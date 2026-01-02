@@ -27,8 +27,30 @@ jobs:
           server-dir: ${{ secrets.FTP_TEST_PATH }}
           local-dir: ./
           exclude: |
-            **
-            !index.php
+            **/.git*
+            **/.github/**
+            **/.htaccess*
+            **/config.inc.php*
+            **/google1523a7878bc930c6.html*
+            **/installer.php*
+            **/log.html*
+            **/purgecss.config.js*
+            **/test.php*
+            **/node_modules/**
+            **/*.md
+            **/*.mjs
+            **/*.sql
+            **/*.yml
+            **/*.jpeg
+            **/*.xml
+            **/*.pdf
+            **/docs/**
+            **/giocate/**
+            **/imgs/**
+            **/plugins/**
+            **/sounds/**
+            **/statuti/**
+            **/themes/advanced/**
 
       # ======================
       # DEPLOY PRODUZIONE
@@ -45,6 +67,25 @@ jobs:
           exclude: |
             **/.git*
             **/.github/**
+            **/.htaccess*
+            **/config.inc.php*
+            **/google1523a7878bc930c6.html*
+            **/installer.php*
+            **/log.html*
+            **/purgecss.config.js*
+            **/test.php*
             **/node_modules/**
             **/*.md
+            **/*.mjs
+            **/*.sql
             **/*.yml
+            **/*.jpeg
+            **/*.xml
+            **/*.pdf
+            **/docs/**
+            **/giocate/**
+            **/imgs/**
+            **/plugins/**
+            **/sounds/**
+            **/statuti/**
+            **/themes/advanced/**
