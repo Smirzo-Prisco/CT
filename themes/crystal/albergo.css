@@ -1,0 +1,15 @@
+.tg  {border-collapse:collapse;border-spacing:0;position:relative; width:550px; margin: 0 auto; margin-bottom:30px;table-layout: fixed;}
+.tg tbody{border: 2px black solid;}
+.tg td{border: 1px black solid;font-family: Lato;font-size:10px;color:#e2e2e2;overflow:hidden;
+  padding:10px 5px;word-break:normal; background: url('imgs/uffici/sfondo_tasto.png');background-repeat: no-repeat; text-align:center; 
+  width:30px; height:20px;background-size: cover; vertical-align: center; filter: drop-shadow(0 0 5px rgba(0,0,0,0.57));}
+.tg th{border-style:solid;border-width:0px;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;
+  overflow:hidden;padding:20px 10px;word-break:normal;background-repeat: no-repeat;}
+.tg .tg-73oq{border-color:#000000;text-align:center;vertical-align:top;}
+
+a:hover{
+	color:white;
+    text-decoration: none;
+}
+
+.tg_no  {border-collapse:collapse;border-spacing:0;position:relative; width:550px; margin: 0 auto; margin-bottom:30px;table-layout: fixed;}

@@ -1,0 +1,211 @@
+::-webkit-scrollbar {
+    border-radius: 5px;
+    width: 5px;
+    background-color: #111;
+    cursor: s-resize;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    cursor: s-resize;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #222;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 5px;
+    background-color: #111;
+    cursor: s-resize;
+}
+
+
+
+/*BREAKING NEWS*/
+
+       /* Contenitore generale */
+        .container_breaking {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Colonna sinistra con le categorie */
+        .left_column_breaking {
+            width: 25%;
+            background-image: url('imgs/documentazione/sfondo_senza_bordino_new.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .left_column_breaking a {
+            color: #ce846f; /* Colore del testo per i link */
+            text-decoration: none; /* Rimuove la sottolineatura dei link */
+        }
+
+        .left_column_breaking a:hover {
+            color: rgba(54, 66, 115, 0.1); /* Colore al passaggio del mouse */
+            text-decoration: none;
+        }
+
+
+        .category_breaking {
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #ce846f;
+            cursor: pointer;
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(151, 155, 165, 0.1);
+            border-radius: 5px;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .category_breaking:hover {
+            background-color: rgba(54, 66, 115, 0.1);
+        }
+
+        /* Contenuto centrale */
+        .content_breaking {
+            width: calc(100% - 40px);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background-color: #14172a;
+            overflow-y: auto;
+        }
+
+        /* Box per incorniciare il contenuto della notizia */
+        .news_content_breaking {
+            width: 100%;
+            background-color: #0f111d;
+            border: 1px solid #000000;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); 
+            border-radius: 8px;
+            color: #8f8f8f;
+            font-size: 16px;
+            line-height: 1.5;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .header_breaking {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: transparent;
+            padding: 0;
+            color: #8f8f8f;
+        }
+        
+        .header_title_breaking {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ce846f;
+        }
+
+        .header_date_breaking {
+            font-size: 12px;
+            color: #ce846f;
+        }
+
+       .text_zone_breaking {
+           font-size: 16px;
+           color: #ce846f;
+           font-weight: bold;
+           text-transform: uppercase;
+       }
+
+        .text_breaking {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #8f8f8f;
+            text-align: justify;
+            line-height: 1.5;
+        }
+
+        /* Stile per il messaggio predefinito */
+        .default_message {
+            text-align: center;
+            color: #8f8f8f;
+            font-size: 18px;
+        }
+
+        .default_image {
+            display: block;
+            margin: 0 auto;
+            max-width: 50%;
+        }
+        
+        .pagination_breaking {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.pagination_breaking a {
+    color: #8f8f8f;
+    margin: 0 5px;
+    text-decoration: none;
+}
+
+.pagination_breaking a:hover {
+    color: #ce846f;
+}
+
+.pagination_breaking strong {
+    color: #ce846f;
+    margin: 0 5px;
+}
+
+
+@keyframes gradientAnimation {
+    0% {
+        background-color: rgba(151, 155, 165, 0.1);
+    }
+    50% {
+        background-color: rgba(151, 155, 165, 0.4);
+    }
+    100% {
+        background-color: rgba(151, 155, 165, 0.1);
+    }
+}
+
+.category_breaking.new {
+    position: relative;
+    animation: gradientAnimation 1.5s infinite;
+    background-color: rgba(151, 155, 165, 0.1); /* Colore iniziale */
+    border-radius: 5px;
+}
+
+.category_breaking.new::before {
+    content: '';
+    position: absolute;
+    top: 10px; /* Posizionamento del pallino */
+    right: -15px; /* Posizionato fuori dal bottone */
+    width: 10px;
+    height: 10px;
+    background-color: #ce846f;
+    border-radius: 50%;
+}
+
+.category_breaking:hover {
+    background-color: rgba(54, 66, 115, 0.1);
+}
+
+.delete_icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    z-index: 10; /* Assicura che sia sopra agli altri elementi */
+}

@@ -1,0 +1,97 @@
+body, ul, li, a{
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.menu{
+  margin: 10px auto;
+  margin-left: auto;
+  margin-right: auto;
+  width: 600px;
+}
+
+.menuItem{
+  width: 120px;
+  height:10px;
+  background-color: #16192b;
+  border: 1px solid #090a10;
+  border-radius: 10px;
+  display: inline-block;  
+  padding: 5px;
+  position: relative;
+  font-size: 11px;
+  color: #8f8f8f;
+  font-family: "DejaVu Sans";
+}
+
+.menuItem:hover{
+ box-shadow: none; 
+}
+
+.subMenu{
+  display: none;
+  left: -1px;
+  position: absolute;
+  top: 20px;
+  z-index: 1;
+  width: 130px;
+  border-radius: 10px;
+  background-color: #16192a;
+  border: 1px solid #090a10;
+}
+
+.subMenuItem{
+  float:none;
+}
+
+.menuItem:hover .subMenu{
+ display: block;
+}
+
+.linkDecoration{
+   font-size: 11px;
+  color: red;
+  font-family: "DejaVu Sans";
+ text-decoration: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media screen and (max-width: 1024px) {
+
+    div.menu_scheda {
+        width: 100%;
+        font-size: 12px;
+    }
+
+}
+
+/* For smaller mobile devices (768px and smaller) */
+@media screen and (max-width: 768px) {
+ 
+    div.menu_scheda {
+        font-size: 11px;
+    }
+
+}
+
+/* For very small mobile devices (480px and smaller) */
+@media screen and (max-width: 480px) {
+
+    div.menu_scheda {
+        font-size: 10px;
+        width: 100%;
+    }
+
+}

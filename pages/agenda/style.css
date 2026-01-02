@@ -1,0 +1,154 @@
+.mainTable {
+	background-color: #0f111d;
+    width: 447px;
+    height: 347px;
+    border-radius: 10px;
+    filter: drop-shadow(0 0 12px rgba(0,0,0,0.57));
+    background-color: #08090d;
+    border: 1px solid #020106;
+    margin: 0px auto;
+}
+
+.monthRow {
+/*	background-image: url("images/monthBg.gif"); */
+	text-align: center;
+	vertical-align: middle;
+	height: 30px;
+    font-size: 15px;
+    font-family: "DejaVu Serif";
+    text-transform: uppercase;
+}
+
+.monthRow a:link, .monthRow a:visited {
+	text-decoration: none;
+    color: #8f8f8f;
+}
+
+.monthRow a:hover {
+	text-decoration: underline;
+	color: #FF0000;
+}
+
+.dayNamesText {
+    /* background-image: url(images/dayBg.gif); */
+    /* background-color: #263256; */
+    text-align: center;    
+    width: 63px;
+    height: 50px;
+    background-color: #131522;
+    border: 1px solid #020106;
+    font-size: 15px;
+    color: #8f8f8f;
+    font-weight: 400;
+    font-family: "DejaVu Serif";
+}
+
+.dayNamesTextToday {
+/*	background-image: url("images/dayBg.gif"); */
+    text-align: center;
+    background-color: #131522;
+    font-size: 15px;
+    color: #8f8f8f;
+    font-family: "DejaVu Serif";
+	width: 63px;
+    height: 50px;
+    border: 1px solid #ce846f;
+
+}
+
+.rows {
+	font-family: Tahoma, Verdana, Arial, sans-serif;
+	font-size: 10px;
+    line-height: 15pt;
+	text-align: center;
+	vertical-align: middle;
+    background-color: #263256;
+    
+}
+
+.sOther {
+    background-color: #EEEEEE;
+	font-family: Tahoma, Verdana, Arial, sans-serif;
+	font-size: 10px;
+	color: #BBBBBB;    
+}
+
+.popupDate {
+    font-size:12px;
+    text-transform:uppercase;
+    color: #8f8f8f;
+    font-family: "DejaVu Serif";
+    width: 175px;
+    border-radius: 10px;
+    background-color: #0b0c14;
+    border: 0px solid #020106;
+    padding: 10px;
+}
+
+.popupDate2 {
+    font-size:12px;
+    text-transform:uppercase;
+    color: #8f8f8f;
+    font-family: "DejaVu Serif";
+    width: 175px;
+    border-radius: 10px;
+    background-color: #0b0c14;
+    border: 1px solid #020106;
+    padding: 10px;
+}
+
+.popupClose {
+    font-family: Geneva, Verdana, Arial, sans-serif; 
+	font-size: 10px;
+	color: #FFFFFF;
+	text-align: right;
+	background-color: #336699;
+}
+
+.popupEventTitle {
+	font-family: Geneva, Verdana, Arial, sans-serif;
+	font-size: 10px;
+	color: #000000;
+	font-weight: bold;
+	padding: 4px;
+	vertical-align: middle;
+	border: 1px solid #EAEAEA;
+	border-bottom: 0px solid #EAEAEA;
+}
+
+.s23 {
+	background-color: #acc0c9;
+	padding: 4px;
+}
+
+.categoryDiv {
+	background-color: #FCF5EF;
+	padding: 4px;
+	border: 1px solid #EAEAEA;
+	border-bottom: 0px solid #EAEAEA;
+}
+
+.categoryName {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+	font-weight: bold;
+	color: #666666;
+}
+
+.categorySelection {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+	font-weight: normal;
+	color: #777777;
+}
+
+.popupEventDescription {
+    font-family: Geneva, Verdana, Arial, sans-serif; 
+	font-size: 10px; 
+	color: #000000;
+	font-weight: normal;
+	background-color: #FFFFFF;
+	border: 1px solid #EAEAEA;
+	padding: 4px;
+    
+}

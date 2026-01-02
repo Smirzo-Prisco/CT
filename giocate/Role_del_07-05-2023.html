@@ -1,0 +1,284 @@
+<!--Force IE6 into quirks mode with this comment tag-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="it" lang="it">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- IE9: mi stai ampiamente rompendo i maroni. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="shortcut icon" href="favicon.png" type="image/png" />
+    <link rel="stylesheet" href="themes/crystal/homepage.css" type="text/css" />
+    <link rel="stylesheet" href="themes/crystal/main.css" type="text/css" />
+    <link rel="stylesheet" href="themes/crystal/chat.css" type="text/css" />
+    <link rel="stylesheet" href="themes/crystal/presenti.css" type="text/css" />
+    <link rel="stylesheet" href="themes/crystal/scheda.css" type="text/css" />
+    <link rel="stylesheet" href="themes/crystal/messaggi.css" type="text/css" />
+    <link rel="stylesheet" href="themes/crystal/forum.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+            <link rel="stylesheet" href="layouts/left-right_frames.php?css=true" type="text/css" />
+            <title>
+        Crystal Tokyo    </title>
+    </head>
+<body class="main_body">
+        
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="it" lang="it">
+        <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+        <link rel="stylesheet" href="../themes/crystal/presenti.css" TYPE="text/css">
+        <link rel="stylesheet" href="../themes/crystal/main.css" TYPE="text/css">
+        <link rel="stylesheet" href="../themes/crystal/chat.css" TYPE="text/css">
+        
+        <script language="Javascript">
+function SaveToDisk(fileURL, fileName) {
+    // for non-IE
+    if (!window.ActiveXObject) {
+        var save = document.createElement('a');
+        save.href = 'chat_download_scelta.proc.php';
+        save.target = '_blank';
+        save.download = fileName || 'Role del 07-05-2023.html';
+
+        var event = new MouseEvent('click');
+        // event.initEvent('click', true, true);
+        save.dispatchEvent(event);
+        (window.URL || window.webkitURL).revokeObjectURL(save.href);
+    }
+
+    // for IE
+    else if ( !! window.ActiveXObject && document.execCommand)     {
+        var _window = window.open(fileURL, '_blank');
+        _window.document.close();
+        _window.document.execCommand('SaveAs', true, fileName || fileURL);
+        _window.close();
+    }
+}
+</script>
+
+<style type="text/css">
+body {
+    padding: 0;
+    margin: 0;
+    color: #b4b6bf;
+    font-family: Verdana, Sans;
+    font-size: 11px;
+    background-color: #111423;
+}
+iframe.iframe_chat {
+    border: none;
+    width: 1px;
+    height: 1px;
+    margin: 0px;
+    }
+
+div.chat_window {
+    text-align: center;
+}
+
+/**	* Fix per layout elastico
+	* @author Blancks
+*/
+div.chat_box {
+    position: absolute;
+    top: 50px;
+    bottom: 120px;
+    left: 10px;
+    right: 10px;
+
+    overflow: auto;
+    font-size: 16px;
+    text-align: left;
+}
+
+div.pagina_frame_chat div.page_body div.panels_box {
+    position: absolute;
+    bottom: 9px;
+    left: 5px;
+    right: 5px;
+}
+
+/**	* Fine fix */
+
+/** * Avatar di chat
+	* @author Blancks
+*/
+img.chat_avatar {
+    margin: 8px;
+    display: block;
+    float: left;
+    position: relative;
+}
+
+/***** testo della chat *****/
+
+/* Tipi messaggio: (A azione, P parlato, N PNG, M Master, X Moderazione, I Immagine, S sussurro, D dado, C skill check, O uso oggetto) */
+
+div.chat_row_A {
+    margin-top: 3px;
+    text-align: justify;
+}
+
+div.chat_row_A span.color2 {
+    margin-top: 3px;
+    color: #000;
+    font-weight: bolder;
+}
+
+div.chat_row_P {
+    margin-top: 3px;
+}
+
+div.chat_row_P span.color2 {
+    margin-top: 3px;
+    color: #000;
+    font-weight: bolder;
+    
+}
+div.chat_row_Z {
+    margin-top: 3px;
+}
+div.chat_row_Z span.color2 {
+    margin-top: 3px;
+    color: blue;
+    font-weight: bold;
+}
+/*  div.chat_row_M {
+    margin-top: 3px;
+    border-width: 2px;
+    border-color: green;
+    border-style: solid;
+    text-align: justify;
+    color: green;
+}
+*/
+
+div.chat_row_M {
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 11px;
+    COLOR: #b4b6bf;
+    TEXT-ALIGN: justify;
+}
+/* div.chat_row_X {
+    margin-top: 3px;
+
+    border-width: 2px;
+    border-color: red;
+    border-style: solid;
+    text-align: center;
+    color: red;
+}
+*/
+div.chat_row_X {
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 11px;
+    COLOR: #b4b6bf;
+    TEXT-ALIGN: justify;
+}
+/*div.chat_row_G {
+    margin-top: 3px;
+
+    border-width: 2px;
+    border-color: green;
+    border-style: solid;
+    text-align: justify;
+    color: green;
+}
+*/
+div.chat_row_G {
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 11px;
+    COLOR: #b4b6bf;
+    TEXT-ALIGN: justify;
+}
+div.chat_row_N {
+    margin-top: 3px;
+}
+
+div.chat_row_N span.color2 {
+    color: #000;
+    font-weight: bolder;
+}
+
+div.chat_row_I {
+    margin-top: 3px;
+    text-align: center;
+}
+
+div.chat_row_S {
+    margin-top: 3px;
+    FONT-SIZE: x-small;
+    COLOR: #000000;
+    BACKGROUND-COLOR: #FFFFFF
+}
+
+/*div.chat_row_D {
+    margin-top: 3px;
+    border-width: 2px;
+    border-color: blue;
+    border-style: solid;
+    color: cyan;
+}
+
+div.chat_row_C {
+    margin-top: 3px;
+    border-width: 2px;
+    border-color: blue;
+    border-style: solid;
+    color: cyan;
+}*/
+
+div.chat_row_D {
+    margin-top: 3px;
+    FONT-WEIGHT: bold;
+    FONT-SIZE: x-small;
+    COLOR: #3267a5;
+}
+
+div.chat_row_C {
+    margin-top: 3px;
+    FONT-WEIGHT: bold;
+    FONT-SIZE: x-small;
+}
+
+span.chat_time {
+    font-size: 10px;
+    font-weight: bolder;
+    margin-right: 3px;
+}
+
+span.chat_name {
+    font-weight: bolder;
+    font-size: 12px;
+    color: #000;
+}
+
+span.chat_msg {
+    color: #b4b6bf;
+    font-size: 11px;     
+}
+
+span.chat_msg_off {
+    color: #a1c3c8;
+    font-size: 10px;
+     
+}
+span.chat_skill {
+    color: #b4b6bf;
+    font-size: 11px; 
+    color: #3267a5;
+}
+span.chat_master {
+}
+
+span.chat_me, span.chat_me_master {
+    text-decoration: underline;
+}
+</style>
+</head>
+
+        <body class="main_body" style="overflow:auto; text-align:justify;">
+        
+        <center><h3><font color='white'><b>Log </b></font></h3>    <br>
+       <input type="submit" href="javascript: void(0)"  onclick="SaveToDisk('fileURL, fileName')" value="Salva" style="font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 10px;font-weight: normal;color: #b4b6bf;background-color: #0a121b;border: 1px solid; border-color:#888888; -moz-border-radius:.4em; border-radius:.4em;vertical-align: bottom;-moz-border-radius: 10px;">
+
+    </center><hr><div class="chat_row_P"><span class="chat_time">15:48</span><span class="chat_msg">Triss: </span> <span class="chat_msg">{[<font color=#7f99bc> Parco Abbandonato </font>]}  L'odore della Pioggia nell'Aria. La percezione certa che scendesse ancor prima di sentirsela battere sulla schiena. E' la posizione comoda a mettere il retro di quel corpo di Strega in mostra, abbandonato su una panchina dopo alcuni tiri di palla tirati ad un Canestro da Basket qualche metro lontano dal punto in cui si trova. Attrattiva dimenticata nel cuore di uno scenario comunque -ad occhio- abbandonato da tempo e senz'altro poco visitato, se non dalla gente della Zona. La Schiena inumidita inizia a farsi sempre più viscida. Zuppa di una sensazione che in realtà va a temperare appena un pò l'umore alquanto lunatico della giornata, eppure soggetto come al solito a cambiamenti che mutano secondo dopo secondo - come i pensieri sempre abbastanza impenetrabili della Marziana. Coperta solamente da una t-shirt sportiva, bianca, strapiena di stelle nere sopra - che lascia nude le braccia e uno spicchio inferiore della pancia sfavillante dal consueto piercing. La posizione assunta, tuttavia va a soffocare il bagliore della piccola pietra che aderisce contro quelle strisce di metallo che fanno da giaciglio al corpo. Sui fianchi un paio di pantaloncini jeansati appaiono sollevati, rivelando la forma tonica dei glutei coperti dal tessuto su cui svetta la simpatica stampa di un Mickey Mouse che manda affanculo il mondo con un bel dito sollevato. Le frange degli scorts solleticano di qualche centimetro anche le gambe anch'esse già percorse dalle gocce d'acqua, mentre se ne sta a caviglie incrociate e sollevate sopra il pallone bloccato sotto ma che sfrutta chiaramente come un sostegno. Sembra inoffensiva a vederla così, ma l'apparenza è sempre una condizione sopravvalutata(?)  vittima di mutazioni a seconda di chi sceglie di passare con lei il proprio tempo. Viziandolo o placandolo. Tormentandolo o eccitandolo, spingendolo forse anche all'eccesso. Anche la chioma nerissima è ormai bagnata. Legata questa volta in un paio di chignon bassi dietro la nuca da cui sfuggono ciuffi, di tanto in tanto, rossicci. Gli oggetti principali li ha tutti in una tracolla lì con lei, solo il cellulare è fuori - avendocelo in mano sotto l'assalto delle dita che sfilano sullo schermo in modo frenetico. Distratta a leggere qualcosa o troppe tutte insieme, dato che lei così fa. Peggio delle accumulatrici seriali che devono poi sbarazzarsi in fretta di qualcosa. Si tiene sui gomiti, mentre con uno sbuffo pare andarsi a liberare del telefono scassone - aprendo improvvisamente un foglio di carta con un ritratto fatto da un passato artista di strada di cui non ha più avuto notizie.</span></div><div class="chat_row_P"><span class="chat_time">16:02</span><span class="chat_msg">Arman: </span> <span class="chat_msg">[<font color=#7f99bc>Parco abbandonato</font>] Acqua le lava via i peccati di questo mondo. O che scioglie il candore da dosso mescolandolo col fango. Pioggia di Primavera che rinvigorisce la terra e l'anima, oppure è solo il cielo che la opprime. Tutto è incerto quando le lacrime cadono, pianti e sorrisi si confondono in maschere sbafate e grottesche. E lui, Signore delle Maschere rotte, invita il mondo ad indossarle. Che ognuna sia diversa e che tutte sia vere. La sua porta i segni da Pagliaccio, ma c'è trucco. Laddove avrebbe dovuto esserci il contorno nero degli occhi ci sono occhiaie vivide e violacee che non colano sotto la pioggia. Dove un sorriso ampio c'è una bocca esangue che resta sospesa, leggermente aperta sotto la forza di una catenina che tira dal collo, intrappolata tra le labbra. Un ciondolo sospeso, uno nuovo che raffigura una strana maschera ed una data. Gioca distratto martoriando con i denti bianchi e le labbra, la maglia metallica da cui il ciondolo penzola. I capelli sono ciocche pesanti e molle, schiacciate sulla fronte e sulle tempie. Ha anche un ombrello l'Arconte, ma è evidente che lo tenga in alto solo per immagine, perchè a volte si inclina un pò troppo tra un passo svogliato e l'atro, lasciando spiragli facili dove la pioggia si infila. Mancano pezzi al suo abito elegante, non c'è una giacca a completare il classicismo di un'epoca distante ed ormai fuori moda. Restano i pantaloni troppo larghi, che fasciano male le gambe slanciate, nascondendo le forme in favore dell'illusione. Stivaletti sporchi di fango, già usurati e martoriati da miglia pregresse. Sopra il panciotto, dello stesso tessuto dei pantaloni, inglese e confezionato su misura in chissà quale secolo passato. La catenina è attaccata al bottone centrale, tintinnando per poi nascondersi nel taschino laterale, dove riposa un orologio. La camicia bianca è come il volto, quasi zuppa e che fa trasparire a tratti le forme nervose, lasciando il colletto fin troppo sbottonato che cade pesante e scomposto. Le maniche arrotolate fino ai gomiti, e bracciali ed anelli che scintillano quando riflettono qualche luce grigia nei dintorni. un cellulare in tasca e solo un coltellino nascosto dentro la vita dei pantaloni, in una cucitura nascosta che lo tiene orizzontale, dietro la schiena. Una mano in tasca mentre sembra avanzare distratto, fissando qualcosa di indefinito su in alto. Spalle curve e prede della gravità, a segnare una figura svogliata o oppressa. Forse è entrambe le cose. E' un sentore che si arrampica alla bocca dello stomaco quello che comincia a corroderlo man mano che circonda il parchetto abbandonato. Ad ogni passo si infittisce il malessere fino a renderlo impossibile da ignorare. Respira ampio, ancora con la catenina tra le labbra mentre si concede il lusso di abbandonare l'attenzione al cielo, per dirigerla sui contorni appannati di ciò che lo circonda. Forse vede qualcosa, e si blocca. La mascella si serra ed il ricordo di un bruciore caldo gli attraversa il petto. Incerto si blocca. Conta i secondi, forse una manciata e poi cambia direzione, avvicinandosi sempre di più a quel veleno che lo attira e lo corrode. Si avvicina a Triss, senza curarsi di essere in alcun modo silenzioso. Semplicemente arriverà quasi sopra al suo corpo disteso, permettendo all'ombrello nero di fare da cupola inefficiente ad entrambi. [<font color=#7f99bc> Mi è venuto un dubbio </font>] mormora [<font color=#7f99bc> Chi segue chi? Sono io che ti seguo o sei tu che insegui me? </font>] dato che sembrano incontrarsi un pò troppo spesso ultimamente. Un sorriso pallido con poca intenzione, mentre si mostrano i segni di unghie piantate sul collo, come piccole mezzelune cremisi che ancora sono fresche,</span></div><div class="chat_row_P"><span class="chat_time">17:05</span><span class="chat_msg">Triss: </span> <span class="chat_msg">{[<font color=#7f99bc> Parco Abbandonato </font>]}  Le palpebre sono sipari calati a metà. Le iridi sotto pieghe di ciglia piangenti e ampie, invece, fumanti e curiose. Perennemente brulicanti di qualcosa. Si accendono con fervore davanti a molte cose anche se -tra quelle- poche le riescono a magnetizzare con successo. Ancor meno quelle che le sanno catturare. Non trovano mai una vera ragione di spegnersi, e di ciò che le smuove dall'interno non sono mai sazie. E se da quando è a Tokyo una sola volta accadde, avvenne nella lotta di una minaccia comune alle famiglie - un Vuoto- che la voleva a tutti i costi deprivare di ogni energia vitale, ma che ottenne in risposta la forza della Custode. Accontentandosi di ingoiare in sè, di lei, ben poca carne recuperata tramite la taumaturgia nel regno delle stelle. E' davvero instancabile il modo in cui Vive di tutto. Ciò di cui si nutre dal prossimo - fluendo in quei momenti rubati, esperienze strappate a giornate mai uguali, avventure sempre differenti. In tutto ciò il foglio che ritrae il suo viso disegnato a carboncino e privo di bocca, si apre tra gli avambracci poco distanti. Pare sopravvivere alla pioggia, che smette di suonare in un silenzio che torna a farsi colmo solo dei suoi sbuffi. Rumorosa. Nel suo viziaccio di farsi sempre sentire. Ma la certezza d'essere sola si scontra con le scelte di quella Hybris in libertà. Si scontra con una volontà che lo muove in quegli istanti - retaggio di un fuoco non soltanto mai scomparso ma che ha scelto fin dal principio di annidarsi al suo interno come un'ustione, uno timbro invisibile tramite cui lasciare traccia di sè senza necessariamente andarlo a scalfire. Forse anche ora che verso lei si va ad avvicinare. La sua Voce è un rintocco che le echeggia in corpo. E ci mette tempo a staccare lo sguardo dalla carta per abbatterlo istintivamente sull'uomo, come in uno stupido accertarsi di averla sentita davvero. Non per l'impossibilità di udirla ancora - quanto, appunto, per la frequenza. Con quelle parole, infatti, Arman fa insolentemente breccia proprio nelle sue stesse perplessità. [<font color=#7f99bc> Oggi sei tu che lo fai. Come anche la prima volta lunapark. Spudorato </font>] stringe la bocca [<font color=#7f99bc> Io sto qui già da un botto .. </font>] Fa spallucce. Rafforzando di proposito il pensiero, con i piedi che smuovendosi vanno a spingere un pò avanti e un pò indietro il pallone così da usarlo come 'scusa' dell'istante e farglielo vedere. Una palla? per nascondere altre palle, chissà. Quelle che ogni tanto si diverte a dire. [<font color=#7f99bc> E' così chiaro no. Ti pare che stavo così tranquilla se il mio obiettivo fosse questo? l'altra volta però si - hm </font>] Lì le scappa un rantolo. Un verso che va di proposito ad alimentare, facendolo sgusciare dal labbro inferiore che si schiude di poco a prendere distanza dal superiore. [<font color=#7f99bc> l'ho fatto io. </font>] Evviva la sincerità. Mezze palle ma anche mezze verità(?) spudorate nel trillare fuori a conquista di un'aria che respirano. Uno spazio che condividono sempre più asfissiante e stretto. Fortuna che non lo ha ancora messo a fuoco: realizzando che è Lui il tizio che porta, con una bellissima naturalezza e un modo di fare del cazzo, la sua collana addosso. Troppe distrazioni. Troppe cose da avere sotto tiro. Le parole, la voce, quelle energie che la spezzano e la ricompongono sul posto all'istante. Non distrugge del tutto la posizione - si sposta solo su un fianco, avvicinando le gambe a sè con tutto il pallone. [<font color=#7f99bc> trascorse bene le ultime notti? con il fuoco a farti compagnia </font>]. E lì la voce viene abbassata, così contraddittoria. Dolce un istante, ma forse anche velenosa quello a seguire. Non è del tutto comprensibile.</span></div><div class="chat_row_P"><span class="chat_time">17:43</span><span class="chat_msg">Arman: </span> <span class="chat_msg">[<font color=#7f99bc>Parco abbandonato</font>] E' tempo di concedersi una lunga occhiata sui contorni di quella ragazza così indifesa all'apparenza, che gioca con troppe cose tutte insieme. Il pallone, il foglio di carte che raffigura un disegno incompleto. Le iridi di ghiaccio scintillano all'ombra dell'ombrello e delle occhiaie, scivolando su tutto il corpo disteso senza preoccuparsi di risultare inopportuno e asfissiante. Ruba i contorni, le forme, i lineamenti che si mostrano quando lei va ad inquadrarlo di rimando. Si sofferma sul foglio, come se la mancanza di quella bocca lo avesse tenuto sospeso in un pensiero fugace. Poi torna a guardarla dall'alto, nella sua posa rilassata con la mano in tasca e l'ombrello ancora alto, sebbene non sembra più necessario. [<font color=#7f99bc> Mi piacciono i pantaloncini </font>] commenta del tutto slegato, dopo aver ascoltato la risposta dell'altra. Si riferisce probabilmente al vaffanculo che il sorcio manda al mondo. Poi si riconnette, aiutato da fuoco lancinante che gli brucia ancora dentro, ricordo che si mescola ad una sensazione ben più viva e corroborante data la vicinanza. Scuote la testa lentamente, come a voler puntualizzare un'imprecisione [<font color=#7f99bc> La prima volta è stata la Sorte, non ti ricordi? </font>] a farli incontrare. Sorride pallido e stanco, nella sua maschera da Giullare struccato e colante. Ancora il ciondolo gli pende da sotto al mento e la catenina tira la pelle. [<font color=#7f99bc> Hai perso questo </font>] afferma lasciandola adesso cadere ed ondulare sul petto per inerzia. [<font color=#7f99bc> O era un regalo? Che significa la data? </font>] chiede senza tanti giri di parole, ammorbidendo in un ghigno l'espressione. Sembra in qualche mondo molto meno avvezzo all'educazione e alla forma verbale, quest'oggi. Svestito della volontà di essere il farabutto mercante che gioca con la realtà. Il volto è più duro, le espressioni troppo forzate e poco convinte. Negli occhi qualcosa giace spento, appannandone l'intensità. Forse è stato quel fuoco, o quello è solo un frammento della rottura. Lei si sposta, gioca con la palla a mostrare le sue "durezze". Lui la segue con lo sguardo, mostrandosi sciolto e rilassato nella postura quanto le fitte lo permettono, e per quanto sia possibile ignorare il richiamo del Mostro che gli ordina Sangue. Poi la stoccata, che brucia sul fondo, quasi come quando l'ha subito. Alza il mento, leggermente, in un ghigno rinnovato. [<font color=#7f99bc> E tu? Come ti sei sentita ad avere il controllo su di me? </font>] gli occhi si assottigliano soddisfatti. [<font color=#7f99bc> Così Arrogante da credere di potermi purificare, piuttosto che uccidermi per difenderti </font>] la testa si inclina, cercando di fargli ricordare quel momento in cui il collo dell'Arconte era tra le sue mani, e lei aveva la sua vita tra le mani. Silenzio, per una manciata di secondi, poi un mormorio basso che si fa intenso [<font color=#7f99bc> Siamo poi così diversi, Triss? </font>] lo chiede, forse perchè se lo domanda lui stesso. O ha già trovato risposta. [<font color=#7f99bc> Cosa siamo ? </font>] lui e lei. Lancaster e Setta. Corvino ed Argento. Ma probabilmente la domanda è più intima, e coinvolge solo i presenti.</span></div><div class="chat_row_P"><span class="chat_time">18:34</span><span class="chat_msg">Triss: </span> <span class="chat_msg">{[<font color=#7f99bc> Parco Abbandonato </font>]}  Il fuoco a fargli compagnia. E tutti gli effetti innestati al suo passaggio - intenti alla fine ad una continua ma serpeggiante stimolazione. Non c'è bisogno di portare Morte lì dove si può voler prendere ciò che è desiderio della mente  percorrendo altre strade. Non c'è bisogno di annichilire Vite, privandosi  così anche di ciò che comporterebbe una qualche trasformazione di uno dei Due stabilita da che definizione riuscirebbero a darsi, insieme, in quella scacchiera dove la Sorte muove le pedine. Aiuta a unire o a dividere letteralmente. C'è la capacità però di potersi ancora sorprendere. Sperimentare possibilità tutt'altro che effimera, ma reale, di una nuova percezione delle cose. Visioni diverse, con occhi diversi. Ma cosa diciamo di quella perfezione? possono essere le cose che - anche per un millesimo istante gli ha fatto sentire- essere meno perfette di tutte quelle che in un tempo che lei neppure conosce gli hanno voluto inculcare. Sono Domande che occupano vuoti, colmano lontananze ora distrutte. Riflessioni che oscillano su quel filo come ha oscillato un pò la Custode, e come adesso forse oscilla lui. Anyway come Arman si è lasciato colpire da quel dettaglio mancante -protagonista, come possono essere due occhi- in quel Volto letteralmente 'gemello' al suo se non fosse fatto di un carbone che traccia delle linee, Lei pare non essersi lasciata troppo prendere da frivolezze di contorno andandosi dapprima a focalizzare sulle sue Occhiaie e poi su quei cazzo di segni sulla sua pelle. Le pupille diventano voragini sulla superficie di una Luna che non viene vista oggi nelle sue vesti più tossiche, ma forse immaginata in altre. Umane - tanto per cominciare. Che le provocano qualcosa di invisibile, interno. Qualcosa che non vorrebbe spiegare a nessuno e forse neanche saprebbe come. [<font color=#7f99bc>.. non mi hai risposto ma non ce n'è bisogno. </font>] Ora che lo guarda con l'intensità che avrebbe un raggio di sole di fondere un oggetto troppo esposto alla sua scia. Lo rimbecca. Non facendosi discreta a rimanere su quelle tracce che la disturbano, profondamente, forse per una ragione o forse mille altre. Tra queste? semmai anche solo il fatto di non essere stata lei a procurargliele. Una cosa ai limiti dell'insano? si. [<font color=#7f99bc> chi è stato? </font>] Diretta anche lei, senza troppi giri. Così volubile e così speculare a colui che ha davanti - respirandolo a tratti diverso in effetti, in nuovi abiti. [<font color=#7f99bc> ormai chiariscimi direttamente questo </font>]. E lì si forza a tendere le labbra in un sorriso, per stemprare l'aria. Forza ciò che non le viene di fare: sminuire ciò che la colpisce. [<font color=#7f99bc> Non sono quelli di un Animale. Ma di qualcuno che sembra volerti molto bene. </font>] Lei li riconosce gli Animali, lei sa cosa significhi portare addosso i loro squarci. La bestialità dei loro artigli. Inoltre in quel modo di parlare pare essere chiaramente ironica - facendo passare il bene per il male, a quanto pare. [<font color=#7f99bc> giusto, la Sorte </font>]. Quella che gioca con loro o forse vuole solo sfidarli ad essere in milioni di altri modi, o anche solo Uno, in cui possono decodificarsi. [<font color=#7f99bc> What a fuck. Ora è così che si fa? spacciamo per regali le cose che ti rubi tu </font>]. E' seria? non è chiaro. Forse non in questo, non così. Ma è stato palese il sobbalzo nel vedergliela attaccata addosso. [<font color=#7f99bc> stavo per raggiungere il magma del sottosuolo e per prosciugare a tratti qualche Oceano pur di trovarla. Fanculo. </font>] I suoi fanculi randomici? ogni tanto, come il topo sopra il suo culo. [<font color=#7f99bc> ...ah si? perchè è coglione come me? coglione con sentimento </font>] Chiede, immaginando che l'apprezzamento possa limitarsi in effetti a Topolino. Senza immaginare altro. Anche se da come ha notato guardarla potrebbe pure esserci altro ma non si lascia ancora sfiorare il cervello. [<font color=#7f99bc> Se ti siedi magari te lo dico </font>] Qualche risposta fuori dal Cilindro riuscirà a tirarla fuori? su come si è sentita con quel Controllo su di lui. [<font color=#7f99bc> Non è stato solo Controllo per me. </font>] Non è stato un cazzo di gioco. [<font color=#7f99bc> ma il tuo? quando mi sei volutamente apparso dietro dopo avermi vista scegliere la gobba posteriore per il pregiudizio su qualche scherzetto che mi potevi tirare. </font>] Si addenta il labbro sottostante. [<font color=#7f99bc> Hai ragione siamo più simili di quanto i nostri spiriti contemplano. Da sempre, dal primo istante. Ed è un problema. Stavolta lo è di più </font>]. E' qualcosa che devono capire come affrontare prima che sfugga di mano. O vogliono permettere che sfugga? è questo il punto. </span></div><div class="chat_row_P"><span class="chat_time">09:08</span><span class="chat_msg">Triss: </span> <span class="chat_msg">{[<font color=#7f99bc> Parco Abbandonato </font>]} ll fuoco a fargli compagnia. E tutti gli effetti innestati al suo passaggio - intenti alla fine ad una continua ma serpeggiante stimolazione. Non c'è bisogno di portare Morte lì dove si può voler prendere ciò che è desiderio della mente  percorrendo altre strade. Non c'è bisogno di annichilire Vite, privandosi  così anche di ciò che comporterebbe una qualche trasformazione di uno dei Due stabilita da che definizione riuscirebbero a darsi, insieme, in quella scacchiera dove la Sorte muove le pedine. Aiuta a unire o a dividere letteralmente. C'è la capacità però di potersi ancora sorprendere. Sperimentare possibilità tutt'altro che effimera, ma reale, di una nuova percezione delle cose. Visioni diverse, con occhi diversi. Ma cosa diciamo di quella perfezione? possono essere le cose che - anche per un millesimo istante gli ha fatto sentire- essere meno perfette di tutte quelle che in un tempo che lei neppure conosce gli hanno voluto inculcare. Sono Domande che occupano vuoti, colmano lontananze ora distrutte. Riflessioni che oscillano su quel filo come ha oscillato un pò la Custode, e come adesso forse oscilla lui. Anyway come Arman si è lasciato colpire da quel dettaglio mancante -protagonista, come possono essere due occhi- in quel Volto letteralmente 'gemello' al suo se non fosse fatto di un carbone che traccia delle linee, Lei pare non essersi lasciata troppo prendere da frivolezze di contorno andandosi dapprima a focalizzare sulle sue Occhiaie e poi su quei cazzo di segni sulla sua pelle. Le pupille diventano voragini sulla superficie di una Luna che non viene vista oggi nelle sue vesti più tossiche, ma forse immaginata in altre. Umane - tanto per cominciare. Che le provocano qualcosa di invisibile, interno. Qualcosa che non vorrebbe spiegare a nessuno e forse neanche saprebbe come. [<font color=#7f99bc>.. non mi hai risposto ma non ce n'è bisogno. </font>] Ora che lo guarda con l'intensità che avrebbe un raggio di sole di fondere un oggetto troppo esposto alla sua scia. Lo rimbecca. Non facendosi discreta a rimanere su quelle tracce che la disturbano, profondamente, forse per una ragione o forse mille altre. Tra queste? semmai anche solo il fatto di non essere stata lei a procurargliele. Una cosa ai limiti dell'insano? si. [<font color=#7f99bc> chi è stato? </font>] Diretta anche lei, senza troppi giri. Così volubile e così speculare a colui che ha davanti - respirandolo a tratti diverso in effetti, in nuovi abiti. [<font color=#7f99bc> ormai chiariscimi direttamente questo </font>]. E lì si forza a tendere le labbra in un sorriso, per stemprare l'aria. Forza ciò che non le viene di fare: sminuire ciò che la colpisce. [<font color=#7f99bc> Non sono quelli di un Animale. Ma di qualcuno che sembra volerti molto bene. </font>] Lei li riconosce gli Animali, lei sa cosa significhi portare addosso i loro squarci. La bestialità dei loro artigli. Inoltre in quel modo di parlare pare essere chiaramente ironica - facendo passare il bene per il male, a quanto pare. [<font color=#7f99bc> giusto, la Sorte </font>]. Quella che gioca con loro o forse vuole solo sfidarli ad essere in milioni di altri modi, o anche solo Uno, in cui possono decodificarsi. [<font color=#7f99bc> What a fuck. Ora è così che si fa? spacciamo per regali le cose che ti rubi tu </font>]. E' seria? non è chiaro. Forse non in questo, non così. Ma è stato palese il sobbalzo nel vedergliela attaccata addosso. [<font color=#7f99bc> stavo per raggiungere il magma del sottosuolo e per prosciugare a tratti qualche Oceano pur di trovarla. Fanculo. </font>] I suoi fanculi randomici? ogni tanto, come il topo sopra il suo culo. [<font color=#7f99bc> ...ah si? perchè è coglione come me? coglione con sentimento </font>] Chiede, immaginando che l'apprezzamento possa limitarsi in effetti a Topolino. Senza immaginare altro. Anche se da come ha notato guardarla potrebbe pure esserci altro ma non si lascia ancora sfiorare il cervello. [<font color=#7f99bc> Se ti siedi magari te lo dico </font>] Qualche risposta fuori dal Cilindro riuscirà a tirarla fuori? su come si è sentita con quel Controllo su di lui. [<font color=#7f99bc> Non è stato solo Controllo per me. </font>] Non è stato un cazzo di gioco. [<font color=#7f99bc> ma il tuo? quando mi sei volutamente apparso dietro dopo avermi vista scegliere la gobba posteriore per il pregiudizio su qualche scherzetto che mi potevi tirare. </font>] Si addenta il labbro sottostante. [<font color=#7f99bc> Hai ragione siamo più simili di quanto i nostri spiriti contemplano. Da sempre, dal primo istante. Ed è un problema. Stavolta lo è di più </font>]. E' qualcosa che devono capire come affrontare prima che sfugga di mano. O vogliono permettere che sfugga? è questo il punto. </span></div><div class="chat_row_P"><span class="chat_time">10:04</span><span class="chat_msg">Arman: </span> <span class="chat_msg">[<font color=#7f99bc>Parco abbandonato</font>] Una distanza giusta, quella tra i due. Non perfetta, ma che rappresenta lo stato delle cose, sia fisiche che in quella strana relazione conoscitiva. Non troppo lontani da rendere impossibile un contatto, che sia fisico, mentale o d'intenti. Non così vicini da sfiorarsi e corrodersi in quella sensazione velenosa. Uno ini piedi e l'altra ancora avvinghiata alla panchina. I ruoli non son però definiti, chi è in piedi non è quello che sta dominando. Vittima, nel loro ultimo incontro, di un fuoco che lo ha corroso e curato allo stesso tempo. L'anima della Custode che si è creata un vaco, cauterizzando l'icore di un abisso corrotto. Non ha risposto, l'Arconte, lo sa bene. Ma non ribatte lasciando scivolare il discorso mentre un sopracciglio di inarca curioso. La stizza di Triss nel vederlo ferito apre spazio ad una nuova curiosità [<font color=#7f99bc> Sei gelosa? </font>] domanda sulla scia di un sorriso che si apre affilato. [<font color=#7f99bc> Tutti mi vogliono bene Triss. Io sono un Giullare di corte e a tutti piacciono i giullari </font>] o forse sarebbe il caso che la smettesse di farsi prendere per il collo così spesso. [<font color=#7f99bc> Comunque non è niente di serio, slo una piccola divergenza di vedute </font>] liquidando 'accaduto senza dargli troppo peso. Forse abituato a scontrarsi e provocare. La sequela di lingue che si mescolano nella bocca della Custode gli provoca quasi una risata divertita, ma quasi. [<font color=#7f99bc> Se è così importante, perchè me lo hai dato? </font>] e si, secondo l'Arconte quello è proprio un dono. O comunque ormai è roba sua [<font color=#7f99bc> E comunque rispetto a quello che mi hai fatto, direi che non siamo neanche lontanamente pari, no? </font>] furbetto bastardo. Per quanto riguarda il sorcio irriverente sulla natica della ragazza, beh, non che sia più apprezzabile del gluteo che gli sta sotto, ma non c'è briciolo di malizia nella sua espressione nel parlarne, e ne quando ci ha poggiato gli occhi sopra. [<font color=#7f99bc> Ti permette di mandare a quel paese due persona alla stesso tempo, una davanti ed una dietro </font>] una ce la mandi tu e l'altra il topo [<font color=#7f99bc> E' funzionale </font>] ammette con un'alzatina di spalle. Poi giunge l'invito a sedersi, avvicinarsi e di nuovo il fuoco riapre uno squarcio nel petto. Un respiro profondo che cerca di donare pace e decisione alla mente. Ancora non si muove però, con i suo ombrello tirato su e lo sguardo leggermente in basso su di lei [<font color=#7f99bc> Perchè dovrebbe esserlo? </font>] un problema. E non è chiaro se stia scherzando, se sia un totale idiota che non si rende conto della situazione o semplicemente non voglia accettarla. Quindi fa un passo fino a ritrovarsi quasi a contatto con la panchina con gli stinchi. Non si siede, ma si accuccia piegando completamente le gambe e portando tutto il peso sulle punte del piedi, con i talloni che fanno da sedia. La differenza d'altezza si azzera e non è tanta la distanza tra i corpi ed i volti. Gesti lenti, calibrati, misurati.[<font color=#7f99bc> Ti ho solo fatto vedere che i tuoi calcoli non funzionano con me </font>] riguardo lo scherzetto e il tentativo di lei di togliersi da qualche problema, scegliendo la gobba posteriore, invano. Un animale a caccia o che non vuole allertare la preda. "Sono simili" [<font color=#7f99bc> Questo non puoi ancora saperlo, Triss </font>] appena un sussurro. [<font color=#7f99bc> Mi hai mostrato parte di te </font>] quel fuoco [<font color=#7f99bc> Ma non conosci quale sia il Caos che mi alimenta. </font>] il collo guadagna qualche centimetro, non per un motivo in particolare, solo per l'abitudine di osservare sempre più da vicino. la fissa senza battere ciglio. [<font color=#7f99bc> Siamo solo lievi differenze, ma separate da un abisso messo da qualcun altro </font>] questa è la sua visione. Simili ma separati da una distanza incolmabile. [<font color=#7f99bc> Vuoi vedere che colori ha il mondo visto dall'altra parte? </font>] la invita, senza forza. Ciò che vede lui, qualcosa che lei non può aver visto, neanche nel Caos dato dall'equilibrio.</span></div><div class="chat_row_P"><span class="chat_time">11:43</span><span class="chat_msg">Triss: </span> <span class="chat_msg">{[<font color=#7f99bc> Parco Abbandonato </font>]} Impigrita o forse solo congelata nel vestito di una tranquillità che si concede all'attenzione altrui senza ritegno. E' giusto che stiano così, in quel limbo dove tutto può scorrere come sta scorrendo - nel ventre di quel cratere che ribolle inesploso. O forse è dannatamente sbagliato. Come se alla fine l'atto sferrato a quelle forme inutili di controllo, si rivelasse sempre il pensiero più sensato. O il più efficace a permettersi di scivolare con tutte le proprie radici nell'una o nell'altro. Anyway a quel 'sei gelosa' segue la sua risposta più cruda. Un silenzio, condito da occhi che nella presa incandescente lo hanno agganciato senza sbattere più. Una carezza per lui o un colpo sordo. Un pugno nello stomaco a reazione del suo sorriso, che si prolunga per un tempo indefinito e denso. Al punto che ciò che non viene detto può non esistere affatto o, invece, fare più rumore di due corpi celesti che si abbattono in una traiettoria che non vuole dare scampo. [<font color=#7f99bc> Ti vedo diverso dall'ultima volta </font>]. Una riflessione fatta di voce e consistenza prende forma solo dopo minuti, scavalcando le curiosità sulla gelosia - portandola a non ammettere deviazioni da quella 'realtà' che ha finalmente potuto assaggiare oggi. Tanto bramata. Ora sempre più vicina, all'approssimarsi di Lui alla panchina. A portata di centimetri. [<font color=#7f99bc> non c'è bisogno di tenere alti i muri che del tutto o in una minima parte crollati ed è rispondendo esattamente come mi hai risposto che provi a rimetterli, ti rincateni di nuovo, ti trattieni </font>]. In riferimento esteso quel ' tutti ' quando Lei -alla fine- aveva solo chiesto un ' chi '. Aridità nel tono. Le labbra, nonostante gocce d'acqua cadute sui loro contorni, sembrano asciugarsi. Lo Sguardo spaccato, che distrugge il contatto. Sradicandosi in un'impennata di violenza da quel volto l'attimo dopo. E forse non è un caso se l'istinto la riporta ad afferrare il foglio riempito da un inquietante disegno, creato da un qualcuno che neanche ha visto più. Ma che l'aveva delineata in questo modo. [<font color=#7f99bc> Hm-hm </font>] Un verso presente o distratto, la sua risposta sui propri shorts con quella bestia di cartone animato sopra. [<font color=#7f99bc> Sei più di adamantio o più paraculo? .. No. Me l'hai rubato. </font>] Il ciondolo. Perchè da una parte c'è lui nella sua ostinatezza a considerarlo un regalo e dall'altra c'è lei che continua a mantenere alta l'impalcatura del furto che dal primo istante gli è montata dentro la testa. [<font color=#7f99bc> E posso prendermelo in qualsiasi momento. </font>] In un attimo davvero. Il senso di farglielo presente? istigarlo, così, a caso. [<font color=#7f99bc> Come fai tu davanti a qualcosa che ti intriga scippare senza il minimo permesso. </font>] Uno scippatore di occhi, oggetti, impulsi, brividi #cose. Altro che giullare. [<font color=#7f99bc>.. Era importante comunque. One year ago. </font>]. Nella marea di domande -wow- pare che alla fine, ad una, inizia davvero a rispondere. E riguarda quella preziosissima kitsune. [<font color=#7f99bc> lo era il giorno che ho fatto incidere perchè da quel giorno tutto è cambiato. Sentivo che riscoprirmi Armitage mi avrebbe fatta cadere dritta dritta nelle fauci del Caos. Chi decantava il suo sacro possesso su di me iniziava a contrastare ogni cosa che parlasse di triss, della natura del suo sangue e di ogni suo cambiamento dopo. Era un cazzo di sesto senso. Ma sentivo che avrei trovato tradimento solo da chi non mi aspettavo. Odio. Che quel cognome dopo la gloria, avrebbe conosciuto macerie e la rovina. Ma è stato in quella caduta che la mia evoluzione ha avuto uno sprint. </font>] Il suo potere. Il suo controllo. [<font color=#7f99bc> Sei stato tu il primo a fiutare l'odore di similitudine </font>]. Fa presente, giusto per rendergli chiaro come sia stato il primo dei due a procedere in quel pensiero. E non lo sapeva. In effetti nessuno può saperlo fino in fondo - ma certe cose non necessitano di troppe spiegazioni quando si sentono. [<font color=#7f99bc> .. Io ho avuto un incontro ravvicinato del quarto tipo con Caos. Milord </font>] Rivela. In un tono leggero che non va a deprivare di intensità quel pensiero confessato. Mentre la carta finisce con l'essere storpiata tra le dita e lasciata sulla panchina, sotto l'acqua nuovamente in caduta dal cielo. [<font color=#7f99bc> l'ho guardato in ogni sua possibile forma. E l'ho sposato in pieno. </font>] Non lo ha cambiato e lo ha integrato. Roba da infarto. Se non è infartata in quel momento, dubito che potrà accadere da qui al prossimo futuro. E sebbene il Caos del Corvino possa tingersi di altre sfumature - alla base, non cambia in lei tutto questo. [<font color=#7f99bc> Un Abisso. Un imposizione che proprio perchè fatta da altri dovrebbe farti rivoltare ancora di più e non darti pace fino al giorno in cui non l'avrai vista annichilirsi sotto di te. </font>] Exactly. Non lo guarda quando accoglie quella proposta. Una frustata nell'aria che la arroventa. Ma che non la fa indugiare. Nè provare paura. [<font color=#7f99bc> Mostrati </font>]. Annuncia. Gli da il permesso di farsi conoscere in lei. [<font color=#7f99bc> .. Ma imboccherai una Via senza ritorno anche tu. </font>] Non più solo Lei - non più solo Lui. Ci finiranno dentro insieme. E sarà un problema, davvero. Il più grande mai sperimentato.</span></div><div class="chat_row_P"><span class="chat_time">12:36</span><span class="chat_msg">Arman: </span> <span class="chat_msg">[<font color=#7f99bc>Parco abbandonato</font>] Il fuoco di uno sguardo che promette e condanna. Si fissa nelle iridi candide dell'Arconte che dona solo una freddezza spietata e senza confini. Il silenzio può significare molto, ma mai niente. Le pause raccontano una storia così come l'assenza, forse più del rumore che il mondo fa per nascondersi. Un sorriso più caldo mentre sembra essere arrivato ad una conclusione che è solo sua. [<font color=#7f99bc>Lo sono </font>] diverso. Un'altra maschera? o ne è privo? Molte sono quelle del Mercante e spesso non mostra mai la stessa. Ormai accucciato si riserva il diritto di parlare ad una distanza che è quasi assente, coe se ci fosse un segreto da tenere nascosto. All'Argento, al Corvino, al mondo. [<font color=#7f99bc> Ma è solo un'altra faccia della stessa Luna. Non ho forma, Triss. E non voglio averne solo una </font>] l'Arroganza di voler essere tutto e niente. Qualcosa che nessuno è mai stato o ha mai visto. Intangibile come un'idea che si fa breccia e si insedia nella mente di chi lo incontra. Il rimbrotto viene così accolto, concedendogli una verità che l'altra voleva, una parte di lui che non sembra essere solo una filastrocca creata ad hoc. Gli occhi raccontano una verità che no si nasconde, questo è ciò che vuole per se stesso. Ancora un sorriso mentre la mano libera dall'ombrello va a prendere il ciondolo tra le dita per alzarlo leggermente fino a sotto il mento [<font color=#7f99bc> Potresti </font>] riprenderlo in qualunque momento [<font color=#7f99bc> Ma vuoi? </font>] assecondando il gioco della Sorte che ha voluto finisse nelle sue mani. E vale per tutto, per i brividi, per gli sguardi, perfino per il malsano dolore che ancora li corrode per quella vicinanza dissacrante. [<font color=#7f99bc> Io prendo sempre tutto ciò che voglio. Prima o poi </font>] e si mostra il bagliore di Hybris negli occhi. Oro liquido e maledetto che cola sul ghiaccio spaccando la patina senza vita delle iridi. E' un Mostro che corrode e lo vuole sopra ad ogni cosa, padrone del mondo. Poi si inclina la testa, ascoltando attentamente il vissuto ed il significato di quella data incisa dietro. L'altra afferra il disegno, martoriandolo tra le mani. Le fissa, quelle mani, e con una lentezza disarmante cerca di avvicinare la sua. Ne prenderebbe una con un tocco flebile quanto inconsistente, volendo staccarla dal foglio per avvicinarla al suo collo. Oltre la il ciondolo e la catenina, andando a toccare le ferite che sono unghie sulla pelle. [<font color=#7f99bc> E' stata tua sorella </font>] soffia, senza che ci sia odio, gratitudine, stizza o sete di vendetta.Agganciandosi a quel cognome sputato fuori da triss. Solo la realtà dei fatti in una concezione atona dell'accaduto. A lei scegliere l'emozione che questa informazione suscita. Forse nulla, o forse tutto. Non sposterebbe ancora la mano, se questa è stata concessa. Assimila e cerca nel fuoco di quello sguardo mentre il bagliore dorato scompare di nuovo in favore dell'algido riflesso. Lei ha sposato Caos, ma quale? Quello che è uscito fuori dal suo passato e che ancora la ferisce? Non quello di Hybris. Poi un cenno affermativo con la testa [<font color=#7f99bc> E' per questo che siamo qui </font>] senza che l'Arconte l'abbia ancora sfiorata con un dito, che non sia illusorio. Perchè non ci sono leggi che possano impedirgli di fare qualcosa. Perchè il Corvino stesso lo vuole Ribelle in ogni sua forma, anche contro di lui. Le dice di mostrarsi, le dice che sanno persi in una strada non battuta. Sorride di nuovo, ma c'è la malsana espressione di voler infrangere un altro Tabù. Un'altra legge ancora. [<font color=#7f99bc> Ci divoreremo l'un l'altra, Triss. Saranno forze che si scontrano, dove la più forte ingloberà l'altra.  Uno dei due perderà se stesso, alla fine </font>] perchè nel Caos non c'è compromesso, non nel suo. E' la pulsione più malsana, che finisce per ferire, soffocare ed annientare tutto ciò che si avvicina. E' uno scontro di volontà e fede in se stessi. Ed un ultimo sguardo come a dare spazio per un dietro front. un ripensamento se l'altra lo vuole. Ma dura un secondo perchè il Sangue si agita, il Vizio traborda alla ricerca di quello presente in Triss, per risvegliarlo. Gli donerà l'Arroganza dei primi peccatori. Coloro che sfidarono Dio stesso, il Cristallo e loro stessi per seguire le loro voglie, bramosie e volontà. Sentirà il Vizio arrampicarsi come un morbo dall'Abisso ed inondarla. Sarà l'assoluta convinzione di essere Sopra ad ogni cosa. La tracotanza di potere tutto, perfino rinnegare ogni catena imposta da secoli di guerre. Così come l'Arconte vede il mondo. Possibilità infinite che lui stesso comanda, sceglie e plasma per il resto del mondo. E' la Ribellione nel suo stato più puro. Contro tutto e contro ogni vincolo e catena. Il Dominio sulla realtà, senza compromessi. [<font color=#7f99bc> Mostrami com'è un Drago in fiamme, quando scopre di essere sopra agli Dei </font>] lo sussurra, avvicinandosi a pochi centimetri. E' malsana voglia di scoprire se esiste veramente una via per tornare. O se uno dei due, condurrà l'altro sulla propria strada.</span></div><div class="chat_row_C"><span class="chat_time">12:36</span><span class="chat_msg">Arman usa la skill mentale Vitium di livello 3 verso <u>Triss</u><font color="#b4b6bf">(<a href="#" onclick="changeFrame('skill_desc.proc.php?id=457');document.getElementById('id01').style.display='block'">Leggi</a>)</font></span></div><div class="chat_row_C"><span class="chat_time">12:36</span><span class="chat_msg">Arman esegue un tiro totale di mente di 27 </span></div><div class="chat_row_C"><span class="chat_time">13:38</span><span class="chat_msg">Triss esegue un tiro totale di 17/20</span></div><div class="chat_row_P"><span class="chat_time">13:38</span><span class="chat_msg">Triss: </span> <span class="chat_msg">( Azioni finali per MP )</span></div><div class="chat_row_C"><span class="chat_time">13:01</span><span class="chat_msg">Arman esegue un tiro totale di destrezza di 11.5 </span></div><div class="chat_row_C"><span class="chat_time">13:21</span><span class="chat_msg">Triss esegue un tiro totale di destrezza di 18.5 </span></div>

@@ -1,0 +1,294 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	background-color: #111423;
+}
+#contenitore {
+	height: 460px;
+	width: 1100px;
+	margin-right: auto;
+	margin-left: auto;
+	position: static;
+	left: auto;
+	right: auto;
+	background-position: center center;
+	margin-top: auto;
+}
+
+#menu {
+	background-color: #072c37;
+	color: #b1d9e5;
+	font-family: Tahoma,Geneva,sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: bold;
+	height: 20px;
+	letter-spacing: 4px;
+	line-height: 20px;
+	position: absolute;
+	text-align: center;
+	top: 465px;
+	width: 600px;
+	background-position: center bottom;
+	left: auto;
+	border-bottom-style: dotted;
+	border-bottom-width: 1px;
+	border-bottom-color: #b1d9e5;
+}
+
+#mask { 
+	position:absolute; 
+	left:0; top:0; 
+	z-index:9000; 
+	background-color:#000; 
+	display:none; 
+}
+
+#box .window { 
+	position:fixed; 
+	left:0;
+	top:0; 
+	width:500px; 	
+	height:200px; 
+	display:none; 
+	z-index:9999; 
+	padding:20px; 
+}
+
+.titoletti {
+	font-family: Dejavu serif;
+	font-size: 13px;
+	font-weight: bold;
+	text-transform: uppercase;
+	color: #9a6353;
+	letter-spacing: 4px;
+    text-align:center;
+}
+
+#box #dialog {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+
+#box #dialog2 {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+
+#box #dialog3 {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+
+#box #dialog4 {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+
+#box #dialog5 {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+
+#box #dialog6 {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+
+#box #dialog7 {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+
+#box #dialog8 {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+
+#box #dialog9 {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+
+#box #dialog10 {
+	width:500px;
+	height:550px;
+	padding:10px;
+	font-family: Dejavu sans;
+	font-size: 11px;
+	line-height: 13px;
+	background-color: #0f111d;
+	color: #a3a3a3;
+	overflow: auto;
+	text-align: justify;
+	border: 1px dotted #9a6353;
+    border-radius:10px;
+}
+a:link {
+	text-decoration: none; /*come è il test normalmente*/
+	color: #b1d9e5;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+a:visited {
+	text-decoration: none; /*come resta il testo dopo averci cliccato*/
+	color: #b1d9e5;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+a:hover {
+	text-decoration: underline overline; /*come è i testo quando ci si passa sopra col mouse*/
+	color: #b1d9e5;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+a:active {
+	text-decoration: overline; /*come è il testo mentre si clicca*/
+	color: #b1d9e5;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+
+
+p.talenti {
+	font-family: Dejavu serif;
+	font-size: 11px;
+	font-weight: bold;
+	text-transform: uppercase;
+	color: #9a6353;
+	letter-spacing: 2px;
+    text-align: center;
+    border-bottom: 1px dashed #9a6353;
+}
+
+span.nomitalenti {
+	font-family: Dejavu sans;
+	font-size: 11px;
+	text-transform: uppercase;
+	color: #9a6353;
+	letter-spacing: 0px;
+    font-weight:bold;
+}
+
+span.livello {
+font-family: Dejavu sans;
+text-transform: uppercase;
+color:#8f8f8f;
+font-weight: bold;
+border-bottom:1px dashed #8f8f8f;
+}
+
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+          background-color:#8f8f8f;
+    } /* colore di sfondo delle scrollbar */
+
+    ::-webkit-scrollbar-thumb {
+          background-color: #9a6353;
+    }
+
+    ::-webkit-scrollbar-corner {
+          background-color: #9a6353;
+          }

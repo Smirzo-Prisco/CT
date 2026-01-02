@@ -1,0 +1,1195 @@
+/* STILE DELLA CHAT E DEI PANNELLI */
+
+/* HELP: Da qui Ã¨ possibile modificare:
+- I font ed i colori della chat
+- Le dimensioni e la posizione della chat
+- Lo sfondo della chat */
+
+div.chat_box {
+    position: absolute;
+    top: 0;        /* Mantieni o aumenta leggermente questo valore */
+    bottom: 180px;    /* Aumenta questo valore per ridurre l'altezza della chat box */
+    left: 10px;
+    overflow: auto;
+    font-size: 16px;
+    text-align: justify;
+}
+
+
+div.pagina_frame_chat div.page_body div.panels_box {
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+    right: 10px;
+}
+
+/**	* Fine fix */
+
+/** * Avatar di chat
+	* @author Blancks
+*/
+img.chat_avatar {
+    margin: 8px;
+    display: block;
+    float: left;
+    position: relative;
+}
+
+/***** testo della chat *****/
+
+/* Tipi messaggio: (A azione, P parlato, N PNG, M Master, X Moderazione, I Immagine, S sussurro, D dado, C skill check, O uso oggetto) */
+
+div.chat_row_A {
+    margin-top: 3px;
+    text-align: justify;
+}
+
+div.chat_row_A span.color2 {
+    margin-top: 3px;
+    color: #000;
+    font-weight: bolder;
+}
+
+div.chat_row_P {
+    margin-top: 3px;
+    text-align: justify;
+    padding: 0 10px 0 0;
+}
+
+div.chat_row_P span.color2 {
+    margin-top: 3px;
+    color: #000;
+    
+}
+
+div.chat_row_Z {
+    margin-top: 3px;
+}
+
+div.chat_row_Z span.color2 {
+    margin-top: 3px;
+    color: blue;
+    font-weight: bold;
+}
+
+/*  div.chat_row_M {
+    margin-top: 3px;
+    border-width: 2px;
+    border-color: green;
+    border-style: solid;
+    text-align: justify;
+    color: green;
+}
+*/
+
+div.chat_row_M {
+    FONT-SIZE: 11px;
+    COLOR: #b4b6bf;
+    TEXT-ALIGN: justify;
+}
+
+/* div.chat_row_X {
+    margin-top: 3px;
+
+    border-width: 2px;
+    border-color: red;
+    border-style: solid;
+    text-align: center;
+    color: red;
+}
+*/
+div.chat_row_X {
+    FONT-SIZE: 11px;
+    COLOR: #b4b6bf;
+    TEXT-ALIGN: justify;
+}
+
+/* div.chat_row_G {
+    margin-top: 3px;
+
+    border-width: 2px;
+    border-color: green;
+    border-style: solid;
+    text-align: justify;
+    color: green;
+}
+*/
+div.chat_row_G {
+    FONT-SIZE: 11px;
+    COLOR: #b4b6bf;
+    TEXT-ALIGN: justify;
+}
+
+div.chat_row_N {
+    margin-top: 3px;
+}
+
+div.chat_row_N span.color2 {
+    color: #000;
+    font-weight: bolder;
+}
+
+div.chat_row_I {
+    margin-top: 3px;
+    text-align: center;
+}
+
+div.chat_row_Y {
+    margin-top: 3px;
+    text-align: center;
+}
+
+div.chat_row_S {
+    margin-top: 3px;
+    font-size: 13px;
+    font-family: "DejaVu Serif", serif;
+    color: #ffd28a;
+}
+
+div.chat_row_Q {
+    margin-top: 3px;
+    font-size: 13px;
+    font-family: "DejaVu Serif", serif;
+    color: #ffd28a;
+}
+
+div.chat_row_D {
+    margin-top: 3px;
+    FONT-WEIGHT: bold;
+    FONT-SIZE: x-small;
+    COLOR: #3267a5;
+}
+
+div.chat_row_C {
+    margin-top: 3px;
+    FONT-WEIGHT: bold;
+    FONT-SIZE: x-small;
+}
+
+span.chat_sussurro {
+    font-size: 13px;
+    font-family: "DejaVu Serif", serif;
+    color: #ffd28a;    
+}
+
+span.chat_time {
+    font-size: 13px;
+    color: #a7a7a8;
+    font-family: "DejaVu Serif", serif;
+    margin-right: 3px;
+}
+
+span.chat_name {
+    font-size: 13px;
+    color: #a7a7a8;
+    font-family: "DejaVu Serif", serif;
+    text-align: justify;
+    
+}
+
+span.chat_msg {
+    color: #a7a7a8;
+    font-size: 15px; 
+    font-family: "DejaVu Serif", serif;
+    text-align: justify;    
+}
+
+span.chat_msg_off {
+    color: #a1c3c8;
+    font-size: 12px;
+    font-family: Verdana, Geneva, sans-serif;
+     
+}
+
+span.chat_msg_sussurro {
+    color: #000;
+    font-size: 12px;     
+}
+
+span.chat_skill {
+    font-size: 12px; 
+    color: #3267a5;
+    font-family: Verdana, Geneva, sans-serif;
+}
+
+span.intestazione_moderazione {
+font-size: 14px;
+color: #d7b500;
+font-family: "DejaVu Serif", serif;
+text-align: center;
+filter: drop-shadow(-0.866px 0.5px 6.5px rgb(0 0 0 / 57%));
+text-transform: uppercase;
+}
+
+span.intestazione_master {
+font-size: 15px;
+color: #05a4c1;
+font-family: "DejaVu Serif", serif;
+text-align: center;
+filter: drop-shadow(-0.866px 0.5px 6.5px rgb(0 0 0 / 57%));
+text-transform: uppercase;
+}
+
+span.chat_master {
+    font-size: 16px;
+    color: #a7a7a8;
+    font-family: "DejaVu Serif", serif;
+    text-align: justify;   
+}
+
+span.chat_me, span.chat_me_master {
+    text-decoration: underline dotted #d89d8c;
+    text-transform: uppercase;
+    color: #d89d8c;
+    
+}
+
+/***** form inserimento *****/
+div.form_row {
+    clear: both;
+    text-align: left;
+}
+
+/* Casella Tag */
+input#tag {
+    width: 90px;
+}
+
+/* Casella Messaggio */
+input#message {
+    width: 320px;
+}
+
+input {
+    border: 2px solid #000;
+    border-radius: 4px;
+    background-color: #181c31;
+    color: white;
+    margin-top: 5px;
+    width: auto;
+}
+
+select {
+    border: 2px solid #03060a;
+    border-radius: 4px;
+    background-color: #181c31;
+    color: white;
+    margin-top: 5px;
+    width: auto;
+}
+
+span.casella_info{
+display:none;
+}
+
+/***************************************************************************  */
+#slide {	
+  height: 0;
+  overflow: hidden;
+  transition: 1s height ease-in-out;
+}
+
+#slide_weapon {	
+  height: 0;
+  overflow: hidden;
+  transition: 1s height ease-in-out;
+}
+
+#slide_object {	
+  height: 0;
+  overflow: hidden;
+  transition: 1s height ease-in-out;
+}
+
+#slide_master {	
+  height: 0;
+  overflow: hidden;
+  transition: 1s height ease-in-out;
+}
+
+#slide.start {
+      height: 31px;
+    width: max-content;
+    margin-top: 5px;
+}
+
+#slide_weapon.start {
+      height: 31px;
+    width: max-content;
+    margin-top: 5px;
+}
+
+#slide_object.start {
+      height: 31px;
+    width: max-content;
+    margin-top: 5px;
+}
+
+#slide_master.start {
+      height: 31px;
+    width: max-content;
+    margin-top: 5px;
+}
+
+input.chat_button{
+  border: none;
+  background-color: transparent;
+}
+
+/********************************************************  */
+
+
+input.azione{
+	width:350px;
+}
+
+/************** Spostato qui da /pages/frame_chat.inc.php ************/
+
+/* Stile della nuova modale */
+#customModal {
+    display: none; 
+    position: fixed;
+    z-index: 1001; /* Z-index più alto per sovrapporsi agli altri contenuti */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0 0 0 / 40%); 
+}
+
+#customModal .custom-modal-content {
+    background-color: #0f111d; /* Sfondo scuro come il resto del sito */
+    color: #b4b6bf; /* Testo grigio chiaro */
+    margin: 1% auto;
+    padding: 20px;
+    border: 1px solid #070a1b; /* Bordi scuri */
+    border-radius: 5px; /* Bordi arrotondati */
+    width: 90%; /* Aumenta la larghezza */
+    max-width: 800px; /* Aumenta la larghezza massima */;
+}
+
+#customModal .custom-close {
+    color: #e2e2e2; /* Colore chiaro */
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+#customModal .custom-close:hover,
+#customModal .custom-close:focus {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Stile del menu a tab */
+#customModal .tab {
+    display: flex;
+    justify-content: center; /* Centra i tab */
+    border-bottom: 1px solid #070a1b;
+    background-color: #1a2240;
+}
+
+#customModal .tab button {
+    background-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+    color: #e2e2e2;
+    flex: 1; /* Fa in modo che i bottoni occupino lo stesso spazio */
+    max-width: 200px; /* Imposta una larghezza massima per evitare che si estendano troppo */
+}
+
+#customModal .tab button:hover {
+    background-color: #070a1b;
+}
+
+#customModal .tab button.active {
+    background-color: #070a1b;
+}
+
+/* Stile del contenuto delle tab */
+#customModal .tabcontent {
+    display: none;
+    padding: 20px;
+    border: 1px solid #070a1b;
+    border-top: none;
+    color: #b4b6bf;
+}
+
+#customModal .customTable select, 
+#customModal .customTable button {
+      width: 100%; /* Imposta la larghezza al 100% della cella */
+}
+
+#customModal .customTable td {
+      padding-right: 10px; /* Aggiungi un po' di padding tra le celle */
+}
+
+#customModal .customTable {
+      table-layout: fixed; /* Mantiene le celle uniformi */
+      width: 100%; /* Imposta la larghezza della tabella al 100% */
+}
+
+#customModal .customTable td:nth-child(1) {
+      width: 70%; /* Prima colonna (select) più larga */
+}
+
+#customModal .customTable td:nth-child(2) {
+      width: 30%; /* Seconda colonna (button) più stretta */
+}
+
+div.casella_chat {
+    display: flex;
+    flex-direction: row; /* Dispone gli elementi in fila */
+    justify-content: space-between; /* Spazia gli elementi per riempire il contenitore */
+    align-items: center;
+    width: 100%;
+    margin-right: 30px;
+}
+
+div.casella_chat a { margin: 0; }
+
+textarea.chat_textarea {
+    width: 100%;
+    height: 80px; /* Altezza impostata come prima */
+    box-sizing: border-box;
+    resize: none;
+    flex-grow: 1; /* Permette alla textarea di occupare lo spazio disponibile */
+    margin-right: 10px;
+}
+
+div.casella_chat_info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px; /* Distanza tra la textarea e la dicitura/bottone */
+    width: 70%; /* La larghezza deve essere la stessa della casella_chat */
+}
+
+button.chat_button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+button.chat_button:hover {
+    background-color: #0056b3;
+}
+
+.btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+}
+
+.btn-sm {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-width: 32px;
+    height: 32px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgb(102 126 234 / 30%);
+}
+
+.div_rosso {
+    width: 100px;
+    height: 80px;
+    background-color: transparent;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colonne */
+    grid-template-rows: repeat(2, 1fr); /* 2 righe */
+    gap: 5px;
+    padding: 5px;
+}
+
+.div_rosso a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    margin: 0; /* Rimuove eventuali margini che potrebbero influenzare l'allineamento */
+    padding: 0; /* Rimuove eventuali padding */
+}
+
+.div_rosso img {
+    display: block;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+}
+
+.chat_icon {
+    width: 25px;
+    height: 25px;
+    display: block;
+    margin: 0 auto;
+}
+
+.countdown_text {
+    font-size: 14px;
+    color: red;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.countdown-container {
+    position: relative;
+    text-align: center;
+    margin-bottom: 5px; /* Distanza tra il countdown e la textarea */
+}
+
+.styled-button {
+    background-color: #161827;
+    border: 2px solid #07080e;
+    border-radius: 5px;
+    font-size: 10px;
+    color: #8f8f8f;
+    font-family: "DejaVu Serif", serif;
+    padding: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+}
+
+.styled-button:hover {
+    background-color: #202233;
+    color: #bfbfbf;
+}
+
+
+/* Stili per tablet e dispositivi con schermo più grande di 768px */
+@media screen and (width <= 1024px) {
+    div.casella_chat {
+        display: flex;
+        flex-direction: row; /* Cambiato da colonna a riga per distribuire meglio gli elementi */
+        justify-content: space-between; /* Distribuisce gli elementi in modo uniforme */
+        padding-bottom: 10px;
+        width: 100%; 
+        height: auto;
+        overflow: hidden; /* Rimuove lo scroll */
+        align-items: center;
+    }
+
+    textarea.chat_textarea {
+        height: 80px; /* Aumentiamo leggermente l'altezza */
+        margin-bottom: 10px; /* Spazio extra sotto */
+        overflow: hidden; /* Rimuove lo scroll */
+    }
+    
+    div.form_chat {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    div.form_row {
+        display: flex;
+        flex-direction: column; /* Cambiamo da riga a colonna per evitare che gli elementi siano compressi orizzontalmente */
+        justify-content: center;
+        align-items: stretch; /* Allarga gli elementi per riempire lo spazio disponibile */
+        width: 100%;
+        height: auto;
+        padding-bottom: 20px; /* Spazio aggiuntivo sotto */
+        overflow: hidden; /* Rimuove lo scroll */
+    }
+
+    /* Per il pulsante INVIA */
+    input[type="submit"] {
+        width: 30%; /* Manteniamo i pulsanti più stretti per evitare il taglio */
+    }
+
+    /* Per la scritta sopra (char count) */
+    span.char_count {
+        font-size: 14px;
+        color: #555;
+        margin-right: 10px; /* Spazio tra la scritta e le icone */
+    }
+
+    /* Per le icone */
+    .div_rosso {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        padding-left: 0;
+        overflow: hidden; /* Rimuove lo scroll */
+    }
+
+    .div_rosso a img {
+        width: 24px; /* Dimensioni leggermente più grandi rispetto ai cellulari */
+        height: 24px;
+    }
+
+    .div_rosso img {
+        width: 25px; /* Dimensioni coerenti delle icone */
+        height: 25px;
+    }
+
+    .chat_icon {
+        width: 24px; /* Manteniamo una dimensione ridotta */
+        height: 24px;
+    }
+
+    .iframe_chat {
+        height: 300px; /* Aumentato per evitare il taglio */
+        min-height: 300px; /* Impostata un'altezza minima più elevata */
+        margin-bottom: 15px; /* Aggiunto spazio extra sotto */
+    }
+
+
+    div.casella_chat_info {
+        position: absolute;
+        bottom: 0;
+        right: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        width: 50%; /* Ridotto al 50% per non sovrapporsi alla textarea */
+        padding: 5px;
+        overflow: hidden; /* Rimuove lo scroll */
+    }
+
+    .styled-button {
+        font-size: 12px; /* Aumenta leggermente la dimensione del font per tablet */
+    }
+}
+
+/* Stili per cellulari con schermo più piccolo di 768px */
+@media screen and (width <= 768px) {    
+    div.casella_chat {
+        display: flex;
+        flex-flow: row wrap; /* Anche qui cambiato da colonna a riga */
+        justify-content: space-between; /* Distribuzione uniforme */
+        padding-bottom: 0px;
+        width: 100%; 
+        height: auto;
+        overflow: hidden; /* Rimuove lo scroll */
+    }
+
+    textarea.chat_textarea {
+        height: 70px; /* Altezza leggermente ridotta per schermi più piccoli */
+        overflow: hidden; /* Rimuove lo scroll */
+    }
+
+    div.form_chat {
+        width: 100%; 
+        overflow-x: hidden;
+    }
+
+    div.form_row {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+        width: 100%;
+        height: auto;
+        padding-bottom: 0px;
+    }
+
+    /* Per il pulsante INVIA */
+    input[type="submit"] {
+        width: 35%; /* I pulsanti sono più stretti su dispositivi più piccoli */
+    }
+
+    /* Per la scritta sopra (char count) */
+    span.char_count {
+        font-size: 12px; /* Leggermente più piccolo per cellulari */
+        color: #555;
+        margin-right: 10px;
+    }
+
+    /* Per le icone */
+    .div_rosso {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%; /* Occupa tutta la larghezza disponibile */
+        padding-left: 0;
+    }
+
+    .div_rosso a img {
+        width: 22px; /* Mantieni le dimensioni ridotte */
+        height: 22px;
+    }
+
+    .chat_icon {
+        width: 22px; /* Riduce leggermente la dimensione delle icone per i cellulari */
+        height: 22px;
+    }
+
+    .iframe_chat {
+        height: 280px; /* Altezza dinamica aumentata per dispositivi più piccoli */
+        min-height: 280px; /* Impostata un'altezza minima per evitare il taglio */
+        margin-bottom: 15px; /* Spazio extra sotto */
+    }
+
+    div.casella_chat_info {
+        position: absolute;
+        bottom: 0;
+        right: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        width: 50%; /* Ridotto al 50% per dispositivi più piccoli */
+        padding: 5px;
+        overflow: hidden; /* Rimuove lo scroll */
+    }
+
+    button.chat_button {
+        width: 100%; /* Il pulsante di invio occupa tutta la larghezza */
+        padding: 10px; /* Aggiunge più padding per renderlo più visibile */
+    }
+
+    .countdown_text {
+        font-size: 16px; /* Testo più grande per essere ben visibile su schermi piccoli */
+    }
+
+    .countdown-container {
+        margin-bottom: 10px; /* Più spazio sotto il countdown */
+    }
+
+    .styled-button {
+        width: 100%; /* I pulsanti coprono tutta la larghezza */
+        padding: 10px; /* Maggiore padding per renderli più grandi */
+        font-size: 14px; /* Testo più grande */
+    }
+}
+
+/* ===== CSS INCAPSULATO - USER SEARCH POPUP ===== */
+.user-search-popup__overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgb(24 28 49 / 80%);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
+
+.user-search-popup__container {
+    background: #181c31;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgb(0 0 0 / 40%);
+    animation: user-search-popup__fadeIn 0.3s ease;
+    border: 1px solid #2a2f4a;
+}
+
+@keyframes user-search-popup__fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Header */
+.user-search-popup__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #2a2f4a;
+    background: linear-gradient(135deg, #1a1f36 0%, #181c31 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.user-search-popup__title {
+    margin: 0;
+    color: #e2e8f0;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.user-search-popup__close-btn {
+    background: #2a2f4a;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #94a3b8;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.user-search-popup__close-btn:hover {
+    background: #3f445e;
+    color: #e2e8f0;
+    transform: rotate(90deg);
+}
+
+/* Search Section */
+.user-search-popup__search-section {
+    padding: 24px;
+    position: relative;
+    border-bottom: 1px solid #2a2f4a;
+    background: #1a1f36;
+}
+
+.user-search-popup__search-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #0f1324;
+    border: 2px solid #2a2f4a;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    color: #e2e8f0;
+    font-family: inherit;
+}
+
+.user-search-popup__search-input::placeholder {
+    color: #64748b;
+}
+
+.user-search-popup__search-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: #0f1324;
+    box-shadow: 0 0 0 3px rgb(99 102 241 / 20%);
+    color: #e2e8f0;
+}
+
+.user-search-popup__autocomplete-list {
+    position: absolute;
+    top: calc(100% - 40px);
+    left: 24px;
+    right: 24px;
+    background: #1a1f36;
+    border: 2px solid #6366f1;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 10001;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 40%);
+}
+
+.user-search-popup__autocomplete-item {
+    padding: 14px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #2a2f4a;
+    transition: all 0.2s ease;
+    color: #e2e8f0;
+    font-size: 14px;
+}
+
+.user-search-popup__autocomplete-item:hover {
+    background: #252a45;
+    color: #fff;
+}
+
+.user-search-popup__autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.user-search-popup__autocomplete-item--selected {
+    background: #1e3a8a;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Selected Users Section */
+.user-search-popup__selected-section {
+    padding: 24px;
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #1a1f36;
+}
+
+.user-search-popup__selected-title {
+    margin: 0 0 16px;
+    color: #94a3b8;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.user-search-popup__selected-list {
+    min-height: 120px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 2px dashed #2a2f4a;
+    border-radius: 8px;
+    padding: 16px;
+    background: #0f1324;
+}
+
+.user-search-popup__empty-message {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+    padding: 20px;
+    font-size: 14px;
+}
+
+.user-search-popup__selected-user {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    background: #252a45;
+    border: 1px solid #2a2f4a;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.user-search-popup__selected-user:hover {
+    border-color: #6366f1;
+    background: #2a2f4a;
+    transform: translateY(-1px);
+}
+
+.user-search-popup__selected-user:last-child {
+    margin-bottom: 0;
+}
+
+.user-search-popup__user-name {
+    font-weight: 500;
+    color: #e2e8f0;
+    font-size: 14px;
+}
+
+.user-search-popup__remove-btn {
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.user-search-popup__remove-btn:hover {
+    background: #b91c1c;
+    transform: scale(1.05);
+}
+
+/* Footer */
+.user-search-popup__footer {
+    padding: 20px 24px;
+    border-top: 1px solid #2a2f4a;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    background: linear-gradient(135deg, #181c31 0%, #1a1f36 100%);
+    border-radius: 0 0 12px 12px;
+}
+
+.user-search-popup__confirm-btn {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    box-shadow: 0 2px 8px rgb(99 102 241 / 30%);
+}
+
+.user-search-popup__confirm-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgb(99 102 241 / 40%);
+}
+
+.user-search-popup__confirm-btn:disabled {
+    background: #374151;
+    color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.user-search-popup__cancel-btn {
+    background: #374151;
+    color: #e2e8f0;
+    border: 1px solid #4b5563;
+    padding: 12px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+.user-search-popup__cancel-btn:hover {
+    background: #4b5563;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* Loading States */
+.user-search-popup__loading {
+    display: none;
+    text-align: center;
+    padding: 12px;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.user-search-popup__loading::after {
+    content: '...';
+    animation: user-search-popup__loadingDots 1.5s infinite;
+}
+
+@keyframes user-search-popup__loadingDots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+/* Bottone Trigger */
+.user-search-popup__trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgb(99 102 241 / 30%);
+}
+
+.user-search-popup__trigger-btn:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgb(99 102 241 / 40%);
+}
+
+.user-search-popup__trigger-icon {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+}
+
+/* Responsive Design */
+@media (width <= 768px) {
+    .user-search-popup__container {
+        width: 95%;
+        margin: 10px;
+        max-height: 90vh;
+    }
+    
+    .user-search-popup__header {
+        padding: 16px 20px;
+    }
+    
+    .user-search-popup__search-section {
+        padding: 20px;
+    }
+    
+    .user-search-popup__selected-section {
+        padding: 20px;
+    }
+    
+    .user-search-popup__footer {
+        padding: 16px 20px;
+        flex-direction: column;
+    }
+    
+    .user-search-popup__confirm-btn,
+    .user-search-popup__cancel-btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .user-search-popup__autocomplete-list {
+        left: 20px;
+        right: 20px;
+    }
+}
+
+@media (width <= 480px) {
+    .user-search-popup__title {
+        font-size: 1.1em;
+    }
+    
+    .user-search-popup__selected-user {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .user-search-popup__remove-btn {
+        align-self: flex-end;
+    }
+}
+
+/* Scrollbar Styling */
+.user-search-popup__selected-list::-webkit-scrollbar,
+.user-search-popup__autocomplete-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.user-search-popup__selected-list::-webkit-scrollbar-track,
+.user-search-popup__autocomplete-list::-webkit-scrollbar-track {
+    background: #1a1f36;
+    border-radius: 3px;
+}
+
+.user-search-popup__selected-list::-webkit-scrollbar-thumb,
+.user-search-popup__autocomplete-list::-webkit-scrollbar-thumb {
+    background: #6366f1;
+    border-radius: 3px;
+}
+
+.user-search-popup__selected-list::-webkit-scrollbar-thumb:hover,
+.user-search-popup__autocomplete-list::-webkit-scrollbar-thumb:hover {
+    background: #4f46e5;
+}

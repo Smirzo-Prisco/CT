@@ -1,0 +1,299 @@
+table.customTable {
+    background-color: #181c31;
+    border-collapse: collapse;
+    border-width: 1px;
+    border-color: #000000;
+    border-style: solid;
+    color: #b4b6bf;
+    font-family: "DejaVu Serif";
+  }
+  
+  table.customTable td.up, table.customTable th.up {
+    border-width: 1px;
+    border-color: #000000;
+    border-style: solid;
+    padding: 5px;
+    text-align: left;
+    text-transform: uppercase; 
+  }
+  
+  tr.second_header{
+      color: #6b8bff;
+      background: url(imgs/forum/sfondo_barra.png);
+      background-size: contain;
+  }
+  
+  tr.second_header td.up_logo {
+      text-align: center;
+      font-size: 15px;
+      color: #ce846f;
+      font-family: "DejaVu Serif";
+      filter: drop-shadow(-1.732px 1px 2px #000000);
+      text-transform: uppercase; 
+  }
+  
+  td.up a:link, a:visited {
+      font-size: 12px;
+      color: #a7a7a8;
+      font-family: "DejaVu Serif";
+      text-transform: uppercase; 
+  }
+  
+  td.up {
+      font-size: 12px;
+      color: #8f8f8f;
+      font-family: "DejaVu Serif";
+      text-transform: uppercase; 
+  }
+  
+  table.customTable thead {
+    background-color: #1A2240;
+  }
+  
+  tr.second_header_inside{
+      font-size: 11px;
+      color: #ce846f;
+      font-family: "DejaVu Serif";
+      filter: drop-shadow(-1.732px 1px 2px #000000);
+      background: url(imgs/forum/sfondo_barra.png);
+      background-size: contain;
+      text-transform: uppercase;
+  }
+  
+  div.titolo{
+      margin: auto;
+  }
+  
+  div.pagina_messages_center {
+      color: #b4b6bf;
+  }
+  
+  input.message_check {
+      width: 10px;
+      /* background-color: darkred; */
+      height: 10px;
+  }
+  
+  form.searchBar {
+      width: 300px;
+      /* text-align: center; */
+      margin: auto;
+  }
+  
+  div.warning{
+      width: 500px;
+      margin: auto;
+      margin-bottom: 10px;
+      }
+      
+  .form_submit {
+      background: #111423;
+  }
+  
+  form.controls {
+      width: 15px;
+      margin: auto;
+      }
+      
+  td.author{
+      vertical-align: top; 
+      width: 20%;
+      background: #15182a;
+  }
+  div.autore {
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: #a7a7a8;
+      font-family: "DejaVu Serif";
+      text-transform: uppercase; 
+  }
+  
+  /*CSS SPOILER*/
+  
+  details[open] summary ~ * {
+    animation: open 0.3s ease-in-out;
+  }
+  
+  @keyframes open {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  details summary::-webkit-details-marker {
+    display: none;
+  }
+  
+  details summary {
+    width:500px;
+    padding: 10px;
+    border:1px dashed #9a6353;
+    position: relative;
+    cursor: pointer;
+    font-size: 11px;
+    list-style: none;
+  }
+  
+  details summary:after {
+    content: "";
+    color: #9a6353;
+    position: absolute;
+    font-size: 11px;
+    line-height: 0;
+    margin-top: 0.75rem;
+    right: 0;
+    font-weight: 200;
+    transform-origin: center;
+    transition: 200ms linear;
+  }
+  details[open] summary:after {
+    transform: rotate(45deg);
+    font-size: 2rem;
+  }
+  details summary {
+    outline: 0;
+  }
+  details p {
+    font-size: 0.95rem;
+    margin: 0 0 1rem;
+    padding-top: 1rem;
+    border:1px dashed #9a6353;
+  }
+  
+  /* Spoiler */
+  .spoiler, .quote-table {
+      border: 1px dashed #9a6353;
+      background-color: #03011f;
+      padding: 10px;
+      border-radius: 10px;
+      width: 100%; /* Use full width on mobile */
+      max-width: 500px;
+      margin: auto;
+      box-sizing: border-box; /* Ensure padding is included in width calculations */
+      overflow: hidden; /* Prevent overflow issues */
+  }
+  
+  .spoiler-summary, .quote-legend {
+      border: 0;
+      padding: 2px;
+      color: #9a6353;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: bold;
+      cursor: pointer;
+  }
+  
+  
+  
+  /* Tablets  */
+  @media screen and (max-width: 1024px) {
+      table.customTable {
+          width: 90%; 
+      }
+      
+      td.up, td.up a:link, a:visited {
+          font-size: 11px; 
+      }
+  
+      tr.second_header td.up_logo {
+          font-size: 13px;
+      }
+  
+      div.warning {
+          width: 80%; 
+      }
+      
+      details summary {
+          width: 90%; 
+      }
+  
+      img.img_forum_avatar {
+          height: 100px;
+          width: 100px;
+      }
+      
+      .spoiler, .quote-table {
+          width: 95%;
+          max-width: none; /* Ensure max-width does not interfere on smaller screens */
+      }
+  }
+  
+  /* Smartphones (max-width: 768px) */
+  @media screen and (max-width: 768px) {
+      table.customTable {
+          width: 95%; 
+      }
+      
+      td.up, td.up a:link, a:visited {
+          font-size: 10px;
+      }
+  
+      tr.second_header td.up_logo {
+          font-size: 12px;
+      }
+  
+      div.warning {
+          width: 90%;
+      }
+  
+      details summary {
+          width: 95%;
+      }
+  
+      img.img_forum_avatar {
+          height: 80px;
+          width: 80px;
+      }
+      
+      .spoiler, .quote-table {
+          width: 95%;
+          max-width: none; /* Ensure max-width does not interfere on smaller screens */
+          font-size: 12px; /* Increase font size slightly for readability */
+      }
+  
+      .spoiler-summary, .quote-legend {
+          font-size: 12px;
+          text-align: left; /* Align text to the left */
+      }
+  }
+  
+  /* Small Smartphones (max-width: 480px) */
+  @media screen and (max-width: 480px) {
+      table.customTable {
+          width: 100%; 
+      }
+  
+      td.up, td.up a:link, a:visited {
+          font-size: 9px;
+      }
+  
+      tr.second_header td.up_logo {
+          font-size: 11px;
+      }
+  
+      div.warning {
+          width: 95%;
+      }
+  
+      details summary {
+          width: 100%;
+      }
+  
+      img.img_forum_avatar {
+          height: 60px;
+          width: 60px;
+      }
+      
+     .spoiler, .quote-table {
+          width: 100%; /* Full width for small screens */
+          padding: 8px; /* Reduce padding for better fit */
+          font-size: 11px;
+      }
+  
+      .spoiler-summary, .quote-legend {
+          font-size: 11px;
+          text-align: left;
+      }
+  }

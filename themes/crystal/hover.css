@@ -1,0 +1,130 @@
+div.iframe_icone{
+    height: 63px;
+    width: 180px;
+    border: none;
+    margin: auto;
+    display: block;
+    position: relative;
+    top: 100px;
+    left: 2%;
+}
+
+/*INNER*/
+
+#pic-wrapper{
+margin:2em auto;
+position:absolute;
+cursor:pointer
+}
+#pic{
+-moz-transition:all 1s ease-out;
+-webkit-transition:all 1s ease-out;
+-o-transition:all 1s ease-out;
+-ms-transition:all 1s ease-out;
+position:absolute;
+z-index:1;
+opacity:1
+}
+#pic-inner{
+z-index:0;
+position:absolute;
+}
+#pic:hover{
+opacity:0
+}
+/*MENU DX*/
+
+#famiglie {
+position:absolute; 
+left:0px;
+top:-21px;
+border:0px solid #a9cded;
+}
+
+#mestieri {
+position:absolute; 
+left:60px;
+top:-21px;
+border:0px solid #a9cded;
+}
+
+#tv {
+position:absolute; 
+left:120px;
+top:-21px;
+border:0px solid #a9cded;
+}
+
+/*MENU SX*/
+
+#mappa {
+position:absolute; 
+width:220px; height:50; 
+left:10;
+top:122;
+border:0px solid #a9cded;
+}
+
+#aggiorna {
+position:absolute; 
+width:220px; height:50; 
+left:70;
+top:122;
+border:0px solid #a9cded;
+}
+
+#mex {
+position:absolute; 
+width:220px; height:50; 
+left:134;
+top:122;
+border:0px solid #a9cded;
+}
+
+#forum {
+position:absolute; 
+width:220px; height:50; 
+left:10;
+top:190;
+border:0px solid #a9cded;
+}
+
+#uffici {
+position:absolute; 
+width:220px; height:50; 
+left:70;
+top:190;
+border:0px solid #a9cded;
+}
+
+#doc {
+position:absolute; 
+width:220px; height:50; 
+left:134;
+top:190;
+border:0px solid #a9cded;
+}
+
+#chat {
+position:absolute; 
+width:220px; height:50; 
+left:10;
+top:258;
+border:0px solid #a9cded;
+}
+
+#gestione {
+position:absolute; 
+width:220px; height:50; 
+left:70;
+top:258;
+border:0px solid #a9cded;
+}
+
+#logout {
+position:absolute; 
+width:220px; height:50; 
+left:134;
+top:258;
+border:0px solid #a9cded;
+}

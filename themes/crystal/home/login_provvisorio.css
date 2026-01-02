@@ -1,0 +1,394 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-image: url('https://crystaltokyogdr.altervista.org/themes/crystal/imgs/login/bg_noah.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+/* Header */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.navigation {
+    list-style: none;
+}
+
+.navigation li {
+    display: inline;
+    margin-right: 20px;
+}
+
+.navigation li:last-child {
+    margin-right: 0;
+}
+
+.navigation a {
+    color: #fff;
+    text-decoration: none;
+    position: relative;
+    transition: color 0.9s ease;
+}
+
+/* Cambia il colore del testo al passaggio del mouse */
+.navigation a:hover {
+    color: #d1d100;
+    text-decoration: underline;
+}
+
+/* Cambia gradualmente il colore del testo quando il mouse non è più sopra il link */
+.navigation a:not(:hover) {
+    color: #fff;
+}
+
+.navigation li:nth-child(5) {
+    margin-left: 20px; /* Spazio tra il pulsante "Privacy" e il nuovo pulsante "Segnala" */
+}
+
+.navigation li:nth-child(5) a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.9s ease;
+}
+
+.navigation li:nth-child(5) a:hover {
+    color: #d1d100;
+    text-decoration: underline;
+}
+
+
+
+
+/* Aggiorna il CSS per il background della finestra modale */
+.custom-content {
+    display: none;
+    position: fixed;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); /* Utilizza translate per spostare la finestra modale al centro */
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.8); 
+    max-width: 70%;
+    max-width: 90%;
+    overflow: auto; 
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); 
+}
+
+.custom-box:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(5px); /* Applica la sfocatura solo al background */
+    opacity: 0.6; /* Riduci l'opacità al 60% */
+    z-index: -1; /* Assicura che il background sia dietro il contenuto */
+}
+
+
+.custom-box {
+    margin: 0 auto; /* Riduci il margine superiore per centrare il contenuto */
+    padding: 20px;
+    border: none;
+    width: 90%;
+    height: 400px;
+    max-width: 1000px;
+    max-height: 600px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #969cb4 !important; 
+    background-color: transparent !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.custom-box h2 {
+    text-align: center; /* Centra il testo */
+    margin-bottom: 20px; /* Aggiunge spazio sotto il titolo */
+}
+
+.input-group {
+    margin-bottom: 20px; /* Aggiunge spazio tra i gruppi di input */
+    max-width: 300px; /* Limita la larghezza massima del gruppo */
+}
+
+.input-group label {
+    display: block; /* Mostra il label su una riga separata */
+    margin-bottom: 5px; /* Aggiunge spazio tra il label e l'input */
+    color: #969cb4; /* Colore del testo del label */
+}
+
+.input-group input {
+    width: 100%; /* Rende l'input larghezza completa */
+    padding: 10px; /* Aggiunge spazio intorno al testo dell'input */
+    border: 1px solid #282a3b; /* Aggiunge un bordo intorno all'input */
+    border-radius: 4px; /* Aggiunge bordi arrotondati all'input */
+    background-color: #090f1c; /* Colore di sfondo dell'input */
+    color: #969cb4; /* Colore del testo dell'input */
+}
+
+/* Stile per il pulsante submit */
+.submit-button {
+    width: 100%; /* Rende il pulsante larghezza completa */
+    padding: 10px; /* Aggiunge spazio intorno al testo del pulsante */
+    border: none; /* Rimuove il bordo del pulsante */
+    border-radius: 4px; /* Aggiunge bordi arrotondati al pulsante */
+    background-color: #1c5c87; /* Colore di sfondo del pulsante */
+    color: #fff; /* Colore del testo del pulsante */
+    cursor: pointer; /* Cambia il cursore al passaggio del mouse */
+    transition: background-color 0.3s; /* Aggiunge una transizione al cambio di colore di sfondo */
+}
+
+.submit-button:hover {
+    background-color: #114162; /* Cambia il colore di sfondo al passaggio del mouse */
+}
+
+
+
+
+
+
+
+/* Aggiorna il CSS per la finestra modale di segnalazione */
+#reportContent {
+    display: none;
+    position: fixed;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.8); 
+    max-width: 70%;
+    max-width: 90%;
+    overflow: auto; 
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); 
+}
+
+#reportContent .custom-box:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(5px); 
+    opacity: 0.6; 
+    z-index: -1; 
+}
+
+#reportContent .custom-box {
+    margin: 0 auto; 
+    padding: 20px;
+    border: none;
+    width: 90%;
+    height: 400px;
+    max-width: 80%;
+    max-height: 90%;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #969cb4 !important; 
+    background-color: transparent !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#reportContent .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+#reportContent .close:hover,
+#reportContent .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#reportContent .custom-box h2 {
+    text-align: center; 
+    margin-bottom: 20px; 
+}
+
+#reportContent .input-group {
+    margin-bottom: 20px; 
+    max-width: 300px; 
+}
+
+#reportContent .input-group label {
+    display: block; 
+    margin-bottom: 5px; 
+    color: #969cb4; 
+}
+
+#reportContent .input-group input,
+#reportContent .input-group textarea {
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #282a3b; 
+    border-radius: 4px; 
+    background-color: #090f1c; 
+    color: #969cb4; 
+}
+
+#reportContent .input-group textarea {
+    height: 150px; /* Imposta l'altezza del textarea */
+}
+
+#reportContent .input-group button[type="submit"] {
+    width: 100%; 
+    padding: 10px; 
+    border: none; 
+    border-radius: 4px; 
+    background-color: #1c5c87; 
+    color: #fff; 
+    cursor: pointer; 
+    transition: background-color 0.3s; 
+}
+
+#reportContent .input-group button[type="submit"]:hover {
+    background-color: #114162; 
+}
+
+
+
+/* Registrazione */
+.registration-modal {
+    max-height: 80vh; /* Imposta un'altezza massima del 80% rispetto all'altezza della finestra */
+    overflow-y: auto; /* Aggiungi una barra di scorrimento verticale se necessario */
+}
+
+#registrationModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.8);
+    max-width: 70%;
+    max-width: 90%;
+    overflow-y: auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    max-height: calc(100vh - 100px); /* Imposta un'altezza massima del 90% rispetto all'altezza della finestra */
+}
+
+#registrationModal .custom-box {
+    margin: 0 auto;
+    padding: 20px;
+    border: none;
+    width: 90%;
+    height: 400px;
+    max-width: 1000px;
+    max-height: 600px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #969cb4 !important;
+    background-color: transparent !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Altri stili per il pulsante di chiusura e per il contenuto della modale possono essere mantenuti simili a quelli già presenti per le altre finestre modali */
+.registration-custom-box {
+    margin: 0 auto; /* Aggiungi un margine superiore di 50px */
+    background-color: transparent !important; /* Colore di sfondo per la finestra modale di registrazione */
+    padding: 20px; /* Aggiungi spazio interno */
+    border: none; /* Rimuovi il bordo */
+    width: 90%; /* Imposta la larghezza al 90% */
+    max-width: 90%; /* Larghezza massima */
+    max-height: 80vh; 
+    height: auto; 
+    overflow-y: auto; /* Aggiungi una barra di scorrimento verticale se necessario */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Aggiungi un'ombra */
+    color: #000; /* Colore del testo */
+    font-family: 'Poppins', sans-serif; /* Font family */
+    /* Altri stili desiderati */
+}
+
+.registration-input-group {
+    text-align: center; /* Centra gli elementi all'interno del contenitore */
+    margin-bottom: 20px; /* Spazio inferiore tra i gruppi di input */
+}
+
+.registration-input-group label {
+    display: block; /* Mostra i label su una riga separata */
+    margin-bottom: 5px; /* Aggiunge spazio inferiore tra il label e l'input */
+    color: #969cb4; /* Colore del testo del label */
+    text-align: left; /* Allinea il testo a sinistra */
+}
+
+.registration-input-group input,
+.registration-input-group select {
+    width: 80%; /* Imposta la larghezza degli input */
+    padding: 10px; /* Aggiunge spazio interno */
+    border: 1px solid #282a3b; /* Aggiunge un bordo */
+    border-radius: 4px; /* Aggiunge bordi arrotondati */
+    background-color: #090f1c; /* Colore di sfondo */
+    color: #969cb4; /* Colore del testo */
+    box-sizing: border-box; /* Considera il padding e il bordo nella larghezza totale */
+    margin: 0 auto; /* Centra gli input */
+}
+
+.registration-custom-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #969cb4; /* Colore del testo per il titolo */
+}
+
+.registration-custom-box h4 {
+    color: #969cb4; /* Colore del testo per la descrizione */
+    text-align: center;
+}

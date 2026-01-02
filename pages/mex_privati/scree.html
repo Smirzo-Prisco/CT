@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Larghezza Viewport</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .message {
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Verifica Larghezza Viewport</h1>
+    <p class="message">Controlla la console per vedere la larghezza attuale del viewport.</p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Log della larghezza del viewport al caricamento della pagina
+            console.log('Larghezza del viewport:', window.innerWidth);
+
+            // Mostra anche un messaggio nella pagina
+            const message = document.createElement('p');
+            message.textContent = 'La larghezza attuale del viewport è: ' + window.innerWidth + 'px';
+            document.body.appendChild(message);
+        });
+    </script>
+</body>
+</html>

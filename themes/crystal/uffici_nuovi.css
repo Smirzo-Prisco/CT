@@ -1,0 +1,67 @@
+div.container_regolamento {
+  border: solid 1px red;
+  width: 285px;
+  margin: 0 auto;
+}
+
+.testo {
+  font-family: "DejaVu Serif", serif;
+  color: #8f8f8f;
+  font-size: 12px;
+  filter: drop-shadow(0 0 5px rgb(0 0 0 / 57%));
+}
+
+.tg {
+  border-collapse: collapse;
+  border-spacing: 0;
+  position: relative;
+  width: 800px;
+  margin: 0 auto;
+  margin-bottom: 30px;
+  table-layout: fixed;
+}
+
+.tg td{border: 1px black solid;font-family: Lato, sans-serif;font-size:10px;color:#e2e2e2;overflow:hidden;
+ padding:10px 5px;word-break:normal; background: url('imgs/uffici/box_uffici.png');background-repeat: no-repeat; text-align:center; 
+ width:231px; height:auto;background-size: cover; vertical-align: center;   filter: drop-shadow(0 0 5px rgb(0 0 0 / 57%));}
+
+.tg th{border-style:solid;border-width:0;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;
+ overflow:hidden;padding:20px 10px;word-break:normal;background-repeat: no-repeat;}
+
+.tg .tg-73oq {
+  border-color: #000;
+  text-align: center;
+  vertical-align: top;
+  width: 231px;
+  height: auto;
+}
+
+a {
+  line-height: 2.1;
+}
+
+.tg_regolamento {
+  border-collapse: collapse;
+  border-spacing: 0;
+  position: relative;
+  width: 285px;
+  margin: 0 auto;
+  margin-bottom: 30px;
+  table-layout: fixed;
+}
+
+.tg_regolamento th{border-style:solid;border-width:0;font-family:"DejaVu Serif", serif;font-size:12px; filter: drop-shadow(0 0 5px rgb(0 0 0 / 57%)); font-weight:normal;
+ overflow:hidden;padding-top:20px;word-break:normal;background-repeat: no-repeat;}
+
+.tg_due {
+  border-collapse: collapse;
+  border-spacing: 0;
+  position: relative;
+  width: 700px;
+  margin: 0 auto;
+  margin-bottom: 30px;
+  table-layout: fixed;
+}
+
+.tg_due th{border-style:solid;border-width:0;font-family:"DejaVu Serif", serif;font-size:12px; filter: drop-shadow(0 0 5px rgb(0 0 0 / 57%)); font-weight:normal;
+ overflow:hidden;padding-top:20px;word-break:normal;background-repeat: no-repeat;}

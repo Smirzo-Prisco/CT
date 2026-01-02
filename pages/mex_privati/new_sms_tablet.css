@@ -1,0 +1,984 @@
+/* Stili generali per la pagina */
+body {
+    font-family: 'Lato', sans-serif;
+    color: #b4b6bf;
+    background-color: #0f111d;
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    overflow: hidden; /* Rimuove lo scroll dall'intera pagina */
+}
+
+.container {
+    display: flex;
+    width: 100%;
+}
+
+.sidebar {
+    width: 30%;
+    background-color: #161d36;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Assicura che lo scroll sia solo per la lista dei messaggi */
+}
+
+.main-content {
+    width: 70%;
+    background-color: #0f111d;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden; /* Nasconde lo scroll aggiuntivo */
+}
+
+.header, .main-header {
+    background-color: #111423;
+    padding: 0; /* Assicura che non ci siano spazi interni */
+    margin: 0; /* Rimuovi eventuali margini */
+    text-align: left;
+    border-bottom: 1px solid #070A1B;
+    height: 60px; /* Mantieni l'altezza fissa */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    flex-direction: column;
+}
+
+.header-title-container, .partecipanti-container {
+    flex: 1; /* Occupa lo spazio rimanente in modo proporzionato */
+    display: flex;
+    align-items: center; /* Centra verticalmente il contenuto */
+    justify-content: center; /* Centra orizzontalmente il contenuto */
+    color: #b4b6bf; /* Colore del testo */
+    font-family: Lato, sans-serif; /* Stile del testo */
+    padding: 0;
+}
+
+.partecipanti-gruppo {
+    font-size: 1em;
+    text-align: center; /* Centra il testo dei partecipanti */
+    margin-top: 0;
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    font-family: Lato, sans-serif;
+    font-size: 1.5em;
+    color: #b4b6bf;
+    margin-bottom: 3px;
+}
+
+.message-section {
+    flex-grow: 1;
+    position: relative; /* Necessario per il posizionamento dell'iframe */
+}
+
+.message-section.active {
+    opacity: 1;
+    display: block;
+}
+
+#messages-off {
+    display: none;
+}
+
+.message-item {
+    background-color: #1a1f3a;
+    padding: 15px 20px; /* Aumentato il padding per riquadri più grandi */
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.message-item:hover {
+    background-color: #2a2f4a;
+}
+
+.message-item p {
+    margin: 0;
+}
+
+.message-content {
+    width: 500px; 
+    height: 500px; 
+    margin: auto; 
+    background: url('../../themes/crystal/imgs/icone/logo_chat.png') no-repeat center center;
+    background-size: contain; 
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Allinea il testo al centro */
+}
+
+.header .header-title {
+    margin: 0;
+}
+
+/* Aggiungi pulsanti per cambiare tra messaggi "on" e "off" */
+.toggle-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.toggle-button {
+    cursor: pointer;
+    margin: 0 5px;
+    border-radius: 5px;
+    transition: filter 0.3s;
+}
+
+.toggle-button img {
+    display: block;
+}
+
+.toggle-button.active img {
+    filter: brightness(1.5); /* Effetto per l'immagine attiva */
+}
+
+/* Stili per la barra dei pulsanti in basso */
+
+/* Stili per i pulsanti di navigazione */
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px; /* Margini più piccoli */
+    background-color: #111423;
+    border-top: 1px solid #070A1B;
+}
+
+.navigation-buttons button {
+    background-color: transparent;
+    color: #b4b6bf;
+    border: none;
+    font-size: 16px; /* Font piccolo per le frecce */
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.navigation-buttons button:hover {
+    color: #ffffff;
+}
+
+.navigation-buttons button:disabled {
+    color: #555; /* Colore più chiaro per il pulsante disabilitato */
+    cursor: not-allowed;
+}
+
+/* Stili per la visualizzazione dei messaggi */
+.message-item {
+    display: flex;
+    align-items: flex-start;
+    background-color: #1a1d2a;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.message-item img {
+    width: 40px; /* Ridotto da 50px */
+    height: 40px; /* Ridotto da 50px */
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;  /* Adatta l'immagine all'area */
+    display: block;  /* Assicurati che l'immagine sia visualizzata come blocco */
+}
+
+.message-details {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.message-details p {
+    margin: 3px 0;
+    color: #b4b6bf;
+}
+
+.message-details .sender {
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.message-details .date {
+    font-size: 11px;
+    color: #8c8f99;
+}
+
+.message-details .preview {
+    font-size: 11px;
+    color: #b4b6bf;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* Scroll per messages-list, solo verticale */
+.messages-list {
+    flex-grow: 1;
+    max-height: calc(100vh - 240px); /* Altezza massima calcolata in base alla viewport */
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 400px; /* Altezza minima per mantenere il layout stabile */
+}
+
+/* Posizionamento della parte inferiore */
+.navigation-buttons, .bottom-bar {
+    width: 100%;
+    background-color: #1a1d2a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+/* Per allineare con la larghezza di "Messaggi Privati" */
+.sidebar .navigation-buttons, .sidebar .bottom-bar {
+    width: 100%; /* Si adatta alla larghezza della colonna Messaggi Privati */
+}
+
+.navigation-buttons {
+    margin-top: 10px; /* Spazio sopra la navigazione */
+}
+
+.bottom-bar {
+    background-color: #111423; /* Sfondo scuro coerente */
+    display: flex;
+    justify-content: center; /* Centra il contenuto */
+    align-items: center; /* Allinea verticalmente al centro */
+    padding: 5px; /* Ridotto padding per risparmiare spazio */
+    border-radius: 5px;
+    border-top: 1px solid #070A1B;
+}
+
+.bottom-bar button {
+    background-color: #1a1f3a;
+    color: #b4b6bf;
+    border: none;
+    padding: 8px 10px; /* Margine ridotto per adattare la larghezza */
+    font-size: 12px; /* Dimensione del testo ridotta */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    flex: 0 1 auto; /* Flex-shrink a 0 e flex-grow a 1 per evitare l'espansione eccessiva */
+    margin: 0 3px; /* Margine ridotto per adattare lo spazio */
+    text-align: center;
+    max-width: 120px; /* Limite massimo di larghezza per evitare che si allarghi troppo */
+}
+
+.bottom-bar button:hover {
+    background-color: #2a2f4a;
+}
+
+.bottom-bar button:first-child {
+    margin-left: 0;
+}
+
+.bottom-bar button:last-child {
+    margin-right: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.main-header {
+    flex-shrink: 0; /* Impedisce al titolo principale di ridimensionarsi */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-content-iframe {
+    flex-grow: 1;
+    border: none;
+    width: 100%;
+    height: calc(100vh - 27px); /* Ridotta ulteriormente l'altezza */
+    background-color: #000;
+    margin: 0; /* Rimuove margini */
+    padding: 0; /* Rimuove padding */
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Contenitore principale per i messaggi */
+.message-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh; /* Occupare tutto lo spazio disponibile nell'iframe */
+    box-sizing: border-box;
+    padding: 0;
+    max-width: 1200px; /* Limita la larghezza massima per non estendere su schermi molto grandi */
+    margin: 0 auto; /* Centra il contenitore */
+    
+    
+}
+
+.messages {
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #111423;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    flex-grow: 1;  /* Assicura che i messaggi occupino tutto lo spazio verticale disponibile */
+    max-height: calc(100% - 142px); /* Riduci ulteriormente se necessario */
+    position: relative; /* Assicura che l'immagine resti dietro i contenuti */  
+ }
+.messages::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../../themes/crystal/imgs/icone/logo_chat.png'); /* Percorso dell'immagine */
+    background-size: cover; /* Adatta l'immagine per coprire l'intero div */
+    background-position: center; /* Centra l'immagine */
+    background-repeat: no-repeat; /* Non ripete l'immagine */
+    opacity: 0.2; /* Imposta la trasparenza dell'immagine */
+    z-index: 1; /* Posiziona l'immagine dietro il contenuto */
+    pointer-events: none; /* Impedisce che l'immagine interferisca con l'interazione con i messaggi */    
+}
+
+
+
+
+/* Stile per la scrollbar della sezione di messaggi */
+/* Pseudo-elementi per personalizzare lo scrollbar */
+::-webkit-scrollbar {
+    width: 10px; /* Larghezza dello scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #111423; /* Colore dello sfondo della track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #828a99; /* Colore del thumb dello scrollbar (qui è arancione) */
+    border-radius: 10px; /* Raggio degli angoli */
+    border: 2px solid #111423; /* Border del thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #828a99; /* Colore del thumb quando è in hover */
+}
+
+
+
+
+
+
+
+/* Messaggi ricevuti */
+.message.received {
+    background-color: #161d36;
+    color: #b4b6bf;
+    padding: 8px 12px;
+    border-radius: 0;
+    margin-bottom: 10px;
+    max-width: 70%;
+    position: relative;
+    font-family: Lato;
+}
+
+/* Messaggi inviati */
+.message.sent {
+    background-color: #161d36;
+    color: #b4b6bf;
+    padding: 8px 12px;
+    border-radius: 0;
+    margin-bottom: 10px;
+    max-width: 70%;
+    position: relative;
+    margin-left: auto;
+}
+
+/* Stile per il nome del mittente sopra i messaggi */
+.message-sender {
+    background-color: rgba(22, 29, 54, 0.5); /* Stessa tonalità di sfondo con più trasparenza */
+    color: #b4b6bf; /* Colore del testo */
+    padding: 5px 12px; /* Spaziatura interna */
+    margin-bottom: 5px; /* Spazio tra la striscia e il messaggio */
+    font-size: 0.85em; /* Dimensione del font */
+    font-family: 'Lato', sans-serif; /* Font personalizzato */
+    text-align: left; /* Testo allineato a sinistra */
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3); /* Aggiunge un'ombra per l'effetto rilievo */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Linea sottile in basso per evidenziare lo stacco */
+}
+
+
+/* Stile per l'orario */
+.time {
+    font-size: 0.8em;
+    color: #8b8d95;
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+}
+
+.tick-icon {
+    color: #1E90FF; /* Colore blu per le spunte */
+    margin-left: 5px;
+    font-size: 14px; /* Dimensione delle spunte */
+    vertical-align: middle; /* Allinea verticalmente con l'ora */
+}
+
+
+
+
+
+
+
+
+.pagination-arrow {
+    cursor: pointer;
+    color: #b4b6bf;
+    font-size: 1em;
+    padding: 0 10px;
+    display: none; /* Nascondi le frecce di default */
+}
+
+.header-title .pagination-arrow {
+    margin: 0 5px; /* Aggiungi margine per separare le frecce dal testo */
+}
+
+
+
+
+
+
+
+
+
+.message-input-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;  /* Rimuovi padding per evitare spazi vuoti */
+    background-color: #111423;
+    border-top: 1px solid #070A1B;
+    width: 100%;
+    box-sizing: border-box;
+    height: 80px; /* Imposta un'altezza fissa per il contenitore di input */
+    position: absolute;
+    bottom: 0;
+    margin: 0;  /* Elimina margini per allineare correttamente */
+    gap: 10px;
+    }
+
+.message-input-container input[type="text"] {
+    flex-grow: 1;
+    padding: 10px;  /* Aggiungi padding interno per distanziare il testo dai bordi */
+    margin-right: 10px;  /* Spazio tra il campo di input e il pulsante invio */
+    border-radius: 5px;  /* Aggiungi degli angoli arrotondati per migliorare l'estetica */
+}
+
+/* CSS per il pulsante invio */
+.message-input-container button {
+    padding: 10px 20px;  /* Aumenta il padding del pulsante per renderlo più comodo */
+    border-radius: 5px;  /* Aggiungi degli angoli arrotondati al pulsante */
+    margin-left: 10px;  /* Aggiungi margine a sinistra per separarlo dal campo di input */
+}
+
+.message-input {
+    flex-grow: 1;
+    padding: 5px;
+    background-color: #161d36;
+    border: none;
+    color: #b4b6bf;
+    font-family: Lato, sans-serif;
+    margin-right: 10px; /* Aggiunge uno spazio tra l'input e il pulsante */
+    width: 100%; /* Assicura che l'input occupi tutta la larghezza disponibile */
+    box-sizing: border-box; /* Considera padding e border nella larghezza totale */
+}
+
+form#send-message-form {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.send-button,
+#manage-group-button {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    flex-shrink: 0; /* Impedisce al pulsante di ridimensionarsi */
+}
+
+.send-button img,
+#manage-group-button img {
+    width: 40px;
+    height: 40px;
+    display: block;
+}
+
+
+
+
+/*LISTA SX*/
+
+.unread-avatar {
+    border: 3px solid #ce846f;
+    border-radius: 50%; /* Mantiene l'avatar circolare se già lo è */
+}
+
+.popup {
+    position: absolute;
+    bottom: 50px; /* Posiziona il popup sopra il pulsante "Nuovo SMS" */
+    left: 20px; /* Sposta il popup vicino al bordo sinistro */
+    background-color: #1d2c3c; /* Colore di sfondo del popup (indicato dalla freccia gialla) */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Assicurati che il popup sia visibile sopra gli altri elementi */
+    width: 200px; /* Imposta una larghezza adeguata per il popup */
+}
+
+.popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.popup-content select {
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.close-popup {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff; /* Colore della X */
+    background: none;
+    border: none;
+    font-size: 16px;
+}
+
+
+/*IFRAME*/
+
+.message-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0f111d; /* Nuovo colore di sfondo */
+    overflow: hidden; /* Evita lo scroll */
+}
+
+.message-placeholder img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Mantiene le proporzioni dell'immagine adattandola allo spazio */
+}
+
+
+.message {
+    position: relative; /* Posiziona i messaggi sopra l'immagine */
+    z-index: 2; /* Assicura che i messaggi siano sopra lo sfondo */
+    background-color: #fff; /* Mantiene i messaggi opachi */
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+
+/*SELECT GRUPPI*/
+
+#group-participants-checkboxes {
+    max-height: 200px;       /* Altezza massima del contenitore */
+    overflow-y: auto;        /* Abilita lo scorrimento verticale */
+    background-color: #1d2c3c; /* Colore di sfondo del popup (indicato dalla freccia gialla) */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;           /* Spaziatura interna */
+}
+
+#group-participants-checkboxes label {
+    display: block;
+    margin: 5px 0;           /* Margine verticale tra le checkbox */
+}
+
+#group-participants-checkboxes input[type="checkbox"] {
+    margin-right: 10px;      /* Spaziatura tra la checkbox e il nome */
+}
+
+
+
+
+
+
+/*POPUO GRUPPO */
+
+.popup_gruppo {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #222;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7); /* Ombra più profonda */
+    z-index: 1000;
+    padding: 20px;
+    width: 400px;
+    max-width: 100%;
+    color: #fff;
+    opacity: 0;  /* Per la transizione */
+    visibility: hidden;  /* Per la transizione */
+    transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s ease; /* Transizioni fluide */
+}
+
+/* Classe per mostrare il popup */
+.popup_gruppo.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);  /* Apre in modo fluido */
+}
+
+/* Sfondo sfocato */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Overlay semi-trasparente */
+    backdrop-filter: blur(5px); /* Sfocatura di sfondo */
+    z-index: 999;  /* Appare sotto il popup */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+/* Classe per mostrare l'overlay */
+.popup-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content_gruppo {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup_gruppo h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #fff;
+}
+
+.form-group_gruppo {
+    margin-bottom: 15px;
+}
+
+.form-group_gruppo label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group_gruppo input[type="text"],
+.form-group_gruppo input[type="checkbox"],
+.form-group_gruppo select {
+    width: 100%; /* Modifica per uniformare la larghezza */
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #444;
+    background-color: #333;
+    color: #fff;
+}
+
+.form-group_gruppo select {
+    height: auto; /* Mantiene l'altezza adattabile */
+}
+
+.form-group_gruppo input[type="checkbox"] {
+    width: auto; /* Mantiene il checkbox alla larghezza standard */
+}
+
+.close-popup_gruppo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.save-button_gruppo,
+.abbandona-button_gruppo {
+    padding: 10px;
+    background-color: #555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.save-button_gruppo:hover,
+.abbandona-button_gruppo:hover {
+    background-color: #777;
+}
+
+
+/*MEX SYSTEM*/
+
+.message.system {
+    background-color: #1c1f2b; /* Colore di sfondo più scuro */
+    color: #b4b6bf; /* Colore del testo */
+    text-align: center; /* Allinea il testo al centro */
+    margin: 10px 0; /* Spazio intorno al messaggio */
+    padding: 10px; /* Spaziatura interna */
+    border-radius: 8px; /* Angoli arrotondati */
+    border: 1px solid #2a2e3d; /* Bordo leggero per definire il contorno */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Leggero effetto ombra */
+    font-weight: 600; /* Testo un po' più spesso */
+}
+
+.message.system b, .message.system u {
+    color: #d1d4e0; /* Colore leggermente più chiaro per enfasi */
+}
+
+.system-header {
+    font-size: 14px;
+    color: #ffdd57; /* Colore giallo oro */
+    margin-bottom: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Adattamento per Tablet e Cellulari */
+@media (max-width: 1024px) {
+
+    /* Impostazioni iniziali: sidebar occupa tutto, la conversazione è nascosta */
+    .sidebar {
+        width: 100%;
+        height: 100vh;
+        overflow-y: auto;
+        transition: height 0.3s ease; /* Transizione per la riduzione */
+    }
+
+    .main-content {
+        display: none; /* Nascondi la conversazione all'inizio */
+        width: 100%;
+        height: calc(100vh - 50px); /* Spazio per la conversazione una volta visibile */
+        overflow-y: auto;
+    }
+
+    /* Quando la sidebar è ridotta */
+    .sidebar.reduced {
+        height: 50px; /* Sidebar ristretta */
+        overflow: hidden; /* Nascondi i contenuti */
+    }
+
+    /* La conversazione diventa visibile quando la sidebar è ridotta */
+    .main-content.active {
+        display: block;
+    }
+
+    /* Pulsante per espandere la sidebar */
+    .sidebar-toggle-button {
+        display: none;
+    }
+
+    /* Mostra il pulsante quando la sidebar è ridotta */
+    .sidebar.reduced .sidebar-toggle-button {
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        background-color: #ce846f;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+    
+    /* Effetti per il pulsante */
+    .sidebar-toggle-button:hover {
+        background-color: #b46b59;
+    }
+    
+    /* Stile per l'input dei messaggi */
+    .message-input-container {
+        height: 60px; /* Ridimensionato per dispositivi mobili */
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background-color: #111423;
+        border-top: 1px solid #070A1B;
+    }
+
+    /* Spazio per i messaggi */
+    .messages {
+        margin-bottom: 70px; /* Lascia spazio per la finestra di input */
+        max-height: calc(100vh - 140px); /* Altezza per i messaggi */
+        overflow-y: auto;
+    }
+    
+    /* Stile per il pulsante Espandi Sidebar */
+.expand-sidebar-button {
+    display: none; /* Non mostrare il pulsante finché la sidebar non è ridotta */
+    position: absolute;
+    top: 10px; /* Posiziona il pulsante in alto */
+    right: 10px; /* Posiziona il pulsante sulla destra */
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1000; /* Assicurati che sia sopra altri elementi */
+}
+
+/* Mostra il pulsante quando la sidebar è ridotta */
+.sidebar.reduced + .expand-sidebar-button {
+    display: block; /* Mostra il pulsante */
+}
+
+/* Modifica la posizione del pulsante quando la sidebar è nascosta */
+.sidebar.reduced {
+    height: 50px; /* Al posto della larghezza completa, riduci l'altezza */
+}
+
+}
+
+
+/* Adattamento per Cellulari (larghezza massima 768px) */
+@media (max-width: 768px) {
+    /* Sidebar e Main Content si posizionano uno sotto l'altro */
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .main-content {
+        width: 100%;
+        height: calc(100vh - 70px); /* Calcola l'altezza in base alla barra di input */
+        overflow-y: auto;
+        margin-bottom: 70px; /* Spazio per la barra di input */
+    }
+
+    /* Messaggi */
+    .messages {
+        overflow-y: auto;
+        max-height: calc(100vh - 140px); /* Lascia spazio per la barra di input */
+    }
+
+    /* Barra di input visibile sempre in basso */
+    .message-input-container {
+        height: 70px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #111423;
+        border-top: 1px solid #070A1B;
+        display: flex;
+        align-items: center;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        z-index: 9999; /* Assicura che la barra sia visibile sopra altri contenuti */
+    }
+
+    .message-input {
+        flex-grow: 1;
+        padding: 10px;
+        font-size: 14px;
+        border: none;
+        background-color: #161d36;
+        color: #b4b6bf;
+        border-radius: 5px;
+        margin-right: 10px;
+    }
+
+    .send-button img {
+        width: 35px;
+        height: 35px;
+    }
+    
+    /* Stile per il pulsante Espandi Sidebar */
+.expand-sidebar-button {
+    display: none; /* Non mostrare il pulsante finché la sidebar non è ridotta */
+    position: absolute;
+    top: 10px; /* Posiziona il pulsante in alto */
+    right: 10px; /* Posiziona il pulsante sulla destra */
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1000; /* Assicurati che sia sopra altri elementi */
+}
+
+/* Mostra il pulsante quando la sidebar è ridotta */
+.sidebar.reduced + .expand-sidebar-button {
+    display: block; /* Mostra il pulsante */
+}
+
+/* Modifica la posizione del pulsante quando la sidebar è nascosta */
+.sidebar.reduced {
+    height: 50px; /* Al posto della larghezza completa, riduci l'altezza */
+}
+
+}

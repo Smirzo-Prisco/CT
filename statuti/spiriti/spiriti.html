@@ -1,0 +1,514 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script src="https://code.jquery.com/jquery-latest.pack.js" type="text/javascript"></script>
+<script src="scripts.js"></script>
+<title>.:: Spiriti Planetari ::.</title>
+<link href="spiriti.css" rel="stylesheet" type="text/css" />
+<style type="text/css"> 
+
+#pic-wrapper{
+margin:2em auto;
+width:100px;
+height:500px;
+position:absolute;
+cursor:pointer
+}
+#pic{
+width:100px;
+height:500px;
+-moz-transition:all 1s ease-out;
+-webkit-transition:all 1s ease-out;
+-o-transition:all 1s ease-out;
+-ms-transition:all 1s ease-out;
+position:absolute;
+z-index:1;
+opacity:1;
+border: 1px solid #000;
+}
+#pic-inner{
+width:100px;
+height:500px;
+z-index:0;
+position:absolute;
+border: 1px solid #000;
+}
+#pic:hover{
+opacity:0
+}
+#mercurio {position:absolute; width:100px; height:500px; left:3; top:0; border:0px solid #a9cded;}
+#venere {position:absolute; width:100px; height:500px; left:3; top:0; border:0px solid #a9cded;}
+#terra {position:absolute; width:100px; height:500px; left:3; top:0; border:0px solid #a9cded;}
+#luna {position:absolute; width:100px; height:500px; left:3; top:0; border:0px solid #a9cded;}
+#marte {position:absolute; width:100px; height:500px; left:3; top:0; border:0px solid #a9cded;}
+#giove {position:absolute; width:100px; height:500px; left:115; top:0; border:0px solid #a9cded;}
+#saturno {position:absolute; width:100px; height:500px; left:3; top:0; border:0px solid #a9cded;}
+#urano {position:absolute; width:100px; height:500px; left:3; top:0; border:0px solid #a9cded;}
+#nettuno {position:absolute; width:100px; height:500px; left:3; top:0; border:0px solid #a9cded;}
+#plutone {position:absolute; width:100px; height:500px; left:3; top:0; border:0px solid #a9cded;}
+</style>
+</head>
+
+<body>
+<div id="contenitore">
+<table><tr width=1100 height=500>
+<td width=100 height=500><div id="mercurio"><div id="pic-wrapper">
+<a href="#dialog" name="modal"><img src="mercurio_2s.png" alt="" id="pic"/>
+<img src="mercurio_2.png" width="100" height="500" id="pic-inner"/></a></div></div></td>
+
+<td width=100 height=500>
+<div id="venere"><div id="pic-wrapper">
+<a href="#dialog2" name="modal2"><img src="venere_2s.png" alt="" id="pic"/>
+<img src="venere_2.png" width="100" height="500" /></a></div></div></td>
+
+<td width=100 height=500>
+<div id="terra"><div id="pic-wrapper">
+<a href="#dialog3" name="modal3"><img src="terras.png" alt="" id="pic"/>
+<img src="terra.png" width="100" height="500" id="pic-inner"/></a></div></div></td>
+
+<td width=100 height=500>
+<div id="luna"><div id="pic-wrapper">
+<a href="#dialog4" name="modal4"><img src="lunas.png" alt="" id="pic"/>
+<img src="luna.png" width="100" height="500" id="pic-inner"/></a></div></div></td>
+
+<td width=100 height=500>
+<div id="marte"><div id="pic-wrapper">
+<a href="#dialog5" name="modal5"><img src="martes.png" alt="" id="pic"/>
+<img src="marte.png" width="100" height="500" id="pic-inner"/></a></div></div></td>
+
+<td width=100 height=500>
+<div id="giove"><div id="pic-wrapper">
+<a href="#dialog6" name="modal6"><img src="gioves.png" alt="" id="pic"/>
+<img src="giove.png" width="100" height="500" id="pic-inner"/></a></div></div></td>
+
+<td width=100 height=500>
+<div id="saturno"><div id="pic-wrapper">
+<a href="#dialog7" name="modal7"><img src="saturnos.png" alt="" id="pic"/>
+<img src="saturno.png" width="100" height="500" id="pic-inner"/></a></div></div></td>
+
+<td width=100 height=500>
+<div id="urano"><div id="pic-wrapper">
+<a href="#dialog8" name="modal8"><img src="uranos.png" alt="" id="pic"/>
+<img src="urano.png" width="100" height="500" id="pic-inner"/></a></div></div></td>
+
+<td width=100 height=500>
+<div id="nettuno"><div id="pic-wrapper">
+<a href="#dialog9" name="modal9"><img src="nettunos.png" alt="" id="pic"/>
+<img src="nettuno.png" width="100" height="500" id="pic-inner"/></a></div></div></td>
+
+<td width=100 height=500>
+<div id="plutone"><div id="pic-wrapper">
+<a href="#dialog10" name="modal10"><img src="plutones.png" alt="" id="pic"/>
+<img src="plutone.png" width="100" height="500" id="pic-inner"/></a></div></div></td>
+</tr></table>
+
+</div>
+<div id="box"> 
+		<div id="dialog" class="window"> <p class="titoletti">Mercurio</p> 
+        <br /><br />
+         L'essenza del pianeta Mercurio, fa di questi spiriti degli esseri brillanti. Amanti della conoscenza, sono curiosi verso tutto ciò che non ha ancora una risposta. Sono persone che non hanno difficoltà a mettersi in discussione e vedono il cambiamento come una caratteristica essenziale della vita stessa. Non a caso hanno un contatto particolare con l'Acqua, l'elemento più mutevole. L'elemento acqua in Mercurio non si identifica con il mare però, campo semantico di Nettuno, bensì in Mercurio l'acqua viene associata principalmente al Ghiaccio (in analogia con la freddezza della ragione che li caratterizza). <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Raziocinio</span><br /> 
+        Indica la capacità mentale che attiene al saper ragionare, al riflettere e ad argomentare in modo arguto, risultando il più delle volte particolarmente convincenti. <br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio è in grado di risolvere quesiti e/o indovinelli di media complessità.</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio è in grado di riflettere e ragionare su un gran numero di quesiti o argomenti di media complessità senza il minimo sforzo.</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio è in grado di prevedere le conseguenze di una determinata azione (da concordare con master e/o player).</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Conoscenza</span><br /> 
+Gli spiriti di mercurio sono conoscitori di una o più materie (a scelta del player) e, per questo motivo, tendono a essere ascoltati con maggiore autorevolezza quando disquisiscono di ciò di cui sono competenti. <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio conosce perfettamente una materia.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio conosce perfettamente due materie.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio conosce perfettamente tre materie.</li>
+</ul>
+<br />
+<span class="nomitalenti">› Osservare</span><br /> 
+Indica la capacità di prestare un&rsquo;attenzione quasi maniacale al mondo che li circonda. <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è predisposto a trovare piccoli oggetti.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è predisposto a scovare informazioni osservando oggetti o gesti di persone a lui vicine</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è predisposto a notare particolari che potrebbero sfuggire agli altri.</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+    <div id="box"> 
+		<div id="dialog2" class="window"> <p class="titoletti">Venere</p><br /><br />
+         Frivoli, amanti delle cose belle, lussuriosi talvolta, gli spiriti di Venere dedicano all'amore ed al corteggiamento gran parte della propria vita. Non sono necessariamente belli, ma hanno qualche tratto particolare o una voce suadente, che attira gli altri. Se aventi un allineamento positivo, essi sono persone pure e luminose, che amano gli altri sacrificando se stessi. Se, viceversa di allineamento malvagio hanno una predisposizione verso la lussuria e la seduzione finalizzata all'ottenimento di qualcosa. L'elemento loro associato è la Luce perché l'Amore viene visto come un dono divino che illumina la terra. <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Sedurre</span><br /> 
+        Indica la capacità di saper conquistare e/o ammaliare la persona con cui si sta interagendo. <br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio è in grado di calamitare l’attenzione su di sé senza il minimo sforzo.</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio è in grado di farsi rivelare informazioni del proprio quotidiano che restano a discrezione dell’ammaliato.</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio è in grado di indurre una persona a compiere piccoli gesti che quotidianamente non farebbe.</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Sensibilità</span><br /> 
+Indica la capacità di sapersi guadagnare la fiducia degli altri mediante l’utilizzo di parole. <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di calmare lo stato d’animo di una persona.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di calmare situazioni conflittuali fra due persone.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di calmare situazioni conflittuali fra tre o più persone.</li>
+</ul>
+<br />
+<span class="nomitalenti">› Intrattenere</span><br /> 
+Indica la capacità di conquistarsi il pubblico grazie al proprio magnetismo. Sanno come rendersi inconfondibili, sanno divertirsi e divertire. <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di intrattenere una conversazione anche con le persone più chiuse.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di coinvolgere uno o due personaggi in un’attività di cui è l’artefice, per divertire o distrarre.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di coinvolgere più personaggi in un’attività di cui è l’artefice, per divertire o distrarre.</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+    <div id="box"> 
+		<div id="dialog3" class="window"> <p class="titoletti">Terra </p>
+         Queste persone sono varie, miste, sempre diverse. Raccolgono le particolarità di tutti gli altri Spiriti e non c'è una logica secondo cui un aspetto del carattere è più evidente o pronunciato di un altro. Sono molto concreti e materialisti senza dubbio, dimostrano di avere i piedi ben piantati al suolo. Possono essere socievoli o anche più solitari. Non hanno la stessa fredda razionalità di Mercurio, così come non sono artisti nati come Nettuno – riescono bene, però, in ogni lavoro che abbia a che fare con la tecnologia e se non hanno approfondito studi a riguardo sono comunque dotati di un grande intuito.
+        <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Imporsi</span><br /> 
+        Indica la capacità di sfruttare il proprio aspetto fisico o il linguaggio verbale e del corpo per prevaricare gli altri, e imporsi sulle loro e sulla propria volontà. <br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio è in grado di controllare le proprie emozioni ed i propri istinti.</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio è in grado di farsi valere nei confronti altrui.</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio è in grado di rendere il proprio punto di vista credibile e acclamato.</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Organizzazione</span><br /> 
+Indica la capacità di pianificare strategie gestionali o militari. <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di calcolare i rischi o i benefici di una determinata strategia.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di facilitare o rendere più pratica una specifica situazione.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di organizzare, verificare, valutare e gestire una situazione particolarmente complessa, calcolando il modo più facile per renderla più sicura (o complessa) per se stesso o gli altri.</li>
+</ul>
+<br />
+<span class="nomitalenti">› Investigare</span><br /> 
+Indica lo sforzo di concentrazione e sull’esame minuzioso ed approfondito di una situazione.<br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di analizzare e trovare indizi prima di altri un luogo vuoto, riuscendo a percepire la presenza di criminali.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di verificare la veridicità di un’informazione e percepire la presenza passata di esseri sovrannaturali in quel luogo.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di giungere a conclusioni certe prima che queste si concretizzino attraverso lo studio di dettagli, umani o magici.</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+    <div id="box"> 
+		<div id="dialog4" class="window"> <p class="titoletti">Luna</p> <br /> <br /> 
+        L'essenza della Luna, si incarna in questi spiriti Puri. Sono algidi, ossia tendono a credere nella purezza delle idee, non accettano compromessi. Non esistono due verità per loro. La luna è una sola nel cielo, così come una verità esiste al mondo. Destinati al Potere, sono predisposti dalla loro indole alle posizioni alte. Eleganti, emotivi molto spesso; estremamente gelidi in altri casi , sono alla perenne ricerca della verità, qualunque essa sia. Se di allineamento Positivo saranno persone schiette che non temono di dire la verità per come è, altrimenti se di indole malvagia, avranno l'ossessione per il potere e la smania di conquista.
+        <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Ascoltare</span><br /> 
+        Indica la capacità di saper ascoltare e di cogliere, attraverso le parole, messaggi più o meno sottintesi. <br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio, ascoltando attentamente l’interlocutore, riesce a memorizzare anche i più piccoli dettagli.
+</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio, ascoltando attentamente l’interlocutore, riesce a captare le necessità più esplicite.</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio, ascoltando attentamente l’interlocutore, riesce a captare incongruenze o bugie.</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Persuadere</span><br /> 
+Indica la capacità di sapersi guadagnare la fiducia degli altri. <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di rendere convincente il proprio punto di vista.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di risultare credibile in ciò che dice o fa.
+</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di calarsi nei panni di un’altra persona e convincerlo/a a fare qualcosa che normalmente non farebbe.</li>
+</ul>
+<br />
+<span class="nomitalenti">› Percepire Intenzioni</span><br /> 
+Indica la capacità di comprendere o prevedere le azioni di altri.<br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di comprendere con maggiore perspicacia azioni di persone particolarmente agitate.
+</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di prevedere azioni di persone agitate o che mostrano qualche stranezza.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di captare le intenzioni di persone diverse fra loro.</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+    <div id="box"> 
+		<div id="dialog5" class="window"> <p class="titoletti">Marte</p> 
+         L’essenza del pianeta Marte si incarna in questi individui e li rende passionali, caparbi, irascibili. Manchevoli di pazienza e sempre pronti a mettersi in gioco, prediligono i fatti alle parole e sono capaci di provare forti emozioni. L'elemento affine è il Fuoco, da cui traggono il temperamento turbolento così come luminoso, distruttivo così come purificatore. Capaci di spensieratezza e poco inclini all'angoscia, al malumore e alla solitudine. Se aventi un allineamento positivo, mantengono un comportamento irascibile e bellicoso ma mai mosso da cattiveria; le emozioni bruciano come il fuoco e sono pure, autentiche, e ad esse viene data molta importanza. Se, viceversa di allineamento malvagio sono inclini alla distruzione per puro piacere di farlo e le passioni li portano al consumare chiunque le provi; violenti, annientatori, iracondi.
+        <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Intimidire</span><br /> 
+        Indica la capacità di incutere timore verso uno o più persone. <br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio è in grado di incutere un profondo senso di disagio usando la gestualità.
+</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio è in grado di incutere paura usando la sola gestualità.</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio è in grado di incutere paura o disagio mediante parole o la propria gestualità.</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Lottare</span><br /> 
+Indica la capacità di far nascere o gestire lotte fisiche o verbali.
+ <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di scatenare delle piccole liti durante situazioni di tensione.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di affrontare meglio uno scontro fisico (+0.5 sul risultato del dado forza).
+</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di affrontare meglio uno scontro fisico (+1 sul risultato del dado forza).</li>
+</ul>
+<br />
+<span class="nomitalenti">› Istintività</span><br /> 
+Indica la capacità e la prontezza con cui ci si affida all'istinto piuttosto che alla ragione o al ponderare se effettuare o meno una scelta e la sua modalità (a scelta del master o dei giocatori presenti).<br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio può prevedere le conseguenze di una situazione.
+</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio può comprendere i tratti sommari di una persona.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di prevedere se la scelta o meno di un’azione verso una situazione o una persona sia giusta o sbagliata.</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+    <div id="box"> 
+		<div id="dialog6" class="window"> <p class="titoletti">Giove</p> 
+                 L’essenza del pianeta li rende autorevoli, mai sgarbati, molto disponibili. Hanno un carattere mite e aperto. Possono essere predisposti al comando, avendo un grande carisma e ironia per sdrammatizzare qualunque situazione. Amano la vita, i piaceri della comodità, il cibo, e la semplicità. Sono molto leali verso le persone a cui tengono e le difendono con tutto se stessi. Se aventi un allineamento positivo, sono affidabili, corretti, ironici, generosi. Amano la compagnia e sono intessati a conoscere gente nuova. Se, viceversa di allineamento malvagio tendono alla tirannia, all'essere saccenti e sarcastici. Il piacere di condividere qualcosa con gli altri si trasforma in un fine egoistico e personale. Utilizzano il loro garbo e disponibilità per i propri interessi.
+        <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Resistere</span><br /> 
+        Indica la capacità di saper resistere fisicamente a determinate situazioni. <br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio è in grado di resistere a sforzi fisici di media entità.</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio è in grado di resistere a colpi fisici di media entità (-5pf sulla somma totale del danno).</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio è in grado di guarire più in fretta da ferite inferte (+5pf al giorno recuperato se la soglia dei pf totali è sotto i 50).</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Pazienza</span><br /> 
+Indica la capacità di tollerare, pazientare e mantenere la calma anche in situazioni di difficoltà maggiore.
+ <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di resistere a provocazioni di media o bassa entità.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di rimanere lucido il più a lungo possibile in situazioni particolarmente complesse.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di diminuire di un giorno un’abilità mentale scagliatagli addosso da un magico.</li>
+</ul>
+<br />
+<span class="nomitalenti">› Coraggio</span><br /> 
+Indica la capacità di esporsi al fine di proteggere qualcuno, qualcosa o di raggiungere un importante obiettivo.<br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio riesce a considerare i rischi di una situazione di media complessità e affrontarla con attenzione e coscienza.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio riesce a infondere coraggio a una seconda persona.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di affrontare situazione di alta complessità, riuscendo a infondere il proprio punto di vista a due o tre persone.</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+    <div id="box"> 
+		<div id="dialog7" class="window"> <p class="titoletti">Saturno</p> 
+         Il pianeta nero, Saturno, ha dannato questi spiriti; racchiudono nel loro seno sia la distruzione del mondo sia la sua rinascita. Molto spesso pessimisti e fatalisti, tendono ad avere manie suicide oppure ad avere una salute molto precaria. Possono aver avuto un contatto con la morte nelle loro esperienze. Altri invece rispecchiano il lato della Rinascita di questo pianeta, possono avere grande fiducia nella redenzione. Sono perseguitati dal fallimento o dalla vittoria. Essendo duplice la loro natura, capita che abbiano disturbi di una doppia personalità, oppure che siano molto volubili.
+        <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Carisma</span><br /> 
+        Indica la capacità di attirare l'attenzione a sé facendoli apparire misteriosi, proibiti, enigmatici. <br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio riesce a calamitare l’attenzione su di sé mediante l’uso di parole o di sguardi.</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio riesce a imporre il proprio punto di vista.</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio è in grado di convincere una o due persone a fare azioni che normalmente non farebbero.</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Misticismo</span><br /> 
+Indica il legame instaurato tra il mondo terreno e quello spirituale.
+ <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di prevedere le conseguenze di una situazione apparentemente tranquilla.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di captare la presenza di esseri sovrannaturali.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di ascoltare, con non poche difficoltà, la voce dei defunti.</li>
+</ul>
+<br />
+<span class="nomitalenti">› Provocare</span><br /> 
+Indica la capacità di fare affidamento sulle loro parole per scatenare reazioni nocive nei confronti di coloro con cui stanno interagendo.<br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di instillare dei dubbi verso un personaggio che conosce mediamente bene.
+</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di accendere una discussione o una lotta in situazioni particolarmente tese.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di incitare uno o due personaggi a commettere azioni pericolose o che normalmente non farebbero.</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+    <div id="box"> 
+		<div id="dialog8" class="window"> <p class="titoletti">Urano</p> 
+         I figli di tale pianeta si distinguono per superbia e autorevolezza. Il vento è il loro elemento predominante che li rende inafferrabili e imprevedibili, come anche soggetti a cambiamenti repentini di umore. Sono scaltri e possono essere incoerenti, come anche scettici: impiegano tempo per credere in qualcosa, ma quando tale concetto diventa parte di loro, lottano per difenderlo fino alla fine; sono per questo molto idealisti. Se aventi un allineamento positivo, sono predisposti alla protezione altrui, disponibili al sacrificio nel nome dell'idea in cui credono. Se, viceversa di allineamento malvagio tendono ad essere cinici, diffidenti, imperscrutabili. Il forte idealismo non varia ed anzi manca di qualsiasi forma di scrupolo.
+        <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Agilità</span><br /> 
+       Indica la capacità di essere scattanti, rapidi, inafferrabili – oltre ad avere un buon equilibrio fisico.<br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio è in grado di compiere azioni più velocemente rispetto ad altre persone.</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio è in grado di ragionare più velocemente rispetto ad altre persone (+0.5 sul risultato del dado destrezza).</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio è in grado di muoversi più velocemente in situazioni di altissima complessità (+1 sul risultato del dado destrezza).</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Priorità</span><br /> 
+Indica la capacità di spiccare rispetto ad altre persone.
+ <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado, con uno sforzo minore, di raggiungere un buon risultato in situazioni quotidiane.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di convincere altre persone ad avere ruoli di spicco.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di convincere qualcun altro ad essere primo in qualcosa.</li>
+</ul>
+<br />
+<span class="nomitalenti">› Furtività</span><br /> 
+Indica la capacità di compiere azioni senza essere notati, passando inosservati ai più.<br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di passare inosservato in luoghi pieni di gente.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di nascondersi nei luoghi più improbabili.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di rubare con una probabilità più alta rispetto ad altri.</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+    <div id="box"> 
+		<div id="dialog9" class="window"> <p class="titoletti">Nettuno</p> 
+         Sognatori, esteti e profeti appartengono a questa categoria di spiriti. Sanno essere ammalianti, muniti di grazia e interesse artistico nonché predisposizione verso lo stesso. Molto profondi come il mare stesso, che è il loro elemento, e fortemente sensibili nonché emotivi. Prediligono il dialogo alle maniere forti, amano conversare e far valere le proprie teorie o ragioni così come ascoltare quelle altrui. Se aventi un allineamento positivo, sono molto leali, capaci di mentire solo a fin di bene e per nobili scopi. Se, viceversa, di allineamento malvagio utilizzano le parole per mentire, diffamare, corrompere.
+        <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Preveggenza</span><br /> 
+       Indica la capacità di dare uno sguardo nel tempo e nello spazio a seconda del loro potenziale.<br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio è in grado di percepire un pericolo imminente di piccola intensità e legato ad attività quotidiane e non al mondo magico.</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio è in grado di percepire pericoli di maggiore intensità e, per la prima volta, legati al mondo magico, sebbene di piccola intensità (come l'inizio di uno scontro).</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio è in grado di percepire un pericolo imminente di enorme complessità, sia legato al mondo umano sia al mondo magico (da concordare con il master o con i giocatori presenti nella location).</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Adattabilità</span><br /> 
+In virtù della loro calma e delle particolarità donate loro dallo Spirito, sanno adattarsi ai luoghi in cui si trovano ma ancora meglio alle situazioni più svariate. 
+ <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di adattarsi, con un importante dispendio di impegno, a situazioni di stress medio-basso. Così come ad ambienti mediamente ostili o sconosciuti.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di adattarsi, con un certo dispendio di impegno, a situazioni di stress medio-alto. Così come ad ambienti piuttosto ostili o sconosciuti che cercano di comprendere.
+</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di adattarsi e affrontare con flessibilità situazioni di stress elevato, risultando meno affaticato intellettualmente rispetto ad altri Spiriti. Riesce a non comportarsi in maniera ostile anche nei confronti di un luogo sconosciuto, tentando piuttosto di comprenderlo e farlo proprio.</li>
+</ul>
+<br />
+<span class="nomitalenti">› Integrità</span><br /> 
+Indica la capacità di risolvere situazioni attraverso il dialogo piuttosto che con la forza. Sono disponibili al confronto intellettuale, al punto da renderne compartecipi gli interlocutori almeno a livello teorico.<br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio possiede forti ideali che porta avanti nella propria quotidianità. Molto aperto al dialogo, è capace di rendere partecipi terze persone di concetti mediamente complessi, senza far scaturire il bisogno di repliche dalle maniere brusche in virtù della propria calma.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio possiede forti ideali che porta avanti nella propria quotidianità e in differenti aspetti della vita. E' capaci di rendere partecipi terze persone di concetti maggiormente complessi e articolati, senza far scaturire il bisogno di repliche dalle maniere brusche in virtù della propria calma.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio possiede una volontà ormai solida, i suoi ideali sono così fortificati dall’esperienza da non poter essere smossi che da sapienti talenti specifici. E' capace di rendere partecipi terze persone di concetti molto complessi e articolati, senza far scaturire il bisogno di repliche dalle maniere brusche in virtù della propria calma.</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+    <div id="box"> 
+		<div id="dialog10" class="window"> <p class="titoletti">Plutone</p>
+         Misteriosi, intriganti, perfezionisti. Appartengono a tale pianeta le persone precise, curiose e che amano la conoscenza esoterica e la storia. Sono connessi e molto legati al concetto del tempo, sensibili agli avvenimenti del passato e molto dediti alla costruzione del futuro, che sia il loro o quello altrui. Evitano pregiudizi e preferiscono analizzare fatti o soggetti in prima persona. Schivi, solitari. Possiedono una buona memoria. Solitamente sono molto selettivi e decidono di confidare se stessi solo a poche persone di cui hanno la massima fiducia. Se aventi un allineamento positivo, sono molto affidabili e riflessivi. Se, viceversa, di allineamento malvagio sono abili calcolatori, spietati, vendicativi.
+        <br /><br />
+         <p class="talenti">Talenti</p>        
+        <span class="nomitalenti">› Occultismo</span><br /> 
+       Indica la capacità di vivere o entrare in contatto con i vari piani dell'esistenza, che essa sia materiale o meno.<br />
+        <ul>
+          <li><span class="livello">Livello 1</span>: Il personaggio è in grado di vivere una situazione sovrannaturale con meno timore rispetto ad altre persone.
+</li>
+          <br />
+          <li><span class="livello">Livello 2</span>: Il personaggio è in grado di praticare riti occulti di bassa-media entità, come ad esempio percepire messaggi nascosti nel mondo sovrannaturale (diversamente dagli spiriti di Mercurio che hanno più difficoltà con ciò che non è pragmatico).</li>
+          <br />
+          <li><span class="livello">Livello 3</span>: Il personaggio è in grado di entrare, con non poche difficoltà, nel Velo e parlare con un solo personaggio.</li>
+        </ul>
+        <br /><br />
+<span class="nomitalenti">› Nascondersi</span><br /> 
+Indica la capacità di nascondere oggetti o tratti della propria personalità.
+ <br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio è in grado di nascondere piccole verità od oggetti.</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di nascondersi in mezzo alla folla con basse probabilità di esser visto o informazioni più complesse.
+</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio è in grado di nascondere le proprie intenzioni, notizie, informazioni, verità ed è difficile riuscire a farlo parlare se non dietro la propria volontà.</li>
+</ul>
+<br />
+<span class="nomitalenti">› Fingere</span><br /> 
+Indica la capacità di raccontare o mostrarsi agli altri secondo una propria attitudine.<br />
+<ul>
+  <li><span class="livello">Livello 1</span>: Il personaggio riesce a fingere in maniera piuttosto basica su argomenti privi di complessità.
+</li>
+  <br />
+  <li><span class="livello">Livello 2</span>: Il personaggio è in grado di risultare convincente a un occhio non particolarmente attento.</li>
+  <br />
+  <li><span class="livello">Livello 3</span>: Il personaggio riesce a creare una menzogna credibile (a meno di una controprova concreta o un talento a esso opposto).</li>
+</ul>
+<br />
+        </div>
+            <div id="mask">
+		</div> 
+	</div>
+</body>
+</html>

@@ -1,0 +1,109 @@
+body {
+margin:0;
+padding:0;
+text-align:center;
+background-color: #0f111d;
+}
+
+#main-container{
+margin:0 auto;
+padding:0;
+width:985px;
+height:100%;
+}
+
+.chapter {
+    position: absolute;
+    height: 100%;
+    z-index: -9999;
+}
+
+iframe.iframemenu{
+    width:100%;
+    height:100%;
+    position:relative;
+    top:0px;
+    bottom:0px;
+    overflow:hidden;
+}
+
+.openmenu{
+   position:fixed; 
+   top:15px; 
+   bottom:0px; 
+   margin:3 auto; 
+   width:330px; 
+   height:580px;
+   color: grey;
+   text-transform:uppercase;
+   font-size:13px;
+   font-family:tahoma;
+   color:#564330;
+   overflow-y:hidden;
+   overflow-x: hidden;
+   border: none;
+}
+
+/* CONTENITORE PAGINE, frame */
+.content{
+    position: absolute;
+    height: 100%;
+    z-index: -9999;
+}
+
+.opendoc{
+   position:relative; 
+   top:15px; 
+   left:337px; 
+   margin:3 auto; 
+   width:527px; 
+   height:588px;
+   color: grey;
+   text-transform:uppercase;
+   font-size:13px;
+   font-family:tahoma;
+   color:#564330;
+   overflow-y:hidden;
+   overflow-x: hidden;
+   border: none;
+}
+iframe.iframedoc{    
+    margin-top: 0px;    
+    width: 100%;
+    height: 100%;
+    overflow:auto;
+    position:relative;
+    }
+
+.titoli{
+    font-family: DejaVu Serif;
+    font-size: 16px;
+    text-decoration: none;
+    color: #ce846f;
+    text-transform: uppercase;
+    font-weight: normal;
+    background-image: url(imgs/documentazione/barra_titolo.png);
+    text-align: center;
+    padding: 10px;
+    text-shadow: 3px 2px 3px #000;
+    }
+
+.testo{
+    font-family: DejaVu Serif;
+    font-size: 15px;
+    color: #8f8f8f;
+    line-height: 18px;
+    text-align:justify;
+    padding:20px;
+
+}
+
+span.look {font-size:13px;
+text-transform:uppercase;
+color: #ce846f;
+}
+
+span.pala {font-size:13px;
+text-transform:uppercase;
+color: #ccac00;
+}
