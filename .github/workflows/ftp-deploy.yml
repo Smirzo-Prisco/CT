@@ -29,6 +29,17 @@ jobs:
           exclude: |
             **/.git*
             **/.github/**
+            **/docs/**
+            **/giocate/**
+            **/imgs/**
+            **/layouts/**
+            **/node_modules/**
+            **/plugins/**
+            **/sounds/**
+            **/statuti/**
+            **/themes/advanced/**
+            **/vocabulary/**
+            **/.gitignore*
             **/.htaccess*
             **/config.inc.php*
             **/google1523a7878bc930c6.html*
@@ -36,21 +47,15 @@ jobs:
             **/log.html*
             **/purgecss.config.js*
             **/test.php*
-            **/node_modules/**
             **/*.md
             **/*.mjs
             **/*.sql
             **/*.yml
+            **/*.json
+            **/*.txt
             **/*.jpeg
             **/*.xml
             **/*.pdf
-            **/docs/**
-            **/giocate/**
-            **/imgs/**
-            **/plugins/**
-            **/sounds/**
-            **/statuti/**
-            **/themes/advanced/**
 
       # ======================
       # DEPLOY PRODUZIONE
