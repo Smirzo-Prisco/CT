@@ -453,7 +453,7 @@
     /* Responsive */
     @media (max-width: 768px) {
         .gdr-session-status {
-            margin: 10px 0;
+            margin: 5px 0;
             order: 3;
             width: 100%;
             justify-content: center;
@@ -521,7 +521,7 @@
         if ($result_mappa_row = gdrcd_query($result_mappa, 'fetch')) {
             $maxlength_value = $result_mappa_row['limite_lunghezza_massima'] !== null ? $result_mappa_row['limite_lunghezza_massima'] : $maxlength_value; // Imposta il valore da mappa
         }
-
+        
         // Se sono master o admin, aggiungo la funzione js che rimuove il limite di caratteri quando trova "=" a inizio testo
         $masterMessageLength = $_SESSION['admin'] == 1 || $_SESSION['master'] == 1 ? 'masterMessageLength(this, '.$maxlength_value.');' : '';
         $textarea_field = '<textarea class="chat_textarea" name="message" id="message" placeholder="Scrivi la tua azione" maxlength="'.$maxlength_value.'" 
@@ -575,21 +575,25 @@
                 <form method="post" target="chat_frame" id="chat_form_messages">
                     <div class="form_row">
                         <div class="casella_chat">
-                            <span class="gdr-char-counter">Hai usato <span id="rimanenti">0</span> caratteri</span> <!-- CONTEGGIO CARATTERI -->
-                            <input type="text" name="action_tag" class="action-tag" maxlength="30" placeholder="TAG max 30"> <!-- TAG AZIONE -->
-                            <a href="#"><img id="openPanelBtn" title="Help" src="themes/crystal/imgs/chat/object.png" class="chat_icon"></a> <!-- PANNELLO DEEP -->
-                            <!-- ROLES -->
-                            <input type="hidden" id="id_role" value=""> <!-- IMPOSTO L'ID DELLA ROLE -->
-                            <div class="gdr-session-status inactive" id="gdrSessionStatus">
-                                <div class="gdr-pulse-dot"></div>
-                                <span class="gdr-status-text"><span id="roleInProgress" style="display:none;">Role in Corso...</span></span> <!-- TESTO STATUS -->
-                                <div class="gdr-animated-border"></div> <!-- BORDO ANIMATO -->
-                                <i id="quitRole" onclick="quitRole('<?=$_SESSION['login']?>');" class="fa-solid fa-power-off" style="cursor:pointer;display:none;font-size:16px;"></i> <!-- PULSANTE QUIT ROLE -->
-                                <i id="pgRolePlaying" class="fa-solid fa-users" style="cursor:pointer;display:none;font-size:16px;"></i> <!-- PULSANTE VISUALIZZA UTENTI IN ROLE -->
-                                <i id="openUserSearch" class="fa-solid fa-play" style="cursor:pointer;display:none;color:green;"> Avvia role</i> <!-- PULSANTE AVVIO ROLE -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                                <span class="gdr-char-counter"><span id="rimanenti">0</span> caratteri</span> <!-- CONTEGGIO CARATTERI -->
+                                <a href="#"><img id="openPanelBtn" title="Help" src="themes/crystal/imgs/chat/object.png" class="chat_icon"></a> <!-- PANNELLO DEEP -->
+                                <input type="text" name="action_tag" class="action-tag" maxlength="30" placeholder="TAG max 30"> <!-- TAG AZIONE -->
                             </div>
-                            <!-- FINE ROLES -->
-                            <input type="submit" value="<?=gdrcd_filter('out', $MESSAGE['interface']['forms']['submit'])?>" />
+                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px;">
+                                <!-- ROLES -->
+                                <input type="hidden" id="id_role" value=""> <!-- IMPOSTO L'ID DELLA ROLE -->
+                                <div class="gdr-session-status inactive" id="gdrSessionStatus">
+                                    <div class="gdr-pulse-dot"></div>
+                                    <span class="gdr-status-text"><span id="roleInProgress" style="display:none;">Role in Corso...</span></span> <!-- TESTO STATUS -->
+                                    <div class="gdr-animated-border"></div> <!-- BORDO ANIMATO -->
+                                    <i id="quitRole" onclick="quitRole('<?=$_SESSION['login']?>');" class="fa-solid fa-power-off" style="cursor:pointer;display:none;font-size:16px;"></i> <!-- PULSANTE QUIT ROLE -->
+                                    <i id="pgRolePlaying" onclick="document.getElementById('pgRolePlayingPanel').style.display = 'block';" class="fa-solid fa-users" style="cursor:pointer;display:none;font-size:16px;"></i> <!-- PULSANTE VISUALIZZA UTENTI IN ROLE -->
+                                    <i id="addPgToRoleBtn" onclick="addPgToRole();" class="fa-solid fa-play" style="cursor:pointer;color:green;"> Avvia!</i> <!-- PULSANTE AVVIO/JOIN ROLE -->
+                                </div>
+                                <!-- FINE ROLES -->
+                                <input type="submit" value="<?=gdrcd_filter('out', $MESSAGE['interface']['forms']['submit'])?>"> <!-- PULSANTE INVIO AZIONE -->
+                            </div>
                         </div>
                     </div>
                     <?=$textarea_field?> <!-- TEXTAREA inserimento azione -->
@@ -645,25 +649,6 @@
                     <div style="text-align: center;">Azione</div>
                 </div>
                 <div id="pgRolePlayingList" style="max-height: 220px; overflow-y: auto;"><!-- Contenuto dinamico --></div>
-            </div>
-        </div>
-        <!-- AGGIUNGI PERSONAGGI -->
-        <!-- Campo Ricerca -->
-        <div id="area_addPgRole" style="display:none;">
-            <div class="user-search-popup__search-section">
-                <input type="text" id="userSearchAdd" class="user-search-popup__search-input" placeholder="Cerca utenti..." autocomplete="off">
-                <div class="user-search-popup__loading">Ricerca in corso</div>
-                <div id="autocompleteResultsAdd" class="user-search-popup__autocomplete-list"></div>
-            </div>
-            <!-- Lista Utenti Selezionati -->
-            <div class="user-search-popup__selected-section">
-                <h4 class="user-search-popup__selected-title">Utenti Selezionati:</h4>
-                <div id="selectedUsersListAdd" class="user-search-popup__selected-list"><div class="user-search-popup__empty-message">Nessun utente selezionato</div></div>
-            </div>
-            <!-- Footer -->
-            <div class="user-search-popup__footer">
-                <button id="confirmSelectionAdd" class="user-search-popup__confirm-btn" disabled>Conferma</button>
-                <button id="cancelSelectionAdd" class="user-search-popup__cancel-btn">Annulla</button>
             </div>
         </div>
     </div>
@@ -1040,20 +1025,6 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<!-- Modale per Scrittura Libera -->
-<div class="gdr-writing-modal" id="gdrWritingModal">
-    <div class="gdr-writing-modal-content">
-        <div class="gdr-writing-modal-header">
-            <h2>Scrittura Libera</h2>
-            <button class="gdr-close-writing-modal">&times;</button>
-        </div>
-        <div class="gdr-form-group">
-            <textarea class="gdr-textarea" id="gdrFreeWritingArea" rows="10" placeholder="Scrivi qui la tua azione..."></textarea>
-            <div class="gdr-char-counter">Caratteri: 0/<span id="gdrCharLimit">0</span></div>
-        </div>
-        <button class="gdr-button gdr-btn-success">Invia Azione</button>
     </div>
 </div>
 

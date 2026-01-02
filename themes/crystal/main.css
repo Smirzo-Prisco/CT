@@ -224,6 +224,10 @@ input[type='week'] {
     color: rgb(var(--text-rgb), 0.5);
 }
 
+div.page_body {
+    text-align: center;
+}
+
 /* Rimuovi frecce/spinner da number input su alcuni browser */
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {

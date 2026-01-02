@@ -115,7 +115,7 @@
             <td valign="top">
                 <ul class="list">
                 <?php
-                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'legami' ORDER BY id", 'result');
+                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'legami' ORDER BY nomePg", 'result');
                 $numresults = gdrcd_query($lista, 'num_rows');
                 if ($numresults > 0) { ?>
                 <li class='tile no-height'>
@@ -163,7 +163,7 @@
                             
                             
                           <?php
-                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'nemici' ORDER BY id", 'result');
+                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'nemici' ORDER BY nomePg", 'result');
                 $numresults = gdrcd_query($lista, 'num_rows');
                 if ($numresults > 0) { ?>  
                             
@@ -215,7 +215,7 @@
                           
                           
                           <?php
-                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'famiglia' ORDER BY id", 'result');
+                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'famiglia' ORDER BY nomePg", 'result');
                 $numresults = gdrcd_query($lista, 'num_rows');
                 if ($numresults > 0) { ?>
                           
@@ -264,7 +264,7 @@
                          
                          
                           <?php
-                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'conoscenze' ORDER BY id", 'result');
+                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'conoscenze' ORDER BY nomePg", 'result');
                 $numresults = gdrcd_query($lista, 'num_rows');
                 if ($numresults > 0) { ?>
                           
@@ -310,7 +310,7 @@
                             
                           
                           <?php
-                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'memories' ORDER BY id", 'result');
+                $lista = gdrcd_query("SELECT * FROM struttura_affetti WHERE username = '".$_REQUEST['pg']."' && tipologia = 'memories' ORDER BY nomePg", 'result');
                 $numresults = gdrcd_query($lista, 'num_rows');
                 if ($numresults > 0) { ?>
                           

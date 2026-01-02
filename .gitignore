@@ -416,3 +416,28 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Git
+.git/
+.github/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Node (se presenti)
+node_modules/
+
+# Config sensibili
+config.inc.php
+db.inc.php
+
+# Log / cache
+*.log
+cache/
+temp/
+
+# Backup
+*.bak
+*.old

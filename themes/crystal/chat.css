@@ -12,6 +12,7 @@ div.chat_box {
     left: 10px;
     overflow: auto;
     font-size: 16px;
+    text-align: justify;
 }
 
 
@@ -684,7 +685,7 @@ button.chat_button:hover {
         display: flex;
         flex-flow: row wrap; /* Anche qui cambiato da colonna a riga */
         justify-content: space-between; /* Distribuzione uniforme */
-        padding-bottom: 10px;
+        padding-bottom: 0px;
         width: 100%; 
         height: auto;
         overflow: hidden; /* Rimuove lo scroll */
@@ -707,7 +708,7 @@ button.chat_button:hover {
         align-items: stretch;
         width: 100%;
         height: auto;
-        padding-bottom: 20px;
+        padding-bottom: 0px;
     }
 
     /* Per il pulsante INVIA */

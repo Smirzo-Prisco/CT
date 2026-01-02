@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/scheda.css" type="text/css">
+
 <script type="text/javascript"> 
   function showHideRow(row) { 
     $("#" + row).toggle(); 

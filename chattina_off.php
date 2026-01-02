@@ -2,12 +2,12 @@
 
 	/** * Chat Off Per GDRCD Extreme
 	@Author Axel di Fairy Tail Universe GDR
-	*** Potrai liberamente utilizzare questa chat off compatibile in tutto e per tutto con GDRCD fino alla versione Extreme riconoscendo la paternità del codice all'autore e non rimuovendo questo commento. 
-	*** Nel caso in cui il commento venisse rimosso, l'autore dei codici non donerà il consenso all'utilizzo del codice sottostante.
-	*** La vendita del codice è vietata, poiché rilasciata in termini d'uso totalmente gratuiti.
-	*** Il creatore del codice non si assume nessuna responsabilità in merito a malfunzionamenti o bug.
-	*** Potrai modificare la grafica della chat off tramite il file style22.css. Vietato modificare il codice PHP. Per modifiche varie ed eventuali che si vuole apportare al codice, è necessaria l'autorizzazione di Axel, reperibile alla mail: stafffairytail@gmail.com
-    *** Fermo restando i punti sopra citati, la chat non dovrai far altro che inserire i file nella directory principale del tuo sito e poi creare il link al file "chatoff.php" dove più ritieni opportuno sul tuo sito.
+	*** Potrai liberamente utilizzare questa chat off compatibile in tutto e per tutto con GDRCD fino alla versione Extreme riconoscendo la paternitï¿½ del codice all'autore e non rimuovendo questo commento. 
+	*** Nel caso in cui il commento venisse rimosso, l'autore dei codici non donerï¿½ il consenso all'utilizzo del codice sottostante.
+	*** La vendita del codice ï¿½ vietata, poichï¿½ rilasciata in termini d'uso totalmente gratuiti.
+	*** Il creatore del codice non si assume nessuna responsabilitï¿½ in merito a malfunzionamenti o bug.
+	*** Potrai modificare la grafica della chat off tramite il file style22.css. Vietato modificare il codice PHP. Per modifiche varie ed eventuali che si vuole apportare al codice, ï¿½ necessaria l'autorizzazione di Axel, reperibile alla mail: stafffairytail@gmail.com
+    *** Fermo restando i punti sopra citati, la chat non dovrai far altro che inserire i file nella directory principale del tuo sito e poi creare il link al file "chatoff.php" dove piï¿½ ritieni opportuno sul tuo sito.
 	*** Enjoy
 	*/
 

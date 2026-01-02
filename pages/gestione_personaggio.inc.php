@@ -151,18 +151,6 @@ if($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore'
 </div>
 <!-- FINE lista personaggi -->
 
-<!-- Paginazione --
-<div class="pagination">
-    <?php
-    // Genera i link di paginazione
-    // $totaleresults = gdrcd_query("SELECT COUNT(*) AS total FROM personaggio $where")['total'];
-    // $total_pages = ceil($totaleresults / $PARAMETERS['settings']['records_per_page']);
-    // echo generateLinks($offset, $total_pages, preg_replace('/&.*/', '', $_SERVER["REQUEST_URI"]));
-    // echo "<p>Pagina $offset di $total_pages (Totale: $totaleresults record)</p>";
-    ?>
-</div>
-<!-- FINE paginazione -->
-
 <!-- Modale col form di modifica -->
 <div class="pg-edit-container" id="pg_edit_container" role="dialog" aria-modal="true">
     <div class="modal-content">

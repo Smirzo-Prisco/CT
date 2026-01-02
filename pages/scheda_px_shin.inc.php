@@ -1,70 +1,44 @@
 <div class="pagina_scheda">
     <?php /* Permessi */
     if ($_SESSION['login'] == $_REQUEST['pg'] || $_SESSION['admin'] == 1) {
-    ?>
-
-    <?php
-
-    //Se non e' stato specificato il nome del pg
-    if (isset($_REQUEST['pg']) === false)
-    {
-        echo '<div class="error">' . gdrcd_filter('out', $MESSAGE['error']['unknonw_character_sheet']) . '</div>';
-    } else
-    {
-    /*Visualizzo la pagina*/
-    /*Verifico l'esistenza del PG*/
-    $query = "SELECT nome FROM personaggio WHERE personaggio.nome = '" . gdrcd_filter('in', $_REQUEST['pg']) . "'";
-    $result = gdrcd_query($query, 'result');
-    //Se non esiste il pg
-    if (gdrcd_query($result, 'num_rows') == 0)
-    {
-        echo '<div class="error">' . gdrcd_filter('out', $MESSAGE['error']['unknown_character_sheet']) . '</div>';
-    }
-    else
-    {
-
-    gdrcd_query($result, 'free');
-
-    $num_logs = $PARAMETERS['settings']['view_logs'];
-    ?>
+        // Se non e' stato specificato il nome del pg
+        if (isset($_REQUEST['pg']) === false) echo '<div class="error">' . gdrcd_filter('out', $MESSAGE['error']['unknonw_character_sheet']) . '</div>';
+        else {
+            /* Visualizzo la pagina */
+            /* Verifico l'esistenza del PG */
+            $query = "SELECT nome FROM personaggio WHERE personaggio.nome = '" . gdrcd_filter('in', $_REQUEST['pg']) . "'";
+            $result = gdrcd_query($query, 'result');
+            //Se non esiste il pg
+            if (gdrcd_query($result, 'num_rows') == 0) echo '<div class="error">' . gdrcd_filter('out', $MESSAGE['error']['unknown_character_sheet']) . '</div>';
+            else {
+                gdrcd_query($result, 'free');
+                $num_logs = $PARAMETERS['settings']['view_logs'];
+            ?>
 
     <!-- Riepilogo PX -->
-    <div class="page_title">
-        <h2><?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['px']['page_name']); ?></h2>
-    </div>
-
-    </div>
-            <div class="menu_scheda"><!-- Menu scheda -->
-            <?php include ('scheda/menu.inc.php'); ?>
-        </div>
-    <div class="pagina_scheda_px">
-    
+    <div class="page_title"><h2><?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['px']['page_name']); ?></h2></div>
+</div>
+<div class="menu_scheda"><!-- Menu scheda -->
+    <?php include ('scheda/menu.inc.php'); ?>
+</div>
+<div class="pagina_scheda_px">
     <?php /* Assegnamento PX*/
-    if ($_POST['op'] == "assegna")
-    {
-        if ((is_numeric($_POST['px']) === true) && ($_SESSION['admin']==1 || $_SESSION['moderatore']==1 || $_SESSION['master']==1))
-        {
-            gdrcd_query("UPDATE personaggio SET esperienza = esperienza + " . gdrcd_filter('num',
-                    $_POST['px']) . " WHERE nome = '" . gdrcd_filter('in', $_REQUEST['pg']) . "' LIMIT 1 ");
+    if ($_POST['op'] == "assegna" && (is_numeric($_POST['px']) === true) && ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1 || $_SESSION['master'] == 1)) {
+        gdrcd_query("UPDATE personaggio SET esperienza = esperienza + " . gdrcd_filter('num',
+                $_POST['px']) . " WHERE nome = '" . gdrcd_filter('in', $_REQUEST['pg']) . "' LIMIT 1 ");
 
-            /*Registro l'operazione*/
-            gdrcd_query("INSERT INTO log (nome_interessato, autore, data_evento, codice_evento ,descrizione_evento) VALUES ('" . gdrcd_filter('in',
-                    $_REQUEST['pg']) . "', '" . $_SESSION['login'] . "', NOW(), " . PX . ", '(" . gdrcd_filter('num',
-                    $_POST['px']) . ' px) ' . gdrcd_filter('in', $_POST['causale']) . "')");
-            echo '<div class="warning">' . gdrcd_filter('out', $MESSAGE['warning']['done']) . '</div>';
-        } else
-        {
-            echo '<div class="warning">' . gdrcd_filter('out', $MESSAGE['warning']['camt_do']) . '</div>';
-        }
-    } ?>
-
-
+        /*Registro l'operazione*/
+        gdrcd_query("INSERT INTO log (nome_interessato, autore, data_evento, codice_evento ,descrizione_evento) VALUES ('" . gdrcd_filter('in',
+                $_REQUEST['pg']) . "', '" . $_SESSION['login'] . "', NOW(), " . PX . ", '(" . gdrcd_filter('num',
+                $_POST['px']) . ' px) ' . gdrcd_filter('in', $_POST['causale']) . "')");
+        echo '<div class="warning">' . gdrcd_filter('out', $MESSAGE['warning']['done']) . '</div>';
+    } else echo '<div class="warning">' . gdrcd_filter('out', $MESSAGE['warning']['camt_do']) . '</div>';
+    ?>
     <div class="page_body">
         <div class="panels_box">
             <?php 
-            if(isset($_REQUEST['op']) === false)
-            {
-            //Determinazione pagina (paginazione)
+            if(isset($_REQUEST['op']) === false) {
+                //Determinazione pagina (paginazione)
                 $pagebegin = (int) $_REQUEST['offset'] * $PARAMETERS['settings']['view_logs'];
                 $pageend = $PARAMETERS['settings']['view_logs'];
                 //Conteggio record totali
@@ -73,37 +47,16 @@
                 $totaleresults = $record_globale['COUNT(*)'];
                 
                 /*Seleziono le ultime 20 assegnamzioni px*/
-
-           
-                       ?>
+            ?>
             <!-- Intestazione tabella elenco -->
             <div class="elenco_record_gioco">
                 <table class="customTable">
                     <tr>
-                        <td class="casella_titolo">
-                            <div class="titoli_elenco">
-                                <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['px']['date']); ?>
-
-                            </div>
-                        </td>
-                        <td class="casella_titolo">
-                            <div class="titoli_elenco">
-                                Titolo
-                            </div>
-                        </td>
-                        <td class="casella_titolo">
-                            <div class="titoli_elenco">
-                               Commento
-                            </div>
-                        </td>
-                        <td class="casella_titolo">
-                            <div class="titoli_elenco">
-                                Punti Shin
-                            </div>
-                        </td>
+                        <td class="casella_titolo"><div class="titoli_elenco"><?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['px']['date']); ?></div></td>
+                        <td class="casella_titolo"><div class="titoli_elenco">Titolo</div></td>
+                        <td class="casella_titolo"><div class="titoli_elenco">Commento</div></td>
+                        <td class="casella_titolo"><div class="titoli_elenco">Punti Shin</div></td>
                     </tr>
-
-
                     <?php //Lettura record
                 $result = gdrcd_query("SELECT * FROM Punti LEFT JOIN messaggioaraldo ON messaggioaraldo.id_messaggio = Punti.id_messaggio WHERE nome = '" . gdrcd_filter('in', 
                           $_REQUEST['pg']) . "' AND shin > 0 ORDER BY data_evento DESC LIMIT ".$pagebegin.", ".$pageend."", 'result');
@@ -112,45 +65,23 @@
                 /* Se esistono record */
                 if($numresults > 0) {
                 
-                while ($record = gdrcd_query($result, 'fetch'))
-                    { 
-                    
-                     if ($record['id_messaggio'] == 0) {
-                     $record['titolo'] = "Assegnazione shin";
-                     }
-                     ?>
+                while ($record = gdrcd_query($result, 'fetch')) { 
+                     if ($record['id_messaggio'] == 0) $record['titolo'] = "Assegnazione shin";
+                ?>
 
-                        <tr>
-                            <!-- Oggetto, immagine, quantità -->
-                            
-                            <td class="casella_elemento">
-                                <div class="elementi_elenco"><?php echo gdrcd_filter('out',
-                                        gdrcd_format_date($record['data_evento'])); ?></div>
-                            </td>
-                            
-                            <td class="casella_elemento">
-                                <div class="elementi_elenco"><?php echo gdrcd_filter('out',
-                                        $record['titolo']); ?></div>
-                            </td>
-                            
-                            <td class="casella_elemento">
-                                <div class="elementi_elenco"><?php echo gdrcd_filter('out', 
-                                        $record['commento']); ?></div>
-                            </td>
-                            
-                            <td class="casella_elemento">
-                                <div class="elementi_elenco"><?php echo gdrcd_filter('out', 
-                                        $record['shin']); ?></div>
-                            </td>                          
-                            
+                    <tr>
+                        <!-- Oggetto, immagine, quantità -->
+                        <td class="casella_elemento"><div class="elementi_elenco"><?php echo gdrcd_filter('out', gdrcd_format_date($record['data_evento'])); ?></div></td>
+                        <td class="casella_elemento"><div class="elementi_elenco"><?php echo gdrcd_filter('out', $record['titolo']); ?></div></td>
+                        <td class="casella_elemento"><div class="elementi_elenco"><?php echo gdrcd_filter('out', $record['commento']); ?></div></td>
+                        <td class="casella_elemento"><div class="elementi_elenco"><?php echo gdrcd_filter('out', $record['shin']); ?></div></td>
+                    </tr>
+                <?php
+                } // while
 
-                        </tr>
-                    <?php }//while
-
-                    gdrcd_query($result, 'free');
-                    ?>
+                gdrcd_query($result, 'free');
+                ?>
                 </table>
-
             </div>
 
            <!-- <?php if ($_SESSION['admin']==1 || $_SESSION['moderatore']==1 || $_SESSION['master']==1)
@@ -209,13 +140,13 @@
 
         <?php
         /********* CHIUSURA SCHEDA **********/
-        }//else
+            }//else
 
         }//else
         
-        }//op
+    }//op
         
-        }
+}
         ?>
     </div>
     <?php } else { ?>
