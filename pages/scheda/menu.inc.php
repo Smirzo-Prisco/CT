@@ -1,41 +1,24 @@
 <link rel="stylesheet" href="../../themes/crystal/scheda_menu.css" type="text/css" />
 <ul class="menu">
  <li class="menuItem"><a href="#">PERSONAGGIO</a>
-    <ul class="subMenu">
-        <p>
-            <li class="subMenuItem">
-                <a href="main.php?page=scheda&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
-                    <?php echo "Scheda"; ?>
-                </a>
+<ul class="subMenu"><p>
+      <li class="subMenuItem"><a href="main.php?page=scheda&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
+        <?php echo "Scheda"; ?>
+    </a></li>
+                        <li class="subMenuItem"><a href="main.php?page=scheda_storia&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
+        <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['history']); ?>
+    </a></li>
+                        <li class="subMenuItem"><a href="main.php?page=scheda_dice&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
+        <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['description']); ?>
+    </a></li>
+                        <li class="subMenuItem"><a href="main.php?page=scheda_affetti&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
+        <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['friends']); ?>
+    </a></li>
+    <li class="subMenuItem"><a href="main.php?page=scheda_off&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
+        <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['off']); ?>
+    </a></li>
+                    </p></ul>
             </li>
-            <li class="subMenuItem">
-                <a href="main.php?page=scheda_storia&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
-                    <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['history']); ?>
-                </a>
-            </li>
-            <li class="subMenuItem">
-                <a href="main.php?page=scheda_dice&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
-                    <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['description']); ?>
-                </a>
-            </li>
-            <li class="subMenuItem">
-                <a href="main.php?page=scheda_affetti&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
-                    <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['friends']); ?>
-                </a>
-            </li>
-            <li class="subMenuItem">
-                <a href="main.php?page=scheda_off&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
-                    <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['off']); ?>
-                </a>
-            </li>
-            <li class="subMenuItem">
-                <a href="main.php?page=scheda_trans&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
-                    <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['transictions']); ?>
-                </a>
-            </li>
-            </p>
-        </ul>
-    </li>
             
             
      
@@ -86,10 +69,19 @@
     </a></li>
     </p></ul>
     </li>
-    <li class="menuItem">
-        <a href="main.php?page=scheda_modifica&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
-            <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['update']); ?>
-        </a>
+    
+    <li class="menuItem"><a href="#">ALTRO</a>
+<ul class="subMenu"><p>
+      <li class="subMenuItem"><a href="main.php?page=scheda_trans&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
+        <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['transictions']); ?>
+    </a></li>
+    <li class="subMenuItem"><a href="main.php?page=scheda_modifica&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>" style="letter-spacing: 0px; line-height: 20px;">
+        <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['menu']['update']); ?>
+    </a></li>
+    </p></ul>
     </li>
     <?php } ?>
-</ul>
+    
+    
+    
+            </ul>

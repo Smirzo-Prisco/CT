@@ -24,6 +24,7 @@
         
         $query_oggetti .= " ORDER BY nome";
     } else {
+        
         // Recupero il mestiere del pg
         $mestiere = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome ='".$_SESSION['login']."'");
         
@@ -39,16 +40,24 @@
     
     <form class="form_gestione" action="main.php?page=oggetto_assegna" method="post">
         <table class="customTable">
-            <tr><td style="font-size: 12px; color: #a7a7a8;">ASSEGNA OGGETTO A PIÙ PERSONAGGI</td></tr>
+            <tr>
+                <td style="font-size: 12px; color: #a7a7a8;">
+                    ASSEGNA OGGETTO A PIÙ PERSONAGGI
+                </td>
+            </tr>
 
             <!-- Seleziona Oggetto -->
-            <tr class="second_header"><td><b>Seleziona Oggetto</b></td></tr>
+            <tr class="second_header">
+                <td><b>Seleziona Oggetto</b></td>
+            </tr>
             <tr>
                 <td>
                     <select name="id_oggetto" class="ares" style="background-color: #0f111d;">
                         <?php
                         $oggetti = gdrcd_query($query_oggetti, 'result');
-                        while($obj = gdrcd_query($oggetti, 'fetch')) echo '<option value="'.$obj['id_oggetto'].'">'.gdrcd_filter('out', $obj['nome']).'</option>';
+                        while($obj = gdrcd_query($oggetti, 'fetch')) {
+                            echo '<option value="'.$obj['id_oggetto'].'">'.gdrcd_filter('out', $obj['nome']).'</option>';
+                        }
                         gdrcd_query($oggetti, 'free');
                         ?>
                     </select>
@@ -80,7 +89,9 @@
                     <select name="personaggi[]" class="ares" style="background-color: #0f111d;">
                         <?php
                         $pg_list = gdrcd_query("SELECT nome FROM personaggio ORDER BY nome", 'result');
-                        while($pg = gdrcd_query($pg_list, 'fetch')) echo '<option value="'.$pg['nome'].'">'.gdrcd_filter('out', $pg['nome']).'</option>';
+                        while($pg = gdrcd_query($pg_list, 'fetch')) {
+                            echo '<option value="'.$pg['nome'].'">'.gdrcd_filter('out', $pg['nome']).'</option>';
+                        }
                         gdrcd_query($pg_list, 'free');
                         ?>
                     </select>
@@ -103,18 +114,28 @@
         $personaggi = $_POST['personaggi'];
 
         // Recupera dati oggetto
-        $oggetto = gdrcd_query("SELECT tipo, categoria, cariche, isTemp, temp_giorni, ricarica_massima FROM oggetto WHERE id_oggetto = $id_oggetto");
+        $oggetto = gdrcd_query("SELECT tipo, categoria, cariche, isTemp, temp_giorni, ricarica_massima FROM oggetto WHERE id_oggetto = ".$id_oggetto."");
 
         switch($oggetto['categoria']) {
-            case 'arma': // 15 = Arma di Gilda
-                if ($oggetto['tipo'] == 15) $cariche = -1; // Cariche infinite
-                else $cariche = $oggetto['ricarica_massima']; // Armi normali: usa ricarica_massima
+            case 'arma':
+                if ($oggetto['tipo'] == 15) { // 15 = Arma di Gilda
+                    $cariche = -1; // Cariche infinite
+                } else {
+                    $cariche = $oggetto['ricarica_massima']; // Armi normali: usa ricarica_massima
+                }
                 break;
-            case 'statistica': $cariche = (int) $oggetto['ricarica_massima']; break;
+            case 'statistica':
+                $cariche = (int) $oggetto['ricarica_massima'];
+                break;
             case 'curativo':
-            case 'magico': $cariche = (int) $oggetto['cariche']; break; // Sempre numero tra 1 e 10
-            case 'standard': $cariche = ($oggetto['cariche'] == 'illimitato') ? -1 : (int) $oggetto['cariche']; break;
-            default: $cariche = 0;  // Fallback di sicurezza in caso di errore
+            case 'magico':
+                $cariche = (int) $oggetto['cariche'];  // Sempre numero tra 1 e 10
+                break;
+            case 'standard':
+                $cariche = ($oggetto['cariche'] == 'illimitato') ? -1 : (int) $oggetto['cariche'];
+                break;
+            default:
+                $cariche = 0;  // Fallback di sicurezza in caso di errore
         }
 
         $isTemp = $oggetto['isTemp'];
@@ -124,18 +145,23 @@
             $pg = gdrcd_filter('in', $pg);
 
             // Controllo se il PG ha già l'oggetto
-            $check = gdrcd_query("SELECT id_oggetto FROM clgpersonaggiooggetto WHERE id_oggetto = $id_oggetto AND nome = '$pg'", 'result');
+            $check = gdrcd_query("SELECT id_oggetto FROM clgpersonaggiooggetto WHERE id_oggetto = ".$id_oggetto." AND nome = '".$pg."'", 'result');
 
             if(gdrcd_query($check, 'num_rows') > 0) {
                 // Controlla lo stato delle cariche attuali
-                $dati_pg_oggetto = gdrcd_query("SELECT cariche FROM clgpersonaggiooggetto WHERE id_oggetto = $id_oggetto AND nome = '$pg'");
+                $dati_pg_oggetto = gdrcd_query("SELECT cariche FROM clgpersonaggiooggetto WHERE id_oggetto = ".$id_oggetto." AND nome = '".$pg."'");
 
-                // Se l'oggetto è scarico, ricaricalo
-                if ($dati_pg_oggetto['cariche'] == 0) gdrcd_query("UPDATE clgpersonaggiooggetto SET cariche = $cariche WHERE id_oggetto = $id_oggetto AND nome = '$pg'");
+                if ($dati_pg_oggetto['cariche'] == 0) {
+                    // Se l'oggetto è scarico, ricaricalo
+                    gdrcd_query("UPDATE clgpersonaggiooggetto 
+                                SET cariche = ".$cariche." 
+                                WHERE id_oggetto = ".$id_oggetto." AND nome = '".$pg."'");
+                } 
+                // Altrimenti NON aggiungo copie e NON faccio nulla
             } else {
                 // Inserisci nuovo oggetto
                 gdrcd_query("INSERT INTO clgpersonaggiooggetto (nome, id_oggetto, cariche, numero, isTemp, temp_giorni) 
-                            VALUES ('$pg', $id_oggetto, $cariche, $num_oggetti, $isTemp, $temp_giorni)");
+                            VALUES ('".$pg."', ".$id_oggetto.", ".$cariche.", ".$num_oggetti.", ".$isTemp.", ".$temp_giorni.")");
             }
             gdrcd_query($check, 'free');
         }

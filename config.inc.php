@@ -13,9 +13,9 @@
 error_reporting(E_ERROR | E_PARSE);
 
 /* PARAMETRI DI CONNESSIONE */
-$PARAMETERS['database']['username'] = 'latinoromano';            //nome utente del database
-$PARAMETERS['database']['password'] = 'L4t1n0r0m4n0';            //password del database
-$PARAMETERS['database']['database_name'] = 'my_latinoromano';    //nome del database
+$PARAMETERS['database']['username'] = 'crystaltokyogdr';            //nome utente del database
+$PARAMETERS['database']['password'] = '68rpTqEFKdfw';            //password del database
+$PARAMETERS['database']['database_name'] = 'my_crystaltokyogdr';    //nome del database
 $PARAMETERS['database']['url'] = 'localhost';        //indirizzo ip del database
 
 

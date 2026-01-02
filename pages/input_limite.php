@@ -56,10 +56,8 @@ else {
 
 <?php
 if (gdrcd_filter('get', $_POST['op']) == 'new_master_message')	{
-    // Caratteri che si vogliono impostare
     $lunghezza = $_POST["caratteri"];
 
-    // Controllo che i caratteri siano almeno 150
     if ($lunghezza < 150) echo "<script type='text/javascript'>alert('I caratteri devono essere almeno 150');</script>";
     else $query_check = gdrcd_query("SELECT * FROM scelte_utenti WHERE nome = '$login' AND id_luogo = '$luogo'", 'result');
 
@@ -67,8 +65,8 @@ if (gdrcd_filter('get', $_POST['op']) == 'new_master_message')	{
     if(gdrcd_query($query_check, 'num_rows') > 0) gdrcd_query("UPDATE scelte_utenti SET lunghezza_massima = '$lunghezza', timestamp_modifica = NOW() WHERE nome = '$login' AND id_luogo = '$luogo'");
     else gdrcd_query("INSERT INTO scelte_utenti (nome, id_luogo, lunghezza_massima, timestamp_modifica) VALUES ('$login', '$luogo', '$lunghezza', NOW())");
 
-    // Query per trovare il valore minimo della lunghezza impostata dagli utenti per questo luogo
-    $query_min_lunghezza = gdrcd_query("SELECT MIN(lunghezza_massima) AS min_lunghezza, nome FROM scelte_utenti WHERE id_luogo = '$luogo' AND lunghezza_massima = MIN(lunghezza_massima)");
+    // Query per trovare il valore minimo della lunghezza massima impostata dagli utenti per questo luogo
+    $query_min_lunghezza = gdrcd_query("SELECT MIN(lunghezza_massima) AS min_lunghezza FROM scelte_utenti WHERE id_luogo = '$luogo'");
     $lunghezza_minima = $query_min_lunghezza['min_lunghezza'];
 
     gdrcd_query("UPDATE mappa SET limite_lunghezza_massima = $lunghezza_minima, timestamp_modifica_limite = NOW() WHERE id = $luogo");
@@ -76,15 +74,14 @@ if (gdrcd_filter('get', $_POST['op']) == 'new_master_message')	{
     // Calcola il timestamp di +1 minuto da ora
     $timestamp_minuto_successivo = date('Y-m-d H:i:s', strtotime('+1 minute'));
 
-    // Query per trovare il valore minimo della lunghezza impostata dagli utenti per questo luogo
-    // $query_min_lunghezza = gdrcd_query("SELECT MIN(lunghezza_massima) AS min_lunghezza FROM scelte_utenti WHERE id_luogo = '$luogo'");
-    // $lunghezza_minima = $query_min_lunghezza['min_lunghezza'];
+    // Query per trovare il valore minimo della lunghezza massima impostata dagli utenti per questo luogo
+    $query_min_lunghezza = gdrcd_query("SELECT MIN(lunghezza_massima) AS min_lunghezza FROM scelte_utenti WHERE id_luogo = '$luogo'");
+    $lunghezza_minima = $query_min_lunghezza['min_lunghezza'];
 
     if ($lunghezza_minima !== null) {
         // Ottieni il nome del personaggio che ha impostato il limite minimo
-        // $query_personaggio = gdrcd_query("SELECT nome FROM scelte_utenti WHERE lunghezza_massima = '$lunghezza_minima' AND id_luogo = '$luogo'");
-        // $personaggio = $query_personaggio['nome'];
-        $personaggio = $query_min_lunghezza['nome'];
+        $query_personaggio = gdrcd_query("SELECT nome FROM scelte_utenti WHERE lunghezza_massima = '$lunghezza_minima' AND id_luogo = '$luogo'");
+        $personaggio = $query_personaggio['nome'];
 
         // Esegui l'inserimento del messaggio nella chat
         $testo = "Il personaggio " . $personaggio . " ha scelto di settare per tutti una lunghezza massima di " . $lunghezza_minima;

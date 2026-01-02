@@ -948,7 +948,7 @@ $ultimotipo = -1;
             
         </table>
         <?php //Pulsante segna tutto come letto ?>
-        <div class="panels_box" style="text-align:center;">
+        <div class="panels_box">
             <div class="form_gioco">
                 <form action="main.php?page=forum" method="post">
                     <input type="hidden" name="op" value="readall" />

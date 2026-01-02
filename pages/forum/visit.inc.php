@@ -148,7 +148,7 @@ if ($_REQUEST['what'] == 141 && ($_SESSION['admin'] == 1 || $_SESSION['master'] 
 <?php } else {
         ?>
         <!-- Elenco forum -->
-        <div class="elenco_esteso" style="text-align:center;">
+        <div class="elenco_esteso">
         
         <!-- comando cerca -->
 

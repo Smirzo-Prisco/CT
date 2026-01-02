@@ -1,519 +1,250 @@
+<link rel="stylesheet" href="../themes/crystal/main.css">
 
-<?php // add_script("/includes/incremento_parametri.js"); ?>
+<?php
 
-<style>
-    #skillPanel {
-        font-family: inherit;
-        color: white;
+//prendo le informazioni del personaggio
+$info_pg = gdrcd_query("SELECT esperienza, esperienza_s, shin, car0, car1, car2, car3, car4, car5, car6, car7, car8, car9, punto_skill FROM personaggio WHERE nome='".gdrcd_filter('in', $_SESSION['login'])."'");
+$esperienza_s = intval($info_pg['esperienza_s']);
+$esperienza = intval($info_pg['esperienza']);
+
+//valuto il massimale
+$stats_gilda = $info_pg['car1'] + $info_pg['car3']+ $info_pg['car5'] + $info_pg['car7'] + $info_pg['car9'] + $info_pg['punto_skill'];
+//se il massimalenon è stato superato:
+if($stats_gilda < 240){
+
+
+// Funzione per calcolare il costo di acquisto in base al tipo di abilità
+function costoAcquisto($tipo) {
+    switch ($tipo) {
+        case 'Default':
+        case 'Difensiva':
+            return 0;
+        case 'Attacco base':
+        case 'Mentale base':
+        case 'Generica base':
+             return 1;
+        case 'Attacco medio':
+        case 'Mentale media':
+        case 'Mentale di attacco':
+        case 'Generica avanzata':
+            return 3;
+        case 'Attacco avanzato':
+        case 'Mentale avanzata':
+            return 5;
+        case 'Potere speciale':
+            return 50;
+        default:
+            return 0; // Ritorna 0 per i tipi non gestiti
     }
+}
 
-    /* ---- ACCORDION ---- */
+// Funzione per calcolare il costo di potenziamento in base al grado attuale
+function costoPotenziamento($grado) {
+    // Ogni potenziamento costa 1 shin
+    return $grado > 0 ? 1 : 0;
+}
 
-    #skillPanel .skill-accordion {
-        width: 100%;
-        margin-top: 20px;
-    }
+if((isset($_POST['op']) === false) && (isset($_REQUEST['op']) === false)) {
 
-    #skillPanel .accordion-item {
-        margin-bottom: 10px;
-        border-radius: 8px;
-        overflow: hidden;
-        background: #1c2033;
-        border: 1px solid #2f3550;
-    }
+?>
 
-    #skillPanel .accordion-header {
-        width: 100%;
-        padding: 12px 16px;
-        font-size: 16px;
-        text-align: left;
-        background: #181c31;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        outline: none;
-    }
-
-    #skillPanel .accordion-header:hover {
-        background: #111423;
-    }
-
-    #skillPanel .accordion-body {
-        display: none;
-        background: #1c2033;
-        padding: 10px 15px;
-    }
-
-    /* ---- SKILL CARD ---- */
-
-    #skillPanel .skill-card {
-        background: #111423;
-        padding: 10px;
-        margin: 8px 0;
-        border-radius: 6px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        border: 1px solid #2f3550;
-    }
-
-    #skillPanel .skill-card strong {
-        color: white;
-    }
-
-    #skillPanel .btn-up {
-        background: #2f3550;
-        border: none;
-        color: white;
-        padding: 6px 8px;
-        font-size: 16px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    /* ---- PULSANTE SALVA ---- */
-
-    #skillPanel .btn-save {
-        background: #2f3550;
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        width: 100%;
-    }
-
-    #skillPanel .skill-info-bar {
-        background: #2f3550;
-        border: 1px solid #111423;
-        padding: 12px 16px;
-        border-radius: 8px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 16px;
-    }
-
-    #skillPanel .skill-info-bar span {
-        font-weight: bold;
-        color: #00eaff;
-    }
-
-    #skillPanel .skill-row {
-        display: grid;
-        grid-template-columns: 25% 55% 20%;
-        gap: 10px;
-        align-items: center;
-
-        background: rgba(255,255,255,0.06);
-        padding: 10px 12px;
-        margin-bottom: 8px;
-
-        border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    #skillPanel .skill-left {
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    #skillPanel .skill-center small {
-        font-size: 13px;
-        opacity: 0.8;
-    }
-
-    #skillPanel .skill-right {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 8px;
-    }
-
-    #skillPanel .skill-level {
-        font-size: 14px;
-        font-weight: bold;
-        min-width: 20px;
-        text-align: center;
-    }
-
-    #skillPanel .btn-up {
-        background: #3b82f6;
-        border: none;
-        color: white;
-        font-size: 14px;
-        width: 26px;
-        height: 26px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    #skillPanel .btn-up:hover {
-        background: #2563eb;
-    }
-
-    /* Pulsante "+" disabilitato */
-    #skillPanel .btn-up.disabled {
-        background: #6b7280 !important;  /* grigio */
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
-    #skillPanel .save-bar {
-        background: rgba(17, 20, 35, 0.95); /* colore del tuo tema */
-        padding: 10px;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    #skillPanel .sticky-header {
-        position: sticky;
-        top: 0;
-        z-index: 20;
-    }
-
-    /* ---- MODALE DESCRIZIONE SKILL ---- */
-    .skill-modal {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.55);
-        backdrop-filter: blur(4px);
-        display: none; /* nascosta */
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        opacity: 0;
-        transition: opacity 0.25s ease;
-    }
-
-    /* Quando attiva */
-    .skill-modal.open {
-        display: flex;
-        opacity: 1;
-    }
-
-    /* Contenuto modale */
-    .skill-modal-content {
-        background: #ffffffcc; /* semi-trasparente */
-        backdrop-filter: blur(8px);
-        padding: 24px 32px;
-        width: 90%;
-        max-width: 520px;
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        transform: scale(0.85);
-        animation: modal-pop 0.25s ease forwards;
-    }
-
-    /* Animazione ingresso */
-    @keyframes modal-pop {
-        from {
-            opacity: 0;
-            transform: scale(0.85);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-
-    /* Testo */
-    #skill-modal-descrizione {
-        font-size: 1rem;
-        color: #333;
-        margin-bottom: 20px;
-        line-height: 1.5;
-    }
-
-    /* Bottone */
-    #close-modal {
-        padding: 10px 18px;
-        border: none;
-        background: #4a6fff;
-        color: white;
-        font-size: 0.95rem;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: background 0.2s ease, transform 0.15s ease;
-    }
-
-    #close-modal:hover {
-        background: #3956d4;
-        transform: translateY(-2px);
-    }
-
-    #close-modal:active {
-        transform: translateY(0);
-    }
-</style>
-
-<div id="skillPanel">
-    <div class="sticky-header">
-        <div class="skill-info-bar">
-            <div>Punti Shin: <span id="skillPoints">0</span></div>
-            <div>L'aumento di un'abilità richiede un costo di shin pari al suo livello</div>
-            <div>Livello PG: <span id="playerLevel">0</span></div>
-        </div>
-        <div class="save-bar">
-            <button id="btnSave" class="btn-save" onclick="saveSkill();">💾 Salva Skill</button>
-            <button id="btnReset" class="btn-save" onclick="resetSkills();" style="display:none;">Reset</button>
-        </div>
-    </div>
-    <div class="skill-accordion">
-        <div class="accordion-item">
-            <button class="accordion-header">🛡️ Default / Difensiva</button>
-            <div class="accordion-body" data-cat="Default"></div>
-        </div>
-        <div class="accordion-item">
-            <button class="accordion-header">✨ Speciale</button>
-            <div class="accordion-body" data-cat="Speciale"></div>
-        </div>
-        <div class="accordion-item">
-            <button class="accordion-header">📘 Generica</button>
-            <div class="accordion-body" data-cat="Generica"></div>
-        </div>
-        <div class="accordion-item">
-            <button class="accordion-header">🗡️ Attacco</button>
-            <div class="accordion-body" data-cat="Attacco"></div>
-        </div>
-        <div class="accordion-item">
-            <button class="accordion-header">🧠 Mentale</button>
-            <div class="accordion-body" data-cat="Mentale"></div>
-        </div>
-    </div>
-</div>
-<div id="skill-modal" class="skill-modal">
-    <div class="skill-modal-content">
-        <h2 id="skill-modal-titolo"></h2>
-        <div id="skill-modal-descrizione"></div>
-        <button id="close-modal">Chiudi</button>
-    </div>
+<div class="form_info">
+    <div class='warning'>Il reset del personaggio avviene solo per errori tecnici, non per errori di distribuzione</div>
+    <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['avalaible_skill_points']).': '.$esperienza_s; ?>
 </div>
 
-<script>
-    let skillPoints = 0;
-    let playerLevel = 0;
-    let originalSkills = {};  // ← copia immutata dei valori iniziali
-    let skillLevels = {};     // ← valori modificabili
+<div class="elenco_abilita">
 
-    async function saveSkill() {
-        const changedSkills = {};
-        let hasChanges = false;
+    <!-- Elenco abilità gilda-->
+    <div class="div_colonne_abilita_scheda">
+    <table class="customTable">
+    
+    <?php
+    // Inizializzazione degli array per le abilità di ogni tipo
+    $abilita_per_tipo = array(
+        'Default/Difensiva' => array(),
+        'Generica base' => array(),
+        'Generica avanzata' => array(),
+        'Attacco base' => array(),
+        'Attacco medio' => array(),
+        'Attacco avanzato' => array(),
+        'Mentale base' => array(),
+        'Mentale media' => array(),
+        'Mentale avanzata' => array(),
+        'Mentale di attacco' => array(),
+        'Potere speciale' => array()
+    );
 
-        for (const id in skillLevels) {
+    // Caricamento dell'elenco delle abilità con i relativi costi
+    $result = gdrcd_query("
+    SELECT a.*, 
+           CASE
+               WHEN a.tipo IN ('Difensiva', 'Generica base', 'Potere speciale') THEN 1
+               WHEN a.tipo IN ('Attacco base', 'Mentale base') THEN 2
+               WHEN a.tipo IN ('Attacco medio', 'Mentale media', 'Mentale di attacco', 'Generica avanzata') THEN 3
+               WHEN a.tipo IN ('Default', 'Attacco avanzato', 'Mentale avanzata') THEN 4
+               ELSE NULL
+           END AS max_lvl,
+           pa.grado
+    FROM abilita a
+    LEFT JOIN clgpersonaggioabilita pa ON a.id_abilita = pa.id_abilita AND pa.nome = '". $_SESSION['login'] ."'
+    WHERE a.id_gilda != 0 
+      AND a.id_gilda = (SELECT id_gilda FROM personaggio WHERE nome = '". $_SESSION['login'] ."') 
+    ORDER BY a.tipo, a.nome", 'result');
 
-            const oldLevel = originalSkills[id];
-            const newLevel = skillLevels[id];
 
-            if (oldLevel !== newLevel) {
-                changedSkills[id] = {
-                    old: oldLevel,
-                    new: newLevel
-                };
-                hasChanges = true;
-            }
+    // Assegnazione delle abilità ai rispettivi array associativi in base al tipo
+    while ($row = gdrcd_query($result, 'fetch')) {
+        $tipo = $row['tipo'];
+
+        if ($tipo == 'Default' || $tipo == 'Difensiva') {
+            $abilita_per_tipo['Default/Difensiva'][] = $row;
+        } elseif ($tipo == 'Generica base' || $tipo == 'Generica avanzata') {
+            $abilita_per_tipo['Generica'][] = $row;
+        } elseif ($tipo == 'Attacco base' || $tipo == 'Attacco medio' || $tipo == 'Attacco avanzato') {
+            $abilita_per_tipo['Attacco'][] = $row;
+        } elseif ($tipo == 'Mentale base' || $tipo == 'Mentale media' || $tipo == 'Mentale avanzata' || $tipo == 'Mentale di attacco') {
+            $abilita_per_tipo['Mentale'][] = $row;
+        } elseif ($tipo == 'Potere speciale' && $esperienza >= 200) {
+            $abilita_per_tipo['Potere speciale'][] = $row;
         }
+    }
 
-        if (!hasChanges) return showNotification('Non hai modificato nessuna skill.', 'error');
+    // Stampa delle abilità organizzate per tipo
+    foreach ($abilita_per_tipo as $tipo => $abilita) {
+        if (!empty($abilita)) {
+            echo '<tr class="second_header"><td colspan="3" style="text-transform: uppercase; font-size: 13px; color: #9a6353 ; font-family: DejaVu Serif; filter: drop-shadow(0 0 5px rgba(0,0,0,0.57));">' . $tipo . '</td></tr>';
 
-        console.log("Dati da salvare:", changedSkills);
-
-        // 🔥 INVIO AL SERVER
-        await fetch("/pages/ajax_engine.php?op=saveSkillPg", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ skills: changedSkills, shin: skillPoints })
-        });
-
-        showNotification("Skill salvate!", "success");
-    };
-
-    async function loadSkills() {
-        try {
-            const playerLevelEl = document.getElementById("playerLevel");
-            const skillPointsEl = document.getElementById("skillPoints");
-            const response = await fetch("/pages/ajax_engine.php?op=getSkillPg"); 
-            if (!response.ok) throw new Error("Errore nella risposta del server");
-
-            const data = await response.json();
-            console.log(data);
-
-            // 🔥 AGGIORNA le variabili
-            skillPoints = data.shinDisponibili;
-            playerLevel = data.livelloPg;
-            console.log("Livello PG:", playerLevel);
-            // 🔥 AGGIORNA il DOM
-            if(skillPointsEl) skillPointsEl.textContent = data.shinDisponibili;
-            if(playerLevel) playerLevelEl.textContent = data.livelloPg;
-            skillLevels = {};
+            foreach ($abilita as $row) {
             
-            data.skills.forEach(s => {
-                originalSkills[s.id] = s.livello;  // 🔥 salva livelli originali
-                skillLevels[s.id] = s.livello;    // livelli attuali modificabili
-            });
+                            $id = gdrcd_filter('out', $row['id_abilita']);
+                            $addr = "skill_desc.proc.php".$id;
+                            $to = "changeFrame('skill_desc.proc.php?id=$id');document.getElementById('id01').style.display='block'";
+                            $costo_acquisto = $row['costo_acquisto'];
+                            $livello_massimo = $row['max_lvl'];
+                            $grado_attuale = $row['grado'];
+                            $costo_potenziamento = costoPotenziamento($costo_acquisto, $livello_massimo, $grado_attuale);
+                            
+                echo '<tr>';
+                echo '<td width="40%"><a href="#" onClick="'. $to .'">' . gdrcd_filter('out', $row['nome']) . '</a></td>';
+                echo '<td width="30%" style="color: #8f8f8f;">';
+                
+                // Controllo se la skill è già stata acquistata dal personaggio
+                $acquistata = false; // Imposto la variabile di controllo a false di default
+                // Query per verificare se la skill è stata acquistata dal personaggio
+                $query_skill_acquistata = gdrcd_query("SELECT * FROM clgpersonaggioabilita WHERE id_abilita = '" . $row['id_abilita'] . "' AND nome = '" . $_SESSION['login'] . "'", 'result');
 
-            renderSkills(data.skills);
-        } catch (err) {
-            console.error("Errore:", err);
-            showNotification('Impossibile recuperare le skill!', 'error');
+                if (gdrcd_query($query_skill_acquistata, 'num_rows') > 0) {
+                    $acquistata = true; // La skill è stata acquistata dal personaggio
+                }
+
+                // Se la skill è stata acquistata, determina se può essere potenziata o se è già al livello massimo
+                if ($acquistata) {
+                    // Visualizza il tipo di abilità e il livello attuale
+                    echo 'Tipo: ' . gdrcd_filter('out', $row['tipo']) . ' <br>Livello attuale: ' . $row['grado'] . '/' . $row['max_lvl'] . '';
+                } else {
+                    // Visualizza solo il costo della skill
+                    echo 'Tipo: ' . gdrcd_filter('out', $row['tipo']) . ' <br>Costo: ' . costoAcquisto($row['tipo']) .'';
+                }
+
+                echo '</td>';                
+                echo '<td width="15%" style="color: #8f8f8f;">';
+                ?>
+                <form action="main.php?page=mercato_abilita_atarashi" method="post">
+
+                    <?php
+    // Controllo se la skill è già stata acquistata dal personaggio
+    $acquistata = false; // Imposto la variabile di controllo a false di default
+    // Query per verificare se la skill è stata acquistata dal personaggio
+    $query_skill_acquistata = gdrcd_query("SELECT * FROM clgpersonaggioabilita WHERE id_abilita = '" . $row['id_abilita'] . "' AND nome = '" . $_SESSION['login'] . "'", 'result');
+    
+    if (gdrcd_query($query_skill_acquistata, 'num_rows') > 0) {
+        $acquistata = true; // La skill è stata acquistata dal personaggio
+    }
+
+    // Se la skill è stata acquistata, determina se può essere potenziata o se è già al livello massimo
+    if ($acquistata) {
+        if ($row['grado'] < $row['max_lvl'] AND $esperienza_s > 0) {
+            // La skill può essere potenziata
+            echo '<input type="submit" value="Potenzia"/>';
+            echo '<input type ="hidden" value="'. $row['id_abilita'] .'" name="id_abilita"/>';
+            echo '<input type ="hidden" value="1" name="costo"/>';
+            echo '<input type="hidden" value="potenzia" name="op"/>';
+            } else {
+            // La skill è già al livello massimo
+            echo '<span>Acquistata</span>';
+        }
+    } else {
+        // La skill non è stata ancora acquistata dal personaggio
+        $costo_acquisto = costoAcquisto($row['tipo']);
+        if ($esperienza_s >= $costo_acquisto) {
+        echo '<input type="submit" value="Acquista"/>';
+        echo '<input type ="hidden" value="'. $row['id_abilita'] .'" name="id_abilita"/>';
+        echo '<input type ="hidden" value="'. costoAcquisto($row['tipo']) .'" name="costo"/>';
+        echo '<input type="hidden" value="acquista" name="op"/>';
+        } else {
+            // Il personaggio non ha abbastanza esperienza_s per acquistare questa skill
+            echo '';
         }
     }
-
-    function wireSkillButtons() {
-        document.querySelectorAll('.btn-up').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const skill = btn.dataset.skill;
-                const currentLevel = skillLevels[skill];
-                const nextLevel = currentLevel + 1;
-                const skillPointsEl = document.getElementById("skillPoints");
-
-                // 💰 il costo è il livello che si raggiunge
-                const cost = nextLevel;
-
-                // ❌ punti insufficienti
-                if (skillPoints < cost) {
-                    return showNotification(
-                        `Ti servono ${cost} punti shin per aumentare questa skill.`,
-                        'error'
-                    );
-                }
-                
-                // ❌ non si può superare livello del PG
-                if (nextLevel > playerLevel) {
-                    return showNotification(
-                        'Non puoi superare il livello del tuo personaggio!',
-                        'error'
-                    );
-                }
-
-                // ✔️ aggiorno i valori
-                skillLevels[skill] = nextLevel;
-                skillPoints -= cost;
-
-                // Aggiorno gli shin disponibili
-                if(skillPointsEl) skillPointsEl.textContent = skillPoints;
-
-                // aggiorno livello skill
-                btn.parentElement.querySelector('.skill-level').textContent = nextLevel;
-
-                // Controllo modifiche per abilitare/disabilitare il pulsante di reset
-                checkForChanges();
-            });
-        });
-    }
-
-    // APRI/CHIUDI ACCORDION
-    document.querySelectorAll(".accordion-header").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const body = btn.nextElementSibling;
-            body.style.display = body.style.display === "block" ? "none" : "block";
-        });
-    });
-
-    function renderSkills(skillList) {
-        const bodies = document.querySelectorAll(".accordion-body");
-
-        // Pulizia
-        bodies.forEach(b => b.innerHTML = "");
-
-        skillList.forEach(skill => {
-            const container = document.querySelector(`.accordion-body[data-cat='${skill.categoria}']`);
-            if (!container) return;
-
-            let locked = skill.locked ? 'disabled' : '';
-                
-            container.innerHTML += `
-                <div class="skill-row" data-descrizione="${skill.descrizione ?? '<em>Nessuna descrizione</em>'}" data-titolo="${skill.nome}">
-                    <div class="skill-left"><strong>${skill.nome}</strong></div>
-                    <div class="skill-center truncate-text"><small>${skill.descrizione ?? "Nessuna descrizione"}</small></div>
-                    <div class="skill-right">
-                        <span class="skill-level">${skill.livello}</span>
-                        <button class="btn-up ${locked}" data-skill="${skill.id}" ${locked}>+</button>
-                    </div>
-                </div>
-            `;
-        });
-
-        wireSkillButtons();
-    }
-
-    function checkForChanges() {
-        for (const id in skillLevels) {
-            if (skillLevels[id] !== originalSkills[id]) {
-                document.getElementById("btnReset").style.display = "inline-block";
-                return;
+    
+    ?>
+                </form>
+                <?php
+                echo '</td>';
             }
         }
-        // Nessuna modifica
-        document.getElementById("btnReset").style.display = "none";
     }
+    ?>
+    </table>
+</div>
+<?php
+          } else {
+?>
 
-    function resetSkills() {
-        if (!confirm("Vuoi davvero annullare tutte le modifiche non salvate?")) return;
+<div class="form_info">
+    <div class='warning'>Hai consumato tutti i punti shin disponibili per potenziarti</div>
+</div>
+<?php
+          }
+          
+          
+  }        
+          
+          
+          
+          
+          
+          
+          //inizio l'acquisto
+          
+if (gdrcd_filter('get', $_POST['op']) == "acquista") {
+$costo_acquisto_2 = $_POST['costo'];
 
-        let refund = 0;
+$query_insert = "INSERT INTO clgpersonaggioabilita (nome, id_abilita, grado) VALUES ('". $_SESSION["login"]."', '". $_POST["id_abilita"] ."', '1')";
+gdrcd_query($query_insert);
 
-        // 1️⃣ Calcolo i punti da restituire PRIMA di resettare i livelli
-        for (const id in skillLevels) {
-            const oldL = originalSkills[id];
-            const newL = skillLevels[id];
+$degrade = gdrcd_query("UPDATE personaggio SET esperienza_s = esperienza_s - $costo_acquisto_2 WHERE nome = '". $_SESSION['login'] ."' LIMIT 1");
 
-            if (newL > oldL) {
-                // costo cumulativo per ogni livello aumentato
-                for (let lvl = oldL + 1; lvl <= newL; lvl++) {
-                    refund += lvl;
-                }
-            }
-        }
+echo "<script type='text/javascript'>
+        alert('Hai acquisitato la skill');
+    </script>";
+    
+echo '<div class="warning"><a href="main.php?page=mercato_abilita_atarashi">Torna indietro</a></div>';
 
-        // 2️⃣ Ripristino i livelli originali
-        for (const id in originalSkills) {
-            skillLevels[id] = originalSkills[id];
-        }
+}
 
-        // 3️⃣ Restituisco i punti shin
-        skillPoints += refund;
-        document.getElementById("skillPoints").textContent = skillPoints;
+if (gdrcd_filter('get', $_POST['op']) == "potenzia") {
+$query_power = gdrcd_query("UPDATE clgpersonaggioabilita SET grado = grado + 1 WHERE nome = '". $_SESSION["login"]."' AND id_abilita = ". $_POST["id_abilita"] ."");
 
-        // 4️⃣ Aggiorno i livelli nella UI direttamente
-        document.querySelectorAll(".skill-row").forEach(row => {
-            const btn = row.querySelector(".btn-up");
-            const id = btn.dataset.skill;
-            row.querySelector(".skill-level").textContent = originalSkills[id];
-        });
+$powerdegrade = gdrcd_query("UPDATE personaggio SET esperienza_s = esperienza_s - 1 WHERE nome = '". $_SESSION['login'] ."' LIMIT 1");
 
-        // 5️⃣ Nascondo il pulsante reset
-        document.getElementById("btnReset").style.display = "none";
+echo "<script type='text/javascript'>
+        alert('Hai potenziato la skill');
+    </script>";
+    
+echo '<div class="warning"><a href="main.php?page=mercato_abilita_atarashi">Torna indietro</a></div>';
 
-        showNotification("Modifiche annullate!", "success");
-    }
+}
 
-    document.addEventListener("click", function(e) {
-        const row = e.target.closest(".skill-row");
-        if (!row) return;
-
-        if (e.target.classList.contains("btn-up")) return;
-
-        const descrizione = row.dataset.descrizione ?? "Nessuna descrizione";
-        const titolo = row.dataset.titolo ?? "Nessun titolo";
-        // Inserisco titolo e descrizione interpretando gli HTML
-        document.getElementById("skill-modal-titolo").textContent = titolo;
-        document.getElementById("skill-modal-descrizione").innerHTML = descrizione;
-
-        document.getElementById("skill-modal").classList.add("open");
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById("close-modal").addEventListener("click", () => {
-            document.getElementById("skill-modal").classList.remove("open");
-        });
-
-        document.getElementById("close-modal").onclick = () =>
-        document.getElementById("skill-modal").classList.remove("open");
-
-        loadSkills(); // chiamata all'avvio
-    });
-</script>
+?>

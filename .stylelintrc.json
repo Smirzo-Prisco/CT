@@ -1,0 +1,19 @@
+{
+    "extends": "stylelint-config-standard",
+    "rules": {
+        "selector-id-pattern": null,
+        "keyframes-name-pattern": null,
+        "block-no-empty": true,
+        "no-duplicate-selectors": true,
+        "declaration-block-no-duplicate-properties": true,
+        "property-no-unknown": true,
+        "selector-class-pattern": null,
+        "no-descending-specificity": null,
+        "selector-max-id": 1,
+        "max-nesting-depth": 3
+    },
+    "ignoreFiles": [
+        "**/vendor/**",
+        "**/cache/**"
+    ]
+}

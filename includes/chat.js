@@ -1,19 +1,19 @@
 /***********    GESTIONE CHAT di gioco  *********************/
 function openSection(evt, sectionName) {
     var i, tabcontent, tablinks;
-
+    
     // Nasconde tutte le sezioni
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
+      tabcontent[i].style.display = "none";
     }
-
+    
     // Rimuove la classe "active" da tutti i pulsanti
     tablinks = document.getElementsByClassName("tablinks");
     for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
-
+    
     // Mostra la sezione corrente e aggiunge la classe "active" al pulsante che l'ha aperta
     document.getElementById(sectionName).style.display = "block";
     evt.currentTarget.className += " active";
@@ -23,24 +23,24 @@ function openSection(evt, sectionName) {
 async function pulisciChat() {
     if (confirm("Sei sicuro di voler pulire questa chat?")) {
         fetch('pages/ajax_engine.php?op=pulisciChat')
-            .then(res => res.json())
-            .then(data => {
-                const chatContainer = document.getElementById('pagina_chat');
-                if (chatContainer) chatContainer.innerHTML = ''; // Svuota la chat
-
-                // Esegue refresh della chat
-                if (window.refreshChat) window.refreshChat();
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
+        .then(res => res.json())
+        .then(data => {
+            const chatContainer = document.getElementById('pagina_chat');
+            if (chatContainer) chatContainer.innerHTML = ''; // Svuota la chat
+            
+            // Esegue refresh della chat
+            if (window.refreshChat) window.refreshChat();
+        })
+        .catch(err => console.error('Errore caricamento chat:', err));
     }
 }
 
 // Ruoli apicali cancellano la chat di gioco
 async function curaPg() {
     fetch('pages/ajax_engine.php?op=curaPg')
-        .then(res => res.json())
-        .then(data => { if (window.refreshChat) window.refreshChat(); })
-        .catch(err => console.error('Errore caricamento chat:', err));
+    .then(res => res.json())
+    .then(data => { if (window.refreshChat) window.refreshChat(); })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 
 // Applica la funzione di debounce al pulsante del back_chat
@@ -48,16 +48,16 @@ function toggleBackChat(a) {
     const img = a.querySelector("img"); // recupera l'immagine dentro <a>
 
     fetch('pages/ajax_engine.php?op=setBackChat')
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                img.src = "themes/crystal/imgs/chat/" + data.image;
-                if (data.title) img.title = data.title;
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            img.src = "themes/crystal/imgs/chat/" + data.image;
+            if (data.title) img.title = data.title;
 
-                if (window.refreshChat) window.refreshChat();
-            } else showNotification(data.message, 'error');
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
+            if (window.refreshChat) window.refreshChat();
+        } else showNotification(data.message, 'error');
+    })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 
 /** Inserisco l'azione dell'utente  */
@@ -83,7 +83,7 @@ async function sendChatMessage() {
         const response = await fetch("/pages/ajax_engine.php?op=new_chat_message", {
             credentials: "same-origin", // mantiene la sessione PHP
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ message, action_tag, tag, type })
         });
 
@@ -119,39 +119,38 @@ function ChatViewer() {
     const fetchMessages = () => {
         fetch('pages/ajax_engine.php?op=get_chat_messages', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ last: lastId })
         })
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.status === 'ok' && Array.isArray(data.messages)) {
-                    const chatContainer = document.getElementById('pagina_chat');
-                    if (chatContainer) {
-                        document.getElementById('id_role').value = data.activeRole; // Imposto l'eventuale id della role in un campo nascosto della chat
-                        gdrSetSessionActive(data.activeRole); // Aggiorna lo stato della sessione di gioco
-                        data.messages.forEach(msg => { if (msg.html) chatContainer.innerHTML += msg.html; }); // Aggiungo i nuovi messaggi in chat
-                        if (data.charLimit != null && data.charLimit > 0) document.getElementById('message').maxLength = data.charLimit; // Aggiorna il limite di caratteri
-                        document.getElementById('quitRole').style.display = data.canQuit ? 'block' : 'none'; // Mostra o nasconde il pulsante di uscita dalla role
-                        document.getElementById('openPanelBtn').style.display = data.canUsePanel ? 'block' : 'none'; // Mostra o nasconde il pulsante di apertura del pannello chat
-                        document.getElementById('pgRolePlaying').style.display = data.activeRole ? 'block' : 'none'; // Mostra o nasconde il pannello con l'elenco degli utenti giocanti
-                        document.getElementById('addPgToRoleBtn').style.display = data.canQuit ? 'none' : 'block'; // Mostra o nasconde il pulsante per avviare o aggiungersi alla role
-                        // Aggiorna l'ultimo ID (prende l'ultimo messaggio disponibile)
-                        const lastMessage = data.messages[data.messages.length - 1];
-                        if (lastMessage) setLastId(parseInt(lastMessage.id, 10));
-                        if (data.messages.length > 0) setTimeout(() => { chatContainer.scrollTop = chatContainer.scrollHeight; }, 100); // Scroll automatico
-                        // Riproduco l'auDIO
-                        const audio = new Audio('../sounds/beep.wav');
-                        if (data.play === true) audio.play().catch(e => console.log('Audio error:', e));
-                    }
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.status === 'ok' && Array.isArray(data.messages)) {
+                const chatContainer = document.getElementById('pagina_chat');
+                if (chatContainer) {
+                    document.getElementById('id_role').value = data.activeRole; // Imposto l'eventuale id della role in un campo nascosto della chat
+                    gdrSetSessionActive(data.activeRole); // Aggiorna lo stato della sessione di gioco
+                    data.messages.forEach(msg => { if (msg.html) chatContainer.innerHTML += msg.html; }); // Aggiungo i nuovi messaggi in chat
+                    if(data.messages.length > 0) chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll automatico
+                    if(data.charLimit != null) document.getElementById('message').maxLength = data.charLimit; // Aggiorna il limite di caratteri
+                    document.getElementById('quitRole').style.display = data.canQuit ? 'block' : 'none'; // Mostra o nasconde il pulsante di uscita dalla role
+                    document.getElementById('openPanelBtn').style.display = data.canUsePanel ? 'block' : 'none'; // Mostra o nasconde il pulsante di apertura del pannello chat
+                    document.getElementById('pgRolePlaying').style.display = data.activeRole ? 'block' : 'none'; // Mostra o nasconde il pannello con l'elenco degli utenti giocanti
+                    // Aggiorna l'ultimo ID (prende l'ultimo messaggio disponibile)
+                    const lastMessage = data.messages[data.messages.length - 1];
+                    if (lastMessage) setLastId(parseInt(lastMessage.id, 10));
+                    // Riproduco l'auDIO
+                    const audio = new Audio('../sounds/beep.wav');
+                    if(data.play === true) audio.play().catch(e => console.log('Audio error:', e));
+                }
+            } else showNotification(data.message, 'error');
+        })
+        .catch(err => console.error('Errore caricamento chat:', err));
     };
 
     // Recupera i messaggi ogni 5 secondi
     React.useEffect(() => {
         fetchMessages();
-        const interval = setInterval(fetchMessages, 8000);
+        const interval = setInterval(fetchMessages, 5000);
         return () => clearInterval(interval);
     }, [lastId]);
 
@@ -174,7 +173,7 @@ function tiraDadoChat() {
     const target = getSelectedNamesCallback();
     const id_role = document.getElementById('id_role').value;
     setMaxTargetExternal(1);
-
+    
     if (target.length != 1 || dice_type == 0) {
         setMaxTargetExternal(0);
         resettaCampiDiv('skills-tab'); // AGGIORNA il limite dei bersagli consentiti
@@ -183,11 +182,11 @@ function tiraDadoChat() {
     }
 
     // Controllo che ci sia almeno il tipo di dado
-    if (dice_type && dice_type != '' && target.length > 0 && target.length < 2) {
+    if(dice_type && dice_type != '' && target.length > 0 && target.length < 2) {
         fetch('pages/ajax_engine.php?op=tiraDadoChat', {
             credentials: "same-origin",
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 dice_type,
                 dice_bonus,
@@ -196,15 +195,15 @@ function tiraDadoChat() {
                 id_role
             })
         })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("chatPanel").style.display = "none";
-                    // Esegue refresh della chat
-                    if (window.refreshChat) window.refreshChat();
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                document.getElementById("chatPanel").style.display = "none";
+                // Esegue refresh della chat
+                if (window.refreshChat) window.refreshChat();
+            } else showNotification(data.message, 'error');
+        })
+        .catch(err => console.error('Errore caricamento chat:', err));
     } else showNotification('Attenzione! Devi selezionare il bersaglio', 'warning');
 }
 
@@ -217,11 +216,11 @@ function tiraSkillChat() {
     const id_role = document.getElementById('id_role').value;
 
     // Controllo che ci sia la skill e il bersaglio
-    if (chat_skill == 0 || target.length > 0) {
+    if(chat_skill == 0 || target.length > 0) {
         // Chiamata
         fetch('pages/ajax_engine.php?op=tiraSkillChat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 chat_skill,
                 livello_skill,
@@ -230,15 +229,15 @@ function tiraSkillChat() {
             }),
             credentials: "same-origin"
         })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("chatPanel").style.display = "none";
-                    // Esegue refresh della chat
-                    if (window.refreshChat) window.refreshChat();
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                document.getElementById("chatPanel").style.display = "none";
+                // Esegue refresh della chat
+                if (window.refreshChat) window.refreshChat();
+            } else showNotification(data.message, 'error');
+        })
+        .catch(err => console.error('Errore caricamento chat:', err));
     } else showNotification('Attenzione! Devi selezionare il bersaglio', 'warning');
 }
 
@@ -257,24 +256,24 @@ function usaArmaChat() {
 
     fetch('pages/ajax_engine.php?op=usaArmaChat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ arma_weapon, arma_body, target })
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById("chatPanel").style.display = "none";
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById("chatPanel").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
-            } else showNotification(data.message, 'error');
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
+            if (window.refreshChat) window.refreshChat();
+        } else showNotification(data.message, 'error');
+    })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 
 // Rimuove il limite di caratteri per la textarea del master
-function masterMessageLength(textarea, maxLen) {
+function masterMessageLength (textarea, maxLen) {
     const value = textarea.value;
-
+            
     // Controlla se il primo carattere è "="
     if (value.length > 0 && value.charAt(0) === '=') {
         // Rimuove l'attributo maxlength
@@ -285,30 +284,30 @@ function masterMessageLength(textarea, maxLen) {
     }
 }
 
-function editAction(content, id) {
+function editAction (content, id) {
     document.getElementById('editAction-modal').style.display = 'block';
     document.getElementById("edit_action_textarea").value = content;
     document.getElementById("edit_action_id").value = id;
 }
 
-function saveEditAction() {
+function saveEditAction () {
     const content = document.getElementById("edit_action_textarea").value;
     const id = document.getElementById("edit_action_id").value;
 
     fetch('pages/ajax_engine.php?op=saveEditAction', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ content, id })
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById("editAction-modal").style.display = "none";
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById("editAction-modal").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
-            } else showNotification(data.message, 'error');
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
+            if (window.refreshChat) window.refreshChat();
+        } else showNotification(data.message, 'error');
+    })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 
 // Imposta limite caratteri
@@ -317,22 +316,22 @@ function setCharLimit() {
 
     fetch('pages/ajax_engine.php?op=setCharLimit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ charLimit })
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById("chatPanel").style.display = "none";
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById("chatPanel").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
-            } else showNotification(data.message, 'error');
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
+            if (window.refreshChat) window.refreshChat();
+        } else showNotification(data.message, 'error');
+    })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 // Revoca il nuovo limite di caratteri se un utente non è d'accordo
-function revocaLimiteCaratteri(nuovo_limite, vecchio_limite, luogo, user) {
-    if (confirm("Sei sicuro di voler revocare il limite?")) {
+function revocaLimiteCaratteri (nuovo_limite, vecchio_limite, luogo, user) {
+    if(confirm("Sei sicuro di voler revocare il limite?")) {
         fetch('/pages/ajax_engine.php?op=revocaLimiteCaratteri', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -343,15 +342,15 @@ function revocaLimiteCaratteri(nuovo_limite, vecchio_limite, luogo, user) {
                 user: user
             })
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) showNotification('Limite rimosso', 'success');
-                else showNotification(data.message, 'error');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Errore nel salvataggio', 'error');
-            });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) showNotification('Limite rimosso', 'success');
+            else showNotification(data.message, 'error');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Errore nel salvataggio', 'error');
+        });
     }
 }
 
@@ -359,50 +358,50 @@ function revocaLimiteCaratteri(nuovo_limite, vecchio_limite, luogo, user) {
 function usaOggettoChat() {
     const objChat = document.getElementById('objChat').value;
 
-    if (objChat == 0) {
+    if(objChat == 0) {
         showNotification('Attenzione! Devi selezionare un oggetto.', 'warning');
         return;
     }
 
     fetch('pages/ajax_engine.php?op=usaOggettoChat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ objChat })
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById("chatPanel").style.display = "none";
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById("chatPanel").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
-            } else showNotification(data.message, 'error');
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
+            if (window.refreshChat) window.refreshChat();
+        } else showNotification(data.message, 'error');
+    })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 
 // Tiro dado generico in chat
 function tiraDadoGenericoChat() {
     const dado = document.getElementById('dado').value;
 
-    if (dado == 0) {
+    if(dado == 0) {
         showNotification('Attenzione! Devi selezionare un dado.', 'warning');
         return;
     }
 
     fetch('pages/ajax_engine.php?op=tiraDadoGenericoChat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ dado })
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById("chatPanel").style.display = "none";
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById("chatPanel").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
-            } else showNotification(data.message, 'error');
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
+            if (window.refreshChat) window.refreshChat();
+        } else showNotification(data.message, 'error');
+    })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 
 // Modifica i parametri del pg in chat
@@ -418,7 +417,7 @@ function editMasterPgChat() {
 
     fetch('pages/ajax_engine.php?op=editMasterPgChat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
             note_fato,
             nome_personaggio_hidden,
@@ -429,13 +428,13 @@ function editMasterPgChat() {
             soldi
         })
     })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("chatPanel").style.display = "none";
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("chatPanel").style.display = "none";
 
-            if (window.refreshChat) window.refreshChat();
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
+        if (window.refreshChat) window.refreshChat();
+    })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 
 // Crea un png in chat
@@ -448,7 +447,7 @@ function newMasterPngChat() {
 
     fetch('pages/ajax_engine.php?op=newMasterPngChat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
             pngName,
             pngMessage,
@@ -456,46 +455,367 @@ function newMasterPngChat() {
             pngCar
         })
     })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("chatPanel").style.display = "none";
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("chatPanel").style.display = "none";
 
-            if (window.refreshChat) window.refreshChat();
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
+        if (window.refreshChat) window.refreshChat();
+    })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 
 // Allungo il turno perché l'ultimo utente che invia ha scelto di lanciare un attacco
-function closeTurn(id_role, suss_id) {
-    // Rimuovo 5 messaggi dal sussurro in poi
-    if (suss_id > 0 && document.getElementById(suss_id)) {
-        for (let i = suss_id; i < (suss_id + 5); i++) {
-            if (document.getElementById(i)) document.getElementById(i).remove();
-        }
-    }
-
-    fetch('pages/ajax_engine.php?op=closeTurn', {
+function longTurn(id_role, yes) {
+    fetch('pages/ajax_engine.php?op=longTurn', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_role, suss_id })
-    })
-        .then(res => res.json())
-        .then(data => { if (window.refreshChat) window.refreshChat(); })
-        .catch(err => console.error('Errore caricamento chat:', err));
-}
-
-// Lancio lo scudo prima di chiudere sicuramente il turno
-function lanciaScudo(id_role, yes, suss_id) {
-    const removeSuss = document.getElementById(suss_id);
-    if (suss_id > 0 && removeSuss) removeSuss.remove();
-
-    fetch('pages/ajax_engine.php?op=lanciaScudo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_role, yes, suss_id })
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id_role, yes })
     });
 }
 
+// Lancio lo scudo prima di chiudere sicuramente il turno
+function lanciaScudo(id_role, yes) {
+    fetch('pages/ajax_engine.php?op=lanciaScudo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id_role, yes })
+    });
+}
+
+/*****************************************************************************/
+/************* Serve per cercare gli utenti in fase di creazione role ********/
+/*****************************************************************************/
+class UserSearchPopup {
+    constructor() {
+        this.selectedUsers = [];
+        this.isOpen = false;
+        this.searchTimeout = null;
+        this.init();
+    }
+
+    init() {
+        // Elementi DOM con classi incapsulate
+        this.elements = {
+            popup: document.getElementById('userSearchPopup'),
+            openBtn: document.getElementById('openUserSearch'),
+            closeBtn: document.getElementById('closePopup'),
+            searchInput: document.getElementById('userSearch'),
+            autocompleteList: document.getElementById('autocompleteResults'),
+            selectedList: document.getElementById('selectedUsersList'),
+            confirmBtn: document.getElementById('confirmSelection'),
+            cancelBtn: document.getElementById('cancelSelection'),
+            loading: document.querySelector('.user-search-popup__loading')
+        };
+
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        // Apertura popup
+        if(this.elements.openBtn) this.elements.openBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openPopup();
+        });
+        
+        // Chiusura popup
+        this.elements.closeBtn.addEventListener('click', () => this.closePopup());
+        this.elements.cancelBtn.addEventListener('click', () => this.closePopup());
+        
+        // Click outside per chiudere
+        this.elements.popup.addEventListener('click', (e) => { if (e.target === this.elements.popup) this.closePopup(); });
+
+        // Ricerca con autocomplete e debounce
+        this.elements.searchInput.addEventListener('input', (e) => { this.debouncedSearch(e.target.value); });
+
+        // Keyboard navigation
+        this.elements.searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.hideAutocomplete();
+            
+            if (e.key === 'Enter' && this.elements.autocompleteList.style.display === 'block') {
+                const firstItem = this.elements.autocompleteList.querySelector('.user-search-popup__autocomplete-item');
+                if (firstItem) firstItem.click();
+            }
+        });
+
+        // Conferma selezione
+        this.elements.confirmBtn.addEventListener('click', () => { this.confirmSelection(); });
+
+        // Keyboard events globali
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.isOpen) this.closePopup(); });
+    }
+
+    debouncedSearch(query) {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout); // Clear previous timeout
+        
+        this.searchTimeout = setTimeout(() => { this.handleSearch(query); }, 300); // Set new timeout
+    }
+
+    async handleSearch(query) {
+        const trimmedQuery = query.trim();
+        
+        if (trimmedQuery.length < 2) {
+            this.hideAutocomplete();
+            this.hideLoading();
+            return;
+        }
+
+        this.showLoading();
+        this.hideAutocomplete();
+
+        try {
+            const users = await this.searchUsers(trimmedQuery);
+            this.showAutocomplete(users);
+        } catch (error) {
+            console.error('Errore ricerca utenti:', error);
+            this.showAutocompleteError(error.message);
+        } finally { this.hideLoading(); }
+    }
+
+    async searchUsers(query) {
+        const response = await fetch('pages/ajax_engine.php?op=searchUsers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ users: this.selectedUsers, 'query': query })
+        });
+
+        if (!response.ok) { throw new Error(`Errore HTTP: ${response.status}`); }
+
+        const data = await response.json();
+        
+        if (data.error) { throw new Error(data.error); }
+        
+        return data;
+    }
+
+    showAutocomplete(users) {
+        if (!users || users.length === 0) {
+            this.elements.autocompleteList.innerHTML = `
+                <div class="user-search-popup__autocomplete-item user-search-popup__autocomplete-item--empty">
+                    Nessun utente trovato
+                </div>
+            `;
+            this.elements.autocompleteList.style.display = 'block';
+            return;
+        }
+    
+        const html = users.map(userName => `
+            <div class="user-search-popup__autocomplete-item" 
+                data-user-name="${this.escapeHtml(userName)}">
+                ${this.escapeHtml(userName)}
+            </div>
+        `).join('');
+    
+        this.elements.autocompleteList.innerHTML = html;
+        this.elements.autocompleteList.style.display = 'block';
+    
+        // Aggiungi event listeners agli items
+        this.bindAutocompleteEvents();
+    }
+
+    bindAutocompleteEvents() {
+        this.elements.autocompleteList.querySelectorAll('.user-search-popup__autocomplete-item').forEach(item => {
+            item.addEventListener('click', () => {
+                this.addUserToSelection(item.dataset.userName);
+                this.clearSearch();
+            });
+    
+            // Hover effects (rimangono uguali)
+            item.addEventListener('mouseenter', () => { item.classList.add('user-search-popup__autocomplete-item--hover'); });
+            item.addEventListener('mouseleave', () => { item.classList.remove('user-search-popup__autocomplete-item--hover'); });
+        });
+    }
+
+    addUserToSelection(userName) {
+        // Aggiungi direttamente il nome utente invece di un oggetto
+        this.selectedUsers.push(userName);
+        this.renderSelectedUsers();
+        this.updateConfirmButton();
+        this.showTempMessage(`"${userName}" aggiunto alla selezione`, 'success');
+    }
+    
+    removeUserFromSelection(userName) {
+        this.selectedUsers = this.selectedUsers.filter(user => user !== userName);
+        this.renderSelectedUsers();
+        this.updateConfirmButton();
+        this.showTempMessage(`"${userName}" rimosso dalla selezione`, 'info');
+    }
+
+    renderSelectedUsers() {
+        if (this.selectedUsers.length === 0) {
+            this.elements.selectedList.innerHTML = '<div class="user-search-popup__empty-message">Nessun utente selezionato</div>';
+            return;
+        }
+        
+        const html = this.selectedUsers.map(userName => `
+            <div class="user-search-popup__selected-user">
+                <span class="user-search-popup__user-name">${this.escapeHtml(userName)}</span>
+                <button class="user-search-popup__remove-btn" data-user-name="${this.escapeHtml(userName)}">
+                    Rimuovi
+                </button>
+            </div>
+        `).join('');
+    
+        this.elements.selectedList.innerHTML = html;
+    
+        // Aggiungi event listeners ai pulsanti rimuovi
+        this.elements.selectedList.querySelectorAll('.user-search-popup__remove-btn').forEach(btn => { btn.addEventListener('click', () => {  this.removeUserFromSelection(btn.dataset.userName);  }); });
+    }
+
+    hideAutocomplete() { this.elements.autocompleteList.style.display = 'none'; }
+
+    updateConfirmButton() {
+        this.elements.confirmBtn.disabled = this.selectedUsers.length === 0;
+        
+        // Aggiorna il testo del bottone con il conteggio
+        if (this.selectedUsers.length > 0) this.elements.confirmBtn.textContent = `Conferma (${this.selectedUsers.length})`;
+        else this.elements.confirmBtn.textContent = 'Conferma';
+    }
+
+    showLoading() { if (this.elements.loading) this.elements.loading.style.display = 'block'; }
+
+    hideLoading() { if (this.elements.loading) this.elements.loading.style.display = 'none'; }
+
+    showAutocompleteError(message) {
+        this.elements.autocompleteList.innerHTML = `
+            <div class="user-search-popup__autocomplete-item user-search-popup__autocomplete-item--error">
+                ${this.escapeHtml(message || 'Errore durante la ricerca')}
+            </div>
+        `;
+        this.elements.autocompleteList.style.display = 'block';
+    }
+
+    clearSearch() {
+        this.elements.searchInput.value = '';
+        this.hideAutocomplete();
+        this.hideLoading();
+    }
+
+    openPopup() {
+        this.elements.popup.style.display = 'flex';
+        this.isOpen = true;
+        this.elements.searchInput.focus();
+        this.updateConfirmButton();
+        
+        // Blocca scroll body
+        document.body.style.overflow = 'hidden';
+        
+        // Reset alla apertura
+        this.clearSearch();
+    }
+
+    closePopup() {
+        this.elements.popup.style.display = 'none';
+        this.isOpen = false;
+        this.clearSearch();
+        
+        // Ripristina scroll body
+        document.body.style.overflow = '';
+    }
+
+    async confirmSelection() {
+        if (this.selectedUsers.length === 0) {
+            this.showTempMessage('Seleziona almeno un utente', 'warning');
+            return;
+        }
+
+        this.elements.confirmBtn.disabled = true;
+        this.elements.confirmBtn.textContent = 'Invio in corso...';
+
+        try {
+            await this.startRole();
+            this.showTempMessage('Selezione inviata con successo!', 'success');
+            
+            // Chiudi il popup dopo successo
+            setTimeout(() => {
+                this.closePopup();
+                this.selectedUsers = [];
+                this.renderSelectedUsers();
+                this.updateConfirmButton();
+            }, 1000);
+        } catch (error) {
+            console.error('Errore invio selezione:', error);
+            this.showTempMessage(error, 'warning');
+        } finally { this.updateConfirmButton(); }
+    }
+
+    async startRole() {
+        const response = await fetch('pages/ajax_engine.php?op=startRole', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ users: this.selectedUsers })
+        });
+
+        if (!response.ok) { throw new Error(`Errore HTTP: ${response.status}`); }
+
+        const result = await response.json();
+        
+        if (!result.success) { throw new Error(result.message || 'Errore sconosciuto'); }
+
+        return result;
+    }
+
+    showTempMessage(message, type = 'info') {
+        // Crea un elemento per il messaggio temporaneo
+        const messageEl = document.createElement('div');
+        messageEl.className = `user-search-popup__temp-message user-search-popup__temp-message--${type}`;
+        messageEl.textContent = message;
+        
+        // Stili per il messaggio temporaneo
+        Object.assign(messageEl.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            padding: '12px 20px',
+            borderRadius: '6px',
+            color: 'white',
+            fontWeight: '500',
+            zIndex: '10002',
+            animation: 'user-search-popup__slideIn 0.3s ease'
+        });
+        
+        // Colori in base al tipo
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+        
+        messageEl.style.background = colors[type] || colors.info;
+        
+        document.body.appendChild(messageEl);
+        
+        // Rimuovi dopo 3 secondi
+        setTimeout(() => {
+            messageEl.style.animation = 'user-search-popup__slideOut 0.3s ease';
+            setTimeout(() => { if (messageEl.parentNode) messageEl.parentNode.removeChild(messageEl); }, 300);
+        }, 3000);
+    }
+
+    escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return unsafe;
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Metodo per distruggere l'istanza e pulire gli event listeners
+    destroy() {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout);
+        
+        // Rimuovi tutti gli event listeners
+        this.elements.openBtn.removeEventListener('click', this.openPopup);
+        this.elements.closeBtn.removeEventListener('click', this.closePopup);
+        this.elements.cancelBtn.removeEventListener('click', this.closePopup);
+        this.elements.searchInput.removeEventListener('input', this.debouncedSearch);
+        this.elements.confirmBtn.removeEventListener('click', this.confirmSelection);
+        
+        document.removeEventListener('keydown', this.handleGlobalKeydown);
+    }
+}
 // Animazioni CSS aggiuntive
 const additionalStyles = `
     @keyframes user-search-popup__slideIn {
@@ -540,18 +860,26 @@ if (!document.querySelector('#user-search-popup-additional-styles')) {
 /*****************************************************************************/
 /************* Serve per cercare gli utenti in fase di creazione role ********/
 /*****************************************************************************/
-class pgRolePlayingPanel {
+class UserSearchPopupAdd {
     constructor() {
+        this.selectedUsers = [];
         this.isOpen = false;
+        this.searchTimeout = null;
         this.init();
     }
 
     init() {
         // Elementi DOM con classi incapsulate
         this.elements = {
-            popupPanel: document.getElementById('pgRolePlayingPanel'),
-            openBtn: document.getElementById('pgRolePlaying'),
-            closeBtn: document.getElementById('closePopupAdd'),
+            popupAdd: document.getElementById('pgRolePlayingPanel'),
+            openBtnAdd: document.getElementById('pgRolePlaying'),
+            closeBtnAdd: document.getElementById('closePopupAdd'),
+            searchInputAdd: document.getElementById('userSearchAdd'),
+            autocompleteListAdd: document.getElementById('autocompleteResultsAdd'),
+            selectedListAdd: document.getElementById('selectedUsersListAdd'),
+            confirmBtnAdd: document.getElementById('confirmSelectionAdd'),
+            cancelBtnAdd: document.getElementById('cancelSelectionAdd'),
+            loading: document.querySelector('.user-search-popup__loading')
         };
 
         this.bindEvents();
@@ -559,77 +887,331 @@ class pgRolePlayingPanel {
 
     bindEvents() {
         // Apertura popup
-        if (this.elements.openBtn) this.elements.openBtn.addEventListener('click', (e) => {
+        if(this.elements.openBtnAdd) this.elements.openBtnAdd.addEventListener('click', (e) => {
             e.preventDefault();
-            this.openPopup();
+            this.openPopupAdd();
+        });
+        
+        // Chiusura popup
+        this.elements.closeBtnAdd.addEventListener('click', () => this.closePopupAdd());
+        this.elements.cancelBtnAdd.addEventListener('click', () => this.closePopupAdd());
+        
+        // Click outside per chiudere
+        this.elements.popupAdd.addEventListener('click', (e) => { if (e.target === this.elements.popupAdd) this.closePopup(); });
+
+        // Ricerca con autocomplete e debounce
+        this.elements.searchInputAdd.addEventListener('input', (e) => { this.debouncedSearch(e.target.value); });
+
+        // Keyboard navigation
+        this.elements.searchInputAdd.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.hideAutocomplete();
+            
+            if (e.key === 'Enter' && this.elements.autocompleteListAdd.style.display === 'block') {
+                const firstItem = this.elements.autocompleteListAdd.querySelector('.user-search-popup__autocomplete-item');
+                if (firstItem) firstItem.click();
+            }
         });
 
-        // Chiusura popup
-        this.elements.closeBtn.addEventListener('click', () => this.closePanel());
-
-        // Click outside per chiudere
-        this.elements.popupPanel.addEventListener('click', (e) => { if (e.target === this.elements.popupPanel) this.closePanel(); });
+        // Conferma selezione
+        this.elements.confirmBtnAdd.addEventListener('click', () => { this.confirmSelection(); });
 
         // Keyboard events globali
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.isOpen) this.closePanel(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.isOpen) this.closePopup(); });
     }
 
-    openPopup() {
-        this.elements.popupPanel.style.display = 'flex';
+    debouncedSearch(query) {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout); // Clear previous timeout
+        
+        this.searchTimeout = setTimeout(() => { this.handleSearch(query); }, 300); // Set new timeout
+    }
+
+    async handleSearch(query) {
+        const trimmedQuery = query.trim();
+        
+        if (trimmedQuery.length < 2) {
+            this.hideAutocomplete();
+            this.hideLoading();
+            return;
+        }
+
+        this.showLoading();
+        this.hideAutocomplete();
+
+        try {
+            const users = await this.searchUsers(trimmedQuery);
+            this.showAutocomplete(users);
+        } catch (error) {
+            console.error('Errore ricerca utenti:', error);
+            this.showAutocompleteError(error.message);
+        } finally { this.hideLoading(); }
+    }
+
+    async searchUsers(query) {
+        const response = await fetch('pages/ajax_engine.php?op=searchUsers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ users: this.selectedUsers, 'query': query })
+        });
+
+        if (!response.ok) { throw new Error(`Errore HTTP: ${response.status}`); }
+
+        const data = await response.json();
+        
+        if (data.error) { throw new Error(data.error); }
+        
+        return data;
+    }
+
+    showAutocomplete(users) {
+        if (!users || users.length === 0) {
+            this.elements.autocompleteListAdd.innerHTML = `
+                <div class="user-search-popup__autocomplete-item user-search-popup__autocomplete-item--empty">
+                    Nessun utente trovato
+                </div>
+            `;
+            this.elements.autocompleteListAdd.style.display = 'block';
+            return;
+        }
+    
+        const html = users.map(userName => `
+            <div class="user-search-popup__autocomplete-item" 
+                data-user-name="${this.escapeHtml(userName)}">
+                ${this.escapeHtml(userName)}
+            </div>
+        `).join('');
+    
+        this.elements.autocompleteListAdd.innerHTML = html;
+        this.elements.autocompleteListAdd.style.display = 'block';
+    
+        // Aggiungi event listeners agli items
+        this.bindAutocompleteEvents();
+    }
+
+    bindAutocompleteEvents() {
+        this.elements.autocompleteListAdd.querySelectorAll('.user-search-popup__autocomplete-item').forEach(item => {
+            item.addEventListener('click', () => {
+                this.addUserToSelection(item.dataset.userName);
+                this.clearSearch();
+            });
+    
+            // Hover effects (rimangono uguali)
+            item.addEventListener('mouseenter', () => { item.classList.add('user-search-popup__autocomplete-item--hover'); });
+            item.addEventListener('mouseleave', () => { item.classList.remove('user-search-popup__autocomplete-item--hover'); });
+        });
+    }
+
+    addUserToSelection(userName) {
+        // Aggiungi direttamente il nome utente invece di un oggetto
+        this.selectedUsers.push(userName);
+        this.renderSelectedUsers();
+        this.updateConfirmButton();
+        this.showTempMessage(`"${userName}" aggiunto alla selezione`, 'success');
+    }
+    
+    removeUserFromSelection(userName) {
+        this.selectedUsers = this.selectedUsers.filter(user => user !== userName);
+        this.renderSelectedUsers();
+        this.updateConfirmButton();
+        this.showTempMessage(`"${userName}" rimosso dalla selezione`, 'info');
+    }
+
+    renderSelectedUsers() {
+        if (this.selectedUsers.length === 0) {
+            this.elements.selectedListAdd.innerHTML = '<div class="user-search-popup__empty-message">Nessun utente selezionato</div>';
+            return;
+        }
+        
+        const html = this.selectedUsers.map(userName => `
+            <div class="user-search-popup__selected-user">
+                <span class="user-search-popup__user-name">${this.escapeHtml(userName)}</span>
+                <button class="user-search-popup__remove-btn" data-user-name="${this.escapeHtml(userName)}">
+                    Rimuovi
+                </button>
+            </div>
+        `).join('');
+    
+        this.elements.selectedListAdd.innerHTML = html;
+    
+        // Aggiungi event listeners ai pulsanti rimuovi
+        this.elements.selectedListAdd.querySelectorAll('.user-search-popup__remove-btn').forEach(btn => { btn.addEventListener('click', () => {  this.removeUserFromSelection(btn.dataset.userName);  }); });
+    }
+
+    hideAutocomplete() { this.elements.autocompleteListAdd.style.display = 'none'; }
+
+    updateConfirmButton() {
+        this.elements.confirmBtnAdd.disabled = this.selectedUsers.length === 0;
+        
+        // Aggiorna il testo del bottone con il conteggio
+        if (this.selectedUsers.length > 0) this.elements.confirmBtnAdd.textContent = `Conferma (${this.selectedUsers.length})`;
+        else this.elements.confirmBtnAdd.textContent = 'Conferma';
+    }
+
+    showLoading() { if (this.elements.loading) this.elements.loading.style.display = 'block'; }
+
+    hideLoading() { if (this.elements.loading) this.elements.loading.style.display = 'none'; }
+
+    showAutocompleteError(message) {
+        this.elements.autocompleteListAdd.innerHTML = `
+            <div class="user-search-popup__autocomplete-item user-search-popup__autocomplete-item--error">
+                ${this.escapeHtml(message || 'Errore durante la ricerca')}
+            </div>
+        `;
+        this.elements.autocompleteListAdd.style.display = 'block';
+    }
+
+    clearSearch() {
+        this.elements.searchInputAdd.value = '';
+        this.hideAutocomplete();
+        this.hideLoading();
+    }
+
+    openPopupAdd() {
+        this.elements.popupAdd.style.display = 'flex';
         this.isOpen = true;
-        document.body.style.overflow = 'hidden'; // Blocca scroll body
-
-        getPgRolePlaying(); // Carica gli utenti
+        this.elements.searchInputAdd.focus();
+        this.updateConfirmButton();
+        
+        // Blocca scroll body
+        document.body.style.overflow = 'hidden';
+        
+        // Reset alla apertura
+        this.clearSearch();
+        getPgRolePlaying();
     }
 
-    closePanel() {
-        this.elements.popupPanel.style.display = 'none';
+    closePopupAdd() {
+        this.elements.popupAdd.style.display = 'none';
         this.isOpen = false;
-        document.body.style.overflow = ''; // Ripristina scroll body
+        this.clearSearch();
+        
+        // Ripristina scroll body
+        document.body.style.overflow = '';
+    }
+
+    async confirmSelection() {
+        if (this.selectedUsers.length === 0) {
+            this.showTempMessage('Seleziona almeno un utente', 'warning');
+            return;
+        }
+
+        this.elements.confirmBtnAdd.disabled = true;
+        this.elements.confirmBtnAdd.textContent = 'Invio in corso...';
+
+        try {
+            await this.addPgToCurrentRole();
+            this.showTempMessage('Selezione inviata con successo!', 'success');
+            
+            // Chiudi il popup dopo successo
+            setTimeout(() => {
+                this.closePopupAdd();
+                this.selectedUsers = [];
+                this.renderSelectedUsers();
+                this.updateConfirmButton();
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Errore invio selezione:', error);
+            this.showTempMessage(error, 'warning');
+        } finally { this.updateConfirmButton(); }
+    }
+
+    async addPgToCurrentRole() {
+        const response = await fetch('pages/ajax_engine.php?op=addPgToCurrentRole', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ users: this.selectedUsers })
+        });
+
+        if (!response.ok) { throw new Error(`Errore HTTP: ${response.status}`); }
+
+        const result = await response.json();
+        
+        if (!result.success) { throw new Error(result.message || 'Errore sconosciuto'); }
+
+        return result;
+    }
+
+    showTempMessage(message, type = 'info') {
+        // Crea un elemento per il messaggio temporaneo
+        const messageEl = document.createElement('div');
+        messageEl.className = `user-search-popup__temp-message user-search-popup__temp-message--${type}`;
+        messageEl.textContent = message;
+        
+        // Stili per il messaggio temporaneo
+        Object.assign(messageEl.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            padding: '12px 20px',
+            borderRadius: '6px',
+            color: 'white',
+            fontWeight: '500',
+            zIndex: '10002',
+            animation: 'user-search-popup__slideIn 0.3s ease'
+        });
+        
+        // Colori in base al tipo
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+        
+        messageEl.style.background = colors[type] || colors.info;
+        
+        document.body.appendChild(messageEl);
+        
+        // Rimuovi dopo 3 secondi
+        setTimeout(() => {
+            messageEl.style.animation = 'user-search-popup__slideOut 0.3s ease';
+            setTimeout(() => { if (messageEl.parentNode) messageEl.parentNode.removeChild(messageEl); }, 300);
+        }, 3000);
+    }
+
+    escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return unsafe;
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     // Metodo per distruggere l'istanza e pulire gli event listeners
     destroy() {
         if (this.searchTimeout) clearTimeout(this.searchTimeout);
-
+        
         // Rimuovi tutti gli event listeners
-        this.elements.openBtn.removeEventListener('click', this.openPopup);
-        this.elements.closeBtn.removeEventListener('click', this.closePanel);
-        this.elements.cancelBtn.removeEventListener('click', this.closePanel);
-    }
-}
-
-function addPgToRole() {
-    if (confirm("Sei sicuro di voler entrare?")) {
-        fetch('pages/ajax_engine.php?op=addPgToRole')
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    if (window.refreshChat) window.refreshChat();
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
+        this.elements.openBtnAdd.removeEventListener('click', this.openPopup);
+        this.elements.closeBtnAdd.removeEventListener('click', this.closePopup);
+        this.elements.cancelBtnAdd.removeEventListener('click', this.closePopup);
+        this.elements.searchInputAdd.removeEventListener('input', this.debouncedSearch);
+        this.elements.confirmBtnAdd.removeEventListener('click', this.confirmSelection);
+        
+        document.removeEventListener('keydown', this.handleGlobalKeydown);
     }
 }
 
 // Pg esce dalla role
 function quitRole(user) {
-    if (confirm("Sei sicuro di voler espellere " + user + " dalla role?")) {
+    if(confirm("Sei sicuro di voler espellere "+user+" dalla role?")) {
         fetch('pages/ajax_engine.php?op=quitRole', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ user })
         })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    if (window.refreshChat) window.refreshChat();
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                if (window.refreshChat) window.refreshChat();
 
-                    // Chiudi il popup dopo successo
-                    document.getElementById('closePopup').style.display = 'none';
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
+                // Chiudi il popup dopo successo
+                document.getElementById('closePopup').style.display = 'none';
+            } else showNotification(data.message, 'error');
+        })
+        .catch(err => console.error('Errore caricamento chat:', err));
     }
 }
 
@@ -643,50 +1225,52 @@ function closePgRolePlayingPanel() {
 // Carica gli utenti
 function getPgRolePlaying() {
     fetch('pages/ajax_engine.php?op=getPgRolePlaying')
-        .then(res => res.json())
-        .then(data => {
-            const pgRolePlayingList = document.getElementById('pgRolePlayingList');
-            const users = data.users || [];
+    .then(res => res.json())
+    .then(data => {
+        const pgRolePlayingList = document.getElementById('pgRolePlayingList');
+        const users = data.users || [];
 
-            pgRolePlayingList.innerHTML = '';
-
-            users.forEach(user => {
-                const row = document.createElement('div');
-                row.style.cssText = 'display: grid; grid-template-columns: 1fr 60px 80px; gap: 8px; align-items: center; padding: 6px 8px; background-color: rgba(30, 40, 60, 0.3); border-radius: 4px; margin-bottom: 3px; font-size: 0.9rem;';
-
-                // Nome
-                const nameCol = document.createElement('div');
-                nameCol.textContent = user.name;
-                nameCol.style.cssText = 'color: #e0e0e0;';
-
-                // Spia luminosa
-                const statusCol = document.createElement('div');
-                statusCol.style.cssText = 'text-align: center;';
-                const dot = document.createElement('div');
-                dot.style.cssText = `width: 10px; height: 10px; border-radius: 50%; display: inline-block; background-color: ${user.inRole ? '#27ae60' : '#e74c3c'}; box-shadow: 0 0 ${user.inRole ? '8px' : '0'} ${user.inRole ? '#27ae60' : 'transparent'};`;
-                if (user.inRole) {
-                    dot.style.animation = 'pulse 2s infinite';
-                }
-                statusCol.appendChild(dot);
-
-                // Pulsante
-                const actionCol = document.createElement('div');
-                actionCol.style.cssText = 'text-align: center;';
-                const button = document.createElement('button');
-                button.textContent = user.inRole ? 'Espelli' : 'Uscito';
-                button.style.cssText = 'background: ' + (user.inRole ? '#27ae60' : '#7f8c8d') + '; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: ' + (user.inRole ? 'pointer' : 'not-allowed') + '; width: 70px;';
-                button.disabled = !user.inRole;
-
-                if (user.inRole) button.onclick = function () { quitRole(user.name); };
-                if (data.canQuit) actionCol.appendChild(button);
-
-                row.appendChild(nameCol);
-                row.appendChild(statusCol);
-                row.appendChild(actionCol);
-                pgRolePlayingList.appendChild(row);
-            });
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
+        if(data.canAdd) document.getElementById('area_addPgRole').style.display = 'block';
+        
+        pgRolePlayingList.innerHTML = '';
+        
+        users.forEach(user => {
+            const row = document.createElement('div');
+            row.style.cssText = 'display: grid; grid-template-columns: 1fr 60px 80px; gap: 8px; align-items: center; padding: 6px 8px; background-color: rgba(30, 40, 60, 0.3); border-radius: 4px; margin-bottom: 3px; font-size: 0.9rem;';
+            
+            // Nome
+            const nameCol = document.createElement('div');
+            nameCol.textContent = user.name;
+            nameCol.style.cssText = 'color: #e0e0e0;';
+            
+            // Spia luminosa
+            const statusCol = document.createElement('div');
+            statusCol.style.cssText = 'text-align: center;';
+            const dot = document.createElement('div');
+            dot.style.cssText = `width: 10px; height: 10px; border-radius: 50%; display: inline-block; background-color: ${user.inRole ? '#27ae60' : '#e74c3c'}; box-shadow: 0 0 ${user.inRole ? '8px' : '0'} ${user.inRole ? '#27ae60' : 'transparent'};`;
+            if (user.inRole) {
+                dot.style.animation = 'pulse 2s infinite';
+            }
+            statusCol.appendChild(dot);
+            
+            // Pulsante
+            const actionCol = document.createElement('div');
+            actionCol.style.cssText = 'text-align: center;';
+            const button = document.createElement('button');
+            button.textContent = user.inRole ? 'Espelli' : 'Uscito';
+            button.style.cssText = 'background: ' + (user.inRole ? '#27ae60' : '#7f8c8d') + '; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: ' + (user.inRole ? 'pointer' : 'not-allowed') + '; width: 70px;';
+            button.disabled = !user.inRole;
+            
+            if (user.inRole)  button.onclick = function() { quitRole(user.name); };
+            if(data.canQuit) actionCol.appendChild(button);
+            
+            row.appendChild(nameCol);
+            row.appendChild(statusCol);
+            row.appendChild(actionCol);
+            pgRolePlayingList.appendChild(row);
+        });
+    })
+    .catch(err => console.error('Errore caricamento chat:', err));
 }
 
 // Stile per l'animazione della spia
@@ -706,18 +1290,18 @@ document.head.appendChild(stylePginRole);
 function gdrSetSessionActive(isActive) {
     const statusElement = document.getElementById('gdrSessionStatus');
     const roleInProgress = document.getElementById('roleInProgress');
-    const addPgToRoleBtn = document.getElementById('addPgToRoleBtn');
-
+    const openUserSearch = document.getElementById('openUserSearch');
+    
     if (isActive) {
         statusElement.classList.add('active');
         statusElement.classList.remove('inactive');
-        addPgToRoleBtn.textContent = ' Join!';
+        openUserSearch.style.display = 'none';
         roleInProgress.style.display = 'block';
     } else {
         statusElement.classList.add('inactive');
         statusElement.classList.remove('active');
-        addPgToRoleBtn.textContent = ' Avvia!';
         roleInProgress.style.display = 'none';
+        openUserSearch.style.display = 'block';
     }
 }
 
@@ -749,14 +1333,14 @@ progressFill.style.cssText = `
 progressBar.appendChild(progressFill);
 textarea.parentNode.insertBefore(progressBar, textarea.nextSibling);
 
-textarea.addEventListener('input', function () {
+textarea.addEventListener('input', function() {
     const length = this.value.length;
     const progress = Math.min(length / maxLength, 1);
     const percentage = progress * 100;
-
+    
     // Aggiorna la barra di progresso
     progressFill.style.width = `${percentage}%`;
-
+    
     // Cambia colore in base al progresso
     if (progress < 0.7) {
         progressFill.style.background = '#4CAF50';
@@ -770,7 +1354,7 @@ textarea.addEventListener('input', function () {
         progressFill.style.background = '#f44336';
         this.style.borderColor = '#f44336';
         this.style.boxShadow = `0 0 ${progress * 20}px rgba(244, 67, 54, ${0.6 + progress * 0.3})`;
-
+        
         // Effetto vibrante quando si avvicina al limite
         if (progress > 0.95) {
             progressFill.style.animation = 'vibrate 0.1s infinite';
@@ -793,12 +1377,12 @@ document.head.appendChild(vibrateStyle);
 /*********************** PANNELLO CHAT ***************************************/
 /*****************************************************************************/
 // Gestione apertura/chiusura modale principale
-document.getElementById('openPanelBtn').addEventListener('click', function () {
+document.getElementById('openPanelBtn').addEventListener('click', function() {
     initUserSelectionBox(); // Carico i bersagli possibili
     document.getElementById('chatPanel').style.display = 'flex';
 });
 
-document.getElementById('gdrCloseBtn').addEventListener('click', function () {
+document.getElementById('gdrCloseBtn').addEventListener('click', function() {
     document.getElementById('chatPanel').style.display = 'none';
 });
 
@@ -809,23 +1393,48 @@ document.querySelectorAll('.gdr-tab').forEach(tab => {
         document.querySelectorAll('.gdr-tab').forEach(t => {
             t.classList.remove('active');
         });
-
+        
         // Aggiungi classe active al tab cliccato
         tab.classList.add('active');
-
+        
         // Nascondi tutti i contenuti
         document.querySelectorAll('.gdr-tab-content').forEach(content => {
             content.classList.remove('active');
         });
-
+        
         // Mostra il contenuto corrispondente
         const tabId = tab.getAttribute('data-tab');
         document.getElementById(`${tabId}-tab`).classList.add('active');
     });
 });
 
+// Gestione Modal Scrittura Libera
+const gdrOpenModalBtn = document.getElementById('gdrOpenTextareaButton');
+const gdrWritingModal = document.getElementById('gdrWritingModal');
+const gdrCloseWritingModalBtn = document.querySelector('.gdr-close-writing-modal');
+const gdrFreeWritingArea = document.getElementById('gdrFreeWritingArea');
+const gdrCharLimitSpan = document.getElementById('gdrCharLimit');
+
+gdrOpenModalBtn.addEventListener('click', () => {
+    const charLimit = document.getElementById('caratteri').value || 500;
+    gdrCharLimitSpan.textContent = charLimit;
+    gdrFreeWritingArea.maxLength = charLimit;
+    gdrWritingModal.style.display = 'flex';
+});
+
+gdrCloseWritingModalBtn.addEventListener('click', () => { gdrWritingModal.style.display = 'none'; });
+
+window.addEventListener('click', (e) => { if (e.target === gdrWritingModal) gdrWritingModal.style.display = 'none'; });
+
+// Contatore caratteri per textarea
+gdrFreeWritingArea.addEventListener('input', function() {
+    const charCount = this.value.length;
+    const charLimit = this.maxLength;
+    this.parentNode.querySelector('.gdr-char-counter').textContent = `Caratteri: ${charCount}/${charLimit}`;
+});
+
 // Contatore caratteri per azione PNG
-document.getElementById('message').addEventListener('input', function () {
+document.getElementById('message').addEventListener('input', function() {
     const charCount = this.value.length;
     this.parentNode.querySelector('.gdr-char-counter').textContent = `Caratteri: ${charCount}/${maxLength}`;
 });
@@ -837,7 +1446,7 @@ async function getRolePgs() {
     try {
         const response = await fetch('pages/ajax_engine.php?op=getRolePgs', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ id_role })
         });
         const data = await response.json();
@@ -884,33 +1493,33 @@ function UserSelectionBox() {
         };
         return () => { setMaxTargetExternal = null; }; // Pulisco
     }, []);
-
+    
     // Carica i dati all'avvio
     React.useEffect(() => { getRolePgs().then(data => { setUsers(data.users); }); }, []);
-
-    const handleToggle = (userName) => {
+    
+    const handleToggle = (userName) => { 
         setSelectedNames(prev => {
             // Se già selezionato, rimuovi
             if (prev.includes(userName)) return prev.filter(name => name !== userName);
-
+            
             // Se c'è un limite e lo superiamo, non aggiungere
             if (maxTarget > 0 && prev.length >= maxTarget) {
                 alert(`Puoi selezionare al massimo ${maxTarget} utenti`);
                 return prev;
             }
-
+            
             // Altrimenti aggiungi
             return [...prev, userName];
-        });
+        }); 
     };
-
+    
     // Esponi la funzione per ottenere i nomi selezionati
     React.useEffect(() => {
         getSelectedNamesCallback = () => selectedNames;
     }, [selectedNames]);
-
+    
     if (!users || users.length === 0) return;
-
+    
     return React.createElement('div', null,
         // Mostra il limite se esiste
         maxTarget > 0 && React.createElement('div', {
@@ -924,29 +1533,29 @@ function UserSelectionBox() {
                 color: '#856404'
             }
         }, `📝 Selezionati: ${selectedNames.length}` +
-        (maxTarget > 0 ? ` / ${maxTarget}` : '')),
-
+            (maxTarget > 0 ? ` / ${maxTarget}` : '')),
+            
         // Lista utenti
         users.map((userName) => {
             const isSelected = selectedNames.includes(userName);
-            const isDisabled = maxTarget > 0 &&
-                !isSelected &&
-                selectedNames.length >= maxTarget;
-
+            const isDisabled = maxTarget > 0 && 
+                              !isSelected && 
+                              selectedNames.length >= maxTarget;
+            
             return React.createElement('div', {
                 key: userName,
                 style: {
                     padding: '8px',
                     margin: '5px 0',
-                    backgroundColor: isSelected ? '#3a4f86' :
-                        isDisabled ? '#f8f9fa' : '#ffffff1a',
+                    backgroundColor: isSelected ? '#3a4f86' : 
+                                   isDisabled ? '#f8f9fa' : '#ffffff1a',
                     border: '1px solid ' + (isSelected ? '#007bff' : '#dee2e6'),
                     borderRadius: '4px',
                     cursor: isDisabled ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    color: isSelected ? 'white' :
-                        isDisabled ? '#adb5bd' : 'inherit',
+                    color: isSelected ? 'white' : 
+                          isDisabled ? '#adb5bd' : 'inherit',
                     opacity: isDisabled ? 0.6 : 1
                 },
                 onClick: isDisabled ? null : () => handleToggle(userName)
@@ -955,15 +1564,15 @@ function UserSelectionBox() {
                     style: {
                         width: '18px',
                         height: '18px',
-                        border: '2px solid ' + (isSelected ? 'white' :
-                            isDisabled ? '#dee2e6' : '#adb5bd'),
+                        border: '2px solid ' + (isSelected ? 'white' : 
+                                               isDisabled ? '#dee2e6' : '#adb5bd'),
                         borderRadius: '3px',
                         marginRight: '10px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: isSelected ? '#007bff' :
-                            isDisabled ? '#e9ecef' : 'white',
+                        backgroundColor: isSelected ? '#007bff' : 
+                                       isDisabled ? '#e9ecef' : 'white',
                         color: 'white',
                         fontSize: '12px'
                     }
@@ -977,7 +1586,7 @@ function UserSelectionBox() {
 // Funzione per inizializzare React
 function initUserSelectionBox() {
     const container = document.getElementById('user-selection-box');
-
+    
     if (ReactDOM.createRoot) {
         try {
             const root = ReactDOM.createRoot(container);
@@ -991,16 +1600,16 @@ function initUserSelectionBox() {
 // Recupero i pg selezionati
 function getSelectedUserNames() {
     if (getSelectedNamesCallback) return getSelectedNamesCallback();
-
+    
     return [];
 }
 
 // Funzione per verificare se la selezione è valida rispetto al limite
 function isSelectionValid() {
     const selected = getSelectedUserNames();
-
+    
     if (maxTarget > 0 && selected.length > maxTarget) return false;
-
+    
     return true;
 }
 
@@ -1009,11 +1618,11 @@ function aggiornaLivelli() {
     const livelloSelect = document.getElementById('livello_skill');
     const skillSelect = document.getElementById('chat_skill');
     const selectedOption = skillSelect.options[skillSelect.selectedIndex];
-
+    
     livelloSelect.innerHTML = ''; // Reset
     const maxLevel = parseInt(selectedOption.getAttribute('data-max-level')) || 1; // Ottieni il livello massimo dal data-attribute
     if (setMaxTargetExternal) setMaxTargetExternal(1); // Imposta di default a 1
-
+    
     // Popola con i livelli disponibili
     for (let i = 1; i <= maxLevel; i++) {
         const option = document.createElement('option');
@@ -1022,7 +1631,7 @@ function aggiornaLivelli() {
         if (i === 1) option.selected = true;
         livelloSelect.appendChild(option);
     }
-
+    
     // Se l'utente aveva selezionato un livello maggiore del nuovo massimo, reimposta a 1
     if (parseInt(livelloSelect.value) > maxLevel) livelloSelect.value = 1;
 }
@@ -1030,19 +1639,19 @@ function aggiornaLivelli() {
 function aggiornaLimiteDaLivello() {
     const livelloSelect = document.getElementById('livello_skill');
     const livelloSelezionato = parseInt(livelloSelect.value) || 1;
-
+    
     if (setMaxTargetExternal) setMaxTargetExternal(livelloSelezionato);
 }
 
 /*****************************************************************************/
 /*********************** CARICAMENTO DOM *************************************/
 /*****************************************************************************/
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('chat_skill').addEventListener('change', aggiornaLivelli); // Se cambio skill, aggiorno il suo livello massimo consentito per il pg
     document.getElementById('livello_skill').addEventListener('change', aggiornaLimiteDaLivello); // Se cambio il livello skill, aggiorno il limite di bersagli
 
-    // new UserSearchPopup();  // Inizializza la ricerca utenti da aggiungere alla role
-    new pgRolePlayingPanel();  // Inizializza l'elenco dei pg giocanti
+    new UserSearchPopup();  // Inizializza la ricerca utenti da aggiungere alla role
+    new UserSearchPopupAdd();  // Inizializza la ricerca utenti da aggiungere alla role
 
     // LOAD DELLA CHAT DI GIOCO
     const container = document.getElementById('pagina_chat');
@@ -1050,68 +1659,68 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Il campo è una textarea, quindi devo catturare l'evento scatenato dal pulsante "Enter" della tastiera
     var chat_message = document.getElementById("message");
-    if (chat_message) chat_message.addEventListener("keydown", function (event) { if (event.key === "Enter" && !event.shiftKey) sendChatMessage(); });
+    if(chat_message) chat_message.addEventListener("keydown", function(event) { if (event.key === "Enter" && !event.shiftKey) sendChatMessage(); });
 
     // Devo catturare l'evento "submit" del form di invio azione al click su invia
     var chat_form = document.getElementById("chat_form_messages");
-    if (chat_form) {
-        chat_form.addEventListener("submit", function (event) {
+    if(chat_form) {
+        chat_form.addEventListener("submit", function(event) {
             event.preventDefault();
             sendChatMessage();
         });
     }
 
     // Apertura funestra di scrittura libera
-    var btn_scritturaLibera = document.getElementById("gdrOpenTextareaButton");
-    if (btn_scritturaLibera) {
-        btn_scritturaLibera.onclick = function () {
-            var popupFreeWrite = window.open("", "ScritturaLiberaPopup", "width=600,height=800,resizable=yes,scrollbars=yes");
-
-            popupFreeWrite.document.write(
+    var btn_scritturaLibera = document.getElementById("openTextareaButton");
+    if(btn_scritturaLibera) {
+        btn_scritturaLibera.onclick = function() {
+            var popup = window.open("", "ScritturaLiberaPopup", "width=600,height=800,resizable=yes,scrollbars=yes");
+            
+            popup.document.write(
                 '<!DOCTYPE html>' +
                 '<html lang="it">' +
                 '<head>' +
-                '<title>Scrittura Libera</title>' +
-                '<style>' +
-                'body {' +
-                'font-family: Arial, sans-serif;' +
-                'margin: 0;' +
-                'padding: 20px;' +
-                'background-color: #1a2240;' +
-                'color: #b4b6bf;' +
-                'height: 100vh;' +
-                '}' +
-                'textarea {' +
-                'width: 100%;' +
-                'height: 90vh;' +
-                'padding: 10px;' +
-                'border: 1px solid #070a1b;' +
-                'background-color: #161827;' +
-                'color: white;' +
-                'resize: none;' +
-                'font-size: 14px;' +
-                'box-sizing: border-box;' +
-                '}' +
-                'h3 {' +
-                'margin-top: 0;' +
-                '}' +
-                '</style>' +
+                    '<title>Scrittura Libera</title>' +
+                    '<style>' +
+                        'body {' +
+                            'font-family: Arial, sans-serif;' +
+                            'margin: 0;' +
+                            'padding: 20px;' +
+                            'background-color: #1a2240;' +
+                            'color: #b4b6bf;' +
+                            'height: 100vh;' +
+                        '}' +
+                        'textarea {' +
+                            'width: 100%;' +
+                            'height: 90vh;' +
+                            'padding: 10px;' +
+                            'border: 1px solid #070a1b;' +
+                            'background-color: #161827;' +
+                            'color: white;' +
+                            'resize: none;' +
+                            'font-size: 14px;' +
+                            'box-sizing: border-box;' +
+                        '}' +
+                        'h3 {' +
+                            'margin-top: 0;' +
+                        '}' +
+                    '</style>' +
                 '</head>' +
                 '<body>' +
-                '<h3>Scrittura Libera</h3>' +
-                '<textarea id="message" placeholder="Scrivi qui..." name="message"></textarea><br>' +
-                '<span class="char_count">Hai usato <span id="rimanenti">0</span> caratteri</span>' +
+                    '<h3>Scrittura Libera</h3>' +
+                    '<textarea id="message" placeholder="Scrivi qui..." name="message"></textarea><br>' +
+                    '<span class="char_count">Hai usato <span id="rimanenti">0</span> caratteri</span>' +
                 '</body>' +
                 '</html>'
             );
-
+            
             // Attendi che il popup sia completamente caricato
-            popupFreeWrite.document.close();
-
+            popup.document.close();
+        
             // Funzione per il conteggio dei caratteri nel popup
-            popupFreeWrite.document.getElementById('message').onkeyup = function () {
-                var textLength = popupFreeWrite.document.getElementById('message').value.length;
-                popupFreeWrite.document.getElementById('rimanenti').textContent = textLength;
+            popup.document.getElementById('message').onkeyup = function() {
+                var textLength = popup.document.getElementById('message').value.length;
+                popup.document.getElementById('rimanenti').textContent = textLength;
             }
         }
     }
@@ -1121,40 +1730,39 @@ document.addEventListener('DOMContentLoaded', function () {
     var customSpan = document.getElementsByClassName("custom-close")[0];
     var chatPanel = document.getElementById("chatPanel");
 
-    if (customImg) customImg.onclick = function () { chatPanel.style.display = "block"; }
-    if (customSpan) customSpan.onclick = function () { chatPanel.style.display = "none"; }
+    if(customImg) customImg.onclick = function() { chatPanel.style.display = "block"; }
+    if(customSpan) customSpan.onclick = function() { chatPanel.style.display = "none"; }
 
-    window.onclick = function (event) { if (event.target == chatPanel) chatPanel.style.display = "none"; }
-
+    window.onclick = function(event) { if (event.target == chatPanel) chatPanel.style.display = "none"; }
+    
     // Apre la prima tab per default
     var chat_panel = document.getElementById("defaultOpen");
-    if (chat_panel) chat_panel.click();
+    if(chat_panel) chat_panel.click();
 
     // Apre popup per parametri 
-    /*
     var formSelectPg = document.getElementById('selezionaPersonaggioForm');
-    var popupEditMaster = document.getElementById('modificaParametri');
+    var popup = document.getElementById('modificaParametri');
     var nomePersonaggioHidden = document.getElementById('nome_personaggio_hidden');
 
-    if (formSelectPg) {
-        formSelectPg.addEventListener('submit', function (event) {
+    if(formSelectPg) {
+        formSelectPg.addEventListener('submit', function(event) {
             event.preventDefault();
-
+            
             // Ottieni il nome del personaggio selezionato
             var nomePersonaggio = document.getElementById('nome_personaggio').value;
-
+            
             // Imposta il nome del personaggio nel campo nascosto
             nomePersonaggioHidden.value = nomePersonaggio;
-
+            
             // Richiedi i dati del personaggio via AJAX
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '../pages/personaggio_data.php', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function () {
+            xhr.onload = function() {
                 if (xhr.status === 200) {
                     // Parse dei dati JSON ricevuti
                     var data = JSON.parse(xhr.responseText);
-
+                    
                     // Riempie i campi del modulo con i dati ricevuti
                     document.getElementById('note_fato').value = data.note_fato;
                     document.getElementById('particolari').value = data.particolari;
@@ -1165,11 +1773,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             };
             xhr.send('nome_personaggio=' + encodeURIComponent(nomePersonaggio));
-
+            
             // Mostra il popup
-            popupEditMaster.style.display = 'block';
+            popup.style.display = 'block';
         });
     }
-    */
     /***********    FINE    GESTIONE CHAT di gioco  *********************/
 });

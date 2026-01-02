@@ -218,7 +218,7 @@
 
         <!-- 3. Messaggi Privati -->
         <div class="grid-item">
-            <a href="../main.php?page=messages_center&offset=0" target="_top" id="message-link">
+            <a id="message-link" href="../main.php?page=messages_center&offset=0" target="_top">
                 <img src="../themes/crystal/imgs/icone/icona_base_mex.png" 
                     alt="<?=gdrcd_filter('out',$PARAMETERS['names']['private_message']['plur'])?>" 
                     title="<?=gdrcd_filter('out',$PARAMETERS['names']['private_message']['plur'])?>">
@@ -239,10 +239,10 @@
             </a>
         </div>
 
-        <!-- 6. Giocate -->
+        <!-- 6. Manuali -->
         <div class="grid-item">
-            <a href="../main.php?page=role_recap" target="_top">
-                <img src="../themes/crystal/imgs/icone/icon_doc.png" alt="Giocate">
+            <a href="../main.php?page=pre_doc" target="_top">
+                <img src="../themes/crystal/imgs/icone/icon_doc.png" alt="Manuali">
             </a>
         </div>
 
