@@ -441,3 +441,11 @@ temp/
 # Backup
 *.bak
 *.old
+
+# Inutili
+docs/
+giocate/
+imgs/
+plugins/
+sounds/
+statuti/
