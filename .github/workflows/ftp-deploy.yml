@@ -27,11 +27,8 @@ jobs:
           server-dir: ${{ secrets.FTP_TEST_PATH }}
           local-dir: ./
           exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/*.md
-            **/*.yml
+            **
+            !index.php
 
       # ======================
       # DEPLOY PRODUZIONE
