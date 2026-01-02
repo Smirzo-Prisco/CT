@@ -1,0 +1,53 @@
+name: Deploy GDRCD su Altervista
+
+on:
+  push:
+    branches:
+      - main
+      - test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ======================
+      # DEPLOY AMBIENTE TEST
+      # ======================
+      - name: Deploy TEST (latinoromano)
+        if: github.ref == 'refs/heads/test'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_TEST_SERVER }}
+          username: ${{ secrets.FTP_TEST_USERNAME }}
+          password: ${{ secrets.FTP_TEST_PASSWORD }}
+          server-dir: ${{ secrets.FTP_TEST_PATH }}
+          local-dir: ./
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/*.md
+            **/*.yml
+
+      # ======================
+      # DEPLOY PRODUZIONE
+      # ======================
+      - name: Deploy PRODUZIONE (Crystal Tokyo)
+        if: github.ref == 'refs/heads/main'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_PROD_SERVER }}
+          username: ${{ secrets.FTP_PROD_USERNAME }}
+          password: ${{ secrets.FTP_PROD_PASSWORD }}
+          server-dir: ${{ secrets.FTP_PROD_PATH }}
+          local-dir: ./
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/*.md
+            **/*.yml
