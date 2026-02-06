@@ -97,7 +97,8 @@ if($_POST['op'] == 'quit') $quit_incli = gdrcd_query("DELETE FROM clgpersonaggio
 <br><br>
 
 <?php
-    /* Ora controllamo che non sia in una famiglia */
+
+/* Ora controllamo che non sia in una famiglia */
     $check_ruolo = gdrcd_query("SELECT * FROM personaggio WHERE nome ='".$_SESSION['login']."'");
     
     ?>
@@ -181,40 +182,42 @@ if($_POST['op'] == 'quit') $quit_incli = gdrcd_query("DELETE FROM clgpersonaggio
             <!--elenco_record_gioco-->
         <?php
         }//if-op
-             
+        
+        
+                     
         //cambio/inserimento
+        
         if($_POST['op'] == 'pick_via') {
-            $check_incl = gdrcd_query("SELECT * FROM clgpersonaggioinclinazione WHERE personaggio = '". $_SESSION['login'] ."'", 'result');
-            $num_results = gdrcd_query($check_incl, 'num_rows');
-            
-            if($num_results == 1) {
-                $change_incli = gdrcd_query("DELETE FROM clgpersonaggioinclinazione WHERE personaggio = '" . gdrcd_filter('in', $_SESSION['login']) . "'");         
-                $insert_mestiere = gdrcd_query("INSERT INTO clgpersonaggioruolo (id_ruolo, personaggio) VALUES (".gdrcd_filter('num', $_POST['id_record']).", '".$_SESSION['login']."')");
-                $change_personaggio = gdrcd_query("UPDATE personaggio SET id_gilda = ".gdrcd_filter('num', $_POST['gilda']).", id_ruolo_gilda = ".gdrcd_filter('num', $_POST['id_record']).", shin = shin + 30 WHERE nome = '" . gdrcd_filter('in', $_SESSION['login']) . "'");
-            }//fine inserimento
+        
+         $check_incl = gdrcd_query("SELECT * FROM clgpersonaggioinclinazione WHERE personaggio = '". $_SESSION['login'] ."'", 'result');
+         $num_results = gdrcd_query($check_incl, 'num_rows');
+         
+         if($num_results == 1) {
+         $change_incli = gdrcd_query("DELETE FROM clgpersonaggioinclinazione WHERE personaggio = '" . gdrcd_filter('in', $_SESSION['login']) . "'");         
+         $insert_mestiere = gdrcd_query("INSERT INTO clgpersonaggioruolo (id_ruolo, personaggio) VALUES (".gdrcd_filter('num', $_POST['id_record']).", '".$_SESSION['login']."')");
+         $change_personaggio = gdrcd_query("UPDATE personaggio SET id_gilda = ".gdrcd_filter('num', $_POST['gilda']).", id_ruolo_gilda = ".gdrcd_filter('num', $_POST['id_record']).", shin = shin + 30 WHERE nome = '" . gdrcd_filter('in', $_SESSION['login']) . "'");
+     }//fine inserimento
         }
         
-        // uscita dalla famiglia/gilda
         if($_POST['op'] == 'exit') {
-            // Tolgo tutti i gradi al pg
-            $exit_incli = gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio = '" . gdrcd_filter('in', $_SESSION['login']) . "'");
-            // Tolgo al pg: GILDA, RUOLO, SHIN ancora da utilizzare, SHIN utilizzati per le stats (lascio i punti assegnati tramite punti esperienza)
-            $change_exit = gdrcd_query("UPDATE personaggio SET id_gilda = 0, id_ruolo_gilda = 0, shin = 0,
-                                        car0 = car0-car1, car1 = 0, 
-                                        car2 = car2-car3, car3 = 0, 
-                                        car4 = car4-car5, car5 = 0, 
-                                        car6 = car6-car7, car7 = 0, 
-                                        car8 = car8-car9, car9 = 0
-                                        WHERE nome = '" . gdrcd_filter('in', $_SESSION['login']) . "'");
-            // Tolgo al pg tutte le SKILL di gilda (non di talento o temporanee)
-            $exit_skill = gdrcd_query("DELETE clgpersonaggioabilita 
-                                    FROM clgpersonaggioabilita 
-                                    JOIN abilita ON clgpersonaggioabilita.id_abilita = abilita.id_abilita 
-                                    WHERE clgpersonaggioabilita.nome = '" . gdrcd_filter('in', $_SESSION['login']) . "' 
-                                    AND abilita.tipo NOT IN ('Talento', 'Skill temporanea')");
+        $exit_incli = gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio = '" . gdrcd_filter('in', $_SESSION['login']) . "'");         
+        $change_exit = gdrcd_query("UPDATE personaggio SET id_gilda = 0, id_ruolo_gilda = 0, shin = 0,
+                                    car0 = car0-car1, car1 = 0, 
+                                    car2 = car2-car3, car3 = 0, 
+                                    car4 = car4-car5, car5 = 0, 
+                                    car6 = car6-car7, car7 = 0, 
+                                    car8 = car8-car9, car9 = 0
+                                    WHERE nome = '" . gdrcd_filter('in', $_SESSION['login']) . "'");
+        $exit_skill = gdrcd_query("
+                                   DELETE clgpersonaggioabilita 
+                                   FROM clgpersonaggioabilita 
+                                   JOIN abilita ON clgpersonaggioabilita.id_abilita = abilita.id_abilita 
+                                   WHERE clgpersonaggioabilita.nome = '" . gdrcd_filter('in', $_SESSION['login']) . "' 
+                                   AND abilita.tipo NOT IN ('Talento', 'Skill temporanea')
+                               ");
 
-            $exit_log = gdrcd_query("DELETE FROM log_spesa WHERE nome = '" . gdrcd_filter('in', $_SESSION['login']) . "'");         
-        }
+         $exit_log = gdrcd_query("DELETE FROM log_spesa WHERE nome = '" . gdrcd_filter('in', $_SESSION['login']) . "'");         
+}
 ?>
 
 <br><br>

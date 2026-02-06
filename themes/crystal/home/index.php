@@ -9,11 +9,16 @@ if ($PARAMETERS['settings']['protection'] == 'ON'){
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
+        <meta http-equiv="Content-Type" content="text/html;">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="Scopri Crystal Tokyo GDR, un GDR play by chat gratuito con combattimenti a dadi, famiglie magiche, crescita del personaggio e gioco narrativo condiviso.">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="canonical" href="https://crystaltokyogdr.altervista.org/">
+        
+        <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
         <title>Crystal Tokyo GDR</title>
-        <link rel="stylesheet" href="../themes/crystal/home/login_index_nuova.css">
+        <link rel="stylesheet" href="../themes/crystal/home/login_index_nuova.css?<?=time()?>">
         <!-- Aggiungi il nuovo nome del file JavaScript -->
         <script src="../themes/crystal/home/script_login_nuova.js" defer></script>
     </head>
@@ -25,11 +30,23 @@ if ($PARAMETERS['settings']['protection'] == 'ON'){
                     <li><a href="#" id="loginBtn">Login</a></li>
                     <li><a href="index.php?page=iscrizione" target="_blank">REGISTRAZIONE</a></li>
                     <li><a href="../documentazione_main.php" target="_blank">AMBIENTAZIONE</a></li>
-                    <!-- <li><a href="#">PRIVACY</a></li> -->
+                    <li><a href="/docs/il_gioco.html">Il Gioco</a></li>
                     <li><a href="#" id="reportLink">SEGNALA</a></li>
                 </ul>
             </nav>
         </header>
+
+        <section class="hero">
+            <div class="overlay-container">
+                <div class="content-box">
+                    <h1>Crystal Tokyo – GDR play by chat</h1>
+                    <p>Crystal Tokyo è un gioco di ruolo online play by chat gratuito, attivo da oltre vent’anni, ambientato in un mondo urban fantasy ricco di trame e interazioni. Il gioco utilizza un sistema a dadi per la gestione dei conflitti e offre sette famiglie magiche diverse, suddivise in tre correnti, ognuna con abilità e caratteristiche uniche.
+
+I giocatori possono creare il proprio personaggio scegliendo una famiglia e un mestiere narrativo, partecipare alle trame e farlo crescere attraverso punti esperienza e punti shin, ottenuti rispettivamente dalla frequenza e dalla qualità del gioco. Crystal Tokyo è pensato sia per chi si avvicina per la prima volta ai GDR play by chat, sia per chi cerca un’esperienza profonda, collaborativa e orientata alla narrazione.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- MODALE LOGIN -->
         <div class="custom-content" id="loginContent" style="display: none;">
             <div class="custom-box">

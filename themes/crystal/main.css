@@ -219,13 +219,13 @@ input[type='week'] {
     cursor: text;
 }
 
+div.page_body {
+    text-align: center;
+}
+
 /* Placeholder styling */
 ::placeholder {
     color: rgb(var(--text-rgb), 0.5);
-}
-
-div.page_body {
-    text-align: center;
 }
 
 /* Rimuovi frecce/spinner da number input su alcuni browser */
@@ -390,6 +390,17 @@ div.pagina_info_location{
     border: none;
 }
 
+.info-location-year {
+    font-size: 16px;
+    font-weight: bolder;
+    color: #9a6353;
+}
+.info-location-year a {
+    font-size: 16px;
+    font-weight: bolder;
+    color: #9a6353;
+    cursor: pointer;
+}
 
 div.pagina_anteprima_scheda{
     margin: 0 auto;

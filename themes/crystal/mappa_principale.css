@@ -12,6 +12,8 @@ div.menu_mappa a:visited { color:#ffffff }
 div.menu_mappa a:hover { color:#ffffff; border-bottom:1px;}
 
 .Stile1 {font-size: 10px; color: #8f8f8f; font-family: "DejaVu Sans"; text-align: center;}
+.Stile1 p {text-align: justify; color: #b4b6bf;}
+
 
 div.menu_mappa {
   position: absolute;
@@ -25,6 +27,15 @@ div.menu_mappa {
   padding: 5px;
   z-index: 500;
   transform: translate(-170%, -50%); /* sopra e centrato */
+  text-align: center;
+}
+
+.close-location-modal {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
 }
 
 /* Mobile: menu sotto il dito */

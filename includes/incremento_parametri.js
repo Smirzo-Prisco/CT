@@ -398,7 +398,7 @@ const panel = document.getElementById('stats_panel');
 
 			tbody.appendChild(tr);
 		});
-		
+
 		table.appendChild(tbody);
 		return table;
 	}

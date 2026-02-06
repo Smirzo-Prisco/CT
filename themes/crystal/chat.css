@@ -1,9 +1,467 @@
 /* STILE DELLA CHAT E DEI PANNELLI */
 
-/* HELP: Da qui Ã¨ possibile modificare:
-- I font ed i colori della chat
-- Le dimensioni e la posizione della chat
-- Lo sfondo della chat */
+/* Reset e stili base */
+.gdr-panel-container * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Variabili CSS con i colori specificati */
+.gdr-panel-container {
+    --primary-dark: #070A1B;
+    --secondary-dark: #181c31;
+    --accent-color: #2a3f76;
+    --accent-light: #3a4f86;
+    --text-light: #e0e0e0;
+    --text-lighter: #e0e0e0;
+    --success-color: #27ae60;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --transition: all 0.3s ease;
+}
+
+/* Overlay per la modale */
+.gdr-modal-overlay {
+    position: relative;
+    height: 95%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    z-index: 10000;
+    padding: 20px;
+}
+
+/* Container principale */
+.gdr-panel-container {
+    width: 100%;
+    overflow-y: auto;
+    background-color: var(--primary-dark);
+    color: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.gdr-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--secondary-dark);
+    padding: 15px 20px;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.gdr-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-lighter);
+}
+
+.gdr-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.gdr-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.gdr-main-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.gdr-control-btn {
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.gdr-control-btn:hover {
+    background-color: var(--accent-light);
+    transform: translateY(-2px);
+}
+
+.gdr-control-btn img {
+    max-width: 70%;
+    max-height: 70%;
+}
+
+/* Stile per button disabled */
+.gdr-button:disabled,
+.gdr-button[disabled] {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Stile specifico per gdr-btn-success disabled */
+.gdr-btn-success:disabled,
+.gdr-btn-success[disabled] {
+    background-color: rgba(39, 174, 96, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Rimuovi effetti hover per button disabled */
+.gdr-button:disabled:hover,
+.gdr-button[disabled]:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    transform: none !important;
+}
+
+.gdr-btn-success:disabled:hover,
+.gdr-btn-success[disabled]:hover {
+    background-color: rgba(39, 174, 96, 0.3) !important;
+}
+
+/* Tabs */
+.gdr-tabs {
+    display: flex;
+    background-color: var(--secondary-dark);
+    overflow-x: auto;
+}
+
+.gdr-tab {
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+    white-space: nowrap;
+    color: var(--text-light);
+}
+
+.gdr-tab.active {
+    border-bottom: 3px solid var(--accent-color);
+    color: var(--text-lighter);
+    font-weight: bold;
+}
+
+.gdr-tab:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Contenuto Tab */
+.gdr-tab-content {
+    display: none;
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.gdr-tab-content.active {
+    display: block;
+}
+
+/* Elementi del form */
+.gdr-form-group {
+    margin-bottom: 15px;
+}
+
+.gdr-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text-lighter);
+}
+
+.gdr-select, .gdr-input, .gdr-textarea, .gdr-button {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.gdr-select:focus, .gdr-input:focus, .gdr-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background-color: var(--accent-light);/*rgba(255, 255, 255, 0.15);*/
+}
+
+.gdr-button {
+    background-color: var(--accent-color);
+    color: var(--text-lighter);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.gdr-button:hover {
+    background-color: var(--accent-light);
+}
+
+.gdr-btn-danger {
+    background-color: var(--danger-color);
+}
+
+.gdr-btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.gdr-btn-success {
+    background-color: var(--success-color);
+}
+
+.gdr-btn-success:hover {
+    background-color: #219653;
+}
+
+.gdr-btn-warning {
+    background-color: var(--warning-color);
+}
+
+.gdr-btn-warning:hover {
+    background-color: #e67e22;
+}
+
+/* Layout a griglia */
+.gdr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.gdr-card {
+    background-color: var(--secondary-dark);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.gdr-card-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--text-lighter);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+/* Pannello Master */
+.gdr-master-panel {
+    background-color: rgba(243, 156, 18, 0.1);
+    border-left: 4px solid var(--warning-color);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.gdr-master-panel-title {
+    color: var(--warning-color);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Contatore caratteri */
+.gdr-char-counter {
+    font-size: 0.8rem;
+    color: #aaa;
+    text-align: right;
+    margin-top: 5px;
+}
+
+/* Modal per scrittura libera */
+.gdr-writing-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10001;
+    align-items: center;
+    justify-content: center;
+}
+
+.gdr-writing-modal-content {
+    background-color: var(--primary-dark);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--box-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gdr-writing-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.gdr-close-writing-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-light);
+    width: auto;
+}
+
+/* Stile per lo status della sessione di gioco */
+.gdr-session-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px;
+    background: linear-gradient(135deg, rgba(42, 63, 118, 0.3), rgba(58, 79, 134, 0.2));
+    border-radius: 20px;
+    border: 1px solid rgba(42, 63, 118, 0.5);
+    position: relative;
+    overflow: hidden;
+    margin: 0 15px;
+}
+
+/* Punto pulsante */
+.gdr-pulse-dot {
+    width: 12px;
+    height: 12px;
+    background-color: #27ae60;
+    border-radius: 50%;
+    animation: gdr-pulse 2s infinite;
+    box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
+}
+
+/* Testo dello status */
+.gdr-status-text {
+    color: var(--text-lighter);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
+}
+
+/* Bordo animato */
+.gdr-animated-border {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(39, 174, 96, 0.4), 
+        transparent);
+    animation: gdr-shine 3s infinite;
+}
+
+@keyframes gdr-pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(39, 174, 96, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
+    }
+}
+
+@keyframes gdr-shine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Variante per sessione non attiva */
+.gdr-session-status.inactive {
+    opacity: 0.6;
+}
+
+.gdr-session-status.inactive .gdr-pulse-dot {
+    background-color: #7f8c8d;
+    animation: none;
+}
+
+.gdr-session-status.inactive .gdr-status-text {
+    text-shadow: none;
+    color: var(--text-light);
+}
+
+.gdr-session-status.inactive .gdr-animated-border {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .gdr-session-status {
+        margin: 5px 0;
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .gdr-header {
+        flex-wrap: wrap;
+    }
+
+    .gdr-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .gdr-main-controls {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .gdr-control-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .gdr-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .gdr-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .gdr-tab {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+    }
+}
 
 div.chat_box {
     position: absolute;
@@ -13,6 +471,7 @@ div.chat_box {
     overflow: auto;
     font-size: 16px;
     text-align: justify;
+    width: 100%;
 }
 
 
@@ -544,8 +1003,8 @@ button.chat_button:hover {
 }
 
 .chat_icon {
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     display: block;
     margin: 0 auto;
 }
@@ -585,6 +1044,7 @@ button.chat_button:hover {
 /* Stili per tablet e dispositivi con schermo più grande di 768px */
 @media screen and (width <= 1024px) {
     div.casella_chat {
+        flex-wrap: wrap; /* Permette agli elementi di andare a capo se necessario */
         display: flex;
         flex-direction: row; /* Cambiato da colonna a riga per distribuire meglio gli elementi */
         justify-content: space-between; /* Distribuisce gli elementi in modo uniforme */

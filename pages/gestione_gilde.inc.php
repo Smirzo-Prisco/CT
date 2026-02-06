@@ -303,8 +303,9 @@ if($_SESSION['admin'] != 1) {
                 <div class="form-group">
                     <label for="car">Caratteristica</label>
                     <select name='car' id="car">
+                        <option value="0">Nessuna</option>
                         <option value="8"><?=gdrcd_filter('out', $PARAMETERS['names']['stats']['car8'])?></option>
-                        <option value="0"><?=gdrcd_filter('out', $PARAMETERS['names']['stats']['car0'])?></option>
+                        <!-- <option value="0"><?=gdrcd_filter('out', $PARAMETERS['names']['stats']['car0'])?></option> -->
                         <option value="2"><?=gdrcd_filter('out', $PARAMETERS['names']['stats']['car2'])?></option>
                         <option value="4"><?=gdrcd_filter('out', $PARAMETERS['names']['stats']['car4'])?></option>
                         <option value="6"><?=gdrcd_filter('out', $PARAMETERS['names']['stats']['car6'])?></option>

@@ -130,6 +130,7 @@ function ChatViewer() {
                         document.getElementById('id_role').value = data.activeRole; // Imposto l'eventuale id della role in un campo nascosto della chat
                         gdrSetSessionActive(data.activeRole); // Aggiorna lo stato della sessione di gioco
                         data.messages.forEach(msg => { if (msg.html) chatContainer.innerHTML += msg.html; }); // Aggiungo i nuovi messaggi in chat
+                        if (data.messages.length > 0) chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll automatico
                         if (data.charLimit != null && data.charLimit > 0) document.getElementById('message').maxLength = data.charLimit; // Aggiorna il limite di caratteri
                         document.getElementById('quitRole').style.display = data.canQuit ? 'block' : 'none'; // Mostra o nasconde il pulsante di uscita dalla role
                         document.getElementById('openPanelBtn').style.display = data.canUsePanel ? 'block' : 'none'; // Mostra o nasconde il pulsante di apertura del pannello chat
@@ -138,7 +139,6 @@ function ChatViewer() {
                         // Aggiorna l'ultimo ID (prende l'ultimo messaggio disponibile)
                         const lastMessage = data.messages[data.messages.length - 1];
                         if (lastMessage) setLastId(parseInt(lastMessage.id, 10));
-                        if (data.messages.length > 0) setTimeout(() => { chatContainer.scrollTop = chatContainer.scrollHeight; }, 100); // Scroll automatico
                         // Riproduco l'auDIO
                         const audio = new Audio('../sounds/beep.wav');
                         if (data.play === true) audio.play().catch(e => console.log('Audio error:', e));
@@ -466,36 +466,363 @@ function newMasterPngChat() {
 }
 
 // Allungo il turno perché l'ultimo utente che invia ha scelto di lanciare un attacco
-function closeTurn(id_role, suss_id) {
-    // Rimuovo 5 messaggi dal sussurro in poi
-    if (suss_id > 0 && document.getElementById(suss_id)) {
-        for (let i = suss_id; i < (suss_id + 5); i++) {
-            if (document.getElementById(i)) document.getElementById(i).remove();
-        }
-    }
-
-    fetch('pages/ajax_engine.php?op=closeTurn', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_role, suss_id })
-    })
-        .then(res => res.json())
-        .then(data => { if (window.refreshChat) window.refreshChat(); })
-        .catch(err => console.error('Errore caricamento chat:', err));
-}
-
-// Lancio lo scudo prima di chiudere sicuramente il turno
-function lanciaScudo(id_role, yes, suss_id) {
+function longTurn(id_role, yes, suss_id) {
     const removeSuss = document.getElementById(suss_id);
     if (suss_id > 0 && removeSuss) removeSuss.remove();
 
-    fetch('pages/ajax_engine.php?op=lanciaScudo', {
+    fetch('pages/ajax_engine.php?op=longTurn', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id_role, yes, suss_id })
     });
 }
 
+// Lancio lo scudo prima di chiudere sicuramente il turno
+function lanciaScudo(id_role, yes) {
+    fetch('pages/ajax_engine.php?op=lanciaScudo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_role, yes })
+    });
+}
+
+/*****************************************************************************/
+/************* Serve per cercare gli utenti in fase di creazione role ********/
+/*****************************************************************************
+class UserSearchPopup {
+    constructor() {
+        this.selectedUsers = [];
+        this.isOpen = false;
+        this.searchTimeout = null;
+        this.init();
+    }
+
+    init() {
+        // Elementi DOM con classi incapsulate
+        this.elements = {
+            popup: document.getElementById('userSearchPopup'),
+            openBtn: document.getElementById('openUserSearch'),
+            closeBtn: document.getElementById('closePopup'),
+            searchInput: document.getElementById('userSearch'),
+            autocompleteList: document.getElementById('autocompleteResults'),
+            selectedList: document.getElementById('selectedUsersList'),
+            confirmBtn: document.getElementById('confirmSelection'),
+            cancelBtn: document.getElementById('cancelSelection'),
+            loading: document.querySelector('.user-search-popup__loading')
+        };
+
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        // Apertura popup
+        if (this.elements.openBtn) this.elements.openBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openPopup();
+        });
+
+        // Chiusura popup
+        this.elements.closeBtn.addEventListener('click', () => this.closePopup());
+        this.elements.cancelBtn.addEventListener('click', () => this.closePopup());
+
+        // Click outside per chiudere
+        this.elements.popup.addEventListener('click', (e) => { if (e.target === this.elements.popup) this.closePopup(); });
+
+        // Ricerca con autocomplete e debounce
+        this.elements.searchInput.addEventListener('input', (e) => { this.debouncedSearch(e.target.value); });
+
+        // Keyboard navigation
+        this.elements.searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.hideAutocomplete();
+
+            if (e.key === 'Enter' && this.elements.autocompleteList.style.display === 'block') {
+                const firstItem = this.elements.autocompleteList.querySelector('.user-search-popup__autocomplete-item');
+                if (firstItem) firstItem.click();
+            }
+        });
+
+        // Conferma selezione
+        this.elements.confirmBtn.addEventListener('click', () => { this.confirmSelection(); });
+
+        // Keyboard events globali
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.isOpen) this.closePopup(); });
+    }
+
+    debouncedSearch(query) {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout); // Clear previous timeout
+
+        this.searchTimeout = setTimeout(() => { this.handleSearch(query); }, 300); // Set new timeout
+    }
+
+    async handleSearch(query) {
+        const trimmedQuery = query.trim();
+
+        if (trimmedQuery.length < 2) {
+            this.hideAutocomplete();
+            this.hideLoading();
+            return;
+        }
+
+        this.showLoading();
+        this.hideAutocomplete();
+
+        try {
+            const users = await this.searchUsers(trimmedQuery);
+            this.showAutocomplete(users);
+        } catch (error) {
+            console.error('Errore ricerca utenti:', error);
+            this.showAutocompleteError(error.message);
+        } finally { this.hideLoading(); }
+    }
+
+    async searchUsers(query) {
+        const response = await fetch('pages/ajax_engine.php?op=searchUsers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ users: this.selectedUsers, 'query': query })
+        });
+
+        if (!response.ok) { throw new Error(`Errore HTTP: ${response.status}`); }
+
+        const data = await response.json();
+
+        if (data.error) { throw new Error(data.error); }
+
+        return data;
+    }
+
+    showAutocomplete(users) {
+        if (!users || users.length === 0) {
+            this.elements.autocompleteList.innerHTML = `
+                <div class="user-search-popup__autocomplete-item user-search-popup__autocomplete-item--empty">
+                    Nessun utente trovato
+                </div>
+            `;
+            this.elements.autocompleteList.style.display = 'block';
+            return;
+        }
+
+        const html = users.map(userName => `
+            <div class="user-search-popup__autocomplete-item" 
+                data-user-name="${this.escapeHtml(userName)}">
+                ${this.escapeHtml(userName)}
+            </div>
+        `).join('');
+
+        this.elements.autocompleteList.innerHTML = html;
+        this.elements.autocompleteList.style.display = 'block';
+
+        // Aggiungi event listeners agli items
+        this.bindAutocompleteEvents();
+    }
+
+    bindAutocompleteEvents() {
+        this.elements.autocompleteList.querySelectorAll('.user-search-popup__autocomplete-item').forEach(item => {
+            item.addEventListener('click', () => {
+                this.addUserToSelection(item.dataset.userName);
+                this.clearSearch();
+            });
+
+            // Hover effects (rimangono uguali)
+            item.addEventListener('mouseenter', () => { item.classList.add('user-search-popup__autocomplete-item--hover'); });
+            item.addEventListener('mouseleave', () => { item.classList.remove('user-search-popup__autocomplete-item--hover'); });
+        });
+    }
+
+    addUserToSelection(userName) {
+        // Aggiungi direttamente il nome utente invece di un oggetto
+        this.selectedUsers.push(userName);
+        this.renderSelectedUsers();
+        this.updateConfirmButton();
+        this.showTempMessage(`"${userName}" aggiunto alla selezione`, 'success');
+    }
+
+    removeUserFromSelection(userName) {
+        this.selectedUsers = this.selectedUsers.filter(user => user !== userName);
+        this.renderSelectedUsers();
+        this.updateConfirmButton();
+        this.showTempMessage(`"${userName}" rimosso dalla selezione`, 'info');
+    }
+
+    renderSelectedUsers() {
+        if (this.selectedUsers.length === 0) {
+            this.elements.selectedList.innerHTML = '<div class="user-search-popup__empty-message">Nessun utente selezionato</div>';
+            return;
+        }
+
+        const html = this.selectedUsers.map(userName => `
+            <div class="user-search-popup__selected-user">
+                <span class="user-search-popup__user-name">${this.escapeHtml(userName)}</span>
+                <button class="user-search-popup__remove-btn" data-user-name="${this.escapeHtml(userName)}">
+                    Rimuovi
+                </button>
+            </div>
+        `).join('');
+
+        this.elements.selectedList.innerHTML = html;
+
+        // Aggiungi event listeners ai pulsanti rimuovi
+        this.elements.selectedList.querySelectorAll('.user-search-popup__remove-btn').forEach(btn => { btn.addEventListener('click', () => { this.removeUserFromSelection(btn.dataset.userName); }); });
+    }
+
+    hideAutocomplete() { this.elements.autocompleteList.style.display = 'none'; }
+
+    updateConfirmButton() {
+        this.elements.confirmBtn.disabled = this.selectedUsers.length === 0;
+
+        // Aggiorna il testo del bottone con il conteggio
+        if (this.selectedUsers.length > 0) this.elements.confirmBtn.textContent = `Conferma (${this.selectedUsers.length})`;
+        else this.elements.confirmBtn.textContent = 'Conferma';
+    }
+
+    showLoading() { if (this.elements.loading) this.elements.loading.style.display = 'block'; }
+
+    hideLoading() { if (this.elements.loading) this.elements.loading.style.display = 'none'; }
+
+    showAutocompleteError(message) {
+        this.elements.autocompleteList.innerHTML = `
+            <div class="user-search-popup__autocomplete-item user-search-popup__autocomplete-item--error">
+                ${this.escapeHtml(message || 'Errore durante la ricerca')}
+            </div>
+        `;
+        this.elements.autocompleteList.style.display = 'block';
+    }
+
+    clearSearch() {
+        this.elements.searchInput.value = '';
+        this.hideAutocomplete();
+        this.hideLoading();
+    }
+
+    openPopup() {
+        this.elements.popup.style.display = 'flex';
+        this.isOpen = true;
+        this.elements.searchInput.focus();
+        this.updateConfirmButton();
+
+        // Blocca scroll body
+        document.body.style.overflow = 'hidden';
+
+        // Reset alla apertura
+        this.clearSearch();
+    }
+
+    closePopup() {
+        this.elements.popup.style.display = 'none';
+        this.isOpen = false;
+        this.clearSearch();
+
+        // Ripristina scroll body
+        document.body.style.overflow = '';
+    }
+
+    async confirmSelection() {
+        if (this.selectedUsers.length === 0) {
+            this.showTempMessage('Seleziona almeno un utente', 'warning');
+            return;
+        }
+
+        this.elements.confirmBtn.disabled = true;
+        this.elements.confirmBtn.textContent = 'Invio in corso...';
+
+        try {
+            await this.startRole();
+            this.showTempMessage('Selezione inviata con successo!', 'success');
+
+            // Chiudi il popup dopo successo
+            setTimeout(() => {
+                this.closePopup();
+                this.selectedUsers = [];
+                this.renderSelectedUsers();
+                this.updateConfirmButton();
+            }, 1000);
+        } catch (error) {
+            console.error('Errore invio selezione:', error);
+            this.showTempMessage(error, 'warning');
+        } finally { this.updateConfirmButton(); }
+    }
+
+    showTempMessage(message, type = 'info') {
+        // Crea un elemento per il messaggio temporaneo
+        const messageEl = document.createElement('div');
+        messageEl.className = `user-search-popup__temp-message user-search-popup__temp-message--${type}`;
+        messageEl.textContent = message;
+
+        // Stili per il messaggio temporaneo
+        Object.assign(messageEl.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            padding: '12px 20px',
+            borderRadius: '6px',
+            color: 'white',
+            fontWeight: '500',
+            zIndex: '10002',
+            animation: 'user-search-popup__slideIn 0.3s ease'
+        });
+
+        // Colori in base al tipo
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+
+        messageEl.style.background = colors[type] || colors.info;
+
+        document.body.appendChild(messageEl);
+
+        // Rimuovi dopo 3 secondi
+        setTimeout(() => {
+            messageEl.style.animation = 'user-search-popup__slideOut 0.3s ease';
+            setTimeout(() => { if (messageEl.parentNode) messageEl.parentNode.removeChild(messageEl); }, 300);
+        }, 3000);
+    }
+
+    escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return unsafe;
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Metodo per distruggere l'istanza e pulire gli event listeners
+    destroy() {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout);
+
+        // Rimuovi tutti gli event listeners
+        this.elements.openBtn.removeEventListener('click', this.openPopup);
+        this.elements.closeBtn.removeEventListener('click', this.closePopup);
+        this.elements.cancelBtn.removeEventListener('click', this.closePopup);
+        this.elements.searchInput.removeEventListener('input', this.debouncedSearch);
+        this.elements.confirmBtn.removeEventListener('click', this.confirmSelection);
+
+        document.removeEventListener('keydown', this.handleGlobalKeydown);
+    }
+
+    async startRole() {
+        if (confirm("Sei sicuro di voler avviare la Role?")) {
+            const response = await fetch('pages/ajax_engine.php?op=startRole', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ users: this.selectedUsers })
+            });
+
+            if (!response.ok) { throw new Error(`Errore HTTP: ${response.status}`); }
+
+            const result = await response.json();
+
+            if (!result.success) { throw new Error(result.message || 'Errore sconosciuto'); }
+
+            return result;
+        }
+    }
+}
+*/
 // Animazioni CSS aggiuntive
 const additionalStyles = `
     @keyframes user-search-popup__slideIn {
@@ -600,16 +927,7 @@ class pgRolePlayingPanel {
 }
 
 function addPgToRole() {
-    if (confirm("Sei sicuro di voler entrare?")) {
-        fetch('pages/ajax_engine.php?op=addPgToRole')
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    if (window.refreshChat) window.refreshChat();
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
-    }
+    if (confirm("Sei sicuro di voler entrare?")) fetch('pages/ajax_engine.php?op=addPgToRole');
 }
 
 // Pg esce dalla role

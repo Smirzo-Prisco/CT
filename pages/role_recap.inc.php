@@ -526,7 +526,7 @@
                 </div>
                 <div class="stat-content">
                     <div class="stat-value" id="total-players">0</div>
-                    <div class="stat-label">Partecipanti</div>
+                    <div class="stat-label">Partecipazioni</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -577,6 +577,7 @@
             giocate = data.roles.map(item => ({
                 id: item.id || item._id,
                 luogo: item.luogo || item.chat || item.nome,
+                luogo_id: item.luogo_id,
                 data: item.data || item.dataGiocata,
                 oraInizio: item.oraInizio || item.inizio,
                 oraFine: item.oraFine || item.fine,
@@ -682,9 +683,9 @@
             <div class="game-card" data-status="${game.inCorso ? 'in-corso' : 'conclusa'}" data-date="${game.data}" data-place="${game.luogo.toLowerCase()}">
                 <div class="game-header">
                     <div>
-                        <div class="game-place">
-                            <i class="${game.icona}"></i>${game.luogo}
-                        </div>
+                        <a href="main.php?dir=${game.luogo_id}">
+                            <div class="game-place"><i class="${game.icona}"></i>${game.luogo}</div>
+                        </a>
                         <div class="game-date">
                             <i class="fas fa-calendar-alt"></i>
                             ${formattedDate} ${isToday ? '<span style="color: var(--secondary-color); font-weight: bold;">(Oggi)</span>' : ''}
@@ -719,10 +720,12 @@
                         </div>
                         <div class="participants-list">
                             ${game.partecipanti.map(participant => `
-                                <div class="participant">
-                                    <i class="fas fa-user"></i>
-                                    <span>${participant}</span>
-                                </div>
+                                <a href="main.php?page=scheda&pg=${participant}">
+                                    <div class="participant">
+                                        <i class="fas fa-user"></i>
+                                        <span>${participant}</span>
+                                    </div>
+                                </a>
                             `).join('')}
                         </div>
                     </div>

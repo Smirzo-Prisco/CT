@@ -64,6 +64,3 @@ include 'themes/' . $PARAMETERS['themes']['current_theme'] . '/home/' . $page . 
 
 require 'footer.inc.php';
 ?>
-<script>
-    alert('PROVA! Di nuovo - Prova tre');
-</script>

@@ -66,7 +66,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <meta charset="UTF-8">
         <meta http-equiv="Content-Type" content="text/html;">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="description" content="Crystal Tokyo GDR è un gioco di ruolo online play by chat attivo da oltre vent'anni, ispirato a Sailor Moon e al genere urban fantasy.">
+        <meta name="description" content="Scopri Crystal Tokyo GDR, un GDR play by chat gratuito con combattimenti a dadi, famiglie magiche, crescita del personaggio e gioco narrativo condiviso.">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">

@@ -49,7 +49,7 @@ $MESSAGE['register']['forms']['mail']['sub'] = 'Cambio password su';
 $MESSAGE['register']['forms']['mail']['text'] = 'La tua nuova password è';
 /* Labels*/
 $MESSAGE['register']['fields']['email'] = 'E-Mail';
-$MESSAGE['register']['fields']['email_info'] = 'Inserire un e-mail valida, altrimento non sarà possibile completare la registrazione';
+$MESSAGE['register']['fields']['email_info'] = 'Inserire un e-mail valida, altrimenti non sarà possibile completare la registrazione';
 $MESSAGE['register']['fields']['name'] = 'Nome del personaggio';
 $MESSAGE['register']['fields']['lastname'] = 'Cognome del personaggio';
 $MESSAGE['register']['fields']['name_info'] = 'Non deve superare i 20 caratteri, contenere spazi o caratteri diversi da lettere e deve avere l\'iniziale maiuscola';

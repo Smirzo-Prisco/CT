@@ -295,21 +295,21 @@ if($_SESSION['login'] != '') {
     <html>
     <head>
         <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-        <link rel='stylesheet' href='themes/<?php echo $PARAMETERS['themes']['current_theme']; ?>/main.css' TYPE='text/css'>
-        <link rel='stylesheet' href='themes/<?php echo $PARAMETERS['themes']['current_theme']; ?>/homepage.css'
+        <link rel='stylesheet' href='themes/<?=$PARAMETERS['themes']['current_theme']?>/main.css' TYPE='text/css'>
+        <link rel='stylesheet' href='themes/<?=$PARAMETERS['themes']['current_theme']?>/homepage.css'
               TYPE='text/css'>
         <link rel='shortcut icon' href='favicon.ico' />
     </head>
     <body>
         <div class="error_box">
-            <h2 class="error_major"><?php echo $MESSAGE['error']['unknown_username']; ?></h2>
-            <span class="error_details"><?php echo $MESSAGE['error']['unknown_username_details']; ?></span>
-            <span class="error_details"><?php echo $MESSAGE['error']['unknown_username_failure_count']; ?></span>
-            <span class="error_details"><?php echo $iErrorsNumber; ?></span>
-            <span class="error_details"><?php echo $MESSAGE['error']['unknown_username_warning']; ?></span>
-            <span class="error_details"><?php echo $MESSAGE['warning']['mailto']; ?></span>
-            <a href="mailto:<?php echo $PARAMETERS['menu']['webmaster_email'] ?>">
-                <?php echo $PARAMETERS['menu']['webmaster_email'] ?>
+            <h2 class="error_major"><?=$MESSAGE['error']['unknown_username']?></h2>
+            <span class="error_details"><?=$MESSAGE['error']['unknown_username_details']?></span>
+            <span class="error_details"><?=$MESSAGE['error']['unknown_username_failure_count']?></span>
+            <span class="error_details"><?=$iErrorsNumber?></span>
+            <span class="error_details"><?=$MESSAGE['error']['unknown_username_warning']?></span>
+            <span class="error_details"><?=$MESSAGE['warning']['mailto']?></span>
+            <a href="mailto:<?=$PARAMETERS['menu']['webmaster_email'] ?>">
+                <?=$PARAMETERS['menu']['webmaster_email'] ?>
             </a> .
         </div>
     <?php
