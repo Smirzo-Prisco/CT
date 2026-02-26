@@ -148,7 +148,6 @@
 		width: 100%;
 		max-width: 100%;
 		box-sizing: border-box;
-		overflow-x: hidden;
 	}
 </style>
 

@@ -7,6 +7,21 @@
 
 /** * Parametri di default nella pagina
 */
+:root {
+    --primary-color: #070A1B;
+    --secondary-color: #181c31;
+    --accent-color: #2a3f76;
+    --accent-light: #3a4f86;
+    --text-light: #e0e0e0;
+    --text-lighter: #e0e0e0;
+    --success-color: #27ae60;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --transition: all 0.3s ease;
+}
+
 body {
     padding: 0;
     margin: 0;
@@ -219,13 +234,13 @@ input[type='week'] {
     cursor: text;
 }
 
-div.page_body {
-    text-align: center;
-}
-
 /* Placeholder styling */
 ::placeholder {
     color: rgb(var(--text-rgb), 0.5);
+}
+
+div.page_body {
+    text-align: center;
 }
 
 /* Rimuovi frecce/spinner da number input su alcuni browser */
@@ -279,7 +294,6 @@ input[type='file'] {
 
 /* Stile per button element */
 button {
-    min-width: 60px;
     text-align: center;
 }
 
@@ -344,7 +358,7 @@ div.innertube h2, div.output h2, div.page_title h2 {
 
 /** * Stile dei contenitori grigi con i bordini arrotondati
 */
-div.menu, div.presenti, div.output {
+div.menu, div.presenti {
     margin: 5px auto;
     width: 180px;
     border: none; /* Bordi arrotondati */
@@ -411,10 +425,7 @@ div.pagina_anteprima_scheda{
 
 
 div.output {
-    position: absolute;
-    inset: 0;
-    width: auto;
-    overflow: auto;
+    width: 100%;
     background-color: transparent;    
 }
 

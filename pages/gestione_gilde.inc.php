@@ -338,6 +338,83 @@ if($_SESSION['admin'] != 1) {
                     <?php endwhile; ?>
                     </select>
                 </div>
+
+                <!-- Opzioni avanzate per skill generiche -->
+                <div id="clausoleSection" class="form-group" style="display: none;">
+                    <label>Opzioni avanzate per skill generiche:</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">
+                            Durata:
+                            <br>
+                            Il bersaglio dovrà lanciare un #d2. Se esce 1, la sua azione fallisce, altrimenti riesce.
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">
+                            Durata:
+                            <br>
+                            Incrementa, su base #d20, il danno inferto dal bersaglio.
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">
+                            Durata:
+                            <br>
+                            Trasferisce il proprio danno sul bersaglio scelto.
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">
+                            Durata:
+                            <br>
+                            Annulla la skill lanciata dal bersaglio.
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">
+                            Durata:
+                            <br>
+                            Il bersaglio può effettuare un doppio attacco.
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">
+                            Durata:
+                            <br>
+                            Viene dimezzato il danno per il bersaglio.
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">Nome</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">Nome</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">Nome</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">Nome</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">Nome</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
+                        <label for="clausola_idGilda">Nome</label>
+                    </div>
+                </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeSkillModal('statuto')">Annulla</button>
                     <button type="submit" class="btn btn-primary" onclick="saveSkill()">Salva</button>

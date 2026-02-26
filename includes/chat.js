@@ -1,3 +1,6 @@
+const api_file = 'pages/api_chat.php';
+const param = 'op';
+
 /***********    GESTIONE CHAT di gioco  *********************/
 function openSection(evt, sectionName) {
     var i, tabcontent, tablinks;
@@ -22,7 +25,7 @@ function openSection(evt, sectionName) {
 // Ruoli apicali cancellano la chat di gioco
 async function pulisciChat() {
     if (confirm("Sei sicuro di voler pulire questa chat?")) {
-        fetch('pages/ajax_engine.php?op=pulisciChat')
+        fetch(api_file + '?' + param + '=pulisciChat')
             .then(res => res.json())
             .then(data => {
                 const chatContainer = document.getElementById('pagina_chat');
@@ -30,6 +33,8 @@ async function pulisciChat() {
 
                 // Esegue refresh della chat
                 if (window.refreshChat) window.refreshChat();
+
+                document.getElementById("chatPanel").style.display = "none";
             })
             .catch(err => console.error('Errore caricamento chat:', err));
     }
@@ -37,7 +42,7 @@ async function pulisciChat() {
 
 // Ruoli apicali cancellano la chat di gioco
 async function curaPg() {
-    fetch('pages/ajax_engine.php?op=curaPg')
+    fetch(api_file + '?' + param + '=curaPg')
         .then(res => res.json())
         .then(data => { if (window.refreshChat) window.refreshChat(); })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -47,7 +52,7 @@ async function curaPg() {
 function toggleBackChat(a) {
     const img = a.querySelector("img"); // recupera l'immagine dentro <a>
 
-    fetch('pages/ajax_engine.php?op=setBackChat')
+    fetch(api_file + '?' + param + '=setBackChat')
         .then(res => res.json())
         .then(data => {
             if (data.success) {
@@ -80,7 +85,7 @@ async function sendChatMessage() {
     }
 
     try {
-        const response = await fetch("/pages/ajax_engine.php?op=new_chat_message", {
+        const response = await fetch(api_file + '?' + param + '=new_chat_message', {
             credentials: "same-origin", // mantiene la sessione PHP
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -117,7 +122,7 @@ function ChatViewer() {
 
     // Funzione per recuperare i messaggi
     const fetchMessages = () => {
-        fetch('pages/ajax_engine.php?op=get_chat_messages', {
+        fetch(api_file + '?' + param + '=get_chat_messages', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ last: lastId })
@@ -129,16 +134,20 @@ function ChatViewer() {
                     if (chatContainer) {
                         document.getElementById('id_role').value = data.activeRole; // Imposto l'eventuale id della role in un campo nascosto della chat
                         gdrSetSessionActive(data.activeRole); // Aggiorna lo stato della sessione di gioco
-                        data.messages.forEach(msg => { if (msg.html) chatContainer.innerHTML += msg.html; }); // Aggiungo i nuovi messaggi in chat
-                        if (data.messages.length > 0) chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll automatico
                         if (data.charLimit != null && data.charLimit > 0) document.getElementById('message').maxLength = data.charLimit; // Aggiorna il limite di caratteri
                         document.getElementById('quitRole').style.display = data.canQuit ? 'block' : 'none'; // Mostra o nasconde il pulsante di uscita dalla role
                         document.getElementById('openPanelBtn').style.display = data.canUsePanel ? 'block' : 'none'; // Mostra o nasconde il pulsante di apertura del pannello chat
                         document.getElementById('pgRolePlaying').style.display = data.activeRole ? 'block' : 'none'; // Mostra o nasconde il pannello con l'elenco degli utenti giocanti
                         document.getElementById('addPgToRoleBtn').style.display = data.canQuit ? 'none' : 'block'; // Mostra o nasconde il pulsante per avviare o aggiungersi alla role
+                        isInRole = data.canQuit; // Variabile globale per sapere se l'utente è dentro una role o no (usata per limitare alcune azioni)
                         // Aggiorna l'ultimo ID (prende l'ultimo messaggio disponibile)
                         const lastMessage = data.messages[data.messages.length - 1];
                         if (lastMessage) setLastId(parseInt(lastMessage.id, 10));
+                        // Aggiorno la chat con i nuovi messaggi
+                        if (data.messages.length > 0) {
+                            data.messages.forEach(msg => { if (msg.html) chatContainer.innerHTML += msg.html; }); // Aggiungo i nuovi messaggi in chat
+                            setTimeout(() => { chatContainer.scrollTop = chatContainer.scrollHeight; }, 100); // Scroll automatico
+                        }
                         // Riproduco l'auDIO
                         const audio = new Audio('../sounds/beep.wav');
                         if (data.play === true) audio.play().catch(e => console.log('Audio error:', e));
@@ -151,7 +160,7 @@ function ChatViewer() {
     // Recupera i messaggi ogni 5 secondi
     React.useEffect(() => {
         fetchMessages();
-        const interval = setInterval(fetchMessages, 8000);
+        const interval = setInterval(fetchMessages, 5000);
         return () => clearInterval(interval);
     }, [lastId]);
 
@@ -184,7 +193,7 @@ function tiraDadoChat() {
 
     // Controllo che ci sia almeno il tipo di dado
     if (dice_type && dice_type != '' && target.length > 0 && target.length < 2) {
-        fetch('pages/ajax_engine.php?op=tiraDadoChat', {
+        fetch(api_file + '?' + param + '=tiraDadoChat', {
             credentials: "same-origin",
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -219,7 +228,7 @@ function tiraSkillChat() {
     // Controllo che ci sia la skill e il bersaglio
     if (chat_skill == 0 || target.length > 0) {
         // Chiamata
-        fetch('pages/ajax_engine.php?op=tiraSkillChat', {
+        fetch(api_file + '?' + param + '=tiraSkillChat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -255,7 +264,7 @@ function usaArmaChat() {
         return;
     }
 
-    fetch('pages/ajax_engine.php?op=usaArmaChat', {
+    fetch(api_file + '?' + param + '=usaArmaChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ arma_weapon, arma_body, target })
@@ -295,7 +304,7 @@ function saveEditAction() {
     const content = document.getElementById("edit_action_textarea").value;
     const id = document.getElementById("edit_action_id").value;
 
-    fetch('pages/ajax_engine.php?op=saveEditAction', {
+    fetch(api_file + '?' + param + '=saveEditAction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, id })
@@ -315,7 +324,7 @@ function saveEditAction() {
 function setCharLimit() {
     const charLimit = document.getElementById('caratteri').value;
 
-    fetch('pages/ajax_engine.php?op=setCharLimit', {
+    fetch(api_file + '?' + param + '=setCharLimit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ charLimit })
@@ -333,7 +342,7 @@ function setCharLimit() {
 // Revoca il nuovo limite di caratteri se un utente non è d'accordo
 function revocaLimiteCaratteri(nuovo_limite, vecchio_limite, luogo, user) {
     if (confirm("Sei sicuro di voler revocare il limite?")) {
-        fetch('/pages/ajax_engine.php?op=revocaLimiteCaratteri', {
+        fetch(api_file + '?' + param + '=revocaLimiteCaratteri', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -364,7 +373,7 @@ function usaOggettoChat() {
         return;
     }
 
-    fetch('pages/ajax_engine.php?op=usaOggettoChat', {
+    fetch(api_file + '?' + param + '=usaOggettoChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ objChat })
@@ -389,7 +398,7 @@ function tiraDadoGenericoChat() {
         return;
     }
 
-    fetch('pages/ajax_engine.php?op=tiraDadoGenericoChat', {
+    fetch(api_file + '?' + param + '=tiraDadoGenericoChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dado })
@@ -416,7 +425,7 @@ function editMasterPgChat() {
     const notorieta = document.getElementById('notorieta').value;
     const soldi = document.getElementById('soldi').value;
 
-    fetch('pages/ajax_engine.php?op=editMasterPgChat', {
+    fetch(api_file + '?' + param + '=editMasterPgChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -439,14 +448,33 @@ function editMasterPgChat() {
 }
 
 // Crea un png in chat
-function newMasterPngChat() {
+function newMasterPng() {
+    // Non modificare! - I parametri vengono usati anche in fondo al file
+    const pngName = document.getElementById('pngNew').value;
+
+    fetch(api_file + '?' + param + '=newMasterPng', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pngName })
+    })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("chatPanel").style.display = "none";
+
+            if (window.refreshChat) window.refreshChat();
+        })
+        .catch(err => console.error('Errore caricamento chat:', err));
+}
+
+// Manda l'azione di un png in chat
+function newMasterPngAction() {
     // Non modificare! - I parametri vengono usati anche in fondo al file
     const pngName = document.getElementById('pngName').value;
     const pngMessage = document.getElementById('pngMessage').value;
     const pngBonus = document.getElementById('pngBonus').value;
     const pngCar = document.getElementById('pngCar').value;
 
-    fetch('pages/ajax_engine.php?op=newMasterPngChat', {
+    fetch(api_file + '?' + param + '=newMasterPngAction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -466,363 +494,36 @@ function newMasterPngChat() {
 }
 
 // Allungo il turno perché l'ultimo utente che invia ha scelto di lanciare un attacco
-function longTurn(id_role, yes, suss_id) {
+function closeTurn(id_role, suss_id) {
+    // Rimuovo 5 messaggi dal sussurro in poi
+    if (suss_id > 0 && document.getElementById(suss_id)) {
+        for (let i = suss_id; i < (suss_id + 5); i++) {
+            if (document.getElementById(i)) document.getElementById(i).remove();
+        }
+    }
+
+    fetch(api_file + '?' + param + '=closeTurn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_role, suss_id })
+    })
+        .then(res => res.json())
+        .then(data => { if (window.refreshChat) window.refreshChat(); })
+        .catch(err => console.error('Errore caricamento chat:', err));
+}
+
+// Lancio lo scudo prima di chiudere sicuramente il turno
+function lanciaScudo(id_role, yes, suss_id) {
     const removeSuss = document.getElementById(suss_id);
     if (suss_id > 0 && removeSuss) removeSuss.remove();
 
-    fetch('pages/ajax_engine.php?op=longTurn', {
+    fetch(api_file + '?' + param + '=lanciaScudo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id_role, yes, suss_id })
     });
 }
 
-// Lancio lo scudo prima di chiudere sicuramente il turno
-function lanciaScudo(id_role, yes) {
-    fetch('pages/ajax_engine.php?op=lanciaScudo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_role, yes })
-    });
-}
-
-/*****************************************************************************/
-/************* Serve per cercare gli utenti in fase di creazione role ********/
-/*****************************************************************************
-class UserSearchPopup {
-    constructor() {
-        this.selectedUsers = [];
-        this.isOpen = false;
-        this.searchTimeout = null;
-        this.init();
-    }
-
-    init() {
-        // Elementi DOM con classi incapsulate
-        this.elements = {
-            popup: document.getElementById('userSearchPopup'),
-            openBtn: document.getElementById('openUserSearch'),
-            closeBtn: document.getElementById('closePopup'),
-            searchInput: document.getElementById('userSearch'),
-            autocompleteList: document.getElementById('autocompleteResults'),
-            selectedList: document.getElementById('selectedUsersList'),
-            confirmBtn: document.getElementById('confirmSelection'),
-            cancelBtn: document.getElementById('cancelSelection'),
-            loading: document.querySelector('.user-search-popup__loading')
-        };
-
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        // Apertura popup
-        if (this.elements.openBtn) this.elements.openBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.openPopup();
-        });
-
-        // Chiusura popup
-        this.elements.closeBtn.addEventListener('click', () => this.closePopup());
-        this.elements.cancelBtn.addEventListener('click', () => this.closePopup());
-
-        // Click outside per chiudere
-        this.elements.popup.addEventListener('click', (e) => { if (e.target === this.elements.popup) this.closePopup(); });
-
-        // Ricerca con autocomplete e debounce
-        this.elements.searchInput.addEventListener('input', (e) => { this.debouncedSearch(e.target.value); });
-
-        // Keyboard navigation
-        this.elements.searchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') this.hideAutocomplete();
-
-            if (e.key === 'Enter' && this.elements.autocompleteList.style.display === 'block') {
-                const firstItem = this.elements.autocompleteList.querySelector('.user-search-popup__autocomplete-item');
-                if (firstItem) firstItem.click();
-            }
-        });
-
-        // Conferma selezione
-        this.elements.confirmBtn.addEventListener('click', () => { this.confirmSelection(); });
-
-        // Keyboard events globali
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.isOpen) this.closePopup(); });
-    }
-
-    debouncedSearch(query) {
-        if (this.searchTimeout) clearTimeout(this.searchTimeout); // Clear previous timeout
-
-        this.searchTimeout = setTimeout(() => { this.handleSearch(query); }, 300); // Set new timeout
-    }
-
-    async handleSearch(query) {
-        const trimmedQuery = query.trim();
-
-        if (trimmedQuery.length < 2) {
-            this.hideAutocomplete();
-            this.hideLoading();
-            return;
-        }
-
-        this.showLoading();
-        this.hideAutocomplete();
-
-        try {
-            const users = await this.searchUsers(trimmedQuery);
-            this.showAutocomplete(users);
-        } catch (error) {
-            console.error('Errore ricerca utenti:', error);
-            this.showAutocompleteError(error.message);
-        } finally { this.hideLoading(); }
-    }
-
-    async searchUsers(query) {
-        const response = await fetch('pages/ajax_engine.php?op=searchUsers', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ users: this.selectedUsers, 'query': query })
-        });
-
-        if (!response.ok) { throw new Error(`Errore HTTP: ${response.status}`); }
-
-        const data = await response.json();
-
-        if (data.error) { throw new Error(data.error); }
-
-        return data;
-    }
-
-    showAutocomplete(users) {
-        if (!users || users.length === 0) {
-            this.elements.autocompleteList.innerHTML = `
-                <div class="user-search-popup__autocomplete-item user-search-popup__autocomplete-item--empty">
-                    Nessun utente trovato
-                </div>
-            `;
-            this.elements.autocompleteList.style.display = 'block';
-            return;
-        }
-
-        const html = users.map(userName => `
-            <div class="user-search-popup__autocomplete-item" 
-                data-user-name="${this.escapeHtml(userName)}">
-                ${this.escapeHtml(userName)}
-            </div>
-        `).join('');
-
-        this.elements.autocompleteList.innerHTML = html;
-        this.elements.autocompleteList.style.display = 'block';
-
-        // Aggiungi event listeners agli items
-        this.bindAutocompleteEvents();
-    }
-
-    bindAutocompleteEvents() {
-        this.elements.autocompleteList.querySelectorAll('.user-search-popup__autocomplete-item').forEach(item => {
-            item.addEventListener('click', () => {
-                this.addUserToSelection(item.dataset.userName);
-                this.clearSearch();
-            });
-
-            // Hover effects (rimangono uguali)
-            item.addEventListener('mouseenter', () => { item.classList.add('user-search-popup__autocomplete-item--hover'); });
-            item.addEventListener('mouseleave', () => { item.classList.remove('user-search-popup__autocomplete-item--hover'); });
-        });
-    }
-
-    addUserToSelection(userName) {
-        // Aggiungi direttamente il nome utente invece di un oggetto
-        this.selectedUsers.push(userName);
-        this.renderSelectedUsers();
-        this.updateConfirmButton();
-        this.showTempMessage(`"${userName}" aggiunto alla selezione`, 'success');
-    }
-
-    removeUserFromSelection(userName) {
-        this.selectedUsers = this.selectedUsers.filter(user => user !== userName);
-        this.renderSelectedUsers();
-        this.updateConfirmButton();
-        this.showTempMessage(`"${userName}" rimosso dalla selezione`, 'info');
-    }
-
-    renderSelectedUsers() {
-        if (this.selectedUsers.length === 0) {
-            this.elements.selectedList.innerHTML = '<div class="user-search-popup__empty-message">Nessun utente selezionato</div>';
-            return;
-        }
-
-        const html = this.selectedUsers.map(userName => `
-            <div class="user-search-popup__selected-user">
-                <span class="user-search-popup__user-name">${this.escapeHtml(userName)}</span>
-                <button class="user-search-popup__remove-btn" data-user-name="${this.escapeHtml(userName)}">
-                    Rimuovi
-                </button>
-            </div>
-        `).join('');
-
-        this.elements.selectedList.innerHTML = html;
-
-        // Aggiungi event listeners ai pulsanti rimuovi
-        this.elements.selectedList.querySelectorAll('.user-search-popup__remove-btn').forEach(btn => { btn.addEventListener('click', () => { this.removeUserFromSelection(btn.dataset.userName); }); });
-    }
-
-    hideAutocomplete() { this.elements.autocompleteList.style.display = 'none'; }
-
-    updateConfirmButton() {
-        this.elements.confirmBtn.disabled = this.selectedUsers.length === 0;
-
-        // Aggiorna il testo del bottone con il conteggio
-        if (this.selectedUsers.length > 0) this.elements.confirmBtn.textContent = `Conferma (${this.selectedUsers.length})`;
-        else this.elements.confirmBtn.textContent = 'Conferma';
-    }
-
-    showLoading() { if (this.elements.loading) this.elements.loading.style.display = 'block'; }
-
-    hideLoading() { if (this.elements.loading) this.elements.loading.style.display = 'none'; }
-
-    showAutocompleteError(message) {
-        this.elements.autocompleteList.innerHTML = `
-            <div class="user-search-popup__autocomplete-item user-search-popup__autocomplete-item--error">
-                ${this.escapeHtml(message || 'Errore durante la ricerca')}
-            </div>
-        `;
-        this.elements.autocompleteList.style.display = 'block';
-    }
-
-    clearSearch() {
-        this.elements.searchInput.value = '';
-        this.hideAutocomplete();
-        this.hideLoading();
-    }
-
-    openPopup() {
-        this.elements.popup.style.display = 'flex';
-        this.isOpen = true;
-        this.elements.searchInput.focus();
-        this.updateConfirmButton();
-
-        // Blocca scroll body
-        document.body.style.overflow = 'hidden';
-
-        // Reset alla apertura
-        this.clearSearch();
-    }
-
-    closePopup() {
-        this.elements.popup.style.display = 'none';
-        this.isOpen = false;
-        this.clearSearch();
-
-        // Ripristina scroll body
-        document.body.style.overflow = '';
-    }
-
-    async confirmSelection() {
-        if (this.selectedUsers.length === 0) {
-            this.showTempMessage('Seleziona almeno un utente', 'warning');
-            return;
-        }
-
-        this.elements.confirmBtn.disabled = true;
-        this.elements.confirmBtn.textContent = 'Invio in corso...';
-
-        try {
-            await this.startRole();
-            this.showTempMessage('Selezione inviata con successo!', 'success');
-
-            // Chiudi il popup dopo successo
-            setTimeout(() => {
-                this.closePopup();
-                this.selectedUsers = [];
-                this.renderSelectedUsers();
-                this.updateConfirmButton();
-            }, 1000);
-        } catch (error) {
-            console.error('Errore invio selezione:', error);
-            this.showTempMessage(error, 'warning');
-        } finally { this.updateConfirmButton(); }
-    }
-
-    showTempMessage(message, type = 'info') {
-        // Crea un elemento per il messaggio temporaneo
-        const messageEl = document.createElement('div');
-        messageEl.className = `user-search-popup__temp-message user-search-popup__temp-message--${type}`;
-        messageEl.textContent = message;
-
-        // Stili per il messaggio temporaneo
-        Object.assign(messageEl.style, {
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            padding: '12px 20px',
-            borderRadius: '6px',
-            color: 'white',
-            fontWeight: '500',
-            zIndex: '10002',
-            animation: 'user-search-popup__slideIn 0.3s ease'
-        });
-
-        // Colori in base al tipo
-        const colors = {
-            success: '#10b981',
-            error: '#ef4444',
-            warning: '#f59e0b',
-            info: '#3b82f6'
-        };
-
-        messageEl.style.background = colors[type] || colors.info;
-
-        document.body.appendChild(messageEl);
-
-        // Rimuovi dopo 3 secondi
-        setTimeout(() => {
-            messageEl.style.animation = 'user-search-popup__slideOut 0.3s ease';
-            setTimeout(() => { if (messageEl.parentNode) messageEl.parentNode.removeChild(messageEl); }, 300);
-        }, 3000);
-    }
-
-    escapeHtml(unsafe) {
-        if (typeof unsafe !== 'string') return unsafe;
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    // Metodo per distruggere l'istanza e pulire gli event listeners
-    destroy() {
-        if (this.searchTimeout) clearTimeout(this.searchTimeout);
-
-        // Rimuovi tutti gli event listeners
-        this.elements.openBtn.removeEventListener('click', this.openPopup);
-        this.elements.closeBtn.removeEventListener('click', this.closePopup);
-        this.elements.cancelBtn.removeEventListener('click', this.closePopup);
-        this.elements.searchInput.removeEventListener('input', this.debouncedSearch);
-        this.elements.confirmBtn.removeEventListener('click', this.confirmSelection);
-
-        document.removeEventListener('keydown', this.handleGlobalKeydown);
-    }
-
-    async startRole() {
-        if (confirm("Sei sicuro di voler avviare la Role?")) {
-            const response = await fetch('pages/ajax_engine.php?op=startRole', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ users: this.selectedUsers })
-            });
-
-            if (!response.ok) { throw new Error(`Errore HTTP: ${response.status}`); }
-
-            const result = await response.json();
-
-            if (!result.success) { throw new Error(result.message || 'Errore sconosciuto'); }
-
-            return result;
-        }
-    }
-}
-*/
 // Animazioni CSS aggiuntive
 const additionalStyles = `
     @keyframes user-search-popup__slideIn {
@@ -927,13 +628,22 @@ class pgRolePlayingPanel {
 }
 
 function addPgToRole() {
-    if (confirm("Sei sicuro di voler entrare?")) fetch('pages/ajax_engine.php?op=addPgToRole');
+    if (confirm("Sei sicuro di voler entrare?")) {
+        fetch(api_file + '?' + param + '=addPgToRole')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (window.refreshChat) window.refreshChat();
+                } else showNotification(data.message, 'error');
+            })
+            .catch(err => console.error('Errore caricamento chat:', err));
+    }
 }
 
 // Pg esce dalla role
 function quitRole(user) {
     if (confirm("Sei sicuro di voler espellere " + user + " dalla role?")) {
-        fetch('pages/ajax_engine.php?op=quitRole', {
+        fetch(api_file + '?' + param + '=quitRole', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user })
@@ -960,7 +670,7 @@ function closePgRolePlayingPanel() {
 
 // Carica gli utenti
 function getPgRolePlaying() {
-    fetch('pages/ajax_engine.php?op=getPgRolePlaying')
+    fetch(api_file + '?' + param + '=getPgRolePlaying')
         .then(res => res.json())
         .then(data => {
             const pgRolePlayingList = document.getElementById('pgRolePlayingList');
@@ -1153,7 +863,7 @@ async function getRolePgs() {
     const id_role = document.getElementById('id_role').value;
 
     try {
-        const response = await fetch('pages/ajax_engine.php?op=getRolePgs', {
+        const response = await fetch(api_file + '?' + param + '=getRolePgs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_role })
@@ -1351,6 +1061,91 @@ function aggiornaLimiteDaLivello() {
 
     if (setMaxTargetExternal) setMaxTargetExternal(livelloSelezionato);
 }
+
+/********************   Rileva quando l'utente sta per lasciare la chat *********************************/
+let uscitaRilevata = false;
+let isInRole = false;
+
+// Rileva quando il mouse esce dalla finestra verso l'alto (intenzione di uscire)
+document.addEventListener('mouseleave', function (event) {
+    console.log('Mouse leave event:', isInRole);
+    // Controlla se il mouse sta uscendo dal bordo superiore
+    if (!uscitaRilevata && event.clientY < 0 && isInRole) {
+        uscitaRilevata = true;
+
+        // Evidenzia la zona per 2 secondi
+        evidenziaZona();
+
+        // Resetta il flag dopo 3 secondi (per permettere future rilevazioni)
+        setTimeout(() => { uscitaRilevata = false; }, 4300);
+    }
+});
+
+// Opzionale: rileva anche quando l'utente sta per chiudere la tab
+// (basato sul movimento del mouse verso l'alto)
+document.addEventListener('mousemove', function (event) {
+    console.log('Mouse move event:', isInRole);
+    if (!uscitaRilevata && event.clientY <= 5 && isInRole) { // Mouse vicino al bordo superiore
+        uscitaRilevata = true;
+        evidenziaZona();
+
+        setTimeout(() => { uscitaRilevata = false; }, 4300);
+    }
+});
+
+function evidenziaZona() {
+    // Seleziona la zona da evidenziare
+    const zona = document.querySelector('.fa-power-off');
+
+    if (zona) {
+        // Salva stili originali
+        const stiliOriginali = {
+            transition: zona.style.transition,
+            backgroundColor: zona.style.backgroundColor,
+            boxShadow: zona.style.boxShadow,
+            transform: zona.style.transform
+        };
+
+        // Applica evidenziazione
+        zona.style.transition = 'all 0.3s ease';
+        zona.style.backgroundColor = '#ffff99';
+        zona.style.boxShadow = '0 0 25px 5px #ffaa00';
+        zona.style.transform = 'scale(1.02)';
+
+        // Crea un piccolo indicatore visivo che dice "Aspetta!"
+        const indicatore = document.createElement('div');
+        indicatore.textContent = '⚡Se esci, chiudi la role!⚡';
+        indicatore.style.position = 'fixed';
+        indicatore.style.top = '100px';
+        indicatore.style.right = '300px';
+        indicatore.style.fontSize = '80px';
+        indicatore.style.animation = 'ping 1s infinite';
+        indicatore.style.zIndex = '9999';
+        document.body.appendChild(indicatore);
+
+        // Aggiungi animazione
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ping {
+                0% { transform: scale(1); opacity: 1; }
+                70% { transform: scale(1.3); opacity: 0.7; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Rimuovi tutto dopo 2 secondi
+        setTimeout(() => {
+            zona.style.transition = stiliOriginali.transition;
+            zona.style.backgroundColor = stiliOriginali.backgroundColor;
+            zona.style.boxShadow = stiliOriginali.boxShadow;
+            zona.style.transform = stiliOriginali.transform;
+
+            if (indicatore && indicatore.parentNode) indicatore.parentNode.removeChild(indicatore);
+        }, 4000);
+    }
+}
+/********************   FINE    rilevamento *********************************/
 
 /*****************************************************************************/
 /*********************** CARICAMENTO DOM *************************************/

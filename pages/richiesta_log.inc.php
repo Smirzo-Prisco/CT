@@ -1,5 +1,5 @@
 <?php
-if ($_SESSION['master'] != 1 && $_SESSION['moderatore'] != 1) {
+if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore'] != 1) {
     echo '<div class="error">Non hai i permessi per accedere a questa pagina.</div>';
 } else {
     if (isset($_POST['submit_request'])) {

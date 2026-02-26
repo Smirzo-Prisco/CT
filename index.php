@@ -41,7 +41,7 @@ if(!empty($_POST['email'])) {
     
     while($row = gdrcd_query($result, 'fetch')) {
         if ($_POST['email'] == $row['email']) {
-        echo "<script type='text/javascript'>alert('entro');</script>";
+            echo "<script type='text/javascript'>alert('entro');</script>";
             gdrcd_query($result, 'free');
             $pass = gdrcd_genera_pass();
             gdrcd_query("UPDATE personaggio SET pass = '" . gdrcd_encript($pass) . "' WHERE nome = '" .$row['nome']. "' LIMIT 1");

@@ -212,10 +212,35 @@ require 'header.inc.php'; /*Header comune*/
                 <div class="command-card">
                     <h2 class="section-title">Turni</h2>
                     <p class="text-content">
-                        I turni vengono calcolati automaticamente dal sistema. Un turno viene chiuso automaticamente quando tutti i giocatori coinvolti hanno confermato la conclusione del proprio turno.
-                        Al termine di ogni turno, il sistema manda un messaggio in chat con il riepilogo di eventuali attacchi e/o difese.
-                        Non è consentito lanciare un qualsiasi tipo di abilità nel primo turno, a meno che non sia un master a consentirlo
-                        Durante il turno è concesso lanciare una sola abilità di attacco e, se si viene attaccati successivamente alla propria azione, è possibile lanciare un'abilità di difesa, ma il sistema impedirà un attacco nel turno successivo. Concederà soltanto il lancio di una ulteriore abilità difensiva continuando ad impedire il lancio di attacchi nel turno seguente.
+                        Nel turno è consentito lanciare solamente ciò che è disponibile dal pannello.
+                        Quando tutti i partecipanti hanno inviato la loro azione e l'eventuale lancio, il sistema invia un sussurro con un pulsante che consente la chiusura del turno.
+                        Il turno viene chiuso solamente quando tutti i partecipanti hanno cliccato sul pulsante di chiusura del turno, per dare la possibilità a tutti di lanciare un'eventuale scudo o attacco.
+                        Quando il turno viene chiuso, il sistema invia automaticamente un riepilogo in chat.
+                    </p>
+                    <p class="text-content">
+                        <b>Esempio 1</b><br>
+                        - A attacca B
+                        <br>- B descrive una difesa e attacca A
+                        <br>- Il sistema manda ai partecipanti la richiesta di chiusura turno
+                        <br>- A clicca sul pulsante di chiusura turno
+                        <br>- B clicca sul pulsante di chiusura turno
+                        <br>- Il sistema manda il riepilogo del turno in chat
+                    </p>
+                    <p class="text-content">
+                        <b>Esempio 2</b><br>
+                        - A attacca B
+                        <br>- B descrive una difesa e attacca C
+                        <br>- C descrive una difesa e attacca A
+                        <br>- D lancia uno scudo per difendere A
+                        <br>- Il sistema manda ai 4 partecipanti la richiesta di chiusura turno
+                        <br>- Prima di chiudere il turno, A lancia uno scudo per difendere se stesso
+                        <br>- Tutti cliccano sul pulsante di chiusura turno
+                        <br>- Il sistema manda il riepilogo del turno in chat
+                        <br><br>Turno successivo...<br><br>
+                        - Il sistema impedisce ad A di lanciare un attacco, poiché ha già utilizzato un attacco e uno scudo nel turno precedente. Ma può continuare a lanciare uno scudo rinunciando nuovamente all'attacco nel turno successivo
+                        <br>- B può continuare ad attaccare
+                        <br>- C può continuare ad attaccare
+                        <br>- D può continuare ad attaccare perché nel turno precedente ha utilizzato il suo lancio per lanciare uno scudo, quindi ha a disposizione un nuovo lancio per il turno corrente
                     </p>
                 </div>
 
@@ -223,11 +248,19 @@ require 'header.inc.php'; /*Header comune*/
                 <div class="command-card">
                     <h2 class="section-title">Danni</h2>
                     <p class="text-content">
-                        Calcolo del danno: attacco meno difesa per il moltiplicatore del livello d'attacco (consultabile nella scheda alla voce "Livello").
+                        Calcolo del danno: attacco meno difesa per il moltiplicatore del livello d'attacco (Vedi tabella successiva).
                         Durante uno scontro è consentito lanciare soltanto abilità di attacco e di difesa.
                         Non c'è bisogno di lanciare dadi relativi alle caratteristiche, poiché il sistema calcola ogni danno a fine turno sulla base delle abilità lanciate.
                         In caso di attacco su bersaglio multiplo, l'eventuale danno viene diviso per tutti i bersagli.
                     </p>
+                    <table style="width:100%; margin-top:5px; border-collapse: collapse; text-align:center;">
+                        <tr><th class="form-group form-column">Livello</th><th class="form-group form-column">Moltiplicatore</th></tr>
+                        <?php
+                        $soglie = gdrcd_query("SELECT * FROM gilda_soglie ORDER BY livello", 'result');
+                        foreach ($soglie as $soglia): ?>
+                            <tr><td><?=$soglia['livello']?></td><td><?=$soglia['danno']?></td></tr>
+                        <?php endforeach; ?>
+                    </table>
                 </div>
 
                 <!-- AZIONE -->

@@ -5,7 +5,7 @@
 
     $login = $_SESSION['login'];
     $luogo = $_SESSION['luogo'];
-    $info = gdrcd_query("SELECT nome, stanza_apparente, invitati, privata, proprietario, scadenza FROM mappa WHERE id = $luogo LIMIT 1");
+    $info = gdrcd_query("SELECT nome, descrizione, stanza_apparente, invitati, privata, proprietario, scadenza FROM mappa WHERE id = $luogo LIMIT 1");
     $pg = gdrcd_query("SELECT * FROM personaggio WHERE nome = '$login' LIMIT 1");
     $preferenze = json_decode($pg['preferenze_chat'], true);
 
@@ -29,473 +29,6 @@
     <link rel="stylesheet" href="../themes/crystal/chat.css?<?=time()?>">
     <?=$chat_style?>
 </head>
-
-<style>
-    /* Reset e stili base */
-    .gdr-panel-container * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    /* Variabili CSS con i colori specificati */
-    .gdr-panel-container {
-        --primary-dark: #070A1B;
-        --secondary-dark: #181c31;
-        --accent-color: #2a3f76;
-        --accent-light: #3a4f86;
-        --text-light: #e0e0e0;
-        --text-lighter: #e0e0e0;
-        --success-color: #27ae60;
-        --danger-color: #e74c3c;
-        --warning-color: #f39c12;
-        --border-radius: 8px;
-        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        --transition: all 0.3s ease;
-    }
-
-    /* Overlay per la modale */
-    .gdr-modal-overlay {
-        position: relative;
-        height: 95%;
-        background-color: rgba(0, 0, 0, 0.7);
-        display: flex;
-        z-index: 10000;
-        padding: 20px;
-    }
-
-    /* Container principale */
-    .gdr-panel-container {
-        width: 100%;
-        overflow-y: auto;
-        background-color: var(--primary-dark);
-        color: var(--text-light);
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Header */
-    .gdr-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: var(--secondary-dark);
-        padding: 15px 20px;
-        border-radius: var(--border-radius) var(--border-radius) 0 0;
-    }
-
-    .gdr-logo {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: var(--text-lighter);
-    }
-
-    .gdr-close-btn {
-        background: none;
-        border: none;
-        color: var(--text-light);
-        font-size: 1.5rem;
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: var(--transition);
-    }
-
-    .gdr-close-btn:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .gdr-main-controls {
-        display: flex;
-        gap: 10px;
-    }
-
-    .gdr-control-btn {
-        background-color: var(--accent-color);
-        border: none;
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: var(--transition);
-    }
-
-    .gdr-control-btn:hover {
-        background-color: var(--accent-light);
-        transform: translateY(-2px);
-    }
-
-    .gdr-control-btn img {
-        max-width: 70%;
-        max-height: 70%;
-    }
-
-    /* Stile per button disabled */
-    .gdr-button:disabled,
-    .gdr-button[disabled] {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: rgba(255, 255, 255, 0.4) !important;
-        cursor: not-allowed !important;
-        opacity: 0.6 !important;
-        transform: none !important;
-        box-shadow: none !important;
-    }
-
-    /* Stile specifico per gdr-btn-success disabled */
-    .gdr-btn-success:disabled,
-    .gdr-btn-success[disabled] {
-        background-color: rgba(39, 174, 96, 0.3) !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    /* Rimuovi effetti hover per button disabled */
-    .gdr-button:disabled:hover,
-    .gdr-button[disabled]:hover {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        transform: none !important;
-    }
-
-    .gdr-btn-success:disabled:hover,
-    .gdr-btn-success[disabled]:hover {
-        background-color: rgba(39, 174, 96, 0.3) !important;
-    }
-
-    /* Tabs */
-    .gdr-tabs {
-        display: flex;
-        background-color: var(--secondary-dark);
-        overflow-x: auto;
-    }
-
-    .gdr-tab {
-        padding: 15px 20px;
-        cursor: pointer;
-        border-bottom: 3px solid transparent;
-        transition: var(--transition);
-        white-space: nowrap;
-        color: var(--text-light);
-    }
-
-    .gdr-tab.active {
-        border-bottom: 3px solid var(--accent-color);
-        color: var(--text-lighter);
-        font-weight: bold;
-    }
-
-    .gdr-tab:hover:not(.active) {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-
-    /* Contenuto Tab */
-    .gdr-tab-content {
-        display: none;
-        padding: 20px;
-        flex: 1;
-        overflow-y: auto;
-    }
-
-    .gdr-tab-content.active {
-        display: block;
-    }
-
-    /* Elementi del form */
-    .gdr-form-group {
-        margin-bottom: 15px;
-    }
-
-    .gdr-label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 500;
-        color: var(--text-lighter);
-    }
-
-    .gdr-select, .gdr-input, .gdr-textarea, .gdr-button {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: var(--border-radius);
-        font-size: 1rem;
-        background-color: rgba(255, 255, 255, 0.1);
-        color: var(--text-light);
-        transition: var(--transition);
-    }
-
-    .gdr-select:focus, .gdr-input:focus, .gdr-textarea:focus {
-        outline: none;
-        border-color: var(--accent-color);
-        background-color: var(--accent-light);/*rgba(255, 255, 255, 0.15);*/
-    }
-
-    .gdr-button {
-        background-color: var(--accent-color);
-        color: var(--text-lighter);
-        border: none;
-        cursor: pointer;
-        transition: var(--transition);
-        font-weight: 500;
-    }
-
-    .gdr-button:hover {
-        background-color: var(--accent-light);
-    }
-
-    .gdr-btn-danger {
-        background-color: var(--danger-color);
-    }
-
-    .gdr-btn-danger:hover {
-        background-color: #c0392b;
-    }
-
-    .gdr-btn-success {
-        background-color: var(--success-color);
-    }
-
-    .gdr-btn-success:hover {
-        background-color: #219653;
-    }
-
-    .gdr-btn-warning {
-        background-color: var(--warning-color);
-    }
-
-    .gdr-btn-warning:hover {
-        background-color: #e67e22;
-    }
-
-    /* Layout a griglia */
-    .gdr-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-    }
-
-    .gdr-card {
-        background-color: var(--secondary-dark);
-        border-radius: var(--border-radius);
-        padding: 20px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .gdr-card-title {
-        font-size: 1.2rem;
-        margin-bottom: 15px;
-        color: var(--text-lighter);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 10px;
-    }
-
-    /* Pannello Master */
-    .gdr-master-panel {
-        background-color: rgba(243, 156, 18, 0.1);
-        border-left: 4px solid var(--warning-color);
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 0 var(--border-radius) var(--border-radius) 0;
-    }
-
-    .gdr-master-panel-title {
-        color: var(--warning-color);
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-
-    /* Contatore caratteri */
-    .gdr-char-counter {
-        font-size: 0.8rem;
-        color: #aaa;
-        text-align: right;
-        margin-top: 5px;
-    }
-
-    /* Modal per scrittura libera */
-    .gdr-writing-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-        z-index: 10001;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .gdr-writing-modal-content {
-        background-color: var(--primary-dark);
-        border-radius: var(--border-radius);
-        padding: 20px;
-        width: 90%;
-        max-width: 600px;
-        max-height: 80vh;
-        overflow-y: auto;
-        box-shadow: var(--box-shadow);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .gdr-writing-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .gdr-close-writing-modal {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: var(--text-light);
-        width: auto;
-    }
-
-    /* Stile per lo status della sessione di gioco */
-    .gdr-session-status {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 15px;
-        background: linear-gradient(135deg, rgba(42, 63, 118, 0.3), rgba(58, 79, 134, 0.2));
-        border-radius: 20px;
-        border: 1px solid rgba(42, 63, 118, 0.5);
-        position: relative;
-        overflow: hidden;
-        margin: 0 15px;
-    }
-
-    /* Punto pulsante */
-    .gdr-pulse-dot {
-        width: 12px;
-        height: 12px;
-        background-color: #27ae60;
-        border-radius: 50%;
-        animation: gdr-pulse 2s infinite;
-        box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
-    }
-
-    /* Testo dello status */
-    .gdr-status-text {
-        color: var(--text-lighter);
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
-    }
-
-    /* Bordo animato */
-    .gdr-animated-border {
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, 
-            transparent, 
-            rgba(39, 174, 96, 0.4), 
-            transparent);
-        animation: gdr-shine 3s infinite;
-    }
-
-    @keyframes gdr-pulse {
-        0% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
-        }
-        70% {
-            transform: scale(1);
-            box-shadow: 0 0 0 10px rgba(39, 174, 96, 0);
-        }
-        100% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
-        }
-    }
-
-    @keyframes gdr-shine {
-        0% {
-            left: -100%;
-        }
-        100% {
-            left: 100%;
-        }
-    }
-
-    /* Variante per sessione non attiva */
-    .gdr-session-status.inactive {
-        opacity: 0.6;
-    }
-
-    .gdr-session-status.inactive .gdr-pulse-dot {
-        background-color: #7f8c8d;
-        animation: none;
-    }
-
-    .gdr-session-status.inactive .gdr-status-text {
-        text-shadow: none;
-        color: var(--text-light);
-    }
-
-    .gdr-session-status.inactive .gdr-animated-border {
-        display: none;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .gdr-session-status {
-            margin: 5px 0;
-            order: 3;
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .gdr-header {
-            flex-wrap: wrap;
-        }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .gdr-header {
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .gdr-main-controls {
-            width: 100%;
-            justify-content: space-around;
-        }
-
-        .gdr-control-btn {
-            width: 40px;
-            height: 40px;
-        }
-
-        .gdr-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .gdr-tabs {
-            flex-wrap: wrap;
-        }
-        
-        .gdr-tab {
-            flex: 1;
-            min-width: 120px;
-            text-align: center;
-        }
-    }
-</style>
 
 <div class="pagina_frame_chat">
     <div class="page_body">
@@ -568,7 +101,6 @@
         <div id="pagina_chat" class="chat_box"></div>
 
 
-
         <!-- FORM DI INSERIMENTO AZIONE + PULSANTI -->
         <div class="panels_box">
             <div class="form_chat">
@@ -577,7 +109,10 @@
                         <div class="casella_chat">
                             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                                 <span class="gdr-char-counter"><span id="rimanenti">0</span> caratteri</span> <!-- CONTEGGIO CARATTERI -->
-                                <a href="#"><img id="openPanelBtn" title="Help" src="themes/crystal/imgs/chat/object.png" class="chat_icon"></a> <!-- PANNELLO DEEP -->
+                                <a href="#"><img id="openPanelBtn" title="Help" src="themes/crystal/imgs/chat/chat_panel.png" class="chat_icon"></a> <!-- PANNELLO CHAT -->
+                                <a href="#" onClick="window.open('chat_help.proc.php','Help','toolbar=no,width=500,height=500');" title="Info">
+                                    <img src="themes/crystal/imgs/chat/help.png" alt="Info" class="chat_icon"> <!-- ISTRUZIONI CHAT -->
+                                </a>
                                 <input type="text" name="action_tag" class="action-tag" maxlength="30" placeholder="TAG max 30"> <!-- TAG AZIONE -->
                             </div>
                             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px;">
@@ -662,7 +197,6 @@
             <div class="gdr-logo">Pannello Gestione GDR</div>
             <div class="gdr-main-controls">
                 <a href="chat_save.proc.php" target="_blank" class="gdr-control-btn" title="Salva giocata"><img src="themes/crystal/imgs/chat/blocca_salva.png" alt="Salva"></a>
-                <a href="#" onClick="window.open('chat_help.proc.php','Help','toolbar=no,width=500,height=500');" class="gdr-control-btn" title="Info"><img src="themes/crystal/imgs/chat/help.png" alt="Info"></a>
                 <?=$pulsante_backchat . $pulsante_cura . $pulsante_pulisci_chat . $pulsante_scacchiera?>
             </div>
             <button class="gdr-close-btn" id="gdrCloseBtn">&times;</button>
@@ -783,9 +317,14 @@
         <div class="gdr-tab-content" id="skills-tab">
             <div class="gdr-master-panel">
                 <div class="gdr-master-panel-title">Attenzione!</div>
-                <p>Caratteristiche ed armi richiedono un solo bersaglio.<br>Le abilità consentono la selezione di una quantità di bersagli pari al livello selezionato.</p>
+                <p>E' possibile selezionare una quantità di bersagli pari al livello selezionato dell'abilità.</p>
             </div>
             <div class="gdr-grid">
+                <!-- Selezione Bersagli -->
+                <div class="gdr-card">
+                    <div class="gdr-card-title">Bersaglio (*)</div>
+                    <div id="user-selection-box"></div> <!-- BERSAGLIO -->
+                </div>
                 <!-- Abilità -->
                 <div class="gdr-card">
                     <div class="gdr-card-title">Abilità</div>
@@ -855,10 +394,12 @@
                         <label class="gdr-label" for="dice_type">Usa caratteristica</label>
                         <select class="gdr-select" id="dice_type" name="valori">
                             <option value="0">Usa dado</option>
+                            <!--
                             <option value="destrezza">Destrezza</option>
                             <option value="potere">Potere</option>
                             <option value="mente">Mente</option>
                             <option value="tempra">Tempra</option>
+                            -->
                             <?php
                             $result_livello = gdrcd_query("SELECT clgpersonaggioruolo.personaggio, ruolo.livello
                                                             FROM ruolo JOIN clgpersonaggioruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo
@@ -924,11 +465,6 @@
                     </div>
                     <button class="gdr-button gdr-btn-success" onclick="usaArmaChat();">Usa Arma</button>
                 </div>
-                <!-- Selezione Bersagli -->
-                <div class="gdr-card">
-                    <div class="gdr-card-title">Bersaglio (*)</div>
-                    <div id="user-selection-box"></div> <!-- BERSAGLIO -->
-                </div>
             </div>
         </div>
         <!-- Contenuto Tab Gestione Master -->
@@ -983,26 +519,36 @@
                 <!-- Gestione PNG -->
                 <div class="gdr-card">
                     <div class="gdr-card-title">Gestione PNG</div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="tag">Nome PNG</label>
-                        <input class="gdr-input" name="tag" id="tag" placeholder="Nome PNG">
+                    <label class="gdr-label" for="pngNew" style="flex:1;">Nome PNG</label>
+                    <div class="gdr-form-group" style="display:flex; gap:8px;">
+                        <input class="gdr-input" id="pngNew" placeholder="Nome PNG" style="flex:2;">
+                        <button class="gdr-button gdr-btn-success" onclick="newMasterPng();" style="flex:1;">Aggiungi</button>
                     </div>
+                    <div class="gdr-card-title"></div>
                     <div class="gdr-form-group">
-                        <label class="gdr-label" for="message">Azione PNG</label>
-                        <textarea class="gdr-textarea" name="message" id="message" onKeyup="gdrConta(this);" maxlength="2000" placeholder="Azione PNG" rows="3"></textarea>
-                        <div class="gdr-char-counter">Caratteri: <span id="rimanenti">0</span></div>
-                    </div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="valori">Caratteristica OPN</label>
-                        <select class="gdr-select" name="valori">
-                            <option value="Usa potere">Usa potere</option>
-                            <option value="Usa mente">Usa mente</option>
+                        <label class="gdr-label" for="pngName">Caratteristica PNG</label>
+                        <select class="gdr-select" id="pngName">
+                            <option value="destrezza">Seleziona</option>
                         </select>
                     </div>
                     <div class="gdr-form-group">
-                        <label class="gdr-label" for="valore">Bonus caratteristica ONG</label>
-                        <input class="gdr-input" name="valore" id="valore" placeholder="Bonus sul dado">
+                        <label class="gdr-label" for="pngAction">Azione PNG</label>
+                        <textarea class="gdr-textarea" id="pngAction" placeholder="Azione PNG" rows="3"></textarea>
                     </div>
+                    <div class="gdr-form-group">
+                        <label class="gdr-label" for="pngCar">Caratteristica PNG</label>
+                        <select class="gdr-select" id="pngCar">
+                            <option value="destrezza">Usa destrezza</option>
+                            <option value="potere">Usa potere</option>
+                            <option value="mente">Usa mente</option>
+                            <option value="tempra">Usa tempra</option>
+                        </select>
+                    </div>
+                    <div class="gdr-form-group">
+                        <label class="gdr-label" for="pngBonus">Bonus caratteristica PNG</label>
+                        <input class="gdr-input" id="pngBonus" placeholder="Bonus sul dado">
+                    </div>
+                    <button class="gdr-button gdr-btn-success" onclick="newMasterPngAction();">Invia</button>
                 </div>
             </div>
         </div>
