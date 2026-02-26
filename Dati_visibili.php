@@ -1,1 +1,0 @@
-Hai accettato di rendere visibile la tua email. Essendo un dato sensibile, questa resterà in chiaro per 24h. Superata tale tempistica, il dato verrà nuovamente criptato e reso illeggibile.  
