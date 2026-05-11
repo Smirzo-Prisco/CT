@@ -120,7 +120,7 @@
                 <div class="primo_box">
                     <div class="header_box">▪ PROFILO ▪</div>
                     <br>
-                    <span style="float: left; margin-left: 5px;"><?=gdrcd_filter('out', $MESSAGE['interface']['sheet']['profile']['age'])?>:</span>    
+                    <span style="float: left; margin-left: 5px;">Età:</span>    
                     <span style="float: right; margin-right: 5px; text-align: right;"><?=gdrcd_filter('out', $pg['eta'])?></span>
                     <br>
                     
@@ -295,7 +295,7 @@
                 <?=gdrcd_filter('out', $MESSAGE['interface']['sheet']['box_title']['background'])?>
             </div>
             <br>
-            <div class="body_box"><?=gdrcd_filter('out', $pg['principale'])?> </div>
+            <div class="body_box"><?=$pg['principale']?> </div>
         </div>
     </div> <!-- scheda_page_body -->
 </div><!-- pagina_scheda -->

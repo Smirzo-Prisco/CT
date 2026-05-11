@@ -1,3 +1,8 @@
+const ns_parametri = {
+	api_file: 'pages/api_personaggio.php',
+	param: 'op'
+};
+
 const panel = document.getElementById('stats_panel');
 const attributesContainer = document.getElementById('attributesContainer');
 const xpDisponibiliEl = document.getElementById('xpDisponibili');
@@ -255,7 +260,7 @@ function loadInitial() {
 	loader.style.color = 'var(--muted)';
 	attributesContainer.appendChild(loader);
 
-	fetch('pages/ajax_engine.php?op=getPuntiPg', { credentials: 'same-origin' })
+	fetch(ns_parametri.api_file + '?' + ns_parametri.param + '=getPuntiPg', { credentials: 'same-origin' })
 		.then(res => {
 			if (!res.ok) throw new Error('HTTP ' + res.status);
 
@@ -327,7 +332,7 @@ function savePuntiPg(saveBtn) {
 		saveBtn.disabled = true;
 		saveBtn.textContent = 'Salvataggio...';
 
-		fetch('pages/ajax_engine.php?op=savePuntiPg', {
+		fetch(ns_parametri.api_file + '?' + ns_parametri.param + '=savePuntiPg', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'same-origin',

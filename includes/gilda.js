@@ -1,3 +1,8 @@
+const ns_gilda = {
+    api_file: 'pages/api_gilda.php',
+    param: 'op'
+};
+
 // GILDE
 function toggleAccordion(gildaId, type) {
     // Previeni la propagazione dell'evento per evitare conflitti
@@ -34,7 +39,7 @@ function resetForm(tipo) {
     document.getElementById(tipo + '_id').value = '';
 }
 function editGuild(id) {
-    fetch('/pages/ajax_engine.php?op=getGuild&id=' + id)
+    fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=getGuild&id=' + id)
         .then(response => response.json())
         .then(data => {
             document.getElementById('guild_id').value = data.id_gilda;
@@ -49,7 +54,7 @@ function editGuild(id) {
 }
 function deleteGuild(id) {
     if (confirm('Sei sicuro di voler eliminare questa gilda e tutti i suoi livelli?')) {
-        fetch('/pages/ajax_engine.php?op=deleteGuild&id=' + id, { method: 'DELETE' })
+        fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=deleteGuild&id=' + id, { method: 'DELETE' })
             .then(response => { if (response.ok) location.reload(); });
     }
 }
@@ -66,7 +71,7 @@ function saveGuild() {
             }
             //*/
 
-            fetch('/pages/ajax_engine.php?op=saveGuild', {
+            fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=saveGuild', {
                 method: 'POST',
                 body: formData
             })
@@ -86,7 +91,7 @@ function saveGuild() {
 }
 function removeGuildPg(nome) {
     if (confirm('Sei sicuro di voler rimuovere ' + nome + ' dalla gilda?')) {
-        fetch('/pages/ajax_engine.php?op=removeGuildPg', {
+        fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=removeGuildPg', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome })
@@ -98,7 +103,7 @@ function addGuildPg(id_gilda) {
     const nome = document.getElementById('addGuildPg' + id_gilda).value;
 
     if (confirm('Inserire ' + nome + ' in questa gilda?')) {
-        fetch('/pages/ajax_engine.php?op=addGuildPg', {
+        fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=addGuildPg', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -111,7 +116,7 @@ function addGuildPg(id_gilda) {
 }
 //  RUOLI
 function editRole(id) {
-    fetch('/pages/ajax_engine.php?op=getRole&id=' + id)
+    fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=getRole&id=' + id)
         .then(response => response.json())
         .then(data => {
             document.getElementById('role_id').value = data.id_ruolo;
@@ -127,7 +132,7 @@ function editRole(id) {
 }
 function deleteRole(id) {
     if (confirm('Sei sicuro di voler eliminare questo ruolo?')) {
-        fetch('/pages/ajax_engine.php?op=deleteRole&id=' + id)
+        fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=deleteRole&id=' + id)
             .then(response => { if (response.ok) location.reload(); });
     }
 }
@@ -138,7 +143,7 @@ function saveRole() {
         formRole.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(this);
-            fetch('/pages/ajax_engine.php?op=saveRole', {
+            fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=saveRole', {
                 method: 'POST',
                 body: formData
             })
@@ -160,30 +165,28 @@ function saveRole() {
 // SOGLIE
 function deleteSoglia(id) {
     if (confirm('Sei sicuro di voler eliminare questa soglia?')) {
-        fetch('/pages/ajax_engine.php?op=deleteSoglia&id=' + id)
+        fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=deleteSoglia&id=' + id)
             .then(response => { if (response.ok) location.reload(); });
     }
 }
-function saveSoglia(id) {
-    const livello_soglia = document.getElementById('livello_soglia' + id).value;
-    const soglia = document.getElementById('soglia' + id).value;
-    const danno = document.getElementById('danno' + id).value;
+function saveSoglia(id_soglia) {
+    const livello_soglia = document.getElementById('livello_soglia' + id_soglia).value;
+    const soglia = document.getElementById('soglia' + id_soglia).value;
+    const danno = document.getElementById('danno' + id_soglia).value;
+    const integrita = document.getElementById('integrita' + id_soglia).value;
 
-    fetch('/pages/ajax_engine.php?op=saveSoglia', {
+    fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=saveSoglia', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            id_soglia: id,
-            livello_soglia: livello_soglia,
-            soglia: soglia,
-            danno: danno
-        })
+        body: JSON.stringify({ id_soglia, livello_soglia, soglia, danno, integrita })
     })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showNotification(data.message, data.success);
-                window.location.reload();
+                showNotification(data.message, 'success');
+                // window.location.reload();
+                // Chiudo modale
+                document.getElementById('modalSoglia').style.display = 'none';
             } else showNotification(data.message, 'error');
         })
         .catch(error => {
@@ -194,7 +197,7 @@ function saveSoglia(id) {
 
 // STATUTO
 function editVoceStatuto(id) {
-    fetch('/pages/ajax_engine.php?op=getVoceStatuto&id=' + id)
+    fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=getVoceStatuto&id=' + id)
         .then(response => response.json())
         .then(data => {
             document.getElementById('articolo').value = data.articolo;
@@ -206,7 +209,7 @@ function editVoceStatuto(id) {
 }
 function deleteVoceStatuto(id) {
     if (confirm('Sei sicuro di voler eliminare questa voce?')) {
-        fetch('/pages/ajax_engine.php?op=deleteVoceStatuto&id=' + id)
+        fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=deleteVoceStatuto&id=' + id)
             .then(response => { if (response.ok) location.reload(); });
     }
 }
@@ -217,7 +220,7 @@ function saveVoceStatuto() {
         formRole.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(this);
-            fetch('/pages/ajax_engine.php?op=saveVoceStatuto', {
+            fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=saveVoceStatuto', {
                 method: 'POST',
                 body: formData
             })
@@ -238,14 +241,19 @@ function saveVoceStatuto() {
 
 // ABILITA'/SKILL
 function editSkill(id) {
-    fetch('/pages/ajax_engine.php?op=getSkill&id=' + id)
+    fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=getSkill&id=' + id)
         .then(response => response.json())
         .then(data => {
+            // Sottotipo
+            let sottotipo = document.getElementById(data.sottotipo);
+            if (sottotipo) sottotipo.checked = true;
+            // FINE sottotipo
+
             document.getElementById('id_abilita').value = data.id_abilita;
             document.getElementById('nome_skill').value = data.nome;
             document.getElementById('descrizione_skill').value = data.descrizione;
             document.getElementById('car').value = data.car;
-            document.getElementById('tipo_gilda').value = data.tipo;
+            document.getElementById('tipo_skill').value = data.tipo;
             document.getElementById('id_gilda').value = data.id_gilda;
             document.getElementById('livello_sblocco').value = data.livello_sblocco;
             document.getElementById('modalSkillTitle').textContent = 'Modifica Abilità';
@@ -255,7 +263,7 @@ function editSkill(id) {
 }
 function deleteSkill(id) {
     if (confirm('Sei sicuro di voler eliminare questa abilità?')) {
-        fetch('/pages/ajax_engine.php?op=deleteSkill&id=' + id)
+        fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=deleteSkill&id=' + id)
             .then(response => { if (response.ok) location.reload(); });
     }
 }
@@ -266,13 +274,20 @@ function saveSkill() {
         formRole.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(this);
+
+            // Sottotipo
+            const sottotipo = document.querySelector('input[name="sottotipo"]:checked');
+            formData.set('sottotipo', sottotipo ? sottotipo.value : '');
+            // FINE sottotipo
+
             /*
             for (let [key, value] of formData.entries()) {
                 console.log(key + ': ' + value);
             }
+            return;
             //*/
 
-            fetch('/pages/ajax_engine.php?op=saveSkill', {
+            fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=saveSkill', {
                 method: 'POST',
                 body: formData
             })
@@ -280,7 +295,9 @@ function saveSkill() {
                 .then(data => {
                     if (data.success) {
                         showNotification(data.message, 'success');
-                        window.location.reload();
+                        // window.location.reload();
+                        // Chiudo modale
+                        document.getElementById('modalSkill').style.display = 'none';
                     } else showNotification('Errore nel salvataggio: ' + data.message, 'error');
                 })
                 .catch(error => {
@@ -309,19 +326,25 @@ if (imgGuild) {
 
 // Funzione per controllare il tipo di skill selezionato
 function checkSkillType() {
-    const tipoSkill = document.getElementById('tipo_gilda');
-    const clausoleSection = document.getElementById('clausoleSection');
+    const tipoSkill = document.getElementById('tipo_skill');
 
     // Tipi di skill generiche
+    const genericaSection = document.getElementById('genericaSection');
     const tipiGeneriche = ['Generica base', 'Generica avanzata'];
+    if (tipiGeneriche.includes(tipoSkill.value)) genericaSection.style.display = 'block';
+    else genericaSection.style.display = 'none';
 
-    if (tipiGeneriche.includes(tipoSkill.value)) clausoleSection.style.display = 'block';
-    else clausoleSection.style.display = 'none';
+    // Tipi di skill mentali
+    const mentaleSection = document.getElementById('mentaleSection');
+    const tipiMentali = ['Mentale base', 'Mentale media', 'Mentale avanzata', 'Mentale di attacco'];
+    if (tipiMentali.includes(tipoSkill.value)) mentaleSection.style.display = 'block';
+    else mentaleSection.style.display = 'none';
+
 }
 
 // Inizializza l'event listener quando il DOM è pronto
 document.addEventListener('DOMContentLoaded', function () {
-    const tipoSkill = document.getElementById('tipo_gilda');
+    const tipoSkill = document.getElementById('tipo_skill');
     // Aggiungi listener per cambiamenti
     if (tipoSkill) tipoSkill.addEventListener('change', checkSkillType);
 });

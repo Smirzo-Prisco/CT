@@ -1,261 +1,325 @@
-/************** GILDE ***********************/
-.guild-container .guild-accordion {
-    background: #25283b;
-    border: 1px solid #2f3349;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.guild-container .guild-accordion:hover {
-    border-color: #3a3f5c;
-    box-shadow: 0 4px 12px color(display-p3 0 0 0 / 30%);
-}
-
-.guild-container .guild-accordion::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.guild-container .guild-accordion:hover::before {
-    opacity: 1;
-}
-
-.guild-container .guild-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 20px 15px;
-    border-bottom: 1px solid #2f3349;
-}
-
-.guild-container .guild-header h4 {
-    margin: 0;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.guild-container .guild-header:hover {
-    background: linear-gradient(135deg, #2f3349 0%, #2a2d42 100%);
-}
-
-.guild-container .guild-header.active {
-    background: linear-gradient(135deg, #3a3f5c 0%, #2f3349 100%);
-    border-bottom: 1px solid #3a3f5c;
-}
-
-.guild-container .guild-info {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 15px;
-}
-
-.guild-container .guild-info h3 {
-    margin: 0;
-    color: #fff;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.guild-container .guild-desc {
-    color: #8a8fb5;
-    font-size: 14px;
-    background: rgb(138 143 181 / 10%);
-    padding: 4px 12px;
-    border-radius: 12px;
-    border: 1px solid rgb(138 143 181 / 20%);
-}
-
-.guild-container .guild-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.guild-container .btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 36px;
-    height: 36px;
-}
-
-.guild-container .btn-sm {
-    padding: 6px 10px;
-    font-size: 12px;
-    min-width: 32px;
-    height: 32px;
-}
-
-.guild-container .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.guild-container .btn-primary:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgb(102 126 234 / 30%);
-}
-
-.guild-container .btn-edit {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-}
-
-.guild-container .btn-edit:hover {
-    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgb(245 87 108 / 30%);
-}
-
-.guild-container .btn-delete {
-    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
-    color: white;
-}
-
-.guild-container .btn-delete:hover {
-    background: linear-gradient(135deg, #e91e63 0%, #f5576c 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgb(229 57 53 / 30%);
-}
-
-.guild-container .guild-content {
-    display: none;
-    background: #1c1f2e;
-}
-
-.guild-container .guild-content.active {
-    display: block;
-    animation: gildaSlideDown 0.3s ease;
-}
-
-@keyframes gildaSlideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
-    }
-}
-
-/* Stile per i ruoli in formato tabellare */
-.guild-container .guild-content .role-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-self: end; /* Allinea i pulsanti a destra */
-}
-
-.guild-container .guild-content .guild-info {
-    display: grid;
-    grid-template-columns: 1fr 2fr 6fr auto auto;
-    align-items: center;
-    gap: 15px;
-    padding: 15px 20px;
-    border-bottom: 1px solid #2f3349;
-    transition: background 0.3s ease;
-}
-
-.guild-container .guild-content .guild-info:last-child {
-    border-bottom: none;
-}
-
-.guild-container .guild-content .guild-info:hover {
-    background: rgb(138 143 181 / 5%);
-}
-
-.guild-container .guild-content .guild-info img {
-    border-radius: 4px;
-    border: 1px solid #3a3f5c;
-    transition: transform 0.3s ease;
-}
-
-.guild-container .guild-content .guild-info:hover img {
-    transform: scale(1.1);
-}
-
-.guild-container .guild-content .guild-info h3 {
-    font-size: 15px;
-    color: #e0e0ff;
-    margin: 0;
-}
-
-.guild-container .guild-content .guild-desc {
-    background: rgb(86 204 242 / 10%);
-    color: #56ccf2;
-    border-color: rgb(86 204 242 / 30%);
-    font-weight: 500;
-}
-
-.guild-container .no-gilde {
-    text-align: center;
-    padding: 40px 20px;
-    background: #25283b;
-    border: 1px solid #2f3349;
-    border-radius: 8px;
-}
-
-.guild-container .no-gilde p {
-    margin: 0;
-    color: #8a8fb5;
-    font-size: 16px;
-}
-
-/* Animazione per il toggle */
-.guild-container .btn-toggle i {
-    transition: transform 0.3s ease;
-}
-
-.guild-container .guild-header.active .btn-toggle i {
-    transform: rotate(180deg);
-}
-
-/* Responsive */
-@media (width <= 768px) {
-    .guild-container .guild-info {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        text-align: center;
-    }
-    
-    .guild-container .guild-actions {
-        justify-content: center;
-    }
-    
-    .guild-container .guild-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    
-    .guild-container .guild-content .gilda-info {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 10px;
-    }
-    
-    .guild-container .guild-content .gilda-info img {
-        justify-self: center;
-    }
+/************** GILDE ***********************/
+.guild-container .guild-accordion {
+    background: #25283b;
+    border: 1px solid #2f3349;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.guild-container .guild-accordion:hover {
+    border-color: #3a3f5c;
+    box-shadow: 0 4px 12px color(display-p3 0 0 0 / 30%);
+}
+
+.guild-container .guild-accordion::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.guild-container .guild-accordion:hover::before {
+    opacity: 1;
+}
+
+.guild-container .guild-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px 15px;
+    border-bottom: 1px solid #2f3349;
+}
+
+.guild-container .guild-header h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.guild-container .guild-header:hover {
+    background: linear-gradient(135deg, #2f3349 0%, #2a2d42 100%);
+}
+
+.guild-container .guild-header.active {
+    background: linear-gradient(135deg, #3a3f5c 0%, #2f3349 100%);
+    border-bottom: 1px solid #3a3f5c;
+}
+
+.guild-container .guild-info {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 15px;
+}
+
+.guild-container .guild-info h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.guild-container .guild-desc {
+    color: #8a8fb5;
+    font-size: 14px;
+    background: rgb(138 143 181 / 10%);
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid rgb(138 143 181 / 20%);
+}
+
+.guild-container .guild-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.guild-container .btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+}
+
+.guild-container .btn-sm {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-width: 32px;
+    height: 32px;
+}
+
+.guild-container .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.guild-container .btn-primary:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgb(102 126 234 / 30%);
+}
+
+.guild-container .btn-edit {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.guild-container .btn-edit:hover {
+    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgb(245 87 108 / 30%);
+}
+
+.guild-container .btn-delete {
+    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    color: white;
+}
+
+.guild-container .btn-delete:hover {
+    background: linear-gradient(135deg, #e91e63 0%, #f5576c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgb(229 57 53 / 30%);
+}
+
+.guild-container .guild-content {
+    display: none;
+    background: #1c1f2e;
+}
+
+.guild-container .guild-content.active {
+    display: block;
+    animation: gildaSlideDown 0.3s ease;
+}
+
+@keyframes gildaSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Stile per i ruoli in formato tabellare */
+.guild-container .guild-content .role-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-self: end; /* Allinea i pulsanti a destra */
+}
+
+.guild-container .guild-content .guild-info {
+    display: grid;
+    grid-template-columns: 1fr 2fr 6fr auto auto;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #2f3349;
+    transition: background 0.3s ease;
+}
+
+.guild-container .guild-content .guild-info:last-child {
+    border-bottom: none;
+}
+
+.guild-container .guild-content .guild-info:hover {
+    background: rgb(138 143 181 / 5%);
+}
+
+.guild-container .guild-content .guild-info img {
+    border-radius: 4px;
+    border: 1px solid #3a3f5c;
+    transition: transform 0.3s ease;
+}
+
+.guild-container .guild-content .guild-info:hover img {
+    transform: scale(1.1);
+}
+
+.guild-container .guild-content .guild-info h3 {
+    font-size: 15px;
+    color: #e0e0ff;
+    margin: 0;
+}
+
+.guild-container .guild-content .guild-desc {
+    background: rgb(86 204 242 / 10%);
+    color: #56ccf2;
+    border-color: rgb(86 204 242 / 30%);
+    font-weight: 500;
+}
+
+.guild-container .no-gilde {
+    text-align: center;
+    padding: 40px 20px;
+    background: #25283b;
+    border: 1px solid #2f3349;
+    border-radius: 8px;
+}
+
+.guild-container .no-gilde p {
+    margin: 0;
+    color: #8a8fb5;
+    font-size: 16px;
+}
+
+/* Animazione per il toggle */
+.guild-container .btn-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.guild-container .guild-header.active .btn-toggle i {
+    transform: rotate(180deg);
+}
+
+.checkbox-group label, .radio-group label { flex: 8; }
+.checkbox-group input, .radio-group input { flex: 1; }
+
+/* INFO PUNTO INTERROGATIVO */
+.tooltip-bottom {
+    position: absolute;
+    top: calc(100% + 8px); /* 8px sopra l'icona */
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 10px 12px;
+    border-radius: 6px;
+    width: 180px; /* Larghezza fissa */
+    font-size: 11px;
+    line-height: 1.2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border: 1px solid #3a6ea5;
+    
+    /* Stato iniziale - NASCOSTO */
+    opacity: 0;
+    visibility: hidden;
+    
+    /* Transizione */
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    
+    /* Z-index */
+    z-index: 1000;
+    
+    /* Non selezionabile */
+    user-select: none;
+    pointer-events: none;
+}
+
+/* FRECCETTA */
+.tooltip-bottom::after {
+    text-align: center;
+    content: '';
+    position: absolute;
+    bottom: 100%; /* Sopra il tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent #3a6ea5 transparent;
+}
+
+/* MOSTRA IL TOOLTIP AL HOVER */
+/* Opzione 1: Hover sull'icona (se tooltip è fratello) */
+.help-animated:hover ~ .tooltip-bottom {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+/* Opzione 2: Hover sul container (più affidabile) */
+span[style*="position:relative"]:hover .tooltip-bottom {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+/*  FINE INFO PUNTO INTERROGATIVO */
+
+/* Responsive */
+@media (width <= 768px) {
+    .guild-container .guild-info {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .guild-container .guild-actions {
+        justify-content: center;
+    }
+
+    .guild-container .guild-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .guild-container .guild-content .gilda-info {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .guild-container .guild-content .gilda-info img {
+        justify-self: center;
+    }
 }

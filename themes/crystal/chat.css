@@ -467,11 +467,11 @@ div.chat_box {
     position: absolute;
     top: 0;        /* Mantieni o aumenta leggermente questo valore */
     bottom: 180px;    /* Aumenta questo valore per ridurre l'altezza della chat box */
-    left: 10px;
+    left: 5px;
     overflow: auto;
     font-size: 16px;
     text-align: justify;
-    width: 100%;
+    width: 99%;
 }
 
 

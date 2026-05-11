@@ -18,177 +18,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
     $data = json_decode($json_data, true);
     
     switch ($_GET['op']) {
-        // ROLE SESSION
-        case 'addPgToRole':
-            session_start();
-            require_once(__DIR__ . '/../includes/chat_functions.inc.php');
-            $login = $_SESSION['login'];
-            $luogo = $_SESSION['luogo'];
-        
-            try {
-                // Controlla se l'utente ha già una giocata in corso
-                if(pgIsInRole($login)) {
-                    echo json_encode(['success' => false,  'message' => "L'utente $userName ha già una giocata in corso."]);
-                    exit;
-                }
-
-                $id_role = locationActiveRole($luogo); // Recupera l'eventuale role attiva nella chat
-
-                // Se nella chat NON ci sono giocate attive, avvio una nuova role
-                if(!$id_role) {
-                    gdrcd_query("INSERT INTO role_sessions (`location`, `start`) VALUES ($luogo, NOW())");
-                    $id_role = gdrcd_query("SELECT LAST_INSERT_ID() AS id")['id'];
-                }
-                
-                // In ogni caso aggiungo il pg alla role
-                gdrcd_query("INSERT INTO role_session_players (id_role, pg_name) VALUES ($id_role, '$login')");
-                chatInsertMessage($luogo, 'System', $login, " si è ha aggiunto alla role", 'N');
-                
-                echo json_encode(['success' => true, 'message' => 'Giocatore aggiunto con successo!']);
-            } catch (Exception $e) {
-                echo json_encode(['success' => false, 'message' => 'Errore nel processamento degli utenti: ' . $e->getMessage(), 'error_details' => [ 'file' => $e->getFile(), 'line' => $e->getLine() ]]);
-            }
-            break;
-        case 'quitRole':
-            session_start();
-            require_once(__DIR__ . '/../includes/chat_functions.inc.php');
-
-            $user = isset($data['user']) ? gdrcd_filter('in', $data['user']) : $_SESSION['login'];
-            $pgIsInRole = pgIsInRole($user, $_SESSION['luogo']); // Verifica se il pg è nella role della chat
-            $set_end = "UPDATE role_session_players SET `sent` = 0, close_turn = 0, `end` = NOW() WHERE pg_name = '$user' AND id_role = ".locationActiveRole($_SESSION['luogo'])." AND `end` IS NULL LIMIT 1";
-
-            // Se il pg è nella role, procedo con l'uscita
-            if ($pgIsInRole && gdrcd_query($set_end)) {
-                chatInsertMessage($_SESSION['luogo'], 'System', $user, " ha abbandonato la role", 'N');
-                
-                if(!pgIsInRole('', $_SESSION['luogo'], true)) endRoleSession($_SESSION['luogo']); // Se sono usciti tutti i pg, chiudo la role
-                    
-                echo json_encode(array('success' => true, 'message' => "Il personaggio $user è uscito dalla role."));
-            } else echo json_encode(array('success' => false, 'message' => "Errore nell'uscita dalla role.", 'query' => $set_end));
-
-            break;
-        case 'getPgRolePlaying': // Serve per mostrare i personaggi coinvolti nella giocata corrente della chat
-            session_start();
-            require_once(__DIR__ . '/../includes/chat_functions.inc.php');
-        
-            try {
-                $query = "SELECT role_session_players.* FROM role_session_players 
-                            INNER JOIN role_sessions ON role_session_players.id_role = role_sessions.id_role 
-                            WHERE role_sessions.end IS NULL 
-                            AND role_sessions.freezed IS NULL 
-                            AND role_sessions.location = ".$_SESSION['luogo'];
-                $result = gdrcd_query($query, 'result');
-                $usersInRole = [];
-
-                while ($row = gdrcd_query($result, 'fetch')) {
-                    $usersInRole[] = [
-                        'name' => $row['pg_name'].($row['png'] == 1 ? ' (PNG)' : ''),
-                        'inRole' => $row['end'] === null ? true : false
-                    ];
-                }
-                
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Personaggi giocanti recuperati con successo',
-                    'users' => $usersInRole,
-                    'canQuit' => isAdminMasterMod($_SESSION),
-                    'canAdd' => pgIsInRole($_SESSION['login'], $_SESSION['luogo']) || isAdminMasterMod($_SESSION)
-                ]);
-            } catch (Exception $e) {
-                echo json_encode(['success' => false, 'message' => 'Errore nel processamento degli utenti: ' . $e->getMessage(), 'error_details' => [ 'file' => $e->getFile(), 'line' => $e->getLine() ]]);
-            }
-            break;
-        case 'getRolePgs': // Prende tutti i personaggi della role
-            require_once(__DIR__ . '/../includes/chat_functions.inc.php');
-
-            $id_role = isset($data['id_role']) ? gdrcd_filter('in', $data['id_role']) : '';
-            $users = getRolePgs($id_role);
-            
-            if(!empty($users)) echo json_encode(array('success' => true, 'message' => "Utenti della role!", 'users' => $users));
-            else echo json_encode(array('success' => false, 'message' => "Errore! Nessun utente nella role. Sta cosa è impossibile!"));
-
-            break;
-        case 'closeTurn':
-            session_start();
-            require_once(__DIR__ . '/../includes/chat_functions.inc.php');
-
-            $id_role = isset($data['id_role']) ? (int)gdrcd_filter('in', $data['id_role']) : '';
-            $suss_id = isset($data['suss_id']) ? (int)gdrcd_filter('in', $data['suss_id']) : 0;
-
-            if($suss_id > 0) { // Elimino il sussurro
-                $_SESSION['last_message'] = ($suss_id-1); // Devo forzare l'aggiornamento della chat
-                
-                gdrcd_query("DELETE FROM chat WHERE id = $suss_id LIMIT 1"); // Elimino il sussurro
-            }
-
-            closeTurn($id_role, $_SESSION['login'], $_SESSION['luogo']);
-
-            echo json_encode(array('success' => true, 'message' => "Turno chiuso"));
-
-            // Allungo il turno se l'ultimo ad azionare risponde che deve lanciare un attacco
-            // if($query) echo json_encode(array('success' => true, 'message' => "Azione modificata con successo!"));
-            // else echo json_encode(array('success' => false, 'message' => "Errore nella modifica dell'azione."));
-
-            break;
-        case 'lanciaScudo':
-            session_start();
-            require_once(__DIR__ . '/../includes/chat_functions.inc.php');
-
-            $id_role = isset($data['id_role']) ? (int)gdrcd_filter('in', $data['id_role']) : '';
-            $yes = isset($data['yes']) ? (int)gdrcd_filter('in', $data['yes']) : '';
-            $suss_id = isset($data['suss_id']) ? (int)gdrcd_filter('in', $data['suss_id']) : 0;
-            $msg = '';
-
-            if($suss_id > 0) {
-                $_SESSION['last_message'] = ($suss_id-1); // Devo forzare l'aggiornamento della chat
-                $msg = $yes == 1 ? 'Scelta registrata, lancio lo scudo' : 'Scelta registrata, lancio il dado';
-
-                gdrcd_query("UPDATE chat SET testo = '$msg' WHERE id = $suss_id LIMIT 1"); // Modifico il sussurro
-            }
-
-            $query = $yes === 1 ? lanciaScudo($id_role, $_SESSION['luogo'], $_SESSION['login']) : closeTurn($id_role, $_SESSION['luogo']);
-
-            // Allungo il turno se l'ultimo ad azionare risponde che deve lanciare un attacco
-            if($query) echo json_encode(array('success' => true, 'message' => $suss_id));
-            else echo json_encode(array('success' => false, 'message' => "Errore nel lancio dello scudo.", 'query' => $query));
-
-            break;
-        case 'getPgAllRoles': // Prende tutte le role del pg
-            session_start();
-            require_once(__DIR__ . '/../includes/chat_functions.inc.php');
-
-            $where = isAdminMasterMod($_SESSION) ? "" : "WHERE role_session_players.pg_name = '".$_SESSION['login']."'";
-            
-            $query = "SELECT role_sessions.*, mappa.nome, mappa.id as luogo_id FROM role_sessions 
-                        LEFT JOIN mappa ON role_sessions.location = mappa.id 
-                        INNER JOIN role_session_players ON role_sessions.id_role = role_session_players.id_role 
-                        $where";
-            $result = gdrcd_query($query, 'result');
-            $roles = [];
-            
-            while($row = gdrcd_query($result, 'fetch')) {
-                $role = [];
-
-                $role['id'] = (int)$row['id_role'];
-                $role['luogo_id'] = $row['luogo_id'];
-                $role['luogo'] = $row['nome'];
-                $role['data'] = date("l j F Y", strtotime($row['start']));
-                $role['oraInizio'] = date("H:i", strtotime($row['start']));
-                $role['oraFine'] = $row['end'] !== null ? date("H:i", strtotime($row['end'])) : '';
-                $role['totTurni'] = (int)$row['turn'];
-                $role['partecipanti'] = getRolePgs($row['id_role']);
-                $role['inCorso'] = $row['end'] === null ? true : false;
-                $role['icona'] = 'fas fa-globe';
-
-                array_push($roles, $role);
-            }
-            
-            if(!empty($roles)) echo json_encode(array('success' => true, 'message' => "Giocate del pg", 'roles' => $roles));
-            else echo json_encode(array('success' => false, 'message' => "Errore! Nessuna giocata trovata per il pg.", 'query' => $query));
-
-            break;
-        
-        // CHAT
         case 'tiraSkillChat':
             $login = $_SESSION['login'];
             $luogo = $_SESSION['luogo'];
@@ -198,12 +27,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $skill = isset($data['chat_skill']) ? (int)$data['chat_skill'] : 0;
             $livello = isset($data['livello_skill']) ? (int)$data['livello_skill'] : 0;
             $level_check = gdrcd_query("SELECT grado FROM clgpersonaggioabilita WHERE id_abilita = $skill AND nome = '$login'");
-            $skill_info = gdrcd_query("SELECT nome, tipo, car FROM abilita WHERE id_abilita = $skill");
-            $car = $PARAMETERS['names']['stats']['car'.$skill_info['car']]; // Nome della caratteristica della skill lanciata
+            $skill_info = gdrcd_query("SELECT nome, tipo, sottotipo, car FROM abilita WHERE id_abilita = $skill");
+            $car = $PARAMETERS['names']['stats']['car'.$skill_info['car']]; // Nome della caratteristica della skill lanciata (Es. Mente, Destrezza, Potere, etc.)
             $bersaglio = isset($data['target']) ? $data['target'] : [];
             $id = gdrcd_filter('out', $skill);
             $can_send = (int)gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login'")['can_send'];
             $tiro = '';
+            $turn = getTurn($id_role);
 
             /**************************** CONTROLLI   ************************************************/
                 // Se il pg ha già lanciato un attacco e uno scudo nel turno precedente, non può attaccare
@@ -230,21 +60,27 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 }
 
                 // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno
-                if($skill_info['car'] > 0 && checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'"])) {
-                    echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi lanciare due attacchi nello stesso turno'));
+                if($skill_info['car'] > 0 && checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'", "'generica'"], $turn)) {
+                    echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi effettuare due lanci nello stesso turno'));
                     exit;
                 }
 
                 // Se sto lanciando uno scudo, devo verificare se non l'ho già lanciato in questo turno
-                if($skill_info['tipo'] === 'Difensiva' && checkMultipleLounch($id_role, $login, ["'D20'"])) {
+                if($skill_info['tipo'] === 'Difensiva' && checkMultipleLounch($id_role, $login, ["'difesa'"], $turn)) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi lanciare due scudi nello stesso turno'));
+                    exit;
+                }
+                
+                // Se sto lanciando una mental, devo verificare se non l'ho già lanciato in questo turno
+                if($skill_info['sottotipo'] === 'comando' && checkMentaleComando($id_role, $bersaglio, $turn)) {
+                    echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi lanciare due mentali di comando sullo stesso bersaglio per due turni di fila'));
                     exit;
                 }
             /**************************** FINE  CONTROLLI   ************************************************/
             
             $messaggio = '';
             $sussurro = null;
-            /**************************** TIPI DI SKILL   ************************************************/
+            /**************************** COSTRUZIONE MESSAGGIO   ************************************************/
             switch ($skill_info['tipo']) {
                 //  FISICA
                 case 'Attacco base':
@@ -312,7 +148,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $messaggio .= "$login usa una skill sconosciuta ".$skill_info['nome']." di livello $livello";
                     break;
             }
-            /**************************** FINE  TIPI DI SKILL   ************************************************/
+            /**************************** FINE  COSTRUZIONE MESSAGGIO   ************************************************/
 
             // Mesaggio in chat
             $messaggio .= " verso <u>".implode(',', $bersaglio)."</u>"; // Aggiungi il bersaglio al messaggio se presente
@@ -329,7 +165,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             gestisciSkillTemporanea($skill, $login); // Gestisci le skill temporanee
             /**************************** FINE  AZIONI   ************************************************/
             
-            gdrcd_query("UPDATE personaggio SET salute = salute-1 WHERE nome = '$login'"); // Aggiorna la salute del personaggio
+            // Aggiorna la salute del personaggio se la skill lanciata non è un talento
+            if($car != 'talento') gdrcd_query("UPDATE personaggio SET salute = salute-1 WHERE nome = '$login'");
 
             // Risposta JSON per AJAX
             echo json_encode(array(
@@ -353,6 +190,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $nome_tiro = '';
             $bonus_stats = true;
             $id_role = locationActiveRole($luogo);
+            $turn = getTurn($id_role);
 
             /****************************  CONTROLLI   ************************************************/
             // Se il pg non è nella role della chat
@@ -368,7 +206,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             }
 
             // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno
-            if(checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'"])) {
+            if(checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'"], $turn)) {
                 echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi lanciare due attacchi nello stesso turno'));
                 exit;
             }
@@ -425,123 +263,93 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode(array(
                 'success' => true,
                 'message' => 'Dado tirato con successo',
-                'testo chat' => $diceLounch['messaggio'],
-                'sussurro' => $diceLounch['sussurro'],
                 'bonus e malus' => "$dice_bonus e $dice_malus",
                 'bersaglio' => $bersaglio
             ));
             exit;
             break;
-        case 'usaArmaChat':
+        case 'usaAttaccoChat':
+            /****************************  Definizione variabili   ************************************************/
             $login = $_SESSION['login'];
             $luogo = $_SESSION['luogo'];
-            $id_arma = (int)$data['arma_weapon'];
+            $tipo_attacco = $data['tipo_attacco'];
             $bersaglio = isset($data['target'][0]) ? $data['target'][0] : [];
-            $target_area = $data['arma_body'];
-            // $id_role = isset($data['id_role']) ? (int)$data['id_role'] : 0;
+            $arma_body = isset($data['arma_body']) ? " mirando al ".$data['arma_body'] : '';
             $id_role = locationActiveRole($luogo);
-
-            /****************************  CONTROLLI   ************************************************/
-            // Se il pg non è nella role della chat
-            if (!pgIsInRole($login, $luogo) && !isAdminMasterMod($_SESSION)) {
-                echo json_encode(array('success' => false, 'message' => 'Attenzione, nessuna role attiva per il tuo pg!'));
-                exit;
-            }
-
-            // Per gli attacchi con armi il bersaglio deve essere uno solo
-            if(empty($bersaglio)) {
-                echo json_encode(array('success' => false, 'message' => 'Attenzione, selezione errata del bersaglio!'));
-                exit;
-            }
-            
-            // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno
-            if(checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'"])) {
-                echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi lanciare due attacchi nello stesso turno'));
-                exit;
-            }
-            /**************************** FINE  CONTROLLI   ************************************************/
+            $turn = getTurn($id_role);
+            $sussurro = '';
+            $sussurro_specifico = '';
+            $descrizione_attacco = '';
+            $bonus_arma = 0;
+            $check_abilita = 0;
+            $malus_salute = 0;
 
             // Ottieni informazioni sul pg
-            $parametri = gdrcd_query("SELECT * FROM personaggio WHERE nome = '$login'");
-            $salute = $parametri["salute"];
-
-            // Ottieni informazioni sull'arma
-            $oggetto = gdrcd_query("SELECT * FROM oggetto WHERE id_oggetto = $id_arma");
-
-            $nome_arma = $oggetto['nome'];
-            $bonus_arma = $oggetto['attacco'];
-            $tipo_arma = $oggetto['tipo_arma'];
-            $obj_cat = $oggetto['categoria'];
-
-            // Verifica abilità possedute
-            $check_abilita = [
-                'bianca' => gdrcd_query("SELECT COUNT(*) AS n_bianca FROM clgpersonaggioabilita WHERE id_abilita = '41' AND nome ='$login'")['n_bianca'],
-                'lancio' => gdrcd_query("SELECT COUNT(*) AS n_lancio FROM clgpersonaggioabilita WHERE id_abilita = '42' AND nome ='$login'")['n_lancio'],
-                'fuoco' => gdrcd_query("SELECT COUNT(*) AS n_fuoco FROM clgpersonaggioabilita WHERE id_abilita = '40' AND nome ='$login'")['n_fuoco'],
-                'fisico' => gdrcd_query("SELECT COUNT(*) AS n_fisico FROM clgpersonaggioabilita WHERE id_abilita = '44' AND nome ='$login'")['n_fisico']
-            ];
+            $pg = gdrcd_query("SELECT * FROM personaggio WHERE nome = '$login'");
+            $salute = $pg["salute"];
 
             // Calcolo del tiro di destrezza
-            $destrezza = $parametri["car2"] / 10;
-            $des_rand = mt_rand(1, 20);
+            $destrezza = $pg["car2"] / 10;
+            $d20 = mt_rand(1, 20);
 
-            /*********  BONUS TALENTO   ***********/
-            // Calcolo del livello talento (tempra)
-            $tempra = $parametri["car6"];
-            $tem_rand = mt_rand(1, 20);
-            $tem_bonus = (($tempra / 10) - 1);
-            $numtot_tem = $tem_rand + $tem_bonus;
+            // Tiro fuori un numero, come bonus sul dado, in base a un tiro di tempra
+            $bonus_talento = (int)calcolaLivelloTalento($pg["car6"])['bonus_talento'];
+            /****************************  FINE Definizione variabili   ************************************************/
 
-            $bonus_talento = 1;
+            /****************************  CONTROLLI   ************************************************/
+                // Se il pg non è nella role della chat
+                if (!pgIsInRole($login, $luogo) && !isAdminMasterMod($_SESSION)) {
+                    echo json_encode(array('success' => false, 'message' => 'Attenzione, nessuna role attiva per il tuo pg!'));
+                    exit;
+                }
 
-            if ($numtot_tem < 17) {
-                $bonus_talento = 0.5;
-                $livello = "di livello 1";
-            } elseif ($numtot_tem > 25) {
-                $bonus_talento = 1.5;
-                $livello = "di livello 3";
-            } else $livello = "di livello 2";
-            /*********  FINE    BONUS TALENTO   ***********/
-
-            // Determinazione del tipo di attacco
-            $tipo = ($id_arma == '999999999') ? 'attacca fisicamente' : "attacca con $nome_arma";
-            $messaggio = "$login $tipo";
-
-            $messaggio .= " <u>$bersaglio</u>";
-            if ($target_area != "") $messaggio .= " mirando al $target_area";
-
-            $messaggio .= " con un tiro totale di destrezza di";
-
-            // Calcolo del risultato finale con bonus/malus
-            if ($id_arma == '999999999' && $check_abilita['fisico'] > 0) {
-                $numtot_finale = $des_rand + $destrezza + $bonus_talento;
-                $sussurro = "$des_rand/20 + $destrezza + $bonus_talento (talento corpo a corpo) = $numtot_finale";
-            } elseif ($tipo_arma == 1 && $check_abilita['bianca'] > 0) {
-                $numtot_finale = $num + $numdes + ($bonus_arma > 0 ? $bonus_arma : 0) + $bonus_talento;
-                $numtot_finale = $des_rand + $destrezza + ($bonus_arma > 0 ? $bonus_arma : 0) + $bonus_talento;
-                $sussurro = "$des_rand/20 + $destrezza";
+                // Per gli attacchi con armi il bersaglio deve essere uno solo
+                if(empty($bersaglio)) {
+                    echo json_encode(array('success' => false, 'message' => 'Attenzione, selezione errata del bersaglio!'));
+                    exit;
+                }
                 
-                if ($bonus_arma > 0) $sussurro .= " + $bonus_arma (bonus arma)";
-                $sussurro .= " + $bonus_talento (talento arma bianca) = $numtot_finale";
-            } elseif ($tipo_arma == 2 && $check_abilita['lancio'] > 0) {
-                $numtot_finale = $des_rand + $destrezza + ($bonus_arma > 0 ? $bonus_arma : 0) + $bonus_talento;
-                $sussurro = "$des_rand/20 + $destrezza";
+                // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno
+                if(checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'"], $turn)) {
+                    echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi effettuare due lanci nello stesso turno'));
+                    exit;
+                }
+            /**************************** FINE  CONTROLLI   ************************************************/
 
-                if ($bonus_arma > 0) $sussurro .= " + $bonus_arma (bonus arma)";
-                $sussurro .= " + $bonus_talento (talento arma da lancio) = $numtot_finale";
-            } elseif ($tipo_arma == 3 && $check_abilita['fuoco'] > 0) {
-                $numtot_finale = $des_rand + $destrezza + ($bonus_arma > 0 ? $bonus_arma : 0) + $bonus_talento;
-                $sussurro = "$des_rand/20 + $destrezza";
-                
-                if ($bonus_arma > 0) $sussurro .= " + $bonus_arma (bonus arma)";
-                $sussurro .= " + $bonus_talento (talento arma da fuoco) = $numtot_finale";
-            } else {
-                $numtot_finale = $des_rand + $destrezza + ($bonus_arma > 0 ? $bonus_arma : 0);
-                $sussurro = "$des_rand/20 + $destrezza";
+            if(is_numeric($tipo_attacco)) { // ***** Attacco con ARMA   *****
+                $weapon = getWeaponAttack($tipo_attacco, $login, $bonus_talento);
+                $bonus_arma = (int)$weapon['bonus_arma'];
+                $check_abilita = (int)$weapon['check_abilita'];
+                $sussurro_specifico = $weapon['sussurro_specifico'];
+                $descrizione_attacco = $weapon['descrizione_attacco'];
+            } elseif ($tipo_attacco == 'attacco_fisico') { // ***** Attacco FISICO   *****
+                $descrizione_attacco = "attacca fisicamente";
+                $check_abilita = gdrcd_query("SELECT COUNT(*) AS n_fisico FROM clgpersonaggioabilita WHERE id_abilita = 44 AND nome = '$login'")['n_fisico'];
+                $sussurro_specifico = "+ $bonus_talento (talento corpo a corpo)";
+            } elseif ($tipo_attacco == 'creatura') { // ***** Attacco con CREATURA   *****
+                // Controllo se esiste la creatura
+                $result = gdrcd_query("SELECT * FROM personaggio WHERE nome = 'creatura di $login'", 'result');
 
-                if ($bonus_arma > 0) $sussurro .= " + $bonus_arma (bonus arma)";
-                $sussurro .= " = $numtot_finale";
+                // Controllo se effettivamente il pg ha evocato una creatura
+                if(gdrcd_query($result, 'num_rows') > 0) {
+                    $creatura = gdrcd_query($result, 'fetch');
+                    $caratteristica = $creatura['car2']; // La creatura attacca con Destrezza
+                    $descrizione_attacco = "attacca con creatura";
+                    $nome_tiro = "La creatura di $login attacca";
+                    $bonus_stats = false;
+                    $dice_bonus = $dice_malus = 0; // Le creature non hanno bonus o malus
+
+                    $diceLounch = lanciaStat($id_role, $creatura['nome'], $bersaglio, $bonus_stats, '', $nome_tiro, $caratteristica, $creatura['salute'], $dice_bonus, $dice_malus);
+                    fight($id_role, $login, $bersaglio, 0, 1, $nome_tiro, $diceLounch['risultato'], 'creatura'); // Funzione di gestione combattimenti
+                } else {
+                    echo json_encode(array('success' => false, 'message' => 'Attenzione! Non hai evocato nessuna creatura.'));
+                    exit;
+                }
             }
+
+            // Se il pg ha il supporto di un'abilità (talento)
+            $totale = $d20 + $destrezza + $bonus_arma + $bonus_talento;
+            $sussurro .= "$d20/20 + $destrezza".($check_abilita > 0 ? " + $bonus_arma (bonus arma) $sussurro_specifico" : '');
 
             /*******    MALUS SALUTE    **********/
             if ($salute <= 50) {
@@ -550,40 +358,24 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 elseif ($salute > 20) $malus_salute = 5;
                 elseif ($salute > 0) $malus_salute = 10;
                 
-                $numtot_finale -= $malus_salute;
+                $totale -= $malus_salute;
             }
 
-            if ($malus_salute > 0) $sussurro .= " - $malus_salute di malus per la salute = $numtot_finale";
+            if ($malus_salute > 0) $sussurro .= " - $malus_salute di malus per la salute = $totale";
             /*******    FINE    MALUS SALUTE    **********/
 
-            $messaggio .= " $numtot_finale";
+            $messaggio = "$login $descrizione_attacco <u>$bersaglio</u>$arma_body con un tiro totale di destrezza di $totale";
             
-            // Scala una carica se NON è attacco fisico
-            if ($id_arma != '999999999') {
-                // Verifica che sia davvero un'arma
-                if ($obj_cat === 'arma') gdrcd_query("UPDATE clgpersonaggiooggetto SET cariche = cariche - 1 WHERE nome = '$login' AND id_oggetto = '$id_arma' AND cariche > 0");
-            }
-
             // Registro l'attacco
-            fight($id_role, $login, $bersaglio, 0, 1, 'destrezza', $numtot_finale, 'attacca con arma'); // Funzione di gestione combattimenti
+            fight($id_role, $login, $bersaglio, 0, 1, 'destrezza', $totale, $descrizione_attacco); // Funzione di gestione combattimenti
             
             // Inserisci i messaggi in chat
             chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro);
             
             // Gestione della polizia automatica
             gestionePoliziaAutomatica($luogo);
-            
-            // Controllo se il long_turn è uguale al pg che lancia l'attacco', perché significa che è quello di fine turno
-            if(gdrcd_query("SELECT long_turn FROM role_sessions WHERE id_role = $id_role LIMIT 1")['long_turn'] == $login) {
-                $last_id = (int)gdrcd_query("SELECT MAX(id) AS last_id FROM chat")['last_id'];
-                // Chiedo al bersaglio se vuole difendersi con lo scudo
-                // Faccio la domanda per capire se devo chiudere il turno con l'azione oppure devo aspettare che lancino un attacco.
-                // Il last id + 1 dovrebbe corrispondere all'id del sussurro che sto per inserire, così lo rimuovo dopo il click
-                $scudo_msg = '<button onclick="lanciaScudo('.$id_role.', 1, '.($last_id+1).');">SI</button> Vuoi difenderti dall\'attacco con uno scudo? <button onclick="lanciaScudo('.$id_role.', 1, '.($last_id+1).');">NO</button>';
-                chatInsertMessage($luogo, 'System', $bersaglio, $scudo_msg, 'S');
-            }
 
-            echo json_encode(array('success' => true, 'message' => 'Attacco eseguito con successo.'));
+            echo json_encode(array('success' => true, 'message' => 'Attacco eseguito con successo.', 'tipo attacco' => $tipo_attacco));
 
             break;
         case 'tiraDadoGenericoChat':
@@ -604,8 +396,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $num = mt_rand(1, $dado_selezionato);
                 $messaggio = "$login esegue un tiro totale di $num/$dado_selezionato";
 
+                chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro);
+                /*
                 if ($back_chat) chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro);
                 else chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro);
+                */
             }
 
             // Risposta JSON per AJAX
@@ -740,7 +535,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                             $add_chat .= '<span class="chat_sussurro">'.gdrcd_format_time($row['ora']).'</span> &nbsp;';
                             $msg_type = ($row['tipo']=='S') ? $MESSAGE['chat']['whisper']['by'] : $MESSAGE['chat']['whisper']['skill'];
                             $add_chat .= '<span class="chat_sussurro">'.$row['mittente'].' '.$msg_type.': </span>';
-                            $add_chat .= '<span class="chat_sussurro">'.gdrcd_filter('out',$row['testo']).'</span>';
+                            $add_chat .= '<span class="chat_sussurro">'.$row['testo'].'</span>';
                         } elseif ($_SESSION['login']==$row['mittente']) {
                             if ($row['tipo']=='S') {
                                 $add_chat .= '<span class="chat_sussurro">'.gdrcd_format_time($row['ora']).'</span>&nbsp;';
@@ -750,7 +545,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         } elseif ($_SESSION['admin']==1) {
                             $add_chat .= '<span class="chat_time">'.gdrcd_format_time($row['ora']).'</span>';
                             $add_chat .= '<span class="chat_name">'.$row['mittente'].' '.$MESSAGE['chat']['whisper']['from_to'].' '.gdrcd_filter('out',$row['destinatario']).' </span>';
-                            $add_chat .= '<span class="chat_name">'.gdrcd_filter('out',$row['testo']).'</span>';
+                            $add_chat .= '<span class="chat_name">'.$row['testo'].'</span>';
                         }
                         break;
 
@@ -758,7 +553,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         $row['testo'] = str_replace(['[',']','«','»'], ['[<font color=#7f99bc>', '</font>]', '«<font color=#7f99bc>', '</font>»'], $row['testo']);
                         $add_chat .= '<span class="chat_time">'.gdrcd_format_time($row['ora']).'</span>';
                         $add_chat .= '<font color="white" style="font-size: 12px;"><b>'.$row['destinatario'].'</b></font> ';
-                        $add_chat .= '<span class="chat_msg">'.gdrcd_chatcolor(gdrcd_filter('out',$row['testo'])).'</span>';
+                        $add_chat .= '<span class="chat_msg">'.gdrcd_chatcolor($row['testo']).'</span>';
                         break;
                     case 'M':
                         $row['testo'] = str_replace(['[',']','«','»','{','}','(br)','(center)','(/center)','(cor)','(/cor)','(link)','(/link)'],
@@ -776,7 +571,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     case 'D':
                     case 'O':
                         if ($row['tipo'] != 'C') $add_chat .= '<span class="chat_time">'.gdrcd_format_time($row['ora']).'</span>';
-                        $add_chat .= '<span class="chat_skill">'.gdrcd_filter('out',$row['testo']).'</span>';
+                        $add_chat .= '<span class="chat_skill">'.$row['testo'].'</span>';
                         break;
                     case 'X':
                     case 'G':
@@ -828,6 +623,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         case 'new_chat_message': // Nuovo messaggio in chat
             // Filtra e prepara i dati
             $login = $_SESSION['login'];
+            $location = $_SESSION['luogo'];
             $chat_message = isset($data['message']) ? gdrcd_filter('in', gdrcd_angs($data['message'])) : '';
             $action_tag = isset($data['action_tag']) ? gdrcd_filter('in', gdrcd_angs($data['action_tag'])) : '';
             $tag_n_beyond = isset($data['tag']) ? gdrcd_filter('in', $data['tag']) : '';
@@ -835,28 +631,41 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $first_char = substr($chat_message, 0, 1);
             $second_char = substr($chat_message, 0, 4);
             $actual_healt = gdrcd_query("SELECT salute FROM personaggio WHERE nome = '$login'"); // Recupera la salute attuale del pg
-            $id_role = locationActiveRole($_SESSION['luogo']); // Recupera l'eventuale role attiva nella chat
-            $pgIsInRole = pgIsInRole($login, $_SESSION['luogo']); // Verifica se il pg è nella role della chat
+            $id_role = locationActiveRole($location); // Recupera l'eventuale role attiva nella chat
+            $pgIsInRole = pgIsInRole($login, $location); // Verifica se il pg è nella role della chat
             $m_type = determineMessageType($type, $first_char, $second_char, $chat_message, $login, $actual_healt, $_SESSION); // Determina il tipo di messaggio
-            $typePermitted = in_array($m_type, array('S', 'M', 'G', 'X', 'Q')); // Tipi di messaggi permessi senza role attiva
+            $typePermitted = in_array($m_type, array('S', 'M', 'G', 'X', 'Q', 'Z')); // Tipi di messaggi permessi senza role attiva
             $isAdminMasterMod = isAdminMasterMod($_SESSION); // Verifica se l'utente è admin/master/mod
 
             /****************************  CONTROLLI   ************************************************/
-            /* Se:
-            - non c'è una role attiva in chat (non posso consentire l'invio neanche da parte degli admin/master/mod per evitare che inviino azioni senza role attiva)
-            - oppure il pg non è nella role della chat ma è un admin/master/mod oppure sta mandando un master in chat */
-            if (!$id_role || (!$pgIsInRole && (!$isAdminMasterMod || !$typePermitted))) {
-                echo json_encode(array('success' => false, 'message' => 'Attenzione, non puoi inviare l\'azione!'));
+            // Se non c'è una role attiva e il tipo di messaggio non è tra quelli permessi senza role attiva, blocco l'invio
+            if (!$id_role && !$typePermitted) {
+                echo json_encode(array('success' => false, 'message' => 'Attenzione, devi avviare una role per inviare l\'azione!'));
+                exit;
+            }
+
+            // Se il pg non è nella role della chat e sta cercando di inviare un messaggio che non è tra quelli permessi senza role attiva, blocco l'invio
+            if (!$pgIsInRole && (!$isAdminMasterMod || !$typePermitted)) {
+                echo json_encode(array('success' => false, 'message' => 'Attenzione, devi unirti alla role per inviare l\'azione!'));
                 exit;
             }
             
             // Se ho già inviato un'azione in questo turno
-            $justSent = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login' AND `sent` = 1", 'result');
+            $justSent = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login' AND `sent` = 1 AND `end` IS NULL", 'result');
 
             if ($justSent && gdrcd_query($justSent, 'num_rows') >= 1 && !$typePermitted) {
                 echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi inviare due azioni nello stesso turno'));
                 exit;
             }
+
+            // Se sono l'unico pg nella role e sto cercando di inviare un messaggio che non è tra quelli permessi senza role attiva, blocco l'invio
+            if(count(getRolePgs($id_role)) == 1 && !$typePermitted) {
+                echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi inviare un\'azione se sei l\'unico pg nella role'));
+                exit;
+            }
+
+            // Se il personaggio che invia è soggetto a una skill di durata, scalo i punti (integrità) e controllo se ne ha troppo pochi
+            checkSkillEffect($login, $location);
             /**************************** FINE  CONTROLLI   ************************************************/
 
             // Determina se è un sussurro, un messaggio normale o comando stanza privata
@@ -1009,13 +818,29 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // FINE fallimenti
 
             // Imposta il limite di caratteri per l'utente
-            if (imposta_limite_caratteri_utente($login, $luogo, $caratteri)) {
-                // Aggiorna il limite globale
-                aggiorna_limite_globale($luogo, $caratteri, $login);
-            }
+            if (imposta_limite_caratteri_utente($login, $luogo, $caratteri)) aggiorna_limite_globale($luogo, $caratteri, $login); // Aggiorna il limite globale
 
             echo json_encode(array('success' => true, 'message' => 'Limite caratteri impostato correttamente.'));
 
+            break;
+        case 'revocaLimiteCaratteri':  // Revoco il limite di caratteri della chat se un pg non è d'accordo
+            $luogo = $data['luogo'];
+            $vecchio_limite = $data['vecchio_limite'];
+            $nuovo_limite = $data['nuovo_limite'];
+            $user = $data['user'];
+            $testo = "E' stato revocato il limite di $nuovo_limite caratteri. Il limite è tornato a $vecchio_limite caratteri.";
+            $testo = gdrcd_filter('in', $testo);
+
+            // Controllo se la revoca è già stata fatta da qualcuno
+            $check_sys_msg = gdrcd_query("SELECT * FROM chat WHERE stanza = $luogo AND mittente = 'System' AND testo = '$testo'", 'result');
+            
+            if (gdrcd_query($check_sys_msg, 'num_rows') == 0 &&
+                gdrcd_query("UPDATE scelte_utenti SET lunghezza_massima = '$vecchio_limite', timestamp_modifica = NOW() WHERE nome = '$user' AND id_luogo = '$luogo'") &&
+                gdrcd_query("UPDATE mappa SET timestamp_modifica_limite = NOW(), limite_lunghezza_massima = $vecchio_limite WHERE id = '$luogo'") &&
+                chatInsertMessage($luogo, 'System', null, $testo, 'N', null)
+            ) echo json_encode(['success' => true, 'message' => $testo]);
+            else echo json_encode(['error' => false, 'message' => 'Limite già revocato da un altro pg']);
+            
             break;
         case 'usaOggettoChat':
             $login = $_SESSION['login'];
@@ -1134,12 +959,16 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             break;
         case 'newMasterPng':
-            $luogo = $_SESSION['luogo'];
-            $id_role = locationActiveRole($luogo); // Recupera l'eventuale role attiva nella chat
+            $location = $_SESSION['luogo'];
+            $id_role = locationActiveRole($location); // Recupera l'eventuale role attiva nella chat
             $pngName = gdrcd_filter('post', $data['pngName']);
 
+            // Inserisco il png nella tabella dei personaggi se non esiste già
+            $existingPng = gdrcd_query("SELECT nome FROM personaggio WHERE nome = '$pngName'", 'result');
+            if (gdrcd_query($existingPng, 'num_rows') == 0)  gdrcd_query("INSERT INTO personaggio (nome, salute, integrita, car2) VALUES ('$pngName', 100, 100, 7)");
+
             // Inserisco il png nella role
-            gdrcd_query("INSERT INTO role_session_players (id_role, pg_name, png) VALUES ($id_role, '$pngName', 1)");
+            addPgToRole($id_role, $pngName, $location, 1);
 
             echo json_encode(array('success' => true, 'message' => 'PNG aggiunto con successo!'));
 
@@ -1151,9 +980,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $pngMessage = gdrcd_filter('in', gdrcd_filter('post', $data['pngMessage']));
             $pngBonus = gdrcd_filter('post', $data['pngBonus']);
             $pngCar = gdrcd_filter('post', $data['pngCar']);
+            $id_role = locationActiveRole($luogo); // Recupera l'eventuale role attiva nella chat
 
             // Se il messaggio è presente, inserisci un messaggio di tipo N
-            if (!empty($pngMessage)) chatInsertMessage($luogo, $login, $pngName, $pngMessage, 'N', null);
+            if (!empty($pngMessage)) {
+                checkTurnEnd($luogo, $pngName, $id_role); // Se è un'azione o un master, controllo il turno
+                chatInsertMessage($luogo, $login, $pngName, $pngMessage, 'N', null);
+            }
             if (!empty($pngBonus) && !empty($pngCar)) {
                 // Se il messaggio è vuoto, ma "pngBonus" e "usa parametro" sono compilati
                 $num = mt_rand(1, 20);
@@ -1161,18 +994,18 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
                 // Gestione dei messaggi in base al parametro usato
                 switch ($pngCar) {
-                    case 'Usa destrezza': $pngMessage = "$pngName esegue un tiro totale di destrezza di $numtot ($num/20 + $pngBonus)"; break;
+                    case 'destrezza': $pngMessage = "$pngName esegue un tiro totale di destrezza di $numtot ($num/20 + $pngBonus)"; break;
                     // case 'Usa forza': $pngMessage = "$pngName esegue un tiro totale di forza di $numtot ($num/20 + $pngBonus)"; break;
-                    case 'Usa mente': $pngMessage = "$pngName esegue un tiro totale di mente di $numtot ($num/20 + $pngBonus)"; break;
-                    case 'Usa tempra': $pngMessage = "$pngName esegue un tiro totale di tempra di $numtot ($num/20 + $pngBonus)"; break;
-                    case 'Usa dado':
+                    case 'mente': $pngMessage = "$pngName esegue un tiro totale di mente di $numtot ($num/20 + $pngBonus)"; break;
+                    case 'tempra': $pngMessage = "$pngName esegue un tiro totale di tempra di $numtot ($num/20 + $pngBonus)"; break;
+                    case 'potere': $pngMessage = "$pngName esegue un tiro totale di potere di $numtot ($num/20 + $pngBonus)"; break;
+                    case 'dado':
                         $num_dado = mt_rand(1, $pngBonus);
                         $pngMessage = "$pngName lancia $num_dado/$pngBonus";
                         break;
                     default: $pngMessage = "$pngName esegue un'azione non specificata."; break;
                 }
                 chatInsertMessage($luogo, $pngName, null, $pngMessage, 'C', null);
-                checkTurnEnd($session['luogo'], $pngName, $id_role); // Se è un'azione o un master, controllo il turno
             }
 
             echo json_encode(array('success' => true, 'message' => 'Azione PNG inviata con successo.'));

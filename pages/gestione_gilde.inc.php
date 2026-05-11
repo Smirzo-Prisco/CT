@@ -35,12 +35,12 @@ if($_SESSION['admin'] != 1) {
                         <span class="guild-desc"><?=htmlspecialchars($gilda['descrizione'])?></span>
                     </div>
                     <div class="guild-actions">
-                        <button class="btn btn-primary" onclick="toggleAccordion(<?=$gilda['id_gilda']?>, 'statuto')"><i class="fa-solid fa-scroll"></i></button>
-                        <button class="btn btn-primary" onclick="toggleAccordion(<?=$gilda['id_gilda']?>, 'skill')"><i class="fa-solid fa-star"></i></button>
-                        <button class="btn btn-primary" onclick="toggleAccordion(<?=$gilda['id_gilda']?>, 'role')"><i class="fa-solid fa-layer-group"></i></button>
-                        <button class="btn btn-primary" onclick="toggleAccordion(<?=$gilda['id_gilda']?>, 'pg')"><i class="fa-solid fa-users"></i></button>
-                        <button class="btn btn-edit" onclick="editGuild(<?= $gilda['id_gilda'] ?>)"><i class="fa-solid fa-pencil"></i></button>
-                        <button class="btn btn-delete" onclick="deleteGuild(<?= $gilda['id_gilda'] ?>)"><i class="fa-solid fa-trash"></i></button>
+                        <button class="btn btn-primary" title="Statuto" onclick="toggleAccordion(<?=$gilda['id_gilda']?>, 'statuto')"><i class="fa-solid fa-scroll"></i></button>
+                        <button class="btn btn-primary" title="Skills" onclick="toggleAccordion(<?=$gilda['id_gilda']?>, 'skill')"><i class="fa-solid fa-star"></i></button>
+                        <button class="btn btn-primary" title="Gradi" onclick="toggleAccordion(<?=$gilda['id_gilda']?>, 'role')"><i class="fa-solid fa-layer-group"></i></button>
+                        <button class="btn btn-primary" title="Membri" onclick="toggleAccordion(<?=$gilda['id_gilda']?>, 'pg')"><i class="fa-solid fa-users"></i></button>
+                        <button class="btn btn-edit" title="Modifica" onclick="editGuild(<?= $gilda['id_gilda'] ?>)"><i class="fa-solid fa-pencil"></i></button>
+                        <button class="btn btn-delete" title="Elimina" onclick="deleteGuild(<?= $gilda['id_gilda'] ?>)"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
                 <!-- Contenuto Ruoli -->
@@ -233,8 +233,16 @@ if($_SESSION['admin'] != 1) {
             <h3 id="modalSogliaTitle">Modifica le soglie dei livelli</h1>
             <div class="form-row">
                 <div class="form-group form-column"><label for="livello_soglia">Livello</label></div>
-                <div class="form-group form-column"><label for="soglia">Fino a</label></div>
-                <div class="form-group form-column"><label for="soglia">Danno</label></div>
+                <div class="form-group form-column"><label for="soglia">Fino a (px)</label></div>
+                <div class="form-group form-column"><label for="soglia">Moltiplicatore</label></div>
+                <div class="form-group form-column">
+                    <span style="float:left; margin-left:5px; position:relative;">
+                        <label for="soglia">Integrità <span class="help-animated">?</span></label>
+                        <div class="tooltip-bottom">
+                            Quantità di integrità persa in caso di attacco mentale con skill di comando per due o più turni di seguito su pg diversi
+                        </div>
+                    </span>
+                </div>
                 <div class="form-group form-column"><span></span></div>
             </div>
             <?php
@@ -251,8 +259,11 @@ if($_SESSION['admin'] != 1) {
                         <input type="number" id="danno<?=$soglia['id_soglia']?>" value="<?=$soglia['danno']?>" required>
                     </div>
                     <div class="form-group form-column">
+                        <input type="number" id="integrita<?=$soglia['id_soglia']?>" value="<?=$soglia['integrita']?>" required>
+                    </div>
+                    <div class="form-group form-column">
                         <div class="actions" style="margin-top:0px;">
-                            <button class="btn btn-sm btn-primary" onclick="saveSoglia(<?=$soglia['id_soglia']?>)"><i class="fa-solid fa-edit"></i></button>
+                            <button class="btn btn-sm btn-primary" onclick="saveSoglia(<?=$soglia['id_soglia']?>)"><i class="fas fa-save"></i></button>
                             <button class="btn btn-sm btn-primary" onclick="deleteSoglia(<?=$soglia['id_soglia']?>)"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
@@ -263,9 +274,10 @@ if($_SESSION['admin'] != 1) {
                 <div class="form-group form-column"><input type="number" id="livello_soglia0" placeholder="Nuovo..."></div>
                 <div class="form-group form-column"><input type="number" id="soglia0" placeholder="Nuovo..."></div>
                 <div class="form-group form-column"><input type="number" id="danno0" placeholder="Nuovo..."></div>
+                <div class="form-group form-column"><input type="number" id="integrita0" placeholder="Nuovo..."></div>
                 <div class="form-group form-column">
                     <div class="actions" style="margin-top:0px;">
-                        <button class="btn btn-sm btn-primary" onclick="saveSoglia(0)"><i class="fa-solid fa-edit"></i></button>
+                        <button class="btn btn-sm btn-primary" onclick="saveSoglia(0)"><i class="fas fa-paper-plane"></i></button>
                         <button class="btn btn-sm btn-primary" onclick="deleteSoglia(0)"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
@@ -313,7 +325,7 @@ if($_SESSION['admin'] != 1) {
                 </div>
                 <div class="form-group">
                     <label for="tipo">Tipologia</label>
-                    <select name="tipo" id="tipo_gilda">
+                    <select name="tipo" id="tipo_skill">
                         <option value="Default"><?=gdrcd_filter('out', $MESSAGE['names']['skill']['2'])?></option>
                         <option value="Difensiva"><?=gdrcd_filter('out', $MESSAGE['names']['skill']['5'])?></option>
                         <option value="Generica base"><?=gdrcd_filter('out', $MESSAGE['names']['skill']['1'])?></option>
@@ -340,81 +352,123 @@ if($_SESSION['admin'] != 1) {
                 </div>
 
                 <!-- Opzioni avanzate per skill generiche -->
-                <div id="clausoleSection" class="form-group" style="display: none;">
-                    <label>Opzioni avanzate per skill generiche:</label>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">
-                            Durata:
-                            <br>
-                            Il bersaglio dovrà lanciare un #d2. Se esce 1, la sua azione fallisce, altrimenti riesce.
+                <div id="genericaSection" class="form-group" style="display: none;">
+                    <label>Opzioni avanzate per skill generiche (seleziona una sola clausola):</label>
+                    
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="usa_creatura" id="usa_creatura">
+                        <label for="usa_creatura">
+                            Mette in gioco una creatura al suo servizio.
                         </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">
-                            Durata:
-                            <br>
-                            Incrementa, su base #d20, il danno inferto dal bersaglio.
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="sposta_danni_castatore_su_bersaglio" id="sposta_danni_castatore_su_bersaglio">
+                        <label for="sposta_danni_castatore_su_bersaglio">
+                            Trasferisce il proprio danno sul bersaglio selezionato.
                         </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">
-                            Durata:
-                            <br>
-                            Trasferisce il proprio danno sul bersaglio scelto.
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="sposta_danni_bersaglio_su_castatore" id="sposta_danni_bersaglio_su_castatore">
+                        <label for="sposta_danni_bersaglio_su_castatore">
+                            Trasferisce su di se i danni subiti dal bersaglio della skill.
                         </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">
-                            Durata:
-                            <br>
-                            Annulla la skill lanciata dal bersaglio.
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="danni_dimezzati_nonostante_scudo" id="danni_dimezzati_nonostante_scudo">
+                        <label for="danni_dimezzati_nonostante_scudo">
+                            Nonostante il bersaglio abbia lanciato la barriera, subisce la metà dei danni.
                         </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">
-                            Durata:
-                            <br>
-                            Il bersaglio può effettuare un doppio attacco.
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="creatura_attacca_padrone" id="creatura_attacca_padrone">
+                        <label for="creatura_attacca_padrone">
+                            La creatura si ribella contro il padrone.
                         </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">
-                            Durata:
-                            <br>
-                            Viene dimezzato il danno per il bersaglio.
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="annulla_lancio_bersaglio" id="annulla_lancio_bersaglio">
+                        <label for="annulla_lancio_bersaglio">
+                            Annulla ogni lancio del bersaglio selezionato.
                         </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">Nome</label>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="più_10_al_danno" id="più_10_al_danno">
+                        <label for="più_10_al_danno">
+                            Incrementa di 10 punti il danno subito dal bersaglio selezionato.
+                        </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">Nome</label>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="più_5_danno" id="più_5_danno">
+                        <label for="più_5_danno">
+                            Incrementa di 5 punti il danno subito dal bersaglio selezionato.
+                        </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">Nome</label>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="dimezza_danno_bersaglio_selezionato" id="dimezza_danno_bersaglio_selezionato">
+                        <label for="dimezza_danno_bersaglio_selezionato">
+                            Dimezza il danno subito dal bersaglio selezionato.
+                        </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">Nome</label>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="meno_50_danni_tutti_con_durata" id="meno_50_danni_tutti_con_durata">
+                        <label for="meno_50_danni_tutti_con_durata">
+                            Tutti i presenti in role subiscono il 50% dei danni.
+                        </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">Nome</label>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="annulla_attacchi_verso_bersaglio" id="annulla_attacchi_verso_bersaglio">
+                        <label for="annulla_attacchi_verso_bersaglio">
+                            Annulla tutti gli attacchi verso il bersaglio selezionato.
+                        </label>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="clausole[]" value="idGilda" id="clausola_idGilda">
-                        <label for="clausola_idGilda">Nome</label>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="danno_doppio" id="danno_doppio">
+                        <label for="danno_doppio">
+                            Raddoppia il danno subito dal bersaglio.
+                        </label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="meno_5_danno" id="meno_5_danno">
+                        <label for="meno_5_danno">
+                            Riduce di 5 punti il danno subito dal bersaglio selezionato.
+                        </label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="annulla_scudo" id="annulla_scudo">
+                        <label for="annulla_scudo">
+                            Annulla lo scudo lanciato dal bersaglio selezionato.
+                        </label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="prolunga_effetti_un_turno" id="prolunga_effetti_un_turno">
+                        <label for="prolunga_effetti_un_turno">
+                        Prolunga gli effetti della skill generica lanciata dal bersaglio.
+                        </label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="converti_danni_bersaglio_in_salute_castatore" id="converti_danni_bersaglio_in_salute_castatore">
+                        <label for="converti_danni_bersaglio_in_salute_castatore">
+                            Tutti i danni subiti dal bersaglio si trasformano in ps per il castatore.
+                        </label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="più_15_punti_salute" id="più_15_punti_salute">
+                        <label for="più_15_punti_salute">
+                            +15 ps al bersaglio.
+                        </label>
                     </div>
                 </div>
+
+                <!-- Opzioni avanzate per skill mentali -->
+                <div id="mentaleSection" class="form-group" style="display: none;">
+                    <label>Opzioni avanzate per skill mentali:</label>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="comando" id="comando">
+                        <label for="comando">La skill può essere utilizzata per imporre un comando al bersaglio.</label>
+                    </div>
+                </div>
+
+                <!-- Pulsanti -->
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeSkillModal('statuto')">Annulla</button>
                     <button type="submit" class="btn btn-primary" onclick="saveSkill()">Salva</button>
@@ -988,36 +1042,18 @@ if($_SESSION['admin'] != 1) {
                     <?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['guilds']['link']['menage_types']); ?>
                 </a>
             </div>
-        <?php
-        }//else
-        ?>
+    <?php } ?>
     </div><!-- page_body -->
 <?php
-    }//else (controllo permessi utente) 
-    
-    //FILES
+    }
 
     function upload_image(){
-    $allow = array("jpg", "jpeg", "gif", "png");
+        $allow = array("jpg", "jpeg", "gif", "png");
 
-    $todir = "imgs/guilds/";
-    $test = $_FILES['img_oggetto']['name'];
+        $todir = "imgs/guilds/";
+        $test = $_FILES['img_oggetto']['name'];
 
-    if ( !!$_FILES['img_oggetto']['tmp_name'] ) // is the file uploaded yet?
-    {
-        $info = explode('.', strtolower( $_FILES['img_oggetto']['name']) ); // whats the extension of the file
-
-        if ( in_array( end($info), $allow) ) // is this file allowed
-        {
-            if ( move_uploaded_file( $_FILES['img_oggetto']['tmp_name'], $todir . basename($_FILES['img_oggetto']['name'] ) ) )
-            {
-                // the file has been moved correctly
-            }
-        }
-        else
-        {
-            // error this file ext is not allowed
-        }
-    }
-} ?>
+        // is the file uploaded yet?
+        if ( !!$_FILES['img_oggetto']['tmp_name'] ) $info = explode('.', strtolower( $_FILES['img_oggetto']['name']) ); // whats the extension of the file
+    } ?>
 </div><!-- pagina -->

@@ -1,5 +1,7 @@
-const api_file = 'pages/api_chat.php';
-const param = 'op';
+const ns_chat = {
+    api_file: 'pages/api_chat.php',
+    param: 'op'
+};
 
 /***********    GESTIONE CHAT di gioco  *********************/
 function openSection(evt, sectionName) {
@@ -25,7 +27,7 @@ function openSection(evt, sectionName) {
 // Ruoli apicali cancellano la chat di gioco
 async function pulisciChat() {
     if (confirm("Sei sicuro di voler pulire questa chat?")) {
-        fetch(api_file + '?' + param + '=pulisciChat')
+        fetch(ns_chat.api_file + '?' + ns_chat.param + '=pulisciChat')
             .then(res => res.json())
             .then(data => {
                 const chatContainer = document.getElementById('pagina_chat');
@@ -42,7 +44,7 @@ async function pulisciChat() {
 
 // Ruoli apicali cancellano la chat di gioco
 async function curaPg() {
-    fetch(api_file + '?' + param + '=curaPg')
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=curaPg')
         .then(res => res.json())
         .then(data => { if (window.refreshChat) window.refreshChat(); })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -52,7 +54,7 @@ async function curaPg() {
 function toggleBackChat(a) {
     const img = a.querySelector("img"); // recupera l'immagine dentro <a>
 
-    fetch(api_file + '?' + param + '=setBackChat')
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=setBackChat')
         .then(res => res.json())
         .then(data => {
             if (data.success) {
@@ -85,7 +87,7 @@ async function sendChatMessage() {
     }
 
     try {
-        const response = await fetch(api_file + '?' + param + '=new_chat_message', {
+        const response = await fetch(ns_chat.api_file + '?' + ns_chat.param + '=new_chat_message', {
             credentials: "same-origin", // mantiene la sessione PHP
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -122,7 +124,7 @@ function ChatViewer() {
 
     // Funzione per recuperare i messaggi
     const fetchMessages = () => {
-        fetch(api_file + '?' + param + '=get_chat_messages', {
+        fetch(ns_chat.api_file + '?' + ns_chat.param + '=get_chat_messages', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ last: lastId })
@@ -181,7 +183,6 @@ function tiraDadoChat() {
     const dice_bonus = document.getElementById('dice_bonus').value;
     const dice_malus = document.getElementById('dice_malus').value;
     const target = getSelectedNamesCallback();
-    const id_role = document.getElementById('id_role').value;
     setMaxTargetExternal(1);
 
     if (target.length != 1 || dice_type == 0) {
@@ -193,51 +194,11 @@ function tiraDadoChat() {
 
     // Controllo che ci sia almeno il tipo di dado
     if (dice_type && dice_type != '' && target.length > 0 && target.length < 2) {
-        fetch(api_file + '?' + param + '=tiraDadoChat', {
+        fetch(ns_chat.api_file + '?' + ns_chat.param + '=tiraDadoChat', {
             credentials: "same-origin",
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                dice_type,
-                dice_bonus,
-                dice_malus,
-                target,
-                id_role
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("chatPanel").style.display = "none";
-                    // Esegue refresh della chat
-                    if (window.refreshChat) window.refreshChat();
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
-    } else showNotification('Attenzione! Devi selezionare il bersaglio', 'warning');
-}
-
-// Funzione per il lancio di una skill in chat
-function tiraSkillChat() {
-    // Parametri
-    const chat_skill = document.getElementById('chat_skill').value;
-    const livello_skill = document.getElementById('livello_skill').value;
-    const target = getSelectedNamesCallback();
-    const id_role = document.getElementById('id_role').value;
-
-    // Controllo che ci sia la skill e il bersaglio
-    if (chat_skill == 0 || target.length > 0) {
-        // Chiamata
-        fetch(api_file + '?' + param + '=tiraSkillChat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_skill,
-                livello_skill,
-                target,
-                id_role
-            }),
-            credentials: "same-origin"
+            body: JSON.stringify({ dice_type, dice_bonus, dice_malus, target })
         })
             .then(res => res.json())
             .then(data => {
@@ -252,22 +213,22 @@ function tiraSkillChat() {
 }
 
 // Serve per usare un'arma in chat
-function usaArmaChat() {
-    const arma_weapon = document.getElementById('arma_weapon').value;
+function usaAttaccoChat() {
+    const tipo_attacco = document.getElementById('tipo_attacco').value;
     const arma_body = document.getElementById('arma_body').value;
     const target = getSelectedNamesCallback();
 
-    if (target.length != 1 || arma_weapon == 0) {
+    if (target.length != 1 || tipo_attacco == 0) {
         setMaxTargetExternal(0);
         resettaCampiDiv('skills-tab'); // AGGIORNA il limite dei bersagli consentiti
-        showNotification('Attenzione! Seleziona un\'arma e un solo bersaglio', 'warning');
+        showNotification('Attenzione! Seleziona una tipologia di attacco e un solo bersaglio', 'warning');
         return;
     }
 
-    fetch(api_file + '?' + param + '=usaArmaChat', {
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=usaAttaccoChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ arma_weapon, arma_body, target })
+        body: JSON.stringify({ tipo_attacco, arma_body, target })
     })
         .then(res => res.json())
         .then(data => {
@@ -294,6 +255,40 @@ function masterMessageLength(textarea, maxLen) {
     }
 }
 
+// Funzione per il lancio di una skill in chat
+function tiraSkillChat() {
+    // Parametri
+    const chat_skill = document.getElementById('chat_skill').value;
+    const livello_skill = document.getElementById('livello_skill').value;
+    const target = getSelectedNamesCallback();
+    const id_role = document.getElementById('id_role').value;
+
+    // Controllo che ci sia la skill e il bersaglio
+    if (chat_skill == 0 || target.length > 0) {
+        // Chiamata
+        fetch(ns_chat.api_file + '?' + ns_chat.param + '=tiraSkillChat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_skill,
+                livello_skill,
+                target,
+                id_role
+            }),
+            credentials: "same-origin"
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("chatPanel").style.display = "none";
+                    // Esegue refresh della chat
+                    if (window.refreshChat) window.refreshChat();
+                } else showNotification(data.message, 'error');
+            })
+            .catch(err => console.error('Errore caricamento chat:', err));
+    } else showNotification('Attenzione! Devi selezionare il bersaglio', 'warning');
+}
+
 function editAction(content, id) {
     document.getElementById('editAction-modal').style.display = 'block';
     document.getElementById("edit_action_textarea").value = content;
@@ -304,7 +299,7 @@ function saveEditAction() {
     const content = document.getElementById("edit_action_textarea").value;
     const id = document.getElementById("edit_action_id").value;
 
-    fetch(api_file + '?' + param + '=saveEditAction', {
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=saveEditAction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, id })
@@ -324,7 +319,7 @@ function saveEditAction() {
 function setCharLimit() {
     const charLimit = document.getElementById('caratteri').value;
 
-    fetch(api_file + '?' + param + '=setCharLimit', {
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=setCharLimit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ charLimit })
@@ -342,7 +337,7 @@ function setCharLimit() {
 // Revoca il nuovo limite di caratteri se un utente non è d'accordo
 function revocaLimiteCaratteri(nuovo_limite, vecchio_limite, luogo, user) {
     if (confirm("Sei sicuro di voler revocare il limite?")) {
-        fetch(api_file + '?' + param + '=revocaLimiteCaratteri', {
+        fetch(ns_chat.api_file + '?' + ns_chat.param + '=revocaLimiteCaratteri', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -373,7 +368,7 @@ function usaOggettoChat() {
         return;
     }
 
-    fetch(api_file + '?' + param + '=usaOggettoChat', {
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=usaOggettoChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ objChat })
@@ -398,7 +393,7 @@ function tiraDadoGenericoChat() {
         return;
     }
 
-    fetch(api_file + '?' + param + '=tiraDadoGenericoChat', {
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=tiraDadoGenericoChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dado })
@@ -425,7 +420,7 @@ function editMasterPgChat() {
     const notorieta = document.getElementById('notorieta').value;
     const soldi = document.getElementById('soldi').value;
 
-    fetch(api_file + '?' + param + '=editMasterPgChat', {
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=editMasterPgChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -452,7 +447,7 @@ function newMasterPng() {
     // Non modificare! - I parametri vengono usati anche in fondo al file
     const pngName = document.getElementById('pngNew').value;
 
-    fetch(api_file + '?' + param + '=newMasterPng', {
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=newMasterPng', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pngName })
@@ -462,6 +457,8 @@ function newMasterPng() {
             document.getElementById("chatPanel").style.display = "none";
 
             if (window.refreshChat) window.refreshChat();
+
+            getPngRolePlaying(); // Aggiorna la lista dei png nella sezione master del pannello chat
         })
         .catch(err => console.error('Errore caricamento chat:', err));
 }
@@ -474,7 +471,7 @@ function newMasterPngAction() {
     const pngBonus = document.getElementById('pngBonus').value;
     const pngCar = document.getElementById('pngCar').value;
 
-    fetch(api_file + '?' + param + '=newMasterPngAction', {
+    fetch(ns_chat.api_file + '?' + ns_chat.param + '=newMasterPngAction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -491,262 +488,6 @@ function newMasterPngAction() {
             if (window.refreshChat) window.refreshChat();
         })
         .catch(err => console.error('Errore caricamento chat:', err));
-}
-
-// Allungo il turno perché l'ultimo utente che invia ha scelto di lanciare un attacco
-function closeTurn(id_role, suss_id) {
-    // Rimuovo 5 messaggi dal sussurro in poi
-    if (suss_id > 0 && document.getElementById(suss_id)) {
-        for (let i = suss_id; i < (suss_id + 5); i++) {
-            if (document.getElementById(i)) document.getElementById(i).remove();
-        }
-    }
-
-    fetch(api_file + '?' + param + '=closeTurn', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_role, suss_id })
-    })
-        .then(res => res.json())
-        .then(data => { if (window.refreshChat) window.refreshChat(); })
-        .catch(err => console.error('Errore caricamento chat:', err));
-}
-
-// Lancio lo scudo prima di chiudere sicuramente il turno
-function lanciaScudo(id_role, yes, suss_id) {
-    const removeSuss = document.getElementById(suss_id);
-    if (suss_id > 0 && removeSuss) removeSuss.remove();
-
-    fetch(api_file + '?' + param + '=lanciaScudo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_role, yes, suss_id })
-    });
-}
-
-// Animazioni CSS aggiuntive
-const additionalStyles = `
-    @keyframes user-search-popup__slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-
-    @keyframes user-search-popup__slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-
-    .user-search-popup__autocomplete-item--error {
-        color: #ef4444 !important;
-        font-style: italic;
-    }
-
-    .user-search-popup__autocomplete-item--empty {
-        color: #94a3b8 !important;
-        font-style: italic;
-        cursor: default !important;
-    }
-
-    .user-search-popup__autocomplete-item--empty:hover {
-        background: #1a1f36 !important;
-    }
-
-    .user-search-popup__autocomplete-item--hover {
-        background: #252a45 !important;
-        transform: translateX(4px);
-        transition: all 0.2s ease;
-    }
-`;
-// Aggiungi gli stili aggiuntivi al documento
-if (!document.querySelector('#user-search-popup-additional-styles')) {
-    const styleEl = document.createElement('style');
-    styleEl.id = 'user-search-popup-additional-styles';
-    styleEl.textContent = additionalStyles;
-    document.head.appendChild(styleEl);
-}
-
-/*****************************************************************************/
-/************* Serve per cercare gli utenti in fase di creazione role ********/
-/*****************************************************************************/
-class pgRolePlayingPanel {
-    constructor() {
-        this.isOpen = false;
-        this.init();
-    }
-
-    init() {
-        // Elementi DOM con classi incapsulate
-        this.elements = {
-            popupPanel: document.getElementById('pgRolePlayingPanel'),
-            openBtn: document.getElementById('pgRolePlaying'),
-            closeBtn: document.getElementById('closePopupAdd'),
-        };
-
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        // Apertura popup
-        if (this.elements.openBtn) this.elements.openBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.openPopup();
-        });
-
-        // Chiusura popup
-        this.elements.closeBtn.addEventListener('click', () => this.closePanel());
-
-        // Click outside per chiudere
-        this.elements.popupPanel.addEventListener('click', (e) => { if (e.target === this.elements.popupPanel) this.closePanel(); });
-
-        // Keyboard events globali
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.isOpen) this.closePanel(); });
-    }
-
-    openPopup() {
-        this.elements.popupPanel.style.display = 'flex';
-        this.isOpen = true;
-        document.body.style.overflow = 'hidden'; // Blocca scroll body
-
-        getPgRolePlaying(); // Carica gli utenti
-    }
-
-    closePanel() {
-        this.elements.popupPanel.style.display = 'none';
-        this.isOpen = false;
-        document.body.style.overflow = ''; // Ripristina scroll body
-    }
-
-    // Metodo per distruggere l'istanza e pulire gli event listeners
-    destroy() {
-        if (this.searchTimeout) clearTimeout(this.searchTimeout);
-
-        // Rimuovi tutti gli event listeners
-        this.elements.openBtn.removeEventListener('click', this.openPopup);
-        this.elements.closeBtn.removeEventListener('click', this.closePanel);
-        this.elements.cancelBtn.removeEventListener('click', this.closePanel);
-    }
-}
-
-function addPgToRole() {
-    if (confirm("Sei sicuro di voler entrare?")) {
-        fetch(api_file + '?' + param + '=addPgToRole')
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    if (window.refreshChat) window.refreshChat();
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
-    }
-}
-
-// Pg esce dalla role
-function quitRole(user) {
-    if (confirm("Sei sicuro di voler espellere " + user + " dalla role?")) {
-        fetch(api_file + '?' + param + '=quitRole', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    if (window.refreshChat) window.refreshChat();
-
-                    // Chiudi il popup dopo successo
-                    document.getElementById('closePopup').style.display = 'none';
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
-    }
-}
-
-/*****************************************************************************/
-/*********************** Pannello utenti giocanti ****************************/
-/*****************************************************************************/
-function closePgRolePlayingPanel() {
-    document.getElementById('pgRolePlayingPanel').style.display = 'none';
-}
-
-// Carica gli utenti
-function getPgRolePlaying() {
-    fetch(api_file + '?' + param + '=getPgRolePlaying')
-        .then(res => res.json())
-        .then(data => {
-            const pgRolePlayingList = document.getElementById('pgRolePlayingList');
-            const users = data.users || [];
-
-            pgRolePlayingList.innerHTML = '';
-
-            users.forEach(user => {
-                const row = document.createElement('div');
-                row.style.cssText = 'display: grid; grid-template-columns: 1fr 60px 80px; gap: 8px; align-items: center; padding: 6px 8px; background-color: rgba(30, 40, 60, 0.3); border-radius: 4px; margin-bottom: 3px; font-size: 0.9rem;';
-
-                // Nome
-                const nameCol = document.createElement('div');
-                nameCol.textContent = user.name;
-                nameCol.style.cssText = 'color: #e0e0e0;';
-
-                // Spia luminosa
-                const statusCol = document.createElement('div');
-                statusCol.style.cssText = 'text-align: center;';
-                const dot = document.createElement('div');
-                dot.style.cssText = `width: 10px; height: 10px; border-radius: 50%; display: inline-block; background-color: ${user.inRole ? '#27ae60' : '#e74c3c'}; box-shadow: 0 0 ${user.inRole ? '8px' : '0'} ${user.inRole ? '#27ae60' : 'transparent'};`;
-                if (user.inRole) {
-                    dot.style.animation = 'pulse 2s infinite';
-                }
-                statusCol.appendChild(dot);
-
-                // Pulsante
-                const actionCol = document.createElement('div');
-                actionCol.style.cssText = 'text-align: center;';
-                const button = document.createElement('button');
-                button.textContent = user.inRole ? 'Espelli' : 'Uscito';
-                button.style.cssText = 'background: ' + (user.inRole ? '#27ae60' : '#7f8c8d') + '; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: ' + (user.inRole ? 'pointer' : 'not-allowed') + '; width: 70px;';
-                button.disabled = !user.inRole;
-
-                if (user.inRole) button.onclick = function () { quitRole(user.name); };
-                if (data.canQuit) actionCol.appendChild(button);
-
-                row.appendChild(nameCol);
-                row.appendChild(statusCol);
-                row.appendChild(actionCol);
-                pgRolePlayingList.appendChild(row);
-            });
-        })
-        .catch(err => console.error('Errore caricamento chat:', err));
-}
-
-// Stile per l'animazione della spia
-const stylePginRole = document.createElement('style');
-stylePginRole.textContent = `
-    @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
-        70% { box-shadow: 0 0 0 6px rgba(39, 174, 96, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
-    }
-`;
-document.head.appendChild(stylePginRole);
-
-/*****************************************************************************/
-/*********************** Session role status *********************************/
-/*****************************************************************************/
-function gdrSetSessionActive(isActive) {
-    const statusElement = document.getElementById('gdrSessionStatus');
-    const roleInProgress = document.getElementById('roleInProgress');
-    const addPgToRoleBtn = document.getElementById('addPgToRoleBtn');
-
-    if (isActive) {
-        statusElement.classList.add('active');
-        statusElement.classList.remove('inactive');
-        addPgToRoleBtn.textContent = ' Join!';
-        roleInProgress.style.display = 'block';
-    } else {
-        statusElement.classList.add('inactive');
-        statusElement.classList.remove('active');
-        addPgToRoleBtn.textContent = ' Avvia!';
-        roleInProgress.style.display = 'none';
-    }
 }
 
 /*****************************************************************************/
@@ -857,24 +598,6 @@ document.getElementById('message').addEventListener('input', function () {
     const charCount = this.value.length;
     this.parentNode.querySelector('.gdr-char-counter').textContent = `Caratteri: ${charCount}/${maxLength}`;
 });
-
-/******************************** Selezione bersagli *******************************************/
-async function getRolePgs() {
-    const id_role = document.getElementById('id_role').value;
-
-    try {
-        const response = await fetch(api_file + '?' + param + '=getRolePgs', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_role })
-        });
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Errore nel caricamento utenti:', error);
-        return [];
-    }
-}
 
 // VARIABILE per memorizzare la funzione di callback
 let getSelectedNamesCallback = null;
@@ -1151,14 +874,13 @@ function evidenziaZona() {
 /*********************** CARICAMENTO DOM *************************************/
 /*****************************************************************************/
 document.addEventListener('DOMContentLoaded', function () {
+    console.log('TEST di prova');
     document.getElementById('chat_skill').addEventListener('change', aggiornaLivelli); // Se cambio skill, aggiorno il suo livello massimo consentito per il pg
     document.getElementById('livello_skill').addEventListener('change', aggiornaLimiteDaLivello); // Se cambio il livello skill, aggiorno il limite di bersagli
 
-    // new UserSearchPopup();  // Inizializza la ricerca utenti da aggiungere alla role
-    new pgRolePlayingPanel();  // Inizializza l'elenco dei pg giocanti
-
     // LOAD DELLA CHAT DI GIOCO
     const container = document.getElementById('pagina_chat');
+    console.log('TEST', container);
     if (container) ReactDOM.render(e(ChatViewer), container);
 
     // Il campo è una textarea, quindi devo catturare l'evento scatenato dal pulsante "Enter" della tastiera

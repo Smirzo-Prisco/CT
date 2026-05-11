@@ -547,8 +547,10 @@
 </div>
 
 <script>
+    const api_file = 'pages/api_roleSession.php';
+    const param = 'op';
     // URL dell'API per recuperare le giocate
-    const API_URL = 'pages/api_chat.php?op=getPgAllRoles'; // SOSTITUIRE con URL reale
+    const API_URL = api_file + '?' + param + '=getPgAllRoles';
     
     // Variabile per memorizzare le giocate recuperate
     let giocate = [];
@@ -735,7 +737,7 @@
     }
 
     function quitRole() {
-        fetch('pages/api_chat.php?op=quitRole')
+        fetch(api_file + '?' + param + '=quitRole')
         .then(res => res.json())
         .then(data => {
             if (data.success) fetchGiocate();

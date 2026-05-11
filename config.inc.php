@@ -20,9 +20,7 @@ $PARAMETERS['database']['password'] = 'L4t1n0r0m4n0';            //password del 
 $PARAMETERS['database']['database_name'] = 'my_latinoromano';    //nome del database
 $PARAMETERS['database']['url'] = 'localhost';        //indirizzo ip del database
 
-
 /* HELP: Sostituire le diciture inserite tra le virgolette con i parametri di connessione al Database del proprio dominio. Essi sono forniti al momento della registrazione. Se non si e' in possesso di tali parametri consultare le FAQ della homepage dell'host che fornisce il dominio. Se non le si trovano li contattare lo staff dell'host. */
-
 
 /* POLITICA DI CRIPTAZIONE
  * E' stata rimossa la possibilita' di scegliere se salvare le password in chiaro.

@@ -1,4 +1,6 @@
 <?php
+add_script("/includes/oggetto.js");
+
 // Recupero i dati del personaggio
 $pg = gdrcd_query("SELECT * FROM personaggio WHERE nome = '".$_SESSION['login']."'");
 $budget = $pg['soldi'];
@@ -26,8 +28,6 @@ $numresults = gdrcd_query($result, 'num_rows');
 		?>
 		<input type="text" class="searchField" id="searchShop" placeholder="Cerca...">
 	</form>
-    <!-- Bottone a destra
-    <button class="btn-action right" title="Elimina esiliati" onclick="eliminaEsiliati()"><i class="fa-solid fa-trash"></i> Esiliati</button> -->
 </div>
 
 <?php if($numresults > 0): ?>

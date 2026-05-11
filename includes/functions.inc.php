@@ -43,7 +43,7 @@ function gdrcd_connect() {
  * @param resource $db : una connessione mysqli
  */
 function gdrcd_close_connection($db) {
-    mysqli_close($db);
+    if(is_resource($db) && get_resource_type($db)==='mysql link') mysqli_close($db);
 }
 
 /**
@@ -61,48 +61,77 @@ function gdrcd_close_connection($db) {
  *  affected: ritorna il numero di record toccati dall'ultima query (INSERT, UPDATE, DELETE o SELECT). In questo caso $sql non viene considerato
  * @return un booleano in caso di esecuzione di query non SELECT e modalità 'query'. Altrimenti ritorna come specificato nella descrizione di $mode
  */
-function gdrcd_query($sql, $mode = 'query') {
+function gdrcd_query($sql, $mode = 'query', $throwOnError = false) {
     $db_link = gdrcd_connect();
 
     switch(strtolower(trim($mode))) {
         case 'query':
             switch(strtoupper(substr(trim($sql), 0, 6))) {
                 case 'SELECT':
-                    $result = mysqli_query($db_link, $sql) or die(gdrcd_mysql_error($sql));
+                    $result = mysqli_query($db_link, $sql);
+                    if($result === false){
+                        if($throwOnError){
+                            throw new Exception("Query DB Fallita: " . $sql . "\n\n" . mysqli_error($db_link));
+                        } else {
+                            die(gdrcd_mysql_error($sql));
+                        }
+                    }
                     $row = mysqli_fetch_array($result, MYSQLI_BOTH);
                     mysqli_free_result($result);
 
                     return $row;
                     break;
                 default:
-                    return mysqli_query($db_link, $sql) or die(gdrcd_mysql_error($sql));
+                    $result = mysqli_query($db_link, $sql);
+                    if($result === false){
+                        if($throwOnError){
+                            throw new Exception("Query DB Fallita: " . $sql . "\n\n" . mysqli_error($db_link));
+                        }
+                        else{
+                            die(gdrcd_mysql_error($sql));
+                        }
+                    }
+                    return $result;
                     break;
             }
 
         case 'result':
-            $result = mysqli_query($db_link, $sql) or die(gdrcd_mysql_error($sql));
+            $result = mysqli_query($db_link, $sql);
+            if($result === false){
+                if($throwOnError){
+                    throw new Exception("Query DB Fallita: " . $sql . "\n\n" . mysqli_error($db_link));
+                } else {
+                    die(gdrcd_mysql_error($sql));
+                }
+            }
 
             return $result;
             break;
 
         case 'num_rows':
-            return (int) mysqli_num_rows($sql);
+            // return (int)mysqli_num_rows($sql);
+            return ($sql instanceof mysqli_result) ? (int)mysqli_num_rows($sql) : 0; // Patch Roberto. Devo liberare la memoria, altrimenti su php 8 va in errore
             break;
 
         case 'fetch':
-            $row = mysqli_fetch_array($sql, MYSQLI_BOTH);
+            // return mysqli_fetch_array($sql, MYSQLI_BOTH);
+            return ($sql instanceof mysqli_result) ? mysqli_fetch_array($sql, MYSQLI_BOTH) : false; // Patch Roberto. Devo liberare la memoria, altrimenti su php 8 va in errore
+            break;
 
-            return $row;
+        case 'assoc':
+            // return mysqli_fetch_array($sql, MYSQLI_ASSOC);
+            return ($sql instanceof mysqli_result) ? mysqli_fetch_array($sql, MYSQLI_ASSOC) : false; // Patch Roberto. Devo liberare la memoria, altrimenti su php 8 va in errore
             break;
 
         case 'object':
-            $row = mysqli_fetch_object($sql);
-
-            return $row;
+            // return mysqli_fetch_object($sql);
+            return ($sql instanceof mysqli_result) ? mysqli_fetch_object($sql) : false; // Patch Roberto. Devo liberare la memoria, altrimenti su php 8 va in errore
             break;
 
         case 'free':
-            return mysqli_free_result($sql);
+            // return mysqli_free_result($sql);
+            if ($sql instanceof mysqli_result) return mysqli_free_result($sql); // Patch Roberto. Devo liberare la memoria, altrimenti su php 8 va in errore
+            return false;
             break;
 
         case 'last_id':
@@ -110,10 +139,64 @@ function gdrcd_query($sql, $mode = 'query') {
             break;
 
         case 'affected':
-            return (int) mysqli_affected_rows($db_link);
+            return (int)mysqli_affected_rows($db_link);
             break;
     }
 }
+
+/*
+    * Prepared Statements
+    * @param string $sql: il codice SQL da inviare al database
+    * @param array $binds: array dei parametri associati alla query
+    *
+    * E' obbligatorio specificare nell'indice zero dell'array binds i tipi delle variabili che si stanno immettendo nella query
+    * Tali tipi sono i seguenti:
+    * i      corrispondente ai valori integer
+    * d     corrispondente ai valori float/double
+    * s     corrispondente alle stringhe
+    * b     corrispondende a valori di tipo blob
+    *
+    * @return mysqli_result
+*/
+function gdrcd_stmt($sql, $binds = array()) {
+    $db_link = gdrcd_connect();
+
+    if ($stmt = mysqli_prepare($db_link, $sql)) {
+
+        if (!empty($binds)) {
+
+            #> E' necessario referenziare ogni parametro da passare alla query
+            #> MySqli è suscettibile in proposito.
+            $ref = array();
+
+            foreach ($binds as $k => $v) {
+                if ($k > 0) {
+                    $ref[$k] = &$binds[$k];
+                } else {
+                    $ref[$k] = $v;
+                }
+            }
+
+            array_unshift($ref, $stmt);
+            call_user_func_array('mysqli_stmt_bind_param', $ref);
+        }
+
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $stmtError = mysqli_stmt_error($stmt);
+
+        if (!empty($stmtError))
+            die(gdrcd_mysql_error($stmtError));
+
+        mysqli_stmt_close($stmt);
+
+        return $result;
+
+    } else {
+        die(gdrcd_mysql_error('Failed when creating the statement.'));
+    }
+}
+
 /**
  * Funzione di recupero delle colonne e della loro dichiarazione della tabella specificata.
  * Si usa per la verifica dell'aggiornamento db da vecchie versioni di gdrcd5
@@ -176,12 +259,26 @@ function gdrcd_check_tables($table) {
 function gdrcd_mysql_error($details = false) {
     $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 50);
 
-    $error_msg = '<strong>GDRCD MySQLi Error</strong> [File: '.basename($backtrace[1]['file']).'; Line: '.$backtrace[1]['line'].']<br>'.'<strong>Error Code</strong>: '.mysqli_errno(gdrcd_connect()).'<br>'.'<strong>Error String</strong>: '.mysqli_error(gdrcd_connect());
-
-    if($details !== false) {
-        $error_msg .= '<br><br><strong>Error Detail</strong>: '.$details;
+    foreach($backtrace as $v) {
+        if($v['function'] == 'gdrcd_query') {
+            $base = $v;
+        }
+        $history .= '<strong>FILE: </strong>: ' . $v['file'] . ' - ';
+        $history .= '<strong>LINE: </strong>: ' . $v['line'] . '</br />';
     }
-
+    $error_msg  = '<div class="error mysql">';
+    $error_msg .= '<strong>GDRCD MySQLi Error</strong>:</br>';
+    if ($details !== false) {
+        $error_msg .= '<strong>QUERY: </strong>: ' . $details . '</br>';
+    }
+    $error_msg .= '<strong>ERROR [' . mysqli_errno(gdrcd_connect()) . ']</strong>: ' . mysqli_error(gdrcd_connect()) .'<br />';
+    $error_msg .= '<strong>FILE: </strong>: ' . $base['file'] . ' - ';
+    $error_msg .= '<strong>LINE: </strong>: ' . $base['line'] . '<br />';
+    $error_msg .= '<details>';
+    $error_msg .= '<summary>Dettagli</summary>';
+    $error_msg .= $history;
+    $error_msg .= '</details>';
+    $error_msg .= '</div>';
     return $error_msg;
 }
 
@@ -231,20 +328,20 @@ function gdrcd_check_pass($str) {
  * @return una versione filtrata di $str
  */
 function gdrcd_filter($what, $str) {
-    switch(strtolower($what)) {
+    switch (strtolower($what)) {
         case 'in':
         case 'get':
             $str = addslashes(str_replace('\\', '', $str));
             break;
 
         case 'num':
-            $str = (int) $str;
+            $str = (int)$str;
             break;
 
         case 'out':
-            $str = html_entity_decode($str, ENT_HTML5, 'utf-8');
+            $str = gdrcd_html_filter(htmlentities($str, ENT_QUOTES, "UTF-8"));
             break;
-
+            
         case 'addslashes':
             $str = addslashes($str);
             break;
@@ -369,13 +466,17 @@ function gdrcd_controllo_esilio($pg) {
  * @return int
  */
 function gdrcd_check_time($time) {
-    $time_hours = date('H', strtotime($time));
-    $time_minutes = date('i', strtotime($time));
+    // Converto l'orario $time in un formato leggibile
+    $time_hours = (int)date('H', strtotime($time));
+    $time_minutes = (int)date('i', strtotime($time));
+    // Converto l'orario corrente in un formato leggibile
+    $current_hours = (int)date('H');
+    $current_minutes = (int)date('i');
 
-    if($time_hours == date('H')) {
-        return date('i') - $time_minutes;
-    } elseif($time_hours == (date('H') - 1) || $time_hours == (strftime('H') + 11)) {
-        return date('i') - $time_minutes + 60;
+    if ($time_hours == $current_hours) {
+        return $current_minutes - $time_minutes;
+    } elseif ($time_hours == ($current_hours - 1) || $time_hours == ($current_hours + 11)) {
+        return $current_minutes - $time_minutes + 60;
     }
 
     return 61;

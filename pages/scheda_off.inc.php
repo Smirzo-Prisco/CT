@@ -77,7 +77,7 @@
                     } else {
                         echo gdrcd_html_filter($personaggio['off']);
                     } */ 
-                    echo gdrcd_filter('out', $personaggio['off']); ?>
+                    echo $personaggio['off']; ?>
                 </div>
             </div>
                    <div class="link_back">

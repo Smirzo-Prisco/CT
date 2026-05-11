@@ -29,16 +29,16 @@
             <div class="panels_box">
                 <div class="form_gioco">
                     <form action="main.php?page=scheda_modifica&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']) ?>" method="post">
-                        <input type="hidden" value="<?php echo strftime('%Y'); ?>" name="year" />
-                        <input type="hidden" value="<?php echo strftime('%m'); ?>" name="month" />
-                        <input type="hidden" value="<?php echo strftime('%d'); ?>" name="day" />
+                        <input type="hidden" value="<?=strftime('%Y')?>" name="year" />
+                        <input type="hidden" value="<?=strftime('%m')?>" name="month" />
+                        <input type="hidden" value="<?=strftime('%d')?>" name="day" />
                         <input type="hidden" value="<?php gdrcd_filter('out', $MESSAGE['interface']['sheet']['modify_form']['unexile']); ?>" name="causale" />
                         <input type="hidden" value="exile" name="op" />
                         <div class="form_label">
-                            <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['modify_form']['unexile']); ?>
+                            <?=gdrcd_filter('out', $MESSAGE['interface']['sheet']['modify_form']['unexile'])?>
                         </div>
                         <div class="form_submit">
-                            <input type="submit" value="<?php echo gdrcd_filter('out', $MESSAGE['interface']['forms']['submit']); ?>" />
+                            <input type="submit" value="<?=gdrcd_filter('out', $MESSAGE['interface']['forms']['submit'])?>" />
                         </div>
                     </form>
                 </div>
@@ -47,43 +47,42 @@
         }
         exit();
     }
-
     ?>
+    
     <div class="page_title">
-        <h2><?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['page_name']); ?></h2>
+        <h2><?=gdrcd_filter('out', $MESSAGE['interface']['sheet']['page_name'])?></h2>
     </div>
     <div class="menu_scheda"><!-- Menu scheda -->
-            <?php include ('scheda/menu.inc.php'); ?>
-        </div>
+        <?php include ('scheda/menu.inc.php'); ?>
+    </div>
     <div class="page_body">
-        
-            
-            <div class="background"><!-- Background, affetti, robe varie -->
-                <div class="titolo_box">
-                    <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['box_title']['background']); ?>
-                </div>
-                <div class="body_box">
-                    <?php
-                    /** * Html, bbcode o entrambi ?
-                     
-                    if($PARAMETERS['mode']['user_bbcode'] == 'ON') {
-                        if($PARAMETERS['settings']['user_bbcode']['type'] == 'bbd' && $PARAMETERS['settings']['bbd']['free_html'] == 'ON') {
-                            echo bbdecoder(gdrcd_html_filter($personaggio['storia']), true);
-                        } elseif($PARAMETERS['settings']['user_bbcode']['type'] == 'bbd') {
-                            echo bbdecoder(gdrcd_filter('out', $personaggio['storia']), true);
-                        } else {
-                            echo gdrcd_bbcoder(gdrcd_filter('out', $personaggio['storia']));
-                        }
-                    } else {
-                        echo gdrcd_html_filter($personaggio['storia']);
-                    } */
-                    echo gdrcd_filter('out', $personaggio['storia']);
-                    ?>
-                </div>
+        <div class="background"><!-- Background, affetti, robe varie -->
+            <div class="titolo_box">
+                <?=gdrcd_filter('out', $MESSAGE['interface']['sheet']['box_title']['background'])?>
             </div>
-                   <div class="link_back" style="display: none;">
+            <div class="body_box">
+                <?php
+                /** * Html, bbcode o entrambi ?
+                 
+                if($PARAMETERS['mode']['user_bbcode'] == 'ON') {
+                    if($PARAMETERS['settings']['user_bbcode']['type'] == 'bbd' && $PARAMETERS['settings']['bbd']['free_html'] == 'ON') {
+                        echo bbdecoder(gdrcd_html_filter($personaggio['storia']), true);
+                    } elseif($PARAMETERS['settings']['user_bbcode']['type'] == 'bbd') {
+                        echo bbdecoder(gdrcd_filter('out', $personaggio['storia']), true);
+                    } else {
+                        echo gdrcd_bbcoder(gdrcd_filter('out', $personaggio['storia']));
+                    }
+                } else {
+                    echo gdrcd_html_filter($personaggio['storia']);
+                } */
+                echo $personaggio['storia'];
+                ?>
+            </div>
+        </div>
+        <div class="link_back" style="display: none;">
             <a href="main.php?page=scheda&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>">
                 <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['link']['back']); ?>
             </a>
         </div>
+    </div>
 </div><!-- Pagina -->

@@ -6,6 +6,8 @@ ini_set('display_errors', '1');
 
 require_once(__DIR__ . '../../includes/custom_functions.inc.php');
 
+add_script("/includes/personaggio.js");
+
 $permessi_azioni = [
     'modifica' => ['admin', 'moderatore', 'master', 'custode'], // ,'moderatore','guida', 'grafico'
     'skill' => ['admin'],

@@ -66,7 +66,7 @@ while($row = gdrcd_query($elenco_talenti, 'fetch')) {
 <td>
 <?php
 $nome = gdrcd_filter('out', $row['nome_abilita']);
-$livello = 0 + gdrcd_filter('out', $row['grado']);
+// $livello = 0 + gdrcd_filter('out', $row['grado']);
 ?>
 <a href="javascript:void(0);" onClick="<?php echo $to ?>">
 <?php
@@ -105,7 +105,7 @@ while($ro = gdrcd_query($elenco_talenti_generici, 'fetch')) {
 <td width="30%">
 <?php
 $nome = gdrcd_filter('out', $ro['nome']);
-$livello = 0 + gdrcd_filter('out', $ro['grado']);
+// $livello = 0 + gdrcd_filter('out', $ro['grado']);
 ?>
 <a href="javascript:void(0);" onClick="<?php echo $to ?>">
 <?php

@@ -1,6 +1,7 @@
 <?php
     require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 
+    add_script("/includes/role_session.js");
     add_script("/includes/chat.js");
 
     $login = $_SESSION['login'];
@@ -178,9 +179,11 @@
         <div style="padding: 12px;">
             <div id="simpleUsersTable">
                 <!-- Intestazione -->
-                <div style="display: grid; grid-template-columns: 1fr 60px 80px; gap: 8px; padding: 6px 8px; background-color: rgba(42, 63, 118, 0.3); border-radius: 6px; margin-bottom: 4px; font-size: 0.85rem;">
+                <div style="display: grid; grid-template-columns: 1fr 60px 60px 60px 80px; gap: 8px; padding: 6px 8px; background-color: rgba(42, 63, 118, 0.3); border-radius: 6px; margin-bottom: 4px; font-size: 0.85rem;">
                     <div>Nome</div>
                     <div style="text-align: center;">Giocante</div>
+                    <div style="text-align: center;">Turno inviato</div>
+                    <div style="text-align: center;">Turno chiuso</div>
                     <div style="text-align: center;">Azione</div>
                 </div>
                 <div id="pgRolePlayingList" style="max-height: 220px; overflow-y: auto;"><!-- Contenuto dinamico --></div>
@@ -205,10 +208,10 @@
         <div class="gdr-tabs">
             <div class="gdr-tab active" data-tab="dice">Dadi e Tiri</div>
             <div class="gdr-tab" data-tab="skills">Abilità e Armi</div>
-            <div class="gdr-tab" data-tab="master">Gestione Master</div>
+            <div class="gdr-tab" data-tab="master" onclick="getPngRolePlaying();">Gestione Master</div>
             <div class="gdr-tab" data-tab="writing">Scrittura</div>
         </div>
-        <!-- Contenuto Tab Dadi e Tiri -->
+        <!-- DADI E TIRI -->
         <div class="gdr-tab-content active" id="dice-tab">
             <div class="gdr-grid">
                 <!-- Dado Generico -->
@@ -313,7 +316,7 @@
                 </div>
             </div>
         </div>
-        <!-- Contenuto Tab Abilità e Armi -->
+        <!-- ABILITA' E ARMI -->
         <div class="gdr-tab-content" id="skills-tab">
             <div class="gdr-master-panel">
                 <div class="gdr-master-panel-title">Attenzione!</div>
@@ -387,58 +390,16 @@
                     </div>
                     <button class="gdr-button gdr-btn-success" onclick="tiraSkillChat();">Usa Abilità</button>
                 </div>
-                <!-- Tiro Dadi -->
-                <div class="gdr-card">
-                    <div class="gdr-card-title">Caratteristiche</div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="dice_type">Usa caratteristica</label>
-                        <select class="gdr-select" id="dice_type" name="valori">
-                            <option value="0">Usa dado</option>
-                            <!--
-                            <option value="destrezza">Destrezza</option>
-                            <option value="potere">Potere</option>
-                            <option value="mente">Mente</option>
-                            <option value="tempra">Tempra</option>
-                            -->
-                            <?php
-                            $result_livello = gdrcd_query("SELECT clgpersonaggioruolo.personaggio, ruolo.livello
-                                                            FROM ruolo JOIN clgpersonaggioruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo
-                                                            JOIN personaggio ON personaggio.nome = clgpersonaggioruolo.personaggio
-                                                            WHERE clgpersonaggioruolo.personaggio = '$login'");
-                            if ($result_livello['livello'] > 0) {
-                                echo '<option value="AttCreatura">Attacca con creatura</option>';
-                                echo '<option value="DifCreatura">Schiva con creatura</option>';
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="dice_bonus">Bonus</label>
-                        <select class="gdr-select" id="dice_bonus" name="bonus">
-                            <option value="0">0</option>
-                            <?php for ($i = 1; $i <= 10; $i++) echo "<option value=\"$i\">$i</option>"; ?>
-                        </select>
-                    </div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="dice_malus">Malus</label>
-                        <select class="gdr-select" id="dice_malus" name="malus">
-                            <option value="0">0</option>
-                            <?php for ($i = 1; $i <= 10; $i++) echo "<option value=\"$i\">$i</option>"; ?>
-                        </select>
-                    </div>
-                    <button class="gdr-button gdr-btn-success" onclick="tiraDadoChat();">Tira Dado</button>
-                </div>
                 <!-- Armi -->
                 <div class="gdr-card">
-                    <div class="gdr-card-title">Armi</div>
+                    <div class="gdr-card-title">Attacchi</div>
                     <div class="gdr-form-group">
-                        <label class="gdr-label" for="arma_weapon">Arma</label>
-                        <select class="gdr-select" id="arma_weapon" name="arma">
+                        <label class="gdr-label" for="tipo_attacco">Tipo di attacco</label>
+                        <select class="gdr-select" id="tipo_attacco" name="arma">
                             <option value="0">Attacca</option>
-                            <optgroup label="Attacco fisico"><option value="999999999">Attacco fisico</option></optgroup>
+                            <optgroup label="Attacco fisico"><option value="attacco_fisico">Attacco fisico</option></optgroup>
                             <optgroup label="Armi">
-                                <?php
-                                // Query per selezionare le armi
+                                <?php // Armi
                                 $result = gdrcd_query("SELECT oggetto.id_oggetto, oggetto.nome, clgpersonaggiooggetto.cariche 
                                     FROM clgpersonaggiooggetto 
                                     LEFT JOIN oggetto ON oggetto.id_oggetto = clgpersonaggiooggetto.id_oggetto 
@@ -452,6 +413,13 @@
                                 gdrcd_query($result, 'free');
                                 ?>
                             </optgroup>
+                            <?php // Creatura
+                            $result_livello = gdrcd_query("SELECT clgpersonaggioruolo.personaggio, ruolo.livello
+                                                            FROM ruolo JOIN clgpersonaggioruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo
+                                                            JOIN personaggio ON personaggio.nome = clgpersonaggioruolo.personaggio
+                                                            WHERE clgpersonaggioruolo.personaggio = '$login'");
+                            if ($result_livello['livello'] > 0) echo '<option value="creatura">Attacca con creatura</option>';
+                            ?>
                         </select>
                     </div>
                     <div class="gdr-form-group">
@@ -463,96 +431,104 @@
                             <option value="punto_vitale">Punto vitale</option>
                         </select>
                     </div>
-                    <button class="gdr-button gdr-btn-success" onclick="usaArmaChat();">Usa Arma</button>
+                    <button class="gdr-button gdr-btn-success" onclick="usaAttaccoChat();">Usa Arma</button>
                 </div>
             </div>
         </div>
-        <!-- Contenuto Tab Gestione Master -->
+        <!-- GESTIONE MASTER -->
         <div class="gdr-tab-content" id="master-tab">
             <div class="gdr-master-panel">
                 <div class="gdr-master-panel-title">Area Master</div>
                 <p>Questa area è riservata ai Master per la gestione dei personaggi e PNG.</p>
             </div>
-
-            <div class="gdr-grid">
-                <!-- Modifica Personaggio -->
-                <div class="gdr-card">
-                    <div class="gdr-card-title">Modifica Personaggio</div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="nome_personaggio">Personaggio</label>
-                        <select class="gdr-select" name="nome_personaggio" id="nome_personaggio">
-                            <option value="pg1">Personaggio 1</option>
-                            <option value="pg2">Personaggio 2</option>
-                            <option value="pg3">Personaggio 3</option>
-                        </select>
+            <?php if(isAdminMasterMod($_SESSION)) : ?>
+                <button class="btn" id="endTurn" onclick="closeTurn();">Chiudi turno</button> <!-- PULSANTE GLOBAL END TURN -->
+                <br>
+                <br>
+                <div class="gdr-grid">
+                    <!-- Modifica Personaggio -->
+                    <div class="gdr-card">
+                        <div class="gdr-card-title">Modifica Personaggio</div>
+                        <div class="gdr-form-group">
+                            <label class="gdr-label" for="nome_personaggio">Personaggio</label>
+                            <select class="gdr-select" name="nome_personaggio" id="nome_personaggio">
+                                <option value="pg1">Personaggio 1</option>
+                                <option value="pg2">Personaggio 2</option>
+                                <option value="pg3">Personaggio 3</option>
+                            </select>
+                        </div>
+                        
+                        <div id="modificaParametri">
+                            <div class="gdr-form-group">
+                                <label class="gdr-label" for="note_fato">Note del Fato</label>
+                                <textarea class="gdr-textarea" name="note_fato" id="note_fato" rows="3"></textarea>
+                            </div>
+                            <div class="gdr-form-group">
+                                <label class="gdr-label" for="particolari">Particolari</label>
+                                <textarea class="gdr-textarea" name="particolari" id="particolari" rows="3"></textarea>
+                            </div>
+                            <div class="gdr-form-group">
+                                <label class="gdr-label" for="salute">Salute</label>
+                                <input class="gdr-input" type="number" name="salute" id="salute">
+                            </div>
+                            <div class="gdr-form-group">
+                                <label class="gdr-label" for="integrita">Integrità (0-10)</label>
+                                <input class="gdr-input" type="number" name="integrita" min="0" max="10" id="integrita">
+                            </div>
+                            <div class="gdr-form-group">
+                                <label class="gdr-label" for="notorieta">Notorietà (0-100)</label>
+                                <input class="gdr-input" type="number" name="notorieta" min="0" max="100" id="notorieta">
+                            </div>
+                            <div class="gdr-form-group">
+                                <label class="gdr-label" for="soldi">Soldi</label>
+                                <input class="gdr-input" type="number" name="soldi" min="0" id="soldi">
+                            </div>
+                            <button class="gdr-button gdr-btn-success" onclick="gdrEditMasterPgChat();">Modifica Personaggio</button>
+                        </div>
                     </div>
-                    
-                    <div id="modificaParametri">
+
+                    <!-- Gestione PNG -->
+                    <div class="gdr-card">
+                        <div class="gdr-card-title">Gestione PNG</div>
+                        
+                        <div class="gdr-form-group" style="flex:1;">
+                            <label class="gdr-label" for="pngNew" style="flex:1;">Nome PNG</label>
+                            <input class="gdr-input" id="pngNew" placeholder="Nome PNG" style="flex:2;">
+                        </div>
+                        <div class="gdr-form-group" style="flex:1;">
+                            <label class="gdr-label" for="pngNew">Destrezza PNG</label>
+                            <input class="gdr-input" id="pngNew" placeholder="Nome PNG">
+                        </div>
+                        <button class="gdr-button gdr-btn-success" onclick="newMasterPng();">Aggiungi</button>
+
+                        <div class="gdr-card-title"></div>
                         <div class="gdr-form-group">
-                            <label class="gdr-label" for="note_fato">Note del Fato</label>
-                            <textarea class="gdr-textarea" name="note_fato" id="note_fato" rows="3"></textarea>
+                            <label class="gdr-label" for="pngName">PNG attivi</label>
+                            <select class="gdr-select" id="pngName"></select>
                         </div>
                         <div class="gdr-form-group">
-                            <label class="gdr-label" for="particolari">Particolari</label>
-                            <textarea class="gdr-textarea" name="particolari" id="particolari" rows="3"></textarea>
+                            <label class="gdr-label" for="pngMessage">Azione PNG</label>
+                            <textarea class="gdr-textarea" id="pngMessage" placeholder="Azione PNG" rows="3"></textarea>
                         </div>
                         <div class="gdr-form-group">
-                            <label class="gdr-label" for="salute">Salute</label>
-                            <input class="gdr-input" type="number" name="salute" id="salute">
+                            <label class="gdr-label" for="pngCar">Caratteristica PNG</label>
+                            <select class="gdr-select" id="pngCar">
+                                <option value="destrezza">Usa destrezza</option>
+                                <option value="potere">Usa potere</option>
+                                <option value="mente">Usa mente</option>
+                                <option value="tempra">Usa tempra</option>
+                            </select>
                         </div>
                         <div class="gdr-form-group">
-                            <label class="gdr-label" for="integrita">Integrità (0-10)</label>
-                            <input class="gdr-input" type="number" name="integrita" min="0" max="10" id="integrita">
+                            <label class="gdr-label" for="pngBonus">Bonus caratteristica PNG</label>
+                            <input class="gdr-input" id="pngBonus" placeholder="Bonus sul dado">
                         </div>
-                        <div class="gdr-form-group">
-                            <label class="gdr-label" for="notorieta">Notorietà (0-100)</label>
-                            <input class="gdr-input" type="number" name="notorieta" min="0" max="100" id="notorieta">
-                        </div>
-                        <div class="gdr-form-group">
-                            <label class="gdr-label" for="soldi">Soldi</label>
-                            <input class="gdr-input" type="number" name="soldi" min="0" id="soldi">
-                        </div>
-                        <button class="gdr-button gdr-btn-success" onclick="gdrEditMasterPgChat();">Modifica Personaggio</button>
+                        <button class="gdr-button gdr-btn-success" onclick="newMasterPngAction();">Invia</button>
                     </div>
                 </div>
-
-                <!-- Gestione PNG -->
-                <div class="gdr-card">
-                    <div class="gdr-card-title">Gestione PNG</div>
-                    <label class="gdr-label" for="pngNew" style="flex:1;">Nome PNG</label>
-                    <div class="gdr-form-group" style="display:flex; gap:8px;">
-                        <input class="gdr-input" id="pngNew" placeholder="Nome PNG" style="flex:2;">
-                        <button class="gdr-button gdr-btn-success" onclick="newMasterPng();" style="flex:1;">Aggiungi</button>
-                    </div>
-                    <div class="gdr-card-title"></div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="pngName">Caratteristica PNG</label>
-                        <select class="gdr-select" id="pngName">
-                            <option value="destrezza">Seleziona</option>
-                        </select>
-                    </div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="pngAction">Azione PNG</label>
-                        <textarea class="gdr-textarea" id="pngAction" placeholder="Azione PNG" rows="3"></textarea>
-                    </div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="pngCar">Caratteristica PNG</label>
-                        <select class="gdr-select" id="pngCar">
-                            <option value="destrezza">Usa destrezza</option>
-                            <option value="potere">Usa potere</option>
-                            <option value="mente">Usa mente</option>
-                            <option value="tempra">Usa tempra</option>
-                        </select>
-                    </div>
-                    <div class="gdr-form-group">
-                        <label class="gdr-label" for="pngBonus">Bonus caratteristica PNG</label>
-                        <input class="gdr-input" id="pngBonus" placeholder="Bonus sul dado">
-                    </div>
-                    <button class="gdr-button gdr-btn-success" onclick="newMasterPngAction();">Invia</button>
-                </div>
-            </div>
+            <?php endif; ?>
         </div>
-        <!-- Contenuto Tab Scrittura -->
+        <!-- SCRITTURA -->
         <div class="gdr-tab-content" id="writing-tab">
             <div class="gdr-grid">
                 <!-- Limite caratteri -->

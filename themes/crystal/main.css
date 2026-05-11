@@ -1748,7 +1748,7 @@ display: none; /* nasconde la checkbox nativa */
     resize: vertical;
 }
 
-.pg-edit-container .checkbox-group {
+.pg-edit-container .checkbox-group, .radio-group {
     display: flex;
     align-items: center;
     gap: 15px;

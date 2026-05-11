@@ -78,12 +78,12 @@
                         echo gdrcd_html_filter($personaggio['descrizione']);
                     } ?> */
                     
-                 echo gdrcd_filter('out', $personaggio['descrizione']);?>
+                 echo $personaggio['descrizione'];?>
                 </div>
             </div>
                    <div class="link_back" style="display: none;">
             <a href="main.php?page=scheda&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>">
-                <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['link']['back']); ?>
+                <?=gdrcd_filter('out', $MESSAGE['interface']['sheet']['link']['back'])?>
             </a>
         </div>
 </div><!-- Pagina -->
