@@ -23,7 +23,7 @@ else $img = "themes/crystal/imgs/maps/mappa_giorno.png";
 </map>
 </center>
 
-<? if(date("G") >= 18 OR date("G") <= 6){ ?>
+<?php if(date("G") >= 18 OR date("G") <= 6){ ?>
   <div class="menu_mappa" id="menu1">
     <ul class="Stile1">
       <p>Odaiba (<span dir="ltr" lang="ja" xml:lang="ja">お台場</span>) &egrave; una grande isola artificiale collocata a Est della citt&agrave;. Meta preferita di molti turisti, &egrave; nota soprattutto per il famoso lungomare.</p>
