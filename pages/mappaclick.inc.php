@@ -9,8 +9,8 @@ else $img = "themes/crystal/imgs/maps/mappa_giorno.png";
 ?>
 
 <center>
-<img src="<?=$img?>" usemap="#<?=$img?>" class="map-responsive" style="max-width: 100%;height: auto;">
-<map id="ctMap" name="<?=$img?>" style="cursor:pointer;">
+<img src="<?=$img?>" usemap="#ctMap" class="map-responsive" style="max-width: 100%;height: auto;">
+<map id="ctMap" name="ctMap" style="cursor:pointer;">
     <area shape="rect" coords="689,377,723,403" data-menu="menu1">
     <area shape="rect" coords="448,129,477,153" data-menu="menu2">
     <area shape="rect" coords="433,277,459,301" data-menu="menu3">
@@ -28,7 +28,7 @@ else $img = "themes/crystal/imgs/maps/mappa_giorno.png";
     <ul class="Stile1">
       <p>Odaiba (<span dir="ltr" lang="ja" xml:lang="ja">お台場</span>) &egrave; una grande isola artificiale collocata a Est della citt&agrave;. Meta preferita di molti turisti, &egrave; nota soprattutto per il famoso lungomare.</p>
       <a href="main.php?dir=50" target="_top"><img src="themes/crystal/imgs/maps/faro.png" border=0></a>
-      <a href="main.php?dir=2" target="_top"><img src="themes/crystal/imgs/maps//porto.png" border=0></a>
+      <a href="main.php?dir=2" target="_top"><img src="themes/crystal/imgs/maps/porto.png" border=0></a>
       <a href="main.php?dir=3" target="_top"><img src="themes/crystal/imgs/maps/ponte.png" border=0></a>
       <a href="main.php?dir=22" target="_top"><img src="themes/crystal/imgs/maps/spiaggia.png" border=0></a>
       <a href="main.php?dir=32" target="_top"><img src="themes/crystal/imgs/maps/regno_di_caos.png" border=0></a>
@@ -128,12 +128,12 @@ else $img = "themes/crystal/imgs/maps/mappa_giorno.png";
     </ul>
     <span class="close-location-modal" onclick="hideAllMenus();">×</span>
   </div>
-<? } else { ?>
+<?php } else { ?>
   <div id="menu1" class="menu_mappa">
     <ul class="Stile1">
       <p>Odaiba (<span dir="ltr" lang="ja" xml:lang="ja">お台場</span>) &egrave; una grande isola artificiale collocata a Est della citt&agrave;. Meta preferita di molti turisti, &egrave; nota soprattutto per il famoso lungomare.</p>
       <a href="main.php?dir=50" target="_top"><img src="themes/crystal/imgs/maps/faro.png" border=0></a>
-      <a href="main.php?dir=2" target="_top"><img src="themes/crystal/imgs/maps//porto.png" border=0></a>
+      <a href="main.php?dir=2" target="_top"><img src="themes/crystal/imgs/maps/porto.png" border=0></a>
       <a href="main.php?dir=3" target="_top"><img src="themes/crystal/imgs/maps/ponte.png" border=0></a>
       <a href="main.php?dir=22" target="_top"><img src="themes/crystal/imgs/maps/spiaggia.png" border=0></a>
       <a href="main.php?dir=32" target="_top"><img src="themes/crystal/imgs/maps/regno_di_caos.png" border=0></a>
@@ -233,7 +233,7 @@ else $img = "themes/crystal/imgs/maps/mappa_giorno.png";
     </ul>
     <span class="close-location-modal" onclick="hideAllMenus();">×</span>
   </div>
-<?
+<?php
 }
 
 $limite_role = gdrcd_query("SELECT * FROM mappa WHERE timestamp_modifica_limite IS NOT NULL AND timestamp_modifica_limite < DATE_SUB(NOW(), INTERVAL 6 HOUR)", 'result');

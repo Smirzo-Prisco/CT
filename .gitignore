@@ -419,7 +419,6 @@ FodyWeavers.xsd
 
 # Git
 .git/
-.github/
 
 # OS / Editor
 .DS_Store
