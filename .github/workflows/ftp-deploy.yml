@@ -1,10 +1,9 @@
-name: Deploy GDRCD su Altervista
+name: Deploy GDRCD su Crystal Tokyo
 
 on:
   push:
     branches:
       - main
-      - test
 
 jobs:
   deploy:
@@ -14,83 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ======================
-      # DEPLOY AMBIENTE TEST
-      # ======================
-      - name: Deploy TEST (latinoromano)
-        if: github.ref == 'refs/heads/test'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Deploy su server via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          server: ${{ secrets.FTP_TEST_SERVER }}
-          username: ${{ secrets.FTP_TEST_USERNAME }}
-          password: ${{ secrets.FTP_TEST_PASSWORD }}
-          server-dir: ${{ secrets.FTP_TEST_PATH }}
-          local-dir: ./
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/docs/**
-            **/giocate/**
-            **/imgs/**
-            **/layouts/**
-            **/node_modules/**
-            **/plugins/**
-            **/sounds/**
-            **/statuti/**
-            **/themes/advanced/**
-            **/vocabulary/**
-            **/.gitignore*
-            **/.htaccess*
-            **/config.inc.php*
-            **/google1523a7878bc930c6.html*
-            **/installer.php*
-            **/log.html*
-            **/purgecss.config.js*
-            **/test.php*
-            **/*.md
-            **/*.mjs
-            **/*.sql
-            **/*.yml
-            **/*.json
-            **/*.txt
-            **/*.jpeg
-            **/*.xml
-            **/*.pdf
-
-      # ======================
-      # DEPLOY PRODUZIONE
-      # ======================
-      - name: Deploy PRODUZIONE (Crystal Tokyo)
-        if: github.ref == 'refs/heads/main'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_PROD_SERVER }}
-          username: ${{ secrets.FTP_PROD_USERNAME }}
-          password: ${{ secrets.FTP_PROD_PASSWORD }}
-          server-dir: ${{ secrets.FTP_PROD_PATH }}
-          local-dir: ./
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/.htaccess*
-            **/config.inc.php*
-            **/google1523a7878bc930c6.html*
-            **/installer.php*
-            **/log.html*
-            **/purgecss.config.js*
-            **/test.php*
-            **/node_modules/**
-            **/*.md
-            **/*.mjs
-            **/*.sql
-            **/*.yml
-            **/*.jpeg
-            **/*.xml
-            **/*.pdf
-            **/docs/**
-            **/giocate/**
-            **/imgs/**
-            **/plugins/**
-            **/sounds/**
-            **/statuti/**
-            **/themes/advanced/**
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.SSH_PATH }}
+            git pull origin main
+            chown -R www-data:www-data /var/www/crystaltokyo
