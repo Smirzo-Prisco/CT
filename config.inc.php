@@ -12,6 +12,8 @@
 
 error_reporting(E_ERROR | E_PARSE);
 
+require_once 'includes/constant_values.inc.php';
+
 /* PARAMETRI DI CONNESSIONE */
 $PARAMETERS['database']['username'] = 'latinoromano';            //nome utente del database
 $PARAMETERS['database']['password'] = 'L4t1n0r0m4n0';            //password del database
