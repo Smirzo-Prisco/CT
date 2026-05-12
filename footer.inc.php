@@ -34,7 +34,7 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Socket.io: variabili utente e libreria client -->
+    <!-- Socket.io: variabili utente, libreria client e connessione unica condivisa -->
     <?php if (isset($_SESSION['login'])): ?>
     <script>
     window.CT_USER = {
@@ -42,9 +42,17 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
         luogo: <?=(int)($_SESSION['luogo'] ?? 0)?>,
         mappa: <?=(int)($_SESSION['mappa'] ?? 0)?>
     };
+    window.ctSocket = null;
     </script>
     <?php endif; ?>
     <script src="/socket.io/socket.io.js"></script>
+    <?php if (isset($_SESSION['login'])): ?>
+    <script>
+    if (typeof io !== 'undefined' && window.CT_USER) {
+        window.ctSocket = io({ auth: window.CT_USER });
+    }
+    </script>
+    <?php endif; ?>
 
     <!-- COREFUNCTIONS -->
     <script src="/includes/corefunctions.js"></script>

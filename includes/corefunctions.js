@@ -520,11 +520,9 @@ function initModernOnlineUsers(containerId = 'online-users-container') {
 
     loadOnlineUsers(container);
 
-    if (window.io) {
-        const socket = io({ auth: window.CT_USER || {} });
-        socket.on('users:update', () => loadOnlineUsers(container));
+    if (window.ctSocket) {
+        window.ctSocket.on('users:update', () => loadOnlineUsers(container));
     }
-    // fallback a 60 secondi
     setInterval(() => loadOnlineUsers(container), 60000);
 }
 /** Carica gli utenti online via AJAX */

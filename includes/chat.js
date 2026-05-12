@@ -166,10 +166,8 @@ function ChatViewer() {
     React.useEffect(() => {
         fetchRef.current(); // caricamento iniziale
 
-        let socket = null;
-        if (window.io) {
-            socket = io({ auth: window.CT_USER || {} });
-            socket.on('chat:update', () => fetchRef.current());
+        if (window.ctSocket) {
+            window.ctSocket.on('chat:update', () => fetchRef.current());
         }
 
         // fallback a 30 secondi se il socket non è disponibile
@@ -177,7 +175,6 @@ function ChatViewer() {
         window.refreshChat = () => fetchRef.current();
 
         return () => {
-            if (socket) socket.disconnect();
             clearInterval(fallback);
         };
     }, []); // solo al mount

@@ -92,10 +92,9 @@ if (link) {
 
 getChatOff();
 
-if (window.io) {
-    const socket = io({ auth: window.CT_USER || {} });
-    socket.on('dm:update', getMessages);
-    socket.on('chatoff:update', getChatOff);
+if (window.ctSocket) {
+    window.ctSocket.on('dm:update', getMessages);
+    window.ctSocket.on('chatoff:update', getChatOff);
 }
 // fallback polling finché non sono aggiunte le notify PHP per DM e chat off
 setInterval(getMessages, 30000);
