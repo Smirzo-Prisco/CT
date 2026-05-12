@@ -267,12 +267,14 @@ if($_SESSION['login'] != '') {
             $remote_addr = $_SERVER['REMOTE_ADDR'];
             $login_filtered = gdrcd_filter('in', $_SESSION['login']);
             gdrcd_query("UPDATE personaggio SET ora_entrata = NOW(), ultimo_luogo='-1', ultimo_refresh = NOW(), last_ip = '$remote_addr', is_invisible = 0 WHERE nome = '$login_filtered'");
+            notifySocketServer('users:update', 'loc:-1');
 
             /*Redirigo alla pagina del gioco*/
             header('Location: main.php?page=mappaclick&map_id='.$_SESSION['mappa'], true);
         } else {
             /*Inserisco nei presenti*/
             gdrcd_query("UPDATE personaggio SET ora_entrata = NOW(), ultimo_refresh = NOW(), last_ip = '".$_SERVER['REMOTE_ADDR']."',  is_invisible = 0 WHERE nome =  '".$_SESSION['login']."'");
+            notifySocketServer('users:update', 'loc:' . (int)$_SESSION['luogo']);
 
             /*Redirigo alla pagina del gioco*/
             header('Location: main.php?dir='.$_SESSION['luogo'], true);

@@ -9,6 +9,7 @@ $handleDBConnection = gdrcd_connect();
 * @author Blancks
 */
 gdrcd_query("UPDATE personaggio SET ora_uscita = NOW() WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "'");
+notifySocketServer('users:update', 'loc:' . (int)$_SESSION['luogo']);
 ?>
 <html>
 <head>
