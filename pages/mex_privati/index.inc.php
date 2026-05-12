@@ -464,7 +464,9 @@ document.getElementById('toggle-off').addEventListener('click', function() {
     updatePagination('off');
 });
 
-if (window.ctSocket) {
+document.addEventListener('DOMContentLoaded', function() {
+    if (!window.ctSocket) return;
+
     window.ctSocket.on('dm:update', function() {
         fetch('/pages/ajax_engine.php?op=getMessagesOngameStatus')
             .then(r => r.json())
@@ -485,7 +487,7 @@ if (window.ctSocket) {
                 }
             });
     });
-}
+});
 
 const maxItemsPerPage = 10;
 let currentPageOn = 1;
