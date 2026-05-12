@@ -85,9 +85,9 @@
         <?php
             if($PARAMETERS['mode']['alert_password_change'] == 'ON') {
                 $six_months = 15552000;
-                $ts_signup = strtotime($record['data_iscrizione']);
-                $ts_lastpass = (int) strtotime($record['ultimo_cambiopass']);
-                if($ts_lastpass + $six_months < time() && $record['nome'] == $_SESSION['login']) {
+                $ts_signup = strtotime($pg['data_iscrizione']);
+                $ts_lastpass = (int) strtotime($pg['ultimo_cambiopass']);
+                if($ts_lastpass + $six_months < time() && $pg['nome'] == $_SESSION['login']) {
                     $message = ($ts_signup + $six_months < time()) ? $MESSAGE['warning']['changepass'] : $MESSAGE['warning']['changepass_signup'];
                     echo '<div class="warning">'.$message.'</div>';
                 }
@@ -106,13 +106,6 @@
             </div>
             -->
             <div class="ritratto_avatar"><img src="<?=gdrcd_filter('fullurl', $pg['url_img'])?>" class="ritratto_avatar_immagine" /></div>
-            <?php
-            // Se l'URL del media esiste, aggiungi il player musicale invisibile
-            if (!empty($pg['url_media'])) {
-                $url_media = gdrcd_filter('out', $pg['url_media']);
-                echo '<audio autoplay style="display:none;"><source src="' . $url_media . '" type="audio/mpeg">Your browser does not support the audio element.</audio>';
-            }
-            ?>
             <!-- nome, ritratto, ultimo ingresso, abiti portati -->
             <div class="profilo"><!-- Punteggi, salute, status, classe, razza. -->
                 <div class="titolo_box"><?=gdrcd_filter('out', $MESSAGE['interface']['sheet']['box_title']['profile'])?></div>
