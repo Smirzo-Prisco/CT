@@ -25,7 +25,8 @@ if(!empty($_GET['map_id'])) {
     $old_luogo_map = (int)(gdrcd_query("SELECT ultimo_luogo FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "'")['ultimo_luogo'] ?? -1);
     $_SESSION['mappa'] = (int) $_GET['map_id'];
     gdrcd_query("UPDATE personaggio SET ultima_mappa=".gdrcd_filter('num', $_SESSION['mappa']).", ultimo_luogo=-1 WHERE nome = '".gdrcd_filter('in', $_SESSION['login'])."'");
-    notifySocketServer('users:update', 'loc:' . $old_luogo_map);
+    notifySocketServer('users:update', 'loc:' . $old_luogo_map); // chi era nella stanza vede l'utente partire
+    notifySocketServer('users:update', 'loc:-1');                 // chi è sulla mappa vede l'utente arrivare
 }
 
 if(isset($_REQUEST['page'])) {
