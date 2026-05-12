@@ -89,7 +89,6 @@ if (link) {
         link.target = "_blank";
     }
 
-    link.addEventListener('click', () => updateMessageIcon(false, false));
 }
 
 getChatOff();

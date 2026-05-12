@@ -44,8 +44,8 @@ function update_read_status($conversazione_id, $gruppo_id = null) {
                 WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'";
     }
 
-    // Esegui l'UPDATE
     gdrcd_query($sql);
+    notifySocketServer('dm:update', 'dm:' . $login);
 }
 
 // Esempio di utilizzo per una conversazione individuale
