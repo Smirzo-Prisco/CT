@@ -44,6 +44,7 @@ $fp = fopen("log.html", 'w');
 		$_SESSION['name'] = $_SESSION['login'];
 	
 gdrcd_query("DELETE FROM chat_letta WHERE nome = '". $_SESSION['login'] ."'"); /* CANCELLO PG*/
+notifySocketServer('chatoff:update', 'chatoff:' . $_SESSION['login']);
 ?>
 
 <html xmlns="http://www.w3.org/1999/xhtml">

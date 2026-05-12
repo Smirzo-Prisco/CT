@@ -461,8 +461,31 @@ document.getElementById('toggle-off').addEventListener('click', function() {
     document.getElementById('messages-off').style.display = 'block';
     document.getElementById('toggle-on').classList.remove('active');
     document.getElementById('toggle-off').classList.add('active');
-    updatePagination('off'); // Aggiorna la paginazione per la sezione OFF
+    updatePagination('off');
 });
+
+if (window.ctSocket) {
+    window.ctSocket.on('dm:update', function() {
+        fetch('/pages/ajax_engine.php?op=getMessagesOngameStatus')
+            .then(r => r.json())
+            .then(data => {
+                const elOff = document.getElementById('toggle-off');
+                const elOn  = document.getElementById('toggle-on');
+                if (elOff) {
+                    elOff.querySelector('img').src = data.hasNewOff
+                        ? '../../themes/crystal/imgs/sms/MessaggioOff_Acceso.gif'
+                        : './../themes/crystal/imgs/sms/MessaggioOff_Spento.png';
+                    elOff.classList.toggle('active', data.hasNewOff);
+                }
+                if (elOn) {
+                    elOn.querySelector('img').src = data.hasNewOn
+                        ? '../../themes/crystal/imgs/sms/MessaggioOn_Acceso.gif'
+                        : './../themes/crystal/imgs/sms/MessaggioOn_Spento.png';
+                    elOn.classList.toggle('active', data.hasNewOn);
+                }
+            });
+    });
+}
 
 const maxItemsPerPage = 10;
 let currentPageOn = 1;

@@ -131,6 +131,27 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             ));
 
             break;
+        case 'getMessagesOngameStatus':
+            session_start();
+            $login = gdrcd_filter('in', $_SESSION['login']);
+            $hasNewOn = false;
+            $hasNewOff = false;
+
+            $r_ind = gdrcd_query("SELECT s.ongame FROM conversazioni_individuali ci JOIN sms s ON ci.id_conversazione = s.id_conversazione WHERE ci.utente_nome = '$login' AND ci.lettura = 0 GROUP BY ci.id_conversazione", 'result');
+            while ($row = gdrcd_query($r_ind, 'fetch')) {
+                if ($row['ongame'] == 1) $hasNewOn = true; else $hasNewOff = true;
+            }
+            gdrcd_query($r_ind, 'free');
+
+            $r_grp = gdrcd_query("SELECT MIN(s.ongame) as ongame FROM partecipazione_gruppo pg JOIN sms s ON pg.gruppo_id = s.gruppo_id WHERE pg.utente_nome = '$login' AND pg.lettura = 0 GROUP BY pg.gruppo_id", 'result');
+            while ($row = gdrcd_query($r_grp, 'fetch')) {
+                if ($row['ongame'] == 1) $hasNewOn = true; else $hasNewOff = true;
+            }
+            gdrcd_query($r_grp, 'free');
+
+            echo json_encode(['hasNewOn' => $hasNewOn, 'hasNewOff' => $hasNewOff]);
+            break;
+
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
     /*********************  FINE    Recupero i dati dell'utente che voglio modificare   */
