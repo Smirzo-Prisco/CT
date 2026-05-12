@@ -47,7 +47,7 @@
         }
 
         $pg = gdrcd_query($personaggi, 'fetch');
-        gdrcd_query($pg, 'free');
+        gdrcd_query($personaggi, 'free');
 
         $bonus_oggetti = gdrcd_query("SELECT SUM(oggetto.bonus_car0) AS BO0, SUM(oggetto.bonus_car1) AS BO1, SUM(oggetto.bonus_car2) AS BO2, SUM(oggetto.bonus_car3) AS BO3, SUM(oggetto.bonus_car4) AS BO4, SUM(oggetto.bonus_car5) AS BO5
                 FROM oggetto JOIN clgpersonaggiooggetto ON oggetto.id_oggetto = clgpersonaggiooggetto.id_oggetto
@@ -304,12 +304,12 @@
 /********* CHIUSURA SCHEDA **********/
 
 //Impedisci XSS nella musica
-$record['url_media'] = gdrcd_filter('fullurl', $record['url_media']);
-if($PARAMETERS['mode']['allow_audio'] == 'ON' && ! $_SESSION['blocca_media'] && ! empty($record['url_media'])) { ?>
+$pg['url_media'] = gdrcd_filter('fullurl', $pg['url_media']);
+if($PARAMETERS['mode']['allow_audio'] == 'ON' && ! $_SESSION['blocca_media'] && ! empty($pg['url_media'])) { ?>
     <audio autoplay>
-        <source src="<?=$record['url_media']?>" type="audio/mpeg">
+        <source src="<?=$pg['url_media']?>" type="audio/mpeg">
     </audio>
     <!--[if IE9]>
-    <embed src="<?=$record['url_media']?>" autostart="true" hidden="true"/>
+    <embed src="<?=$pg['url_media']?>" autostart="true" hidden="true"/>
     <![endif]-->
 <?php } ?>
