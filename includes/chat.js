@@ -34,7 +34,6 @@ async function pulisciChat() {
                 if (chatContainer) chatContainer.innerHTML = ''; // Svuota la chat
 
                 // Esegue refresh della chat
-                if (window.refreshChat) window.refreshChat();
 
                 document.getElementById("chatPanel").style.display = "none";
             })
@@ -46,7 +45,7 @@ async function pulisciChat() {
 async function curaPg() {
     fetch(ns_chat.api_file + '?' + ns_chat.param + '=curaPg')
         .then(res => res.json())
-        .then(data => { if (window.refreshChat) window.refreshChat(); })
+        .then(data => {})
         .catch(err => console.error('Errore caricamento chat:', err));
 }
 
@@ -61,7 +60,6 @@ function toggleBackChat(a) {
                 img.src = "themes/crystal/imgs/chat/" + data.image;
                 if (data.title) img.title = data.title;
 
-                if (window.refreshChat) window.refreshChat();
             } else showNotification(data.message, 'error');
         })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -107,8 +105,6 @@ async function sendChatMessage() {
             // Ripristina il tag salvato in sessione, se necessario
             if (form.elements["tag"]) form.elements["tag"].value = result.tag ?? "";
 
-            // Esegue refresh della chat
-            if (window.refreshChat) window.refreshChat();
         } else showNotification(result.message, 'error');
     } catch (err) {
         console.error("💥 Errore nell’invio del messaggio:", err);
@@ -207,8 +203,7 @@ function tiraDadoChat() {
                 if (data.success) {
                     document.getElementById("chatPanel").style.display = "none";
                     // Esegue refresh della chat
-                    if (window.refreshChat) window.refreshChat();
-                } else showNotification(data.message, 'error');
+                    } else showNotification(data.message, 'error');
             })
             .catch(err => console.error('Errore caricamento chat:', err));
     } else showNotification('Attenzione! Devi selezionare il bersaglio', 'warning');
@@ -237,7 +232,6 @@ function usaAttaccoChat() {
             if (data.success) {
                 document.getElementById("chatPanel").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
             } else showNotification(data.message, 'error');
         })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -284,8 +278,7 @@ function tiraSkillChat() {
                 if (data.success) {
                     document.getElementById("chatPanel").style.display = "none";
                     // Esegue refresh della chat
-                    if (window.refreshChat) window.refreshChat();
-                } else showNotification(data.message, 'error');
+                    } else showNotification(data.message, 'error');
             })
             .catch(err => console.error('Errore caricamento chat:', err));
     } else showNotification('Attenzione! Devi selezionare il bersaglio', 'warning');
@@ -311,7 +304,6 @@ function saveEditAction() {
             if (data.success) {
                 document.getElementById("editAction-modal").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
             } else showNotification(data.message, 'error');
         })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -331,7 +323,6 @@ function setCharLimit() {
             if (data.success) {
                 document.getElementById("chatPanel").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
             } else showNotification(data.message, 'error');
         })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -380,7 +371,6 @@ function usaOggettoChat() {
             if (data.success) {
                 document.getElementById("chatPanel").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
             } else showNotification(data.message, 'error');
         })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -405,7 +395,6 @@ function tiraDadoGenericoChat() {
             if (data.success) {
                 document.getElementById("chatPanel").style.display = "none";
 
-                if (window.refreshChat) window.refreshChat();
             } else showNotification(data.message, 'error');
         })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -439,7 +428,6 @@ function editMasterPgChat() {
         .then(data => {
             document.getElementById("chatPanel").style.display = "none";
 
-            if (window.refreshChat) window.refreshChat();
         })
         .catch(err => console.error('Errore caricamento chat:', err));
 }
@@ -457,8 +445,6 @@ function newMasterPng() {
         .then(res => res.json())
         .then(data => {
             document.getElementById("chatPanel").style.display = "none";
-
-            if (window.refreshChat) window.refreshChat();
 
             getPngRolePlaying(); // Aggiorna la lista dei png nella sezione master del pannello chat
         })
@@ -487,7 +473,6 @@ function newMasterPngAction() {
         .then(data => {
             document.getElementById("chatPanel").style.display = "none";
 
-            if (window.refreshChat) window.refreshChat();
         })
         .catch(err => console.error('Errore caricamento chat:', err));
 }

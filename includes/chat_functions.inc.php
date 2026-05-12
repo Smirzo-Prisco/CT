@@ -331,6 +331,7 @@ function chatInsertMessage($location, $sender, $target = null, $msg, $m_type, $s
     gdrcd_query("INSERT INTO chat (stanza, mittente, destinatario, ora, tipo, testo, backing, id_role) VALUES ('$location', '$sender', '$target', NOW(), '$m_type', '".gdrcd_filter('in', $msg)."', $back_chat, $id_role)");
     if ($sussurro !== null) gdrcd_query("INSERT INTO chat (stanza, mittente, destinatario, ora, tipo, testo, id_role) VALUES ('$location', 'System', '$sender', NOW(), 'Q', '".gdrcd_filter('in', $sussurro)."', $id_role)");
 
+    notifySocketServer('chat:update', 'chat:' . (int)$location);
     return true;
 }
 /***************    FINE    Inserimento messaggio in chat *********************/
