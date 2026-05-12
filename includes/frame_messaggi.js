@@ -96,6 +96,3 @@ if (window.ctSocket) {
     window.ctSocket.on('dm:update', getMessages);
     window.ctSocket.on('chatoff:update', getChatOff);
 }
-// fallback polling finché non sono aggiunte le notify PHP per DM e chat off
-setInterval(getMessages, 30000);
-setInterval(getChatOff, 60000);

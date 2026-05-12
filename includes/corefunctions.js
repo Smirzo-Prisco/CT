@@ -523,7 +523,6 @@ function initModernOnlineUsers(containerId = 'online-users-container') {
     if (window.ctSocket) {
         window.ctSocket.on('users:update', () => loadOnlineUsers(container));
     }
-    setInterval(() => loadOnlineUsers(container), 60000);
 }
 /** Carica gli utenti online via AJAX */
 function loadOnlineUsers(container) {

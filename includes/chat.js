@@ -170,13 +170,7 @@ function ChatViewer() {
             window.ctSocket.on('chat:update', () => fetchRef.current());
         }
 
-        // fallback a 30 secondi se il socket non è disponibile
-        const fallback = setInterval(() => fetchRef.current(), 30000);
         window.refreshChat = () => fetchRef.current();
-
-        return () => {
-            clearInterval(fallback);
-        };
     }, []); // solo al mount
 
     return e('div', { className: 'chat_inner' }, null);
