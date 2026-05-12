@@ -25,7 +25,7 @@ if(!empty($_GET['map_id'])) {
     $old_luogo_map = (int)(gdrcd_query("SELECT ultimo_luogo FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "'")['ultimo_luogo'] ?? -1);
     $_SESSION['mappa'] = (int) $_GET['map_id'];
     gdrcd_query("UPDATE personaggio SET ultima_mappa=".gdrcd_filter('num', $_SESSION['mappa']).", ultimo_luogo=-1 WHERE nome = '".gdrcd_filter('in', $_SESSION['login'])."'");
-    if ($old_luogo_map >= 0) notifySocketServer('users:update', 'loc:' . $old_luogo_map);
+    notifySocketServer('users:update', 'loc:' . $old_luogo_map);
 }
 
 if(isset($_REQUEST['page'])) {
@@ -41,7 +41,7 @@ if(isset($_REQUEST['page'])) {
 
     $old_luogo_dir = (int)(gdrcd_query("SELECT ultimo_luogo FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "'")['ultimo_luogo'] ?? -1);
     gdrcd_query("UPDATE personaggio SET ultimo_luogo=".gdrcd_filter('num', $_REQUEST['dir'])." WHERE nome='".gdrcd_filter('in', $_SESSION['login'])."'");
-    if ($old_luogo_dir >= 0) notifySocketServer('users:update', 'loc:' . $old_luogo_dir);
+    notifySocketServer('users:update', 'loc:' . $old_luogo_dir);
     notifySocketServer('users:update', 'loc:' . (int)$_REQUEST['dir']);
     /**    * Caso di fix
      * se non ci sono variabili via url, si ripristinano dei valori di default
