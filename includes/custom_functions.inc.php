@@ -190,6 +190,8 @@ function send_sms($from, $to, $title, $text) {
         gdrcd_query("INSERT INTO conversazioni_individuali (id_conversazione, utente_nome, lettura)
                     VALUES ($new_id, '" . gdrcd_filter('in', $to) . "', 0)");
     }
+
+    notifySocketServer('dm:update', 'dm:' . $to);
 }
 
 function isAdminMasterMod($session) {

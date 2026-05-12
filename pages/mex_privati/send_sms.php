@@ -84,13 +84,19 @@ if ($is_archivio) {
 
         // Aggiorna il campo lettura per i partecipanti del gruppo
         $sql_aggiorna_lettura = "
-            UPDATE partecipazione_gruppo 
+            UPDATE partecipazione_gruppo
             SET lettura = IF(utente_nome = '$mittente', 1, 0)
             WHERE gruppo_id = $gruppo_id
         ";
         gdrcd_query($sql_aggiorna_lettura);
-        
-        
+
+        // Notifica i membri del gruppo (escluso il mittente)
+        $members_result = gdrcd_query("SELECT utente_nome FROM partecipazione_gruppo WHERE gruppo_id = $gruppo_id AND utente_nome != '$mittente'", 'result');
+        while ($m = gdrcd_query($members_result, 'fetch')) {
+            notifySocketServer('dm:update', 'dm:' . $m['utente_nome']);
+        }
+        gdrcd_query($members_result, 'free');
+
         // **NUOVO BLOCCO DI CODICE**: Aggiunta dei nuovi utenti al gruppo globale solo se is_globale è 1
 if ($is_globale == 1) {
     // Trova tutti gli utenti che non sono ancora nel gruppo globale
@@ -135,7 +141,7 @@ if ($is_globale == 1) {
         WHERE id_conversazione = $id_conversazione";
         gdrcd_query($sql_aggiorna_lettura);
 
-        // Reindirizza alla pagina della conversazione individuale
+        notifySocketServer('dm:update', 'dm:' . $destinatario);
         header("Location: message_content.php?conversazione_id=$id_conversazione");
         exit();
     } else {
@@ -163,7 +169,7 @@ if ($is_globale == 1) {
     ";
     gdrcd_query($sql_inserisci_conversazione);
 
-    // Reindirizza alla pagina della nuova conversazione
+    notifySocketServer('dm:update', 'dm:' . $destinatario);
     header("Location: message_content.php?conversazione_id=$nuovo_id_conversazione");
     exit();
 }

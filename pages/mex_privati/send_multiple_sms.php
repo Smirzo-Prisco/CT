@@ -42,11 +42,11 @@ foreach ($destinatari as $destinatario) {
 ";
         gdrcd_query($sql_inserisci_messaggio);
 
-        // Aggiorna il campo lettura nella tabella conversazione_individuale
-        $sql_aggiorna_lettura = "UPDATE conversazioni_individuali 
+        $sql_aggiorna_lettura = "UPDATE conversazioni_individuali
         SET lettura = IF(utente_nome = '$destinatario', 0, 1)
         WHERE id_conversazione = $id_conversazione_esistente";
         gdrcd_query($sql_aggiorna_lettura);
+        notifySocketServer('dm:update', 'dm:' . $destinatario);
     } else {
         // Conversazione non esistente: Crea una nuova conversazione
         // Trova l'ultimo id_conversazione e calcola il nuovo id_conversazione
@@ -70,6 +70,7 @@ foreach ($destinatari as $destinatario) {
             ($nuovo_id_conversazione, '$destinatario', 0)
         ";
         gdrcd_query($sql_inserisci_conversazione);
+        notifySocketServer('dm:update', 'dm:' . $destinatario);
     }
 }
 
