@@ -56,11 +56,7 @@ async function getMessages() {
     }
 }
 
-// Esegui subito
 getMessages();
-
-// Polling ogni 8 sec
-setInterval(getMessages, 12000);
 
 /*************  CHAT OFF   ***************/
 function updateChatOffIcon(hasNew) {
@@ -94,8 +90,13 @@ if (link) {
     }
 }
 
-// Esegui subito
 getChatOff();
 
-// Polling
-setInterval(getChatOff, 20000);
+if (window.io) {
+    const socket = io({ auth: window.CT_USER || {} });
+    socket.on('dm:update', getMessages);
+    socket.on('chatoff:update', getChatOff);
+}
+// fallback polling finché non sono aggiunte le notify PHP per DM e chat off
+setInterval(getMessages, 30000);
+setInterval(getChatOff, 60000);

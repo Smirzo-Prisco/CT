@@ -34,6 +34,18 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+    <!-- Socket.io: variabili utente e libreria client -->
+    <?php if (isset($_SESSION['login'])): ?>
+    <script>
+    window.CT_USER = {
+        login: <?=json_encode($_SESSION['login'])?>,
+        luogo: <?=(int)($_SESSION['luogo'] ?? 0)?>,
+        mappa: <?=(int)($_SESSION['mappa'] ?? 0)?>
+    };
+    </script>
+    <?php endif; ?>
+    <script src="/socket.io/socket.io.js"></script>
+
     <!-- COREFUNCTIONS -->
     <script src="/includes/corefunctions.js"></script>
     

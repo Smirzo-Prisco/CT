@@ -677,6 +677,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $_SESSION['tag'] = gdrcd_filter('in', $data['tag']);
 
             // Risposta JSON per AJAX
+            notifySocketServer('chat:update', 'chat:' . (int)$location);
             echo json_encode(array(
                 'success' => true,
                 'message' => 'Messaggio registrato con successo',

@@ -159,17 +159,28 @@ function ChatViewer() {
             .catch(err => console.error('Errore caricamento chat:', err));
     };
 
-    // Recupera i messaggi ogni 5 secondi
-    React.useEffect(() => {
-        fetchMessages();
-        const interval = setInterval(fetchMessages, 5000);
-        return () => clearInterval(interval);
-    }, [lastId]);
+    // Ref sempre aggiornata alla closure corrente di fetchMessages (cattura lastId aggiornato)
+    const fetchRef = React.useRef(fetchMessages);
+    fetchRef.current = fetchMessages;
 
-    // espone la funzione per richiami esterni
     React.useEffect(() => {
-        window.refreshChat = fetchMessages;
-    }, [fetchMessages]);
+        fetchRef.current(); // caricamento iniziale
+
+        let socket = null;
+        if (window.io) {
+            socket = io({ auth: window.CT_USER || {} });
+            socket.on('chat:update', () => fetchRef.current());
+        }
+
+        // fallback a 30 secondi se il socket non è disponibile
+        const fallback = setInterval(() => fetchRef.current(), 30000);
+        window.refreshChat = () => fetchRef.current();
+
+        return () => {
+            if (socket) socket.disconnect();
+            clearInterval(fallback);
+        };
+    }, []); // solo al mount
 
     return e('div', { className: 'chat_inner' }, null);
 }

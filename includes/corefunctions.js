@@ -518,11 +518,14 @@ function initModernOnlineUsers(containerId = 'online-users-container') {
         return;
     }
 
-    // Carica i dati iniziali
     loadOnlineUsers(container);
 
-    // Aggiorna ogni TOT secondi
-    setInterval(() => loadOnlineUsers(container), 14000);
+    if (window.io) {
+        const socket = io({ auth: window.CT_USER || {} });
+        socket.on('users:update', () => loadOnlineUsers(container));
+    }
+    // fallback a 60 secondi
+    setInterval(() => loadOnlineUsers(container), 60000);
 }
 /** Carica gli utenti online via AJAX */
 function loadOnlineUsers(container) {

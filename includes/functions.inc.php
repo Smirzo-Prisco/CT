@@ -767,8 +767,22 @@ function gdrcd_sendSystemMsg($destinatario, $msg) {
 
     // inserimento messaggio
     $query="INSERT INTO msg (idgroup, nomesender, message) VALUES (".$idSystem.",'SYSTEM', '".$msg."');";
-    $retmsg = gdrcd_query($query);		
-			
+    $retmsg = gdrcd_query($query);
+
     return $retmsg;
-			
+}
+
+/** Notifica il server socket.io di un evento in tempo reale (fire-and-forget) */
+function notifySocketServer(string $event, string $room, array $data = []): void {
+    $payload = json_encode(['event' => $event, 'room' => $room, 'data' => $data]);
+    $ctx = stream_context_create([
+        'http' => [
+            'method'        => 'POST',
+            'header'        => "Content-Type: application/json\r\nContent-Length: " . strlen($payload),
+            'content'       => $payload,
+            'timeout'       => 0.5,
+            'ignore_errors' => true,
+        ]
+    ]);
+    @file_get_contents('http://127.0.0.1:3000/notify', false, $ctx);
 }
