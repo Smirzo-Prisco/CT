@@ -88,6 +88,8 @@ if (link) {
         link.href = "../pages/mex_privati/index.php";
         link.target = "_blank";
     }
+
+    link.addEventListener('click', () => updateMessageIcon(false, false));
 }
 
 getChatOff();
