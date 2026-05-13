@@ -449,23 +449,25 @@ export default function Forum() {
                 {loadingSections ? (
                     <p style={{ padding: '20px', color: '#aaa' }}>Caricamento sezioni...</p>
                 ) : (
-                    Object.entries(sections).map(([tipo, secs]) => (
-                        <div key={tipo} style={{ marginBottom: '20px' }}>
-                            {/* Intestazione gruppo sezioni */}
-                            <table className="customTable" style={{ width: '100%' }}>
-                                <thead>
-                                    <tr className="third_header">
-                                        <th colSpan="3" style={{ textAlign: 'left', padding: '6px 10px' }}>
+                    /*
+                     * Struttura identica al vecchio forum PHP:
+                     * - Un'unica tabella per tutti i gruppi
+                     * - Riga header di gruppo a larghezza intera (third_header)
+                     * - Riga per ogni sezione: [icona letto] [nome] [descrizione]
+                     * - Nessuna ripetizione di "Sezione / Descrizione / Non letti"
+                     */
+                    <table className="customTable" style={{ width: '100%' }}>
+                        <tbody>
+                            {Object.entries(sections).map(([tipo, secs]) => (
+                                <>
+                                    {/* Riga header del gruppo */}
+                                    <tr key={`h-${tipo}`} className="third_header">
+                                        <td colSpan="3" style={{ textAlign: 'center', padding: '6px 10px', textTransform: 'uppercase', fontWeight: 'bold' }}>
                                             {tipo}
-                                        </th>
+                                        </td>
                                     </tr>
-                                    <tr className="second_header">
-                                        <td style={{ width: '60%', padding: '4px 10px' }}>Sezione</td>
-                                        <td style={{ padding: '4px 10px' }}>Descrizione</td>
-                                        <td style={{ textAlign: 'center', padding: '4px 10px' }}>Non letti</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
+
+                                    {/* Righe delle sezioni */}
                                     {secs.map(sec => (
                                         <tr
                                             key={sec.id}
@@ -473,29 +475,28 @@ export default function Forum() {
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => openSection(sec)}
                                         >
-                                            <td style={{ padding: '6px 10px' }}>
-                                                <strong style={{ color: '#ce846f' }}>{sec.nome}</strong>
-                                            </td>
-                                            <td style={{ padding: '6px 10px', fontSize: '12px', color: '#aaa' }}>
-                                                {sec.descrizione}
-                                            </td>
-                                            <td style={{ textAlign: 'center', padding: '6px 10px' }}>
+                                            {/* Icona luna per thread non letti, come nel vecchio forum */}
+                                            <td style={{ width: '24px', padding: '6px 6px 6px 10px', textAlign: 'center' }}>
                                                 {sec.non_letti > 0 && (
-                                                    <span style={{
-                                                        background: '#e74c3c', color: '#fff',
-                                                        borderRadius: '10px', padding: '2px 7px',
-                                                        fontSize: '11px', fontWeight: 'bold',
-                                                    }}>
-                                                        {sec.non_letti}
-                                                    </span>
+                                                    <span title={`${sec.non_letti} thread non letti`} style={{ fontSize: '14px' }}>🌙</span>
                                                 )}
+                                            </td>
+
+                                            {/* Nome sezione */}
+                                            <td style={{ padding: '6px 10px', textTransform: 'uppercase' }}>
+                                                <strong style={{ color: '#ce846f', letterSpacing: '1px' }}>{sec.nome}</strong>
+                                            </td>
+
+                                            {/* Descrizione */}
+                                            <td style={{ padding: '6px 10px', fontSize: '11px', color: '#a7a7a8', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                                {sec.descrizione}
                                             </td>
                                         </tr>
                                     ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ))
+                                </>
+                            ))}
+                        </tbody>
+                    </table>
                 )}
             </div>
         )
