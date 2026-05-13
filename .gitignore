@@ -436,6 +436,9 @@ config.inc.php
 cache/
 temp/
 
+# Build frontend Vite
+themes/crystal/dist/
+
 # Backup
 *.bak
 *.old

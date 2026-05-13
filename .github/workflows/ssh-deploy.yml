@@ -20,9 +20,13 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd ${{ secrets.SSH_PATH }}
             git pull origin main
-            chown -R www-data:www-data /var/www/crystaltokyo
             cd ${{ secrets.SSH_PATH }}/nodeserver
             npm install --production
             pm2 restart ct-socket || pm2 start server.js --name ct-socket
+            cd ${{ secrets.SSH_PATH }}/frontend
+            npm install
+            npm run build
+            chown -R www-data:www-data /var/www/crystaltokyo

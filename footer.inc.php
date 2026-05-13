@@ -54,6 +54,11 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
     </script>
     <?php endif; ?>
 
+    <!-- Bundle React/Vite (caricato solo se il build è stato eseguito) -->
+    <?php if (file_exists(__DIR__ . '/themes/crystal/dist/ct-app.js')): ?>
+    <script type="module" src="/themes/crystal/dist/ct-app.js"></script>
+    <?php endif; ?>
+
     <!-- COREFUNCTIONS -->
     <script src="/includes/corefunctions.js"></script>
     
