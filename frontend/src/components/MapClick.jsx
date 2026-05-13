@@ -327,104 +327,118 @@ export default function MapClick() {
                     onLoad={onImageLoad}
                 />
 
-                {/* Hotspot per ogni zona — renderizzati solo dopo che l'immagine è caricata */}
+                {/*
+                  * HOTSPOT — solo i pallini, senza popup al loro interno.
+                  * Il popup è un sibling separato nel container (vedi sotto).
+                  * Renderizzati solo dopo che l'immagine è caricata (naturalSize.w > 0).
+                  */}
                 {ZONES.map(zone => {
                     const style = hotspotStyle(zone.cx, zone.cy)
-                    if (!style) return null   // immagine non ancora caricata
+                    if (!style) return null
                     return (
-                    <div
-                        key={zone.id}
-                        style={style}
-                        // Ferma la propagazione per non chiudere subito il popup
-                        onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
-                        onMouseEnter={() => setOpenZone(zone.id)}
-                        title={zone.name}
-                    >
-                        {/* Punto cliccabile visibile sulla mappa */}
-                        <div style={{
-                            width: '14px',
-                            height: '14px',
-                            borderRadius: '50%',
-                            backgroundColor: openZone === zone.id ? '#ffcc00' : 'rgba(255,255,255,0.7)',
-                            border: '2px solid rgba(0,0,0,0.5)',
-                            boxShadow: '0 0 6px rgba(0,0,0,0.6)',
-                            transition: 'background-color 0.2s',
-                        }} />
-
-                        {/* Popup zona — visibile solo se questa zona è aperta */}
-                        {openZone === zone.id && (
-                            <div
-                                className="menu_mappa"
-                                style={{
-                                    visibility: 'visible',
-                                    position: 'absolute',
-                                    /* Posizionamento intelligente: allinea a sinistra se vicino al bordo destro */
-                                    left: zone.cx > (mapInfo?.larghezza ?? 760) * 0.6 ? 'auto' : '20px',
-                                    right: zone.cx > (mapInfo?.larghezza ?? 760) * 0.6 ? '20px' : 'auto',
-                                    top: zone.cy < (mapInfo?.altezza ?? 430) * 0.3 ? '20px' : 'auto',
-                                    bottom: zone.cy >= (mapInfo?.altezza ?? 430) * 0.3 ? '20px' : 'auto',
-                                    zIndex: 500,
-                                }}
-                                onClick={e => e.stopPropagation()}
-                            >
-                                <ul className="Stile1">
-                                    {/* Descrizione della zona */}
-                                    <p>{zone.desc}</p>
-
-                                    {/* Icone stanze con badge utenti online */}
-                                    {zone.rooms.map((room, i) => {
-                                        const count = room.dir ? (onlineCounts[room.dir] || 0) : 0
-                                        return (
-                                            <span
-                                                key={i}
-                                                style={{ position: 'relative', display: 'inline-block', margin: '2px' }}
-                                                onClick={() => navigate(room)}
-                                                title={room.img.replace('.png', '').replace(/_/g, ' ')}
-                                            >
-                                                <img
-                                                    src={`themes/crystal/imgs/maps/${room.img}`}
-                                                    style={{ cursor: 'pointer', display: 'block' }}
-                                                    alt=""
-                                                    border="0"
-                                                />
-                                                {/* Badge con numero utenti online (visibile solo se > 0) */}
-                                                {count > 0 && (
-                                                    <span style={{
-                                                        position: 'absolute',
-                                                        top: '-4px',
-                                                        right: '-4px',
-                                                        background: '#e74c3c',
-                                                        color: '#fff',
-                                                        borderRadius: '50%',
-                                                        fontSize: '10px',
-                                                        fontWeight: 'bold',
-                                                        minWidth: '16px',
-                                                        height: '16px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        pointerEvents: 'none',
-                                                    }}>
-                                                        {count}
-                                                    </span>
-                                                )}
-                                            </span>
-                                        )
-                                    })}
-                                </ul>
-
-                                {/* Pulsante chiusura popup */}
-                                <span
-                                    className="close-location-modal"
-                                    onClick={e => { e.stopPropagation(); setOpenZone(null) }}
-                                >
-                                    ×
-                                </span>
-                            </div>
-                        )}
-                    </div>
+                        <div
+                            key={zone.id}
+                            style={style}
+                            onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
+                            onMouseEnter={() => setOpenZone(zone.id)}
+                            title={zone.name}
+                        >
+                            <div style={{
+                                width: '14px',
+                                height: '14px',
+                                borderRadius: '50%',
+                                backgroundColor: openZone === zone.id ? '#ffcc00' : 'rgba(255,255,255,0.7)',
+                                border: '2px solid rgba(0,0,0,0.5)',
+                                boxShadow: '0 0 6px rgba(0,0,0,0.6)',
+                                transition: 'background-color 0.2s',
+                            }} />
+                        </div>
                     )
                 })}
+
+                {/*
+                  * POPUP — sibling dei pallini, non figlio.
+                  * È position:absolute relativo al container (l'immagine), non al pallino.
+                  * La posizione si calcola con le stesse percentuali dell'hotspot ma con
+                  * un offset per non sovrapporsi al pallino, spostandosi verso l'interno
+                  * della mappa in base alla zona (sinistra/destra, alto/basso).
+                  */}
+                {openZone && (() => {
+                    const zone = ZONES.find(z => z.id === openZone)
+                    if (!zone || naturalSize.w === 0) return null
+
+                    /** Posizione del pallino in percentuale sull'immagine */
+                    const leftPct = (zone.cx / naturalSize.w) * 100
+                    const topPct  = (zone.cy / naturalSize.h) * 100
+
+                    /**
+                     * Posizionamento smart: allinea il popup verso l'interno della mappa
+                     * per evitare che esca dai bordi.
+                     * - Zone sulla destra (leftPct > 55): popup a sinistra del pallino
+                     * - Zone in basso  (topPct  > 55): popup sopra il pallino
+                     */
+                    const isRight  = leftPct > 55
+                    const isBottom = topPct  > 55
+
+                    const popupStyle = {
+                        visibility: 'visible',
+                        position:   'absolute',
+                        left:       isRight  ? 'auto'               : `calc(${leftPct}% + 12px)`,
+                        right:      isRight  ? `calc(${100 - leftPct}% + 12px)` : 'auto',
+                        top:        isBottom ? 'auto'               : `calc(${topPct}% - 10px)`,
+                        bottom:     isBottom ? `calc(${100 - topPct}% + 12px)` : 'auto',
+                        zIndex:     500,
+                    }
+
+                    return (
+                        <div
+                            className="menu_mappa"
+                            style={popupStyle}
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <ul className="Stile1">
+                                <p>{zone.desc}</p>
+
+                                {/* Icone stanze con badge utenti online */}
+                                {zone.rooms.map((room, i) => {
+                                    const count = room.dir ? (onlineCounts[room.dir] || 0) : 0
+                                    return (
+                                        <span
+                                            key={i}
+                                            style={{ position: 'relative', display: 'inline-block', margin: '2px' }}
+                                            onClick={() => navigate(room)}
+                                        >
+                                            <img
+                                                src={`/themes/crystal/imgs/maps/${room.img}`}
+                                                style={{ cursor: 'pointer', display: 'block' }}
+                                                alt=""
+                                                border="0"
+                                            />
+                                            {count > 0 && (
+                                                <span style={{
+                                                    position: 'absolute', top: '-4px', right: '-4px',
+                                                    background: '#e74c3c', color: '#fff',
+                                                    borderRadius: '50%', fontSize: '10px', fontWeight: 'bold',
+                                                    minWidth: '16px', height: '16px',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    pointerEvents: 'none',
+                                                }}>
+                                                    {count}
+                                                </span>
+                                            )}
+                                        </span>
+                                    )
+                                })}
+                            </ul>
+                            <span
+                                className="close-location-modal"
+                                onClick={e => { e.stopPropagation(); setOpenZone(null) }}
+                            >
+                                ×
+                            </span>
+                        </div>
+                    )
+                })()}
             </div>
         </center>
     )
