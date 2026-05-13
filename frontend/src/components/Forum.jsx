@@ -102,19 +102,23 @@ function ThreadRow({ thread, onClick, isStaff, onAction }) {
             {/* AZIONI staff: importante, chiudi/apri, elimina */}
             {isStaff && (
                 <td style={{ padding: '8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {/* Marca come importante (freccia su/giù) */}
+                    {/* Importante: freccia_su (verde) = segna, freccia_giu (rossa) = rimuovi */}
                     <img
-                        src={`/themes/crystal/imgs/forum/${thread.importante ? 'freccia_su' : 'freccia_giu'}.png`}
+                        src={thread.importante
+                            ? '/themes/crystal/imgs/forum/freccia_giu.png'
+                            : '/themes/crystal/imgs/forum/freccia_su.png'}
                         alt="Importante"
-                        title={thread.importante ? 'Rimuovi da importanti' : 'Marca come importante'}
+                        title={thread.importante ? 'Rimuovi da importanti' : 'Segna come importante'}
                         style={{ cursor: 'pointer', margin: '0 2px', width: '20px' }}
                         onClick={e => action(e, 'toggle_important')}
                     />
-                    {/* Apri / chiudi thread */}
+                    {/* Chiudi/Apri: lucchetto_chiuso = chiudi post, lucchetto_aperto = apri post */}
                     <img
-                        src={`/themes/crystal/imgs/forum/${thread.chiuso ? 'lucchetto_aperto' : 'lucchetto_chiuso'}.png`}
+                        src={thread.chiuso
+                            ? '/themes/crystal/imgs/forum/lucchetto_aperto.png'
+                            : '/themes/crystal/imgs/forum/lucchetto_chiuso.png'}
                         alt={thread.chiuso ? 'Apri' : 'Chiudi'}
-                        title={thread.chiuso ? 'Apri thread' : 'Chiudi thread'}
+                        title={thread.chiuso ? 'Apri post' : 'Chiudi post'}
                         style={{ cursor: 'pointer', margin: '0 2px', width: '20px' }}
                         onClick={e => action(e, 'toggle_close')}
                     />
