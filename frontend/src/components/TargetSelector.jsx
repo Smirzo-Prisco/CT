@@ -103,12 +103,16 @@ export default function TargetSelector() {
         // Caricamento iniziale della lista al mount del componente
         fetchUsers()
 
-        // Ascolta l'evento socket 'users:update': viene emesso ogni volta che
-        // qualcuno entra o esce dalla stanza, oppure cambia luogo sulla mappa.
-        // In questo modo la lista bersagli è sempre aggiornata in tempo reale.
         const sock = window.ctSocket
         if (sock) {
+            // 'users:update' — qualcuno entra o esce dalla stanza (movimento sulla mappa)
             sock.on('users:update', fetchUsers)
+
+            // 'role:update' — un pg si è aggiunto o ha abbandonato la role nella stanza.
+            // Emesso da api_roleSession.php nei case addPgToRole e quitRole.
+            // Questo è l'evento che garantisce l'aggiornamento della lista bersagli
+            // quando un nuovo giocatore si unisce alla giocata corrente.
+            sock.on('role:update', fetchUsers)
         }
 
         /**
@@ -143,9 +147,12 @@ export default function TargetSelector() {
             })
         }
 
-        // Cleanup al dismount: rimuove il listener socket e le callback globali
+        // Cleanup al dismount: rimuove i listener socket e le callback globali
         return () => {
-            if (sock) sock.off('users:update', fetchUsers)
+            if (sock) {
+                sock.off('users:update', fetchUsers)
+                sock.off('role:update',  fetchUsers)
+            }
             window.getSelectedNamesCallback = null
             window.setMaxTargetExternal     = null
         }

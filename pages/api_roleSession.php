@@ -43,7 +43,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 
                 // In ogni caso aggiungo il pg alla role
                 addPgToRole($id_role, $login, $location);
-                
+
+                // Notifica tutti i client nella stessa stanza:
+                // TargetSelector.jsx ascolta 'role:update' per ricaricare la lista bersagli
+                notifySocketServer('role:update', 'loc:' . $location);
+
                 echo json_encode(['success' => true, 'message' => 'Giocatore aggiunto con successo!']);
             } catch (Exception $e) {
                 echo json_encode(['success' => false, 'message' => 'Errore nel processamento degli utenti: ' . $e->getMessage(), 'error_details' => [ 'file' => $e->getFile(), 'line' => $e->getLine() ]]);
@@ -58,11 +62,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Se il pg è nella role, procedo con l'uscita
             if ($pgIsInRole && gdrcd_query($set_end)) {
                 chatInsertMessage($_SESSION['luogo'], 'System', $user, " ha abbandonato la role", 'N');
-                
+
                 if(!pgIsInRole('', $_SESSION['luogo'], true)) endRoleSession($_SESSION['luogo']); // Se sono usciti tutti i pg, chiudo la role
 
                 checkTurnEnd($_SESSION['luogo'], $user, $id_role); // Controllo se i pg rimasti hanno tutti già azionato nel turno, così propongo la chiusura
-                    
+
+                // Notifica tutti i client nella stessa stanza che la lista role è cambiata
+                notifySocketServer('role:update', 'loc:' . $_SESSION['luogo']);
+
                 echo json_encode(array('success' => true, 'message' => "Il personaggio $user è uscito dalla role."));
             } else echo json_encode(array('success' => false, 'message' => "Errore nell'uscita dalla role.", 'query' => $set_end));
 
