@@ -50,15 +50,20 @@ switch ($op) {
             ]);
         } else {
             // Il personaggio è sulla mappa (luogo = -1)
-            $zona = gdrcd_query("SELECT nome FROM mappa_click WHERE id_click = $mappa LIMIT 1");
+            // Recupera nome, immagine e dimensioni naturali dell'immagine mappa
+            $zona = gdrcd_query("SELECT nome, immagine, larghezza, altezza
+                FROM mappa_click WHERE id_click = $mappa LIMIT 1");
             echo json_encode([
-                'success'   => true,
-                'tipo'      => 'mappa',
-                'luogo'     => -1,
-                'mappa'     => $mappa,
-                'nome'      => $zona['nome'] ?? $PARAMETERS['names']['maps_location'],
-                'is_notte'  => $isNotte,
-                'anno'      => date('Y', strtotime('+1053 years')),
+                'success'        => true,
+                'tipo'           => 'mappa',
+                'luogo'          => -1,
+                'mappa'          => $mappa,
+                'nome'           => $zona['nome']     ?? $PARAMETERS['names']['maps_location'],
+                'immagine_mappa' => $zona['immagine'] ?? 'standard_mappa.png',
+                'larghezza'      => (int)($zona['larghezza'] ?? 500),
+                'altezza'        => (int)($zona['altezza']   ?? 330),
+                'is_notte'       => $isNotte,
+                'anno'           => date('Y', strtotime('+1053 years')),
             ]);
         }
         break;

@@ -34,6 +34,7 @@ import ChatViewer      from './components/ChatViewer'
 import TargetSelector  from './components/TargetSelector'
 import PresentiEstesi  from './components/PresentiEstesi'
 import MessagesInbox   from './components/MessagesInbox'
+import MapClick        from './components/MapClick'
 
 /**
  * Registry privato dei componenti.
@@ -101,6 +102,9 @@ window.CT.register('PresentiEstesi', PresentiEstesi)
 
 /** Inbox messaggi privati: lista conversazioni + thread + risposta — si aggiorna via socket dm:update */
 window.CT.register('MessagesInbox', MessagesInbox)
+
+/** Mappa di gioco con hotspot zone, popup stanze e conteggi online real-time */
+window.CT.register('MapClick', MapClick)
 
 // --------------------------------------------------------------------------------------------
 // EVENTO ct:ready — segnala ai file PHP che il bundle è pronto
