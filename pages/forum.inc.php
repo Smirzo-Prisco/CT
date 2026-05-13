@@ -33,6 +33,8 @@
  * il bundle Vite ha terminato il caricamento (evento ct:ready).
  */
 document.addEventListener('ct:ready', function() {
-    CT.mount('Forum', 'forum-container', {});
+    CT.mount('Forum', 'forum-container', {
+        isStaff: <?= ($_SESSION['admin']==1 || $_SESSION['moderatore']==1 || $_SESSION['master']==1) ? 'true' : 'false' ?>
+    });
 });
 </script>

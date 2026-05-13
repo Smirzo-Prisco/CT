@@ -45,40 +45,51 @@ function formatDate(iso) {
 
 /**
  * Riga di un thread nell'elenco di una sezione.
- * Mostra titolo, autore, data ultima risposta, numero risposte e badge "non letto".
+ * Struttura identica al vecchio visit.inc.php:
+ *   STATO (pallino) | TOPIC (titolo+data) | AUTORE | RISPOSTE (n + ultima)
  *
  * @param {Object}   props.thread   - Dati del thread
  * @param {Function} props.onClick  - Callback al click per aprire il thread
  */
 function ThreadRow({ thread, onClick }) {
     return (
-        <tr
-            className={thread.letto ? 'presente' : 'presente'}
-            style={{ cursor: 'pointer' }}
-            onClick={() => onClick(thread)}
-        >
-            {/* Titolo e indicatore non letto */}
-            <td>
-                <div className="forum_post_title">
-                    {!thread.letto && (
-                        <span style={{ color: '#e74c3c', marginRight: '6px', fontSize: '10px' }}>●</span>
-                    )}
+        <tr style={{ cursor: 'pointer' }} onClick={() => onClick(thread)}>
+
+            {/* STATO: pallino verde = letto, rosso = non letto */}
+            <td style={{ textAlign: 'center', width: '40px', padding: '8px' }}>
+                <span style={{
+                    display: 'inline-block',
+                    width: '14px', height: '14px',
+                    borderRadius: '50%',
+                    backgroundColor: thread.letto ? '#4caf50' : '#e74c3c',
+                    boxShadow: `0 0 5px ${thread.letto ? '#4caf50' : '#e74c3c'}`,
+                }} />
+            </td>
+
+            {/* TOPIC: titolo + data creazione */}
+            <td style={{ padding: '8px 10px' }}>
+                <div className="forum_post_title" style={{ color: '#a7a7a8' }}>
                     {thread.titolo}
                     {thread.chiuso && (
-                        <span style={{ marginLeft: '6px', fontSize: '10px', color: '#aaa' }}>[chiuso]</span>
+                        <span style={{ marginLeft: '6px', fontSize: '10px', color: '#888' }}>[chiuso]</span>
                     )}
                 </div>
-                <div className="forum_date_small">{thread.autore}</div>
+                <div className="forum_date_small">{formatDate(thread.data)}</div>
             </td>
 
-            {/* Numero risposte */}
-            <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                <div className="forum_date_big_right">{thread.n_risposte}</div>
+            {/* AUTORE */}
+            <td style={{ padding: '8px 10px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                <div className="forum_date_big_right">{thread.autore}</div>
             </td>
 
-            {/* Data ultima risposta */}
-            <td style={{ whiteSpace: 'nowrap' }}>
-                <div className="forum_date_big">{formatDate(thread.data_ultimo_messaggio)}</div>
+            {/* RISPOSTE: numero + data ultima risposta */}
+            <td style={{ padding: '8px 10px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                <div className="forum_date_big_right">{thread.n_risposte} Risposte</div>
+                {thread.n_risposte > 0 && (
+                    <div className="forum_date_big" style={{ paddingLeft: 0 }}>
+                        Ultima: {formatDate(thread.data_ultimo_messaggio)}
+                    </div>
+                )}
             </td>
         </tr>
     )
@@ -154,6 +165,70 @@ function PostCard({ msg, isFirst }) {
 // ---------------------------------------------------------------------------
 
 /**
+ * Toolbar BBCode per la composizione dei messaggi.
+ * Ogni pulsante avvolge il testo selezionato nel tag BBCode corrispondente.
+ * Se non c'è selezione, inserisce i tag con il cursore in mezzo.
+ *
+ * @param {React.RefObject} textareaRef - Ref alla textarea di composizione
+ * @param {Function} onChange           - Setter del valore testuale
+ */
+function BBCodeToolbar({ textareaRef, onChange }) {
+    /**
+     * Inserisce un tag BBCode intorno al testo selezionato (o al cursore).
+     * @param {string} openTag  - Tag di apertura, es. '[b]'
+     * @param {string} closeTag - Tag di chiusura, es. '[/b]'
+     */
+    const insert = (openTag, closeTag) => {
+        const ta = textareaRef.current
+        if (!ta) return
+        const start = ta.selectionStart
+        const end   = ta.selectionEnd
+        const val   = ta.value
+        const selected = val.substring(start, end)
+        const newVal = val.substring(0, start) + openTag + selected + closeTag + val.substring(end)
+        onChange(newVal)
+        // Riposiziona il cursore dopo i tag inseriti
+        setTimeout(() => {
+            ta.focus()
+            const curPos = start + openTag.length + selected.length + closeTag.length
+            ta.setSelectionRange(curPos, curPos)
+        }, 0)
+    }
+
+    /** Stile base per i pulsanti BBCode */
+    const btn = (label, openTag, closeTag, color) => (
+        <span
+            key={label}
+            onClick={() => insert(openTag, closeTag)}
+            style={{ cursor: 'pointer', margin: '0 4px', color: color || '#a7a7a8', fontFamily: '"DejaVu Serif"', fontSize: '12px', letterSpacing: '1px', userSelect: 'none' }}
+            title={`${openTag}...${closeTag}`}
+        >
+            {label}
+        </span>
+    )
+
+    return (
+        <div style={{ padding: '6px 0', textAlign: 'center', borderBottom: '1px solid #2a2f4a', marginBottom: '6px', color: '#a7a7a8', fontSize: '11px' }}>
+            <span style={{ marginRight: '6px', color: '#888' }}>formattazione testo:</span>
+            {btn('B',       '[b]',          '[/b]',          '#fff')}
+            {btn('I',       '[i]',          '[/i]',          '#ccc')}
+            <span style={{ cursor: 'pointer', margin: '0 4px', color: '#a7a7a8', textDecoration: 'underline', fontSize: '12px', userSelect: 'none' }}
+                onClick={() => insert('[u]', '[/u]')}>U</span>
+            {btn('CENTRO',  '[center]',     '[/center]')}
+            {btn('IMG',     '[img]',        '[/img]')}
+            {btn('URL',     '[url]',        '[/url]')}
+            <br />
+            {btn('SPOILER', '[spoiler]',    '[/spoiler]')}
+            <br style={{ marginBottom: '4px' }} />
+            {btn('AZZURRO', '[color=blue]', '[/color]', '#5599ff')}
+            {btn('ROSSO',   '[color=red]',  '[/color]', '#ff5555')}
+            {btn('VERDE',   '[color=green]','[/color]', '#55cc55')}
+            {btn('GIALLO',  '[color=yellow]','[/color]','#ffcc00')}
+        </div>
+    )
+}
+
+/**
  * Form per inviare una risposta a un thread o creare un nuovo thread.
  *
  * @param {boolean}  props.isNew      - true = nuovo thread, false = risposta
@@ -163,13 +238,12 @@ function PostCard({ msg, isFirst }) {
  * @param {Function} props.onCancel   - Callback per annullare (solo per nuovi thread)
  */
 function PostForm({ isNew, chiuso, sending, onSubmit, onCancel }) {
-    const [titolo,   setTitolo]   = useState('')
-    const [testo,    setTesto]    = useState('')
-    const [anonimo,  setAnonimo]  = useState(false)
+    const [titolo,  setTitolo]  = useState('')
+    const [testo,   setTesto]   = useState('')
+    const [anonimo, setAnonimo] = useState(false)
     const textareaRef = useRef(null)
 
     useEffect(() => {
-        // Porta il focus sulla textarea alla prima apertura del form
         if (textareaRef.current) textareaRef.current.focus()
     }, [])
 
@@ -208,6 +282,9 @@ function PostForm({ isNew, chiuso, sending, onSubmit, onCancel }) {
                 </div>
             )}
 
+            {/* Toolbar BBCode — stesse opzioni del vecchio forum */}
+            <BBCodeToolbar textareaRef={textareaRef} onChange={setTesto} />
+
             {/* Corpo del messaggio */}
             <textarea
                 ref={textareaRef}
@@ -230,18 +307,12 @@ function PostForm({ isNew, chiuso, sending, onSubmit, onCancel }) {
                     Anonimo
                 </label>
 
-                <button
-                    onClick={handleSubmit}
-                    disabled={sending || !testo.trim() || (isNew && !titolo.trim())}
-                    style={{ cursor: 'pointer' }}
-                >
+                <button onClick={handleSubmit} disabled={sending || !testo.trim() || (isNew && !titolo.trim())} style={{ cursor: 'pointer' }}>
                     {sending ? 'Invio...' : 'Invia'}
                 </button>
 
                 {onCancel && (
-                    <button onClick={onCancel} style={{ cursor: 'pointer' }}>
-                        Annulla
-                    </button>
+                    <button onClick={onCancel} style={{ cursor: 'pointer' }}>Annulla</button>
                 )}
             </div>
         </div>
@@ -252,7 +323,7 @@ function PostForm({ isNew, chiuso, sending, onSubmit, onCancel }) {
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
-export default function Forum() {
+export default function Forum({ isStaff = false }) {
 
     // --- vista attiva ---
     /**
@@ -279,6 +350,8 @@ export default function Forum() {
     const [currentThread,   setCurrentThread]   = useState(null)
     /** Pagina corrente nella lista thread (1-based) */
     const [page,            setPage]            = useState(1)
+    /** Testo di ricerca nella lista thread */
+    const [searchQuery,     setSearchQuery]     = useState('')
 
     // --- stati UI ---
     const [loadingSections, setLoadingSections] = useState(true)
@@ -465,12 +538,12 @@ export default function Forum() {
                                       * Il colore arancione va aggiunto inline perché third_header colora
                                       * solo i tag <a> per default, non il testo puro nei <td>.
                                       */}
-                                    <tr key={`h-${tipo}`} className="third_header">
+                                    <tr key={`h-${tipo}`} className="third_header" style={{ backgroundImage: "url('/themes/crystal/imgs/presenti/barra_mappa_chat.png')" }}>
                                         {/*
-                                          * Il CSS di tr.third_header è in presenti.css (ora caricato da forum.inc.php):
-                                          * - background: url('imgs/presenti/barra_mappa_chat.png') — sfondo testured
-                                          * - colore arancione solo su <a>: aggiungiamo un <a> fittizio per ereditare
-                                          *   il colore, oppure usiamo color inline direttamente sul <td>
+                                          * backgroundImage inline forza il background-image anche quando
+                                          * la specificità CSS di customTable potrebbe sovrastare presenti.css.
+                                          * Il colore arancione va aggiunto inline perché third_header colora
+                                          * solo i tag <a> nel CSS, non il testo puro dei <td>.
                                           */}
                                         <td colSpan="3" style={{ textAlign: 'center', padding: '8px 20px', textTransform: 'uppercase', color: '#ce846f', fontFamily: '"DejaVu Serif"', filter: 'drop-shadow(-1.732px 1px 2px #000000)' }}>
                                             {tipo}
@@ -522,16 +595,34 @@ export default function Forum() {
     // --- VISTA THREAD LIST ---
     if (view === 'threads') {
         const totalPages = Math.ceil(totalThreads / 20)
+        /** Filtra i thread in base al testo di ricerca (locale, sui thread già caricati) */
+        const filteredThreads = searchQuery.trim()
+            ? threads.filter(t =>
+                t.titolo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.autore.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+            : threads
+
         return (
             <div className="pagina_forum">
-                {/* Navigazione + titolo sezione */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                        <button onClick={backToSections} style={{ cursor: 'pointer', marginRight: '10px' }}>← Sezioni</button>
-                        <strong style={{ color: '#ce846f', fontSize: '14px' }}>{currentSection?.nome}</strong>
-                    </div>
+                {/* Barra di ricerca — identica al vecchio forum */}
+                <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                    <input
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        placeholder="Cerca per termine, titolo o autore"
+                        style={{ width: '200px', marginRight: '6px' }}
+                    />
+                    <button onClick={() => setSearchQuery(searchQuery)} style={{ cursor: 'pointer' }}>cerca</button>
+                </div>
+
+                {/* Pulsanti Nuovo Messaggio e Torna indietro */}
+                <div style={{ textAlign: 'center', marginBottom: '10px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
                     <button onClick={() => setView('compose')} style={{ cursor: 'pointer' }}>
-                        + Nuova discussione
+                        Nuovo Messaggio
+                    </button>
+                    <button onClick={backToSections} style={{ cursor: 'pointer' }}>
+                        Torna indietro
                     </button>
                 </div>
 
@@ -541,17 +632,19 @@ export default function Forum() {
                     <>
                         <table className="customTable" style={{ width: '100%' }}>
                             <thead>
+                                {/* Intestazioni colonne come nel vecchio forum */}
                                 <tr className="second_header">
-                                    <td>Discussione</td>
-                                    <td style={{ textAlign: 'center', width: '60px' }}>Risposte</td>
-                                    <td style={{ width: '130px' }}>Ultimo post</td>
+                                    <td style={{ textAlign: 'center', width: '40px' }}>STATO</td>
+                                    <td>TOPIC</td>
+                                    <td style={{ textAlign: 'center' }}>AUTORE</td>
+                                    <td style={{ textAlign: 'center' }}>RISPOSTE</td>
                                 </tr>
                             </thead>
                             <tbody>
-                                {threads.length === 0 ? (
-                                    <tr><td colSpan="3" style={{ padding: '20px', color: '#aaa', textAlign: 'center' }}>Nessuna discussione.</td></tr>
+                                {filteredThreads.length === 0 ? (
+                                    <tr><td colSpan="4" style={{ padding: '20px', color: '#aaa', textAlign: 'center' }}>Nessuna discussione.</td></tr>
                                 ) : (
-                                    threads.map(t => (
+                                    filteredThreads.map(t => (
                                         <ThreadRow key={t.id} thread={t} onClick={openThread} />
                                     ))
                                 )}
@@ -560,7 +653,7 @@ export default function Forum() {
 
                         {/* Paginazione */}
                         {totalPages > 1 && (
-                            <div className="pagination" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '10px' }}>
+                            <div className="pagination" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '10px', justifyContent: 'center' }}>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                                     <a
                                         key={p}
