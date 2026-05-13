@@ -1,16 +1,20 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 if(isset($_GET['op']) && $_GET['op'] != '') {
+    session_start();
     require_once(__DIR__ . '/../config.inc.php');
     require_once(__DIR__ . '/../includes/required.php');
     require_once(__DIR__ . '/../includes/functions.inc.php');
     require_once(__DIR__ . '/../includes/custom_functions.inc.php');
     
     // IMPORTANTE: Solo per le richieste AJAX
-    header('Content-Type: application/json');   
-    
+    header('Content-Type: application/json');
+
+    if (empty($_SESSION['login'])) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Non autenticato']);
+        exit;
+    }
+
     $json_data = file_get_contents('php://input');
     $data = json_decode($json_data, true);
     
@@ -151,9 +155,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 break;
             }
             
-            $volto 	= $_GET['volto'];
-            $query = "SELECT volto from personaggio where volto = '".strtolower($volto)."'";
-            $results = gdrcd_query($query, 'result') or die('ok');
+            $volto  = gdrcd_filter('in', strtolower($_GET['volto']));
+            $query  = "SELECT volto FROM personaggio WHERE volto = '$volto'";
+            $results = gdrcd_query($query, 'result');
             
             if(gdrcd_query($results, 'num_rows') > 0) {
                 $querys = "SELECT nome, cognome from personaggio WHERE volto = '".strtolower($volto)."'";
