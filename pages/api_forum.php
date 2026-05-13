@@ -128,12 +128,12 @@ switch ($op) {
             WHERE id_araldo = $araldo_id AND id_messaggio_padre = -1");
 
         $result = gdrcd_query("SELECT ma.id_messaggio, ma.titolo, ma.autore,
-                ma.data_messaggio, ma.data_ultimo_messaggio, ma.chiuso, ma.anonimo,
+                ma.data_messaggio, ma.data_ultimo_messaggio, ma.chiuso, ma.anonimo, ma.importante,
                 (SELECT COUNT(*) FROM messaggioaraldo r WHERE r.id_messaggio_padre = ma.id_messaggio) AS n_risposte,
                 (SELECT 1 FROM araldo_letto al WHERE al.thread_id = ma.id_messaggio AND al.nome = '" . gdrcd_filter('in', $login) . "' LIMIT 1) AS letto
             FROM messaggioaraldo ma
             WHERE ma.id_araldo = $araldo_id AND ma.id_messaggio_padre = -1
-            ORDER BY ma.data_ultimo_messaggio DESC
+            ORDER BY ma.importante DESC, ma.data_ultimo_messaggio DESC
             LIMIT $per_page OFFSET " . ($offset * $per_page), 'result');
 
         $threads = [];
@@ -145,6 +145,7 @@ switch ($op) {
                 'data'                 => $row['data_messaggio'],
                 'data_ultimo_messaggio' => $row['data_ultimo_messaggio'],
                 'chiuso'               => (bool)$row['chiuso'],
+                'importante'           => (bool)$row['importante'],
                 'n_risposte'           => (int)$row['n_risposte'],
                 'letto'                => (bool)$row['letto'],
             ];
