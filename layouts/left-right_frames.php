@@ -152,10 +152,8 @@
 </style>
 
 <?php
-echo '<!-- DBG:A_LAYOUT_REACHED -->';
-if (isset($_GET['css'])) { echo '<!-- DBG:B_CSS_MODE -->'; header('Content-Type:text/css; charset=utf-8'); }
+if (isset($_GET['css'])) header('Content-Type:text/css; charset=utf-8');
 else {
-    echo '<!-- DBG:C_ELSE_BLOCK -->';
     if ($PARAMETERS['left_column']['activate'] == 'ON') {
     ?>
         <!-- Colonna sinistra -->
@@ -181,15 +179,11 @@ else {
             <div class="innertube">
                 <div class="colonne_dx">
 					<?php
-						echo '<!-- DBG:D_RIGHT_COL_START -->';
 						foreach ($PARAMETERS['right_column']['box'] as $box) {
-							echo '<!-- DBG:E_BOX=' . $box['page'] . ' -->';
 							echo '<div class="' . $box['class'] . '">';
 							gdrcd_load_modules('pages/' . $box['page'] . '.inc.php', $box);
 							echo '</div>';
-							echo '<!-- DBG:F_BOX_DONE=' . $box['page'] . ' -->';
 						}
-						echo '<!-- DBG:G_RIGHT_COL_END -->';
 					?>
                 </div>
             </div>
@@ -209,7 +203,7 @@ else {
 					</div>
 				</form>
             </div>
-            <?php echo '<!-- DBG:LAYOUT_LINE206 strInnerPage=' . $strInnerPage . ' -->'; gdrcd_load_modules('pages/' . $strInnerPage); ?>
+            <?php echo '<!--DBG1:before_load strInnerPage=' . $strInnerPage . '-->'; gdrcd_load_modules('pages/' . $strInnerPage); echo '<!--DBG2:after_load-->'; ?>
         </div>
     </div>
 

@@ -1,16 +1,17 @@
+<!--DBG3:scheda_file_start-->
 <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/scheda.css?<?=time()?>" type="text/css">
 
 <div class="pagina_scheda">
     <?php
+        echo '<!--DBG4:before_require-->';
         require_once(__DIR__ . '/../includes/custom_functions.inc.php');
+        echo '<!--DBG5:after_require-->';
 
         /* HELP: E' possibile modificare la scheda agendo su scheda.css nel tema scelto,
         * oppure sostituendo il codice che segue la voce "Scheda del personaggio"
         */
         /********* CARICAMENTO PERSONAGGIO ***********/
         
-        echo '<!-- DBG:SCHEDA_START pg=' . ($_REQUEST['pg'] ?? 'NON_SET') . ' -->';
-
         // Se non e' stato specificato il nome del pg
         if(isset($_REQUEST['pg']) === false) {
             echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['unknown_character_sheet']).'</div>';
@@ -51,7 +52,6 @@
 
         $pg = gdrcd_query($personaggi, 'fetch');
         gdrcd_query($personaggi, 'free');
-        echo '<!-- DBG:PG_LOADED nome=' . $pg['nome'] . ' -->';
 
         $bonus_oggetti = gdrcd_query("SELECT SUM(oggetto.bonus_car0) AS BO0, SUM(oggetto.bonus_car1) AS BO1, SUM(oggetto.bonus_car2) AS BO2, SUM(oggetto.bonus_car3) AS BO3, SUM(oggetto.bonus_car4) AS BO4, SUM(oggetto.bonus_car5) AS BO5
                 FROM oggetto JOIN clgpersonaggiooggetto ON oggetto.id_oggetto = clgpersonaggiooggetto.id_oggetto
