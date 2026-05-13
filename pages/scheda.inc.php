@@ -9,11 +9,10 @@
         */
         /********* CARICAMENTO PERSONAGGIO ***********/
         
-        error_log('[SCHEDA] pg=' . ($_REQUEST['pg'] ?? 'NON_SET') . ' login=' . ($_SESSION['login'] ?? 'NO_SESSION'));
+        echo '<!-- DBG:SCHEDA_START pg=' . ($_REQUEST['pg'] ?? 'NON_SET') . ' -->';
 
         // Se non e' stato specificato il nome del pg
         if(isset($_REQUEST['pg']) === false) {
-            error_log('[SCHEDA] RETURN: pg non impostato');
             echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['unknown_character_sheet']).'</div>';
             return;
         }
@@ -52,7 +51,7 @@
 
         $pg = gdrcd_query($personaggi, 'fetch');
         gdrcd_query($personaggi, 'free');
-        error_log('[SCHEDA] pg caricato: ' . $pg['nome']);
+        echo '<!-- DBG:PG_LOADED nome=' . $pg['nome'] . ' -->';
 
         $bonus_oggetti = gdrcd_query("SELECT SUM(oggetto.bonus_car0) AS BO0, SUM(oggetto.bonus_car1) AS BO1, SUM(oggetto.bonus_car2) AS BO2, SUM(oggetto.bonus_car3) AS BO3, SUM(oggetto.bonus_car4) AS BO4, SUM(oggetto.bonus_car5) AS BO5
                 FROM oggetto JOIN clgpersonaggiooggetto ON oggetto.id_oggetto = clgpersonaggiooggetto.id_oggetto
