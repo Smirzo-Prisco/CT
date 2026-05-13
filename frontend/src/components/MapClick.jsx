@@ -393,6 +393,13 @@ export default function MapClick() {
                         // approccio mouse-position). Con il posizionamento percentuale
                         // relativo all'immagine, quel transform deve essere annullato.
                         transform:  'none',
+                        // mappa_principale.css ha width:200px fisso: va bene su monitor
+                        // grandi ma non scala nei frame più piccoli. Usiamo una larghezza
+                        // percentuale con un cap massimo per adattarsi a qualunque dimensione.
+                        width:    '22%',
+                        maxWidth: '200px',
+                        // Forza il testo a capo invece di allargare ulteriormente il popup
+                        wordBreak: 'break-word',
                     }
 
                     return (
