@@ -98,11 +98,17 @@
         /****************** FINE    PULSANTI    ***********************/
         ?>
 
-        <!-- CHAT CONTENT -->
+        <!-- CHAT CONTENT: la lista messaggi viene gestita dal componente React ChatViewer -->
         <div id="pagina_chat" class="chat_box"></div>
         <script>
+        /**
+         * Monta i componenti React del bundle Vite non appena il bundle è pronto (evento ct:ready).
+         * - ChatViewer: visualizza e aggiorna i messaggi della chat
+         * - TargetSelector: selezione bersagli per skill/armi, aggiornata via socket
+         */
         document.addEventListener('ct:ready', function() {
-            CT.mount('ChatViewer', 'pagina_chat', {});
+            CT.mount('ChatViewer',     'pagina_chat',       {});
+            CT.mount('TargetSelector', 'user-selection-box', {});
         });
         </script>
 

@@ -171,18 +171,21 @@ function ChatViewer() {
 
 // Funzione per il lancio di un dado in chat
 function tiraDadoChat() {
-    if (setMaxTargetExternal) setMaxTargetExternal(1); // AGGIORNA il limite dei bersagli consentiti
+    // Per il dado caratteristica serve esattamente 1 bersaglio
+    if (window.setMaxTargetExternal) window.setMaxTargetExternal(1);
 
-    // Parametri
+    // Parametri del lancio dado
     const dice_type = document.getElementById('dice_type').value;
     const dice_bonus = document.getElementById('dice_bonus').value;
     const dice_malus = document.getElementById('dice_malus').value;
-    const target = getSelectedNamesCallback();
-    setMaxTargetExternal(1);
+
+    // Legge i bersagli selezionati da TargetSelector.jsx tramite la callback esposta
+    const target = window.getSelectedNamesCallback ? window.getSelectedNamesCallback() : [];
+    if (window.setMaxTargetExternal) window.setMaxTargetExternal(1);
 
     if (target.length != 1 || dice_type == 0) {
-        setMaxTargetExternal(0);
-        resettaCampiDiv('skills-tab'); // AGGIORNA il limite dei bersagli consentiti
+        if (window.setMaxTargetExternal) window.setMaxTargetExternal(0);
+        resettaCampiDiv('skills-tab'); // Azzera la selezione bersagli
         showNotification('Attenzione! Seleziona una caratteristica e un solo bersaglio', 'warning');
         return;
     }
@@ -210,11 +213,13 @@ function tiraDadoChat() {
 function usaAttaccoChat() {
     const tipo_attacco = document.getElementById('tipo_attacco').value;
     const arma_body = document.getElementById('arma_body').value;
-    const target = getSelectedNamesCallback();
+
+    // Legge i bersagli selezionati da TargetSelector.jsx
+    const target = window.getSelectedNamesCallback ? window.getSelectedNamesCallback() : [];
 
     if (target.length != 1 || tipo_attacco == 0) {
-        setMaxTargetExternal(0);
-        resettaCampiDiv('skills-tab'); // AGGIORNA il limite dei bersagli consentiti
+        if (window.setMaxTargetExternal) window.setMaxTargetExternal(0);
+        resettaCampiDiv('skills-tab'); // Azzera la selezione bersagli
         showNotification('Attenzione! Seleziona una tipologia di attacco e un solo bersaglio', 'warning');
         return;
     }
@@ -253,7 +258,8 @@ function tiraSkillChat() {
     // Parametri
     const chat_skill = document.getElementById('chat_skill').value;
     const livello_skill = document.getElementById('livello_skill').value;
-    const target = getSelectedNamesCallback();
+    // Legge i bersagli selezionati da TargetSelector.jsx
+    const target = window.getSelectedNamesCallback ? window.getSelectedNamesCallback() : [];
     const id_role = document.getElementById('id_role').value;
 
     // Controllo che ci sia la skill e il bersaglio
@@ -547,7 +553,8 @@ document.head.appendChild(vibrateStyle);
 /*****************************************************************************/
 // Gestione apertura/chiusura modale principale
 document.getElementById('openPanelBtn').addEventListener('click', function () {
-    initUserSelectionBox(); // Carico i bersagli possibili
+    // TargetSelector è montato una volta sola via ct:ready (TargetSelector.jsx nel bundle Vite)
+    // e si aggiorna automaticamente tramite socket — non serve re-inizializzarlo qui
     document.getElementById('chatPanel').style.display = 'flex';
 });
 
@@ -583,150 +590,17 @@ document.getElementById('message').addEventListener('input', function () {
     this.parentNode.querySelector('.gdr-char-counter').textContent = `Caratteri: ${charCount}/${maxLength}`;
 });
 
-// VARIABILE per memorizzare la funzione di callback
-let getSelectedNamesCallback = null;
-let setMaxTargetExternal = null; // Limite massimo di bersagli
-
-function UserSelectionBox() {
-    const [selectedNames, setSelectedNames] = React.useState([]);
-    const [users, setUsers] = React.useState([]);
-    const [maxTarget, setMaxTarget] = React.useState(1);
-    const selectedNamesRef = React.useRef(selectedNames);
-    React.useEffect(() => { selectedNamesRef.current = selectedNames; }, [selectedNames]); // Aggiorna il ref ogni volta che selectedNames cambia
-
-    // Esponi la funzione setMaxTarget all'esterno
-    React.useEffect(() => {
-        setMaxTargetExternal = (nuovoLimite) => {
-            setMaxTarget(nuovoLimite); // Imposto il nuovo limite
-
-            // Riduco i bersagli selezionati, se sono più di quelli consentiti dal nuovo limite
-            setTimeout(() => {
-                const currentSelected = selectedNamesRef.current;
-
-                if (nuovoLimite > 0 && currentSelected.length > nuovoLimite) {
-                    console.log(`Riduco selezione da ${currentSelected.length} a ${nuovoLimite}`);
-                    const nuovaSelezione = currentSelected.slice(0, nuovoLimite);
-                    setSelectedNames(nuovaSelezione);
-
-                    // Mostra un messaggio all'utente
-                    if (nuovaSelezione.length < currentSelected.length) {
-                        setMaxTargetExternal = null;
-                        alert(`Limite ridotto a ${nuovoLimite}. Sono stati rimossi ${currentSelected.length - nuovaSelezione.length} bersagli: ${currentSelected.slice(nuovoLimite).join(', ')}`);
-                        return false;
-                    }
-                }
-            }, 0);
-        };
-        return () => { setMaxTargetExternal = null; }; // Pulisco
-    }, []);
-
-    // Carica i dati all'avvio
-    React.useEffect(() => { getRolePgs().then(data => { setUsers(data.users); }); }, []);
-
-    const handleToggle = (userName) => {
-        setSelectedNames(prev => {
-            // Se già selezionato, rimuovi
-            if (prev.includes(userName)) return prev.filter(name => name !== userName);
-
-            // Se c'è un limite e lo superiamo, non aggiungere
-            if (maxTarget > 0 && prev.length >= maxTarget) {
-                alert(`Puoi selezionare al massimo ${maxTarget} utenti`);
-                return prev;
-            }
-
-            // Altrimenti aggiungi
-            return [...prev, userName];
-        });
-    };
-
-    // Esponi la funzione per ottenere i nomi selezionati
-    React.useEffect(() => {
-        getSelectedNamesCallback = () => selectedNames;
-    }, [selectedNames]);
-
-    if (!users || users.length === 0) return;
-
-    return React.createElement('div', null,
-        // Mostra il limite se esiste
-        maxTarget > 0 && React.createElement('div', {
-            style: {
-                marginBottom: '10px',
-                padding: '5px 10px',
-                backgroundColor: '#fff3cd',
-                border: '1px solid #ffeaa7',
-                borderRadius: '4px',
-                fontSize: '13px',
-                color: '#856404'
-            }
-        }, `📝 Selezionati: ${selectedNames.length}` +
-        (maxTarget > 0 ? ` / ${maxTarget}` : '')),
-
-        // Lista utenti
-        users.map((userName) => {
-            const isSelected = selectedNames.includes(userName);
-            const isDisabled = maxTarget > 0 &&
-                !isSelected &&
-                selectedNames.length >= maxTarget;
-
-            return React.createElement('div', {
-                key: userName,
-                style: {
-                    padding: '8px',
-                    margin: '5px 0',
-                    backgroundColor: isSelected ? '#3a4f86' :
-                        isDisabled ? '#f8f9fa' : '#ffffff1a',
-                    border: '1px solid ' + (isSelected ? '#007bff' : '#dee2e6'),
-                    borderRadius: '4px',
-                    cursor: isDisabled ? 'not-allowed' : 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    color: isSelected ? 'white' :
-                        isDisabled ? '#adb5bd' : 'inherit',
-                    opacity: isDisabled ? 0.6 : 1
-                },
-                onClick: isDisabled ? null : () => handleToggle(userName)
-            },
-                React.createElement('div', {
-                    style: {
-                        width: '18px',
-                        height: '18px',
-                        border: '2px solid ' + (isSelected ? 'white' :
-                            isDisabled ? '#dee2e6' : '#adb5bd'),
-                        borderRadius: '3px',
-                        marginRight: '10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: isSelected ? '#007bff' :
-                            isDisabled ? '#e9ecef' : 'white',
-                        color: 'white',
-                        fontSize: '12px'
-                    }
-                }, isSelected ? '✓' : ''),
-                userName
-            );
-        })
-    );
-}
-
-// Funzione per inizializzare React
-function initUserSelectionBox() {
-    const container = document.getElementById('user-selection-box');
-
-    if (ReactDOM.createRoot) {
-        try {
-            const root = ReactDOM.createRoot(container);
-            root.render(React.createElement(UserSelectionBox));
-        } catch (error) {
-            container.innerHTML = '<div style="color: red; padding: 20px;">Errore React</div>';
-        }
-    }
-}
-
-// Recupero i pg selezionati
+/**
+ * Recupero i nomi dei bersagli selezionati dall'utente.
+ *
+ * La funzione legge window.getSelectedNamesCallback, esposta da TargetSelector.jsx
+ * (bundle Vite) tramite un ref sempre aggiornato alla selezione corrente.
+ *
+ * @returns {string[]} Array di nomi dei personaggi selezionati, o array vuoto se nessuno
+ */
 function getSelectedUserNames() {
-    if (getSelectedNamesCallback) return getSelectedNamesCallback();
-
+    // window.getSelectedNamesCallback viene impostato da TargetSelector.jsx al mount
+    if (window.getSelectedNamesCallback) return window.getSelectedNamesCallback();
     return [];
 }
 
@@ -747,7 +621,8 @@ function aggiornaLivelli() {
 
     livelloSelect.innerHTML = ''; // Reset
     const maxLevel = parseInt(selectedOption.getAttribute('data-max-level')) || 1; // Ottieni il livello massimo dal data-attribute
-    if (setMaxTargetExternal) setMaxTargetExternal(1); // Imposta di default a 1
+    // Imposta il limite bersagli a 1 di default quando si cambia skill
+    if (window.setMaxTargetExternal) window.setMaxTargetExternal(1);
 
     // Popola con i livelli disponibili
     for (let i = 1; i <= maxLevel; i++) {
@@ -766,7 +641,8 @@ function aggiornaLimiteDaLivello() {
     const livelloSelect = document.getElementById('livello_skill');
     const livelloSelezionato = parseInt(livelloSelect.value) || 1;
 
-    if (setMaxTargetExternal) setMaxTargetExternal(livelloSelezionato);
+    // Aggiorna il limite bersagli in base al livello skill selezionato
+    if (window.setMaxTargetExternal) window.setMaxTargetExternal(livelloSelezionato);
 }
 
 /********************   Rileva quando l'utente sta per lasciare la chat *********************************/
