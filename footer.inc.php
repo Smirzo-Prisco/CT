@@ -75,6 +75,9 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
 
         if (document.getElementById('anteprima-scheda-container'))
             CT.mount('AnteprimaScheda', 'anteprima-scheda-container', {});
+
+        if (document.getElementById('menu-icons-container'))
+            CT.mount('MenuIcons', 'menu-icons-container', {});
     });
     </script>
 

@@ -96,6 +96,19 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         // -------------------------------------------------------------------------
         // METEO — restituisce dati meteo (rigenera se scaduti da >24h)
         // -------------------------------------------------------------------------
+        // -------------------------------------------------------------------------
+        // EVENTS_TODAY — verifica se ci sono eventi/appuntamenti oggi per l'utente
+        // Usato da MenuIcons.jsx per l'icona Calendario animata
+        // -------------------------------------------------------------------------
+        case 'events_today':
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+            $sql = gdrcd_query("SELECT COUNT(*) AS n FROM appuntamenti
+                WHERE (autore = '$login_f' OR destinatario = '$login_f' OR titolo = 'Quest' OR titolo = 'Evento')
+                AND DATE(FROM_UNIXTIME(str_data)) = CURDATE()", 'result');
+            $row = gdrcd_query($sql, 'fetch');
+            echo json_encode(['success' => true, 'has_events' => (int)$row['n'] > 0]);
+            break;
+
         case 'meteo':
             $meteoQ = gdrcd_query("SELECT * FROM meteo WHERE id = 1", 'result');
             $meteo  = gdrcd_query($meteoQ, 'fetch');

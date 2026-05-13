@@ -40,6 +40,8 @@ import AppRouter, { MIGRATED_PAGES } from './AppRouter'
 import InfoLocation   from './components/InfoLocation'
 import FrameMessaggi   from './components/FrameMessaggi'
 import AnteprimaScheda from './components/AnteprimaScheda'
+import MenuIcons       from './components/MenuIcons'
+import LinkMenu        from './components/LinkMenu'
 
 /**
  * Registry privato dei componenti.
@@ -122,6 +124,12 @@ window.CT.register('FrameMessaggi', FrameMessaggi)
 
 /** Anteprima personaggio: avatar + link scheda e presenti */
 window.CT.register('AnteprimaScheda', AnteprimaScheda)
+
+/** Icone Famiglie/Mestieri/Calendario con hover CSS e verifica eventi oggi */
+window.CT.register('MenuIcons', MenuIcons)
+
+/** Select gotomap aggiornato via socket + link menu con hover effect */
+window.CT.register('LinkMenu', LinkMenu)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.

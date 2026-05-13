@@ -77,6 +77,38 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // GOTOMAP — lista completa mappe+stanze per il select di navigazione rapida
+    // Replica la query del vecchio link_menu.inc.php ($gotomap_list)
+    // -------------------------------------------------------------------------
+    case 'gotomap':
+        $result = gdrcd_query("
+            SELECT mc.id_click, mc.nome AS nome_mappa,
+                   m.id, m.nome AS nome_stanza, m.chat, m.pagina, m.id_mappa_collegata
+            FROM mappa_click mc
+            LEFT JOIN mappa m ON m.id_mappa = mc.id_click
+            ORDER BY mc.nome, m.nome
+        ", 'result');
+
+        $maps = [];
+        while ($row = gdrcd_query($result, 'fetch')) {
+            $mapKey = $row['id_click'] . '|' . $row['nome_mappa'];
+            if (!isset($maps[$mapKey])) $maps[$mapKey] = ['id' => (int)$row['id_click'], 'nome' => $row['nome_mappa'], 'stanze' => []];
+            if (!empty($row['nome_stanza'])) {
+                if ($row['chat'] != 0) {
+                    $url = 'main.php?dir=' . $row['id'] . '&map_id=' . $row['id_click'];
+                } elseif ($row['id_mappa_collegata'] != 0) {
+                    $url = 'main.php?page=mappaclick&map_id=' . $row['id_mappa_collegata'];
+                } else {
+                    $url = 'main.php?page=' . $row['pagina'];
+                }
+                $maps[$mapKey]['stanze'][] = ['id' => (int)$row['id'], 'nome' => $row['nome_stanza'], 'url' => $url];
+            }
+        }
+        gdrcd_query($result, 'free');
+        echo json_encode(['success' => true, 'maps' => array_values($maps), 'mappa' => (int)$_SESSION['mappa'], 'luogo' => (int)$_SESSION['luogo']]);
+        break;
+
+    // -------------------------------------------------------------------------
     // ROOMS — lista stanze di una mappa (per costruire la UI React)
     // -------------------------------------------------------------------------
     case 'rooms':
