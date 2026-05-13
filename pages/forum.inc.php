@@ -17,6 +17,8 @@
 <!-- CSS del forum mantenuto per le classi usate dal componente React -->
 <link rel="stylesheet" href="themes/crystal/bacheca.css">
 <link rel="stylesheet" href="themes/crystal/forum.css">
+<!-- presenti.css contiene la definizione di tr.third_header (background image + colori) -->
+<link rel="stylesheet" href="themes/crystal/presenti.css">
 
 <div class="page_title">
     <h2><?php echo gdrcd_filter('out', $PARAMETERS['names']['forum']['plur']); ?></h2>

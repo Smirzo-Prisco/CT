@@ -466,7 +466,13 @@ export default function Forum() {
                                       * solo i tag <a> per default, non il testo puro nei <td>.
                                       */}
                                     <tr key={`h-${tipo}`} className="third_header">
-                                        <td colSpan="3" style={{ textAlign: 'center', padding: '8px 20px', textTransform: 'uppercase', color: '#ce846f', fontFamily: '"DejaVu Serif"', filter: 'drop-shadow(-1px 1px 2px #000)' }}>
+                                        {/*
+                                          * Il CSS di tr.third_header è in presenti.css (ora caricato da forum.inc.php):
+                                          * - background: url('imgs/presenti/barra_mappa_chat.png') — sfondo testured
+                                          * - colore arancione solo su <a>: aggiungiamo un <a> fittizio per ereditare
+                                          *   il colore, oppure usiamo color inline direttamente sul <td>
+                                          */}
+                                        <td colSpan="3" style={{ textAlign: 'center', padding: '8px 20px', textTransform: 'uppercase', color: '#ce846f', fontFamily: '"DejaVu Serif"', filter: 'drop-shadow(-1.732px 1px 2px #000000)' }}>
                                             {tipo}
                                         </td>
                                     </tr>
