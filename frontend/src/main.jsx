@@ -167,6 +167,9 @@ document.addEventListener('click', function(e) {
     } catch {
         // URL non valida o altro errore: lascia agire il browser normalmente
     }
-}, false)
+// true = capture phase: si attiva PRIMA che stopPropagation possa bloccare il bubbling.
+// Necessario perché left-right_frames.php chiama e.stopPropagation() sul click
+// della colonna sinistra per la gestione mobile, impedendo il bubbling normale.
+}, true)
 
 console.log('[CT] bundle caricato — componenti registrati:', Object.keys(registry))
