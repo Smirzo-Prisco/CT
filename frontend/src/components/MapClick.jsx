@@ -309,151 +309,121 @@ export default function MapClick() {
         ? 'themes/crystal/imgs/maps/mappa_notte.png'
         : 'themes/crystal/imgs/maps/mappa_giorno.png'
 
+    /**
+     * Zona attualmente selezionata (se c'è un openZone).
+     * Usata sia per evidenziare il pallino che per il pannello sotto.
+     */
+    const selectedZone = openZone ? ZONES.find(z => z.id === openZone) : null
+
     return (
-        <center>
-            {/*
-              * Wrapper con position:relative per i hotspot assoluti.
-              * overflow:hidden evita che hotspot fuori immagine (se le coordinate
-              * fossero errate) causino scroll orizzontale della pagina.
-              */}
-            <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%', overflow: 'hidden' }}>
+        <div>
+            {/* ---------------------------------------------------------------- */}
+            {/* MAPPA — immagine con pallini hotspot                              */}
+            {/* Il popup NON è dentro questo container per evitare overflow/clip  */}
+            {/* ---------------------------------------------------------------- */}
+            <center>
+                <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%' }}>
+                    <img
+                        ref={imgRef}
+                        src={mapImg}
+                        alt="Mappa di Crystal Tokyo"
+                        style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
+                        onLoad={onImageLoad}
+                    />
 
-                {/* Immagine mappa — responsive */}
-                <img
-                    ref={imgRef}
-                    src={mapImg}
-                    alt="Mappa di Crystal Tokyo"
-                    style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
-                    onLoad={onImageLoad}
-                />
-
-                {/*
-                  * HOTSPOT — solo i pallini, senza popup al loro interno.
-                  * Il popup è un sibling separato nel container (vedi sotto).
-                  * Renderizzati solo dopo che l'immagine è caricata (naturalSize.w > 0).
-                  */}
-                {ZONES.map(zone => {
-                    const style = hotspotStyle(zone.cx, zone.cy)
-                    if (!style) return null
-                    return (
-                        <div
-                            key={zone.id}
-                            style={style}
-                            onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
-                            onMouseEnter={() => setOpenZone(zone.id)}
-                            title={zone.name}
-                        >
-                            <div style={{
-                                width: '14px',
-                                height: '14px',
-                                borderRadius: '50%',
-                                backgroundColor: openZone === zone.id ? '#ffcc00' : 'rgba(255,255,255,0.7)',
-                                border: '2px solid rgba(0,0,0,0.5)',
-                                boxShadow: '0 0 6px rgba(0,0,0,0.6)',
-                                transition: 'background-color 0.2s',
-                            }} />
-                        </div>
-                    )
-                })}
-
-                {/*
-                  * POPUP — sibling dei pallini, non figlio.
-                  * È position:absolute relativo al container (l'immagine), non al pallino.
-                  * La posizione si calcola con le stesse percentuali dell'hotspot ma con
-                  * un offset per non sovrapporsi al pallino, spostandosi verso l'interno
-                  * della mappa in base alla zona (sinistra/destra, alto/basso).
-                  */}
-                {openZone && (() => {
-                    const zone = ZONES.find(z => z.id === openZone)
-                    if (!zone || naturalSize.w === 0) return null
-
-                    /** Posizione del pallino in percentuale sull'immagine */
-                    const leftPct = (zone.cx / naturalSize.w) * 100
-                    const topPct  = (zone.cy / naturalSize.h) * 100
-
-                    /**
-                     * Posizionamento smart: allinea il popup verso l'interno della mappa
-                     * per evitare che esca dai bordi.
-                     * - Zone sulla destra (leftPct > 55): popup a sinistra del pallino
-                     * - Zone in basso  (topPct  > 55): popup sopra il pallino
-                     */
-                    const isRight  = leftPct > 55
-                    const isBottom = topPct  > 55
-
-                    const popupStyle = {
-                        visibility: 'visible',
-                        position:   'absolute',
-                        left:       isRight  ? 'auto'               : `calc(${leftPct}% + 12px)`,
-                        right:      isRight  ? `calc(${100 - leftPct}% + 12px)` : 'auto',
-                        top:        isBottom ? 'auto'               : `calc(${topPct}% - 10px)`,
-                        bottom:     isBottom ? `calc(${100 - topPct}% + 12px)` : 'auto',
-                        zIndex:     500,
-                        // mappa_principale.css ha transform: translate(-170%, -50%)
-                        // che spostava il popup di 170% a sinistra (logica del vecchio
-                        // approccio mouse-position). Con il posizionamento percentuale
-                        // relativo all'immagine, quel transform deve essere annullato.
-                        transform:  'none',
-                        // mappa_principale.css ha width:200px fisso: va bene su monitor
-                        // grandi ma non scala nei frame più piccoli. Usiamo una larghezza
-                        // percentuale con un cap massimo per adattarsi a qualunque dimensione.
-                        width:    '22%',
-                        maxWidth: '200px',
-                        // Forza il testo a capo invece di allargare ulteriormente il popup
-                        wordBreak:  'break-word',
-                        // Nasconde qualsiasi contenuto che eccede la larghezza del popup
-                        overflow:   'hidden',
-                    }
-
-                    return (
-                        <div
-                            className="menu_mappa"
-                            style={popupStyle}
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <ul className="Stile1">
-                                <p>{zone.desc}</p>
-
-                                {/* Icone stanze con badge utenti online */}
-                                {zone.rooms.map((room, i) => {
-                                    const count = room.dir ? (onlineCounts[room.dir] || 0) : 0
-                                    return (
-                                        <span
-                                            key={i}
-                                            style={{ position: 'relative', display: 'inline-block', margin: '2px', maxWidth: '100%' }}
-                                            onClick={() => navigate(room)}
-                                        >
-                                            <img
-                                                src={`/themes/crystal/imgs/maps/${room.img}`}
-                                                style={{ cursor: 'pointer', display: 'block', maxWidth: '100%', height: 'auto' }}
-                                                alt=""
-                                                border="0"
-                                            />
-                                            {count > 0 && (
-                                                <span style={{
-                                                    position: 'absolute', top: '-4px', right: '-4px',
-                                                    background: '#e74c3c', color: '#fff',
-                                                    borderRadius: '50%', fontSize: '10px', fontWeight: 'bold',
-                                                    minWidth: '16px', height: '16px',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    pointerEvents: 'none',
-                                                }}>
-                                                    {count}
-                                                </span>
-                                            )}
-                                        </span>
-                                    )
-                                })}
-                            </ul>
-                            <span
-                                className="close-location-modal"
-                                onClick={e => { e.stopPropagation(); setOpenZone(null) }}
+                    {/* Pallini cliccabili — solo dopo il caricamento dell'immagine */}
+                    {ZONES.map(zone => {
+                        const style = hotspotStyle(zone.cx, zone.cy)
+                        if (!style) return null
+                        return (
+                            <div
+                                key={zone.id}
+                                style={style}
+                                onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
+                                title={zone.name}
                             >
-                                ×
-                            </span>
-                        </div>
-                    )
-                })()}
-            </div>
-        </center>
+                                <div style={{
+                                    width: '14px', height: '14px',
+                                    borderRadius: '50%',
+                                    backgroundColor: openZone === zone.id ? '#ffcc00' : 'rgba(255,255,255,0.7)',
+                                    border: '2px solid rgba(0,0,0,0.5)',
+                                    boxShadow: '0 0 6px rgba(0,0,0,0.6)',
+                                    transition: 'background-color 0.2s',
+                                }} />
+                            </div>
+                        )
+                    })}
+                </div>
+            </center>
+
+            {/* ---------------------------------------------------------------- */}
+            {/* PANNELLO ZONA — appare SOTTO la mappa in flusso normale.          */}
+            {/* Non usa position:absolute dentro il container, quindi non viene   */}
+            {/* mai tagliato dall'overflow né dalla dimensione del frame.         */}
+            {/* ---------------------------------------------------------------- */}
+            {selectedZone && (
+                <div className="menu_mappa" style={{
+                    visibility: 'visible',
+                    position:   'relative',   // flusso normale, non absolute
+                    transform:  'none',       // annulla il translate(-170%,-50%) del CSS
+                    width:      '100%',
+                    maxWidth:   '100%',
+                    margin:     '6px 0 0 0',
+                    boxSizing:  'border-box',
+                    textAlign:  'center',
+                }}>
+                    {/* Nome zona e descrizione */}
+                    <strong style={{ display: 'block', marginBottom: '4px', fontSize: '1em' }}>
+                        {selectedZone.name}
+                    </strong>
+                    <p style={{ margin: '0 0 8px', fontSize: '0.85em', lineHeight: '1.4' }}>
+                        {selectedZone.desc}
+                    </p>
+
+                    {/* Stanze — griglia flex, le immagini scalano con il contenitore */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px' }}>
+                        {selectedZone.rooms.map((room, i) => {
+                            const count = room.dir ? (onlineCounts[room.dir] || 0) : 0
+                            return (
+                                <span
+                                    key={i}
+                                    style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}
+                                    onClick={() => navigate(room)}
+                                >
+                                    <img
+                                        src={`/themes/crystal/imgs/maps/${room.img}`}
+                                        style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+                                        alt=""
+                                        border="0"
+                                    />
+                                    {/* Badge utenti online */}
+                                    {count > 0 && (
+                                        <span style={{
+                                            position: 'absolute', top: '-4px', right: '-4px',
+                                            background: '#e74c3c', color: '#fff',
+                                            borderRadius: '50%', fontSize: '10px', fontWeight: 'bold',
+                                            minWidth: '16px', height: '16px',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            pointerEvents: 'none',
+                                        }}>
+                                            {count}
+                                        </span>
+                                    )}
+                                </span>
+                            )
+                        })}
+                    </div>
+
+                    {/* Chiudi pannello */}
+                    <span
+                        className="close-location-modal"
+                        onClick={() => setOpenZone(null)}
+                        style={{ display: 'block', marginTop: '8px', cursor: 'pointer' }}
+                    >
+                        ×
+                    </span>
+                </div>
+            )}
+        </div>
     )
 }
