@@ -100,6 +100,11 @@
 
         <!-- CHAT CONTENT -->
         <div id="pagina_chat" class="chat_box"></div>
+        <script>
+        document.addEventListener('ct:ready', function() {
+            CT.mount('ChatViewer', 'pagina_chat', {});
+        });
+        </script>
 
 
         <!-- FORM DI INSERIMENTO AZIONE + PULSANTI -->

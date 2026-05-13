@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import OnlineUsers from './components/OnlineUsers'
+import ChatViewer from './components/ChatViewer'
 
 const registry = {}
 
@@ -24,6 +25,7 @@ window.CT = {
 }
 
 window.CT.register('OnlineUsers', OnlineUsers)
+window.CT.register('ChatViewer', ChatViewer)
 
 document.dispatchEvent(new CustomEvent('ct:ready'))
 console.log('[CT] bundle caricato — componenti registrati:', Object.keys(registry))

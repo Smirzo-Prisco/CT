@@ -30,10 +30,7 @@ async function pulisciChat() {
         fetch(ns_chat.api_file + '?' + ns_chat.param + '=pulisciChat')
             .then(res => res.json())
             .then(data => {
-                const chatContainer = document.getElementById('pagina_chat');
-                if (chatContainer) chatContainer.innerHTML = ''; // Svuota la chat
-
-                // Esegue refresh della chat
+                if (window.clearChat) window.clearChat();
 
                 document.getElementById("chatPanel").style.display = "none";
             })
@@ -865,10 +862,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('chat_skill').addEventListener('change', aggiornaLivelli); // Se cambio skill, aggiorno il suo livello massimo consentito per il pg
     document.getElementById('livello_skill').addEventListener('change', aggiornaLimiteDaLivello); // Se cambio il livello skill, aggiorno il limite di bersagli
 
-    // LOAD DELLA CHAT DI GIOCO
-    const container = document.getElementById('pagina_chat');
-    console.log('TEST', container);
-    if (container) ReactDOM.render(e(ChatViewer), container);
+    // ChatViewer è montato dal bundle React (ChatViewer.jsx via ct:ready)
 
     // Il campo è una textarea, quindi devo catturare l'evento scatenato dal pulsante "Enter" della tastiera
     var chat_message = document.getElementById("message");
