@@ -219,6 +219,74 @@ switch ($op) {
         ]);
         break;
 
+    // -------------------------------------------------------------------------
+    // PRESENTI — utenti nella stessa stanza + heartbeat ultimo_refresh
+    // -------------------------------------------------------------------------
+    case 'presenti':
+        $login   = gdrcd_filter('in', $_SESSION['login']);
+        $is_staff = ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1 || $_SESSION['master'] == 1);
+
+        $q = "UPDATE personaggio SET ultimo_refresh = NOW()";
+        if (isset($_GET['disponibile'])) {
+            $disp = gdrcd_filter('num', $_GET['disponibile']);
+            $q   .= ", disponibile = $disp";
+        } elseif (isset($_GET['invisibile']) && $is_staff) {
+            $inv = gdrcd_filter('num', $_GET['invisibile']);
+            $q  .= ", is_invisible = $inv";
+        }
+        $q .= " WHERE nome = '$login'";
+        gdrcd_query($q);
+
+        $luogo = (int)$_SESSION['luogo'];
+        $mappa = (int)$_SESSION['mappa'];
+
+        $result = gdrcd_query(
+            "SELECT p.nome, p.cognome, p.permessi, p.sesso, p.id_razza,
+                    p.disponibile, p.is_invisible,
+                    m.stanza_apparente, m.nome AS luogo_nome
+             FROM personaggio p
+             LEFT JOIN mappa m ON p.ultimo_luogo = m.id
+             WHERE p.ora_entrata > p.ora_uscita
+               AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
+               AND p.ultimo_luogo = $luogo
+               AND p.ultima_mappa = $mappa
+             ORDER BY p.is_invisible, p.nome",
+            'result'
+        );
+
+        $users = [];
+        while ($row = gdrcd_query($result, 'fetch')) {
+            if ($row['is_invisible'] == 0 || $row['nome'] == $_SESSION['login']) {
+                $users[] = [
+                    'nome'             => $row['nome'],
+                    'cognome'          => $row['cognome'],
+                    'permessi'         => (int)$row['permessi'],
+                    'sesso'            => $row['sesso'],
+                    'id_razza'         => (int)$row['id_razza'],
+                    'disponibile'      => (int)$row['disponibile'],
+                    'is_invisible'     => (int)$row['is_invisible'],
+                    'luogo_nome'       => $row['stanza_apparente'] ?: ($row['luogo_nome'] ?? ''),
+                ];
+            }
+        }
+        gdrcd_query($result, 'free');
+
+        $tot = gdrcd_query(
+            "SELECT COUNT(*) AS n FROM personaggio
+             WHERE ora_entrata > ora_uscita
+               AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
+               AND is_invisible = 0"
+        );
+
+        echo json_encode([
+            'success'      => true,
+            'users'        => $users,
+            'total_online' => (int)$tot['n'],
+            'self'         => $_SESSION['login'],
+            'is_staff'     => $is_staff,
+        ]);
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Operazione non valida']);

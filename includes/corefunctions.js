@@ -607,9 +607,7 @@ function openCharacterSheet(userName) { window.top.location.href = `main.php?pag
 
 /****************   Al completo caricamento del DOM della pagina... **********************************/
 document.addEventListener('DOMContentLoaded', function () {
-    /***********    REACT - Utenti online  *********************/
-    // Cerca il container moderno (senza iframe)
-    if (document.getElementById('online-users-container')) initModernOnlineUsers('online-users-container');
+    // online-users-container è gestito dal bundle React (OnlineUsers.jsx via ct:ready)
     // Cerca il container messaggi
     if (document.getElementById('menu-messages-container')) initModernMenuMessages('menu-messages-container');
 
