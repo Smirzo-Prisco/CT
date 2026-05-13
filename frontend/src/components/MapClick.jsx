@@ -388,6 +388,11 @@ export default function MapClick() {
                         top:        isBottom ? 'auto'               : `calc(${topPct}% - 10px)`,
                         bottom:     isBottom ? `calc(${100 - topPct}% + 12px)` : 'auto',
                         zIndex:     500,
+                        // mappa_principale.css ha transform: translate(-170%, -50%)
+                        // che spostava il popup di 170% a sinistra (logica del vecchio
+                        // approccio mouse-position). Con il posizionamento percentuale
+                        // relativo all'immagine, quel transform deve essere annullato.
+                        transform:  'none',
                     }
 
                     return (
