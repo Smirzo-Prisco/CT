@@ -203,7 +203,7 @@ else {
 					</div>
 				</form>
             </div>
-            <?php gdrcd_load_modules('pages/' . $strInnerPage); ?>
+            <?php echo '<!-- DBG:LAYOUT_LINE206 strInnerPage=' . $strInnerPage . ' -->'; gdrcd_load_modules('pages/' . $strInnerPage); ?>
         </div>
     </div>
 
