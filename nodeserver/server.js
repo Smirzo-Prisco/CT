@@ -18,8 +18,6 @@ const httpServer = http.createServer((req, res) => {
         try {
             const { event, room, data } = JSON.parse(body);
             if (event && room) {
-                const clients = io.sockets.adapter.rooms.get(room)?.size ?? 0;
-                console.log(`[notify] ${event} → ${room} (${clients} client)`);
                 io.to(room).emit(event, data || {});
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end('{"ok":true}');
@@ -51,16 +49,12 @@ io.on('connection', socket => {
         return;
     }
 
-    console.log(`[connect] ${login} luogo=${luogo} sid=${socket.id}`);
-
     socket.join(`chat:${luogo}`);
     socket.join(`loc:${luogo}`);
     socket.join(`dm:${login}`);
     socket.join(`chatoff:${login}`);
 
-    socket.on('disconnect', reason => {
-        console.log(`[disconnect] ${login} sid=${socket.id} (${reason})`);
-    });
+    socket.on('disconnect', () => {});
 });
 
 httpServer.listen(PORT, HOST, () => {

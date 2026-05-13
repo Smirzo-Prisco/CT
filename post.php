@@ -43,6 +43,7 @@ $query = gdrcd_query("SELECT nome FROM personaggio WHERE nome != '" . $_SESSION[
 while ($row = gdrcd_query($query, 'fetch'))
             {
                 gdrcd_query("INSERT INTO chat_letta (nome) VALUES ('" . $row['nome'] . "')");
+                notifySocketServer('chatoff:update', 'chatoff:' . $row['nome']);
             }
 
 }
