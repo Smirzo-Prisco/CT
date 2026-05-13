@@ -1,40 +1,17 @@
 <?php
 /**
- * forum.inc.php
+ * forum.inc.php — contenitore standard per AppRouter (Phase 3.1)
  *
- * Pagina del forum (Araldo) — caricata da main.php?page=forum.
- *
- * Il rendering è completamente delegato al componente React Forum.jsx
- * nel bundle Vite, che gestisce navigazione interna tra:
- *   - Lista sezioni (raggruppate per tipo, con badge non letti)
- *   - Lista thread di una sezione (paginata)
- *   - Lettura thread completo con tutte le risposte
- *   - Composizione nuovo thread
- *   - Form di risposta inline nel thread
+ * Carica i CSS necessari e fornisce il div #ct-app-content su cui
+ * AppRouter monterà il componente Forum.
+ * Il div è lo stesso per tutte le pagine migrate, così AppRouter può
+ * fare navigazione client-side tra forum, messaggi e presenti_estesi
+ * senza ricaricare la pagina.
  */
 ?>
 
-<!-- CSS del forum mantenuto per le classi usate dal componente React -->
 <link rel="stylesheet" href="themes/crystal/bacheca.css">
 <link rel="stylesheet" href="themes/crystal/forum.css">
-<!-- presenti.css contiene la definizione di tr.third_header (background image + colori) -->
 <link rel="stylesheet" href="themes/crystal/presenti.css">
 
-<div class="page_title">
-    <h2><?php echo gdrcd_filter('out', $PARAMETERS['names']['forum']['plur']); ?></h2>
-</div>
-
-<!-- Contenitore dove React monterà il componente Forum -->
-<div id="forum-container"></div>
-
-<script>
-/**
- * Monta il componente React Forum su #forum-container non appena
- * il bundle Vite ha terminato il caricamento (evento ct:ready).
- */
-document.addEventListener('ct:ready', function() {
-    CT.mount('Forum', 'forum-container', {
-        isStaff: <?= ($_SESSION['admin']==1 || $_SESSION['moderatore']==1 || $_SESSION['master']==1) ? 'true' : 'false' ?>
-    });
-});
-</script>
+<div id="ct-app-content"></div>

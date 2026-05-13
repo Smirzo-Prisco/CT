@@ -55,6 +55,19 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
     <script type="module" src="/themes/crystal/dist/ct-app.js"></script>
     <?php endif; ?>
 
+    <!-- Phase 3.1: monta AppRouter su #ct-app-content se presente.
+         Le pagine migrate (forum, messages_center, presenti_estesi) usano
+         questo div come punto di mount per il router React. -->
+    <?php
+    $isStaff = (($_SESSION['admin'] ?? 0) == 1 || ($_SESSION['moderatore'] ?? 0) == 1 || ($_SESSION['master'] ?? 0) == 1) ? 'true' : 'false';
+    ?>
+    <script>
+    document.addEventListener('ct:ready', function() {
+        var el = document.getElementById('ct-app-content');
+        if (el) CT.mount('AppRouter', 'ct-app-content', { isStaff: <?= $isStaff ?> });
+    });
+    </script>
+
     <!-- COREFUNCTIONS -->
     <script src="/includes/corefunctions.js"></script>
     

@@ -35,7 +35,8 @@ import TargetSelector  from './components/TargetSelector'
 import PresentiEstesi  from './components/PresentiEstesi'
 import MessagesInbox   from './components/MessagesInbox'
 import MapClick        from './components/MapClick'
-import Forum          from './components/Forum'
+import Forum           from './components/Forum'
+import AppRouter       from './AppRouter'
 
 /**
  * Registry privato dei componenti.
@@ -109,6 +110,24 @@ window.CT.register('MapClick', MapClick)
 
 /** Forum (Araldo): sezioni → thread → lettura → composizione */
 window.CT.register('Forum', Forum)
+
+/**
+ * AppRouter — Phase 3.1: router client-side per le pagine migrate.
+ * Legge ?page=X dalla URL e renderizza il componente giusto senza reload.
+ * Espone window.CT.navigate() per la navigazione tra pagine migrate.
+ */
+window.CT.register('AppRouter', AppRouter)
+
+/**
+ * CT.navigate — naviga a una URL.
+ * Se la pagina di destinazione è migrata: pushState + re-render React.
+ * Se non è migrata: reload PHP (window.top.location.href).
+ * Viene sovrascritto da AppRouter quando montato (versione completa).
+ * Questa è la versione fallback per pagine che non montano AppRouter.
+ *
+ * @param {string} url - URL di destinazione
+ */
+window.CT.navigate = (url) => { window.top.location.href = url }
 
 // --------------------------------------------------------------------------------------------
 // EVENTO ct:ready — segnala ai file PHP che il bundle è pronto
