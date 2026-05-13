@@ -29,9 +29,10 @@
 import { createRoot } from 'react-dom/client'
 
 // Importazione di tutti i componenti registrati
-import OnlineUsers    from './components/OnlineUsers'
-import ChatViewer     from './components/ChatViewer'
-import TargetSelector from './components/TargetSelector'
+import OnlineUsers     from './components/OnlineUsers'
+import ChatViewer      from './components/ChatViewer'
+import TargetSelector  from './components/TargetSelector'
+import PresentiEstesi  from './components/PresentiEstesi'
 
 /**
  * Registry privato dei componenti.
@@ -93,6 +94,9 @@ window.CT.register('ChatViewer', ChatViewer)
 
 /** Selezione bersagli nel pannello skill/armi — si aggiorna via socket users:update */
 window.CT.register('TargetSelector', TargetSelector)
+
+/** Lista completa presenti con avatar/razza/famiglia — si aggiorna via socket users:update */
+window.CT.register('PresentiEstesi', PresentiEstesi)
 
 // --------------------------------------------------------------------------------------------
 // EVENTO ct:ready — segnala ai file PHP che il bundle è pronto

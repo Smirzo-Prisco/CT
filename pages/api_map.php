@@ -287,6 +287,123 @@ switch ($op) {
         ]);
         break;
 
+    // -------------------------------------------------------------------------
+    // PRESENTI_ESTESI — lista completa di tutti gli utenti online, raggruppati
+    // per mappa e stanza, con avatar, razza, famiglia/inclinazione, mestiere e
+    // cariche staff. Usata dalla pagina main.php?page=presenti_estesi.
+    //
+    // Usa 2 query batch invece di N query per utente:
+    //   1. Query principale con tutti i JOIN necessari
+    //   2. Query batch per le inclinazioni (evita il problema N+1)
+    //
+    // Filtro visibilità: replica la logica hardcoded del vecchio presenti_estesi.inc.php
+    // -------------------------------------------------------------------------
+    case 'presenti_estesi':
+        $login    = $_SESSION['login'];
+        $is_staff = ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1 || $_SESSION['master'] == 1);
+
+        // Filtro visibilità: alcuni personaggi speciali vedono liste diverse
+        if ($login === 'Mino' || $login === 'Lii') {
+            $exclude = '';                                              // vede tutti
+        } elseif ($login === 'Jamal' || $login === 'Alice') {
+            $exclude = "AND p.nome NOT IN ('Megan', 'Niklaus')";       // vede quasi tutti
+        } else {
+            $exclude = "AND p.nome != 'Mino'";                         // esclude Mino per tutti gli altri
+        }
+
+        // Query principale: recupera tutti i dati di base in un solo passaggio,
+        // unendo mappa, razza, mestiere, famiglia e privilegi staff
+        $result = gdrcd_query("
+            SELECT
+                p.nome, p.cognome, p.sesso,
+                p.is_invisible, p.ultima_mappa, p.ultimo_luogo,
+                p.url_img_chat, p.id_gilda, p.id_ruolo_gilda,
+                r.sing_m, r.sing_f, r.immagine             AS razza_img,
+                m.stanza_apparente,    m.nome              AS stanza_nome,
+                mc.nome                                    AS mappa_nome,
+                rm.immagine            AS mestiere_img,    rm.nome_ruolo AS mestiere_nome,
+                ru_fam.immagine        AS fam_img,         ru_fam.nome_ruolo AS fam_nome,
+                pr.admin               AS p_admin,         pr.moderatore AS p_mod,
+                pr.master              AS p_master,        pr.guida      AS p_guida,
+                pr.grafico             AS p_grafico
+            FROM personaggio p
+            LEFT JOIN mappa          m    ON p.ultimo_luogo     = m.id
+            LEFT JOIN mappa_click    mc   ON p.ultima_mappa     = mc.id_click
+            LEFT JOIN razza          r    ON p.id_razza         = r.id_razza
+            LEFT JOIN ruolo_mestiere rm   ON p.id_ruolo_mestiere= rm.id_ruolo
+            LEFT JOIN ruolo          ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
+            LEFT JOIN privilegi      pr   ON pr.nome            = p.nome
+            WHERE p.ora_entrata > p.ora_uscita
+              AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
+              $exclude
+            ORDER BY p.is_invisible, mc.nome, m.nome, p.nome
+        ", 'result');
+
+        $users = [];  // mappa nome → dati utente (per merge inclinazioni)
+        $nomi  = [];  // lista nomi per la query batch inclinazioni
+
+        while ($row = gdrcd_query($result, 'fetch')) {
+            // Gli invisibili sono visibili solo allo staff
+            if ($row['is_invisible'] == 1 && !$is_staff) continue;
+
+            $nome = $row['nome'];
+            $users[$nome] = [
+                'nome'          => $nome,
+                'cognome'       => $row['cognome']       ?? '',
+                'sesso'         => $row['sesso'],
+                'is_invisible'  => (bool)$row['is_invisible'],
+                'ultima_mappa'  => (int)$row['ultima_mappa'],
+                'ultimo_luogo'  => (int)$row['ultimo_luogo'],
+                'url_img_chat'  => $row['url_img_chat']  ?? '',
+                'razza_img'     => 'imgs/races/' . ($row['razza_img'] ?: 'standard_razza.png'),
+                'razza_nome'    => $row['sing_' . $row['sesso']] ?? '',
+                'stanza'        => $row['stanza_apparente'] ?: ($row['stanza_nome'] ?? ''),
+                'mappa'         => $row['mappa_nome']    ?? '',
+                'mestiere_img'  => 'imgs/mestieri/' . ($row['mestiere_img'] ?? ''),
+                'mestiere_nome' => $row['mestiere_nome'] ?? '',
+                // Famiglia/inclinazione: inizializzata dalla query principale,
+                // sovrascritta dalla query batch inclinazioni se il pg ne ha una
+                'gruppo_img'    => 'imgs/guilds/'  . ($row['fam_img']  ?? ''),
+                'gruppo_nome'   => $row['fam_nome'] ?? '',
+                'staff'         => [
+                    'admin'      => !empty($row['p_admin']),
+                    'moderatore' => !empty($row['p_mod']),
+                    'master'     => !empty($row['p_master']),
+                    'guida'      => !empty($row['p_guida']),
+                    'grafico'    => !empty($row['p_grafico']),
+                ],
+            ];
+            $nomi[] = gdrcd_filter('in', $nome);
+        }
+        gdrcd_query($result, 'free');
+
+        // Query batch per le inclinazioni: un solo round-trip invece di N query.
+        // I pg con inclinazione hanno un'immagine diversa rispetto alla gilda/famiglia.
+        if (!empty($nomi)) {
+            $nomi_str = "'" . implode("','", $nomi) . "'";
+            $r_incl = gdrcd_query("
+                SELECT cpi.personaggio, i.immagine, i.nome
+                FROM clgpersonaggioinclinazione cpi
+                JOIN inclinazione i ON i.id_inclinazione = cpi.id_ruolo
+                WHERE cpi.personaggio IN ($nomi_str)
+            ", 'result');
+            while ($row = gdrcd_query($r_incl, 'fetch')) {
+                if (isset($users[$row['personaggio']])) {
+                    // Sovrascrive il gruppo con l'inclinazione
+                    $users[$row['personaggio']]['gruppo_img']  = 'imgs/inclinazioni/' . $row['immagine'];
+                    $users[$row['personaggio']]['gruppo_nome'] = $row['nome'];
+                }
+            }
+            gdrcd_query($r_incl, 'free');
+        }
+
+        echo json_encode([
+            'success' => true,
+            'users'   => array_values($users),
+            'total'   => count($users),
+        ]);
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Operazione non valida']);
