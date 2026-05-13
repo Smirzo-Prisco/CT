@@ -65,6 +65,10 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
     document.addEventListener('ct:ready', function() {
         var el = document.getElementById('ct-app-content');
         if (el) CT.mount('AppRouter', 'ct-app-content', { isStaff: <?= $isStaff ?> });
+
+        // Phase 3.3 — frame laterali come componenti React
+        if (document.getElementById('info-location-container'))
+            CT.mount('InfoLocation', 'info-location-container', {});
     });
     </script>
 

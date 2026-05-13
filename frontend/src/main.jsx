@@ -37,6 +37,7 @@ import MessagesInbox   from './components/MessagesInbox'
 import MapClick        from './components/MapClick'
 import Forum           from './components/Forum'
 import AppRouter, { MIGRATED_PAGES } from './AppRouter'
+import InfoLocation   from './components/InfoLocation'
 
 /**
  * Registry privato dei componenti.
@@ -110,6 +111,9 @@ window.CT.register('MapClick', MapClick)
 
 /** Forum (Araldo): sezioni → thread → lettura → composizione */
 window.CT.register('Forum', Forum)
+
+/** Info luogo corrente con immagine, anno, stato e breaking news — aggiornato via users:update */
+window.CT.register('InfoLocation', InfoLocation)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.
