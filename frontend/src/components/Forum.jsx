@@ -46,34 +46,40 @@ function formatDate(iso) {
 /**
  * Riga di un thread nell'elenco di una sezione.
  * Struttura identica al vecchio visit.inc.php:
- *   STATO (pallino) | TOPIC (titolo+data) | AUTORE | RISPOSTE (n + ultima)
+ *   STATO | TOPIC (titolo+data) | AUTORE | RISPOSTE (n + ultima) | [AZIONI staff]
  *
- * @param {Object}   props.thread   - Dati del thread
- * @param {Function} props.onClick  - Callback al click per aprire il thread
+ * @param {Object}   props.thread    - Dati del thread
+ * @param {Function} props.onClick   - Callback al click per aprire il thread
+ * @param {boolean}  props.isStaff   - true = mostra pulsanti azioni staff
+ * @param {Function} props.onAction  - Callback ({ action, threadId }) per azioni staff
  */
-function ThreadRow({ thread, onClick }) {
+function ThreadRow({ thread, onClick, isStaff, onAction }) {
+
+    /** Blocca la propagazione per non aprire il thread al click sui pulsanti */
+    const action = (e, type) => {
+        e.stopPropagation()
+        onAction && onAction({ action: type, thread })
+    }
+
     return (
         <tr style={{ cursor: 'pointer' }} onClick={() => onClick(thread)}>
 
-            {/* STATO: verde = thread aperto, rosso = thread chiuso */}
+            {/* STATO: verde = aperto, rosso = chiuso */}
             <td style={{ textAlign: 'center', width: '40px', padding: '8px' }}>
-                <span style={{
-                    display: 'inline-block',
-                    width: '14px', height: '14px',
-                    borderRadius: '50%',
-                    backgroundColor: thread.chiuso ? '#e74c3c' : '#4caf50',
-                    boxShadow: `0 0 5px ${thread.chiuso ? '#e74c3c' : '#4caf50'}`,
-                    title: thread.chiuso ? 'Chiuso' : 'Aperto',
-                }} />
+                <img
+                    src={thread.chiuso
+                        ? '/themes/crystal/imgs/forum/topic_chiuso.png'
+                        : '/themes/crystal/imgs/forum/topic_aperto.png'}
+                    alt={thread.chiuso ? 'Chiuso' : 'Aperto'}
+                    style={{ width: '18px', height: '18px' }}
+                    title={thread.chiuso ? 'Thread chiuso' : 'Thread aperto'}
+                />
             </td>
 
             {/* TOPIC: titolo + data creazione */}
             <td style={{ padding: '8px 10px' }}>
                 <div className="forum_post_title" style={{ color: '#a7a7a8' }}>
                     {thread.titolo}
-                    {thread.chiuso && (
-                        <span style={{ marginLeft: '6px', fontSize: '10px', color: '#888' }}>[chiuso]</span>
-                    )}
                 </div>
                 <div className="forum_date_small">{formatDate(thread.data)}</div>
             </td>
@@ -92,6 +98,41 @@ function ThreadRow({ thread, onClick }) {
                     </div>
                 )}
             </td>
+
+            {/* AZIONI staff: importante, chiudi/apri, elimina */}
+            {isStaff && (
+                <td style={{ padding: '8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {/* Marca come importante (freccia su/giù) */}
+                    <img
+                        src={`/themes/crystal/imgs/forum/${thread.importante ? 'freccia_su' : 'freccia_giu'}.png`}
+                        alt="Importante"
+                        title={thread.importante ? 'Rimuovi da importanti' : 'Marca come importante'}
+                        style={{ cursor: 'pointer', margin: '0 2px', width: '20px' }}
+                        onClick={e => action(e, 'toggle_important')}
+                    />
+                    {/* Apri / chiudi thread */}
+                    <img
+                        src={`/themes/crystal/imgs/forum/${thread.chiuso ? 'lucchetto_aperto' : 'lucchetto_chiuso'}.png`}
+                        alt={thread.chiuso ? 'Apri' : 'Chiudi'}
+                        title={thread.chiuso ? 'Apri thread' : 'Chiudi thread'}
+                        style={{ cursor: 'pointer', margin: '0 2px', width: '20px' }}
+                        onClick={e => action(e, 'toggle_close')}
+                    />
+                    {/* Elimina thread (solo admin/mod) */}
+                    <img
+                        src="/themes/crystal/imgs/forum/cancella_topic.png"
+                        alt="Elimina"
+                        title="Elimina thread"
+                        style={{ cursor: 'pointer', margin: '0 2px', width: '20px' }}
+                        onClick={e => {
+                            e.stopPropagation()
+                            if (confirm('Eliminare questo thread e tutte le risposte?')) {
+                                onAction && onAction({ action: 'delete_thread', thread })
+                            }
+                        }}
+                    />
+                </td>
+            )}
         </tr>
     )
 }
@@ -444,6 +485,27 @@ export default function Forum({ isStaff = false }) {
     }
 
     /**
+     * Gestisce le azioni staff sui thread (importante, chiudi, elimina).
+     * Chiama l'endpoint corrispondente e ricarica la lista thread.
+     *
+     * @param {Object} params - { action: string, thread: Object }
+     */
+    const handleThreadAction = ({ action, thread }) => {
+        const endpoint = `/pages/api_forum.php?op=${action}`
+        fetch(endpoint, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ thread: thread.id, araldo: currentSection?.id }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) fetchThreads(currentSection.id, page)
+                else alert(data.message || 'Errore')
+            })
+            .catch(console.error)
+    }
+
+    /**
      * Segna tutti i thread della sezione corrente come letti.
      * Chiama op=readall, poi ricarica la lista sezioni per aggiornare i badge.
      */
@@ -657,20 +719,30 @@ export default function Forum({ isStaff = false }) {
                     <>
                         <table className="customTable" style={{ width: '100%' }}>
                             <thead>
-                                {/* Intestazioni colonne come nel vecchio forum */}
+                                {/*
+                                  * second_header ha color:#a7a7a8 nel CSS — aggiunto color inline
+                                  * per forzare il colore arancione come nel vecchio forum.
+                                  */}
                                 <tr className="second_header">
-                                    <td style={{ textAlign: 'center', width: '40px' }}>STATO</td>
-                                    <td>TOPIC</td>
-                                    <td style={{ textAlign: 'center' }}>AUTORE</td>
-                                    <td style={{ textAlign: 'center' }}>RISPOSTE</td>
+                                    <td style={{ textAlign: 'center', width: '40px', color: '#ce846f' }}>STATO</td>
+                                    <td style={{ color: '#ce846f' }}>TOPIC</td>
+                                    <td style={{ textAlign: 'center', color: '#ce846f' }}>AUTORE</td>
+                                    <td style={{ textAlign: 'center', color: '#ce846f' }}>RISPOSTE</td>
+                                    {isStaff && <td style={{ color: '#ce846f' }}></td>}
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredThreads.length === 0 ? (
-                                    <tr><td colSpan="4" style={{ padding: '20px', color: '#aaa', textAlign: 'center' }}>Nessuna discussione.</td></tr>
+                                    <tr><td colSpan={isStaff ? 5 : 4} style={{ padding: '20px', color: '#aaa', textAlign: 'center' }}>Nessuna discussione.</td></tr>
                                 ) : (
                                     filteredThreads.map(t => (
-                                        <ThreadRow key={t.id} thread={t} onClick={openThread} />
+                                        <ThreadRow
+                                            key={t.id}
+                                            thread={t}
+                                            onClick={openThread}
+                                            isStaff={isStaff}
+                                            onAction={handleThreadAction}
+                                        />
                                     ))
                                 )}
                             </tbody>

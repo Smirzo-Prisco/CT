@@ -309,6 +309,54 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // TOGGLE_IMPORTANT — alterna lo stato "importante" di un thread (solo staff)
+    // -------------------------------------------------------------------------
+    case 'toggle_important':
+        if ($_SESSION['admin'] != 1 && $_SESSION['moderatore'] != 1 && $_SESSION['master'] != 1 && $_SESSION['capogilda'] != 1 && $_SESSION['capomestiere'] != 1) {
+            http_response_code(403); echo json_encode(['success' => false]); exit;
+        }
+        $thread_id  = (int)($data['thread'] ?? 0);
+        $araldo_id  = (int)($data['araldo'] ?? 0);
+        $current    = gdrcd_query("SELECT importante FROM messaggioaraldo WHERE id_messaggio = $thread_id LIMIT 1");
+        $new_val    = $current['importante'] == 1 ? 0 : 1;
+
+        // Massimo 4 thread importanti per sezione
+        if ($new_val == 1) {
+            $check = gdrcd_query("SELECT COUNT(*) AS n FROM messaggioaraldo WHERE importante = 1 AND id_araldo = $araldo_id");
+            if ($check['n'] >= 4) { echo json_encode(['success' => false, 'message' => 'Massimo 4 topic importanti per sezione']); exit; }
+        }
+        gdrcd_query("UPDATE messaggioaraldo SET importante = $new_val WHERE id_messaggio = $thread_id");
+        echo json_encode(['success' => true, 'importante' => (bool)$new_val]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // TOGGLE_CLOSE — apre o chiude un thread (solo staff)
+    // -------------------------------------------------------------------------
+    case 'toggle_close':
+        if ($_SESSION['admin'] != 1 && $_SESSION['moderatore'] != 1 && $_SESSION['master'] != 1 && $_SESSION['capogilda'] != 1 && $_SESSION['capomestiere'] != 1) {
+            http_response_code(403); echo json_encode(['success' => false]); exit;
+        }
+        $thread_id = (int)($data['thread'] ?? 0);
+        $current   = gdrcd_query("SELECT chiuso FROM messaggioaraldo WHERE id_messaggio = $thread_id LIMIT 1");
+        $new_val   = $current['chiuso'] == 1 ? 0 : 1;
+        gdrcd_query("UPDATE messaggioaraldo SET chiuso = $new_val WHERE id_messaggio = $thread_id");
+        echo json_encode(['success' => true, 'chiuso' => (bool)$new_val]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // DELETE_THREAD — elimina un thread e tutte le sue risposte (solo admin/mod)
+    // -------------------------------------------------------------------------
+    case 'delete_thread':
+        if ($_SESSION['admin'] != 1 && $_SESSION['moderatore'] != 1) {
+            http_response_code(403); echo json_encode(['success' => false]); exit;
+        }
+        $thread_id = (int)($data['thread'] ?? 0);
+        gdrcd_query("DELETE FROM messaggioaraldo WHERE id_messaggio = $thread_id OR id_messaggio_padre = $thread_id");
+        gdrcd_query("DELETE FROM araldo_letto WHERE thread_id = $thread_id");
+        echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
     // READALL — segna tutti i thread di una sezione come letti
     // -------------------------------------------------------------------------
     case 'readall':
