@@ -108,66 +108,8 @@ async function sendChatMessage() {
     }
 }
 
-// Load chat di gioco
-const e = React.createElement;
-
-// Load messaggi in chat /**************************************************************************************************************************************** */
-function ChatViewer() {
-    const [lastId, setLastId] = React.useState(0);
-
-    // Funzione per recuperare i messaggi
-    const fetchMessages = () => {
-        fetch(ns_chat.api_file + '?' + ns_chat.param + '=get_chat_messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ last: lastId })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.status === 'ok' && Array.isArray(data.messages)) {
-                    const chatContainer = document.getElementById('pagina_chat');
-                    if (chatContainer) {
-                        document.getElementById('id_role').value = data.activeRole; // Imposto l'eventuale id della role in un campo nascosto della chat
-                        gdrSetSessionActive(data.activeRole); // Aggiorna lo stato della sessione di gioco
-                        if (data.charLimit != null && data.charLimit > 0) document.getElementById('message').maxLength = data.charLimit; // Aggiorna il limite di caratteri
-                        document.getElementById('quitRole').style.display = data.canQuit ? 'block' : 'none'; // Mostra o nasconde il pulsante di uscita dalla role
-                        document.getElementById('openPanelBtn').style.display = data.canUsePanel ? 'block' : 'none'; // Mostra o nasconde il pulsante di apertura del pannello chat
-                        document.getElementById('pgRolePlaying').style.display = data.activeRole ? 'block' : 'none'; // Mostra o nasconde il pannello con l'elenco degli utenti giocanti
-                        document.getElementById('addPgToRoleBtn').style.display = data.canQuit ? 'none' : 'block'; // Mostra o nasconde il pulsante per avviare o aggiungersi alla role
-                        isInRole = data.canQuit; // Variabile globale per sapere se l'utente è dentro una role o no (usata per limitare alcune azioni)
-                        // Aggiorna l'ultimo ID (prende l'ultimo messaggio disponibile)
-                        const lastMessage = data.messages[data.messages.length - 1];
-                        if (lastMessage) setLastId(parseInt(lastMessage.id, 10));
-                        // Aggiorno la chat con i nuovi messaggi
-                        if (data.messages.length > 0) {
-                            data.messages.forEach(msg => { if (msg.html) chatContainer.innerHTML += msg.html; }); // Aggiungo i nuovi messaggi in chat
-                            setTimeout(() => { chatContainer.scrollTop = chatContainer.scrollHeight; }, 100); // Scroll automatico
-                        }
-                        // Riproduco l'auDIO
-                        const audio = new Audio('../sounds/beep.wav');
-                        if (data.play === true) audio.play().catch(e => console.log('Audio error:', e));
-                    }
-                } else showNotification(data.message, 'error');
-            })
-            .catch(err => console.error('Errore caricamento chat:', err));
-    };
-
-    // Ref sempre aggiornata alla closure corrente di fetchMessages (cattura lastId aggiornato)
-    const fetchRef = React.useRef(fetchMessages);
-    fetchRef.current = fetchMessages;
-
-    React.useEffect(() => {
-        fetchRef.current(); // caricamento iniziale
-
-        if (window.ctSocket) {
-            window.ctSocket.on('chat:update', () => fetchRef.current());
-        }
-
-        window.refreshChat = () => fetchRef.current();
-    }, []); // solo al mount
-
-    return e('div', { className: 'chat_inner' }, null);
-}
+// ChatViewer è ora nel bundle Vite (frontend/src/components/ChatViewer.jsx)
+// e viene montato da frame_chat.inc.php via ct:ready su #pagina_chat.
 
 // Funzione per il lancio di un dado in chat
 function tiraDadoChat() {
