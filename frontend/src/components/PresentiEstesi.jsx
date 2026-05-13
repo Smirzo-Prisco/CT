@@ -201,8 +201,8 @@ export default function PresentiEstesi() {
     const grouped = groupUsers(users)
 
     return (
-        <div className="presenti_estesi">
-            <table className="customTable">
+        <div className="presenti_estesi" style={{ overflowX: 'auto', maxWidth: '100%' }}>
+            <table className="customTable" style={{ width: '100%', tableLayout: 'fixed', wordBreak: 'break-word' }}>
                 <thead>
                     <tr>
                         {/* Header con conteggio — si aggiorna automaticamente ad ogni evento socket */}
