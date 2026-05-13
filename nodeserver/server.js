@@ -54,6 +54,11 @@ io.on('connection', socket => {
     socket.join(`dm:${login}`);
     socket.join(`chatoff:${login}`);
 
+    // Room globale: tutti i client la joinano per ricevere eventi
+    // che riguardano l'intero gioco (login/logout di chiunque).
+    // Usata da PresentiEstesi che mostra utenti di tutte le stanze.
+    socket.join('global');
+
     socket.on('disconnect', () => {});
 });
 

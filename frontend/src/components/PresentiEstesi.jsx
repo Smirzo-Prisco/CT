@@ -170,12 +170,25 @@ export default function PresentiEstesi() {
         // Caricamento iniziale
         fetchPresenti()
 
-        // Ascolta 'users:update': emesso ogni volta che qualcuno si muove tra stanze/mappe
         const sock = window.ctSocket
-        if (sock) sock.on('users:update', fetchPresenti)
+        if (sock) {
+            // 'users:update' — qualcuno si è mosso dentro la stessa stanza del viewer
+            sock.on('users:update', fetchPresenti)
+
+            // 'presenti:update' — evento globale (login/logout di chiunque nel gioco).
+            // Inviato alla room 'global' da login.php e logout.php.
+            // Necessario perché 'users:update' è specifico per stanza: se il pg che
+            // fa logout è in una stanza diversa dal viewer, 'users:update' non arriva.
+            sock.on('presenti:update', fetchPresenti)
+        }
 
         // Cleanup al dismount per evitare listener orfani
-        return () => { if (sock) sock.off('users:update', fetchPresenti) }
+        return () => {
+            if (sock) {
+                sock.off('users:update',   fetchPresenti)
+                sock.off('presenti:update', fetchPresenti)
+            }
+        }
     }, [fetchPresenti])
 
     // --- Rendering ---

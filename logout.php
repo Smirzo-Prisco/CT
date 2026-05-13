@@ -9,7 +9,14 @@ $handleDBConnection = gdrcd_connect();
 * @author Blancks
 */
 gdrcd_query("UPDATE personaggio SET ora_uscita = NOW() WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "'");
+
+// Notifica la stanza specifica (per OnlineUsers nella stessa stanza)
 notifySocketServer('users:update', 'loc:' . (int)$_SESSION['luogo']);
+
+// Notifica la room globale (per PresentiEstesi che mostra tutti gli utenti):
+// 'presenti:update' viene usato solo per eventi globali come login/logout,
+// così OnlineUsers non ri-fetcha inutilmente per eventi fuori dalla propria stanza.
+notifySocketServer('presenti:update', 'global');
 ?>
 <html>
 <head>
