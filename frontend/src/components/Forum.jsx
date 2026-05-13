@@ -55,14 +55,15 @@ function ThreadRow({ thread, onClick }) {
     return (
         <tr style={{ cursor: 'pointer' }} onClick={() => onClick(thread)}>
 
-            {/* STATO: pallino verde = letto, rosso = non letto */}
+            {/* STATO: verde = thread aperto, rosso = thread chiuso */}
             <td style={{ textAlign: 'center', width: '40px', padding: '8px' }}>
                 <span style={{
                     display: 'inline-block',
                     width: '14px', height: '14px',
                     borderRadius: '50%',
-                    backgroundColor: thread.letto ? '#4caf50' : '#e74c3c',
-                    boxShadow: `0 0 5px ${thread.letto ? '#4caf50' : '#e74c3c'}`,
+                    backgroundColor: thread.chiuso ? '#e74c3c' : '#4caf50',
+                    boxShadow: `0 0 5px ${thread.chiuso ? '#e74c3c' : '#4caf50'}`,
+                    title: thread.chiuso ? 'Chiuso' : 'Aperto',
                 }} />
             </td>
 
@@ -442,6 +443,27 @@ export default function Forum({ isStaff = false }) {
         fetchSections()
     }
 
+    /**
+     * Segna tutti i thread della sezione corrente come letti.
+     * Chiama op=readall, poi ricarica la lista sezioni per aggiornare i badge.
+     */
+    const markAllRead = () => {
+        if (!currentSection) return
+        fetch('/pages/api_forum.php?op=readall', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ araldo: currentSection.id }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    fetchThreads(currentSection.id, page)
+                    fetchSections()
+                }
+            })
+            .catch(console.error)
+    }
+
     /** Torna alla lista thread della sezione corrente */
     const backToThreads = () => {
         setView('threads')
@@ -616,10 +638,13 @@ export default function Forum({ isStaff = false }) {
                     <button onClick={() => setSearchQuery(searchQuery)} style={{ cursor: 'pointer' }}>cerca</button>
                 </div>
 
-                {/* Pulsanti Nuovo Messaggio e Torna indietro */}
-                <div style={{ textAlign: 'center', marginBottom: '10px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                {/* Pulsanti: Nuovo Messaggio | Segna tutto letto | Torna indietro */}
+                <div style={{ textAlign: 'center', marginBottom: '10px', display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
                     <button onClick={() => setView('compose')} style={{ cursor: 'pointer' }}>
                         Nuovo Messaggio
+                    </button>
+                    <button onClick={markAllRead} style={{ cursor: 'pointer' }}>
+                        Segna tutto come letto
                     </button>
                     <button onClick={backToSections} style={{ cursor: 'pointer' }}>
                         Torna indietro

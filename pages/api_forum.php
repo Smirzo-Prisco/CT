@@ -308,6 +308,35 @@ switch ($op) {
         echo json_encode(['success' => true]);
         break;
 
+    // -------------------------------------------------------------------------
+    // READALL — segna tutti i thread di una sezione come letti
+    // -------------------------------------------------------------------------
+    case 'readall':
+        $araldo_id = (int)($data['araldo'] ?? 0);
+
+        // Verifica accesso alla sezione
+        $section = gdrcd_query("SELECT id_araldo, tipo, proprietari FROM araldo
+            WHERE id_araldo = $araldo_id AND invisibile = 0 LIMIT 1");
+        if (!$section || !can_access_section($section)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Accesso negato']);
+            exit;
+        }
+
+        // Inserisce in araldo_letto tutti i thread della sezione non ancora letti
+        $login_f = gdrcd_filter('in', $login);
+        gdrcd_query("INSERT IGNORE INTO araldo_letto (nome, thread_id)
+            SELECT '$login_f', ma.id_messaggio
+            FROM messaggioaraldo ma
+            WHERE ma.id_araldo = $araldo_id
+              AND ma.id_messaggio_padre = -1
+              AND ma.id_messaggio NOT IN (
+                  SELECT thread_id FROM araldo_letto WHERE nome = '$login_f'
+              )");
+
+        echo json_encode(['success' => true]);
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Operazione non valida']);
