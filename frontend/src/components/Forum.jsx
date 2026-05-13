@@ -475,10 +475,21 @@ export default function Forum() {
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => openSection(sec)}
                                         >
-                                            {/* Icona luna per thread non letti, come nel vecchio forum */}
-                                            <td style={{ width: '24px', padding: '6px 6px 6px 10px', textAlign: 'center' }}>
+                                            {/* Icona luna + badge numerico per thread non letti */}
+                                            <td style={{ width: '50px', padding: '6px 6px 6px 10px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                                                 {sec.non_letti > 0 && (
-                                                    <span title={`${sec.non_letti} thread non letti`} style={{ fontSize: '14px' }}>🌙</span>
+                                                    <>
+                                                        <span style={{ fontSize: '14px' }}>🌙</span>
+                                                        <span style={{
+                                                            marginLeft: '4px',
+                                                            background: '#e74c3c', color: '#fff',
+                                                            borderRadius: '10px', padding: '1px 6px',
+                                                            fontSize: '10px', fontWeight: 'bold',
+                                                            verticalAlign: 'middle',
+                                                        }}>
+                                                            {sec.non_letti}
+                                                        </span>
+                                                    </>
                                                 )}
                                             </td>
 
