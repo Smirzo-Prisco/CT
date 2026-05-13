@@ -35,6 +35,7 @@ import TargetSelector  from './components/TargetSelector'
 import PresentiEstesi  from './components/PresentiEstesi'
 import MessagesInbox   from './components/MessagesInbox'
 import MapClick        from './components/MapClick'
+import Forum          from './components/Forum'
 
 /**
  * Registry privato dei componenti.
@@ -105,6 +106,9 @@ window.CT.register('MessagesInbox', MessagesInbox)
 
 /** Mappa di gioco con hotspot zone, popup stanze e conteggi online real-time */
 window.CT.register('MapClick', MapClick)
+
+/** Forum (Araldo): sezioni → thread → lettura → composizione */
+window.CT.register('Forum', Forum)
 
 // --------------------------------------------------------------------------------------------
 // EVENTO ct:ready — segnala ai file PHP che il bundle è pronto
