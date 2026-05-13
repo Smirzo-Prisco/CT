@@ -177,8 +177,12 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                 </span>
             </div>
 
-            {/* Lista messaggi con scroll */}
-            <div className="thread-messages" style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
+            {/*
+              * Lista messaggi: altezza massima fissa con scroll interno.
+              * Senza max-height il div cresce con il contenuto e scrolla tutta la pagina.
+              * calc(100vh - 180px) lascia spazio per header e form risposta.
+              */}
+            <div className="thread-messages" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 180px)', padding: '10px' }}>
                 {messages.length === 0 && (
                     <p style={{ color: '#aaa', fontStyle: 'italic' }}>Nessun messaggio.</p>
                 )}
@@ -319,8 +323,10 @@ export default function MessagesInbox() {
     // --- stato lista ---
     /** Tutte le conversazioni dalla API */
     const [conversations, setConversations] = useState([])
-    /** Tab attiva: 'on' | 'off' */
-    const [activeTab, setActiveTab] = useState('on')
+    /** Tab attiva: 'on' | 'off' — default OFF come nel vecchio PHP */
+    const [activeTab, setActiveTab] = useState('off')
+    /** true durante il primo caricamento della lista */
+    const [loadingList, setLoadingList] = useState(true)
 
     // --- stato thread ---
     /** Conversazione attualmente aperta, o null se nessuna */
@@ -335,10 +341,16 @@ export default function MessagesInbox() {
     const [replyText, setReplyText] = useState('')
     /** true durante l'invio di una risposta o nuovo messaggio */
     const [sending, setSending] = useState(false)
-    /** 'inbox' | 'compose' — quale vista mostrare nella colonna destra */
-    const [view, setView] = useState('inbox')
+    /**
+     * Vista attiva:
+     *   'list'    — lista conversazioni a piena larghezza
+     *   'thread'  — thread aperto a piena larghezza
+     *   'compose' — form nuovo messaggio
+     */
+    const [view, setView] = useState('list')
 
-    // Ref alla conversazione aperta, usata dal listener socket per il refresh del thread
+    // Ref alla conversazione aperta: usato dal listener socket per aggiornare
+    // il thread senza passarlo come dipendenza all'useEffect (evita ri-registrazioni)
     const selectedConvRef = useRef(null)
     useEffect(() => { selectedConvRef.current = selectedConv }, [selectedConv])
 
@@ -353,8 +365,14 @@ export default function MessagesInbox() {
     const fetchList = useCallback(() => {
         fetch('/pages/api_messages.php?op=list')
             .then(r => r.json())
-            .then(data => { if (data.success) setConversations(data.conversations) })
-            .catch(err => console.error('[MessagesInbox] Errore lista:', err))
+            .then(data => {
+                if (data.success) setConversations(data.conversations)
+                setLoadingList(false)
+            })
+            .catch(err => {
+                console.error('[MessagesInbox] Errore lista:', err)
+                setLoadingList(false)
+            })
     }, [])
 
     // ---------------------------------------------------------------------------
@@ -369,12 +387,12 @@ export default function MessagesInbox() {
      */
     const openConversation = useCallback((conv) => {
         setSelectedConv(conv)
-        setView('inbox')
+        setView('thread')      // passa alla vista thread a piena larghezza
         setLoadingThread(true)
         setMessages([])
         setReplyText('')
 
-        // Costruisce l'URL in base al tipo di conversazione
+        // op=read: segna come letto + restituisce messaggi + emette dm:update al self
         const qs = conv.tipo === 'individuale'
             ? `conversazione_id=${conv.conversazione_id}`
             : `gruppo_id=${conv.gruppo_id}`
@@ -384,14 +402,32 @@ export default function MessagesInbox() {
             .then(data => {
                 if (data.success) setMessages(data.messages)
                 setLoadingThread(false)
-                // Aggiorna la lista per riflettere lo stato "letto"
-                fetchList()
+                fetchList() // aggiorna la lista per riflettere lo stato "letto"
             })
             .catch(err => {
                 console.error('[MessagesInbox] Errore thread:', err)
                 setLoadingThread(false)
             })
     }, [fetchList])
+
+    /**
+     * Aggiorna silenziosamente il thread aperto senza segnarlo come letto e senza
+     * emettere dm:update. Usato dal listener socket per il real-time del thread:
+     * evita il loop dm:update → re-read → dm:update → ...
+     *
+     * Usa ?silent=1: l'API restituisce i messaggi ma non aggiorna il DB.
+     */
+    const fetchThreadSilent = useCallback(() => {
+        const conv = selectedConvRef.current
+        if (!conv) return
+        const qs = conv.tipo === 'individuale'
+            ? `conversazione_id=${conv.conversazione_id}&silent=1`
+            : `gruppo_id=${conv.gruppo_id}&silent=1`
+        fetch(`/pages/api_messages.php?op=read&${qs}`)
+            .then(r => r.json())
+            .then(data => { if (data.success) setMessages(data.messages) })
+            .catch(console.error)
+    }, [])
 
     // ---------------------------------------------------------------------------
     // SOCKET — aggiornamento real-time
@@ -403,14 +439,17 @@ export default function MessagesInbox() {
 
         const sock = window.ctSocket
         if (sock) {
-            // 'dm:update' arriva sia per nuovi messaggi ricevuti SIA per letture proprie.
-            // Aggiorna SOLO la lista: riaprire la conversazione creerebbe un loop
-            // perché op=read emette 'dm:update' al self → openConversation → op=read → ...
-            sock.on('dm:update', fetchList)
+            sock.on('dm:update', () => {
+                // Aggiorna sempre la lista (icone non letti, ordine conversazioni)
+                fetchList()
+                // Se c'è un thread aperto: aggiorna silenziosamente i messaggi
+                // (silent=1 → no mark-as-read → no dm:update emesso → nessun loop)
+                fetchThreadSilent()
+            })
         }
 
-        return () => { if (sock) sock.off('dm:update', fetchList) }
-    }, [fetchList])
+        return () => { if (sock) sock.off('dm:update') }
+    }, [fetchList, fetchThreadSilent])
 
     // ---------------------------------------------------------------------------
     // INVIO RISPOSTA
@@ -447,7 +486,9 @@ export default function MessagesInbox() {
             .then(data => {
                 if (data.success) {
                     setReplyText('')
-                    openConversation(selectedConv) // Ricarica il thread con il nuovo messaggio
+                    // Ricarica il thread dopo l'invio (il socket dm:update arriverà,
+                    // ma meglio forzare subito il refresh per responsività)
+                    fetchThreadSilent()
                 } else {
                     alert(data.message || 'Errore nell\'invio')
                 }
@@ -477,8 +518,7 @@ export default function MessagesInbox() {
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    // Torna all'inbox e aggiorna la lista
-                    setView('inbox')
+                    setView('list')  // torna alla lista dopo l'invio
                     fetchList()
                 } else {
                     alert(data.message || 'Errore nell\'invio')
@@ -509,123 +549,97 @@ export default function MessagesInbox() {
     // RENDERING
     // ---------------------------------------------------------------------------
 
-    return (
-        <div className="container">
+    /**
+     * Layout a colonna singola con tre viste esclusive:
+     *   'list'    → lista conversazioni a piena larghezza
+     *   'thread'  → thread aperto a piena larghezza + pulsante back
+     *   'compose' → form nuovo messaggio + pulsante back
+     *
+     * Il .container di new_sms.css è display:flex, ma qui mostriamo una sola
+     * colonna alla volta, quindi usa width:100% su ciascuna vista.
+     */
 
-            {/* ---------------------------------------------------------------- */}
-            {/* SIDEBAR: tab ON/OFF + lista conversazioni + pulsanti azione      */}
-            {/* ---------------------------------------------------------------- */}
-            <div className="sidebar">
+    // --- VISTA LISTA ---
+    if (view === 'list') {
+        return (
+            <div className="container">
+                <div className="sidebar" style={{ width: '100%' }}>
 
-                {/* Intestazione */}
-                <div className="header">
-                    <div className="header-container">
-                        <h1 className="header-title">Messaggi Privati</h1>
-                    </div>
-                </div>
-
-                {/* Toggle tab ON / OFF — con icone animate se ci sono nuovi messaggi */}
-                <div className="toggle-buttons">
-                    <div
-                        className={`toggle-button ${activeTab === 'off' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('off')}
-                        title="Messaggi OFF"
-                    >
-                        <img
-                            src={hasNewOff ? IMG.offAcceso : IMG.offSpento}
-                            alt="Messaggi Off"
-                        />
-                    </div>
-                    <div
-                        className={`toggle-button ${activeTab === 'on' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('on')}
-                        title="Messaggi ON"
-                    >
-                        <img
-                            src={hasNewOn ? IMG.onAcceso : IMG.onSpento}
-                            alt="Messaggi On"
-                        />
-                    </div>
-                </div>
-
-                {/*
-                  * Lista conversazioni — due sezioni OFF e ON sempre presenti nel DOM.
-                  * Il CSS di new_sms.css ha '#messages-off { display: none }' hardcoded,
-                  * quindi la visibilità di ciascuna viene sovrascritta via style inline
-                  * in base alla tab attiva, ignorando il valore CSS di default.
-                  */}
-                <div className="messages-list" id="messages-list">
-
-                    {/* Sezione OFF */}
-                    <div
-                        className="message-section"
-                        id="messages-off"
-                        style={{ display: activeTab === 'off' ? 'block' : 'none' }}
-                    >
-                        {convOff.length === 0 ? (
-                            <p style={{ padding: '10px', color: '#aaa', fontStyle: 'italic' }}>
-                                Nessun messaggio OFF trovato.
-                            </p>
-                        ) : (
-                            convOff.map(conv => (
-                                <ConvItem
-                                    key={`${conv.tipo}-${conv.conversazione_id}`}
-                                    conv={conv}
-                                    isSelected={selectedConv?.conversazione_id === conv.conversazione_id}
-                                    onClick={openConversation}
-                                />
-                            ))
-                        )}
+                    {/* Intestazione */}
+                    <div className="header">
+                        <div className="header-container">
+                            <h1 className="header-title">Messaggi Privati</h1>
+                        </div>
                     </div>
 
-                    {/* Sezione ON */}
-                    <div
-                        className="message-section active"
-                        id="messages-on"
-                        style={{ display: activeTab === 'on' ? 'block' : 'none' }}
-                    >
-                        {convOn.length === 0 ? (
-                            <p style={{ padding: '10px', color: '#aaa', fontStyle: 'italic' }}>
-                                Nessun messaggio ON trovato.
-                            </p>
-                        ) : (
-                            convOn.map(conv => (
-                                <ConvItem
-                                    key={`${conv.tipo}-${conv.conversazione_id}`}
-                                    conv={conv}
-                                    isSelected={selectedConv?.conversazione_id === conv.conversazione_id}
-                                    onClick={openConversation}
-                                />
-                            ))
-                        )}
+                    {/* Toggle tab ON / OFF */}
+                    <div className="toggle-buttons">
+                        <div
+                            className={`toggle-button ${activeTab === 'off' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('off')}
+                            title="Messaggi OFF"
+                        >
+                            <img src={hasNewOff ? IMG.offAcceso : IMG.offSpento} alt="Messaggi Off" />
+                        </div>
+                        <div
+                            className={`toggle-button ${activeTab === 'on' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('on')}
+                            title="Messaggi ON"
+                        >
+                            <img src={hasNewOn ? IMG.onAcceso : IMG.onSpento} alt="Messaggi On" />
+                        </div>
                     </div>
-                </div>
 
-                {/* Pulsanti in fondo alla sidebar */}
-                <div className="bottom-bar">
-                    <button
-                        id="new-message-button"
-                        onClick={() => { setView('compose'); setSelectedConv(null) }}
-                    >
-                        Nuovo Messaggio
-                    </button>
+                    {/* Lista conversazioni — loading / vuota / popolata */}
+                    <div className="messages-list" id="messages-list">
+                        <div
+                            className="message-section"
+                            id="messages-off"
+                            style={{ display: activeTab === 'off' ? 'block' : 'none' }}
+                        >
+                            {loadingList ? (
+                                <p style={{ padding: '10px', color: '#aaa' }}>Caricamento...</p>
+                            ) : convOff.length === 0 ? (
+                                <p style={{ padding: '10px', color: '#aaa', fontStyle: 'italic' }}>Nessun messaggio OFF.</p>
+                            ) : (
+                                convOff.map(conv => (
+                                    <ConvItem key={`${conv.tipo}-${conv.conversazione_id}`} conv={conv} isSelected={false} onClick={openConversation} />
+                                ))
+                            )}
+                        </div>
+                        <div
+                            className="message-section active"
+                            id="messages-on"
+                            style={{ display: activeTab === 'on' ? 'block' : 'none' }}
+                        >
+                            {loadingList ? (
+                                <p style={{ padding: '10px', color: '#aaa' }}>Caricamento...</p>
+                            ) : convOn.length === 0 ? (
+                                <p style={{ padding: '10px', color: '#aaa', fontStyle: 'italic' }}>Nessun messaggio ON.</p>
+                            ) : (
+                                convOn.map(conv => (
+                                    <ConvItem key={`${conv.tipo}-${conv.conversazione_id}`} conv={conv} isSelected={false} onClick={openConversation} />
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Azioni in fondo */}
+                    <div className="bottom-bar">
+                        <button id="new-message-button" onClick={() => setView('compose')}>
+                            Nuovo Messaggio
+                        </button>
+                    </div>
                 </div>
             </div>
+        )
+    }
 
-            {/* ---------------------------------------------------------------- */}
-            {/* MAIN-CONTENT: thread aperto o form composizione                  */}
-            {/* Il CSS new_sms.css si aspetta '.main-content', non '.content'    */}
-            {/* ---------------------------------------------------------------- */}
-            <div className="main-content">
-                {view === 'compose' ? (
-                    /* Vista composizione nuovo messaggio */
-                    <ComposeView
-                        onSend={sendNew}
-                        onCancel={() => setView('inbox')}
-                        sending={sending}
-                    />
-                ) : selectedConv ? (
-                    /* Vista thread conversazione aperta */
+    // --- VISTA THREAD ---
+    if (view === 'thread' && selectedConv) {
+        return (
+            <div className="container">
+                <div className="main-content" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
                     <ThreadView
                         messages={messages}
                         conv={selectedConv}
@@ -634,14 +648,22 @@ export default function MessagesInbox() {
                         setReplyText={setReplyText}
                         sending={sending}
                         onSend={sendReply}
-                        onBack={() => setSelectedConv(null)}
+                        onBack={() => { setView('list'); setSelectedConv(null) }}
                     />
-                ) : (
-                    /* Placeholder quando nessuna conversazione è selezionata */
-                    <div style={{ padding: '20px', color: '#aaa', fontStyle: 'italic' }}>
-                        Seleziona una conversazione per leggere i messaggi.
-                    </div>
-                )}
+                </div>
+            </div>
+        )
+    }
+
+    // --- VISTA COMPOSIZIONE ---
+    return (
+        <div className="container">
+            <div className="main-content" style={{ width: '100%' }}>
+                <ComposeView
+                    onSend={sendNew}
+                    onCancel={() => setView('list')}
+                    sending={sending}
+                />
             </div>
         </div>
     )

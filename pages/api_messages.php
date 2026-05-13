@@ -153,10 +153,13 @@ switch ($op) {
                 WHERE s.id_conversazione = $conv_id
                 ORDER BY s.ora_spedizione ASC", 'result');
 
-            // Segna come letto
-            gdrcd_query("UPDATE conversazioni_individuali SET lettura = 1
-                WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
-            notifySocketServer('dm:update', 'dm:' . $_SESSION['login']);
+            // Segna come letto (solo se non è una chiamata "silent" fatta per aggiornare
+            // il thread senza emettere eventi — evita il loop dm:update → re-read → dm:update)
+            if (empty($_GET['silent'])) {
+                gdrcd_query("UPDATE conversazioni_individuali SET lettura = 1
+                    WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
+                notifySocketServer('dm:update', 'dm:' . $_SESSION['login']);
+            }
 
         } elseif ($gruppo_id > 0) {
             // Verifica accesso al gruppo
@@ -176,10 +179,12 @@ switch ($op) {
                 WHERE s.gruppo_id = $gruppo_id
                 ORDER BY s.ora_spedizione ASC", 'result');
 
-            // Segna come letto
-            gdrcd_query("UPDATE partecipazione_gruppo SET lettura = 1
-                WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'");
-            notifySocketServer('dm:update', 'dm:' . $_SESSION['login']);
+            // Segna come letto (solo se non è una chiamata silent)
+            if (empty($_GET['silent'])) {
+                gdrcd_query("UPDATE partecipazione_gruppo SET lettura = 1
+                    WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'");
+                notifySocketServer('dm:update', 'dm:' . $_SESSION['login']);
+            }
 
         } else {
             echo json_encode(['success' => false, 'message' => 'Specifica conversazione_id o gruppo_id']);
