@@ -460,14 +460,18 @@ export default function Forum() {
                         <tbody>
                             {Object.entries(sections).map(([tipo, secs]) => (
                                 <>
-                                    {/* Riga header del gruppo — il CSS third_header la colora in arancione */}
+                                    {/*
+                                      * Header di gruppo: third_header dà lo sfondo corretto via CSS.
+                                      * Il colore arancione va aggiunto inline perché third_header colora
+                                      * solo i tag <a> per default, non il testo puro nei <td>.
+                                      */}
                                     <tr key={`h-${tipo}`} className="third_header">
-                                        <td colSpan="3" style={{ textAlign: 'center', padding: '8px 20px', textTransform: 'uppercase' }}>
+                                        <td colSpan="3" style={{ textAlign: 'center', padding: '8px 20px', textTransform: 'uppercase', color: '#ce846f', fontFamily: '"DejaVu Serif"', filter: 'drop-shadow(-1px 1px 2px #000)' }}>
                                             {tipo}
                                         </td>
                                     </tr>
 
-                                    {/* Righe delle sezioni */}
+                                    {/* Righe delle sezioni: [🌙 nome] [descrizione] [badge] */}
                                     {secs.map(sec => (
                                         <tr
                                             key={sec.id}
@@ -475,28 +479,30 @@ export default function Forum() {
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => openSection(sec)}
                                         >
-                                            {/* Nome sezione con luna + badge non letti inline */}
+                                            {/* Luna a sinistra del nome sezione */}
                                             <td style={{ padding: '8px 20px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                                                {sec.nome}
                                                 {sec.non_letti > 0 && (
-                                                    <>
-                                                        <span style={{ marginLeft: '8px', fontSize: '14px', verticalAlign: 'middle' }}>🌙</span>
-                                                        <span style={{
-                                                            marginLeft: '3px',
-                                                            background: '#e74c3c', color: '#fff',
-                                                            borderRadius: '10px', padding: '1px 6px',
-                                                            fontSize: '10px', fontWeight: 'bold',
-                                                            verticalAlign: 'middle',
-                                                        }}>
-                                                            {sec.non_letti}
-                                                        </span>
-                                                    </>
+                                                    <span style={{ marginRight: '6px', fontSize: '14px', verticalAlign: 'middle' }}>🌙</span>
                                                 )}
+                                                {sec.nome}
                                             </td>
 
-                                            {/* Descrizione — grigio più scuro, uppercase */}
+                                            {/* Descrizione */}
                                             <td style={{ padding: '8px 20px', fontSize: '11px', color: '#a7a7a8', textTransform: 'uppercase', letterSpacing: '1px' }}>
                                                 {sec.descrizione}
+                                            </td>
+
+                                            {/* Badge non letti a destra */}
+                                            <td style={{ padding: '8px 20px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                                {sec.non_letti > 0 && (
+                                                    <span style={{
+                                                        background: '#e74c3c', color: '#fff',
+                                                        borderRadius: '10px', padding: '1px 7px',
+                                                        fontSize: '10px', fontWeight: 'bold',
+                                                    }}>
+                                                        {sec.non_letti}
+                                                    </span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
