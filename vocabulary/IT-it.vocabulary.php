@@ -846,7 +846,7 @@ $MESSAGE['warning']['double_connection'] = 'Il personaggio con cui stai tentando
 /** * Messaggio di avviso che è tempo di cambiare password perchè passati 6 mesi
  * @author Blancks
  */
-$MESSAGE['warning']['changepass'] = 'Attenzione: sono passati più di sei mesi dal tuo ultimo cambio di password. Per la tua sicurezza lo staff del gioco ti consiglia di cambiare la tua password il prima possibile.';
+$MESSAGE['warning']['changepass'] = 'Attenzione! Si consiglia di cambiare la password.';
 $MESSAGE['warning']['changepass_signup'] = 'Attenzione: per la tua sicurezza, lo staff di gioco ti consiglia di sostituire la password generata automaticamente in fase di iscrizione';
 
 $MESSAGE['level_up']['inserted'] = 'Spirito potenziato e punto razza incrementato';

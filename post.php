@@ -1,5 +1,5 @@
-	
-<?/** * Chat Off Per GDRCD Extreme
+
+<?php /** * Chat Off Per GDRCD Extreme
 	@Author Axel di Fairy Tail Universe GDR
 	*** Potrai liberamente utilizzare questa chat off compatibile in tutto e per tutto con GDRCD fino alla versione Extreme riconoscendo la paternit� del codice all'autore e non rimuovendo questo commento. 
 	*** Nel caso in cui il commento venisse rimosso, l'autore dei codici non doner� il consenso all'utilizzo del codice sottostante.
