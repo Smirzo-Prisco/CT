@@ -430,7 +430,6 @@ node_modules/
 
 # Config sensibili
 config.inc.php
-db.inc.php
 
 # Log / cache
 *.log

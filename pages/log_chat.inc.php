@@ -411,7 +411,7 @@
                                 ORDER BY ora ASC", 'result');
                 } else {
                     // Nessun periodo valido: risultato vuoto
-                    echo '<div class="error">Non ci sono log validi da mostrare per il periodo selezionato. Fai richiesta per accedere ai log <a href="https://crystaltokyogdr.altervista.org/main.php?page=richiesta_log" target="_top">Clicca qui</a>.</div>';
+                    echo '<div class="error">Non ci sono log validi da mostrare per il periodo selezionato. Fai richiesta per accedere ai log <a href="main.php?page=richiesta_log" target="_top">Clicca qui</a>.</div>';
                 
                     $result = false;
                 }

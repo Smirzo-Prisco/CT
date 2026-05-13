@@ -15,9 +15,9 @@ error_reporting(E_ERROR | E_PARSE);
 require_once 'includes/constant_values.inc.php';
 
 /* PARAMETRI DI CONNESSIONE */
-$PARAMETERS['database']['username'] = 'latinoromano';            //nome utente del database
-$PARAMETERS['database']['password'] = 'L4t1n0r0m4n0';            //password del database
-$PARAMETERS['database']['database_name'] = 'my_latinoromano';    //nome del database
+$PARAMETERS['database']['username'] = 'gdrcd';            //nome utente del database
+$PARAMETERS['database']['password'] = '68rpTqEFKdfw';            //password del database
+$PARAMETERS['database']['database_name'] = 'gdrcd';    //nome del database
 $PARAMETERS['database']['url'] = 'localhost';        //indirizzo ip del database
 
 /* HELP: Sostituire le diciture inserite tra le virgolette con i parametri di connessione al Database del proprio dominio. Essi sono forniti al momento della registrazione. Se non si e' in possesso di tali parametri consultare le FAQ della homepage dell'host che fornisce il dominio. Se non le si trovano li contattare lo staff dell'host. */
@@ -29,9 +29,9 @@ $PARAMETERS['database']['url'] = 'localhost';        //indirizzo ip del database
 
 /* INFORMAZIONI SUL SITO */
 $PARAMETERS['info']['site_name'] = 'Crystal Tokyo'; //nome del gioco
-$PARAMETERS['info']['site_url'] = 'http://crystaltokyogdr.altervista.org/'; //indirizzo URL del gioco
-$PARAMETERS['info']['webmaster_name'] = 'Webmaster'; //nome e cognome del responsabile del sito
-$PARAMETERS['info']['webmaster_email'] = 'crystaltokyogdr@altervista.org'; //email ufficiale del webmaster (è visibile in homepage)
+$PARAMETERS['info']['site_url'] = 'http://crystaltokyo.it'; //indirizzo URL del gioco
+$PARAMETERS['info']['webmaster_name'] = 'Gestione'; //nome e cognome del responsabile del sito
+$PARAMETERS['info']['webmaster_email'] = 'gestione@crystaltokyo.it'; //email ufficiale del webmaster (è visibile in homepage)
 $PARAMETERS['info']['homepage_name'] = 'Homepage'; //nome con il quale si indica la prima pagina visualizzata
 $PARAMETERS['info']['dbadmin_name'] = 'Admin DB';
 $PARAMETERS['info']['GDRCD'] = 'CT'; //nome del gioco

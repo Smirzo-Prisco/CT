@@ -3,15 +3,13 @@
 // ini_set('display_errors', 1);
 
 function send_mail($to, $subject, $message) {
-    $headers = 'From: crystaltokyogdr@altervista.org' . "\r\n" .
-        'Reply-To: crystaltokyogdr@altervista.org' . "\r\n" .
+    $from = $GLOBALS['PARAMETERS']['info']['webmaster_email'];
+    $headers = 'From: ' . $from . "\r\n" .
+        'Reply-To: ' . $from . "\r\n" .
         'X-Mailer: PHP/' . phpversion() . "\r\n" .
         'Content-type: text/html; charset=UTF-8' . "\r\n";
 
-    $send = mail($to, $subject, $message, $headers);
-
-    if($send) return true;
-    else return false;
+    return (bool) mail($to, $subject, $message, $headers);
 }
 
 function generateLinks($current_page, $total_pages, $url = "?") {

@@ -14,7 +14,7 @@ if ($PARAMETERS['settings']['protection'] == 'ON'){
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="description" content="Scopri Crystal Tokyo GDR, un GDR play by chat gratuito con combattimenti a dadi, famiglie magiche, crescita del personaggio e gioco narrativo condiviso.">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="canonical" href="https://crystaltokyogdr.altervista.org/">
+        <link rel="canonical" href="https://crystaltokyo.it/">
         
         <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
         <title>Crystal Tokyo GDR</title>

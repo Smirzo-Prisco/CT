@@ -30,7 +30,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
         
         
         //invio segnalazione
-        $segnalazione = "<a href='https://crystaltokyogdr.altervista.org/main.php?page=autorizza_log' target='_top'>Clicca qui</a>";
+        $segnalazione = "<a href='main.php?page=autorizza_log' target='_top'>Clicca qui</a>";
         $testo = gdrcd_filter_in("<b>$segnalazione" . " (<i>Un master ha appena richiesto autorizzazione per leggere i log chat</i>");
 
          // Recupera gli admin

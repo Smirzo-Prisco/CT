@@ -9,7 +9,7 @@
 }
 
 body {
-    background-image: url('https://crystaltokyogdr.altervista.org/themes/crystal/imgs/login/bg_noah.png');
+    background-image: url('../imgs/login/bg_noah.png');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;

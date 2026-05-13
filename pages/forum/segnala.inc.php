@@ -71,7 +71,7 @@ if ($_REQUEST['op'] == 'segnala') {
 // Seconda parte: gestione dell'invio della segnalazione
 
 if ($_REQUEST['op'] == 'segnalaok') {
-    $segnalazione = "<a href='https://crystaltokyogdr.altervista.org/main.php?page=forum&op=read&what=" . gdrcd_filter('num', $_REQUEST['what']) . "&where=" . gdrcd_filter('num', $_REQUEST['where']) . "' target='_top'>Clicca qui</a>";
+    $segnalazione = "<a href='main.php?page=forum&op=read&what=" . gdrcd_filter('num', $_REQUEST['what']) . "&where=" . gdrcd_filter('num', $_REQUEST['where']) . "' target='_top'>Clicca qui</a>";
     $CommentoSegnalazione = gdrcd_filter('in', $_POST['CommentoSegnalazione']);
     $testo = gdrcd_filter_in("<b>$segnalazione" . " (<i>Messaggio segnalato da " . $_SESSION['login'] . "</i>)<br><br></b>" . "$CommentoSegnalazione");
 
