@@ -1,11 +1,8 @@
-<!--DBG3:scheda_file_start-->
 <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/scheda.css?<?=time()?>" type="text/css">
 
 <div class="pagina_scheda">
     <?php
-        echo '<!--DBG4:before_require-->';
         require_once(__DIR__ . '/../includes/custom_functions.inc.php');
-        echo '<!--DBG5:after_require-->';
 
         /* HELP: E' possibile modificare la scheda agendo su scheda.css nel tema scelto,
         * oppure sostituendo il codice che segue la voce "Scheda del personaggio"
@@ -181,12 +178,17 @@
                             <table style="width:100%; margin-top:5px; border-collapse: collapse; text-align:center;">
                                 <tr><th class="form-group form-column">Livello</th><th class="form-group form-column">Fino a</th></tr>
                                 <?php
+                                $soglie = null;
                                 try {
                                     $soglie = gdrcd_query("SELECT * FROM gilda_soglie ORDER BY livello", 'result', true);
-                                    foreach ($soglie as $soglia): ?>
-                                        <tr><td><?=$soglia['livello']?></td><td><?=$soglia['soglia']?></td></tr>
-                                    <?php endforeach;
-                                } catch (Exception $e) { /* tabella non trovata */ } ?>
+                                } catch (Exception $e) {}
+                                if ($soglie) {
+                                    while ($soglia = gdrcd_query($soglie, 'fetch')) {
+                                        echo '<tr><td>' . (int)$soglia['livello'] . '</td><td>' . (int)$soglia['soglia'] . '</td></tr>';
+                                    }
+                                    gdrcd_query($soglie, 'free');
+                                }
+                                ?>
                             </table>
                         </div>
                     </span>
