@@ -38,7 +38,8 @@ import MapClick        from './components/MapClick'
 import Forum           from './components/Forum'
 import AppRouter, { MIGRATED_PAGES } from './AppRouter'
 import InfoLocation   from './components/InfoLocation'
-import FrameMessaggi  from './components/FrameMessaggi'
+import FrameMessaggi   from './components/FrameMessaggi'
+import AnteprimaScheda from './components/AnteprimaScheda'
 
 /**
  * Registry privato dei componenti.
@@ -118,6 +119,9 @@ window.CT.register('InfoLocation', InfoLocation)
 
 /** Meteo + griglia icone + notifiche messaggi/chatoff real-time via dm:update e chatoff:update */
 window.CT.register('FrameMessaggi', FrameMessaggi)
+
+/** Anteprima personaggio: avatar + link scheda e presenti */
+window.CT.register('AnteprimaScheda', AnteprimaScheda)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.
