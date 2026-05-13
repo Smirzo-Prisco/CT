@@ -9,7 +9,8 @@
     *** Fermo restando i punti sopra citati, la chat non dovrai far altro che inserire i file nella directory principale del tuo sito e poi creare il link al file "chatoff.php" dove pi� ritieni opportuno sul tuo sito.
 	*** Enjoy
 	*/
-session_start();
+	
+	session_start();
 	header('Content-Type:text/html; charset=UTF-8');													  
 
 	//Includio i parametri, la configurazione, la lingua e le funzioni
