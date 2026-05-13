@@ -12,7 +12,7 @@
         // Se non e' stato specificato il nome del pg
         if(isset($_REQUEST['pg']) === false) {
             echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['unknown_character_sheet']).'</div>';
-            exit();
+            return;
         }
         $query = "SELECT
                     personaggio.*,
@@ -43,7 +43,7 @@
         // Se il personaggio non esiste
         if(gdrcd_query($personaggi, 'num_rows') == 0) {
             echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['unknown_character_sheet']).'</div>';
-            exit();
+            return;
         }
 
         $pg = gdrcd_query($personaggi, 'fetch');
@@ -76,7 +76,7 @@
                 </div>
             <?php
             }
-            exit();
+            return;
         }
     ?>
     <div class="page_title"><h2><?=gdrcd_filter('out', $MESSAGE['interface']['sheet']['page_name'])?></h2></div>
@@ -177,10 +177,12 @@
                             <table style="width:100%; margin-top:5px; border-collapse: collapse; text-align:center;">
                                 <tr><th class="form-group form-column">Livello</th><th class="form-group form-column">Fino a</th></tr>
                                 <?php
-                                $soglie = gdrcd_query("SELECT * FROM gilda_soglie ORDER BY livello", 'result');
-                                foreach ($soglie as $soglia): ?>
-                                    <tr><td><?=$soglia['livello']?></td><td><?=$soglia['soglia']?></td></tr>
-                                <?php endforeach; ?>
+                                try {
+                                    $soglie = gdrcd_query("SELECT * FROM gilda_soglie ORDER BY livello", 'result', true);
+                                    foreach ($soglie as $soglia): ?>
+                                        <tr><td><?=$soglia['livello']?></td><td><?=$soglia['soglia']?></td></tr>
+                                    <?php endforeach;
+                                } catch (Exception $e) { /* tabella non trovata */ } ?>
                             </table>
                         </div>
                     </span>
