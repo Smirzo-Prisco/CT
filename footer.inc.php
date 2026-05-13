@@ -69,6 +69,9 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
         // Phase 3.3 — frame laterali come componenti React
         if (document.getElementById('info-location-container'))
             CT.mount('InfoLocation', 'info-location-container', {});
+
+        if (document.getElementById('frame-messaggi-container'))
+            CT.mount('FrameMessaggi', 'frame-messaggi-container', {});
     });
     </script>
 
