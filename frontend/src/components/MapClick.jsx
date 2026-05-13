@@ -399,7 +399,9 @@ export default function MapClick() {
                         width:    '22%',
                         maxWidth: '200px',
                         // Forza il testo a capo invece di allargare ulteriormente il popup
-                        wordBreak: 'break-word',
+                        wordBreak:  'break-word',
+                        // Nasconde qualsiasi contenuto che eccede la larghezza del popup
+                        overflow:   'hidden',
                     }
 
                     return (
@@ -417,12 +419,12 @@ export default function MapClick() {
                                     return (
                                         <span
                                             key={i}
-                                            style={{ position: 'relative', display: 'inline-block', margin: '2px' }}
+                                            style={{ position: 'relative', display: 'inline-block', margin: '2px', maxWidth: '100%' }}
                                             onClick={() => navigate(room)}
                                         >
                                             <img
                                                 src={`/themes/crystal/imgs/maps/${room.img}`}
-                                                style={{ cursor: 'pointer', display: 'block' }}
+                                                style={{ cursor: 'pointer', display: 'block', maxWidth: '100%', height: 'auto' }}
                                                 alt=""
                                                 border="0"
                                             />
