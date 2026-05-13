@@ -456,13 +456,13 @@ export default function Forum() {
                      * - Riga per ogni sezione: [icona letto] [nome] [descrizione]
                      * - Nessuna ripetizione di "Sezione / Descrizione / Non letti"
                      */
-                    <table className="customTable" style={{ width: '100%' }}>
+                    <table className="customTable" style={{ width: '100%', margin: '0 auto' }}>
                         <tbody>
                             {Object.entries(sections).map(([tipo, secs]) => (
                                 <>
-                                    {/* Riga header del gruppo */}
+                                    {/* Riga header del gruppo — il CSS third_header la colora in arancione */}
                                     <tr key={`h-${tipo}`} className="third_header">
-                                        <td colSpan="3" style={{ textAlign: 'center', padding: '6px 10px', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                                        <td colSpan="3" style={{ textAlign: 'center', padding: '8px 20px', textTransform: 'uppercase' }}>
                                             {tipo}
                                         </td>
                                     </tr>
@@ -471,17 +471,18 @@ export default function Forum() {
                                     {secs.map(sec => (
                                         <tr
                                             key={sec.id}
-                                            className="presente"
+                                            className="mappa"
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => openSection(sec)}
                                         >
-                                            {/* Icona luna + badge numerico per thread non letti */}
-                                            <td style={{ width: '50px', padding: '6px 6px 6px 10px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                            {/* Nome sezione con luna + badge non letti inline */}
+                                            <td style={{ padding: '8px 20px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                                                {sec.nome}
                                                 {sec.non_letti > 0 && (
                                                     <>
-                                                        <span style={{ fontSize: '14px' }}>🌙</span>
+                                                        <span style={{ marginLeft: '8px', fontSize: '14px', verticalAlign: 'middle' }}>🌙</span>
                                                         <span style={{
-                                                            marginLeft: '4px',
+                                                            marginLeft: '3px',
                                                             background: '#e74c3c', color: '#fff',
                                                             borderRadius: '10px', padding: '1px 6px',
                                                             fontSize: '10px', fontWeight: 'bold',
@@ -493,13 +494,8 @@ export default function Forum() {
                                                 )}
                                             </td>
 
-                                            {/* Nome sezione */}
-                                            <td style={{ padding: '6px 10px', textTransform: 'uppercase' }}>
-                                                <strong style={{ color: '#ce846f', letterSpacing: '1px' }}>{sec.nome}</strong>
-                                            </td>
-
-                                            {/* Descrizione */}
-                                            <td style={{ padding: '6px 10px', fontSize: '11px', color: '#a7a7a8', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                            {/* Descrizione — grigio più scuro, uppercase */}
+                                            <td style={{ padding: '8px 20px', fontSize: '11px', color: '#a7a7a8', textTransform: 'uppercase', letterSpacing: '1px' }}>
                                                 {sec.descrizione}
                                             </td>
                                         </tr>
