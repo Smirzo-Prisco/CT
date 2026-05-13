@@ -157,7 +157,7 @@ const ZONES = [
 
 export default function MapClick() {
 
-    /** Info sulla posizione corrente (is_notte, larghezza, altezza immagine) */
+    /** Info sulla posizione corrente (is_notte) */
     const [mapInfo, setMapInfo] = useState(null)
 
     /**
@@ -169,11 +169,16 @@ export default function MapClick() {
     /** ID zona con popup aperto, es. 'menu1'. null = nessun popup. */
     const [openZone, setOpenZone] = useState(null)
 
-    /** Ref all'immagine mappa per calcolare le dimensioni renderizzate */
+    /** Ref all'immagine mappa per leggere le dimensioni naturali reali */
     const imgRef = useRef(null)
 
-    /** Dimensioni renderizzate dell'immagine (aggiornate al resize) */
-    const [rendered, setRendered] = useState({ w: 1, h: 1 })
+    /**
+     * Dimensioni naturali REALI dell'immagine (px), lette da img.naturalWidth/Height.
+     * Necessarie per calcolare le posizioni percentuali degli hotspot.
+     * Non si usa il DB (larghezza/altezza) perché il valore del DB potrebbe essere
+     * il default errato (500×330) invece delle dimensioni effettive dell'immagine.
+     */
+    const [naturalSize, setNaturalSize] = useState({ w: 0, h: 0 })
 
     // ---------------------------------------------------------------------------
     // FETCH DATI
@@ -212,13 +217,15 @@ export default function MapClick() {
     // ---------------------------------------------------------------------------
 
     /**
-     * Aggiorna le dimensioni renderizzate quando l'immagine è caricata o la
-     * finestra viene ridimensionata. Serve per scalare i hotspot correttamente.
+     * Legge le dimensioni naturali dell'immagine una volta caricata.
+     * Viene chiamata su onLoad dell'immagine: in quel momento naturalWidth e
+     * naturalHeight sono i pixel reali del file, indipendentemente dalla
+     * dimensione renderizzata o dai valori nel DB.
      */
-    const updateRendered = useCallback(() => {
+    const onImageLoad = useCallback(() => {
         const img = imgRef.current
-        if (img && img.offsetWidth > 0) {
-            setRendered({ w: img.offsetWidth, h: img.offsetHeight })
+        if (img && img.naturalWidth > 0) {
+            setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight })
         }
     }, [])
 
@@ -235,14 +242,8 @@ export default function MapClick() {
         const sock = window.ctSocket
         if (sock) sock.on('users:update', fetchRoomCounts)
 
-        // Aggiorna dimensioni al resize della finestra
-        window.addEventListener('resize', updateRendered)
-
-        return () => {
-            if (sock) sock.off('users:update', fetchRoomCounts)
-            window.removeEventListener('resize', updateRendered)
-        }
-    }, [fetchMapInfo, fetchRoomCounts, updateRendered])
+        return () => { if (sock) sock.off('users:update', fetchRoomCounts) }
+    }, [fetchMapInfo, fetchRoomCounts])
 
     // Chiude il popup cliccando fuori dalla mappa
     useEffect(() => {
@@ -275,26 +276,27 @@ export default function MapClick() {
     // ---------------------------------------------------------------------------
 
     /**
-     * Calcola la posizione CSS di un hotspot in percentuale sull'immagine.
-     * Le coordinate (cx, cy) sono in pixel nell'immagine naturale.
-     * Le dimensioni naturali vengono da mapInfo (mappa_click.larghezza/altezza).
+     * Calcola la posizione CSS di un hotspot come percentuale sull'immagine.
+     * Usa le dimensioni naturali REALI dell'immagine (naturalWidth/naturalHeight)
+     * lette al caricamento — NON i valori del DB che potrebbero essere i default
+     * errati (500×330 invece delle dimensioni reali del file).
      *
-     * Se le dimensioni naturali non sono ancora disponibili, usa valori di default.
+     * Non renderizza nulla finché l'immagine non è caricata (naturalSize.w === 0)
+     * per evitare posizionamenti errati con dimensioni placeholder.
      *
-     * @param {number} cx - Coordinata X centro hotspot (px, immagine naturale)
-     * @param {number} cy - Coordinata Y centro hotspot (px, immagine naturale)
-     * @returns {Object} Stile CSS con left e top in percentuale
+     * @param {number} cx - Coordinata X centro hotspot (px nell'immagine naturale)
+     * @param {number} cy - Coordinata Y centro hotspot (px nell'immagine naturale)
+     * @returns {Object|null} Stile CSS con left/top in %, o null se non ancora pronto
      */
     const hotspotStyle = (cx, cy) => {
-        const natW = mapInfo?.larghezza || 760
-        const natH = mapInfo?.altezza   || 430
+        if (naturalSize.w === 0) return null   // immagine non ancora caricata
         return {
-            position: 'absolute',
-            left:     `${(cx / natW) * 100}%`,
-            top:      `${(cy / natH) * 100}%`,
+            position:  'absolute',
+            left:      `${(cx / naturalSize.w) * 100}%`,
+            top:       `${(cy / naturalSize.h) * 100}%`,
             transform: 'translate(-50%, -50%)',
-            cursor: 'pointer',
-            zIndex: 10,
+            cursor:    'pointer',
+            zIndex:    10,
         }
     }
 
@@ -309,8 +311,12 @@ export default function MapClick() {
 
     return (
         <center>
-            {/* Wrapper con position:relative per i hotspot assoluti */}
-            <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%' }}>
+            {/*
+              * Wrapper con position:relative per i hotspot assoluti.
+              * overflow:hidden evita che hotspot fuori immagine (se le coordinate
+              * fossero errate) causino scroll orizzontale della pagina.
+              */}
+            <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%', overflow: 'hidden' }}>
 
                 {/* Immagine mappa — responsive */}
                 <img
@@ -318,14 +324,17 @@ export default function MapClick() {
                     src={mapImg}
                     alt="Mappa di Crystal Tokyo"
                     style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
-                    onLoad={updateRendered}
+                    onLoad={onImageLoad}
                 />
 
-                {/* Hotspot per ogni zona */}
-                {ZONES.map(zone => (
+                {/* Hotspot per ogni zona — renderizzati solo dopo che l'immagine è caricata */}
+                {ZONES.map(zone => {
+                    const style = hotspotStyle(zone.cx, zone.cy)
+                    if (!style) return null   // immagine non ancora caricata
+                    return (
                     <div
                         key={zone.id}
-                        style={hotspotStyle(zone.cx, zone.cy)}
+                        style={style}
                         // Ferma la propagazione per non chiudere subito il popup
                         onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
                         onMouseEnter={() => setOpenZone(zone.id)}
@@ -414,7 +423,8 @@ export default function MapClick() {
                             </div>
                         )}
                     </div>
-                ))}
+                    )
+                })}
             </div>
         </center>
     )
