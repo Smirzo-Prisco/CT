@@ -42,7 +42,6 @@
 
         // Se il personaggio non esiste
         if(gdrcd_query($personaggi, 'num_rows') == 0) {
-            error_log('[SCHEDA] RETURN: personaggio non trovato per pg=' . $_REQUEST['pg']);
             echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['unknown_character_sheet']).'</div>';
             return;
         }
@@ -233,7 +232,7 @@
 
                         <span style="float: left; margin-left: 5px;"><?=gdrcd_filter('out', $MESSAGE['interface']['sheet']['modify_form']['shin'])?>:</span>
                         <span style="float: right; margin-right: 5px; text-align: right;"><?=gdrcd_filter('out', floor($pg['shin']))?></span>
-                    <? endif; ?>
+                    <?php endif; ?>
                     <br>
                     <span style="float: left; margin-left: 5px;"><?=gdrcd_filter('out', $PARAMETERS['names']['stats']['notorieta'])?>:</span>
                     <span style="float: right; margin-right: 5px; text-align: right;"><?=gdrcd_filter('out', floor($pg['notorieta']))?></span>
