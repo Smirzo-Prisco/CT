@@ -75,9 +75,10 @@ function formatDate(isoDate, ongame) {
 /**
  * Determina l'URL dell'avatar corretto in base al tipo e al mittente.
  * I mittenti speciali ('Segnalazione', 'Calendario') hanno icone dedicate.
+ * Per le conversazioni individuali l'avatar viene da api_messages.php?op=list
+ * (campo avatar_url, aggiunto nella risposta lato server).
  *
- * @param {Object} conv     - Oggetto conversazione dalla lista
- * @param {string} selfName - Login dell'utente corrente (window.CT_USER.login)
+ * @param {Object} conv - Oggetto conversazione dalla lista
  * @returns {string} URL dell'avatar da mostrare
  */
 function getAvatarUrl(conv) {
@@ -86,9 +87,8 @@ function getAvatarUrl(conv) {
     // Mittenti speciali di sistema
     if (conv.ultimo_mittente === 'Segnalazione') return '../pages/msg/img/segnalazione.png'
     if (conv.ultimo_mittente === 'Calendario')   return '../pages/msg/img/calendario.png'
-    // Individuale: si mostra l'avatar dell'altra persona
-    // (il display_name è già calcolato lato server come "l'altro" della conversazione)
-    return '' // verrà gestita nel componente con fallback
+    // Individuale: avatar restituito dall'API (url_img_chat del contatto)
+    return conv.avatar_url || ''
 }
 
 // ---------------------------------------------------------------------------
@@ -403,19 +403,14 @@ export default function MessagesInbox() {
 
         const sock = window.ctSocket
         if (sock) {
-            sock.on('dm:update', () => {
-                // Aggiorna sempre la lista
-                fetchList()
-
-                // Se c'è un thread aperto, ricarica anche quello per mostrare nuovi messaggi
-                if (selectedConvRef.current) {
-                    openConversation(selectedConvRef.current)
-                }
-            })
+            // 'dm:update' arriva sia per nuovi messaggi ricevuti SIA per letture proprie.
+            // Aggiorna SOLO la lista: riaprire la conversazione creerebbe un loop
+            // perché op=read emette 'dm:update' al self → openConversation → op=read → ...
+            sock.on('dm:update', fetchList)
         }
 
-        return () => { if (sock) sock.off('dm:update') }
-    }, [fetchList, openConversation])
+        return () => { if (sock) sock.off('dm:update', fetchList) }
+    }, [fetchList])
 
     // ---------------------------------------------------------------------------
     // INVIO RISPOSTA
@@ -553,15 +548,48 @@ export default function MessagesInbox() {
                     </div>
                 </div>
 
-                {/* Lista conversazioni della tab attiva */}
+                {/*
+                  * Lista conversazioni — due sezioni OFF e ON sempre presenti nel DOM.
+                  * Il CSS di new_sms.css ha '#messages-off { display: none }' hardcoded,
+                  * quindi la visibilità di ciascuna viene sovrascritta via style inline
+                  * in base alla tab attiva, ignorando il valore CSS di default.
+                  */}
                 <div className="messages-list" id="messages-list">
-                    <div className="message-section active">
-                        {displayed.length === 0 ? (
+
+                    {/* Sezione OFF */}
+                    <div
+                        className="message-section"
+                        id="messages-off"
+                        style={{ display: activeTab === 'off' ? 'block' : 'none' }}
+                    >
+                        {convOff.length === 0 ? (
                             <p style={{ padding: '10px', color: '#aaa', fontStyle: 'italic' }}>
-                                Nessun messaggio {activeTab === 'on' ? 'ON' : 'OFF'} trovato.
+                                Nessun messaggio OFF trovato.
                             </p>
                         ) : (
-                            displayed.map(conv => (
+                            convOff.map(conv => (
+                                <ConvItem
+                                    key={`${conv.tipo}-${conv.conversazione_id}`}
+                                    conv={conv}
+                                    isSelected={selectedConv?.conversazione_id === conv.conversazione_id}
+                                    onClick={openConversation}
+                                />
+                            ))
+                        )}
+                    </div>
+
+                    {/* Sezione ON */}
+                    <div
+                        className="message-section active"
+                        id="messages-on"
+                        style={{ display: activeTab === 'on' ? 'block' : 'none' }}
+                    >
+                        {convOn.length === 0 ? (
+                            <p style={{ padding: '10px', color: '#aaa', fontStyle: 'italic' }}>
+                                Nessun messaggio ON trovato.
+                            </p>
+                        ) : (
+                            convOn.map(conv => (
                                 <ConvItem
                                     key={`${conv.tipo}-${conv.conversazione_id}`}
                                     conv={conv}
@@ -585,9 +613,10 @@ export default function MessagesInbox() {
             </div>
 
             {/* ---------------------------------------------------------------- */}
-            {/* CONTENT: thread aperto o form composizione                        */}
+            {/* MAIN-CONTENT: thread aperto o form composizione                  */}
+            {/* Il CSS new_sms.css si aspetta '.main-content', non '.content'    */}
             {/* ---------------------------------------------------------------- */}
-            <div className="content">
+            <div className="main-content">
                 {view === 'compose' ? (
                     /* Vista composizione nuovo messaggio */
                     <ComposeView

@@ -91,12 +91,21 @@ switch ($op) {
                 $unread = false;
             }
 
+            // Recupera l'avatar del contatto (per gruppi e globali usa icone fisse lato client)
+            $avatar_url = '';
+            if ($tipo === 'individuale') {
+                $av = gdrcd_query("SELECT url_img_chat FROM personaggio
+                    WHERE nome = '" . gdrcd_filter('in', $display_name) . "' LIMIT 1");
+                $avatar_url = $av['url_img_chat'] ?? '';
+            }
+
             $conversations[] = [
                 'conversazione_id' => (int)$row['conversazione_id'],
                 'tipo'             => $tipo,
                 'gruppo_id'        => $row['gruppo_id'] ? (int)$row['gruppo_id'] : null,
                 'is_globale'       => (bool)$row['is_globale'],
                 'display_name'     => $display_name,
+                'avatar_url'       => $avatar_url,
                 'ultimo_mittente'  => $row['mittente_nome'],
                 'ultimo_testo'     => mb_substr($row['testo'] ?? '', 0, 80),
                 'ongame'           => (bool)$row['ongame'],
