@@ -479,30 +479,28 @@ export default function Forum() {
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => openSection(sec)}
                                         >
-                                            {/* Luna a sinistra del nome sezione */}
+                                            {/* 🌙 Nome sezione [badge] — tutto nella stessa cella */}
                                             <td style={{ padding: '8px 20px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                                                 {sec.non_letti > 0 && (
                                                     <span style={{ marginRight: '6px', fontSize: '14px', verticalAlign: 'middle' }}>🌙</span>
                                                 )}
                                                 {sec.nome}
+                                                {sec.non_letti > 0 && (
+                                                    <span style={{
+                                                        marginLeft: '6px',
+                                                        background: '#e74c3c', color: '#fff',
+                                                        borderRadius: '10px', padding: '1px 7px',
+                                                        fontSize: '10px', fontWeight: 'bold',
+                                                        verticalAlign: 'middle',
+                                                    }}>
+                                                        {sec.non_letti}
+                                                    </span>
+                                                )}
                                             </td>
 
                                             {/* Descrizione */}
                                             <td style={{ padding: '8px 20px', fontSize: '11px', color: '#a7a7a8', textTransform: 'uppercase', letterSpacing: '1px' }}>
                                                 {sec.descrizione}
-                                            </td>
-
-                                            {/* Badge non letti a destra */}
-                                            <td style={{ padding: '8px 20px', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                                                {sec.non_letti > 0 && (
-                                                    <span style={{
-                                                        background: '#e74c3c', color: '#fff',
-                                                        borderRadius: '10px', padding: '1px 7px',
-                                                        fontSize: '10px', fontWeight: 'bold',
-                                                    }}>
-                                                        {sec.non_letti}
-                                                    </span>
-                                                )}
                                             </td>
                                         </tr>
                                     ))}
