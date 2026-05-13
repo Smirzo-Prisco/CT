@@ -36,7 +36,7 @@ import PresentiEstesi  from './components/PresentiEstesi'
 import MessagesInbox   from './components/MessagesInbox'
 import MapClick        from './components/MapClick'
 import Forum           from './components/Forum'
-import AppRouter       from './AppRouter'
+import AppRouter, { MIGRATED_PAGES } from './AppRouter'
 
 /**
  * Registry privato dei componenti.
@@ -135,5 +135,38 @@ window.CT.navigate = (url) => { window.top.location.href = url }
 // evitando race condition tra il caricamento del modulo e il parsing del DOM.
 // --------------------------------------------------------------------------------------------
 document.dispatchEvent(new CustomEvent('ct:ready'))
+
+// ---------------------------------------------------------------------------
+// PHASE 3.2 — Intercettore click globale per navigazione React
+//
+// Ascolta tutti i click sull'intera pagina (menu incluso).
+// Se il link punta a una pagina migrata, chiama CT.navigate() invece
+// di fare un reload PHP completo — la navigazione diventa istantanea.
+//
+// Funziona solo quando CT.navigate è la versione completa (AppRouter montato).
+// Sulle pagine non migrate, CT.navigate fa il reload PHP normale (fallback).
+// ---------------------------------------------------------------------------
+document.addEventListener('click', function(e) {
+    // Risale il DOM fino a trovare il tag <a> (gestisce click su figli dell'<a>)
+    const link = e.target.closest('a')
+    if (!link || !link.href) return
+
+    try {
+        const url = new URL(link.href)
+
+        // Ignora link a domini diversi (link esterni, mailto:, ecc.)
+        if (url.hostname !== window.location.hostname) return
+
+        const page = url.searchParams.get('page')
+
+        // Se la pagina di destinazione è migrata, intercetta il click
+        if (page && MIGRATED_PAGES.has(page)) {
+            e.preventDefault()
+            window.CT.navigate(url.pathname + url.search)
+        }
+    } catch {
+        // URL non valida o altro errore: lascia agire il browser normalmente
+    }
+}, false)
 
 console.log('[CT] bundle caricato — componenti registrati:', Object.keys(registry))
