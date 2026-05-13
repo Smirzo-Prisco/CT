@@ -33,6 +33,7 @@ import OnlineUsers     from './components/OnlineUsers'
 import ChatViewer      from './components/ChatViewer'
 import TargetSelector  from './components/TargetSelector'
 import PresentiEstesi  from './components/PresentiEstesi'
+import MessagesInbox   from './components/MessagesInbox'
 
 /**
  * Registry privato dei componenti.
@@ -97,6 +98,9 @@ window.CT.register('TargetSelector', TargetSelector)
 
 /** Lista completa presenti con avatar/razza/famiglia — si aggiorna via socket users:update */
 window.CT.register('PresentiEstesi', PresentiEstesi)
+
+/** Inbox messaggi privati: lista conversazioni + thread + risposta — si aggiorna via socket dm:update */
+window.CT.register('MessagesInbox', MessagesInbox)
 
 // --------------------------------------------------------------------------------------------
 // EVENTO ct:ready — segnala ai file PHP che il bundle è pronto
