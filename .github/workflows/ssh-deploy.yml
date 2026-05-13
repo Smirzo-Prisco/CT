@@ -22,7 +22,8 @@ jobs:
           script: |
             set -e
             cd ${{ secrets.SSH_PATH }}
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             cd ${{ secrets.SSH_PATH }}/nodeserver
             npm install --production
             pm2 restart ct-socket || pm2 start server.js --name ct-socket
