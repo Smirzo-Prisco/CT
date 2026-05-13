@@ -89,7 +89,7 @@
                 $ts_lastpass = (int) strtotime($pg['ultimo_cambiopass']);
                 if($ts_lastpass + $six_months < time() && $pg['nome'] == $_SESSION['login']) {
                     $message = ($ts_signup + $six_months < time()) ? $MESSAGE['warning']['changepass'] : $MESSAGE['warning']['changepass_signup'];
-                    echo '<div class="warning">'.$message.'</div>';
+                    echo '<div class="warning" style="width:100%;box-sizing:border-box;">'.$message.'</div>';
                 }
             }
         ?>
