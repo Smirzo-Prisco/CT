@@ -191,12 +191,18 @@ export default function SchedaAffetti() {
                                         )
                                     })}
 
-                                    {/* Pulsante aggiungi (solo proprietario) */}
+                                    {/* Pulsante aggiungi (solo proprietario):
+                                        carica il form nell'iframe come faceva jQuery originale,
+                                        non naviga full-page */}
                                     {canAdd && (
                                         <li className="tile">
                                             <br />
                                             <a className="tile-content"
-                                                href={`/pages/form_affetto.php?username=${enc}`}>
+                                                href={`/pages/form_affetto.php?username=${enc}`}
+                                                onClick={e => {
+                                                    e.preventDefault()
+                                                    openDetail(`/pages/form_affetto.php?username=${enc}`, null)
+                                                }}>
                                                 <div className="tile-text" style={{ textAlign: 'center' }}>
                                                     <span style={{ color: '#353535', fontSize: 11,
                                                                    fontFamily: 'Dejavu Sans',

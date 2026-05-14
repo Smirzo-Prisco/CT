@@ -185,34 +185,46 @@ switch ($op) {
                 'Potere speciale','Skill temporanea','Talento'
             ), a.nome ASC", 'result');
 
-        // iconv//IGNORE strips raw invalid UTF-8 bytes (mb_convert_encoding non lo fa)
-        $clean = fn(?string $s): string => @iconv('UTF-8', 'UTF-8//IGNORE', $s ?? '') ?: '';
+        // ob_start cattura qualsiasi output accidentale (warning PHP, ecc.)
+        // che altrimenti corromperebbe la risposta JSON.
+        ob_start();
+        try {
+            // iconv//IGNORE rimuove fisicamente i byte non-UTF8.
+            // Applicato a TUTTI i campi stringa incluso il tipo (usato come array key).
+            $clean = fn(?string $s): string => @iconv('UTF-8', 'UTF-8//IGNORE', $s ?? '') ?: '';
 
-        $skills = [];
-        while ($row = gdrcd_query($result, 'fetch')) {
-            $tipo = $row['tipo'];
-            if (!isset($skills[$tipo])) $skills[$tipo] = [];
-            $skills[$tipo][] = [
-                'id'          => (int)$row['id_abilita'],
-                'nome'        => $clean($row['nome']),
-                'descrizione' => $clean($row['descrizione']),
-                'tipo'        => $tipo,
-                'sottotipo'   => $clean($row['sottotipo']),
-                'car'         => (int)$row['car'],
-                'costo'       => (int)$row['costo'],
-                'grado'       => (int)$row['grado'],
-                'usi'         => $row['usi'],
-            ];
+            $skills = [];
+            while ($row = gdrcd_query($result, 'fetch')) {
+                $tipo = $clean($row['tipo']); // pulizia anche sulla chiave dell'array
+                if (!isset($skills[$tipo])) $skills[$tipo] = [];
+                $skills[$tipo][] = [
+                    'id'          => (int)$row['id_abilita'],
+                    'nome'        => $clean($row['nome']),
+                    'descrizione' => $clean($row['descrizione']),
+                    'tipo'        => $tipo,
+                    'sottotipo'   => $clean($row['sottotipo']),
+                    'car'         => (int)$row['car'],
+                    'costo'       => (int)$row['costo'],
+                    'grado'       => (int)$row['grado'],
+                    'usi'         => $row['usi'] !== null ? $clean((string)$row['usi']) : null,
+                ];
+            }
+            gdrcd_query($result, 'free');
+
+            ob_end_clean(); // scarta qualsiasi output accidentale catturato
+
+            $json = json_encode(
+                ['success' => true, 'skills' => $skills],
+                JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
+            );
+            // Controlla anche stringa vuota (possibile con JSON_PARTIAL_OUTPUT_ON_ERROR)
+            echo ($json !== false && $json !== '')
+                ? $json
+                : json_encode(['success' => false, 'message' => 'json_encode: ' . json_last_error_msg()]);
+        } catch (Throwable $e) {
+            ob_end_clean();
+            echo json_encode(['success' => false, 'message' => 'Errore: ' . $e->getMessage()]);
         }
-        gdrcd_query($result, 'free');
-
-        // JSON_INVALID_UTF8_SUBSTITUTE come secondo strato: sostituisce qualsiasi
-        // byte non-UTF8 sopravvissuto con U+FFFD invece di far fallire json_encode
-        $json = json_encode(
-            ['success' => true, 'skills' => $skills],
-            JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
-        );
-        echo $json !== false ? $json : json_encode(['success' => false, 'message' => 'Errore encoding: ' . json_last_error_msg()]);
         break;
 
     // -------------------------------------------------------------------------
