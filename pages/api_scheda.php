@@ -275,6 +275,145 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // FORM_DATA — tutti i campi editabili per scheda_modifica (own o admin)
+    // -------------------------------------------------------------------------
+    case 'form_data':
+        if (!$is_own && !$is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Accesso negato']);
+            exit;
+        }
+        $pg_data = load_pg($pg);
+        if (!$pg_data) {
+            echo json_encode(['success' => false, 'message' => 'Personaggio non trovato']);
+            exit;
+        }
+        // Nickname TokyoBook (tabella tokyobook)
+        $tb_r = gdrcd_query("SELECT nickname FROM tokyobook WHERE personaggio = '$pg' LIMIT 1");
+        $nick_tokyo = $tb_r ? $tb_r['nickname'] : null;
+        // Nickname Gilda (tabella clgpersonaggioruolo)
+        $gg_r = gdrcd_query("SELECT nickname FROM clgpersonaggioruolo WHERE personaggio = '$pg' LIMIT 1");
+        $nick_gilda = $gg_r ? $gg_r['nickname'] : null;
+        echo json_encode([
+            'success'                => true,
+            'is_own'                 => $is_own,
+            'is_admin'               => $is_admin,
+            'is_staff'               => $is_staff,
+            'is_master'              => $is_master,
+            'nome'                   => $pg_data['nome'],
+            'cognome'                => $pg_data['cognome']    ?? '',
+            'eta'                    => $pg_data['eta']        ?? '',
+            'natoa'                  => $pg_data['natoa']      ?? '',
+            'volto'                  => $pg_data['volto']      ?? '',
+            'url_img'                => $pg_data['url_img']    ?? '',
+            'url_img_chat'           => $pg_data['url_img_chat'] ?? '',
+            'principale'             => $pg_data['principale'] ?? '',
+            'storia'                 => $pg_data['storia']     ?? '',
+            'descrizione'            => $pg_data['descrizione'] ?? '',
+            'off'                    => $pg_data['off']        ?? '',
+            'blocca_media'           => (bool)($pg_data['blocca_media'] ?? 0),
+            'url_media'              => $pg_data['url_media']  ?? '',
+            'nickname_tokyo'         => $nick_tokyo,
+            'nickname_tokyo_readonly' => ($nick_tokyo !== null) && !$is_admin,
+            'nickname_gilda'         => $nick_gilda,
+            'nickname_gilda_set'     => ($gg_r !== false),
+            'nickname_gilda_readonly' => (!empty($nick_gilda)) && !$is_admin,
+            'allow_audio'            => ($PARAMETERS['mode']['allow_audio'] === 'ON'),
+        ]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // SAVE_MODIFICA — salva il form di modifica scheda (POST, own o admin)
+    // -------------------------------------------------------------------------
+    case 'save_modifica':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Metodo non consentito']);
+            exit;
+        }
+        if (!$is_own && !$is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Non autorizzato']);
+            exit;
+        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Dati non validi']);
+            exit;
+        }
+        $f = fn($k) => gdrcd_filter('in', $data[$k] ?? '');
+        // Aggiornamento tabella personaggio
+        gdrcd_query(sprintf(
+            "UPDATE personaggio SET
+                cognome='%s', volto='%s', storia='%s', off='%s',
+                principale='%s', descrizione='%s', eta=%d, natoa='%s',
+                blocca_media=%d, url_img='%s', url_img_chat='%s', url_media='%s'
+             WHERE nome='%s'",
+            $f('cognome'), $f('volto'), $f('storia'), $f('off'),
+            $f('principale'), $f('descrizione'), (int)($data['eta'] ?? 0), $f('natoa'),
+            ($data['blocca_media'] ?? false) ? 1 : 0,
+            gdrcd_filter('in', gdrcd_filter('fullurl', $data['url_img']      ?? '')),
+            gdrcd_filter('in', gdrcd_filter('fullurl', $data['url_img_chat'] ?? '')),
+            gdrcd_filter('in', gdrcd_filter('fullurl', $data['url_media']    ?? '')),
+            $pg
+        ));
+        if ($is_own) $_SESSION['blocca_media'] = ($data['blocca_media'] ?? false) ? 1 : 0;
+        // Nickname TokyoBook
+        $nick_tokyo_new = gdrcd_filter('in', $data['nickname_tokyo'] ?? '');
+        if (!empty($nick_tokyo_new)) {
+            $existing_tb = gdrcd_query("SELECT nickname FROM tokyobook WHERE personaggio = '$pg' LIMIT 1");
+            if ($existing_tb) {
+                if ($is_admin || empty($existing_tb['nickname']))
+                    gdrcd_query("UPDATE tokyobook SET nickname='$nick_tokyo_new' WHERE personaggio='$pg'");
+            } else {
+                gdrcd_query("INSERT INTO tokyobook (personaggio, nickname) VALUES ('$pg', '$nick_tokyo_new')");
+            }
+        }
+        // Nickname Gilda (solo aggiornamento, non inserimento)
+        $nick_gilda_new = gdrcd_filter('in', $data['nickname_gilda'] ?? '');
+        if (!empty($nick_gilda_new)) {
+            $existing_gg = gdrcd_query("SELECT nickname FROM clgpersonaggioruolo WHERE personaggio = '$pg' LIMIT 1");
+            if ($existing_gg && ($is_admin || empty($existing_gg['nickname'])))
+                gdrcd_query("UPDATE clgpersonaggioruolo SET nickname='$nick_gilda_new' WHERE personaggio='$pg'");
+        }
+        echo json_encode(['success' => true, 'message' => 'Scheda aggiornata con successo']);
+        break;
+
+    // -------------------------------------------------------------------------
+    // AFFETTI — lista affetti del personaggio per tipo (pubblico)
+    // -------------------------------------------------------------------------
+    case 'affetti':
+        $result = gdrcd_query(
+            "SELECT id, username, tipologia, nomePg, avatar, Nome, Cognome, titolo
+             FROM struttura_affetti
+             WHERE username = '$pg'
+             ORDER BY tipologia, nomePg",
+            'result'
+        );
+        $tipologie = ['legami' => [], 'nemici' => [], 'famiglia' => [], 'conoscenze' => [], 'memories' => []];
+        while ($row = gdrcd_query($result, 'fetch')) {
+            $tipo = $row['tipologia'];
+            if (array_key_exists($tipo, $tipologie)) {
+                $tipologie[$tipo][] = [
+                    'id'      => (int)$row['id'],
+                    'nomePg'  => $row['nomePg'],
+                    'avatar'  => $row['avatar'],
+                    'nome'    => $row['Nome'],
+                    'cognome' => $row['Cognome'],
+                    'titolo'  => $row['titolo'],
+                ];
+            }
+        }
+        gdrcd_query($result, 'free');
+        echo json_encode([
+            'success'  => true,
+            'affetti'  => $tipologie,
+            'can_add'  => ($pg === $_SESSION['login']),
+        ]);
+        break;
+
+    // -------------------------------------------------------------------------
     // TRANSIZIONI — log bonifici/stipendi PX (pubblico)
     // -------------------------------------------------------------------------
     case 'transizioni':

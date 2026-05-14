@@ -40,6 +40,8 @@ import Scheda         from './components/Scheda'
 import SchedaSub      from './components/SchedaSub'
 import SchedaSkills   from './components/SchedaSkills'
 import SchedaTrans    from './components/SchedaTrans'
+import SchedaModifica from './components/SchedaModifica'
+import SchedaAffetti  from './components/SchedaAffetti'
 import Gestione       from './components/Gestione'
 import Uffici         from './components/Uffici'
 
@@ -103,6 +105,14 @@ const ROUTES = {
     scheda_trans: {
         component: SchedaTrans,
         css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+    },
+    scheda_modifica: {
+        component: SchedaModifica,
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css', '/themes/crystal/mestieri.css'],
+    },
+    scheda_affetti: {
+        component: SchedaAffetti,
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_affetto.css', '/themes/crystal/volti.css'],
     },
     gestione: {
         component: Gestione,
