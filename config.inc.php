@@ -131,36 +131,21 @@ $PARAMETERS['themes']['kind_of_layout'] = 'left-right';
 
 // ON: è attiva la colonna/riga specificata
 // OFF: è disattiva
-$PARAMETERS['top_column']['activate'] = 'OFF';
+$PARAMETERS['top_column']['activate']    = 'OFF';
 $PARAMETERS['bottom_column']['activate'] = 'OFF';
-$PARAMETERS['left_column']['activate'] = 'ON';
-$PARAMETERS['right_column']['activate'] = 'ON';
+$PARAMETERS['left_column']['activate']   = 'ON';
+$PARAMETERS['right_column']['activate']  = 'ON';
 
-/*COLONNA SINISTRA */
-$PARAMETERS['left_column']['box']['info_location']['class'] = 'info';
-$PARAMETERS['left_column']['box']['info_location']['page'] = 'info_location'; //Meteo e informazioni sul luogo.
-$PARAMETERS['left_column']['box']['link_menu']['class'] = 'menu';
-$PARAMETERS['left_column']['box']['link_menu']['page'] = 'link_menu'; //Menu' del gioco.
-$PARAMETERS['left_column']['box']['frame_messaggi']['class'] = 'msgs';
-$PARAMETERS['left_column']['box']['frame_messaggi']['page'] = 'frame_messaggi'; //Link ai messaggi ed al forum.
-#$PARAMETERS['left_column']['box']['frame_sx']['class'] = 'sinistra';
-#$PARAMETERS['left_column']['box']['frame_sx']['page'] = 'frame_sx'; //Menu' a sx.
-
-/*COLONNA DESTRA*/
-$PARAMETERS['right_column']['box']['anteprima_scheda']['class'] = 'anteprima_scheda';
-$PARAMETERS['right_column']['box']['anteprima_scheda']['page'] = 'anteprima_scheda'; //Meteo e informazioni sul luogo.
-#$PARAMETERS['right_column']['box']['frame_presenti']['class'] = 'presenti';
-#$PARAMETERS['right_column']['box']['frame_presenti']['page'] = 'frame_presenti'; //Presenti. */
-$PARAMETERS['right_column']['box']['link_icon']['class'] = 'icons';
-$PARAMETERS['right_column']['box']['link_icon']['page'] = 'menu_icons'; //Menu' del gioco
-$PARAMETERS['right_column']['box']['frame_online']['class'] = 'online';
-$PARAMETERS['right_column']['box']['frame_online']['page'] = 'frame_online'; //Presenti. */
-#$PARAMETERS['right_column']['box']['link_menu']['class'] = 'secondo_menu';
-#$PARAMETERS['right_column']['box']['link_menu']['page'] = 'link_menu_sec'; //Menu' del gioco.
-#$PARAMETERS['right_column']['box']['frame_calendario']['class'] = 'calendario_box';
-#$PARAMETERS['right_column']['box']['frame_calendario']['page'] = 'frame_calendario'; //Presenti. */
-#$PARAMETERS['right_column']['box']['frame_dx']['class'] = 'destra';
-#$PARAMETERS['right_column']['box']['frame_dx']['page'] = 'frame_dx'; //Menu' a dx.
+/*
+ * Phase 3.4 — configurazione box rimossa.
+ *
+ * I container sidebar sono ora hardcoded in layouts/left-right_frames.php
+ * e non vengono più caricati tramite il loop gdrcd_load_modules().
+ * Il montaggio React avviene in footer.inc.php via ct:ready.
+ *
+ * Ordine sidebar sinistra: InfoLocation, LinkMenu, FrameMessaggi
+ * Ordine sidebar destra:   AnteprimaScheda, MenuIcons, OnlineUsers
+ */
 
 
 /* NOMI CHIAVE DEL GIOCO */
