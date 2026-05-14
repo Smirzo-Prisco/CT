@@ -493,14 +493,17 @@ document.head.appendChild(vibrateStyle);
 /*****************************************************************************/
 /*********************** PANNELLO CHAT ***************************************/
 /*****************************************************************************/
-// Gestione apertura/chiusura modale principale
-document.getElementById('openPanelBtn').addEventListener('click', function () {
-    // TargetSelector è montato una volta sola via ct:ready (TargetSelector.jsx nel bundle Vite)
-    // e si aggiorna automaticamente tramite socket — non serve re-inizializzarlo qui
+// Gestione apertura/chiusura modale principale.
+// Null-check necessario: se lo script viene iniettato dinamicamente (SPA) e
+// l'elemento non è ancora nel DOM, non lanciamo un TypeError che bloccherebbe
+// tutta l'esecuzione del file — inclusa la definizione di window.initChatListeners.
+var _openPanelBtn = document.getElementById('openPanelBtn');
+if (_openPanelBtn) _openPanelBtn.addEventListener('click', function () {
     document.getElementById('chatPanel').style.display = 'flex';
 });
 
-document.getElementById('gdrCloseBtn').addEventListener('click', function () {
+var _gdrCloseBtn = document.getElementById('gdrCloseBtn');
+if (_gdrCloseBtn) _gdrCloseBtn.addEventListener('click', function () {
     document.getElementById('chatPanel').style.display = 'none';
 });
 

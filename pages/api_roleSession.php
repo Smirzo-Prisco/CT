@@ -128,15 +128,23 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             }
             break;
         case 'getRolePgs': // Prende tutti i personaggi della role
-            $location = $_SESSION['luogo'];
-            $id_role = locationActiveRole($location);
-            $users = getRolePgs($id_role, true); // Prendo tutti i pg della role, esclusi quelli che hanno chiuso il turno o sono usciti
-            
-            if(!empty($users)) $response = array('success' => true, 'message' => "Utenti della role!", 'users' => $users, 'id_role' => $id_role);
-            else $response = array('success' => false, 'message' => "Errore! Nessun utente nella role. Sta cosa è impossibile!", 'users' => $users, 'id_role' => $id_role);
+            $location = (int)$_SESSION['luogo'];
+            $id_role  = locationActiveRole($location);
+
+            // Se non c'è una role attiva nella stanza, $id_role è false.
+            // Restituiamo risposta vuota invece di passare false alla query
+            // (PHP interpola false come stringa vuota → "WHERE id_role =" → SQL error → 500).
+            if (!$id_role) {
+                echo json_encode(['success' => false, 'message' => 'Nessuna role attiva', 'users' => [], 'id_role' => 0]);
+                break;
+            }
+
+            $users = getRolePgs($id_role, true);
+
+            if (!empty($users)) $response = ['success' => true,  'message' => 'Utenti della role!',                            'users' => $users, 'id_role' => $id_role];
+            else                $response = ['success' => false, 'message' => 'Nessun utente attivo nella role corrente.', 'users' => [],     'id_role' => $id_role];
 
             echo json_encode($response);
-
             break;
         case 'closePgTurn': // Chiude il turno di un pg, se è l'ultimo chiude anche la role
             $id_role = isset($data['id_role']) ? (int)gdrcd_filter('in', $data['id_role']) : '';

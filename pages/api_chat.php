@@ -1178,6 +1178,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 WHERE clgpersonaggioruolo.personaggio = '$login_f' LIMIT 1");
             $has_creatura = !empty($creatura_row) && (int)$creatura_row['livello'] > 0;
 
+            // Role attiva: determina se mostrare il pannello GDR ai non-staff.
+            // Staff lo vede sempre; altri solo quando c'è una role attiva nella stanza.
+            $has_active_role = (bool)locationActiveRole($luogo);
+
             echo json_encode([
                 'success'      => true,
                 'luogo'        => $luogo,
@@ -1214,8 +1218,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'armi'          => $armi,
                 ],
                 'abilita'      => $abilita_obj,
-                'creatura'     => $has_creatura,
-                'submit_label' => gdrcd_filter('out', $MESSAGE['interface']['forms']['submit'] ?? 'Invia'),
+                'creatura'        => $has_creatura,
+                'has_active_role' => $has_active_role,
+                'submit_label'    => gdrcd_filter('out', $MESSAGE['interface']['forms']['submit'] ?? 'Invia'),
             ]);
             break;
 

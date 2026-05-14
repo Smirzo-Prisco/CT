@@ -175,7 +175,12 @@ export default function ChatShell() {
     // Finché i dati non arrivano non renderizza nulla — evita qualsiasi flash
     if (!shell) return null
 
-    const { stanza, pulsanti, oggetti, abilita, creatura, maxlength, submit_label, luogo, login } = shell
+    const { stanza, pulsanti, oggetti, abilita, creatura, maxlength, submit_label, luogo, login, has_active_role } = shell
+
+    // Il pannello GDR (dadi/skill/armi) è visibile a:
+    // - staff (sempre)
+    // - tutti gli utenti quando c'è una role attiva nella stanza
+    const showPanelBtn = pulsanti.is_staff || has_active_role
 
     // -----------------------------------------------------------------------
     // RENDERING
@@ -212,10 +217,15 @@ export default function ChatShell() {
                                             <span id="rimanenti">0</span> caratteri
                                         </span>
 
-                                        {/* Bottone apertura pannello GDR — id="helpImg" atteso da chat.js */}
-                                        <a href="#" id="helpImg">
-                                            <img title="Help" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" />
-                                        </a>
+                                        {/* Bottone apertura pannello GDR:
+                                            - id="openPanelBtn" usato da chat.js (livello modulo, riga ~497)
+                                            - visibile a staff sempre e a non-staff solo con role attiva
+                                              (no FOUC: la condizione è già corretta al primo render) */}
+                                        {showPanelBtn && (
+                                            <a href="#" id="openPanelBtn">
+                                                <img title="Pannello GDR" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" />
+                                            </a>
+                                        )}
 
                                         <a href="#" onClick={(e) => { e.preventDefault(); window.open('chat_help.proc.php','Help','toolbar=no,width=500,height=500') }}>
                                             <img src="themes/crystal/imgs/chat/help.png" alt="Info" className="chat_icon" />
