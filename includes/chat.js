@@ -675,12 +675,20 @@ function evidenziaZona() {
 /*****************************************************************************/
 /*********************** CARICAMENTO DOM *************************************/
 /*****************************************************************************/
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('TEST di prova');
-    document.getElementById('chat_skill').addEventListener('change', aggiornaLivelli); // Se cambio skill, aggiorno il suo livello massimo consentito per il pg
-    document.getElementById('livello_skill').addEventListener('change', aggiornaLimiteDaLivello); // Se cambio il livello skill, aggiorno il limite di bersagli
 
-    // ChatViewer è montato dal bundle React (ChatViewer.jsx via ct:ready)
+/**
+ * Attacca tutti gli event listener del DOM della chat.
+ * Esposta globalmente come window.initChatListeners() per essere richiamata
+ * da ChatShell.jsx in navigazione SPA, dove DOMContentLoaded è già scattato
+ * e il DOM React non era ancora presente.
+ */
+window.initChatListeners = function () {
+    // null-check obbligatorio: in navigazione SPA questo può essere chiamato
+    // anche da pagine che non hanno ancora renderizzato il pannello GDR
+    var chat_skill = document.getElementById('chat_skill');
+    var livello_skill = document.getElementById('livello_skill');
+    if (chat_skill)    chat_skill.addEventListener('change', aggiornaLivelli);         // aggiorna il livello max consentito al pg
+    if (livello_skill) livello_skill.addEventListener('change', aggiornaLimiteDaLivello); // aggiorna il limite bersagli
 
     // Il campo è una textarea, quindi devo catturare l'evento scatenato dal pulsante "Enter" della tastiera
     var chat_message = document.getElementById("message");
@@ -806,4 +814,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     */
     /***********    FINE    GESTIONE CHAT di gioco  *********************/
-});
+};
+
+// Al primo caricamento PHP la funzione viene chiamata automaticamente da DOMContentLoaded.
+// In navigazione SPA, ChatShell.jsx la chiama esplicitamente dopo aver montato il DOM.
+document.addEventListener('DOMContentLoaded', window.initChatListeners);

@@ -35,6 +35,7 @@ import TargetSelector  from './components/TargetSelector'
 import PresentiEstesi  from './components/PresentiEstesi'
 import MessagesInbox   from './components/MessagesInbox'
 import MapClick        from './components/MapClick'
+import ChatShell       from './components/ChatShell'
 import Forum           from './components/Forum'
 import AppRouter, { MIGRATED_PAGES } from './AppRouter'
 import InfoLocation   from './components/InfoLocation'
@@ -112,6 +113,9 @@ window.CT.register('MessagesInbox', MessagesInbox)
 
 /** Mappa di gioco con hotspot zone, popup stanze e conteggi online real-time */
 window.CT.register('MapClick', MapClick)
+
+/** Shell completa della chat di gioco: form, pannello GDR, modali role (Phase 4b) */
+window.CT.register('ChatShell', ChatShell)
 
 /** Forum (Araldo): sezioni → thread → lettura → composizione */
 window.CT.register('Forum', Forum)

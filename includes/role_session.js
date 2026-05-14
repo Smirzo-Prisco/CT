@@ -312,6 +312,10 @@ function gdrSetSessionActive(isActive) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    new pgRolePlayingPanel();  // Inizializza l'elenco dei pg giocanti
-});
+// Esposta globalmente: ChatShell.jsx la chiama dopo il mount in navigazione SPA.
+// Al primo caricamento PHP viene chiamata da DOMContentLoaded come prima.
+window.initRoleSession = function () {
+    new pgRolePlayingPanel();
+};
+
+document.addEventListener('DOMContentLoaded', window.initRoleSession);
