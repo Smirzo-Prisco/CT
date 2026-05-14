@@ -1014,6 +1014,211 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode(array('success' => true, 'message' => 'Azione PNG inviata con successo.'));
 
             break;
+        // -------------------------------------------------------------------------
+        // SHELL — dati iniziali per il componente React ChatShell.jsx
+        //
+        // Restituisce in un'unica chiamata tutto ciò che frame_chat.inc.php
+        // calcolava lato PHP: info stanza, preferenze tipografiche, maxlength
+        // textarea, visibilità pulsanti, inventario (oggetti/armi) e abilità.
+        // Chiamato da ChatShell.jsx al mount per popolare l'intera UI della chat.
+        // -------------------------------------------------------------------------
+        case 'shell':
+            $login   = $_SESSION['login'];
+            $luogo   = (int)$_SESSION['luogo'];
+            $login_f = gdrcd_filter('in', $login);
+
+            // Dati stanza (aggiunge limite_lunghezza_massima per il maxlength)
+            $info = gdrcd_query("SELECT nome, descrizione, stanza_apparente, invitati,
+                        privata, proprietario, scadenza, limite_lunghezza_massima
+                    FROM mappa WHERE id = $luogo LIMIT 1");
+
+            // Dati personaggio (solo i campi utili alla shell)
+            $pg = gdrcd_query("SELECT salute, integrita, esperienza, back_chat,
+                        preferenze_chat
+                    FROM personaggio WHERE nome = '$login_f' LIMIT 1");
+
+            // Preferenze tipografiche (font, colori, grandezza, interlinea)
+            $preferenze = !empty($pg['preferenze_chat'])
+                ? (json_decode($pg['preferenze_chat'], true) ?? [])
+                : [];
+
+            // Verifica accesso stanza privata — stessa logica di frame_chat.inc.php
+            $allowance = true;
+            if ((int)$info['privata'] === 1) {
+                $allowance    = false;
+                $scadenza_ok  = $info['scadenza'] > date('Y-m-d H:i:s');
+                $prop_ok      = $info['proprietario'] === gdrcd_capital_letter($login);
+                $gilda_ok     = !empty($_SESSION['gilda'])
+                                && strpos($_SESSION['gilda'], $info['proprietario']) !== false;
+                $invit_ok     = strpos($info['invitati'], gdrcd_capital_letter($login)) !== false;
+                $spy_ok       = ($PARAMETERS['mode']['spyprivaterooms'] === 'ON')
+                                && ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1);
+                if ($scadenza_ok && ($prop_ok || $gilda_ok || $invit_ok || $spy_ok)) {
+                    $allowance = true;
+                }
+            }
+
+            // Lunghezza massima textarea (default 2000 se non impostata in DB)
+            $maxlength = (int)($info['limite_lunghezza_massima'] ?? 0) ?: 2000;
+
+            // Flag staff
+            $is_admin  = (int)$_SESSION['admin']      === 1;
+            $is_master = (int)$_SESSION['master']     === 1;
+            $is_mod    = (int)$_SESSION['moderatore'] === 1;
+            $is_staff  = $is_admin || $is_master || $is_mod;
+
+            // Visibilità pulsanti
+            $show_backchat   = (float)$pg['esperienza'] > 19;
+            $backchat_on     = (int)$pg['back_chat'] === 1;
+            $num_cura        = (int)gdrcd_query("SELECT COUNT(*) AS n FROM chat
+                                    WHERE stanza = $luogo AND mittente = '$login_f' AND tipo = 'P'")['n'];
+            $show_cura       = ($luogo === 25 && $num_cura > 3
+                                && (int)$pg['salute'] > 0 && (int)$pg['salute'] < 50);
+            $show_pulisci    = $is_staff;
+            $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
+            $can_master_msg  = $is_admin || $is_master;
+
+            // Helper: recupera oggetti per categoria come array JSON
+            $fetch_oggetti = function(string $categoria, string $extra = '') use ($login_f): array {
+                $res  = gdrcd_query("SELECT c.id_oggetto, o.nome, c.cariche
+                    FROM clgpersonaggiooggetto c
+                    JOIN oggetto o ON c.id_oggetto = o.id_oggetto
+                    WHERE c.nome = '$login_f' AND o.categoria = '$categoria'
+                    AND c.posizione > 0 AND c.cariche > 0 $extra
+                    ORDER BY o.nome", 'result');
+                $out = [];
+                while ($row = gdrcd_query($res, 'fetch')) {
+                    $out[] = [
+                        'id'      => (int)$row['id_oggetto'],
+                        'nome'    => gdrcd_filter('out', $row['nome']),
+                        'cariche' => (int)$row['cariche'],
+                    ];
+                }
+                gdrcd_query($res, 'free');
+                return $out;
+            };
+
+            // Oggetti curativi: visibili solo se la salute non è piena o l'integrità bassa
+            $salute    = (int)$pg['salute'];
+            $integrita = (int)$pg['integrita'];
+            $curativi  = (($salute < 100 && $salute > 49) || $integrita < 10)
+                         ? $fetch_oggetti('curativo') : [];
+
+            // Potenziamenti: visibili solo se non ce n'è già uno attivo
+            $pot_attivo   = (int)gdrcd_query("SELECT COUNT(*) AS n FROM clgpersonaggiooggetto
+                                WHERE nome = '$login_f' AND used = 1 AND isTemp = 1")['n'];
+            $potenziamenti = ($pot_attivo === 0) ? $fetch_oggetti('statistica') : [];
+
+            $magici = $fetch_oggetti('magico');
+
+            // Oggetti standard: cariche > 0 oppure infinito (-1)
+            $res_std = gdrcd_query("SELECT c.id_oggetto, o.nome, c.cariche
+                FROM clgpersonaggiooggetto c JOIN oggetto o ON c.id_oggetto = o.id_oggetto
+                WHERE c.nome = '$login_f' AND o.categoria = 'standard'
+                AND c.posizione > 0 AND (c.cariche > 0 OR c.cariche = -1)
+                ORDER BY o.nome", 'result');
+            $standard = [];
+            while ($row = gdrcd_query($res_std, 'fetch')) {
+                $standard[] = ['id' => (int)$row['id_oggetto'],
+                               'nome' => gdrcd_filter('out', $row['nome']),
+                               'cariche' => (int)$row['cariche']];
+            }
+            gdrcd_query($res_std, 'free');
+
+            // Armi
+            $res_armi = gdrcd_query("SELECT o.id_oggetto, o.nome, c.cariche
+                FROM clgpersonaggiooggetto c LEFT JOIN oggetto o ON o.id_oggetto = c.id_oggetto
+                WHERE c.nome = '$login_f' AND o.categoria = 'arma'
+                AND (c.cariche > 0 OR c.cariche = -1) ORDER BY o.nome", 'result');
+            $armi = [];
+            while ($row = gdrcd_query($res_armi, 'fetch')) {
+                $armi[] = ['id' => (int)$row['id_oggetto'],
+                           'nome' => gdrcd_filter('out', $row['nome']),
+                           'cariche' => (int)$row['cariche']];
+            }
+            gdrcd_query($res_armi, 'free');
+
+            // Abilità raggruppate per categoria (stesso raggruppamento di frame_chat.inc.php)
+            $gruppi = [
+                'Default e Difensiva' => [], 'Generiche'    => [],
+                'Attacchi'            => [], 'Mentali'      => [],
+                'Poteri speciali'     => [], 'Skill Temporanee' => [],
+                'Talenti'             => [],
+            ];
+            $res_ab = gdrcd_query("SELECT a.id_abilita, a.nome, a.tipo, pa.grado, pa.usi
+                FROM clgpersonaggioabilita pa LEFT JOIN abilita a ON a.id_abilita = pa.id_abilita
+                WHERE pa.nome = '$login_f' ORDER BY a.tipo DESC, a.id_abilita DESC", 'result');
+            while ($row = gdrcd_query($res_ab, 'fetch')) {
+                $item = ['id'    => (int)$row['id_abilita'],
+                         'nome'  => gdrcd_filter('out', $row['nome']),
+                         'grado' => (int)$row['grado'],
+                         'usi'   => $row['usi'],
+                         'tipo'  => $row['tipo']];
+                $t = $row['tipo'];
+                if (in_array($t, ['Default', 'Difensiva']))                               $gruppi['Default e Difensiva'][] = $item;
+                elseif (in_array($t, ['Generica base', 'Generica avanzata']))             $gruppi['Generiche'][] = $item;
+                elseif (in_array($t, ['Attacco base', 'Attacco medio', 'Attacco avanzato'])) $gruppi['Attacchi'][] = $item;
+                elseif (in_array($t, ['Mentale base', 'Mentale media', 'Mentale avanzata', 'Mentale di attacco'])) $gruppi['Mentali'][] = $item;
+                elseif ($t === 'Potere speciale')  $gruppi['Poteri speciali'][] = $item;
+                elseif ($t === 'Skill Temporanea') $gruppi['Skill Temporanee'][] = $item;
+                elseif ($t === 'Talento')          $gruppi['Talenti'][] = $item;
+            }
+            gdrcd_query($res_ab, 'free');
+            // Rimuovi i gruppi vuoti per non gonfiare la risposta
+            $abilita = array_values(array_filter($gruppi, fn($g) => !empty($g)));
+            // Ricostruisce come oggetto chiave→array per il JS
+            $abilita_obj = [];
+            foreach ($gruppi as $cat => $items) {
+                if (!empty($items)) $abilita_obj[$cat] = $items;
+            }
+
+            // Creatura: pg con ruolo a livello > 0
+            $creatura_row = gdrcd_query("SELECT ruolo.livello FROM ruolo
+                JOIN clgpersonaggioruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo
+                WHERE clgpersonaggioruolo.personaggio = '$login_f' LIMIT 1");
+            $has_creatura = !empty($creatura_row) && (int)$creatura_row['livello'] > 0;
+
+            echo json_encode([
+                'success'      => true,
+                'luogo'        => $luogo,
+                'login'        => $login,
+                'stanza'       => [
+                    'nome'             => gdrcd_filter('out', $info['nome']          ?? ''),
+                    'descrizione'      => gdrcd_filter('out', $info['descrizione']   ?? ''),
+                    'stanza_apparente' => (int)($info['stanza_apparente'] ?? 0),
+                    'privata'          => (int)$info['privata'],
+                    'allowance'        => $allowance,
+                ],
+                'preferenze'   => [
+                    'font'           => $preferenze['font']           ?? null,
+                    'colore_testo'   => $preferenze['colore_testo']   ?? null,
+                    'grandezza'      => $preferenze['grandezza']      ?? null,
+                    'interlinea'     => $preferenze['interlinea']     ?? null,
+                    'colore_dialogo' => $preferenze['colore_dialogo'] ?? null,
+                ],
+                'maxlength'    => $maxlength,
+                'pulsanti'     => [
+                    'show_backchat'   => $show_backchat,
+                    'backchat_on'     => $backchat_on,
+                    'show_cura'       => $show_cura,
+                    'show_pulisci'    => $show_pulisci,
+                    'show_scacchiera' => $show_scacchiera,
+                    'is_staff'        => $is_staff,
+                    'can_master_msg'  => $can_master_msg,
+                ],
+                'oggetti'      => [
+                    'curativi'      => $curativi,
+                    'potenziamenti' => $potenziamenti,
+                    'magici'        => $magici,
+                    'standard'      => $standard,
+                    'armi'          => $armi,
+                ],
+                'abilita'      => $abilita_obj,
+                'creatura'     => $has_creatura,
+                'submit_label' => gdrcd_filter('out', $MESSAGE['interface']['forms']['submit'] ?? 'Invia'),
+            ]);
+            break;
+
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
 } else {
