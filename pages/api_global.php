@@ -114,60 +114,61 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $meteo  = gdrcd_query($meteoQ, 'fetch');
 
             if ($meteo) {
-                $ora     = new DateTime();
-                $ultimo  = new DateTime($meteo['datetime_aggiornamento']);
-                $stale   = ($ora->diff($ultimo)->h >= 24) || ($ultimo->format('Y-m-d') != $ora->format('Y-m-d'));
+                $ora    = new DateTime();
+                $ultimo = new DateTime($meteo['datetime_aggiornamento']);
+                $stale  = ($ora->diff($ultimo)->days >= 1) || ($ultimo->format('Y-m-d') != $ora->format('Y-m-d'));
 
                 if ($stale) {
-                    $mese = date('n');
+                    $mese = (int)date('n');
 
-                    function _meteo_cond($m) {
-                        $map = [
-                            [12,1,2]  => ['nuvoloso','pioggia','neve','sole_nebbia','sole_nuvoloso','temporale'],
-                            [3,4,5]   => ['sole','nuvoloso','sole_nuvoloso','pioggia','temporale'],
-                            [6,7,8]   => ['sole','nuvoloso','pioggia','temporale'],
-                            [9,10,11] => ['sole','sole_nuvoloso','nuvoloso','pioggia','sole_nebbia'],
-                        ];
-                        foreach ($map as $mesi => $cond) { if (in_array($m, $mesi)) return $cond[array_rand($cond)]; }
-                        return 'sole';
-                    }
-                    function _meteo_temp($m, $t='giorno') {
-                        $r = ['giorno'=>[[12,1,2],[-5,10]], 'notte'=>[[12,1,2],[-10,5]]];
-                        $stagioni = [[12,1,2],[-5,10,-10,5],[3,4,5],[10,20,5,15],[6,7,8],[25,35,15,25],[9,10,11],[10,20,5,15]];
-                        if (in_array($m,[12,1,2]))  return $t==='giorno' ? rand(-5,10)  : rand(-10,5);
-                        if (in_array($m,[3,4,5]))   return $t==='giorno' ? rand(10,20)  : rand(5,15);
-                        if (in_array($m,[6,7,8]))   return $t==='giorno' ? rand(25,35)  : rand(15,25);
-                        if (in_array($m,[9,10,11])) return $t==='giorno' ? rand(10,20)  : rand(5,15);
+                    // Usa closures (variabili) invece di named functions per evitare
+                    // "Cannot redeclare" se il file viene eseguito più volte nel processo
+                    $condFn = function($m) {
+                        if (in_array($m, [12,1,2]))  { $c = ['nuvoloso','pioggia','neve','sole_nebbia','sole_nuvoloso','temporale']; }
+                        elseif (in_array($m, [3,4,5])){ $c = ['sole','nuvoloso','sole_nuvoloso','pioggia','temporale']; }
+                        elseif (in_array($m, [6,7,8])){ $c = ['sole','nuvoloso','pioggia','temporale']; }
+                        else                          { $c = ['sole','sole_nuvoloso','nuvoloso','pioggia','sole_nebbia']; }
+                        return $c[array_rand($c)];
+                    };
+                    $tempFn = function($m, $t = 'giorno') {
+                        if (in_array($m, [12,1,2]))  return $t === 'giorno' ? rand(-5,10)  : rand(-10,5);
+                        if (in_array($m, [3,4,5]))   return $t === 'giorno' ? rand(10,20)  : rand(5,15);
+                        if (in_array($m, [6,7,8]))   return $t === 'giorno' ? rand(25,35)  : rand(15,25);
+                        if (in_array($m, [9,10,11])) return $t === 'giorno' ? rand(10,20)  : rand(5,15);
                         return rand(10,25);
-                    }
-                    function _meteo_vento($m) {
-                        if (in_array($m,[12,1,2]))  { $v=['assente','brezza','medio','forte']; }
-                        elseif (in_array($m,[3,4,5])){ $v=['assente','brezza','medio']; }
-                        elseif (in_array($m,[6,7,8])){ $v=['brezza','medio','forte']; }
-                        else                         { $v=['assente','brezza','medio','forte']; }
+                    };
+                    $ventoFn = function($m) {
+                        if (in_array($m, [12,1,2]))  { $v = ['assente','brezza','medio','forte']; }
+                        elseif (in_array($m, [3,4,5])){ $v = ['assente','brezza','medio']; }
+                        elseif (in_array($m, [6,7,8])){ $v = ['brezza','medio','forte']; }
+                        else                          { $v = ['assente','brezza','medio','forte']; }
                         return $v[array_rand($v)];
-                    }
+                    };
 
-                    $mg = gdrcd_filter('in', _meteo_cond($mese));
-                    $mn = gdrcd_filter('in', _meteo_cond($mese));
-                    $tg = _meteo_temp($mese,'giorno');
-                    $tn = _meteo_temp($mese,'notte');
-                    $vg = gdrcd_filter('in', _meteo_vento($mese));
-                    $vn = gdrcd_filter('in', _meteo_vento($mese));
+                    $mg = gdrcd_filter('in', $condFn($mese));
+                    $mn = gdrcd_filter('in', $condFn($mese));
+                    $tg = $tempFn($mese, 'giorno');
+                    $tn = $tempFn($mese, 'notte');
+                    $vg = gdrcd_filter('in', $ventoFn($mese));
+                    $vn = gdrcd_filter('in', $ventoFn($mese));
 
                     gdrcd_query("UPDATE meteo SET
-                        meteo_giorno_precedente=meteo_giorno_attuale,
-                        meteo_notte_precedente=meteo_notte_attuale,
-                        temperatura_giorno_precedente=temperatura_giorno_attuale,
-                        temperatura_notte_precedente=temperatura_notte_attuale,
-                        vento_giorno_precedente=vento_giorno_attuale,
-                        vento_notte_precedente=vento_notte_attuale,
-                        meteo_giorno_attuale='$mg', meteo_notte_attuale='$mn',
-                        temperatura_giorno_attuale=$tg, temperatura_notte_attuale=$tn,
-                        vento_giorno_attuale='$vg', vento_notte_attuale='$vn',
-                        datetime_aggiornamento=NOW() WHERE id=1");
+                        meteo_giorno_precedente  = meteo_giorno_attuale,
+                        meteo_notte_precedente   = meteo_notte_attuale,
+                        temperatura_giorno_precedente = temperatura_giorno_attuale,
+                        temperatura_notte_precedente  = temperatura_notte_attuale,
+                        vento_giorno_precedente  = vento_giorno_attuale,
+                        vento_notte_precedente   = vento_notte_attuale,
+                        meteo_giorno_attuale     = '$mg',
+                        meteo_notte_attuale      = '$mn',
+                        temperatura_giorno_attuale = $tg,
+                        temperatura_notte_attuale  = $tn,
+                        vento_giorno_attuale     = '$vg',
+                        vento_notte_attuale      = '$vn',
+                        datetime_aggiornamento   = NOW()
+                        WHERE id = 1");
 
-                    $meteoQ = gdrcd_query("SELECT * FROM meteo WHERE id=1", 'result');
+                    $meteoQ = gdrcd_query("SELECT * FROM meteo WHERE id = 1", 'result');
                     $meteo  = gdrcd_query($meteoQ, 'fetch');
                 }
             }
