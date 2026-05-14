@@ -192,7 +192,9 @@ switch ($op) {
             $skills[$tipo][] = [
                 'id'          => (int)$row['id_abilita'],
                 'nome'        => $row['nome'],
-                'descrizione' => $row['descrizione'],
+                // mb_convert_encoding garantisce UTF-8 valido: descrizioni con
+                // caratteri legacy possono far restituire false a json_encode
+                'descrizione' => mb_convert_encoding($row['descrizione'] ?? '', 'UTF-8', 'UTF-8'),
                 'tipo'        => $tipo,
                 'sottotipo'   => $row['sottotipo'],
                 'car'         => (int)$row['car'],
@@ -203,7 +205,8 @@ switch ($op) {
         }
         gdrcd_query($result, 'free');
 
-        echo json_encode(['success' => true, 'skills' => $skills]);
+        $json = json_encode(['success' => true, 'skills' => $skills], JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+        echo $json !== false ? $json : json_encode(['success' => false, 'message' => 'Errore encoding: ' . json_last_error_msg()]);
         break;
 
     // -------------------------------------------------------------------------
