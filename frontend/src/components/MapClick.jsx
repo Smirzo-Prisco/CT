@@ -18,12 +18,19 @@
  *   equivalente ai 9 div.menu_mappa del vecchio PHP. Le dimensioni naturali
  *   dell'immagine vengono lette dall'API e usate per scalare i hotspot.
  *
- * Montaggio: via ct:ready su #map-container in mappaclick.inc.php
+ * Montaggio: via AppRouter su #ct-app-content (Phase 4)
+ *
+ * Cambio mappa SPA:
+ *   Quando la URL contiene ?map_id=X diverso da window.CT_USER.mappa
+ *   (navigazione SPA — PHP non ha potuto aggiornare il DB),
+ *   viene chiamata api_map.php?op=changemap (POST) per aggiornare
+ *   ultima_mappa e notificare i socket, replicando esattamente ciò
+ *   che fa main.php lines 24-29 in caso di visita diretta.
  *
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 
 // ---------------------------------------------------------------------------
 // DATI STATICI DELLE ZONE
@@ -157,6 +164,16 @@ const ZONES = [
 
 export default function MapClick() {
 
+    /**
+     * ID mappa effettivo: preferisce il valore da URL (?map_id=X) rispetto a
+     * CT_USER.mappa perché in navigazione SPA la sessione PHP non è stata
+     * aggiornata e il CT_USER iniettato nel footer potrebbe essere stale.
+     */
+    const effectiveMapId = useMemo(() => {
+        const p = new URLSearchParams(window.location.search)
+        return parseInt(p.get('map_id') || '') || window.CT_USER?.mappa || 1
+    }, [])
+
     /** Info sulla posizione corrente (is_notte) */
     const [mapInfo, setMapInfo] = useState(null)
 
@@ -197,11 +214,12 @@ export default function MapClick() {
 
     /**
      * Recupera il conteggio utenti online per ogni stanza della mappa corrente.
+     * Usa effectiveMapId (URL → CT_USER.mappa) per essere corretto anche in
+     * navigazione SPA dove CT_USER.mappa potrebbe essere stale.
      * Chiamato al mount e ad ogni evento socket 'users:update'.
      */
     const fetchRoomCounts = useCallback(() => {
-        const mapId = window.CT_USER?.mappa ?? 1
-        fetch(`/pages/api_map.php?op=rooms&map_id=${mapId}`)
+        fetch(`/pages/api_map.php?op=rooms&map_id=${effectiveMapId}`)
             .then(r => r.json())
             .then(data => {
                 if (!data.success) return
@@ -210,7 +228,7 @@ export default function MapClick() {
                 setOnlineCounts(counts)
             })
             .catch(console.error)
-    }, [])
+    }, [effectiveMapId])
 
     // ---------------------------------------------------------------------------
     // DIMENSIONI IMMAGINE RENDERIZZATA
@@ -244,6 +262,30 @@ export default function MapClick() {
 
         return () => { if (sock) sock.off('users:update', fetchRoomCounts) }
     }, [fetchMapInfo, fetchRoomCounts])
+
+    /**
+     * Cambio mappa in navigazione SPA.
+     *
+     * In visita diretta PHP (main.php?page=mappaclick&map_id=X), PHP aggiorna
+     * ultima_mappa in DB e CT_USER.mappa viene iniettato già aggiornato dal footer.
+     * In navigazione SPA, invece, PHP non gira: se l'URL ha map_id diverso da
+     * CT_USER.mappa, chiama api_map.php?op=changemap per replicare l'aggiornamento.
+     */
+    useEffect(() => {
+        const urlMapId = parseInt(new URLSearchParams(window.location.search).get('map_id') || '0')
+        if (!urlMapId || urlMapId === (window.CT_USER?.mappa ?? 0)) return
+
+        fetch('/pages/api_map.php?op=changemap', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ map_id: urlMapId }),
+        })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success && window.CT_USER) window.CT_USER.mappa = urlMapId
+            })
+            .catch(console.error)
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Chiude il popup cliccando fuori dalla mappa
     useEffect(() => {

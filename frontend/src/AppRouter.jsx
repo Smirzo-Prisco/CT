@@ -15,14 +15,14 @@
  *   Quando si naviga client-side verso una nuova pagina, i suoi CSS vengono
  *   iniettati dinamicamente nel <head> (solo se non già presenti).
  *
- * Pagine attualmente migrate (Phase 3.1):
+ * Pagine attualmente migrate:
  *   - forum
  *   - messages_center
  *   - presenti_estesi
+ *   - mappaclick  ← Phase 4: cambio mappa via api_map.php?op=changemap (POST)
  *
- * Pagine che richiedono ancora reload PHP (Phase 3.2+):
- *   - mappaclick (aggiorna ultima_mappa nel DB)
- *   - frame_chat / dir=X (aggiorna ultimo_luogo nel DB)
+ * Pagine che richiedono ancora reload PHP:
+ *   - frame_chat / dir=X (aggiorna ultimo_luogo nel DB — prossima migrazione)
  *   - tutte le altre
  *
  * Montaggio: via ct:ready su #ct-app-content (inserito nelle pagine migrate).
@@ -36,6 +36,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Forum          from './components/Forum'
 import MessagesInbox  from './components/MessagesInbox'
 import PresentiEstesi from './components/PresentiEstesi'
+import MapClick       from './components/MapClick'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -66,6 +67,12 @@ const ROUTES = {
         component: PresentiEstesi,
         css: [
             '/themes/crystal/anagrafe.css',
+        ],
+    },
+    mappaclick: {
+        component: MapClick,
+        css: [
+            '/themes/crystal/mappa_principale.css',
         ],
     },
 }

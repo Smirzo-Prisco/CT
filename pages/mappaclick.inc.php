@@ -3,17 +3,17 @@
 
     Pagina mappa di gioco — caricata da main.php?page=mappaclick.
 
-    Il rendering visivo è delegato al componente React MapClick.jsx
-    (bundle Vite) che gestisce:
-      - Immagine mappa giorno/notte
-      - 9 hotspot zone cliccabili con popup stanze
-      - Badge utenti online per stanza (real-time via socket 'users:update')
-      - Navigazione verso le stanze via main.php?dir=X
+    Phase 4: il rendering è gestito da MapClick.jsx via AppRouter.
+    Questo file fornisce solo il container #ct-app-content su cui
+    AppRouter monta il componente, più la pulizia periodica PHP dei
+    limiti di lunghezza messaggio scaduti.
 
-    Rimane in PHP solo la pulizia periodica dei limiti di character scaduti.
+    La navigazione verso una stanza (dir=X) fa ancora un reload PHP
+    perché aggiorna ultimo_luogo in DB (main.php lines 36-46).
+    Il cambio mappa (map_id=X in URL) viene invece gestito da
+    MapClick.jsx via api_map.php?op=changemap se in navigazione SPA,
+    oppure da main.php direttamente in visita PHP diretta.
 -->
-
-<link rel="stylesheet" href="../themes/crystal/mappa_principale.css">
 
 <?php
 /**
@@ -40,15 +40,5 @@ while ($rowm = gdrcd_query($limite_master, 'fetch')) {
 }
 ?>
 
-<!-- Contenitore dove React monterà il componente MapClick -->
-<div id="map-container"></div>
-
-<script>
-/**
- * Monta il componente React MapClick su #map-container non appena
- * il bundle Vite ha terminato il caricamento (evento ct:ready).
- */
-document.addEventListener('ct:ready', function() {
-    CT.mount('MapClick', 'map-container', {});
-});
-</script>
+<!-- AppRouter legge ?page=mappaclick e renderizza il componente MapClick -->
+<div id="ct-app-content"></div>
