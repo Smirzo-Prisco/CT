@@ -197,6 +197,12 @@ export default function ChatShell() {
         ]).then(() => {
             window.initChatListeners?.()
             window.initRoleSession?.()
+
+            // Fix race condition: ChatViewer potrebbe aver già chiamato fetchMessages
+            // e ricevuto activeRole, ma gdrSetSessionActive non era ancora definita
+            // (script non ancora caricati). Riallineiamo lo stato dell'indicatore role
+            // usando has_active_role dalla shell (già corretto al momento del fetch).
+            window.gdrSetSessionActive?.(shell.has_active_role)
         })
     }, [shell])
 

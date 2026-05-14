@@ -125,8 +125,10 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 			left: 0 !important;
 			right: 0 !important;
 			width: 100% !important;
-			transform: translateX(0) !important;
-			/* auto invece di hidden: le tabelle larghe scrollano invece di essere troncate */
+			/* RIMOSSO: transform: translateX(0) — anche translateX(0) crea un
+			   containing block per position:fixed, facendo sì che i popup (es.
+			   #pgRolePlayingPanel) si posizionino relativi a #maincontent
+			   invece che al viewport. Reset via left/right/width è sufficiente. */
 			overflow-x: auto !important;
 		}
 
@@ -255,7 +257,10 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
             document.body.style.overflowX = 'hidden';
             document.body.style.width     = '100%';
             document.body.classList.add('sidebars-closed');
-            mainContent.style.transform  = 'translateX(0)';
+            // Rimuoviamo il transform invece di impostarlo a translateX(0):
+            // translateX(0) è visivamente no-op ma crea un containing block per
+            // position:fixed, spostando fuori schermo i popup (chat, role, ecc.)
+            mainContent.style.transform  = '';
             mainContent.style.width      = '100%';
             mainContent.style.left       = '0';
             mainContent.style.right      = '0';
