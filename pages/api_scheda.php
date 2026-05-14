@@ -185,18 +185,19 @@ switch ($op) {
                 'Potere speciale','Skill temporanea','Talento'
             ), a.nome ASC", 'result');
 
+        // iconv//IGNORE strips raw invalid UTF-8 bytes (mb_convert_encoding non lo fa)
+        $clean = fn(?string $s): string => @iconv('UTF-8', 'UTF-8//IGNORE', $s ?? '') ?: '';
+
         $skills = [];
         while ($row = gdrcd_query($result, 'fetch')) {
             $tipo = $row['tipo'];
             if (!isset($skills[$tipo])) $skills[$tipo] = [];
             $skills[$tipo][] = [
                 'id'          => (int)$row['id_abilita'],
-                'nome'        => $row['nome'],
-                // mb_convert_encoding garantisce UTF-8 valido: descrizioni con
-                // caratteri legacy possono far restituire false a json_encode
-                'descrizione' => mb_convert_encoding($row['descrizione'] ?? '', 'UTF-8', 'UTF-8'),
+                'nome'        => $clean($row['nome']),
+                'descrizione' => $clean($row['descrizione']),
                 'tipo'        => $tipo,
-                'sottotipo'   => $row['sottotipo'],
+                'sottotipo'   => $clean($row['sottotipo']),
                 'car'         => (int)$row['car'],
                 'costo'       => (int)$row['costo'],
                 'grado'       => (int)$row['grado'],
@@ -205,7 +206,12 @@ switch ($op) {
         }
         gdrcd_query($result, 'free');
 
-        $json = json_encode(['success' => true, 'skills' => $skills], JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+        // JSON_INVALID_UTF8_SUBSTITUTE come secondo strato: sostituisce qualsiasi
+        // byte non-UTF8 sopravvissuto con U+FFFD invece di far fallire json_encode
+        $json = json_encode(
+            ['success' => true, 'skills' => $skills],
+            JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR
+        );
         echo $json !== false ? $json : json_encode(['success' => false, 'message' => 'Errore encoding: ' . json_last_error_msg()]);
         break;
 
