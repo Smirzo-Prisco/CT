@@ -220,7 +220,16 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
             </form>
         </div>
 
-        <?php gdrcd_load_modules('pages/' . $strInnerPage); ?>
+        <?php
+        /**
+         * TODO thin shell (passo finale SPA):
+         * Quando tutte le pagine saranno migrate a React, sostituire questa
+         * riga con il container diretto:
+         *   <div id="ct-app-content"></div>
+         * ed eliminare il blocco routing in main.php.
+         */
+        gdrcd_load_modules('pages/' . $strInnerPage);
+        ?>
     </div>
 </div>
 
