@@ -65,10 +65,14 @@ const ICO = '../themes/crystal/imgs/icone/'
  *
  * @param {Object} props.data - Dati meteo del giorno (attuale o precedente)
  */
+/**
+ * Renderizza le due colonne giorno/notte del meteo.
+ * NON aggiunge un wrapper: il div meteo_box è già nel componente padre.
+ */
 function MeteoBox({ data }) {
     if (!data) return null
     return (
-        <div className="meteo_box">
+        <>
             <div className="meteo_colonna_sx">
                 <div className="meteo_img">
                     <img src={`../themes/crystal/imgs/meteo/${data.giorno_img}.png`} alt="Giorno" className="meteo_immagine" />
@@ -83,7 +87,7 @@ function MeteoBox({ data }) {
                 <div className="meteo_temp">Min: <span className="temp_min">{data.temp_min}°C</span></div>
                 <div className="meteo_vento">Vento: <span>{data.vento_notte}</span></div>
             </div>
-        </div>
+        </>
     )
 }
 
@@ -253,11 +257,13 @@ export default function FrameMessaggi() {
 
             {/* ================================================================ */}
             {/* GRIGLIA ICONE 3×3                                                */}
+            {/* I CSS del gridPanel erano inline nel vecchio PHP:                */}
+            {/* li ristabiliamo come stili inline React.                         */}
             {/* ================================================================ */}
-            <div id="gridPanel">
-                <div className="grid">
+            <div id="gridPanel" style={{ display:'flex', justifyContent:'center', alignItems:'center', marginTop:'10px', marginLeft:'22px' }}>
+                <div className="grid" style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:'12px', gridAutoRows:'60px', padding:'10px' }}>
                     {ICONS.map(icon => (
-                        <div key={icon.id} className="grid-item">
+                        <div key={icon.id} className="grid-item" style={{ display:'flex', justifyContent:'center', alignItems:'center' }}>
                             {icon.chatoff ? (
                                 /* Chat Off: apre popup */
                                 <a
