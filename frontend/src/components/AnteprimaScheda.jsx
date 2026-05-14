@@ -9,8 +9,9 @@
  *   - Link alla scheda personaggio (main.php?page=scheda)
  *   - Link alla lista presenti estesi (main.php?page=presenti_estesi)
  *
- * Il nome è letto direttamente da window.CT_USER.login (già disponibile dal footer).
- * L'avatar viene recuperato da api_scheda.php?op=profile&pg={login}.
+ * Sia il nome che l'URL dell'avatar vengono letti direttamente da window.CT_USER,
+ * che viene iniettato in footer.inc.php con una query DB al load della pagina.
+ * Questo evita una chiamata API separata (api_scheda.php aveva problemi di costanti).
  *
  * Nessun aggiornamento real-time necessario: l'avatar del proprio personaggio
  * cambia raramente e non richiede socket events.
@@ -20,28 +21,16 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect } from 'react'
-
 export default function AnteprimaScheda() {
-
-    /** URL dell'avatar del personaggio corrente */
-    const [avatar, setAvatar] = useState('')
 
     /** Nome del personaggio — letto da window.CT_USER (impostato da footer.inc.php) */
     const nome = window.CT_USER?.login ?? ''
 
+    /** URL avatar — iniettato da footer.inc.php via query DB sul personaggio corrente */
+    const avatar = window.CT_USER?.url_img_chat ?? ''
+
     /** true se è notte (orario 18-6) */
     const isNotte = (() => { const h = new Date().getHours(); return h >= 18 || h <= 6 })()
-
-    useEffect(() => {
-        if (!nome) return
-
-        // Recupera il profilo del personaggio per ottenere url_img_chat
-        fetch(`/pages/api_scheda.php?op=profile&pg=${encodeURIComponent(nome)}`)
-            .then(r => r.json())
-            .then(d => { if (d.success && d.url_img_chat) setAvatar(d.url_img_chat) })
-            .catch(err => console.error('[AnteprimaScheda] Errore:', err))
-    }, [nome])
 
     return (
         <div className="pagina_info_location">

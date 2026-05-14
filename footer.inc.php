@@ -32,11 +32,19 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
 
     <!-- Socket.io: variabili utente, libreria client e connessione unica condivisa -->
     <?php if (isset($_SESSION['login'])): ?>
+    <?php
+    // Recupera l'avatar del personaggio corrente per esporlo in CT_USER
+    // ed evitare una chiamata API separata da AnteprimaScheda.jsx
+    $pg_avatar = '';
+    $r = gdrcd_query("SELECT url_img_chat FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "' LIMIT 1");
+    if ($r) $pg_avatar = $r['url_img_chat'] ?? '';
+    ?>
     <script>
     window.CT_USER = {
-        login: <?=json_encode($_SESSION['login'])?>,
-        luogo: <?=(int)($_SESSION['luogo'] ?? 0)?>,
-        mappa: <?=(int)($_SESSION['mappa'] ?? 0)?>
+        login:        <?=json_encode($_SESSION['login'])?>,
+        luogo:        <?=(int)($_SESSION['luogo'] ?? 0)?>,
+        mappa:        <?=(int)($_SESSION['mappa'] ?? 0)?>,
+        url_img_chat: <?=json_encode($pg_avatar)?>
     };
     window.ctSocket = null;
     </script>
