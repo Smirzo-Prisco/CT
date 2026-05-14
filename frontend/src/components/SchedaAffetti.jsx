@@ -18,7 +18,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Fragment } from 'react'
 import SchedaMenu from './SchedaMenu'
 
 // ---------------------------------------------------------------------------
@@ -102,15 +102,9 @@ export default function SchedaAffetti() {
             if (aff.success) {
                 setAffetti(aff.affetti)
                 setCanAdd(aff.can_add)
-                // Pre-seleziona il primo affetto disponibile nel pannello destro
-                const prima = Object.values(aff.affetti).flat()[0]
-                if (prima) {
-                    const url = `${DETAIL_BASE}?id=${prima.id}&username=${enc}&pg=${encodeURIComponent(prima.nomePg)}`
-                    setIframeSrc(url)
-                    setSelected(prima.id)
-                } else {
-                    setIframeSrc(`${INTRO_BASE}?username=${enc}`)
-                }
+                // Comportamento identico all'originale PHP: parte sempre da intro_affetto.php;
+                // il dettaglio viene caricato solo al click su una tile (come faceva jQuery).
+                setIframeSrc(`${INTRO_BASE}?username=${enc}`)
             } else {
                 setError(aff.message ?? 'Errore affetti')
             }
@@ -164,8 +158,9 @@ export default function SchedaAffetti() {
                                     {Object.entries(TIPO_LABELS).map(([tipo, label]) => {
                                         const lista = affetti[tipo] ?? []
                                         if (lista.length === 0) return null
+                                        // Fragment con key per evitare <span>/<div> dentro <ul> (HTML invalido)
                                         return (
-                                            <span key={tipo}>
+                                            <Fragment key={tipo}>
                                                 <li className="tile no-height">
                                                     <div className="tile-text header" style={{ textAlign: 'center' }}>
                                                         <span className="header">{label}</span>
@@ -180,7 +175,7 @@ export default function SchedaAffetti() {
                                                         onClick={url => openDetail(url, entry.id)}
                                                     />
                                                 ))}
-                                            </span>
+                                            </Fragment>
                                         )
                                     })}
 
