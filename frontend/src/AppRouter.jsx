@@ -38,6 +38,7 @@ import MapClick       from './components/MapClick'
 import ChatShell      from './components/ChatShell'
 import Scheda         from './components/Scheda'
 import Gestione       from './components/Gestione'
+import Uffici         from './components/Uffici'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -87,6 +88,12 @@ const ROUTES = {
         component: Gestione,
         css: [
             '/themes/crystal/uffici_nuovi.css',
+        ],
+    },
+    uffici: {
+        component: Uffici,
+        css: [
+            '/themes/crystal/uffici_layout.css',
         ],
     },
 }
