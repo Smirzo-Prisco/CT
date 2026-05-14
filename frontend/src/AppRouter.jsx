@@ -37,6 +37,9 @@ import PresentiEstesi from './components/PresentiEstesi'
 import MapClick       from './components/MapClick'
 import ChatShell      from './components/ChatShell'
 import Scheda         from './components/Scheda'
+import SchedaSub      from './components/SchedaSub'
+import SchedaSkills   from './components/SchedaSkills'
+import SchedaTrans    from './components/SchedaTrans'
 import Gestione       from './components/Gestione'
 import Uffici         from './components/Uffici'
 
@@ -79,10 +82,27 @@ const ROUTES = {
     },
     scheda: {
         component: Scheda,
-        css: [
-            '/themes/crystal/scheda.css',
-            '/themes/crystal/scheda_menu.css',
-        ],
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+    },
+    scheda_storia: {
+        component: SchedaSub,
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+    },
+    scheda_dice: {
+        component: SchedaSub,
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+    },
+    scheda_off: {
+        component: SchedaSub,
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+    },
+    scheda_skills: {
+        component: SchedaSkills,
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+    },
+    scheda_trans: {
+        component: SchedaTrans,
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
     },
     gestione: {
         component: Gestione,

@@ -122,6 +122,9 @@ switch ($op) {
             'particolari'   => $pg_data['particolari'],
             'note_fato'     => $pg_data['note_fato'],
             'principale'    => $pg_data['principale'],
+            'storia'        => $pg_data['storia'],
+            'descrizione'   => $pg_data['descrizione'],
+            'off'           => $pg_data['off'],
             // Date
             'data_iscrizione' => $pg_data['data_iscrizione'],
             'ora_entrata'   => $pg_data['ora_entrata'],
@@ -269,6 +272,32 @@ switch ($op) {
             'affetti'     => true,
             'transizioni' => true,
         ]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // TRANSIZIONI — log bonifici/stipendi PX (pubblico)
+    // -------------------------------------------------------------------------
+    case 'transizioni':
+        $num_logs = (int)($PARAMETERS['settings']['view_logs'] ?? 50);
+        $result   = gdrcd_query(
+            "SELECT descrizione_evento, autore, data_evento, nome_interessato
+             FROM log
+             WHERE (nome_interessato = '$pg' OR autore = '$pg')
+               AND (codice_evento = " . BONIFICO . " OR codice_evento = " . STIPENDIO . ")
+             ORDER BY data_evento DESC LIMIT $num_logs",
+            'result'
+        );
+        $transizioni = [];
+        while ($row = gdrcd_query($result, 'fetch')) {
+            $transizioni[] = [
+                'descrizione'      => $row['descrizione_evento'],
+                'nome_interessato' => $row['nome_interessato'],
+                'data'             => $row['data_evento'],
+                'autore'           => $row['autore'],
+            ];
+        }
+        gdrcd_query($result, 'free');
+        echo json_encode(['success' => true, 'transizioni' => $transizioni]);
         break;
 
     default:

@@ -21,6 +21,7 @@
  */
 
 import { useState, useEffect } from 'react'
+import SchedaMenu from './SchedaMenu'
 
 // ---------------------------------------------------------------------------
 // UTILITÀ
@@ -54,87 +55,7 @@ function openSmsFrame(nome) {
 // SOTTO-COMPONENTI
 // ---------------------------------------------------------------------------
 
-/**
- * Menu di navigazione della scheda: link alle sotto-sezioni.
- * I link puntano a pagine PHP ancora non migrate, quindi causano reload.
- * Solo scheda_modifica, scheda_px ecc. sono mostrati se is_own o is_admin.
- */
-function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
-    const enc = encodeURIComponent(pg)
-    return (
-        <div className="menu_scheda">
-            <ul className="menu">
-                {/* ── Personaggio ─────────────────────────────────────── */}
-                <li className="menuItem">
-                    <a href="#">PERSONAGGIO</a>
-                    <ul className="subMenu">
-                        <li className="subMenuItem">
-                            <a href={`main.php?page=scheda&pg=${enc}`}>Scheda</a>
-                        </li>
-                        <li className="subMenuItem">
-                            <a href={`main.php?page=scheda_storia&pg=${enc}`}>Storia</a>
-                        </li>
-                        <li className="subMenuItem">
-                            <a href={`main.php?page=scheda_dice&pg=${enc}`}>Dice di sé</a>
-                        </li>
-                        <li className="subMenuItem">
-                            <a href={`main.php?page=scheda_affetti&pg=${enc}`}>Affetti</a>
-                        </li>
-                        <li className="subMenuItem">
-                            <a href={`main.php?page=scheda_off&pg=${enc}`}>Off</a>
-                        </li>
-                        <li className="subMenuItem">
-                            <a href={`main.php?page=scheda_trans&pg=${enc}`}>Transizioni</a>
-                        </li>
-                    </ul>
-                </li>
-
-                {/* ── Skill & Oggetti ──────────────────────────────────── */}
-                <li className="menuItem">
-                    <a href="#">SKILL &amp; OGGETTI</a>
-                    <ul className="subMenu">
-                        {(isOwn || isAdmin || isMaster) && (
-                            <li className="subMenuItem">
-                                <a href={`main.php?page=scheda_skills&pg=${enc}`}>Abilità</a>
-                            </li>
-                        )}
-                        <li className="subMenuItem">
-                            <a href={`main.php?page=scheda_equip&pg=${enc}`}>Equipaggiamento</a>
-                        </li>
-                        {(isOwn || isAdmin) && (
-                            <li className="subMenuItem">
-                                <a href={`main.php?page=scheda_oggetti&pg=${enc}`}>Inventario</a>
-                            </li>
-                        )}
-                    </ul>
-                </li>
-
-                {/* ── Punti + Modifica (solo proprio pg o admin) ───────── */}
-                {(isOwn || isAdmin) && (
-                    <>
-                        <li className="menuItem">
-                            <a href="#">PUNTI</a>
-                            <ul className="subMenu">
-                                <li className="subMenuItem">
-                                    <a href={`main.php?page=scheda_px&pg=${enc}`}>Esperienza</a>
-                                </li>
-                                <li className="subMenuItem">
-                                    <a href={`main.php?page=scheda_px_shin&pg=${enc}`}>Punti Shin</a>
-                                </li>
-                                <li className="subMenuItem">
-                                    <a href={`main.php?page=scheda_px_mestiere&pg=${enc}`}>Punti Mestiere</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li className="menuItem">
-                            <a href={`main.php?page=scheda_modifica&pg=${enc}`}>MODIFICA</a>
-                        </li>
-                    </>
-                )}
-            </ul>
-        </div>
-    )
-}
+// SchedaMenu è ora in SchedaMenu.jsx (condiviso con le sotto-sezioni)
 
 /**
  * Blocco profilo sinistro: avatar grande del personaggio.
