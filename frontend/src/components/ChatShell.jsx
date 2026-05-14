@@ -323,25 +323,18 @@ export default function ChatShell() {
                 </div>
 
             </div>
-        </div>
-
-        {/*
-          * createPortal: le modali vengono renderizzate come figli diretti di
-          * document.body, fuori dalla gerarchia DOM di #maincontent.
-          *
-          * Motivo: #maincontent ha position:fixed + overflow:auto.
-          * In Chrome (e altri browser moderni), i discendenti position:fixed di un
-          * ancestor con overflow non-visible vengono clippati da quell'ancestor,
-          * anche se position:fixed dovrebbe posizionarsi rispetto al viewport.
-          * Con il portal, le modali escono dalla catena DOM e si comportano
-          * correttamente (coprono l'intero viewport).
-          */}
+        {/* Portal: solo le modali full-screen (position:fixed) vanno in document.body
+             per evitare il clipping di #maincontent (position:fixed + overflow:auto).
+             chatPanel e editAction-modal restano qui dentro (position:relative). */}
         {createPortal(<>
 
             {/* ================================================================ */}
             {/* MODALE — Avvio role (selezione utenti)                          */}
             {/* ================================================================ */}
-            <div id="userSearchPopup" className="user-search-popup__overlay">
+            <div id="userSearchPopup" className="user-search-popup__overlay"
+                 style={{ position:'fixed', top:0, left:'260px', right:'260px', bottom:0,
+                          width:'auto', display:'none', justifyContent:'center',
+                          alignItems:'center', zIndex:10000 }}>
                 <div className="user-search-popup__container">
                     <div className="user-search-popup__header">
                         <h3 className="user-search-popup__title">Seleziona Utenti</h3>
@@ -368,7 +361,10 @@ export default function ChatShell() {
             {/* ================================================================ */}
             {/* MODALE — Personaggi giocanti nella role                         */}
             {/* ================================================================ */}
-            <div id="pgRolePlayingPanel" className="user-search-popup__overlay">
+            <div id="pgRolePlayingPanel" className="user-search-popup__overlay"
+                 style={{ position:'fixed', top:0, left:'260px', right:'260px', bottom:0,
+                          width:'auto', display:'none', justifyContent:'center',
+                          alignItems:'center', zIndex:10000 }}>
                 <div className="user-search-popup__container">
                     <div className="user-search-popup__header">
                         <h3 className="user-search-popup__title">Personaggi giocanti</h3>
@@ -389,8 +385,12 @@ export default function ChatShell() {
                 </div>
             </div>
 
+        </>, document.body)}
+
             {/* ================================================================ */}
-            {/* PANNELLO GDR — dadi, abilità, armi, master, scrittura            */}
+            {/* PANNELLO GDR — position:relative, dentro pagina_frame_chat      */}
+            {/* Non in portal: non è un overlay full-screen ma un pannello che   */}
+            {/* occupa l'area di #maincontent con height:95% relativo ad essa.  */}
             {/* ================================================================ */}
             <div className="gdr-modal-overlay" id="chatPanel" style={{ display:'none' }}>
                 <div className="gdr-panel-container">
@@ -694,7 +694,7 @@ export default function ChatShell() {
                 </div>
             </div>
 
-        </>, document.body)}
+        </div>
         </>
     )
 }
