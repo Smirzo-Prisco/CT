@@ -36,7 +36,7 @@ export default function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
 
                 {/* ── Skill & Oggetti ──────────────────────────────────── */}
                 <li className="menuItem">
-                    <a href="#">SKILL &amp; OGGETTI</a>
+                    <a href="#">SKILL&amp;OGGETTI</a>
                     <ul className="subMenu">
                         {(isOwn || isAdmin || isMaster) && (
                             <li className="subMenuItem"><a href={`main.php?page=scheda_skills&pg=${enc}`}>Abilità</a></li>
