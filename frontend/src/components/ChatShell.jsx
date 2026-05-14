@@ -20,6 +20,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import ChatViewer    from './ChatViewer'
 import TargetSelector from './TargetSelector'
 
@@ -228,6 +229,7 @@ export default function ChatShell() {
     // -----------------------------------------------------------------------
 
     return (
+        <>
         <div className="pagina_frame_chat">
             <div className="page_body">
 
@@ -321,6 +323,20 @@ export default function ChatShell() {
                 </div>
 
             </div>
+        </div>
+
+        {/*
+          * createPortal: le modali vengono renderizzate come figli diretti di
+          * document.body, fuori dalla gerarchia DOM di #maincontent.
+          *
+          * Motivo: #maincontent ha position:fixed + overflow:auto.
+          * In Chrome (e altri browser moderni), i discendenti position:fixed di un
+          * ancestor con overflow non-visible vengono clippati da quell'ancestor,
+          * anche se position:fixed dovrebbe posizionarsi rispetto al viewport.
+          * Con il portal, le modali escono dalla catena DOM e si comportano
+          * correttamente (coprono l'intero viewport).
+          */}
+        {createPortal(<>
 
             {/* ================================================================ */}
             {/* MODALE — Avvio role (selezione utenti)                          */}
@@ -678,6 +694,7 @@ export default function ChatShell() {
                 </div>
             </div>
 
-        </div>
+        </>, document.body)}
+        </>
     )
 }
