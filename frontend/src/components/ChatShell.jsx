@@ -91,6 +91,14 @@ export default function ChatShell() {
     /** Messaggio di errore se l'API fallisce */
     const [error, setError] = useState(null)
 
+    /**
+     * Stato reattivo della role attiva nella stanza.
+     * Inizializzato da shell.has_active_role, poi aggiornato via socket
+     * 'role:update' — così il bottone pannello compare/scompare in tempo
+     * reale quando una role inizia o termina, senza ricaricare la pagina.
+     */
+    const [roleActive, setRoleActive] = useState(false)
+
     /** Ref allo <style> iniettato per le preferenze tipografiche */
     const styleRef = useRef(null)
 
@@ -102,15 +110,41 @@ export default function ChatShell() {
      * Al mount chiede all'API tutti i dati necessari a costruire la shell.
      * Il component non renderizza nulla finché non arrivano (null state) —
      * nessun flash di contenuto provvisorio.
+     * Inizializza anche roleActive dal valore has_active_role restituito.
      */
     useEffect(() => {
         fetch('/pages/api_chat.php?op=shell')
             .then(r => r.json())
             .then(d => {
-                if (d.success) setShell(d)
-                else setError(d.error || 'Errore caricamento chat')
+                if (d.success) {
+                    setShell(d)
+                    setRoleActive(d.has_active_role ?? false)
+                } else setError(d.error || 'Errore caricamento chat')
             })
             .catch(() => setError('Errore di rete'))
+    }, [])
+
+    /**
+     * Ascolta l'evento socket 'role:update' per aggiornare roleActive in
+     * tempo reale quando una role inizia o termina nella stanza corrente.
+     *
+     * Quando un pg avvia una role (addPgToRole), il server emette 'role:update'.
+     * Ri-controlliamo lo stato chiamando getRolePgs: se restituisce utenti
+     * la role è attiva (mostro il pannello); se empty è terminata (nascondo).
+     */
+    useEffect(() => {
+        const sock = window.ctSocket
+        if (!sock) return
+
+        const onRoleUpdate = () => {
+            fetch('/pages/api_roleSession.php?op=getRolePgs', { method: 'POST' })
+                .then(r => r.json())
+                .then(d => setRoleActive(d.success && (d.users?.length ?? 0) > 0))
+                .catch(() => {})
+        }
+
+        sock.on('role:update', onRoleUpdate)
+        return () => sock.off('role:update', onRoleUpdate)
     }, [])
 
     // -----------------------------------------------------------------------
@@ -175,12 +209,13 @@ export default function ChatShell() {
     // Finché i dati non arrivano non renderizza nulla — evita qualsiasi flash
     if (!shell) return null
 
-    const { stanza, pulsanti, oggetti, abilita, creatura, maxlength, submit_label, luogo, login, has_active_role } = shell
+    const { stanza, pulsanti, oggetti, abilita, creatura, maxlength, submit_label, luogo, login } = shell
 
     // Il pannello GDR (dadi/skill/armi) è visibile a:
     // - staff (sempre)
     // - tutti gli utenti quando c'è una role attiva nella stanza
-    const showPanelBtn = pulsanti.is_staff || has_active_role
+    // roleActive è reattivo: si aggiorna via socket 'role:update'
+    const showPanelBtn = pulsanti.is_staff || roleActive
 
     // -----------------------------------------------------------------------
     // RENDERING
