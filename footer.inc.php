@@ -37,7 +37,7 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
     // ed evitare una chiamata API separata da AnteprimaScheda.jsx
     $pg_avatar = '';
     $r = gdrcd_query("SELECT url_img_chat FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "' LIMIT 1");
-    if ($r) $pg_avatar = $r['url_img_chat'] ?? '';
+    if ($r) $pg_avatar = trim($r['url_img_chat'] ?? '');
     ?>
     <script>
     window.CT_USER = {

@@ -3,6 +3,7 @@ session_start();
 header('Content-Type: application/json');
 
 require_once(__DIR__ . '/../includes/required.php');
+require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 $handleDBConnection = gdrcd_connect();
 
 if (empty($_SESSION['login'])) {
@@ -41,7 +42,7 @@ function load_pg(string $pg): ?array {
         LEFT JOIN razza          ON personaggio.id_razza = razza.id_razza
         LEFT JOIN gilda          ON personaggio.id_gilda = gilda.id_gilda
         LEFT JOIN ruolo          ON personaggio.id_ruolo_gilda = ruolo.id_ruolo
-        LEFT JOIN mestiere       ON mestiere.id_mestiere = mestiere.id_mestiere
+        LEFT JOIN mestiere       ON personaggio.id_mestiere = mestiere.id_mestiere
         LEFT JOIN ruolo_mestiere ON personaggio.id_ruolo_mestiere = ruolo_mestiere.id_ruolo
         WHERE personaggio.nome = '$pg' LIMIT 1");
     return $r ?: null;

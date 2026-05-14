@@ -126,7 +126,8 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 			right: 0 !important;
 			width: 100% !important;
 			transform: translateX(0) !important;
-			overflow-x: hidden !important;
+			/* auto invece di hidden: le tabelle larghe scrollano invece di essere troncate */
+			overflow-x: auto !important;
 		}
 
 		.mobile-toggle { display: block; }
