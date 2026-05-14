@@ -92,8 +92,10 @@ export default function SchedaAffetti() {
         if (!pg) { setError('Personaggio non specificato'); return }
         const enc = encodeURIComponent(pg)
         Promise.all([
-            fetch(`/pages/api_scheda.php?op=profile&pg=${enc}`).then(r => r.json()),
-            fetch(`/pages/api_scheda.php?op=affetti&pg=${enc}`).then(r => r.json()),
+            fetch(`/pages/api_scheda.php?op=profile&pg=${enc}`)
+                .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+            fetch(`/pages/api_scheda.php?op=affetti&pg=${enc}`)
+                .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
         ]).then(([prof, aff]) => {
             if (prof.success) setProfile(prof)
             else              setError(prof.message ?? 'Errore profilo')
@@ -112,7 +114,7 @@ export default function SchedaAffetti() {
             } else {
                 setError(aff.message ?? 'Errore affetti')
             }
-        }).catch(() => setError('Errore di rete'))
+        }).catch(e => setError(`Errore: ${e.message ?? 'risposta non valida dall\'API'}`))
     }, [pg])
 
     const openDetail = (url, id) => {

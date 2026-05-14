@@ -384,28 +384,30 @@ switch ($op) {
     // AFFETTI — lista affetti del personaggio per tipo (pubblico)
     // -------------------------------------------------------------------------
     case 'affetti':
+        // SELECT * per non dipendere dall'esatta capitalizzazione dei nomi colonna
+        // (la tabella usa nomi misti: nomePg, Nome, Cognome — stesso pattern dell'inc.php originale)
         $result = gdrcd_query(
-            "SELECT id, username, tipologia, nomePg, avatar, Nome, Cognome, titolo
-             FROM struttura_affetti
-             WHERE username = '$pg'
-             ORDER BY tipologia, nomePg",
+            "SELECT * FROM struttura_affetti WHERE username = '$pg' ORDER BY tipologia, nomePg",
             'result'
         );
         $tipologie = ['legami' => [], 'nemici' => [], 'famiglia' => [], 'conoscenze' => [], 'memories' => []];
-        while ($row = gdrcd_query($result, 'fetch')) {
-            $tipo = $row['tipologia'];
-            if (array_key_exists($tipo, $tipologie)) {
-                $tipologie[$tipo][] = [
-                    'id'      => (int)$row['id'],
-                    'nomePg'  => $row['nomePg'],
-                    'avatar'  => $row['avatar'],
-                    'nome'    => $row['Nome'],
-                    'cognome' => $row['Cognome'],
-                    'titolo'  => $row['titolo'],
-                ];
+        if ($result) {
+            while ($row = gdrcd_query($result, 'fetch')) {
+                $tipo = $row['tipologia'] ?? '';
+                if (array_key_exists($tipo, $tipologie)) {
+                    // Accesso ai campi con lo stesso nome usato nell'inc.php originale
+                    $tipologie[$tipo][] = [
+                        'id'      => (int)($row['id']     ?? 0),
+                        'nomePg'  => $row['nomePg']       ?? '',
+                        'avatar'  => $row['avatar']        ?? '',
+                        'nome'    => $row['Nome']          ?? '',
+                        'cognome' => $row['Cognome']       ?? '',
+                        'titolo'  => $row['titolo']        ?? '',
+                    ];
+                }
             }
+            gdrcd_query($result, 'free');
         }
-        gdrcd_query($result, 'free');
         echo json_encode([
             'success'  => true,
             'affetti'  => $tipologie,
