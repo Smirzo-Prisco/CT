@@ -1,3 +1,4 @@
+<?php add_script('/includes/forum.js'); ?>
 <script language="JavaScript">
 function quote(NewCode) {
 document.getElementById('messaggio').value+=NewCode;

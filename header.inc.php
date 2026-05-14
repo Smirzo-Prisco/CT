@@ -79,7 +79,6 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/forum.css" type="text/css">
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/lettura_bacheca.css" type="text/css">
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <?php
         /** * Il controllo individua se l'header non è impiegato per il main */

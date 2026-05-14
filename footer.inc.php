@@ -23,11 +23,6 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
 
     </body>
     <footer></footer>
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="/includes/forum.js"></script>
 
 
     <!-- Socket.io: variabili utente, libreria client e connessione unica condivisa -->
