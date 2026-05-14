@@ -36,6 +36,8 @@ import MessagesInbox  from './components/MessagesInbox'
 import PresentiEstesi from './components/PresentiEstesi'
 import MapClick       from './components/MapClick'
 import ChatShell      from './components/ChatShell'
+import Scheda         from './components/Scheda'
+import Gestione       from './components/Gestione'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -72,6 +74,19 @@ const ROUTES = {
         component: MapClick,
         css: [
             '/themes/crystal/mappa_principale.css',
+        ],
+    },
+    scheda: {
+        component: Scheda,
+        css: [
+            '/themes/crystal/scheda.css',
+            '/themes/crystal/scheda_menu.css',
+        ],
+    },
+    gestione: {
+        component: Gestione,
+        css: [
+            '/themes/crystal/uffici_nuovi.css',
         ],
     },
 }

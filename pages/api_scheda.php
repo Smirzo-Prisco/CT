@@ -81,14 +81,28 @@ switch ($op) {
         $privilegi = gdrcd_query("SELECT admin, moderatore, master, guida, grafico
             FROM privilegi WHERE nome = '$pg' LIMIT 1");
 
+        // Lavoro attivo (ruolo in mestiere tramite clgpersonaggiolavoro)
+        $lavoro_q = gdrcd_query("SELECT ruolo_mestiere.nome_ruolo
+            FROM clgpersonaggiolavoro
+            JOIN ruolo_mestiere ON clgpersonaggiolavoro.id_ruolo = ruolo_mestiere.id_ruolo
+            WHERE clgpersonaggiolavoro.personaggio = '$pg' LIMIT 1");
+        $lavoro = $lavoro_q ? $lavoro_q['nome_ruolo'] : null;
+
         // Dati pubblici
         $profile = [
             'success'       => true,
+            // Flag di accesso — usati da Scheda.jsx per mostrare/nascondere sezioni
+            'is_own'        => $is_own,
+            'is_staff'      => $is_staff,
+            'is_admin'      => $is_admin,
+            'is_master'     => $is_master,
+            // Anagrafica
             'nome'          => $pg_data['nome'],
             'cognome'       => $pg_data['cognome'],
             'sesso'         => $pg_data['sesso'],
             'eta'           => $pg_data['eta'],
             'natoa'         => $pg_data['natoa'],
+            'lavoro'        => $lavoro,
             'url_img'       => $pg_data['url_img'],
             'url_img_chat'  => $pg_data['url_img_chat'],
             'razza'         => $pg_data['sesso'] == 'f' ? $pg_data['sing_f'] : $pg_data['sing_m'],
@@ -98,27 +112,43 @@ switch ($op) {
             'nome_mestiere' => $pg_data['nome_mestiere'],
             'nome_ruolo_mestiere' => $pg_data['nome_ruolo_mestiere'],
             'immagine_mestiere'   => $pg_data['immagine_mestiere'],
+            // Vitali (pubblici)
             'salute'        => (int)$pg_data['salute'],
             'salute_max'    => (int)$pg_data['salute_max'],
             'integrita'     => (int)$pg_data['integrita'],
             'integrita_max' => (int)$pg_data['integrita_max'],
             'notorieta'     => (float)$pg_data['notorieta'],
+            // Testi (pubblici)
             'particolari'   => $pg_data['particolari'],
             'note_fato'     => $pg_data['note_fato'],
             'principale'    => $pg_data['principale'],
+            // Date
             'data_iscrizione' => $pg_data['data_iscrizione'],
             'ora_entrata'   => $pg_data['ora_entrata'],
             'esiliato'      => $esiliato,
             'privilegi'     => $privilegi ?: [],
+            // Nomi configurabili delle statistiche — letti da $PARAMETERS
+            'config'        => [
+                'stat_names' => [
+                    'car2'      => $PARAMETERS['names']['stats']['car2']      ?? 'car2',
+                    'car4'      => $PARAMETERS['names']['stats']['car4']      ?? 'car4',
+                    'car6'      => $PARAMETERS['names']['stats']['car6']      ?? 'car6',
+                    'car8'      => $PARAMETERS['names']['stats']['car8']      ?? 'car8',
+                    'hitpoints' => $PARAMETERS['names']['stats']['hitpoints'] ?? 'Salute',
+                    'integrita' => $PARAMETERS['names']['stats']['integrita'] ?? 'Integrità',
+                    'notorieta' => $PARAMETERS['names']['stats']['notorieta'] ?? 'Notorietà',
+                    'race_sing' => $PARAMETERS['names']['race']['sing']       ?? 'Spirito',
+                ],
+            ],
         ];
 
         // Dati visibili solo al proprio pg o staff
         if ($is_own || $is_staff) {
             $profile['statistiche'] = [
-                'car2'  => (int)$pg_data['car2']  + (int)($pg_data['bonus_car2'] ?? 0) + (int)($bo['BO2'] ?? 0),
-                'car4'  => (int)$pg_data['car4']  + (int)($pg_data['bonus_car4'] ?? 0) + (int)($bo['BO4'] ?? 0),
-                'car6'  => (int)$pg_data['car6']  + (int)($pg_data['bonus_car5'] ?? 0) + (int)($bo['BO4'] ?? 0),
-                'car8'  => (int)$pg_data['car8'],
+                'car2'   => (int)$pg_data['car2']  + (int)($pg_data['bonus_car2'] ?? 0) + (int)($bo['BO2'] ?? 0),
+                'car4'   => (int)$pg_data['car4']  + (int)($pg_data['bonus_car4'] ?? 0) + (int)($bo['BO4'] ?? 0),
+                'car6'   => (int)$pg_data['car6']  + (int)($pg_data['bonus_car6'] ?? 0) + (int)($bo['BO6'] ?? 0),
+                'car8'   => (int)$pg_data['car8'],
                 'totale' => getTotStatsPg($pg),
                 'livello' => $pg_data['id_gilda'] > 0 ? getLevelPg(getTotStatsPg($pg)) : 1,
             ];

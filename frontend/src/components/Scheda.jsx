@@ -1,0 +1,402 @@
+/**
+ * Scheda.jsx — Scheda personaggio (Phase SPA)
+ *
+ * Legge ?pg=NomePg dalla URL corrente e carica i dati via:
+ *   api_scheda.php?op=profile&pg=X
+ *
+ * Sezioni renderizzate:
+ *   - Menu sub-sezioni (link PHP, causano reload — non ancora migrate)
+ *   - Avatar + blocco profilo/statistiche
+ *   - Note & Fato collassabili
+ *   - Background principale
+ *
+ * Flag di visibilità (is_own, is_staff, is_admin, is_master) vengono
+ * restituiti dall'API stessa, che li calcola server-side dalla sessione.
+ *
+ * I nomi delle statistiche (car2, car4, ecc.) vengono letti da
+ * profile.config.stat_names, che rispecchia $PARAMETERS['names']['stats']
+ * configurati nel backend.
+ *
+ * @author Crystal Tokyo Dev
+ */
+
+import { useState, useEffect } from 'react'
+
+// ---------------------------------------------------------------------------
+// UTILITÀ
+// ---------------------------------------------------------------------------
+
+/**
+ * Formatta una stringa data MySQL in formato italiano leggibile.
+ * @param {string|null} dateStr
+ * @returns {string}
+ */
+function formatDate(dateStr) {
+    if (!dateStr) return ''
+    const d = new Date(dateStr)
+    if (isNaN(d)) return dateStr
+    return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+/**
+ * Apre il frame modale per l'invio di un SMS privato al personaggio.
+ * changeFrame() è definita in left-right_frames.php ed è globale.
+ * @param {string} nome - Nome del destinatario
+ */
+function openSmsFrame(nome) {
+    const url = `pages/mex_privati/multi_message.php?destinatari=${encodeURIComponent(nome)}`
+    if (typeof window.changeFrame === 'function') window.changeFrame(url)
+    const modal = document.getElementById('id01')
+    if (modal) modal.style.display = 'block'
+}
+
+// ---------------------------------------------------------------------------
+// SOTTO-COMPONENTI
+// ---------------------------------------------------------------------------
+
+/**
+ * Menu di navigazione della scheda: link alle sotto-sezioni.
+ * I link puntano a pagine PHP ancora non migrate, quindi causano reload.
+ * Solo scheda_modifica, scheda_px ecc. sono mostrati se is_own o is_admin.
+ */
+function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
+    const enc = encodeURIComponent(pg)
+    return (
+        <div className="menu_scheda">
+            <ul className="menu">
+                {/* ── Personaggio ─────────────────────────────────────── */}
+                <li className="menuItem">
+                    <a href="#">PERSONAGGIO</a>
+                    <ul className="subMenu">
+                        <li className="subMenuItem">
+                            <a href={`main.php?page=scheda&pg=${enc}`}>Scheda</a>
+                        </li>
+                        <li className="subMenuItem">
+                            <a href={`main.php?page=scheda_storia&pg=${enc}`}>Storia</a>
+                        </li>
+                        <li className="subMenuItem">
+                            <a href={`main.php?page=scheda_dice&pg=${enc}`}>Dice di sé</a>
+                        </li>
+                        <li className="subMenuItem">
+                            <a href={`main.php?page=scheda_affetti&pg=${enc}`}>Affetti</a>
+                        </li>
+                        <li className="subMenuItem">
+                            <a href={`main.php?page=scheda_off&pg=${enc}`}>Off</a>
+                        </li>
+                        <li className="subMenuItem">
+                            <a href={`main.php?page=scheda_trans&pg=${enc}`}>Transizioni</a>
+                        </li>
+                    </ul>
+                </li>
+
+                {/* ── Skill & Oggetti ──────────────────────────────────── */}
+                <li className="menuItem">
+                    <a href="#">SKILL &amp; OGGETTI</a>
+                    <ul className="subMenu">
+                        {(isOwn || isAdmin || isMaster) && (
+                            <li className="subMenuItem">
+                                <a href={`main.php?page=scheda_skills&pg=${enc}`}>Abilità</a>
+                            </li>
+                        )}
+                        <li className="subMenuItem">
+                            <a href={`main.php?page=scheda_equip&pg=${enc}`}>Equipaggiamento</a>
+                        </li>
+                        {(isOwn || isAdmin) && (
+                            <li className="subMenuItem">
+                                <a href={`main.php?page=scheda_oggetti&pg=${enc}`}>Inventario</a>
+                            </li>
+                        )}
+                    </ul>
+                </li>
+
+                {/* ── Punti + Modifica (solo proprio pg o admin) ───────── */}
+                {(isOwn || isAdmin) && (
+                    <>
+                        <li className="menuItem">
+                            <a href="#">PUNTI</a>
+                            <ul className="subMenu">
+                                <li className="subMenuItem">
+                                    <a href={`main.php?page=scheda_px&pg=${enc}`}>Esperienza</a>
+                                </li>
+                                <li className="subMenuItem">
+                                    <a href={`main.php?page=scheda_px_shin&pg=${enc}`}>Punti Shin</a>
+                                </li>
+                                <li className="subMenuItem">
+                                    <a href={`main.php?page=scheda_px_mestiere&pg=${enc}`}>Punti Mestiere</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li className="menuItem">
+                            <a href={`main.php?page=scheda_modifica&pg=${enc}`}>MODIFICA</a>
+                        </li>
+                    </>
+                )}
+            </ul>
+        </div>
+    )
+}
+
+/**
+ * Blocco profilo sinistro: avatar grande del personaggio.
+ */
+function SchedaAvatar({ urlImg, nome }) {
+    return (
+        <div className="ritratto_avatar">
+            <img src={urlImg} className="ritratto_avatar_immagine" alt={nome} />
+        </div>
+    )
+}
+
+/**
+ * Blocco profilo destro: stats pubbliche + statistiche private + info.
+ * stat_names proviene da profile.config.stat_names (configurazione backend).
+ */
+function SchedaProfilo({ profile }) {
+    const { nome, cognome, eta, natoa, lavoro, razza, nome_ruolo, nome_ruolo_mestiere,
+            salute, salute_max, integrita, integrita_max, notorieta,
+            esperienza, shin, statistiche, privilegi, config } = profile
+    const sn = config?.stat_names ?? {}
+
+    // Icone staff visibili sulle cariche
+    const staffIcons = [
+        { key: 'admin',      file: 'Admin.png',      label: 'Admin' },
+        { key: 'moderatore', file: 'Moderatore.png', label: 'Moderatore' },
+        { key: 'master',     file: 'Master.png',     label: 'Master' },
+        { key: 'guida',      file: 'Guida.png',      label: 'Guida' },
+        { key: 'grafico',    file: 'Grafico.png',    label: 'Grafico' },
+    ]
+
+    return (
+        <div className="profilo">
+            <div className="titolo_box">Profilo</div>
+            <div className="primo_box">
+
+                {/* ── PROFILO ───────────────────────────────────────────── */}
+                <div className="header_box">▪ PROFILO ▪</div><br />
+
+                <span style={{ float: 'left', marginLeft: 5 }}>Età:</span>
+                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{eta}</span>
+                <br />
+
+                <span style={{ float: 'left', marginLeft: 5 }}>Luogo:</span>
+                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{natoa}</span>
+                <br />
+
+                {lavoro && (
+                    <>
+                        <span style={{ float: 'left', marginLeft: 5 }}>Lavoro:</span>
+                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{lavoro}</span>
+                        <br />
+                    </>
+                )}
+
+                <span style={{ float: 'left', marginLeft: 5 }}>{sn.race_sing ?? 'Spirito'}:</span>
+                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{razza}</span>
+                <br />
+
+                <span style={{ float: 'left', marginLeft: 5 }}>Famiglia:</span>
+                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{nome_ruolo}</span>
+                <br />
+
+                <span style={{ float: 'left', marginLeft: 5 }}>Ruolo:</span>
+                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{nome_ruolo_mestiere}</span>
+                <br /><br />
+
+                {/* ── STATISTICHE (solo proprio pg o staff) ─────────────── */}
+                {statistiche && (
+                    <>
+                        <div className="header_box">▪ STATISTICHE ▪</div><br />
+
+                        <span style={{ float: 'left', marginLeft: 5 }}>Livello</span>
+                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right', color: 'yellow', fontWeight: 'bold' }}>
+                            {statistiche.livello}
+                        </span>
+                        <br /><br />
+
+                        <span style={{ float: 'left', marginLeft: 5 }}>Tot. Caratteristiche</span>
+                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right', fontWeight: 'bold' }}>
+                            {statistiche.totale}
+                        </span>
+                        <br />
+
+                        {['car8', 'car2', 'car4', 'car6'].map(k => (
+                            <span key={k}>
+                                <span style={{ float: 'left', marginLeft: 5 }}>{sn[k] ?? k}:</span>
+                                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{statistiche[k]}</span>
+                                <br />
+                            </span>
+                        ))}
+                    </>
+                )}
+
+                {/* ── INFO ──────────────────────────────────────────────── */}
+                <div className="header_box">▪ INFO ▪</div><br />
+
+                <span style={{ float: 'left', marginLeft: 5 }}>{sn.hitpoints ?? 'Salute'}:</span>
+                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{salute}/{salute_max}</span>
+                <br />
+
+                <span style={{ float: 'left', marginLeft: 5 }}>{sn.integrita ?? 'Integrità'}:</span>
+                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{integrita}/{integrita_max}</span>
+
+                {statistiche && (
+                    <>
+                        <br />
+                        <span style={{ float: 'left', marginLeft: 5 }}>Esperienza:</span>
+                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>
+                            {Math.floor(esperienza ?? 0)}
+                        </span>
+                        <br />
+                        <span style={{ float: 'left', marginLeft: 5 }}>Shin:</span>
+                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>
+                            {Math.floor(shin ?? 0)}
+                        </span>
+                    </>
+                )}
+
+                <br />
+                <span style={{ float: 'left', marginLeft: 5 }}>{sn.notorieta ?? 'Notorietà'}:</span>
+                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{Math.floor(notorieta)}</span>
+                <br /><br />
+
+                {/* ── CARICHE STAFF ─────────────────────────────────────── */}
+                <span style={{ float: 'left', marginLeft: 5 }}>Cariche</span>
+                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>
+                    {staffIcons.map(({ key, file, label }) =>
+                        privilegi?.[key] == 1 ? (
+                            <img key={key}
+                                src={`themes/crystal/imgs/staff/${file}`}
+                                width="20" height="20"
+                                alt={label} title={label} />
+                        ) : null
+                    )}
+                </span>
+                <br /><br />
+
+            </div>
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------
+// COMPONENTE PRINCIPALE
+// ---------------------------------------------------------------------------
+
+export default function Scheda() {
+    // Legge il nome del pg dalla URL (?page=scheda&pg=NomePg)
+    const pg = new URLSearchParams(window.location.search).get('pg') ?? ''
+
+    const [profile, setProfile] = useState(null)
+    const [error, setError]     = useState(null)
+    const [noteFatoOpen, setNoteFatoOpen] = useState(false)
+
+    useEffect(() => {
+        if (!pg) { setError('Personaggio non specificato'); return }
+        fetch(`/pages/api_scheda.php?op=profile&pg=${encodeURIComponent(pg)}`)
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) setProfile(d)
+                else           setError(d.message ?? 'Errore nel caricamento della scheda')
+            })
+            .catch(() => setError('Errore di rete'))
+    }, [pg])
+
+    if (error) {
+        return (
+            <div className="pagina_scheda">
+                <div className="error">{error}</div>
+            </div>
+        )
+    }
+
+    if (!profile) {
+        return (
+            <div className="pagina_scheda">
+                <div className="loading">Caricamento scheda…</div>
+            </div>
+        )
+    }
+
+    const { nome, cognome, is_own, is_staff, is_admin, is_master,
+            particolari, note_fato, principale,
+            data_iscrizione, ora_entrata, url_media } = profile
+
+    return (
+        <div className="pagina_scheda">
+            <div className="page_title">
+                <h2>Scheda del personaggio</h2>
+            </div>
+
+            <div className="scheda_page_body">
+
+                {/* ── Menu navigazione scheda ──────────────────────────── */}
+                <SchedaMenu
+                    pg={pg}
+                    isOwn={is_own}
+                    isAdmin={is_admin}
+                    isStaff={is_staff}
+                    isMaster={is_master}
+                />
+
+                {/* ── Nome e cognome ───────────────────────────────────── */}
+                <div className="title">{nome} {cognome}</div>
+
+                {/* ── Riga principale: avatar + profilo ────────────────── */}
+                <div className="pg-infos">
+                    <SchedaAvatar urlImg={profile.url_img} nome={nome} />
+                    <SchedaProfilo profile={profile} />
+                </div>
+
+                {/* ── Seconda riga: Note&Fato + accessi + SMS ──────────── */}
+                <div className="pg-infos">
+                    <div className="secondo_box">
+                        {/* Toggle Note & Fato collassabili */}
+                        <div
+                            className="titolo_box_scheda"
+                            onClick={() => setNoteFatoOpen(o => !o)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            Note e Fato
+                        </div>
+                    </div>
+                    <div className="terzo_box">
+                        {data_iscrizione && <>Primo accesso: {formatDate(data_iscrizione)}<br /></>}
+                        {ora_entrata    && <>Ultimo accesso: {formatDate(ora_entrata)}<br /></>}
+                        <a href="#" onClick={e => { e.preventDefault(); openSmsFrame(nome) }}>
+                            ▪ INVIA SMS ▪
+                        </a>
+                    </div>
+                </div>
+
+                {/* ── Note & Fato (collassabili) ───────────────────────── */}
+                {noteFatoOpen && (
+                    <div className="hidden_row" id="NoteEFato">
+                        <div className="particolari">
+                            {/* Contenuto HTML grezzo dal DB — solo utenti autenticati */}
+                            <div className="green"
+                                dangerouslySetInnerHTML={{ __html: particolari ?? '' }} />
+                            <div className="blue"
+                                dangerouslySetInnerHTML={{ __html: note_fato ?? '' }} />
+                        </div>
+                    </div>
+                )}
+
+                {/* ── Background principale ────────────────────────────── */}
+                <div className="background">
+                    <br />
+                    <div className="body_box"
+                        dangerouslySetInnerHTML={{ __html: principale ?? '' }} />
+                </div>
+
+            </div>{/* fine scheda_page_body */}
+
+            {/* ── Audio (se il pg ha musica in scheda) ─────────────────── */}
+            {url_media && (
+                <audio autoPlay>
+                    <source src={url_media} type="audio/mpeg" />
+                </audio>
+            )}
+
+        </div>
+    )
+}
