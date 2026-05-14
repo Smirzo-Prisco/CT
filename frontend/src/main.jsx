@@ -161,39 +161,42 @@ window.CT.navigate = (url) => { window.top.location.href = url }
 document.dispatchEvent(new CustomEvent('ct:ready'))
 
 // ---------------------------------------------------------------------------
-// PHASE 3.2 — Intercettore click globale per navigazione React
+// PHASE 3.2 / 4b — Intercettore click globale per navigazione React
 //
-// Ascolta tutti i click sull'intera pagina (menu incluso).
-// Se il link punta a una pagina migrata, chiama CT.navigate() invece
-// di fare un reload PHP completo — la navigazione diventa istantanea.
+// Intercetta i click su link che puntano a pagine migrate (page=X) o a
+// cambi stanza (dir=X), chiama CT.navigate() invece del reload PHP.
 //
 // Funziona solo quando CT.navigate è la versione completa (AppRouter montato).
 // Sulle pagine non migrate, CT.navigate fa il reload PHP normale (fallback).
+//
+// true = capture phase: si attiva PRIMA di stopPropagation.
+// Necessario perché left-right_frames.php chiama e.stopPropagation() sul click
+// della colonna sinistra per il toggle mobile, bloccando il bubbling normale.
 // ---------------------------------------------------------------------------
 document.addEventListener('click', function(e) {
-    // Risale il DOM fino a trovare il tag <a> (gestisce click su figli dell'<a>)
     const link = e.target.closest('a')
     if (!link || !link.href) return
 
     try {
-        const url = new URL(link.href)
+        const url  = new URL(link.href)
 
-        // Ignora link a domini diversi (link esterni, mailto:, ecc.)
+        // Ignora link esterni (domini diversi, mailto:, ecc.)
         if (url.hostname !== window.location.hostname) return
 
         const page = url.searchParams.get('page')
+        const dir  = url.searchParams.get('dir')
 
-        // Se la pagina di destinazione è migrata, intercetta il click
-        if (page && MIGRATED_PAGES.has(page)) {
+        // Intercetta se: pagina React migrata (page=X) o cambio stanza (dir=X)
+        const isMigratedPage = page && MIGRATED_PAGES.has(page)
+        const isDirNav       = dir !== null   // dir=X (>= 0 = stanza, < 0 = mappa)
+
+        if (isMigratedPage || isDirNav) {
             e.preventDefault()
             window.CT.navigate(url.pathname + url.search)
         }
     } catch {
-        // URL non valida o altro errore: lascia agire il browser normalmente
+        // URL non valida: lascia agire il browser normalmente
     }
-// true = capture phase: si attiva PRIMA che stopPropagation possa bloccare il bubbling.
-// Necessario perché left-right_frames.php chiama e.stopPropagation() sul click
-// della colonna sinistra per la gestione mobile, impedendo il bubbling normale.
 }, true)
 
 console.log('[CT] bundle caricato — componenti registrati:', Object.keys(registry))

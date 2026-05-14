@@ -301,16 +301,19 @@ export default function MapClick() {
 
     /**
      * Naviga verso una stanza (dir=X) o una pagina (page=X).
-     * Usa window.top per uscire dai frame e caricare il contenuto principale.
+     * Usa CT.navigate per la navigazione SPA (aggiorna DB via API, poi re-render).
+     * Fallback a window.top.location.href se CT.navigate non è ancora disponibile.
      *
      * @param {Object} room - Oggetto stanza dalla costante ZONES
      */
     const navigate = (room) => {
-        if (room.dir !== undefined) {
-            window.top.location.href = `main.php?dir=${room.dir}`
-        } else if (room.page) {
-            window.top.location.href = `main.php?page=${room.page}`
-        }
+        let url = null
+        if (room.dir !== undefined) url = `main.php?dir=${room.dir}`
+        else if (room.page)        url = `main.php?page=${room.page}`
+        if (!url) return
+
+        if (window.CT?.navigate) window.CT.navigate(url)
+        else window.top.location.href = url
     }
 
     // ---------------------------------------------------------------------------

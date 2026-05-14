@@ -16,14 +16,12 @@
  *   iniettati dinamicamente nel <head> (solo se non già presenti).
  *
  * Pagine attualmente migrate:
- *   - forum
- *   - messages_center
- *   - presenti_estesi
- *   - mappaclick  ← Phase 4: cambio mappa via api_map.php?op=changemap (POST)
+ *   - forum, messages_center, presenti_estesi, mappaclick
+ *   - dir=X  ← Phase 4b: cambio stanza via api_map.php?op=move (POST),
+ *              poi renderizza ChatShell. dir < 0 = torna alla mappa.
  *
  * Pagine che richiedono ancora reload PHP:
- *   - frame_chat / dir=X (aggiorna ultimo_luogo nel DB — prossima migrazione)
- *   - tutte le altre
+ *   - tutto il resto (gestione, scheda, uffici, ecc.)
  *
  * Montaggio: via ct:ready su #ct-app-content (inserito nelle pagine migrate).
  * window.CT.navigate() viene esposto globalmente per i link nelle pagine migrate.
@@ -37,6 +35,7 @@ import Forum          from './components/Forum'
 import MessagesInbox  from './components/MessagesInbox'
 import PresentiEstesi from './components/PresentiEstesi'
 import MapClick       from './components/MapClick'
+import ChatShell      from './components/ChatShell'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -100,12 +99,17 @@ function injectCSS(href) {
 }
 
 /**
- * Legge i parametri della URL corrente.
- * @returns {{ page: string|null }} Parametri rilevanti per il routing
+ * Legge i parametri rilevanti dalla URL corrente.
+ * `dir` è presente quando l'utente entra in una stanza (>= 0) o torna
+ * alla mappa (< 0) tramite main.php?dir=X.
  */
 function readParams() {
-    const p = new URLSearchParams(window.location.search)
-    return { page: p.get('page') }
+    const p      = new URLSearchParams(window.location.search)
+    const dirRaw = p.get('dir')
+    return {
+        page: p.get('page'),
+        dir:  dirRaw !== null ? parseInt(dirRaw, 10) : null,
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -128,24 +132,68 @@ export default function AppRouter({ isStaff = false }) {
     }, [])
 
     /**
-     * Naviga a una nuova URL.
-     * - Se la pagina è migrata: pushState + re-render React (nessun reload)
-     * - Se la pagina non è migrata: reload PHP tradizionale
+     * Naviga a una nuova URL — SPA o PHP reload a seconda della destinazione.
+     *
+     * Casi gestiti:
+     *   ?page=X migrato   → pushState + re-render React
+     *   ?dir=X (X >= 0)   → chiama api_map.php?op=move per aggiornare DB/sessione,
+     *                        poi pushState + renderizza ChatShell
+     *   ?dir=X (X < 0)    → tornare alla mappa (trattato come ?page=mappaclick)
+     *   tutto il resto    → reload PHP tradizionale
+     *
+     * La funzione è async perché la chiamata move deve completarsi prima
+     * di aggiornare la URL (altrimenti ChatShell legge una sessione stale).
      *
      * @param {string} url - URL di destinazione (relativa o assoluta)
      */
-    const navigate = useCallback((url) => {
-        const target    = new URL(url, window.location.href)
+    const navigate = useCallback(async (url) => {
+        const target     = new URL(url, window.location.href)
         const targetPage = target.searchParams.get('page')
+        const targetDir  = target.searchParams.get('dir')
 
+        // ── Pagina React migrata ──────────────────────────────────────────
         if (targetPage && MIGRATED_PAGES.has(targetPage)) {
-            // Navigazione React: cambia URL senza reload
             window.history.pushState({}, '', url)
             setParams(readParams())
-        } else {
-            // Pagina non migrata: reload PHP (target_top per uscire dai frame se necessario)
-            window.top.location.href = url
+            return
         }
+
+        // ── Cambio stanza (dir=X) ─────────────────────────────────────────
+        if (targetDir !== null) {
+            const dir = parseInt(targetDir, 10)
+
+            // dir < 0 → torna alla mappa (equivale a ?page=mappaclick)
+            if (dir < 0) {
+                window.history.pushState({}, '', 'main.php?page=mappaclick')
+                setParams(readParams())
+                return
+            }
+
+            // dir >= 0 → entra in stanza: aggiorna DB+sessione via API prima
+            // di renderizzare ChatShell (altrimenti op=shell legge luogo sbagliato)
+            try {
+                const resp = await fetch('/pages/api_map.php?op=move', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ dir }),
+                })
+                const data = await resp.json()
+                if (data.success) {
+                    if (window.CT_USER) window.CT_USER.luogo = dir
+                    window.history.pushState({}, '', url)
+                    setParams(readParams())
+                } else {
+                    // Stanza privata o errore: fallback PHP
+                    window.top.location.href = url
+                }
+            } catch {
+                window.top.location.href = url
+            }
+            return
+        }
+
+        // ── Pagina non migrata: reload PHP ────────────────────────────────
+        window.top.location.href = url
     }, [])
 
     // Espone CT.navigate globalmente — usato dai link nei componenti migrati
@@ -157,16 +205,24 @@ export default function AppRouter({ isStaff = false }) {
     // RENDERING
     // -----------------------------------------------------------------------
 
-    const route = params.page ? ROUTES[params.page] : null
+    const route  = params.page ? ROUTES[params.page] : null
+    const isChat = params.dir !== null && !isNaN(params.dir) && params.dir >= 0
 
-    // Pagina non migrata: AppRouter non renderizza nulla
-    // (il PHP ha già renderizzato il contenuto via inc.php)
-    if (!route) return null
+    // Pagina non migrata: AppRouter non renderizza nulla.
+    // Il PHP ha già renderizzato il contenuto via inc.php.
+    if (!route && !isChat) return null
 
-    // Inietta i CSS della pagina se non già presenti (navigazione client-side)
+    // ── Stanza chat (dir >= 0) ────────────────────────────────────────────
+    // key={params.dir}: forza unmount+remount di ChatShell ad ogni cambio stanza,
+    // così il nuovo mount chiama op=shell con la sessione aggiornata dal move.
+    if (isChat) {
+        injectCSS('/themes/crystal/mestieri.css')
+        injectCSS('/themes/crystal/chat.css')
+        return <ChatShell key={params.dir} />
+    }
+
+    // ── Pagina React migrata (page=X) ─────────────────────────────────────
     route.css.forEach(injectCSS)
-
     const Component = route.component
-
     return <Component isStaff={isStaff} />
 }
