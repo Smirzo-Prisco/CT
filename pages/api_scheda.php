@@ -2,6 +2,22 @@
 session_start();
 header('Content-Type: application/json');
 
+// Impedisce che warning/notice PHP compaiano nella risposta JSON
+ini_set('display_errors', '0');
+error_reporting(0);
+
+// Shutdown handler: cattura E_ERROR (OOM, timeout, ecc.) che non sono Throwable
+// e che kill-ano il processo silenziosamente con display_errors=Off,
+// restituendo risposta vuota al client ("Unexpected end of JSON input").
+register_shutdown_function(function () {
+    $e = error_get_last();
+    if ($e && in_array($e['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE], true)) {
+        while (ob_get_level()) ob_end_clean();
+        if (!headers_sent()) header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Fatal: ' . $e['message']]);
+    }
+});
+
 require_once(__DIR__ . '/../includes/required.php');
 require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 $handleDBConnection = gdrcd_connect();
@@ -173,6 +189,10 @@ switch ($op) {
             exit;
         }
 
+        // Skills con descrizioni HTML grandi possono superare il memory_limit di default:
+        // allochiamo abbastanza per il fetch + json_encode dell'intero set.
+        ini_set('memory_limit', '256M');
+
         $result = gdrcd_query("SELECT a.id_abilita, a.nome, a.descrizione, a.tipo,
                 a.sottotipo, a.car, a.costo, pa.grado, pa.usi
             FROM abilita a
@@ -184,6 +204,12 @@ switch ($op) {
                 'Mentale base','Mentale media','Mentale avanzata','Mentale di attacco',
                 'Potere speciale','Skill temporanea','Talento'
             ), a.nome ASC", 'result');
+
+        // Guard: se la query fallisce gdrcd_query potrebbe chiamare die()
+        if (!$result) {
+            echo json_encode(['success' => false, 'message' => 'Errore nella query delle abilità']);
+            break;
+        }
 
         // ob_start cattura qualsiasi output accidentale (warning PHP, ecc.)
         // che altrimenti corromperebbe la risposta JSON.
