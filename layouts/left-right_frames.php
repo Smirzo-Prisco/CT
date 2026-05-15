@@ -224,7 +224,15 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
         $dbg_exists = file_exists($dbg_path);
         echo '<div style="background:orange;color:black;padding:5px;font-size:12px">DEBUG strInnerPage='.var_export($strInnerPage,true).' | exists='.($dbg_exists?'YES':'NO').' | cwd='.getcwd().'</div>';
         if ($strInnerPage !== null && $dbg_exists) {
+            register_shutdown_function(function() {
+                $e = error_get_last();
+                if ($e) {
+                    echo '<div style="background:red;color:white;padding:10px;font-size:14px">FATAL: ['.$e['type'].'] '.$e['message'].' in '.$e['file'].':'.$e['line'].'</div>';
+                }
+            });
             echo '<!-- BEFORE INCLUDE -->';
+            ini_set('display_errors', '1');
+            error_reporting(E_ALL);
             include($dbg_path);
             echo '<!-- AFTER INCLUDE -->';
         } elseif ($strInnerPage === null) {
