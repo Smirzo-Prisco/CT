@@ -487,6 +487,91 @@ switch ($op) {
         echo json_encode(['success' => true, 'transizioni' => $transizioni]);
         break;
 
+    // -------------------------------------------------------------------------
+    // PUNTI — storico PX, shin o punti mestiere (solo proprio pg o admin)
+    // ?tipo=px|shin|mestiere  ?offset=N (numero pagina, default 0)
+    // -------------------------------------------------------------------------
+    case 'punti':
+        if (!$is_own && !$is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Sezione riservata']);
+            exit;
+        }
+        $tipo     = $_GET['tipo']   ?? 'px';
+        $offset   = max(0, (int)($_GET['offset'] ?? 0));
+        $per_page = (int)($PARAMETERS['settings']['view_logs'] ?? 20);
+        $sql_off  = $offset * $per_page;
+
+        if ($tipo === 'mestiere') {
+            // Tabella dedicata PuntiMestiere
+            $count_q  = gdrcd_query("SELECT COUNT(*) AS n FROM PuntiMestiere WHERE nome = '$pg'");
+            $totale   = (int)($count_q['n'] ?? 0);
+            $result   = gdrcd_query(
+                "SELECT pm.*, ma.titolo, ma.commento
+                 FROM PuntiMestiere pm
+                 LEFT JOIN messaggioaraldo ma ON ma.id_messaggio = pm.id_messaggio
+                 WHERE pm.nome = '$pg'
+                 ORDER BY pm.data_evento DESC LIMIT $sql_off, $per_page",
+                'result'
+            );
+            $field    = 'mestiere';
+            $fallback = 'Ruolata di mestiere';
+        } elseif ($tipo === 'shin') {
+            // Tabella Punti, solo righe con shin > 0
+            $count_q  = gdrcd_query("SELECT COUNT(*) AS n FROM Punti WHERE nome = '$pg' AND shin > 0");
+            $totale   = (int)($count_q['n'] ?? 0);
+            $result   = gdrcd_query(
+                "SELECT p.*, ma.titolo, ma.commento
+                 FROM Punti p
+                 LEFT JOIN messaggioaraldo ma ON ma.id_messaggio = p.id_messaggio
+                 WHERE p.nome = '$pg' AND p.shin > 0
+                 ORDER BY p.data_evento DESC LIMIT $sql_off, $per_page",
+                'result'
+            );
+            $field    = 'shin';
+            $fallback = 'Assegnazione shin';
+        } else {
+            // px — tabella Punti completa
+            $count_q  = gdrcd_query("SELECT COUNT(*) AS n FROM Punti WHERE nome = '$pg'");
+            $totale   = (int)($count_q['n'] ?? 0);
+            $result   = gdrcd_query(
+                "SELECT p.*, ma.titolo, ma.commento
+                 FROM Punti p
+                 LEFT JOIN messaggioaraldo ma ON ma.id_messaggio = p.id_messaggio
+                 WHERE p.nome = '$pg'
+                 ORDER BY p.data_evento DESC LIMIT $sql_off, $per_page",
+                'result'
+            );
+            $field    = 'px'; // non usato direttamente, ma px ha due campi
+            $fallback = 'Ruolata libera';
+        }
+
+        $records = [];
+        if ($result) {
+            while ($row = gdrcd_query($result, 'fetch')) {
+                $titolo = (!empty($row['titolo'])) ? $row['titolo'] : $fallback;
+                $entry  = [
+                    'data'      => $row['data_evento'] ?? '',
+                    'titolo'    => $titolo,
+                    'commento'  => $row['commento']    ?? '',
+                ];
+                if ($tipo === 'mestiere') $entry['mestiere']    = $row['mestiere']    ?? '';
+                if ($tipo === 'shin')     $entry['shin']        = $row['shin']        ?? 0;
+                if ($tipo === 'px')      { $entry['esperienza'] = $row['esperienza']  ?? 0;
+                                           $entry['notorieta']  = $row['notorieta']   ?? 0; }
+                $records[] = $entry;
+            }
+            gdrcd_query($result, 'free');
+        }
+        echo json_encode([
+            'success'  => true,
+            'records'  => $records,
+            'totale'   => $totale,
+            'per_page' => $per_page,
+            'offset'   => $offset,
+        ]);
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Operazione non valida']);
