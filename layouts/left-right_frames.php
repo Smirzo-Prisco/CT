@@ -50,7 +50,6 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 		overflow: auto;
 		z-index: 1000;
 		transition: transform 0.3s ease;
-		background: your-background-here;
 	}
 
 	#framecontentRight {
