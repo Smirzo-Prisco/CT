@@ -68,21 +68,21 @@ switch ($op) {
 
         // GESTIONE PERSONAGGI
         if ($perms['admin'] || $perms['master'] || $perms['moderatore'] || $perms['custode']) {
-            $voci = [['label' => 'Personaggi', 'url' => 'main.php?page=gestione_personaggio']];
+            $voci = [['label' => 'Personaggi', 'url' => 'gestione.php?page=gestione_personaggio']];
             if ($perms['admin'])
-                $voci[] = ['label' => 'Azzera punti', 'url' => 'main.php?page=gestione_azzeramento_skill'];
+                $voci[] = ['label' => 'Azzera punti', 'url' => 'gestione.php?page=gestione_azzeramento_skill'];
             if ($perms['admin'] || $perms['master'])
-                $voci[] = ['label' => 'Crea e assegna skill temporanee', 'url' => 'main.php?page=gestione_abilita_master'];
+                $voci[] = ['label' => 'Crea e assegna skill temporanee', 'url' => 'gestione.php?page=gestione_abilita_master'];
             $menu[] = ['key' => 'gestione_pg', 'label' => 'Gestione pg', 'icon' => 'fa-user-gear', 'voci' => $voci];
         }
 
         // GILDE
         if ($perms['admin'] || $perms['capogilda']) {
-            $voci = [['label' => 'Gilde e gradi', 'url' => 'main.php?page=gestione_gilde']];
+            $voci = [['label' => 'Gilde e gradi', 'url' => 'gestione.php?page=gestione_gilde']];
             if ($perms['admin']) {
-                $voci[] = ['label' => 'Famiglie indipendenti', 'url' => 'main.php?page=gestione_gilde&op=edit&id_record=-1'];
-                $voci[] = ['label' => 'Correnti',              'url' => 'main.php?page=gestione_tipi&types=guilds'];
-                $voci[] = ['label' => 'Reliquie',              'url' => 'main.php?page=punti_png'];
+                $voci[] = ['label' => 'Famiglie indipendenti', 'url' => 'gestione.php?page=gestione_gilde&op=edit&id_record=-1'];
+                $voci[] = ['label' => 'Correnti',              'url' => 'gestione.php?page=gestione_tipi&types=guilds'];
+                $voci[] = ['label' => 'Reliquie',              'url' => 'gestione.php?page=punti_png'];
             }
             $menu[] = ['key' => 'gilde', 'label' => 'Gilde', 'icon' => 'fa-users', 'voci' => $voci];
         }
@@ -90,7 +90,7 @@ switch ($op) {
         // RAZZE
         if ($perms['admin']) {
             $menu[] = ['key' => 'razze', 'label' => 'Razze', 'icon' => 'fa-users', 'voci' => [
-                ['label' => 'Razze e spiriti', 'url' => 'main.php?page=gestione_razze'],
+                ['label' => 'Razze e spiriti', 'url' => 'gestione.php?page=gestione_razze'],
             ]];
         }
 
@@ -98,45 +98,45 @@ switch ($op) {
         if ($perms['admin'] || $perms['master'] || $perms['capogilda']) {
             $voci = [];
             if ($perms['admin']) {
-                $voci[] = ['label' => 'Mestieri',             'url' => 'main.php?page=gestione_mestieri'];
-                $voci[] = ['label' => 'Assegna mestiere',    'url' => 'main.php?page=gestione_mestiere'];
-                $voci[] = ['label' => 'Lavori indipendenti', 'url' => 'main.php?page=gestione_mestieri&op=edit&id_record=-1'];
+                $voci[] = ['label' => 'Mestieri',             'url' => 'gestione.php?page=gestione_mestieri'];
+                $voci[] = ['label' => 'Assegna mestiere',    'url' => 'gestione.php?page=gestione_mestiere'];
+                $voci[] = ['label' => 'Lavori indipendenti', 'url' => 'gestione.php?page=gestione_mestieri&op=edit&id_record=-1'];
             }
             if ($perms['admin'] || $perms['capogilda'])
-                $voci[] = ['label' => 'Statuti', 'url' => 'main.php?page=gestione_statuti_new'];
+                $voci[] = ['label' => 'Statuti', 'url' => 'gestione.php?page=gestione_statuti_new'];
             if (!empty($voci))
                 $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri', 'icon' => 'fa-briefcase', 'voci' => $voci];
         }
 
         // OGGETTI
         if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['capogilda'] || $perms['capomestiere'] || $perms['magic']) {
-            $voci = [['label' => 'Oggetti', 'url' => 'main.php?page=gestione_oggetti']];
+            $voci = [['label' => 'Oggetti', 'url' => 'gestione.php?page=gestione_oggetti']];
             if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic'])
-                $voci[] = ['label' => 'Ricarica oggetto', 'url' => 'main.php?page=oggetto_ricarica'];
+                $voci[] = ['label' => 'Ricarica oggetto', 'url' => 'gestione.php?page=oggetto_ricarica'];
             if ($perms['admin'])
-                $voci[] = ['label' => 'Tipi di oggetto', 'url' => 'main.php?page=gestione_tipi&types=items'];
+                $voci[] = ['label' => 'Tipi di oggetto', 'url' => 'gestione.php?page=gestione_tipi&types=items'];
             $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
         }
 
         // STRUMENTI (solo admin)
         if ($perms['admin']) {
             $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => [
-                ['label' => 'Assegna ruoli apicali', 'url' => 'main.php?page=gestione_nomine'],
-                ['label' => 'CT news',               'url' => 'main.php?page=gestione_ctnews'],
-                ['label' => 'Bacheche',              'url' => 'main.php?page=gestione_bacheche'],
-                ['label' => 'Luoghi',                'url' => 'main.php?page=gestione_luoghi'],
-                ['label' => 'Mappa',                 'url' => 'main.php?page=gestione_mappe'],
-                ['label' => 'Regolamento',           'url' => 'main.php?page=gestione_regolamento'],
-                ['label' => 'Manutenzione',          'url' => 'main.php?page=gestione_manutenzione'],
+                ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'],
+                ['label' => 'CT news',               'url' => 'gestione.php?page=gestione_ctnews'],
+                ['label' => 'Bacheche',              'url' => 'gestione.php?page=gestione_bacheche'],
+                ['label' => 'Luoghi',                'url' => 'gestione.php?page=gestione_luoghi'],
+                ['label' => 'Mappa',                 'url' => 'gestione.php?page=gestione_mappe'],
+                ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'],
+                ['label' => 'Manutenzione',          'url' => 'gestione.php?page=gestione_manutenzione'],
             ]];
         }
 
         // LOG
         if ($perms['admin'] || $perms['master'] || $perms['capomestiere'] || $perms['moderatore']) {
             $voci = [];
-            if ($perms['admin'])                              $voci[] = ['label' => 'Tutti i log',        'url' => 'main.php?page=log'];
-            if ($perms['admin'] || $perms['master'])          $voci[] = ['label' => 'Richiesta log chat', 'url' => 'main.php?page=richiesta_log'];
-            if ($perms['admin'] || $perms['moderatore'])      $voci[] = ['label' => 'Log chat',           'url' => 'main.php?page=log_chat'];
+            if ($perms['admin'])                              $voci[] = ['label' => 'Tutti i log',        'url' => 'gestione.php?page=log'];
+            if ($perms['admin'] || $perms['master'])          $voci[] = ['label' => 'Richiesta log chat', 'url' => 'gestione.php?page=richiesta_log'];
+            if ($perms['admin'] || $perms['moderatore'])      $voci[] = ['label' => 'Log chat',           'url' => 'gestione.php?page=log_chat'];
             if (!empty($voci))
                 $menu[] = ['key' => 'log', 'label' => 'Log', 'icon' => 'fa-file-lines', 'voci' => $voci];
         }
@@ -148,7 +148,7 @@ switch ($op) {
         $azioni_sett = (int)gdrcd_query("SELECT COUNT(id) AS num FROM chat WHERE ora > DATE_SUB(NOW(), INTERVAL 7 DAY)")['num'];
 
         $menu[] = ['key' => 'stats', 'label' => 'Informazioni', 'icon' => 'fa-chart-line', 'voci' => [
-            ['label' => 'Contatta la moderazione',    'url' => 'main.php?page=contatta_moderazione'],
+            ['label' => 'Contatta la moderazione',    'url' => 'gestione.php?page=contatta_moderazione'],
             ['label' => "Iscritti: $iscritti",        'url' => '#'],
             ['label' => "Esiliati: $esiliati",        'url' => '#'],
             ['label' => "Post in bacheca: $bacheca",  'url' => '#'],
