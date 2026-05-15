@@ -866,3 +866,51 @@ span[style*="position:relative"]:hover .tooltip-animated {
         margin-bottom: -120px !important;    /* Compensa visivamente */
     }
 }
+/* ── Paginazione scheda punti ───────────────────────────────────────────── */
+.scheda-pager {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    margin: 16px auto;
+    flex-wrap: wrap;
+}
+
+.scheda-pager button {
+    min-width: 30px;
+    height: 28px;
+    padding: 0 8px;
+    background-color: #16192b;
+    border: 1px solid #090a10;
+    border-radius: 6px;
+    color: #89aee7;
+    font-size: 11px;
+    font-family: "DejaVu Sans", sans-serif;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.scheda-pager button:hover:not(.active) {
+    background-color: #1e2240;
+    color: #e2e2e2;
+}
+
+.scheda-pager button.active {
+    background-color: #9a6353;
+    border-color: #9a6353;
+    color: #fff;
+    cursor: default;
+    font-weight: bold;
+}
+
+.scheda-pager button.nav {
+    color: #9a6353;
+    font-size: 13px;
+}
+
+.scheda-pager .ellipsis {
+    color: #8f8f8f;
+    font-size: 12px;
+    padding: 0 2px;
+    line-height: 28px;
+}

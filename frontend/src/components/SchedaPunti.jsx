@@ -16,6 +16,49 @@ import { useState, useEffect, useCallback } from 'react'
 import SchedaMenu from './SchedaMenu'
 
 // ---------------------------------------------------------------------------
+// PAGINAZIONE
+// ---------------------------------------------------------------------------
+
+/**
+ * Genera la sequenza di pagine da mostrare, con ellissi per range lunghi.
+ * Mostra sempre prima, ultima, e una finestra di 2 pagine attorno alla corrente.
+ * Esempio con 20 pagine, corrente=9: 1 … 7 8 [9] 10 11 … 20
+ */
+function buildPages(current, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i)
+    const pages = new Set([0, total - 1])
+    for (let i = Math.max(0, current - 2); i <= Math.min(total - 1, current + 2); i++) pages.add(i)
+    const sorted = [...pages].sort((a, b) => a - b)
+    const result = []
+    sorted.forEach((p, idx) => {
+        if (idx > 0 && p - sorted[idx - 1] > 1) result.push('…')
+        result.push(p)
+    })
+    return result
+}
+
+function Pager({ current, total, onChange }) {
+    return (
+        <div className="scheda-pager">
+            <button className="nav" disabled={current === 0}
+                onClick={() => onChange(current - 1)}>&#8249;</button>
+
+            {buildPages(current, total).map((p, i) =>
+                p === '…'
+                    ? <span key={`e${i}`} className="ellipsis">…</span>
+                    : <button key={p} className={p === current ? 'active' : ''}
+                        onClick={() => p !== current && onChange(p)}>
+                        {p + 1}
+                      </button>
+            )}
+
+            <button className="nav" disabled={current === total - 1}
+                onClick={() => onChange(current + 1)}>&#8250;</button>
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------
 // CONFIGURAZIONE PER PAGINA
 // ---------------------------------------------------------------------------
 
@@ -167,15 +210,7 @@ export default function SchedaPunti() {
 
                         {/* Paginazione */}
                         {pagine > 1 && (
-                            <div className="pager">
-                                {Array.from({ length: pagine }, (_, i) => (
-                                    i === offset
-                                        ? <span key={i}> {i + 1} </span>
-                                        : <a key={i} href="#" onClick={e => { e.preventDefault(); goToPage(i) }}>
-                                            {i + 1}
-                                          </a>
-                                ))}
-                            </div>
+                            <Pager current={offset} total={pagine} onChange={goToPage} />
                         )}
                     </div>
                 </div>
