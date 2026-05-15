@@ -1,12 +1,4 @@
 <?php
-/*
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-//*/
-
-include __DIR__ . '/../includes/custom_functions.inc.php';
-
 /***************    Stampa correnti e controllo permessi di visualizzazione    *****************************/
 $pg = gdrcd_query("SELECT personaggio.*, clgpersonaggioinclinazione.*
                     FROM personaggio
@@ -15,7 +7,7 @@ $pg = gdrcd_query("SELECT personaggio.*, clgpersonaggioinclinazione.*
 $inclinazione = $pg['id_ruolo']; // i ruoli sono da 1, 2 e 3. Zero non deve esistere
 ?>
 
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
+<link rel="stylesheet" href="/themes/crystal/famiglie.css">
 
 <div class="pagina_servizi_lavoro">
     <div class="page_title"><h2><?php echo gdrcd_filter('out', $MESSAGE['interface']['inclinazioni']['page_name']); ?></h2></div>

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../themes/crystal/volti.css">
+<link rel="stylesheet" href="/themes/crystal/volti.css">
 
 <div class="page_body">  
 
@@ -51,24 +51,19 @@
 <?php echo gdrcd_filter('out', $row['volto']); ?>
 </td>
 
-<?
-if($_SESSION['admin'] == 1) {
-
-?>
+<?php if($_SESSION['admin'] == 1) { ?>
 
 <td align=center width="7%">
 <form action="main.php?page=elenco_volti" method="Post">
     <input type="hidden" name="nome" value="<?php echo gdrcd_filter('out', $row['nome']); ?>" />
-    <input type="submit" name="Cancella" value="Cancella">  
+    <input type="submit" name="Cancella" value="Cancella">
     </form>
     </td>
 
-<? } ?>
+<?php } ?>
 
 </tr>
-<? 
-}
-?>
+<?php } ?>
 </table><br><br>
 
 <?php
