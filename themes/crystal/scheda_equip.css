@@ -368,6 +368,13 @@ div.inventario_riga_proprieta {
     width: 80px;
 }
 
+div.inventario_riga_descrizione,
+div.inventario_riga_commento {
+    overflow-wrap: break-word;
+    text-align: justify;
+    max-width: 400px;
+}
+
 div.pagina_scheda_equip form,
 div.pagina_scheda_oggetti form {
     text-align: center;
