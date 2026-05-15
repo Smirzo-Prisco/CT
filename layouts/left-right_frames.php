@@ -65,8 +65,8 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 		left: 260px;
 		right: 260px;
 		bottom: 0;
-		overflow: auto;
-		/* Assicurati che non crei scroll orizzontale */
+		overflow-y: auto;
+		overflow-x: hidden;
 		width: calc(100% - 520px);
 		box-sizing: border-box;
 	}
@@ -164,6 +164,7 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 		width: 100%;
 		max-width: 100%;
 		box-sizing: border-box;
+		overflow-x: hidden;
 	}
 </style>
 
