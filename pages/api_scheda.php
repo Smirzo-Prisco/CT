@@ -254,36 +254,313 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
-    // EQUIPMENT — oggetti per posizione (zaino / indossato / ecc.)
+    // EQUIP — oggetti indossati (omino) + zaino (posizione > 0)
     // -------------------------------------------------------------------------
-    case 'equipment':
-        $result = gdrcd_query("SELECT o.id_oggetto, o.nome, o.descrizione,
-                o.categoria, o.effetto,
-                po.posizione, po.cariche, po.numero, po.usato
-            FROM oggetto o
-            JOIN clgpersonaggiooggetto po ON o.id_oggetto = po.id_oggetto
-            WHERE po.nome = '$pg'
-            ORDER BY po.posizione DESC, o.categoria, o.nome ASC", 'result');
+    case 'equip':
+        // Sesso del pg per immagine omino (m/f)
+        $res_sex = gdrcd_query("SELECT sesso FROM personaggio WHERE nome = '$pg'", 'result');
+        $row_sex = gdrcd_query($res_sex, 'fetch');
+        gdrcd_query($res_sex, 'free');
+        $sesso = $row_sex ? $row_sex['sesso'] : 'm';
 
-        $items = ['indossato' => [], 'zaino' => [], 'altro' => []];
-        while ($row = gdrcd_query($result, 'fetch')) {
-            $pos = (int)$row['posizione'];
-            $bucket = $pos > ZAINO ? 'indossato' : ($pos == ZAINO ? 'zaino' : 'altro');
-            $items[$bucket][] = [
-                'id'         => (int)$row['id_oggetto'],
-                'nome'       => $row['nome'],
-                'descrizione' => $row['descrizione'],
-                'categoria'  => $row['categoria'],
-                'effetto'    => $row['effetto'],
-                'posizione'  => $pos,
-                'cariche'    => (int)$row['cariche'],
-                'numero'     => (int)$row['numero'],
-                'usato'      => (bool)$row['usato'],
+        // Oggetti indossati (posizione > 1) per la figura omino, indicizzati per slot
+        $res_worn = gdrcd_query("
+            SELECT o.id_oggetto, o.nome, o.urlimg, po.posizione
+            FROM clgpersonaggiooggetto po
+            JOIN oggetto o ON po.id_oggetto = o.id_oggetto
+            WHERE po.posizione > 1 AND po.nome = '$pg'
+        ", 'result');
+        $worn = [];
+        while ($row = gdrcd_query($res_worn, 'fetch')) {
+            $worn[(int)$row['posizione']] = [
+                'id'     => (int)$row['id_oggetto'],
+                'nome'   => $row['nome'],
+                'urlimg' => $row['urlimg'],
             ];
         }
-        gdrcd_query($result, 'free');
+        gdrcd_query($res_worn, 'free');
 
-        echo json_encode(['success' => true, 'items' => $items]);
+        // Tutti gli oggetti visibili nello zaino/indossati (posizione > 0)
+        $res_items = gdrcd_query("
+            SELECT o.id_oggetto, o.nome AS nome_oggetto, o.descrizione,
+                   o.urlimg, o.ubicabile, o.tipo,
+                   po.posizione, po.cariche, po.numero,
+                   po.commento, po.commento_master, po.commento_shop
+            FROM clgpersonaggiooggetto po
+            LEFT JOIN oggetto o ON po.id_oggetto = o.id_oggetto
+            WHERE po.nome = '$pg' AND po.posizione > 0
+            ORDER BY o.nome DESC
+        ", 'result');
+        $items_equip = [];
+        while ($row = gdrcd_query($res_items, 'fetch')) {
+            $items_equip[] = [
+                'id'              => (int)$row['id_oggetto'],
+                'nome'            => $row['nome_oggetto'],
+                'descrizione'     => $row['descrizione'],
+                'urlimg'          => $row['urlimg'],
+                'ubicabile'       => (int)$row['ubicabile'],
+                'tipo'            => (int)$row['tipo'],
+                'posizione'       => (int)$row['posizione'],
+                'cariche'         => (int)$row['cariche'],
+                'numero'          => (int)$row['numero'],
+                'commento'        => $row['commento']        ?? '',
+                'commento_master' => $row['commento_master'] ?? '',
+                'commento_shop'   => $row['commento_shop']   ?? '',
+            ];
+        }
+        gdrcd_query($res_items, 'free');
+
+        // Personaggi disponibili per operazione "cedi"
+        if ($PARAMETERS['mode']['give_only_if_online'] == 'ON') {
+            $chars_q = "SELECT nome FROM personaggio
+                WHERE ultimo_luogo = " . (int)($_SESSION['luogo'] ?? -1) . "
+                AND ultimo_luogo <> -1 AND nome <> '$pg'
+                AND DATE_ADD(ultimo_refresh, INTERVAL 2 MINUTE) > NOW()
+                ORDER BY nome";
+        } else {
+            $chars_q = "SELECT nome FROM personaggio WHERE nome <> '$pg' ORDER BY nome";
+        }
+        $res_chars = gdrcd_query($chars_q, 'result');
+        $chars = [];
+        while ($row = gdrcd_query($res_chars, 'fetch')) { $chars[] = $row['nome']; }
+        gdrcd_query($res_chars, 'free');
+
+        echo json_encode([
+            'success'  => true,
+            'sesso'    => $sesso,
+            'worn'     => $worn,
+            'items'    => $items_equip,
+            'chars'    => $chars,
+            'is_admin' => $is_admin || $is_mod,
+        ]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // EQUIP_ACTION — operazioni di scrittura sull'equipaggiamento
+    // -------------------------------------------------------------------------
+    case 'equip_action':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Metodo non consentito']);
+            exit;
+        }
+        if (!$is_own && !$is_admin && !$is_mod) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Azione non autorizzata']);
+            exit;
+        }
+        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $sub  = $body['sub']       ?? '';
+        $id   = (int)($body['id_oggetto'] ?? 0);
+        if (!$id) { echo json_encode(['success' => false, 'message' => 'ID oggetto mancante']); break; }
+
+        switch ($sub) {
+            case 'abbandona':
+                $num = (int)($body['numero'] ?? 1);
+                if ($num <= 1) {
+                    gdrcd_query("DELETE FROM clgpersonaggiooggetto WHERE id_oggetto = $id AND nome = '$pg' LIMIT 1");
+                } else {
+                    gdrcd_query("UPDATE clgpersonaggiooggetto SET numero = numero - 1 WHERE id_oggetto = $id AND nome = '$pg' LIMIT 1");
+                }
+                echo json_encode(['success' => true]);
+                break;
+
+            case 'cedi':
+                $to  = gdrcd_filter('in', $body['give_item'] ?? '');
+                $car = (int)($body['cariche'] ?? 0);
+                $num = (int)($body['numero']  ?? 1);
+                if (!$to) { echo json_encode(['success' => false, 'message' => 'Destinatario mancante']); break; }
+                if ($num <= 1) {
+                    gdrcd_query("DELETE FROM clgpersonaggiooggetto WHERE id_oggetto = $id AND nome = '$pg' LIMIT 1");
+                } else {
+                    gdrcd_query("UPDATE clgpersonaggiooggetto SET numero = numero - 1 WHERE id_oggetto = $id AND nome = '$pg' LIMIT 1");
+                }
+                $ex = gdrcd_query("SELECT id_oggetto FROM clgpersonaggiooggetto WHERE id_oggetto = $id AND nome = '$to'", 'result');
+                if (gdrcd_query($ex, 'num_rows') > 0) {
+                    gdrcd_query("UPDATE clgpersonaggiooggetto SET numero = numero + 1 WHERE id_oggetto = $id AND nome = '$to'");
+                } else {
+                    gdrcd_query("INSERT INTO clgpersonaggiooggetto (nome, id_oggetto, cariche, numero) VALUES ('$to', $id, $car, 1)");
+                }
+                gdrcd_query($ex, 'free');
+                echo json_encode(['success' => true]);
+                break;
+
+            case 'indossa':
+                $pos = (int)($body['posizione'] ?? 0);
+                gdrcd_query("UPDATE clgpersonaggiooggetto SET posizione = $pos WHERE id_oggetto = $id AND nome = '$pg' LIMIT 1");
+                echo json_encode(['success' => true]);
+                break;
+
+            case 'in_zaino':
+                gdrcd_query("UPDATE clgpersonaggiooggetto SET posizione = 1 WHERE id_oggetto = $id AND nome = '$pg' LIMIT 1");
+                echo json_encode(['success' => true]);
+                break;
+
+            case 'riponi':
+                // Sposta da zaino/indossato → inventario (posizione=0)
+                gdrcd_query("UPDATE clgpersonaggiooggetto SET posizione = 0 WHERE id_oggetto = $id AND nome = '$pg' LIMIT 1");
+                echo json_encode(['success' => true]);
+                break;
+
+            default:
+                echo json_encode(['success' => false, 'message' => 'Operazione sconosciuta']);
+        }
+        break;
+
+    // -------------------------------------------------------------------------
+    // OGGETTI — inventario (posizione=0), vista per categoria o lista items
+    // -------------------------------------------------------------------------
+    case 'oggetti':
+        if (!$is_own && !$is_admin) {
+            // Permesso speciale per shop keeper (mestiere 3=Magic, 4=Pandora)
+            $pg_login = gdrcd_filter('in', $_SESSION['login']);
+            $tm = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome = '$pg_login'");
+            $id_mestiere = $tm ? (int)$tm['id_mestiere'] : 0;
+            $what_check  = (int)($_GET['what'] ?? 0);
+            if (!(($id_mestiere == 3 && $what_check == 8) || ($id_mestiere == 4 && $what_check == 9))) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Accesso non autorizzato']);
+                exit;
+            }
+        }
+
+        $what = $_GET['what'] ?? '';
+
+        if ($what === '') {
+            // Vista indice: categorie con conteggio
+            $res = gdrcd_query("
+                SELECT COUNT(*) AS numero, c.cod_tipo, c.descrizione
+                FROM oggetto o
+                JOIN codtipooggetto c ON o.tipo = c.cod_tipo
+                JOIN clgpersonaggiooggetto po ON po.id_oggetto = o.id_oggetto
+                WHERE po.nome = '$pg' AND po.posizione = 0
+                GROUP BY c.cod_tipo
+                ORDER BY c.descrizione
+            ", 'result');
+            $categorie = [];
+            while ($row = gdrcd_query($res, 'fetch')) {
+                $categorie[] = [
+                    'cod_tipo'    => $row['cod_tipo'],
+                    'descrizione' => $row['descrizione'],
+                    'numero'      => (int)$row['numero'],
+                ];
+            }
+            gdrcd_query($res, 'free');
+
+            // Mestiere del visitatore per permessi lato client
+            $pg_login2   = gdrcd_filter('in', $_SESSION['login']);
+            $me_row      = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome = '$pg_login2'");
+            $id_mestiere = $me_row ? (int)$me_row['id_mestiere'] : 0;
+
+            echo json_encode([
+                'success'      => true,
+                'categorie'    => $categorie,
+                'is_admin'     => $is_admin || $is_mod,
+                'is_master'    => $is_master,
+                'id_mestiere'  => $id_mestiere,
+            ]);
+        } else {
+            // Vista dettaglio: oggetti di un tipo specifico
+            $what_safe = gdrcd_filter('in', $what);
+            $res = gdrcd_query("
+                SELECT o.id_oggetto, o.nome AS nome_oggetto, o.descrizione,
+                       o.urlimg, o.ubicabile, o.tipo,
+                       po.numero, po.cariche,
+                       po.commento, po.commento_master, po.commento_shop
+                FROM clgpersonaggiooggetto po
+                LEFT JOIN oggetto o ON po.id_oggetto = o.id_oggetto
+                WHERE o.tipo = '$what_safe' AND po.nome = '$pg' AND po.posizione = 0
+                ORDER BY o.nome DESC
+            ", 'result');
+            $items_ogg = [];
+            while ($row = gdrcd_query($res, 'fetch')) {
+                $items_ogg[] = [
+                    'id'              => (int)$row['id_oggetto'],
+                    'nome'            => $row['nome_oggetto'],
+                    'descrizione'     => $row['descrizione'],
+                    'urlimg'          => $row['urlimg'],
+                    'ubicabile'       => (int)$row['ubicabile'],
+                    'numero'          => (int)$row['numero'],
+                    'cariche'         => (int)$row['cariche'],
+                    'commento'        => $row['commento']        ?? '',
+                    'commento_master' => $row['commento_master'] ?? '',
+                    'commento_shop'   => $row['commento_shop']   ?? '',
+                ];
+            }
+            gdrcd_query($res, 'free');
+            $cat_row  = gdrcd_query("SELECT descrizione FROM codtipooggetto WHERE cod_tipo = '$what_safe'");
+            $cat_desc = $cat_row ? $cat_row['descrizione'] : $what;
+            echo json_encode(['success' => true, 'items' => $items_ogg, 'categoria' => $cat_desc]);
+        }
+        break;
+
+    // -------------------------------------------------------------------------
+    // OGGETTI_ACTION — operazioni di scrittura sull'inventario
+    // -------------------------------------------------------------------------
+    case 'oggetti_action':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Metodo non consentito']);
+            exit;
+        }
+        $body2 = json_decode(file_get_contents('php://input'), true) ?? [];
+        $sub2  = $body2['sub']       ?? '';
+        $id2   = (int)($body2['id_oggetto'] ?? 0);
+        if (!$id2) { echo json_encode(['success' => false, 'message' => 'ID oggetto mancante']); break; }
+
+        switch ($sub2) {
+            case 'togli':
+                if (!$is_own) { echo json_encode(['success' => false, 'message' => 'Non autorizzato']); break; }
+                gdrcd_query("UPDATE clgpersonaggiooggetto SET posizione = 0 WHERE id_oggetto = $id2 AND nome = '$pg' LIMIT 1");
+                echo json_encode(['success' => true]);
+                break;
+
+            case 'in_zaino':
+                if (!$is_own) { echo json_encode(['success' => false, 'message' => 'Non autorizzato']); break; }
+                gdrcd_query("UPDATE clgpersonaggiooggetto SET posizione = 1 WHERE id_oggetto = $id2 AND nome = '$pg' LIMIT 1");
+                echo json_encode(['success' => true]);
+                break;
+
+            case 'abbandona':
+                if (!$is_own) { echo json_encode(['success' => false, 'message' => 'Non autorizzato']); break; }
+                $num2 = (int)($body2['numero'] ?? 1);
+                if ($num2 <= 1) {
+                    gdrcd_query("DELETE FROM clgpersonaggiooggetto WHERE id_oggetto = $id2 AND nome = '$pg' LIMIT 1");
+                } else {
+                    gdrcd_query("UPDATE clgpersonaggiooggetto SET numero = numero - 1 WHERE id_oggetto = $id2 AND nome = '$pg' LIMIT 1");
+                }
+                echo json_encode(['success' => true]);
+                break;
+
+            case 'commenta':
+                if (!$is_own) { echo json_encode(['success' => false, 'message' => 'Non autorizzato']); break; }
+                $comm = gdrcd_filter('in', $body2['commento'] ?? '');
+                gdrcd_query("UPDATE clgpersonaggiooggetto SET commento = '$comm' WHERE id_oggetto = $id2 AND nome = '$pg' LIMIT 1");
+                echo json_encode(['success' => true]);
+                break;
+
+            case 'commenta_master':
+                if (!$is_admin && !$is_master) { echo json_encode(['success' => false, 'message' => 'Non autorizzato']); break; }
+                $comm_m = gdrcd_filter('in', $body2['commento_master'] ?? '');
+                gdrcd_query("UPDATE clgpersonaggiooggetto SET commento_master = '$comm_m' WHERE id_oggetto = $id2 AND nome = '$pg' LIMIT 1");
+                echo json_encode(['success' => true]);
+                break;
+
+            case 'commenta_shop':
+                $pg_login3   = gdrcd_filter('in', $_SESSION['login']);
+                $me_row3     = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome = '$pg_login3'");
+                $id_mes3     = $me_row3 ? (int)$me_row3['id_mestiere'] : 0;
+                if (!$is_admin && $id_mes3 != 3 && $id_mes3 != 4) {
+                    echo json_encode(['success' => false, 'message' => 'Non autorizzato']); break;
+                }
+                $comm_s = gdrcd_filter('in', $body2['commento_shop'] ?? '');
+                gdrcd_query("UPDATE clgpersonaggiooggetto SET commento_shop = '$comm_s' WHERE id_oggetto = $id2 AND nome = '$pg' LIMIT 1");
+                echo json_encode(['success' => true]);
+                break;
+
+            default:
+                echo json_encode(['success' => false, 'message' => 'Operazione sconosciuta']);
+        }
         break;
 
     // -------------------------------------------------------------------------

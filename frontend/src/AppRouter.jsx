@@ -43,6 +43,8 @@ import SchedaTrans    from './components/SchedaTrans'
 import SchedaModifica from './components/SchedaModifica'
 import SchedaAffetti  from './components/SchedaAffetti'
 import SchedaPunti    from './components/SchedaPunti'
+import SchedaEquip    from './components/SchedaEquip'
+import SchedaOggetti  from './components/SchedaOggetti'
 import Gestione       from './components/Gestione'
 import Uffici         from './components/Uffici'
 
@@ -126,6 +128,14 @@ const ROUTES = {
     scheda_px_mestiere: {
         component: SchedaPunti,
         css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+    },
+    scheda_equip: {
+        component: SchedaEquip,
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_equip.css'],
+    },
+    scheda_oggetti: {
+        component: SchedaOggetti,
+        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_equip.css'],
     },
     gestione: {
         component: Gestione,
