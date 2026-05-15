@@ -3,53 +3,145 @@
  *
  * Fetch parallele:
  *   api_scheda.php?op=profile  → dati pg + flag permessi per il menu
- *   api_scheda.php?op=skills   → abilità raggruppate per tipo
+ *   api_scheda.php?op=skills   → abilità raggruppate per tipo DB
+ *
+ * I tipi DB vengono fusi nelle stesse categorie dell'originale PHP:
+ *   Default + Difensiva            → Default/Difensiva
+ *   Generica base + avanzata       → Generica
+ *   Attacco base/medio/avanzato    → Attacco
+ *   Mentale base/media/avanzata/di attacco → Mentale
+ *   Potere speciale / Talento / Skill temporanea → label propria
+ *
+ * Ogni categoria usa <table class="customTable"> con header second_header,
+ * identico al layout PHP originale (skillsystem.inc.php).
+ * Per il tipo "Talento" il livello non viene mostrato (come nell'originale).
  *
  * Accesso ristretto: solo proprio pg, admin o master (403 dall'API).
- * Le skill sono mostrate raggruppate per tipo con nome, grado e descrizione.
  *
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import SchedaMenu from './SchedaMenu'
+
+// ---------------------------------------------------------------------------
+// MAPPA TIPI DB → CATEGORIE DISPLAY
+// ---------------------------------------------------------------------------
+
+/** Fusione tipi DB → label categoria (come nell'originale PHP) */
+const TYPE_MERGE = {
+    'Default':            'Default/Difensiva',
+    'Difensiva':          'Default/Difensiva',
+    'Generica base':      'Generica',
+    'Generica avanzata':  'Generica',
+    'Attacco base':       'Attacco',
+    'Attacco medio':      'Attacco',
+    'Attacco avanzato':   'Attacco',
+    'Mentale base':       'Mentale',
+    'Mentale media':      'Mentale',
+    'Mentale avanzata':   'Mentale',
+    'Mentale di attacco': 'Mentale',
+    'Potere speciale':    'Potere speciale',
+    'Talento':            'Talento',
+    'Skill temporanea':   'Skill temporanee',
+}
+
+/** Ordine canonico delle categorie display */
+const CATEGORY_ORDER = [
+    'Default/Difensiva',
+    'Generica',
+    'Attacco',
+    'Mentale',
+    'Potere speciale',
+    'Talento',
+    'Skill temporanee',
+]
+
+/**
+ * Fonde i gruppi per-tipo restituiti dall'API nelle categorie display,
+ * rispettando l'ordine canonico e appendendo eventuali tipi extra in fondo.
+ *
+ * @param {Object} skillsByTipo - { tipo: [skill, …], … }
+ * @returns {Array} [[categoria, [skill, …]], …]
+ */
+function mergeByCategory(skillsByTipo) {
+    const merged = {}
+    for (const [tipo, lista] of Object.entries(skillsByTipo)) {
+        const cat = TYPE_MERGE[tipo] ?? tipo
+        if (!merged[cat]) merged[cat] = []
+        merged[cat].push(...lista)
+    }
+    const ordered = []
+    for (const cat of CATEGORY_ORDER) {
+        if (merged[cat]) ordered.push([cat, merged[cat]])
+    }
+    // Tipi extra non mappati (fallback)
+    for (const [cat, lista] of Object.entries(merged)) {
+        if (!CATEGORY_ORDER.includes(cat)) ordered.push([cat, lista])
+    }
+    return ordered
+}
 
 // ---------------------------------------------------------------------------
 // SOTTO-COMPONENTI
 // ---------------------------------------------------------------------------
 
 /**
- * Singola skill: nome, grado opzionale, descrizione collassabile.
+ * Singola riga skill nella tabella categoria.
+ * Cliccando sul nome si espande/comprime la descrizione (inline, come popup originale).
+ * Per le categorie "Talento" showLevel=false: il livello non viene mostrato.
  */
-function SkillRow({ skill }) {
+function SkillRow({ skill, showLevel }) {
     const [open, setOpen] = useState(false)
     return (
-        <div className="skill-row">
-            <div className="skill-header" onClick={() => skill.descrizione && setOpen(o => !o)}
-                style={{ cursor: skill.descrizione ? 'pointer' : 'default' }}>
-                <span className="skill-nome">{skill.nome}</span>
-                {skill.grado > 1 && <span className="skill-grado"> — Grado {skill.grado}</span>}
-                {skill.usi    !== null && skill.usi !== undefined &&
-                    <span className="skill-usi"> [{skill.usi}]</span>}
-                {skill.descrizione && <span className="skill-toggle">{open ? ' ▲' : ' ▼'}</span>}
-            </div>
+        <Fragment>
+            <tr>
+                <td width="40%">
+                    {skill.descrizione
+                        ? <a href="#" onClick={e => { e.preventDefault(); setOpen(o => !o) }}>{skill.nome}</a>
+                        : skill.nome
+                    }
+                    {showLevel && (
+                        <><br />Livello attuale: {skill.grado}/{skill.max_lvl}</>
+                    )}
+                </td>
+            </tr>
             {open && skill.descrizione && (
-                <div className="skill-desc"
-                    dangerouslySetInnerHTML={{ __html: skill.descrizione }} />
+                <tr>
+                    <td>
+                        <div className="skill-desc"
+                            dangerouslySetInnerHTML={{ __html: skill.descrizione }} />
+                    </td>
+                </tr>
             )}
-        </div>
+        </Fragment>
     )
 }
 
 /**
- * Gruppo di skill per tipo (es. "Difensiva", "Talento", ecc.)
+ * Tabella categoria con header second_header, identica alla struttura PHP originale.
  */
-function SkillGroup({ tipo, lista }) {
+function SkillGroup({ categoria, lista }) {
+    const showLevel = categoria !== 'Talento'
     return (
-        <div className="skill-group">
-            <div className="titolo_box">{tipo}</div>
-            {lista.map(skill => <SkillRow key={skill.id} skill={skill} />)}
-        </div>
+        <table className="customTable">
+            <tbody>
+                <tr className="second_header">
+                    <td colSpan="1" style={{
+                        textTransform: 'uppercase',
+                        fontSize:      13,
+                        color:         '#9a6353',
+                        fontFamily:    'DejaVu Serif',
+                        filter:        'drop-shadow(0 0 5px rgba(0,0,0,0.57))',
+                    }}>
+                        {categoria}
+                    </td>
+                </tr>
+                {lista.map(skill => (
+                    <SkillRow key={skill.id} skill={skill} showLevel={showLevel} />
+                ))}
+            </tbody>
+        </table>
     )
 }
 
@@ -81,11 +173,11 @@ export default function SchedaSkills() {
         }).catch(e => setError(e.message ?? 'Errore di rete'))
     }, [pg])
 
-    if (error)            return <div className="pagina_scheda"><div className="error">{error}</div></div>
+    if (error)               return <div className="pagina_scheda"><div className="error">{error}</div></div>
     if (!profile || !skills) return <div className="pagina_scheda"><div>Caricamento…</div></div>
 
     const { nome, cognome, is_own, is_admin, is_staff, is_master } = profile
-    const gruppi = Object.entries(skills) // [[tipo, [skill…]], …]
+    const gruppi = mergeByCategory(skills)
 
     return (
         <div className="pagina_scheda">
@@ -105,8 +197,8 @@ export default function SchedaSkills() {
                 <div className="page_scheda_skills">
                     {gruppi.length === 0
                         ? <p>Nessuna abilità registrata.</p>
-                        : gruppi.map(([tipo, lista]) => (
-                            <SkillGroup key={tipo} tipo={tipo} lista={lista} />
+                        : gruppi.map(([cat, lista]) => (
+                            <SkillGroup key={cat} categoria={cat} lista={lista} />
                         ))
                     }
                 </div>

@@ -194,7 +194,7 @@ switch ($op) {
         ini_set('memory_limit', '256M');
 
         $result = gdrcd_query("SELECT a.id_abilita, a.nome, a.descrizione, a.tipo,
-                a.sottotipo, a.car, pa.grado, pa.usi
+                a.sottotipo, a.car, a.max_lvl, pa.grado, pa.usi
             FROM abilita a
             LEFT JOIN clgpersonaggioabilita pa ON a.id_abilita = pa.id_abilita
             WHERE pa.nome = '$pg'
@@ -230,6 +230,7 @@ switch ($op) {
                     'tipo'        => $tipo,
                     'sottotipo'   => $clean($row['sottotipo']),
                     'car'         => (int)$row['car'],
+                    'max_lvl'     => (int)$row['max_lvl'],
                     'grado'       => (int)$row['grado'],
                     'usi'         => $row['usi'] !== null ? $clean((string)$row['usi']) : null,
                 ];
