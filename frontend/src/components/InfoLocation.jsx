@@ -8,7 +8,6 @@
  *   - Immagine del luogo (variante giorno/notte)
  *   - Nome luogo + anno di gioco (cliccabile → apre descrizione)
  *   - Stato e descrizione in marquee
- *   - Icona Breaking News (animata se ci sono nuove notizie)
  *
  * Aggiornamento real-time:
  *   - Ascolta 'users:update' via socket: si aggiorna ogni volta che il
@@ -30,9 +29,6 @@ export default function InfoLocation() {
 
     /** Dati del luogo corrente restituiti da op=current */
     const [data, setData] = useState(null)
-
-    /** true mentre il modal delle breaking news è aperto */
-    const [newsOpen, setNewsOpen] = useState(false)
 
     /**
      * Recupera le informazioni sul luogo corrente dall'API.
@@ -84,19 +80,6 @@ export default function InfoLocation() {
         ? `/themes/crystal/imgs/locations/${data.immagine || 'ingresso.png'}`
         : `/themes/crystal/imgs/locations/ingresso.png`
 
-    /**
-     * Scegli l'icona Breaking News in base all'ora e alla presenza di notizie.
-     * - Notizie nuove + mattina (6-17): BNews_Mattina.gif
-     * - Notizie nuove + sera/notte  : BNews_Notte.gif
-     * - Nessuna nuova notizia       : BNews_Off.png
-     */
-    const hour = new Date().getHours()
-    const bnewsSrc = data.has_new_news
-        ? (hour >= 6 && hour <= 17
-            ? '../themes/crystal/imgs/menu/BNews_Mattina.gif'
-            : '../themes/crystal/imgs/menu/BNews_Notte.gif')
-        : '../themes/crystal/imgs/menu/BNews_Off.png'
-
     return (
         <div className="pagina_info_location">
 
@@ -143,42 +126,6 @@ export default function InfoLocation() {
                     </div>
                 ) : (
                     <div className="box_stato_luogo">&nbsp;</div>
-                )}
-
-                {/* Icona Breaking News */}
-                <div className="meteo_image_replacement">
-                    <img
-                        src={bnewsSrc}
-                        alt="Breaking News"
-                        className="meteo_image"
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => setNewsOpen(true)}
-                    />
-                </div>
-
-                {/* Modal Breaking News — iframe come nel vecchio PHP */}
-                {newsOpen && (
-                    <div
-                        id="modalBreaking"
-                        className="modal_breaking"
-                        style={{ display: 'block' }}
-                        onClick={e => { if (e.target === e.currentTarget) setNewsOpen(false) }}
-                    >
-                        <div className="modal_content_breaking">
-                            <span
-                                className="close_breaking"
-                                onClick={() => setNewsOpen(false)}
-                            >
-                                &times;
-                            </span>
-                            <iframe
-                                src="../pages/breaking_news.inc.php"
-                                frameBorder="0"
-                                className="modal_iframe_breaking"
-                                title="Breaking News"
-                            />
-                        </div>
-                    </div>
                 )}
 
             </div>

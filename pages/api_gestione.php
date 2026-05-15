@@ -122,7 +122,6 @@ switch ($op) {
         if ($perms['admin']) {
             $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => [
                 ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'],
-                ['label' => 'CT news',               'url' => 'gestione.php?page=gestione_ctnews'],
                 ['label' => 'Bacheche',              'url' => 'gestione.php?page=gestione_bacheche'],
                 ['label' => 'Luoghi',                'url' => 'gestione.php?page=gestione_luoghi'],
                 ['label' => 'Mappa',                 'url' => 'gestione.php?page=gestione_mappe'],

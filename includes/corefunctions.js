@@ -36,24 +36,6 @@ function set_fade(id, opacity) {
     obj.style.opacity = opacity / 100;
 }
 
-function ctNews(pgName) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", window.location.origin + "/pages/leggi_ctnews.php", true);
-    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    var param = "pg=" + pgName;
-    xhttp.send(param);
-
-    var x = document.getElementById("ctnews");
-    if (x.style.height === '0px' && x.style.opacity === '0') {
-        x.style.height = 'auto';
-        x.style.opacity = '1';
-        new Audio(window.location.origin + '/sounds/tg5.mp3').play();
-    } else {
-        x.style.height = '0px';
-        x.style.opacity = '0';
-    }
-}
-
 // Funzione che resetta tutti i campi all'interno di un <div>
 function resettaCampiDiv(divId) {
     const div = document.getElementById(divId);
@@ -170,24 +152,6 @@ window.onclick = function (event) {
 function changeFrame(input_text) {
     document.getElementById("myframe").src = input_text;
 }
-
-// JavaScript per aprire e chiudere la modale delle breaking news -->
-const openModalBreaking = document.getElementById("openModalBreaking");
-if (openModalBreaking) {
-    document.getElementById("openModalBreaking").onclick = function () {
-        document.getElementById("modalBreaking").style.display = "block";
-    }
-}
-
-const closeModalBreaking = document.getElementById("closeModalBreaking");
-if (closeModalBreaking) {
-    document.getElementById("closeModalBreaking").onclick = function () {
-        document.getElementById("modalBreaking").style.display = "none";
-    }
-}
-
-// Chiudere la modale cliccando fuori di essa
-window.onclick = function (event) { if (event.target == document.getElementById("modalBreaking")) document.getElementById("modalBreaking").style.display = "none"; }
 
 // Funzione per mostrare notifiche
 function showNotification(message, type = 'info') {

@@ -47,7 +47,7 @@ switch ($op) {
 
         $login1 = ucwords(strtolower(trim($login1)));
 
-        $record = gdrcd_query("SELECT personaggio.id_gilda, personaggio.ctnews_letto,
+        $record = gdrcd_query("SELECT personaggio.id_gilda,
             personaggio.pass, personaggio.nome, personaggio.cognome, personaggio.permessi,
             personaggio.sesso, personaggio.ultima_mappa, personaggio.ultimo_luogo,
             personaggio.id_razza, personaggio.id_mestiere, personaggio.id_ruolo_mestiere,
@@ -80,7 +80,6 @@ switch ($op) {
         $_SESSION['moderatore']         = $record['moderatore'];
         $_SESSION['guida']              = $record['guida'];
         $_SESSION['grafico']            = $record['grafico'];
-        $_SESSION['ctnews_letto']       = $record['ctnews_letto'];
         $_SESSION['user']               = 1;
         $_SESSION['blocca_media']       = $record['blocca_media'];
         $_SESSION['ultima_uscita']      = $record['ora_uscita'];

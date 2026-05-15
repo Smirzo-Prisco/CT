@@ -1120,74 +1120,7 @@ div.right{
   cursor: pointer;
 }
 
-/* BREAKING NEWS */
-
-/* Modale */
-.modal_breaking {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0%;
-    top: 10%;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto; /* Aggiungi scroll verticale per modali su schermi piccoli */
-}
-
-.modal_content_breaking {
-    background-color: #14172a;
-    color: #f1f1f1;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 70%;
-    max-width: 800px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgb(0 0 0 / 50%);
-}
-
-/* Chiusura della modale */
-.close_breaking {
-    color: #f1f1f1;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close_breaking:hover,
-.close_breaking:focus {
-    color: #fc0;
-}
-
-.modal_iframe_breaking {
-    width: 100%;
-    height: 500px;
-    border-radius: 8px;
-    background-color: #1a1a1a;
-}
-
-/* Posizionamento della modale verso sinistra su tablet e cellulari */
-@media only screen and (width <= 1024px) {
-    .modal_content_breaking {
-        width: 60% !important; /* Forza la larghezza al 60% per tablet */
-        max-width: 600px !important; /* Imposta una larghezza massima */
-        height: auto !important;
-        padding: 10px !important;
-        margin-left: 10% !important;
-        margin-right: auto !important;
-    }
-}
-
 @media only screen and (width <= 768px) {
-    .modal_content_breaking {
-        width: 70% !important; /* Forza la larghezza al 70% per cellulari */
-        max-width: 500px !important; /* Imposta una larghezza massima */
-        height: auto !important;
-        padding: 10px !important;
-        margin-left: 5% !important;
-        margin-right: auto !important;
-    }
 
     .topbar {
         flex-wrap: wrap;

@@ -24,13 +24,6 @@ switch ($op) {
         $mappa = (int)$_SESSION['mappa'];
         $isNotte = (date("G") >= 18 || date("G") <= 6);
 
-        // Verifica se ci sono breaking news non ancora lette dall'utente
-        $login_f     = gdrcd_filter('in', $_SESSION['login']);
-        $last_news   = gdrcd_query("SELECT last_date_news FROM personaggio WHERE nome = '$login_f' LIMIT 1");
-        $last_dt     = !empty($last_news['last_date_news']) ? $last_news['last_date_news'] : '1970-01-01 00:00:00';
-        $news_check  = gdrcd_query("SELECT COUNT(*) AS n FROM ctnews WHERE data > '$last_dt'");
-        $has_new_news = (int)$news_check['n'] > 0;
-
         if ($luogo >= 0) {
             // Il personaggio è in una stanza specifica
             $row = gdrcd_query("SELECT mappa.nome, mappa.descrizione, mappa.stato,
@@ -54,7 +47,6 @@ switch ($op) {
                 'meteo'          => $row['meteo'] ?? '',
                 'is_notte'       => $isNotte,
                 'anno'           => date('Y', strtotime('+1053 years')),
-                'has_new_news'   => $has_new_news,
             ]);
         } else {
             // Il personaggio è sulla mappa (luogo = -1)
@@ -71,7 +63,6 @@ switch ($op) {
                 'altezza'        => (int)($zona['altezza']   ?? 330),
                 'is_notte'       => $isNotte,
                 'anno'           => date('Y', strtotime('+1053 years')),
-                'has_new_news'   => $has_new_news,
             ]);
         }
         break;
