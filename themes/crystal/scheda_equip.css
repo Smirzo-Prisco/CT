@@ -135,7 +135,7 @@ div.menu_scheda {
     /* margin-left: 10px; */
     text-align: center;
     font-size: 14px;
-    width: 751px;
+    /* width: 751px; — commentato: fisso in pixel sovrascrive il menu su tutte le pagine dopo navigazione SPA */
     height: 35px;
     margin: auto;
     /* float: left; */

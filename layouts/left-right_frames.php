@@ -65,8 +65,7 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 		left: 260px;
 		right: 260px;
 		bottom: 0;
-		overflow-y: auto;
-		overflow-x: clip;
+		overflow: auto;
 		width: calc(100% - 520px);
 		box-sizing: border-box;
 	}
