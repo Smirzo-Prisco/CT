@@ -48,20 +48,26 @@ body, ul, li, a{
 
 .subMenuItem {
   float: none;
+  list-style: none;
 }
 
-.subMenuItem a {
+div.menu_scheda .subMenu .subMenuItem a {
   display: block;
-  padding: 3px 10px;
+  height: 22px;
+  line-height: 22px;
+  padding: 0 10px;
+  border: none;
+  box-sizing: border-box;
   color: #e2e2e2;
   text-decoration: none;
   text-transform: uppercase;
   font-size: 11px;
-  font-family: "DejaVu Sans";
+  font-family: "DejaVu Sans", sans-serif;
   white-space: nowrap;
+  overflow: hidden;
 }
 
-.subMenuItem a:hover {
+div.menu_scheda .subMenu .subMenuItem a:hover {
   background-color: #1e2240;
   border-radius: 8px;
 }
