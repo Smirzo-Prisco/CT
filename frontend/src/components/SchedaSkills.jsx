@@ -102,7 +102,7 @@ function SkillRow({ skill, showLevel }) {
                         : skill.nome
                     }
                     {showLevel && (
-                        <><br />Livello attuale: {skill.grado}/{skill.max_lvl}</>
+                        <><br /><span style={{ color: '#9a6353' }}>Livello attuale: {skill.grado}/{skill.max_lvl}</span></>
                     )}
                 </td>
             </tr>
