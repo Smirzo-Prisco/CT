@@ -87,6 +87,66 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <?php endif; ?>
 
         <title><?=$PARAMETERS['info']['site_name']; ?></title>
+
+        <!-- Bundle React — type="module" è sempre deferred: esegue dopo il DOM
+             anche se caricato nell'<head>. Posizionato qui (anziché in footer)
+             per garantire che sia in pagina anche se footer.inc.php non esegue
+             a causa di un die() interno al contenuto della pagina. -->
+        <?php if (file_exists(__DIR__ . '/themes/crystal/dist/ct-app.js')): ?>
+        <script type="module" src="/themes/crystal/dist/ct-app.js"></script>
+        <?php endif; ?>
+
+        <!-- Listener ct:ready: monta i componenti React sidebar e AppRouter.
+             Deve stare nell'<head> per la stessa ragione del bundle. -->
+        <?php
+        $isStaff = (($_SESSION['admin'] ?? 0) == 1 || ($_SESSION['moderatore'] ?? 0) == 1 || ($_SESSION['master'] ?? 0) == 1) ? 'true' : 'false';
+        $lm_items = [];
+        if (!empty($PARAMETERS['menu'])) {
+            foreach ($PARAMETERS['menu'] as $key => $item) {
+                if (!empty($item['url'])) {
+                    $lm_items[] = [
+                        'key'                => $key,
+                        'url'                => $item['url'],
+                        'text'               => $item['text']               ?? '',
+                        'image_file'         => $item['image_file']         ?? '',
+                        'image_file_onclick' => $item['image_file_onclick'] ?? '',
+                    ];
+                }
+            }
+        }
+        $lm_title       = $PARAMETERS['names']['gamemenu']['menu'] ?? '';
+        $lm_theme       = $PARAMETERS['themes']['current_theme'];
+        $lm_showGotomap = ($PARAMETERS['mode']['gotomap_list'] === 'ON') ? 'true' : 'false';
+        ?>
+        <script>
+        document.addEventListener('ct:ready', function() {
+            var el = document.getElementById('ct-app-content');
+            if (el) CT.mount('AppRouter', 'ct-app-content', { isStaff: <?= $isStaff ?> });
+
+            if (document.getElementById('info-location-container'))
+                CT.mount('InfoLocation', 'info-location-container', {});
+
+            if (document.getElementById('link-menu-container'))
+                CT.mount('LinkMenu', 'link-menu-container', {
+                    menuItems:   <?= json_encode($lm_items) ?>,
+                    menuTitle:   <?= json_encode($lm_title) ?>,
+                    theme:       <?= json_encode($lm_theme) ?>,
+                    showGotomap: <?= $lm_showGotomap ?>
+                });
+
+            if (document.getElementById('frame-messaggi-container'))
+                CT.mount('FrameMessaggi', 'frame-messaggi-container', {});
+
+            if (document.getElementById('anteprima-scheda-container'))
+                CT.mount('AnteprimaScheda', 'anteprima-scheda-container', {});
+
+            if (document.getElementById('menu-icons-container'))
+                CT.mount('MenuIcons', 'menu-icons-container', {});
+
+            if (document.getElementById('online-users-container'))
+                CT.mount('OnlineUsers', 'online-users-container', {});
+        });
+        </script>
     </head>
     <body class="main_body">
 <?php
