@@ -1,6 +1,11 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+?>
+<div style="background:red;color:white;padding:10px;font-size:20px;z-index:9999;position:relative">
+    DEBUG: scegli_inclinazione.inc.php ESEGUITO
+</div>
+<?php
 /***************    Stampa correnti e controllo permessi di visualizzazione    *****************************/
 $pg = gdrcd_query("SELECT personaggio.*, clgpersonaggioinclinazione.*
                     FROM personaggio
