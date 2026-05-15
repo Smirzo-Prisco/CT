@@ -61,7 +61,7 @@ if(isset($_POST['op']) === false) { ?>
                     <input type="hidden" name="id_record" value="<?php echo $row['id_inclinazione']; ?>" />
                 </form>
             </center>
-<? } ?>
+<?php } ?>
         </div>
 <?php
 }
