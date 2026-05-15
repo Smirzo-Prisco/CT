@@ -10,6 +10,8 @@ div.pagina_scheda {
     margin-left: auto;
     margin-right: auto;
     width: max-content;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 div.pagina_scheda div.pagebody {
@@ -455,6 +457,8 @@ div.titolo_box_scheda {
 
 .scheda_page_body {
     width: max-content;
+    max-width: 100%;
+    box-sizing: border-box;
     margin: auto;
 }
 
@@ -482,7 +486,9 @@ div.body_box {
     /* border-top: none; */
     /* margin: auto; */
     height: max-content;
-    width: max-content; 
+    width: max-content;
+    max-width: 100%;
+    box-sizing: border-box;
     font-size: 10px;
     color: #e2e2e2;
     clear:both;

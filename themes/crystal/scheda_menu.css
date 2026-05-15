@@ -13,7 +13,7 @@ body, ul, li, a{
 
 .menu_scheda {
   position: relative;
-  z-index: 10;
+  z-index: 1000;
 }
 
 .menuItem{

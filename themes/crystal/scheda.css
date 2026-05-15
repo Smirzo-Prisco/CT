@@ -10,6 +10,8 @@ div.pagina_scheda {
     margin-left: auto;
     margin-right: auto;
     width: max-content;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 div.pagina_scheda div.form_info {
