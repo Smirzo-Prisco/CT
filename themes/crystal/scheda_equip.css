@@ -372,7 +372,21 @@ div.inventario_riga_descrizione,
 div.inventario_riga_commento {
     overflow-wrap: break-word;
     text-align: justify;
-    max-width: 400px;
+}
+
+/* Tabella zaino/inventario: layout fisso per evitare resize su cambio pulsanti */
+table.inventory-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+table.inventory-table td.casella_img_col {
+    width: 130px;
+}
+
+table.inventory-table td.casella_azioni_col {
+    width: 160px;
+    vertical-align: top;
 }
 
 div.pagina_scheda_equip form,

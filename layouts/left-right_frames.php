@@ -165,6 +165,7 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 		max-width: 100%;
 		box-sizing: border-box;
 		overflow-x: hidden;
+		padding: 0 12px;
 	}
 </style>
 

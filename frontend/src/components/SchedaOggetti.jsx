@@ -50,7 +50,7 @@ function OggettoRow({ item, isOwn, isAdmin, isMaster, idMestiere, pg, onAction, 
     return (
         <tr>
             {/* Immagine */}
-            <td className="casella_elemento">
+            <td className="casella_elemento casella_img_col">
                 <img src={`/imgs/items/${item.urlimg}`} align="center"
                     style={{ height: 120, width: 120 }} alt={item.nome} />
             </td>
@@ -129,7 +129,7 @@ function OggettoRow({ item, isOwn, isAdmin, isMaster, idMestiere, pg, onAction, 
             </td>
 
             {/* Pulsanti */}
-            <td className="casella_controlli">
+            <td className="casella_controlli casella_azioni_col">
                 {isOwn && (
                     <div className="form_gioco">
                         <button onClick={() => act('abbandona')}>Abbandona</button>
@@ -285,16 +285,16 @@ export default function SchedaOggetti() {
                         </div>
                         <div className="panels_box">
                             <div className="elenco_record_gioco">
-                                <table className="customTable" align="center">
+                                <table className="customTable inventory-table">
                                     <thead>
                                         <tr>
-                                            <td className="casella_titolo">
+                                            <td className="casella_titolo casella_img_col">
                                                 <div className="titoli_elenco">Immagine</div>
                                             </td>
                                             <td className="casella_titolo">
                                                 <div className="titoli_elenco">Descrizioni e Commenti</div>
                                             </td>
-                                            <td className="casella_titolo">
+                                            <td className="casella_titolo casella_azioni_col">
                                                 <div className="titoli_elenco">&nbsp;</div>
                                             </td>
                                         </tr>

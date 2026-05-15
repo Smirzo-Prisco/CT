@@ -90,7 +90,7 @@ function ItemRow({ item, worn, canAct, chars, onAction }) {
     return (
         <tr>
             {/* Immagine */}
-            <td className="casella_elemento">
+            <td className="casella_elemento casella_img_col">
                 <div className="inventario_img">
                     <img src={`/imgs/items/${item.urlimg}`} alt={item.nome} style={{ maxWidth: 300 }} />
                 </div>
@@ -130,7 +130,7 @@ function ItemRow({ item, worn, canAct, chars, onAction }) {
             </td>
 
             {/* Pulsanti azione */}
-            <td className="casella_elemento">
+            <td className="casella_elemento casella_azioni_col">
                 {canAct && (
                     <div className="form_gioco">
                         <button onClick={() => act('abbandona')}>Abbandona</button>
@@ -256,16 +256,16 @@ export default function SchedaEquip() {
                 {feedback && <div className="warning">{feedback}</div>}
                 <div className="panels_box">
                     <div className="elenco_record_gioco">
-                        <table className="customTable" align="center">
+                        <table className="customTable inventory-table">
                             <thead>
                                 <tr>
-                                    <td className="casella_titolo">
+                                    <td className="casella_titolo casella_img_col">
                                         <div className="titoli_elenco">Immagine</div>
                                     </td>
-                                    <td className="casella_titolo" colSpan="1">
+                                    <td className="casella_titolo">
                                         <div className="titoli_elenco">Descrizione</div>
                                     </td>
-                                    <td className="casella_titolo">
+                                    <td className="casella_titolo casella_azioni_col">
                                         <div className="titoli_elenco">&nbsp;</div>
                                     </td>
                                 </tr>
