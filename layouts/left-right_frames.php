@@ -220,15 +220,14 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
         </div>
 
         <?php
-        /**
-         * TODO thin shell (passo finale SPA):
-         * Quando tutte le pagine saranno migrate a React, sostituire questa
-         * riga con il container diretto:
-         *   <div id="ct-app-content"></div>
-         * ed eliminare il blocco routing in main.php.
-         */
-        gdrcd_load_modules('pages/' . $strInnerPage);
+        // Thin shell: pagine migrate → container React diretto, senza I/O su file .inc.php.
+        // Pagine non migrate (gestione sub-pagine, tool staff) → include PHP classico.
+        if ($strInnerPage === null):
         ?>
+        <div id="ct-app-content"></div>
+        <?php else: ?>
+        <?php gdrcd_load_modules('pages/' . $strInnerPage); ?>
+        <?php endif; ?>
     </div>
 </div>
 

@@ -1,22 +1,16 @@
 <?php
 /**
- * main.php — Entry point Crystal Tokyo GDR
+ * main.php — Entry point Crystal Tokyo GDR (thin shell)
  *
- * Ruolo attuale (Phase SPA ~85% completata):
+ * Ruolo:
  *   1. Sessione, config e autenticazione (via header.inc.php)
- *   2. Aggiornamento posizione in DB per navigazioni PHP dirette
- *      (accesso diretto via URL o refresh; le navigazioni SPA usano api_map.php)
- *   3. Routing: determina quale .inc.php includere nel layout
- *      Le pagine migrate a React restituiscono solo <div id="ct-app-content"></div>;
- *      AppRouter fa il rendering effettivo lato client.
+ *   2. DB update per navigazioni PHP dirette verso mappa/stanze
+ *      (le navigazioni SPA usano api_map.php — questo è il fallback)
+ *   3. Routing: pagine migrate → $strInnerPage = null → React prende il controllo;
+ *      pagine NON migrate (gestione sub-pagine, tool staff) → include .inc.php PHP
  *   4. Layout (left-right_frames.php) + footer React bundle
  *
- * ── Roadmap thin shell (passo finale, quando tutte le pagine sono migrate) ──
- *   - Eliminare il blocco mappa/dir (i DB update vanno solo via api_map.php)
- *   - Eliminare il blocco routing ($strInnerPage)
- *   - In left-right_frames.php: sostituire gdrcd_load_modules() con
- *     <div id="ct-app-content"></div> direttamente nel markup
- *   - Risultato: ~20 righe — solo sessione + HTML shell
+ * @author Crystal Tokyo Dev
  */
 
 require('header.inc.php');
@@ -26,8 +20,19 @@ gdrcd_controllo_sessione();
 $scripts = [];
 function add_script(string $path): void { global $scripts; $scripts[] = $path; }
 
+// ── Pagine migrate a React (AppRouter le gestisce client-side) ────────────────
+// Quando $strInnerPage = null il layout emette solo <div id="ct-app-content"></div>.
+// CSS e rendering sono a carico di AppRouter/injectCSS.
+const MIGRATED_PAGES = [
+    'forum', 'messages_center', 'presenti_estesi', 'mappaclick',
+    'scheda', 'scheda_storia', 'scheda_dice', 'scheda_off',
+    'scheda_skills', 'scheda_trans', 'scheda_modifica', 'scheda_affetti',
+    'scheda_equip', 'scheda_oggetti',
+    'scheda_px', 'scheda_px_shin', 'scheda_px_mestiere',
+    'gestione', 'uffici',
+];
+
 // ── Aggiornamento DB per cambio mappa (navigazione PHP diretta) ───────────────
-// In SPA questo non passa mai per qui: MapClick.jsx chiama api_map.php?op=changemap
 if (!empty($_GET['map_id']) && is_numeric($_GET['map_id']) && !empty($_SESSION['login'])) {
     $old_luogo = (int)(gdrcd_query(
         "SELECT ultimo_luogo FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "'"
@@ -41,16 +46,20 @@ if (!empty($_GET['map_id']) && is_numeric($_GET['map_id']) && !empty($_SESSION['
     notifySocketServer('users:update', 'loc:-1');
 }
 
-// ── Routing: determina quale .inc.php mostrare nel layout ─────────────────────
-// TODO thin shell: rimuovere questo blocco quando tutte le pagine sono migrate.
+// ── Routing ───────────────────────────────────────────────────────────────────
 if (isset($_REQUEST['page'])) {
-    $strInnerPage = gdrcd_filter('include', $_REQUEST['page']) . '.inc.php';
+    $page = gdrcd_filter('include', $_REQUEST['page']);
+    // Pagina migrata: React
+    if (in_array($page, MIGRATED_PAGES)) {
+        $strInnerPage = null;
+    } else {
+        // Pagina non migrata (es. gestione_personaggio): PHP classico
+        $strInnerPage = $page . '.inc.php';
+    }
 
 } elseif (isset($_REQUEST['dir']) && is_numeric($_REQUEST['dir'])) {
-    // Navigazione PHP diretta verso una stanza o la mappa
-    // In SPA questo non passa per qui: AppRouter chiama api_map.php?op=move
-    $strInnerPage = (int)$_REQUEST['dir'] >= 0 ? 'frame_chat.inc.php' : 'mappaclick.inc.php';
-    if ((int)$_REQUEST['dir'] < 0) $_REQUEST['id_map'] = $_SESSION['mappa'];
+    // Navigazione PHP diretta verso stanza o mappa — AppRouter gestisce ChatShell/MapClick
+    $strInnerPage = null;
 
     if (!empty($_SESSION['login'])) {
         $old_luogo = (int)(gdrcd_query(
@@ -65,8 +74,8 @@ if (isset($_REQUEST['page'])) {
     }
 
 } else {
-    // Default: mappa
-    $strInnerPage = 'mappaclick.inc.php';
+    // Default: mappa — migrata
+    $strInnerPage = null;
     $_REQUEST['id_map'] = $_SESSION['mappa'];
 }
 
