@@ -374,17 +374,13 @@ div.inventario_riga_commento {
     text-align: justify;
 }
 
-/* Tabella zaino/inventario: layout fisso per evitare resize su cambio pulsanti */
-table.inventory-table {
-    table-layout: fixed;
-    width: 100%;
-}
-
+/* Colonne fisse nella tabella zaino/inventario: evita resize al cambio pulsanti */
 table.inventory-table td.casella_img_col {
     width: 130px;
 }
 
 table.inventory-table td.casella_azioni_col {
+    min-width: 160px;
     width: 160px;
     vertical-align: top;
 }

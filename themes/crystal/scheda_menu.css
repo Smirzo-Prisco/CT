@@ -11,13 +11,18 @@ body, ul, li, a{
   width: 600px;
 }
 
+.menu_scheda {
+  position: relative;
+  z-index: 10;
+}
+
 .menuItem{
   width: 120px;
   height:10px;
   background-color: #16192b;
   border: 1px solid #090a10;
   border-radius: 10px;
-  display: inline-block;  
+  display: inline-block;
   padding: 5px;
   position: relative;
   font-size: 11px;
