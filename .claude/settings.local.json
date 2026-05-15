@@ -1,7 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs wc -l)"
+      "Bash(xargs wc -l)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(grep -E \"\\\\.\\(php|js|css\\)$\")",
+      "Bash(git commit -m 'Forum: mostra luna + badge numerico per sezioni non lette *)",
+      "Bash(git commit -m 'Fix subMenu: selettore specifico con height:22px fissa *)",
+      "Bash(git commit -m 'Fix pagine Uffici rotte: short tags, path CSS relativi, topbar z-index *)",
+      "Bash(git commit -m 'Fix CSS: rimosso placeholder '\\\\''your-background-here'\\\\'' in left-right_frames.php *)",
+      "Bash(git commit -m 'Fix scegli_inclinazione: try/catch sulle query per evitare die\\(\\) con HTML rotto *)",
+      "Bash(git commit -m 'scegli_inclinazione: rimuovi try/catch dalla query principale *)",
+      "Bash(git commit *)",
+      "Bash(php -l layouts/left-right_frames.php)",
+      "Bash(grep -v \"SELECT\\\\|DELETE\\\\|UPDATE\\\\|DROP\\\\|WHERE\\\\|#\\\\|//\")",
+      "Bash(grep -v \"ajax_engine\\\\|#\\\\|//\")"
     ]
   }
 }

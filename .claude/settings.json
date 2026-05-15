@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m ' *)",
+      "Bash(php -l pages/api_scheda.php)",
+      "Bash(grep -rn '$MESSAGE\\\\s*=\\\\s*\\\\[' includes/ pages/)"
+    ]
+  }
+}
