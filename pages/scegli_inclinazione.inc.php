@@ -1,16 +1,10 @@
 <?php
 /***************    Stampa correnti e controllo permessi di visualizzazione    *****************************/
-try {
-    $pg = gdrcd_query("SELECT personaggio.*, clgpersonaggioinclinazione.*
-                        FROM personaggio
-                        LEFT JOIN clgpersonaggioinclinazione on clgpersonaggioinclinazione.personaggio = personaggio.nome
-                        WHERE personaggio.nome = '". $_SESSION['login'] ."'",
-                       'query', true);
-} catch (Exception $e) {
-    echo '<div class="error">Errore caricamento dati personaggio.</div>';
-    return;
-}
-$inclinazione = $pg['id_ruolo']; // i ruoli sono da 1, 2 e 3. Zero non deve esistere
+$pg = gdrcd_query("SELECT personaggio.*, clgpersonaggioinclinazione.*
+                    FROM personaggio
+                    LEFT JOIN clgpersonaggioinclinazione on clgpersonaggioinclinazione.personaggio = personaggio.nome
+                    WHERE personaggio.nome = '". $_SESSION['login'] ."'");
+$inclinazione = $pg['id_ruolo'] ?? 0; // i ruoli sono da 1, 2 e 3. Zero non deve esistere
 ?>
 
 <link rel="stylesheet" href="/themes/crystal/famiglie.css">
