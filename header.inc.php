@@ -89,6 +89,33 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
 
         <title><?=$PARAMETERS['info']['site_name']; ?></title>
 
+        <!-- CT_USER + Socket.io: spostati nell'<head> per garantire disponibilità
+             anche quando footer.inc.php non esegue (die() nel contenuto della pagina) -->
+        <?php if (isset($_SESSION['login'])): ?>
+        <?php
+        $pg_avatar = '';
+        $r_avatar = gdrcd_query("SELECT url_img_chat FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "' LIMIT 1");
+        if ($r_avatar) $pg_avatar = trim($r_avatar['url_img_chat'] ?? '');
+        ?>
+        <script>
+        window.CT_USER = {
+            login:        <?=json_encode($_SESSION['login'])?>,
+            luogo:        <?=(int)($_SESSION['luogo'] ?? 0)?>,
+            mappa:        <?=(int)($_SESSION['mappa'] ?? 0)?>,
+            url_img_chat: <?=json_encode($pg_avatar)?>
+        };
+        window.ctSocket = null;
+        </script>
+        <?php endif; ?>
+        <script src="/socket.io/socket.io.js"></script>
+        <?php if (isset($_SESSION['login'])): ?>
+        <script>
+        if (typeof io !== 'undefined' && window.CT_USER) {
+            window.ctSocket = io({ auth: window.CT_USER });
+        }
+        </script>
+        <?php endif; ?>
+
         <!-- Bundle React — type="module" è sempre deferred: esegue dopo il DOM
              anche se caricato nell'<head>. Posizionato qui (anziché in footer)
              per garantire che sia in pagina anche se footer.inc.php non esegue
