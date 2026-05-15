@@ -219,7 +219,6 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
         </div>
 
         <?php
-        <?php
         // DEBUG TEMPORANEO
         echo '<div style="background:orange;color:black;padding:5px;font-size:12px">DEBUG strInnerPage='.var_export($strInnerPage,true).' | page='.var_export($_REQUEST['page']??'N/A',true).'</div>';
         // Thin shell: pagine migrate → container React diretto, senza I/O su file .inc.php.
