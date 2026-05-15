@@ -220,15 +220,17 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 
         <?php
         // DEBUG TEMPORANEO
-        echo '<div style="background:orange;color:black;padding:5px;font-size:12px">DEBUG strInnerPage='.var_export($strInnerPage,true).' | page='.var_export($_REQUEST['page']??'N/A',true).'</div>';
-        // Thin shell: pagine migrate → container React diretto, senza I/O su file .inc.php.
-        // Pagine non migrate (gestione sub-pagine, tool staff) → include PHP classico.
-        if ($strInnerPage === null):
+        $dbg_path = 'pages/' . $strInnerPage;
+        $dbg_exists = file_exists($dbg_path);
+        echo '<div style="background:orange;color:black;padding:5px;font-size:12px">DEBUG strInnerPage='.var_export($strInnerPage,true).' | exists='.($dbg_exists?'YES':'NO').' | cwd='.getcwd().'</div>';
+        if ($strInnerPage !== null && $dbg_exists) {
+            echo '<!-- BEFORE INCLUDE -->';
+            include($dbg_path);
+            echo '<!-- AFTER INCLUDE -->';
+        } elseif ($strInnerPage === null) {
         ?>
         <div id="ct-app-content"></div>
-        <?php else: ?>
-        <?php gdrcd_load_modules('pages/' . $strInnerPage); ?>
-        <?php endif; ?>
+        <?php } else { echo '<div style="color:red">FILE NOT FOUND: '.$dbg_path.'</div>'; } ?>
     </div>
 </div>
 
