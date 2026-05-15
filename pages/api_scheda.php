@@ -785,7 +785,7 @@ switch ($op) {
             $count_q  = gdrcd_query("SELECT COUNT(*) AS n FROM PuntiMestiere WHERE nome = '$pg'");
             $totale   = (int)($count_q['n'] ?? 0);
             $result   = gdrcd_query(
-                "SELECT pm.*, ma.titolo, ma.commento
+                "SELECT pm.*, ma.titolo
                  FROM PuntiMestiere pm
                  LEFT JOIN messaggioaraldo ma ON ma.id_messaggio = pm.id_messaggio
                  WHERE pm.nome = '$pg'
@@ -799,7 +799,7 @@ switch ($op) {
             $count_q  = gdrcd_query("SELECT COUNT(*) AS n FROM Punti WHERE nome = '$pg' AND shin > 0");
             $totale   = (int)($count_q['n'] ?? 0);
             $result   = gdrcd_query(
-                "SELECT p.*, ma.titolo, ma.commento
+                "SELECT p.*, ma.titolo
                  FROM Punti p
                  LEFT JOIN messaggioaraldo ma ON ma.id_messaggio = p.id_messaggio
                  WHERE p.nome = '$pg' AND p.shin > 0
@@ -813,7 +813,7 @@ switch ($op) {
             $count_q  = gdrcd_query("SELECT COUNT(*) AS n FROM Punti WHERE nome = '$pg'");
             $totale   = (int)($count_q['n'] ?? 0);
             $result   = gdrcd_query(
-                "SELECT p.*, ma.titolo, ma.commento
+                "SELECT p.*, ma.titolo
                  FROM Punti p
                  LEFT JOIN messaggioaraldo ma ON ma.id_messaggio = p.id_messaggio
                  WHERE p.nome = '$pg'
