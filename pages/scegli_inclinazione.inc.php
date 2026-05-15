@@ -1,9 +1,15 @@
 <?php
 /***************    Stampa correnti e controllo permessi di visualizzazione    *****************************/
-$pg = gdrcd_query("SELECT personaggio.*, clgpersonaggioinclinazione.*
-                    FROM personaggio
-                    LEFT JOIN clgpersonaggioinclinazione on clgpersonaggioinclinazione.personaggio = personaggio.nome
-                    WHERE personaggio.nome = '". $_SESSION['login'] ."'");
+try {
+    $pg = gdrcd_query("SELECT personaggio.*, clgpersonaggioinclinazione.*
+                        FROM personaggio
+                        LEFT JOIN clgpersonaggioinclinazione on clgpersonaggioinclinazione.personaggio = personaggio.nome
+                        WHERE personaggio.nome = '". $_SESSION['login'] ."'",
+                       'query', true);
+} catch (Exception $e) {
+    echo '<div class="error">Errore caricamento dati personaggio.</div>';
+    return;
+}
 $inclinazione = $pg['id_ruolo']; // i ruoli sono da 1, 2 e 3. Zero non deve esistere
 ?>
 
@@ -19,9 +25,14 @@ if(isset($_POST['op']) === false) { ?>
             <tbody>
                 <tr class="second_header"><td></td><td>NOME</td><td></td></tr>
 <?php
-    $result = gdrcd_query("SELECT * FROM inclinazione WHERE visibile > 0 ORDER BY id_inclinazione", 'result');
+    try {
+        $result = gdrcd_query("SELECT * FROM inclinazione WHERE visibile > 0 ORDER BY id_inclinazione", 'result', true);
+    } catch (Exception $e) {
+        echo '</tbody></table><div class="error">Tabella correnti non disponibile.</div>';
+        $result = false;
+    }
 
-    while($row = gdrcd_query($result, 'fetch')) { ?>
+    while($result && $row = gdrcd_query($result, 'fetch')) { ?>
                 <!--table class="lavori_box" border="1"-->
                 <tr>
                     <td><img class="" src="imgs/inclinazioni/<?php echo $row['immagine']; ?>" /></td>
