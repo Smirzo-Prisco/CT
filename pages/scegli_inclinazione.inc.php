@@ -1,11 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-?>
-<div style="background:red;color:white;padding:10px;font-size:20px;z-index:9999;position:relative">
-    DEBUG: scegli_inclinazione.inc.php ESEGUITO
-</div>
-<?php
 /***************    Stampa correnti e controllo permessi di visualizzazione    *****************************/
 $pg = gdrcd_query("SELECT personaggio.*, clgpersonaggioinclinazione.*
                     FROM personaggio
@@ -179,7 +172,7 @@ if($_POST['op'] == 'quit') $quit_incli = gdrcd_query("DELETE FROM clgpersonaggio
                         <input type="hidden" name="gilda" value="<?php echo $row['gilda']; ?>" />
                     </form>
                 </center>
-            <? } ?>
+            <?php } ?>
                                 
             </div>
             <!--elenco_record_gioco-->
