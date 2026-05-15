@@ -46,12 +46,28 @@ body, ul, li, a{
   border: 1px solid #090a10;
 }
 
-.subMenuItem{
-  float:none;
+.subMenuItem {
+  float: none;
 }
 
-.menuItem:hover .subMenu{
- display: block;
+.subMenuItem a {
+  display: block;
+  padding: 6px 10px;
+  color: #e2e2e2;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-family: "DejaVu Sans";
+  white-space: nowrap;
+}
+
+.subMenuItem a:hover {
+  background-color: #1e2240;
+  border-radius: 8px;
+}
+
+.menuItem:hover .subMenu {
+  display: block;
 }
 
 .linkDecoration{
