@@ -18,7 +18,7 @@
     --danger-color: #e74c3c;
     --warning-color: #f39c12;
     --border-radius: 8px;
-    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
     --transition: all 0.3s ease;
 }
 
@@ -388,20 +388,10 @@ div.secondo_menu {
 
 div.msgs{
         margin: -50px auto;
-        padding: 10px;
-        width: 180px;
-        height: 250px;
-        border: none; /* Bordi arrotondati */
-        border-radius: 5px;
-        position: relative;
-        
 }
 
 div.pagina_info_location{
-    margin: 0 auto;
     padding: 10px;
-    background-color: transparent;
-    border: none;
 }
 
 .info-location-year {
@@ -409,6 +399,7 @@ div.pagina_info_location{
     font-weight: bolder;
     color: #9a6353;
 }
+
 .info-location-year a {
     font-size: 16px;
     font-weight: bolder;
@@ -432,30 +423,20 @@ div.output {
 /** * Informazioni con anteprima luogo
 */
 div.info_image {
-    text-align: center;
-    border: none;
     background: url("imgs/colonna_sx/cerchio_descrizioneluogo.png");
-    background-repeat: no-repeat;
     background-size:100%;
-    background-position:center;
-    height: 220px;
-    width: 100%;
+    height: 210px;
 }
 
 div.info_image_night {
-    text-align: center;
-    border: none;
     background: url("imgs/colonna_sx/cerchio_descrizioneluogo_night.png");
-    background-repeat: no-repeat;
     background-size:100%;
-    background-position:center;
-    height: 220px;
-    width: 100%;
+    height: 210px;
 }
 
 img.immagine_luogo{
     text-align: center;
-     border: none; /* Bordi arrotondati */
+    border: none; /* Bordi arrotondati */
     border-radius: 100%;
     width: 173px;
     height: 173px;
@@ -463,13 +444,6 @@ img.immagine_luogo{
     margin-left: 8px;
     position: relative;
     z-index: -1;
-}
-
-div.box_stato_luogo {
-    padding-top: 2px;
-    margin-bottom: 15px;
-    visibility: hidden;
-    height: 18px;
 }
 
 div.news {
@@ -805,12 +779,12 @@ div.innertube {
 div.page_title{display:  none;}
 
 div.colonne_sx{
-	height:750px;
-   overflow-y: auto;
+	height:100%;
+    overflow-y: auto;
 }
 
 div.colonne_dx{
-    height:750px;
+    height:100%;
     overflow: hidden auto;
    
 }
@@ -1121,7 +1095,6 @@ div.right{
 }
 
 @media only screen and (width <= 768px) {
-
     .topbar {
         flex-wrap: wrap;
     }

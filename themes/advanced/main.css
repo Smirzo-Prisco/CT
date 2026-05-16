@@ -49,7 +49,7 @@ input, textarea, select {
 
 input[type='submit'] {
     width: auto;
-    margin: 5px 0 15px 0;
+    margin: 5px 0 15px;
 }
 
 textarea {
@@ -97,9 +97,9 @@ div.logout_box {
     text-align: center;
     background-color: #D9D9D9;
     border: solid 1px #333;
-    -moz-border-radius: 5px; /* Bordi arrotondati */
-    -webkit-border-radius: 5px;
-    -khtml-border-radius: 5px;
+    border-radius: 5px; /* Bordi arrotondati */
+    border-radius: 5px;
+    border-radius: 5px;
     border-radius: 5px;
 }
 
@@ -126,18 +126,15 @@ div.pagina_info_location, div.msgs, div.menu, div.presenti, div.output {
     width: 180px;
     background-color: #b9b9b9;
     border: solid 1px #444;
-    -moz-border-radius: 5px; /* Bordi arrotondati */
-    -webkit-border-radius: 5px;
-    -khtml-border-radius: 5px;
+    border-radius: 5px; /* Bordi arrotondati */
+    border-radius: 5px;
+    border-radius: 5px;
     border-radius: 5px;
 }
 
 div.output {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0px;
-    left: 0px;
+    inset: 0;
     width: auto;
     overflow: auto;
     text-align: center;
@@ -148,11 +145,6 @@ div.output {
 */
 div.info_image {
     text-align: center;
-}
-
-div.box_stato_luogo {
-    padding-top: 2px;
-    margin-bottom: 15px;
 }
 
 div.meteo, div.meteo_date {
@@ -189,7 +181,7 @@ div.messaggio_forum_nuovo a, div.messaggio_forum_nuovo a:visited {
 select#gotomap {
     display: block;
     width: 160px;
-    margin: 0 auto 15px auto;
+    margin: 0 auto 15px;
 }
 
 div.link_menu {
@@ -206,9 +198,9 @@ div.link_menu a {
 div.link_menu a:hover {
     background-color: #cfcfcf;
     text-decoration: none;
-    -moz-border-radius: 5px; /* Bordi arrotondati */
-    -webkit-border-radius: 5px;
-    -khtml-border-radius: 5px;
+    border-radius: 5px; /* Bordi arrotondati */
+    border-radius: 5px;
+    border-radius: 5px;
     border-radius: 5px;
 }
 
@@ -248,14 +240,12 @@ div#descriptionLoc {
     border: solid 1px #666;
     font-family: Verdana, Sans;
     text-align: left;
-
-    -moz-border-radius: 5px; /* Bordi arrotondati */
-    -webkit-border-radius: 5px;
-    -khtml-border-radius: 5px;
+    border-radius: 5px; /* Bordi arrotondati */
     border-radius: 5px;
-
-    display: none; /*NON TOCCARE* Di configurazione: nasconde la tip in partenza */
-    z-index: 9999; /*NON TOCCARE* Di configurazione: mostra la tooltip sopra gli altri link */
+    border-radius: 5px;
+    border-radius: 5px;
+    display: none; /* NON TOCCARE* Di configurazione: nasconde la tip in partenza */
+    z-index: 9999; /* NON TOCCARE* Di configurazione: mostra la tooltip sopra gli altri link */
 }
 
 /** * Stili relativi all'elenco delle mappe in basso
@@ -268,9 +258,9 @@ div.mappaclick_more a {
     background-color: #cfcfcf;
     padding: 8px;
     margin-right: 10px;
-    -moz-border-radius: 5px; /* Bordi arrotondati */
-    -webkit-border-radius: 5px;
-    -khtml-border-radius: 5px;
+    border-radius: 5px; /* Bordi arrotondati */
+    border-radius: 5px;
+    border-radius: 5px;
     border-radius: 5px;
 }
 
@@ -283,9 +273,9 @@ div.elenco_record_gioco {
 div.elenco_record_gioco table {
     width: 100%;
     background-color: #d1d1d1;
-    -moz-border-radius: 5px; /* Bordi arrotondati */
-    -webkit-border-radius: 5px;
-    -khtml-border-radius: 5px;
+    border-radius: 5px; /* Bordi arrotondati */
+    border-radius: 5px;
+    border-radius: 5px;
     border-radius: 5px;
 }
 
