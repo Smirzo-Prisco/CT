@@ -1,0 +1,12 @@
+/* SchedaModifica.module.css — stili scoped per SchedaModifica.jsx */
+
+.labelCell       { text-transform: uppercase; font-size: 12px; width: 200px; }
+.labelCellTop    { text-transform: uppercase; font-size: 12px; width: 200px; vertical-align: top; }
+.sectionTitle    { text-transform: uppercase; font-size: 15px; }
+.fieldWrap       { margin-bottom: 10px; }
+.flexRow         { display: flex; gap: 8px; }
+.flexItem        { flex: 1; }
+.fullWidth       { width: 100%; }
+.fullResize      { width: 100%; resize: vertical; }
+.smallText       { font-size: 11px; text-transform: none; }
+.centered        { text-align: center; padding: 20px; }

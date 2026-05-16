@@ -130,6 +130,9 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
              per garantire che sia in pagina anche se footer.inc.php non esegue
              a causa di un die() interno al contenuto della pagina. -->
         <?php if (file_exists(__DIR__ . '/themes/crystal/dist/ct-app.js')): ?>
+        <?php if (file_exists(__DIR__ . '/themes/crystal/dist/ct-main.css')): ?>
+        <link rel="stylesheet" href="/themes/crystal/dist/ct-main.css" type="text/css">
+        <?php endif; ?>
         <script type="module" src="/themes/crystal/dist/ct-app.js"></script>
         <?php endif; ?>
 

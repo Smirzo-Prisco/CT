@@ -20,6 +20,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import SchedaMenu from './SchedaMenu'
+import shared from './shared.module.css'
 
 // ---------------------------------------------------------------------------
 // MANNEQUIN
@@ -99,7 +100,7 @@ function ItemRow({ item, worn, canAct, chars, onAction }) {
             {/* Descrizione + commenti */}
             <td className="casella_elemento">
                 <div className="inventario_riga_descrizione">
-                    <span style={{ textTransform: 'uppercase' }}>
+                    <span className={shared.schedaUpper}>
                         <center><b>{item.nome}</b> x {item.numero}
                             {item.cariche > 1 && ` (Cariche: ${item.cariche})`}
                         </center>
@@ -111,19 +112,19 @@ function ItemRow({ item, worn, canAct, chars, onAction }) {
 
                 {item.commento && (
                     <div className="inventario_riga_commento">
-                        <span style={{ textTransform: 'uppercase' }}><center><b>COMMENTO</b></center></span>
+                        <span className={shared.schedaUpper}><center><b>COMMENTO</b></center></span>
                         {item.commento}
                     </div>
                 )}
                 {item.commento_master && (
                     <div className="inventario_riga_commento">
-                        <span style={{ textTransform: 'uppercase' }}><center><b>NOTA MASTER</b></center></span>
+                        <span className={shared.schedaUpper}><center><b>NOTA MASTER</b></center></span>
                         <span dangerouslySetInnerHTML={{ __html: item.commento_master }} />
                     </div>
                 )}
                 {item.commento_shop && (
                     <div className="inventario_riga_commento">
-                        <span style={{ textTransform: 'uppercase' }}><center><b>NOTA SHOP</b></center></span>
+                        <span className={shared.schedaUpper}><center><b>NOTA SHOP</b></center></span>
                         <span dangerouslySetInnerHTML={{ __html: item.commento_shop }} />
                     </div>
                 )}
@@ -272,7 +273,7 @@ export default function SchedaEquip() {
                             </thead>
                             <tbody>
                                 {items.length === 0
-                                    ? <tr><td colSpan="3" style={{ textAlign: 'center', padding: 20 }}>
+                                    ? <tr><td colSpan="3" className={shared.centered}>
                                         Zaino vuoto.
                                       </td></tr>
                                     : items.map(item => (

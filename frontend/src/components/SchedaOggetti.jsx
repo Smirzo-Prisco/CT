@@ -26,6 +26,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import SchedaMenu from './SchedaMenu'
+import shared from './shared.module.css'
 
 // ---------------------------------------------------------------------------
 // ITEM DETAIL
@@ -58,7 +59,7 @@ function OggettoRow({ item, isOwn, isAdmin, isMaster, idMestiere, pg, onAction, 
             {/* Descrizione + commenti */}
             <td className="casella_elemento">
                 <div className="inventario_riga_descrizione">
-                    <span style={{ textTransform: 'uppercase' }}>
+                    <span className={shared.schedaUpper}>
                         <center>
                             <b>{item.nome}</b> (<i>x {item.numero}
                                 {item.cariche > 1 && ` Cariche: ${item.cariche}`}
@@ -73,7 +74,7 @@ function OggettoRow({ item, isOwn, isAdmin, isMaster, idMestiere, pg, onAction, 
                 {/* Commento personale */}
                 {!isOwn && item.commento && (
                     <div className="inventario_riga_commento">
-                        <span style={{ textTransform: 'uppercase' }}><center><b>COMMENTO</b></center></span>
+                        <span className={shared.schedaUpper}><center><b>COMMENTO</b></center></span>
                         <i>{item.commento}</i>
                     </div>
                 )}
@@ -104,7 +105,7 @@ function OggettoRow({ item, isOwn, isAdmin, isMaster, idMestiere, pg, onAction, 
                 {!canMaster && item.commento_master && (
                     <div>
                         <hr />
-                        <span style={{ textTransform: 'uppercase' }}><center><b>COMMENTO MASTER</b></center></span>
+                        <span className={shared.schedaUpper}><center><b>COMMENTO MASTER</b></center></span>
                         <span dangerouslySetInnerHTML={{ __html: item.commento_master }} />
                     </div>
                 )}
@@ -255,7 +256,7 @@ export default function SchedaOggetti() {
                                 <td colSpan="3"><div>Numero oggetti</div></td>
                             </tr>
                             {categorie.length === 0
-                                ? <tr><td colSpan="6" style={{ textAlign: 'center', padding: 20 }}>
+                                ? <tr><td colSpan="6" className={shared.centered}>
                                     Nessun oggetto in inventario.
                                   </td></tr>
                                 : categorie.map(cat => (
@@ -301,7 +302,7 @@ export default function SchedaOggetti() {
                                     </thead>
                                     <tbody>
                                         {detailData.items.length === 0
-                                            ? <tr><td colSpan="3" style={{ textAlign: 'center', padding: 20 }}>
+                                            ? <tr><td colSpan="3" className={shared.centered}>
                                                 Nessun oggetto.
                                               </td></tr>
                                             : detailData.items.map(item => (

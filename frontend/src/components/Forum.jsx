@@ -23,6 +23,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import styles from './Forum.module.css'
 
 // ---------------------------------------------------------------------------
 // UTILITÀ
@@ -62,38 +63,36 @@ function ThreadRow({ thread, onClick, isStaff, onAction }) {
     }
 
     return (
-        <tr style={{ cursor: 'pointer' }} onClick={() => onClick(thread)}>
+        <tr className={styles.clickable} onClick={() => onClick(thread)}>
 
             {/* STATO: verde = aperto, rosso = chiuso */}
-            <td style={{ textAlign: 'center', width: '40px', padding: '8px' }}>
+            <td className={styles.statusCell}>
                 <img
                     src={thread.chiuso
                         ? '/themes/crystal/imgs/forum/topic_chiuso.png'
                         : '/themes/crystal/imgs/forum/topic_aperto.png'}
                     alt={thread.chiuso ? 'Chiuso' : 'Aperto'}
-                    style={{ width: '18px', height: '18px' }}
+                    className={styles.statusIcon}
                     title={thread.chiuso ? 'Thread chiuso' : 'Thread aperto'}
                 />
             </td>
 
             {/* TOPIC: titolo + data creazione */}
-            <td style={{ padding: '8px 10px' }}>
-                <div className="forum_post_title" style={{ color: '#a7a7a8' }}>
-                    {thread.titolo}
-                </div>
+            <td className={styles.topicCell}>
+                <div className="forum_post_title">{thread.titolo}</div>
                 <div className="forum_date_small">{formatDate(thread.data)}</div>
             </td>
 
             {/* AUTORE */}
-            <td style={{ padding: '8px 10px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+            <td className={styles.authorCell}>
                 <div className="forum_date_big_right">{thread.autore}</div>
             </td>
 
             {/* RISPOSTE: numero + data ultima risposta */}
-            <td style={{ padding: '8px 10px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+            <td className={styles.repliesCell}>
                 <div className="forum_date_big_right">{thread.n_risposte} Risposte</div>
                 {thread.n_risposte > 0 && (
-                    <div className="forum_date_big" style={{ paddingLeft: 0 }}>
+                    <div className={`forum_date_big ${styles.dateNoIndent}`}>
                         Ultima: {formatDate(thread.data_ultimo_messaggio)}
                     </div>
                 )}
@@ -101,33 +100,30 @@ function ThreadRow({ thread, onClick, isStaff, onAction }) {
 
             {/* AZIONI staff: importante, chiudi/apri, elimina */}
             {isStaff && (
-                <td style={{ padding: '8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {/* Importante: freccia_su (verde) = segna, freccia_giu (rossa) = rimuovi */}
+                <td className={styles.actionsCell}>
                     <img
                         src={thread.importante
                             ? '/themes/crystal/imgs/forum/freccia_giu.png'
                             : '/themes/crystal/imgs/forum/freccia_su.png'}
                         alt="Importante"
                         title={thread.importante ? 'Rimuovi da importanti' : 'Segna come importante'}
-                        style={{ cursor: 'pointer', margin: '0 2px', width: '20px' }}
+                        className={styles.actionIcon}
                         onClick={e => action(e, 'toggle_important')}
                     />
-                    {/* Chiudi/Apri: lucchetto_chiuso = chiudi post, lucchetto_aperto = apri post */}
                     <img
                         src={thread.chiuso
                             ? '/themes/crystal/imgs/forum/lucchetto_aperto.png'
                             : '/themes/crystal/imgs/forum/lucchetto_chiuso.png'}
                         alt={thread.chiuso ? 'Apri' : 'Chiudi'}
                         title={thread.chiuso ? 'Apri post' : 'Chiudi post'}
-                        style={{ cursor: 'pointer', margin: '0 2px', width: '20px' }}
+                        className={styles.actionIcon}
                         onClick={e => action(e, 'toggle_close')}
                     />
-                    {/* Elimina thread (solo admin/mod) */}
                     <img
                         src="/themes/crystal/imgs/forum/cancella_topic.png"
                         alt="Elimina"
                         title="Elimina thread"
-                        style={{ cursor: 'pointer', margin: '0 2px', width: '20px' }}
+                        className={styles.actionIcon}
                         onClick={e => {
                             e.stopPropagation()
                             if (confirm('Eliminare questo thread e tutte le risposte?')) {
@@ -154,50 +150,30 @@ function ThreadRow({ thread, onClick, isStaff, onAction }) {
  */
 function PostCard({ msg, isFirst }) {
     return (
-        <table
-            className={`customTable`}
-            style={{ marginBottom: '10px', width: '100%' }}
-        >
+        <table className={`customTable ${styles.postCard}`}>
             <tbody>
                 <tr>
                     {/* Colonna avatar + autore */}
-                    <td className="forum_main_post_author" style={{ verticalAlign: 'top', padding: '10px', minWidth: '80px' }}>
+                    <td className={`forum_main_post_author ${styles.authorColumn}`}>
                         {msg.avatar && (
                             <img
                                 src={msg.avatar}
-                                className="img_forum_avatar"
+                                className={`img_forum_avatar ${styles.avatarImg}`}
                                 alt={msg.autore}
-                                style={{ display: 'block', marginBottom: '6px' }}
                             />
                         )}
-                        <div className="forum_post_author" style={{ fontSize: '12px', color: '#ce846f', textAlign: 'center' }}>
-                            {msg.autore}
-                        </div>
-                        <div className="forum_date_big" style={{ paddingLeft: 0, textAlign: 'center' }}>
-                            {formatDate(msg.data)}
-                        </div>
+                        <div className={`forum_post_author ${styles.authorName}`}>{msg.autore}</div>
+                        <div className={`forum_date_big ${styles.authorDate}`}>{formatDate(msg.data)}</div>
                     </td>
 
                     {/* Colonna messaggio */}
-                    <td className="forum_main_post_message" style={{ verticalAlign: 'top', padding: '10px' }}>
-                        {/* Titolo solo per il post padre */}
+                    <td className={`forum_main_post_message ${styles.messageColumn}`}>
                         {isFirst && msg.titolo && (
-                            <div className="header_thread" style={{ marginBottom: '10px' }}>
-                                {msg.titolo}
-                            </div>
+                            <div className={`header_thread ${styles.threadTitle}`}>{msg.titolo}</div>
                         )}
-
-                        {/* Corpo del messaggio — può contenere HTML (BBCode convertito lato server) */}
-                        <div
-                            className="forum_post_message"
-                            dangerouslySetInnerHTML={{ __html: msg.messaggio }}
-                        />
-
-                        {/* Nota modifica se presente */}
+                        <div className="forum_post_message" dangerouslySetInnerHTML={{ __html: msg.messaggio }} />
                         {msg.edit_note && (
-                            <div className="forum_post_modify" style={{ marginTop: '10px', fontSize: '11px', color: '#aaa' }}>
-                                {msg.edit_note}
-                            </div>
+                            <div className={`forum_post_modify ${styles.editNote}`}>{msg.edit_note}</div>
                         )}
                     </td>
                 </tr>
@@ -246,7 +222,8 @@ function BBCodeToolbar({ textareaRef, onChange }) {
         <span
             key={label}
             onClick={() => insert(openTag, closeTag)}
-            style={{ cursor: 'pointer', margin: '0 4px', color: color || '#a7a7a8', fontFamily: '"DejaVu Serif"', fontSize: '12px', letterSpacing: '1px', userSelect: 'none' }}
+            className={styles.toolbarBtn}
+            style={color ? { color } : undefined}
             title={`${openTag}...${closeTag}`}
         >
             {label}
@@ -254,12 +231,11 @@ function BBCodeToolbar({ textareaRef, onChange }) {
     )
 
     return (
-        <div style={{ padding: '6px 0', textAlign: 'center', borderBottom: '1px solid #2a2f4a', marginBottom: '6px', color: '#a7a7a8', fontSize: '11px' }}>
-            <span style={{ marginRight: '6px', color: '#888' }}>formattazione testo:</span>
+        <div className={styles.toolbar}>
+            <span className={styles.toolbarLabel}>formattazione testo:</span>
             {btn('B',       '[b]',          '[/b]',          '#fff')}
             {btn('I',       '[i]',          '[/i]',          '#ccc')}
-            <span style={{ cursor: 'pointer', margin: '0 4px', color: '#a7a7a8', textDecoration: 'underline', fontSize: '12px', userSelect: 'none' }}
-                onClick={() => insert('[u]', '[/u]')}>U</span>
+            <span className={styles.toolbarBtnU} onClick={() => insert('[u]', '[/u]')}>U</span>
             {btn('CENTRO',  '[center]',     '[/center]')}
             {btn('IMG',     '[img]',        '[/img]')}
             {btn('URL',     '[url]',        '[/url]')}
@@ -302,64 +278,50 @@ function PostForm({ isNew, chiuso, sending, onSubmit, onCancel }) {
     }
 
     if (chiuso) {
-        return (
-            <p style={{ color: '#aaa', fontStyle: 'italic', textAlign: 'center', margin: '20px 0' }}>
-                Thread chiuso — non è possibile rispondere.
-            </p>
-        )
+        return <p className={styles.closedNote}>Thread chiuso — non è possibile rispondere.</p>
     }
 
     return (
-        <div style={{ marginTop: '20px', padding: '10px', background: '#111423', borderRadius: '6px' }}>
-            <h4 style={{ color: '#ce846f', marginBottom: '10px' }}>
-                {isNew ? 'Nuova discussione' : 'Rispondi'}
-            </h4>
+        <div className={styles.formContainer}>
+            <h4 className={styles.formTitle}>{isNew ? 'Nuova discussione' : 'Rispondi'}</h4>
 
-            {/* Titolo — solo per nuovi thread */}
             {isNew && (
-                <div style={{ marginBottom: '8px' }}>
+                <div className={styles.titleField}>
                     <input
                         type="text"
                         value={titolo}
                         onChange={e => setTitolo(e.target.value)}
                         placeholder="Titolo della discussione"
-                        style={{ width: '100%', boxSizing: 'border-box' }}
+                        className={styles.fullWidth}
                     />
                 </div>
             )}
 
-            {/* Toolbar BBCode — stesse opzioni del vecchio forum */}
             <BBCodeToolbar textareaRef={textareaRef} onChange={setTesto} />
 
-            {/* Corpo del messaggio */}
             <textarea
                 ref={textareaRef}
                 value={testo}
                 onChange={e => setTesto(e.target.value)}
                 placeholder="Scrivi il tuo messaggio..."
                 rows="6"
-                style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical' }}
+                className={styles.fullWidthResize}
             />
 
-            {/* Opzioni e pulsanti */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px', flexWrap: 'wrap' }}>
-                <label style={{ fontSize: '12px', color: '#aaa', cursor: 'pointer' }}>
+            <div className={styles.formOptions}>
+                <label className={styles.anonLabel}>
                     <input
                         type="checkbox"
                         checked={anonimo}
                         onChange={e => setAnonimo(e.target.checked)}
-                        style={{ marginRight: '4px' }}
+                        className={styles.anonCheckbox}
                     />
                     Anonimo
                 </label>
-
-                <button onClick={handleSubmit} disabled={sending || !testo.trim() || (isNew && !titolo.trim())} style={{ cursor: 'pointer' }}>
+                <button onClick={handleSubmit} disabled={sending || !testo.trim() || (isNew && !titolo.trim())}>
                     {sending ? 'Invio...' : 'Invia'}
                 </button>
-
-                {onCancel && (
-                    <button onClick={onCancel} style={{ cursor: 'pointer' }}>Annulla</button>
-                )}
+                {onCancel && <button onClick={onCancel}>Annulla</button>}
             </div>
         </div>
     )
@@ -608,7 +570,7 @@ export default function Forum({ isStaff = false }) {
         return (
             <div className="pagina_forum">
                 {loadingSections ? (
-                    <p style={{ padding: '20px', color: '#aaa' }}>Caricamento sezioni...</p>
+                    <p className={styles.loadingText}>Caricamento sezioni...</p>
                 ) : (
                     /*
                      * Struttura identica al vecchio forum PHP:
@@ -617,7 +579,7 @@ export default function Forum({ isStaff = false }) {
                      * - Riga per ogni sezione: [icona letto] [nome] [descrizione]
                      * - Nessuna ripetizione di "Sezione / Descrizione / Non letti"
                      */
-                    <table className="customTable" style={{ width: '100%', margin: '0 auto' }}>
+                    <table className={`customTable ${styles.sectionsTable}`}>
                         <tbody>
                             {Object.entries(sections).map(([tipo, secs]) => (
                                 <>
@@ -633,42 +595,18 @@ export default function Forum({ isStaff = false }) {
                                           * Il colore arancione va aggiunto inline perché third_header colora
                                           * solo i tag <a> nel CSS, non il testo puro dei <td>.
                                           */}
-                                        <td colSpan="3" style={{ textAlign: 'center', padding: '8px 20px', textTransform: 'uppercase', color: '#ce846f', fontFamily: '"DejaVu Serif"', filter: 'drop-shadow(-1.732px 1px 2px #000000)' }}>
-                                            {tipo}
-                                        </td>
+                                        <td colSpan="3" className={styles.groupHeaderCell}>{tipo}</td>
                                     </tr>
 
                                     {/* Righe delle sezioni: [🌙 nome] [descrizione] [badge] */}
                                     {secs.map(sec => (
-                                        <tr
-                                            key={sec.id}
-                                            className="mappa"
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={() => openSection(sec)}
-                                        >
-                                            {/* 🌙 Nome sezione [badge] — tutto nella stessa cella */}
-                                            <td style={{ padding: '8px 20px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                                                {sec.non_letti > 0 && (
-                                                    <span style={{ marginRight: '6px', fontSize: '14px', verticalAlign: 'middle' }}>🌙</span>
-                                                )}
+                                        <tr key={sec.id} className={`mappa ${styles.clickable}`} onClick={() => openSection(sec)}>
+                                            <td className={styles.sectionNameCell}>
+                                                {sec.non_letti > 0 && <span className={styles.unreadMoon}>🌙</span>}
                                                 {sec.nome}
-                                                {sec.non_letti > 0 && (
-                                                    <span style={{
-                                                        marginLeft: '6px',
-                                                        background: '#e74c3c', color: '#fff',
-                                                        borderRadius: '10px', padding: '1px 7px',
-                                                        fontSize: '10px', fontWeight: 'bold',
-                                                        verticalAlign: 'middle',
-                                                    }}>
-                                                        {sec.non_letti}
-                                                    </span>
-                                                )}
+                                                {sec.non_letti > 0 && <span className={styles.unreadBadge}>{sec.non_letti}</span>}
                                             </td>
-
-                                            {/* Descrizione */}
-                                            <td style={{ padding: '8px 20px', fontSize: '11px', color: '#a7a7a8', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                                {sec.descrizione}
-                                            </td>
+                                            <td className={styles.sectionDescCell}>{sec.descrizione}</td>
                                         </tr>
                                     ))}
                                 </>
@@ -693,32 +631,24 @@ export default function Forum({ isStaff = false }) {
 
         return (
             <div className="pagina_forum">
-                {/* Barra di ricerca — identica al vecchio forum */}
-                <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                <div className={styles.searchBar}>
                     <input
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                         placeholder="Cerca per termine, titolo o autore"
-                        style={{ width: '200px', marginRight: '6px' }}
+                        className={styles.searchInput}
                     />
-                    <button onClick={() => setSearchQuery(searchQuery)} style={{ cursor: 'pointer' }}>cerca</button>
+                    <button onClick={() => setSearchQuery(searchQuery)}>cerca</button>
                 </div>
 
-                {/* Pulsanti: Nuovo Messaggio | Segna tutto letto | Torna indietro */}
-                <div style={{ textAlign: 'center', marginBottom: '10px', display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                    <button onClick={() => setView('compose')} style={{ cursor: 'pointer' }}>
-                        Nuovo Messaggio
-                    </button>
-                    <button onClick={markAllRead} style={{ cursor: 'pointer' }}>
-                        Segna tutto come letto
-                    </button>
-                    <button onClick={backToSections} style={{ cursor: 'pointer' }}>
-                        Torna indietro
-                    </button>
+                <div className={styles.buttonsBar}>
+                    <button onClick={() => setView('compose')}>Nuovo Messaggio</button>
+                    <button onClick={markAllRead}>Segna tutto come letto</button>
+                    <button onClick={backToSections}>Torna indietro</button>
                 </div>
 
                 {loadingThreads ? (
-                    <p style={{ color: '#aaa' }}>Caricamento thread...</p>
+                    <p className={styles.loadingSmall}>Caricamento thread...</p>
                 ) : (
                     <>
                         <table className="customTable" style={{ width: '100%' }}>
@@ -728,16 +658,16 @@ export default function Forum({ isStaff = false }) {
                                   * per forzare il colore arancione come nel vecchio forum.
                                   */}
                                 <tr className="second_header">
-                                    <td style={{ textAlign: 'center', width: '40px', color: '#ce846f' }}>STATO</td>
-                                    <td style={{ color: '#ce846f' }}>TOPIC</td>
-                                    <td style={{ textAlign: 'center', color: '#ce846f' }}>AUTORE</td>
-                                    <td style={{ textAlign: 'center', color: '#ce846f' }}>RISPOSTE</td>
-                                    {isStaff && <td style={{ color: '#ce846f' }}></td>}
+                                    <td className={styles.theadCenter}>STATO</td>
+                                    <td className={styles.theadColor}>TOPIC</td>
+                                    <td className={styles.theadColor} style={{ textAlign: 'center' }}>AUTORE</td>
+                                    <td className={styles.theadColor} style={{ textAlign: 'center' }}>RISPOSTE</td>
+                                    {isStaff && <td className={styles.theadColor}></td>}
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredThreads.length === 0 ? (
-                                    <tr><td colSpan={isStaff ? 5 : 4} style={{ padding: '20px', color: '#aaa', textAlign: 'center' }}>Nessuna discussione.</td></tr>
+                                    <tr><td colSpan={isStaff ? 5 : 4} className={styles.emptyState}>Nessuna discussione.</td></tr>
                                 ) : (
                                     filteredThreads.map(t => (
                                         <ThreadRow
@@ -754,7 +684,7 @@ export default function Forum({ isStaff = false }) {
 
                         {/* Paginazione */}
                         {totalPages > 1 && (
-                            <div className="pagination" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '10px', justifyContent: 'center' }}>
+                            <div className={`pagination ${styles.pagination}`}>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                                     <a
                                         key={p}
@@ -777,10 +707,8 @@ export default function Forum({ isStaff = false }) {
     if (view === 'compose') {
         return (
             <div className="pagina_forum">
-                <div style={{ marginBottom: '10px' }}>
-                    <button onClick={() => setView('threads')} style={{ cursor: 'pointer' }}>
-                        ← {currentSection?.nome}
-                    </button>
+                <div className={styles.backBar}>
+                    <button onClick={() => setView('threads')}>← {currentSection?.nome}</button>
                 </div>
                 <PostForm
                     isNew={true}
@@ -798,15 +726,12 @@ export default function Forum({ isStaff = false }) {
         const threadClosed = messages[0]?.chiuso ?? false
         return (
             <div className="pagina_forum">
-                {/* Navigazione */}
-                <div style={{ marginBottom: '10px' }}>
-                    <button onClick={backToThreads} style={{ cursor: 'pointer' }}>
-                        ← {currentSection?.nome}
-                    </button>
+                <div className={styles.backBar}>
+                    <button onClick={backToThreads}>← {currentSection?.nome}</button>
                 </div>
 
                 {loadingRead ? (
-                    <p style={{ color: '#aaa' }}>Caricamento messaggi...</p>
+                    <p className={styles.loadingSmall}>Caricamento messaggi...</p>
                 ) : (
                     <>
                         {/* Tutti i messaggi del thread */}

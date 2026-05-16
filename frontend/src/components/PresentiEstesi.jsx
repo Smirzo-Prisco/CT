@@ -17,6 +17,7 @@
  */
 
 import { useState, useEffect, useCallback, Fragment } from 'react'
+import shared from './shared.module.css'
 
 // ---------------------------------------------------------------------------
 // COSTANTI
@@ -194,19 +195,19 @@ export default function PresentiEstesi() {
     // --- Rendering ---
 
     if (loading) {
-        return <div style={{ padding: '20px', color: '#aaa' }}>Caricamento presenti...</div>
+        return <div className={shared.centered}>Caricamento presenti...</div>
     }
 
     /** Struttura annidata { mappa: { stanza: [utenti] } } per il rendering gerarchico */
     const grouped = groupUsers(users)
 
     return (
-        <div className="presenti_estesi" style={{ overflowX: 'auto', maxWidth: '100%' }}>
-            <table className="customTable" style={{ width: '100%', tableLayout: 'fixed', wordBreak: 'break-word' }}>
+        <div className={`presenti_estesi ${shared.overflowX}`}>
+            <table className={`customTable ${shared.fullTable}`}>
                 <thead>
                     <tr>
                         {/* Header con conteggio — si aggiorna automaticamente ad ogni evento socket */}
-                        <th colSpan="7" style={{ fontSize: '12px', color: '#8f8f8f', fontFamily: "'DejaVu Serif'" }}>
+                        <th colSpan="7" className={shared.schedaSerial}>
                             PRESENTI: {total}
                         </th>
                     </tr>
@@ -230,7 +231,7 @@ export default function PresentiEstesi() {
 
                             {/* Header mappa */}
                             <tr className="mappa">
-                                <td colSpan="8" style={{ textTransform: 'uppercase' }}>{mappa}</td>
+                                <td colSpan="8" className={shared.schedaUpper}>{mappa}</td>
                             </tr>
 
                             {/* Iterazione per stanza — Fragment con key, obbligatorio per liste React */}
@@ -244,7 +245,7 @@ export default function PresentiEstesi() {
                                       */}
                                     {stanza && (
                                         <tr className="third_header">
-                                            <td colSpan="8" style={{ textTransform: 'uppercase' }}>
+                                            <td colSpan="8" className={shared.schedaUpper}>
                                                 <a href={`main.php?dir=${utenti[0].ultimo_luogo}&map_id=${utenti[0].ultima_mappa}`}>
                                                     {stanza}
                                                 </a>

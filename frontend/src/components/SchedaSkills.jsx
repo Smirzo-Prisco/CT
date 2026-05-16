@@ -23,6 +23,7 @@
 
 import { useState, useEffect, Fragment } from 'react'
 import SchedaMenu from './SchedaMenu'
+import shared from './shared.module.css'
 
 // ---------------------------------------------------------------------------
 // MAPPA TIPI DB → CATEGORIE DISPLAY
@@ -102,7 +103,7 @@ function SkillRow({ skill, showLevel }) {
                         : skill.nome
                     }
                     {showLevel && (
-                        <><br /><span style={{ color: '#9a6353' }}>Livello attuale: {skill.grado}/{skill.max_lvl}</span></>
+                        <><br /><span className={shared.primaryColor}>Livello attuale: {skill.grado}/{skill.max_lvl}</span></>
                     )}
                 </td>
             </tr>

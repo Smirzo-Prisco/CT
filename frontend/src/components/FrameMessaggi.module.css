@@ -1,0 +1,5 @@
+/* FrameMessaggi.module.css — stili scoped per FrameMessaggi.jsx */
+
+.gridPanel  { display: flex; justify-content: center; align-items: center; margin-top: 10px; margin-left: 22px; }
+.grid       { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; grid-auto-rows: 60px; padding: 10px; }
+.gridItem   { display: flex; justify-content: center; align-items: center; }

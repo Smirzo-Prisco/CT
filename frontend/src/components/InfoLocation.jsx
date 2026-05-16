@@ -24,6 +24,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import shared from './shared.module.css'
 
 export default function InfoLocation() {
 
@@ -68,7 +69,7 @@ export default function InfoLocation() {
     // ---------------------------------------------------------------------------
 
     if (!data) {
-        return <div className="pagina_info_location" style={{ padding: '10px', color: '#aaa' }}>...</div>
+        return <div className="pagina_info_location"><div className={shared.muted}>...</div></div>
     }
 
     /**
@@ -110,24 +111,6 @@ export default function InfoLocation() {
                     </a>
                     {`, Anno ${data.anno}`}
                 </div>
-
-                {/* Stato e descrizione in marquee (visibili solo in stanza) */}
-                {data.tipo === 'stanza' && (data.stato || data.descrizione) ? (
-                    <div className="box_stato_luogo">
-                        <marquee
-                            onMouseOver={e => e.target.stop()}
-                            onMouseOut={e => e.target.start()}
-                            direction="left"
-                            scrollAmount="3"
-                            className="stato_luogo"
-                        >
-                            &nbsp;Stato: {data.stato} - {data.descrizione}
-                        </marquee>
-                    </div>
-                ) : (
-                    <div className="box_stato_luogo">&nbsp;</div>
-                )}
-
             </div>
         </div>
     )

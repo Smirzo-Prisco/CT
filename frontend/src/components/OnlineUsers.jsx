@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import shared from './shared.module.css'
 
 const HEARTBEAT_MS = 120_000
 
@@ -58,7 +59,7 @@ export default function OnlineUsers() {
     <div className="iframe_online">
       <div className="contenitore_presenti">
         {users.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 10px', color: '#666', fontStyle: 'italic' }}>
+          <div className={shared.centered}>
             Nessun utente online
           </div>
         ) : (

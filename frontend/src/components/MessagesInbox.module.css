@@ -1,0 +1,29 @@
+/* MessagesInbox.module.css — stili scoped per MessagesInbox.jsx */
+
+/* ── ConvItem ──────────────────────────────────────────────── */
+.noDecoration  { text-decoration: none; }
+.unreadDot     { color: #e74c3c; margin-left: 6px; }
+
+/* ── ThreadView ────────────────────────────────────────────── */
+.loading       { padding: 20px; color: #aaa; }
+.threadWrap    { display: flex; flex-direction: column; height: 100%; }
+.threadHeader  { border-bottom: 1px solid #333; padding: 10px; }
+.backBtn       { margin-right: 10px; }
+.onlineBadge   { margin-left: 8px; font-size: 0.85em; color: #aaa; }
+.messages      { overflow-y: auto; max-height: calc(100vh - 180px); padding: 10px; }
+.emptyMsg      { color: #aaa; font-style: italic; }
+.msgRow        { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+.msgAvatar     { width: 40px; height: 40px; border-radius: 4px; flex-shrink: 0; }
+.msgBody       { flex: 1; }
+.msgMeta       { font-size: 0.8em; color: #aaa; margin-bottom: 2px; }
+.replyBar      { border-top: 1px solid #333; padding: 10px; display: flex; gap: 8px; }
+.replyTextarea { flex: 1; resize: vertical; }
+.sendBtn       { align-self: flex-end; }
+
+/* ── ComposeView ───────────────────────────────────────────── */
+.composeWrap   { padding: 20px; }
+.formField     { margin-bottom: 10px; }
+.formLabel     { display: block; margin-bottom: 4px; }
+.fullWidth     { width: 100%; }
+.fullResize    { width: 100%; resize: vertical; }
+.formActions   { display: flex; gap: 8px; }

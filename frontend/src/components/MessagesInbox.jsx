@@ -27,6 +27,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import styles from './MessagesInbox.module.css'
 
 // ---------------------------------------------------------------------------
 // COSTANTI — path immagini (stesse del vecchio PHP)
@@ -110,7 +111,7 @@ function ConvItem({ conv, isSelected, onClick }) {
         <a
             href="#"
             onClick={e => { e.preventDefault(); onClick(conv) }}
-            style={{ textDecoration: 'none' }}
+            className={styles.noDecoration}
         >
             <div className={`message-item ${isSelected ? 'selected' : ''}`}>
 
@@ -126,7 +127,7 @@ function ConvItem({ conv, isSelected, onClick }) {
                     <p className="sender">
                         {conv.display_name}
                         {/* Punto indicatore nuovo messaggio */}
-                        {conv.non_letto && <span style={{ color: '#e74c3c', marginLeft: '6px' }}>●</span>}
+                        {conv.non_letto && <span className={styles.unreadDot}>●</span>}
                     </p>
                     <p className="date">{formatDate(conv.ora, conv.ongame)}</p>
                     <p className="preview">{preview || '(nessun testo)'}</p>
@@ -161,16 +162,16 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [messages])
 
-    if (loading) return <div style={{ padding: '20px', color: '#aaa' }}>Caricamento messaggi...</div>
+    if (loading) return <div className={styles.loading}>Caricamento messaggi...</div>
 
     return (
-        <div className="thread-container" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div className={`thread-container ${styles.threadWrap}`}>
 
             {/* Header del thread con nome contatto e pulsante torna indietro */}
-            <div className="thread-header" style={{ borderBottom: '1px solid #333', padding: '10px' }}>
-                <button onClick={onBack} style={{ marginRight: '10px', cursor: 'pointer' }}>←</button>
+            <div className="thread-header">
+                <button onClick={onBack} className={styles.backBtn}>←</button>
                 <strong>{conv.display_name}</strong>
-                <span style={{ marginLeft: '8px', fontSize: '0.85em', color: '#aaa' }}>
+                <span className={styles.onlineBadge}>
                     {conv.ongame ? '[ON]' : '[OFF]'}
                     {conv.tipo === 'gruppo' ? ' · Gruppo' : ''}
                     {conv.tipo === 'globale' ? ' · Globale' : ''}
@@ -182,33 +183,27 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
               * Senza max-height il div cresce con il contenuto e scrolla tutta la pagina.
               * calc(100vh - 180px) lascia spazio per header e form risposta.
               */}
-            <div className="thread-messages" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 180px)', padding: '10px' }}>
+            <div className="thread-messages">
                 {messages.length === 0 && (
-                    <p style={{ color: '#aaa', fontStyle: 'italic' }}>Nessun messaggio.</p>
+                    <p className={styles.emptyMsg}>Nessun messaggio.</p>
                 )}
                 {messages.map((msg, i) => (
                     <div
                         key={i}
-                        className="thread-message"
-                        style={{
-                            display: 'flex',
-                            gap: '10px',
-                            marginBottom: '12px',
-                            alignItems: 'flex-start',
-                        }}
+                        className={`thread-message ${styles.msgRow}`}
                     >
                         {/* Avatar mittente */}
                         {msg.avatar && (
                             <img
                                 src={msg.avatar}
                                 alt={msg.mittente}
-                                style={{ width: '40px', height: '40px', borderRadius: '4px', flexShrink: 0 }}
+                                className={styles.msgAvatar}
                             />
                         )}
 
                         {/* Corpo del messaggio */}
-                        <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '0.8em', color: '#aaa', marginBottom: '2px' }}>
+                        <div className={styles.msgBody}>
+                            <div className={styles.msgMeta}>
                                 <strong>{msg.mittente}</strong>
                                 {' · '}
                                 {formatDate(msg.ora, msg.ongame)}
@@ -227,20 +222,20 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
 
             {/* Form di risposta (nascosto per messaggi globali) */}
             {conv.tipo !== 'globale' && (
-                <div className="thread-reply" style={{ borderTop: '1px solid #333', padding: '10px', display: 'flex', gap: '8px' }}>
+                <div className="thread-reply">
                     <textarea
                         value={replyText}
                         onChange={e => setReplyText(e.target.value)}
                         placeholder="Scrivi una risposta..."
                         rows="3"
-                        style={{ flex: 1, resize: 'vertical' }}
+                        className={styles.replyTextarea}
                         // Invio con Ctrl+Enter per comodità
                         onKeyDown={e => { if (e.ctrlKey && e.key === 'Enter') onSend() }}
                     />
                     <button
                         onClick={onSend}
                         disabled={sending || !replyText.trim()}
-                        style={{ alignSelf: 'flex-end', cursor: 'pointer' }}
+                        className={styles.sendBtn}
                     >
                         {sending ? '...' : 'Invia'}
                     </button>
@@ -272,39 +267,39 @@ function ComposeView({ onSend, onCancel, sending }) {
     }
 
     return (
-        <div style={{ padding: '20px' }}>
+        <div className={styles.composeWrap}>
             <h3>Nuovo Messaggio</h3>
 
-            <div style={{ marginBottom: '10px' }}>
-                <label style={{ display: 'block', marginBottom: '4px' }}>Destinatario</label>
+            <div className={styles.formField}>
+                <label className={styles.formLabel}>Destinatario</label>
                 <input
                     type="text"
                     value={dest}
                     onChange={e => setDest(e.target.value)}
                     placeholder="Nome personaggio"
-                    style={{ width: '100%' }}
+                    className={styles.fullWidth}
                 />
             </div>
 
-            <div style={{ marginBottom: '10px' }}>
-                <label style={{ display: 'block', marginBottom: '4px' }}>Tipo</label>
+            <div className={styles.formField}>
+                <label className={styles.formLabel}>Tipo</label>
                 <select value={ongame} onChange={e => setOngame(parseInt(e.target.value))}>
                     <option value={0}>OFF (fuori gioco)</option>
                     <option value={1}>ON (in gioco)</option>
                 </select>
             </div>
 
-            <div style={{ marginBottom: '10px' }}>
-                <label style={{ display: 'block', marginBottom: '4px' }}>Messaggio</label>
+            <div className={styles.formField}>
+                <label className={styles.formLabel}>Messaggio</label>
                 <textarea
                     value={testo}
                     onChange={e => setTesto(e.target.value)}
                     rows="5"
-                    style={{ width: '100%', resize: 'vertical' }}
+                    className={styles.fullResize}
                 />
             </div>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className={styles.formActions}>
                 <button onClick={handleSend} disabled={sending || !dest.trim() || !testo.trim()}>
                     {sending ? 'Invio...' : 'Invia'}
                 </button>

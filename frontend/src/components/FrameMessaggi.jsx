@@ -26,6 +26,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import styles from './FrameMessaggi.module.css'
 
 // ---------------------------------------------------------------------------
 // GRIGLIA ICONE — configurazione statica dei 9 link di navigazione
@@ -249,7 +250,6 @@ export default function FrameMessaggi() {
                         src="../themes/crystal/imgs/forum/freccia_giu.png"
                         alt="Switch Meteo"
                         className="switch_meteo"
-                        style={{ cursor: 'pointer' }}
                         onClick={() => setShowYesterday(v => !v)}
                     />
                 </div>
@@ -260,10 +260,10 @@ export default function FrameMessaggi() {
             {/* I CSS del gridPanel erano inline nel vecchio PHP:                */}
             {/* li ristabiliamo come stili inline React.                         */}
             {/* ================================================================ */}
-            <div id="gridPanel" style={{ display:'flex', justifyContent:'center', alignItems:'center', marginTop:'10px', marginLeft:'22px' }}>
-                <div className="grid" style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:'12px', gridAutoRows:'60px', padding:'10px' }}>
+            <div id="gridPanel" className={styles.gridPanel}>
+                <div className={`grid ${styles.grid}`}>
                     {ICONS.map(icon => (
-                        <div key={icon.id} className="grid-item" style={{ display:'flex', justifyContent:'center', alignItems:'center' }}>
+                        <div key={icon.id} className={`grid-item ${styles.gridItem}`}>
                             {icon.chatoff ? (
                                 /* Chat Off: apre popup */
                                 <a

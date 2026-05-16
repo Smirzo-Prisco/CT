@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SchedaModifica.jsx — Form di modifica scheda personaggio (Phase SPA)
  *
  * Fetch GET:  api_scheda.php?op=form_data&pg=X  → campi attuali + permessi
@@ -17,6 +17,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import SchedaMenu from './SchedaMenu'
+import styles from './SchedaModifica.module.css'
 
 // ---------------------------------------------------------------------------
 // SOTTO-COMPONENTI
@@ -26,9 +27,7 @@ import SchedaMenu from './SchedaMenu'
 function FormRow({ label, children, valignTop = false }) {
     return (
         <tr>
-            <td className="second_header"
-                style={{ textTransform: 'uppercase', fontSize: 12, width: 200,
-                         verticalAlign: valignTop ? 'top' : 'middle' }}>
+            <td className={`second_header ${valignTop ? styles.labelCellTop : styles.labelCell}`}>
                 {label}
             </td>
             <td>{children}</td>
@@ -40,7 +39,7 @@ function FormRow({ label, children, valignTop = false }) {
 function SectionHeader({ children }) {
     return (
         <tr className="second_header">
-            <td colSpan="2" style={{ textTransform: 'uppercase', fontSize: 15 }}>
+            <td colSpan="2" className={styles.sectionTitle}>
                 {children}
             </td>
         </tr>
@@ -134,7 +133,7 @@ export default function SchedaModifica() {
                 <div className="page_body">
                     <div className="panels_box">
                         {msg && (
-                            <div className={msg.ok ? 'notice' : 'error'} style={{ marginBottom: 10 }}>
+                            <div className={`${msg.ok ? 'notice' : 'error'} ${styles.fieldWrap}`}>
                                 {msg.text}
                             </div>
                         )}
@@ -146,66 +145,62 @@ export default function SchedaModifica() {
                                 <SectionHeader>Dati personali</SectionHeader>
 
                                 <FormRow label="Cognome">
-                                    <input type="text" className="form_input"
+                                    <input type="text" className={`form_input ${styles.fullWidth}`}
                                         value={form.cognome ?? ''} onChange={upd('cognome')}
-                                        style={{ width: '100%' }} />
+                                         />
                                 </FormRow>
                                 <FormRow label="Età">
-                                    <input type="number" className="form_input"
+                                    <input type="number" className={`form_input ${styles.fullWidth}`}
                                         value={form.eta ?? ''} onChange={upd('eta')}
-                                        style={{ width: '100%' }} />
+                                         />
                                 </FormRow>
                                 <FormRow label="Nato a">
-                                    <input type="text" className="form_input"
+                                    <input type="text" className={`form_input ${styles.fullWidth}`}
                                         value={form.natoa ?? ''} onChange={upd('natoa')}
-                                        style={{ width: '100%' }} />
+                                         />
                                 </FormRow>
 
                                 {/* ── ASPETTO E IMMAGINI ───────────────── */}
                                 <SectionHeader>Aspetto e immagini</SectionHeader>
 
                                 <FormRow label="Volto">
-                                    <div style={{ display: 'flex', gap: 8 }}>
-                                        <input type="text" className="form_input"
+                                    <div className={styles.flexRow}>
+                                        <input type="text" className={`form_input ${styles.flexItem}`}
                                             value={form.volto ?? ''} onChange={upd('volto')}
-                                            style={{ flex: 1 }} />
+                                             />
                                         <input type="button" value="Controlla"
                                             className="form_button" onClick={checkVolto} />
                                     </div>
                                 </FormRow>
                                 <FormRow label="URL Immagine">
-                                    <input type="url" className="form_input"
+                                    <input type="url" className={`form_input ${styles.fullWidth}`}
                                         value={form.url_img ?? ''} onChange={upd('url_img')}
-                                        style={{ width: '100%' }} />
+                                         />
                                 </FormRow>
                                 <FormRow label="URL Immagine Chat">
-                                    <input type="url" className="form_input"
+                                    <input type="url" className={`form_input ${styles.fullWidth}`}
                                         value={form.url_img_chat ?? ''} onChange={upd('url_img_chat')}
-                                        placeholder="No gif animate" style={{ width: '100%' }} />
+                                        placeholder="No gif animate"  />
                                 </FormRow>
 
                                 {/* ── DESCRIZIONI ──────────────────────── */}
                                 <SectionHeader>Descrizioni</SectionHeader>
 
                                 <FormRow label="Background" valignTop>
-                                    <textarea className="ares" rows="15"
-                                        value={form.principale ?? ''} onChange={upd('principale')}
-                                        style={{ width: '100%' }} />
+                                    <textarea className={`ares ${styles.fullWidth}`} rows="15"
+                                        value={form.principale ?? ''} onChange={upd('principale')} />
                                 </FormRow>
                                 <FormRow label="Storia" valignTop>
-                                    <textarea className="ares" rows="15"
-                                        value={form.storia ?? ''} onChange={upd('storia')}
-                                        style={{ width: '100%' }} />
+                                    <textarea className={`ares ${styles.fullWidth}`} rows="15"
+                                        value={form.storia ?? ''} onChange={upd('storia')} />
                                 </FormRow>
                                 <FormRow label="Dice di sé" valignTop>
-                                    <textarea className="ares" rows="15"
-                                        value={form.descrizione ?? ''} onChange={upd('descrizione')}
-                                        style={{ width: '100%' }} />
+                                    <textarea className={`ares ${styles.fullWidth}`} rows="15"
+                                        value={form.descrizione ?? ''} onChange={upd('descrizione')} />
                                 </FormRow>
                                 <FormRow label="Off" valignTop>
-                                    <textarea className="ares" rows="15"
-                                        value={form.off ?? ''} onChange={upd('off')}
-                                        style={{ width: '100%' }} />
+                                    <textarea className={`ares ${styles.fullWidth}`} rows="15"
+                                        value={form.off ?? ''} onChange={upd('off')} />
                                 </FormRow>
 
                                 {/* ── IMPOSTAZIONI ─────────────────────── */}
@@ -218,9 +213,8 @@ export default function SchedaModifica() {
                                 </FormRow>
                                 {allow_audio && (
                                     <FormRow label="Musica in scheda">
-                                        <input type="url" className="form_input"
-                                            value={form.url_media ?? ''} onChange={upd('url_media')}
-                                            style={{ width: '100%' }} />
+                                        <input type="url" className={`form_input ${styles.fullWidth}`}
+                                            value={form.url_media ?? ''} onChange={upd('url_media')} />
                                     </FormRow>
                                 )}
 
@@ -229,37 +223,35 @@ export default function SchedaModifica() {
 
                                 <FormRow label={
                                     <>Tokyobook<br />
-                                    <em style={{ fontSize: 11, textTransform: 'none' }}>
+                                    <em className={styles.smallText}>
                                         {form.nickname_tokyo == null
                                             ? '(Puoi impostarlo)'
                                             : '(Modificabile una sola volta)'}
                                     </em></>
                                 }>
-                                    <input type="text" className="form_input"
+                                    <input type="text" className={`form_input ${styles.fullWidth}`}
                                         value={form.nickname_tokyo ?? ''}
                                         onChange={upd('nickname_tokyo')}
-                                        readOnly={nickname_tokyo_readonly}
-                                        style={{ width: '100%' }} />
+                                        readOnly={nickname_tokyo_readonly} />
                                 </FormRow>
 
                                 {nickname_gilda_set && (
                                     <FormRow label={
                                         <>Famiglia<br />
-                                        <em style={{ fontSize: 11, textTransform: 'none' }}>
+                                        <em className={styles.smallText}>
                                             (Modificabile una sola volta)
                                         </em></>
                                     }>
-                                        <input type="text" className="form_input"
+                                        <input type="text" className={`form_input ${styles.fullWidth}`}
                                             value={form.nickname_gilda ?? ''}
                                             onChange={upd('nickname_gilda')}
-                                            readOnly={nickname_gilda_readonly}
-                                            style={{ width: '100%' }} />
+                                            readOnly={nickname_gilda_readonly} />
                                     </FormRow>
                                 )}
 
                                 {/* ── SUBMIT ───────────────────────────── */}
                                 <tr>
-                                    <td colSpan="2" style={{ textAlign: 'center', padding: 20 }}>
+                                    <td colSpan="2" className={styles.centered}>
                                         <input type="submit" className="form_submit"
                                             value={saving ? 'Salvataggio…' : 'Salva scheda'}
                                             disabled={saving} />

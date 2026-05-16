@@ -22,6 +22,7 @@
 
 import { useState, useEffect } from 'react'
 import SchedaMenu from './SchedaMenu'
+import styles from './Scheda.module.css'
 
 // ---------------------------------------------------------------------------
 // UTILITÀ
@@ -95,32 +96,32 @@ function SchedaProfilo({ profile }) {
                 {/* ── PROFILO ───────────────────────────────────────────── */}
                 <div className="header_box">▪ PROFILO ▪</div><br />
 
-                <span style={{ float: 'left', marginLeft: 5 }}>Età:</span>
-                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{eta}</span>
+                <span className={styles.labelLeft}>Età:</span>
+                <span className={styles.valueRight}>{eta}</span>
                 <br />
 
-                <span style={{ float: 'left', marginLeft: 5 }}>Luogo:</span>
-                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{natoa}</span>
+                <span className={styles.labelLeft}>Luogo:</span>
+                <span className={styles.valueRight}>{natoa}</span>
                 <br />
 
                 {lavoro && (
                     <>
-                        <span style={{ float: 'left', marginLeft: 5 }}>Lavoro:</span>
-                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{lavoro}</span>
+                        <span className={styles.labelLeft}>Lavoro:</span>
+                        <span className={styles.valueRight}>{lavoro}</span>
                         <br />
                     </>
                 )}
 
-                <span style={{ float: 'left', marginLeft: 5 }}>{sn.race_sing ?? 'Spirito'}:</span>
-                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{razza}</span>
+                <span className={styles.labelLeft}>{sn.race_sing ?? 'Spirito'}:</span>
+                <span className={styles.valueRight}>{razza}</span>
                 <br />
 
-                <span style={{ float: 'left', marginLeft: 5 }}>Famiglia:</span>
-                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{nome_ruolo}</span>
+                <span className={styles.labelLeft}>Famiglia:</span>
+                <span className={styles.valueRight}>{nome_ruolo}</span>
                 <br />
 
-                <span style={{ float: 'left', marginLeft: 5 }}>Ruolo:</span>
-                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{nome_ruolo_mestiere}</span>
+                <span className={styles.labelLeft}>Ruolo:</span>
+                <span className={styles.valueRight}>{nome_ruolo_mestiere}</span>
                 <br /><br />
 
                 {/* ── STATISTICHE (solo proprio pg o staff) ─────────────── */}
@@ -128,22 +129,22 @@ function SchedaProfilo({ profile }) {
                     <>
                         <div className="header_box">▪ STATISTICHE ▪</div><br />
 
-                        <span style={{ float: 'left', marginLeft: 5 }}>Livello</span>
-                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right', color: 'yellow', fontWeight: 'bold' }}>
+                        <span className={styles.labelLeft}>Livello</span>
+                        <span className={styles.levelValue}>
                             {statistiche.livello}
                         </span>
                         <br /><br />
 
-                        <span style={{ float: 'left', marginLeft: 5 }}>Tot. Caratteristiche</span>
-                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right', fontWeight: 'bold' }}>
+                        <span className={styles.labelLeft}>Tot. Caratteristiche</span>
+                        <span className={styles.boldValue}>
                             {statistiche.totale}
                         </span>
                         <br />
 
                         {['car8', 'car2', 'car4', 'car6'].map(k => (
                             <span key={k}>
-                                <span style={{ float: 'left', marginLeft: 5 }}>{sn[k] ?? k}:</span>
-                                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{statistiche[k]}</span>
+                                <span className={styles.labelLeft}>{sn[k] ?? k}:</span>
+                                <span className={styles.valueRight}>{statistiche[k]}</span>
                                 <br />
                             </span>
                         ))}
@@ -153,36 +154,36 @@ function SchedaProfilo({ profile }) {
                 {/* ── INFO ──────────────────────────────────────────────── */}
                 <div className="header_box">▪ INFO ▪</div><br />
 
-                <span style={{ float: 'left', marginLeft: 5 }}>{sn.hitpoints ?? 'Salute'}:</span>
-                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{salute}/{salute_max}</span>
+                <span className={styles.labelLeft}>{sn.hitpoints ?? 'Salute'}:</span>
+                <span className={styles.valueRight}>{salute}/{salute_max}</span>
                 <br />
 
-                <span style={{ float: 'left', marginLeft: 5 }}>{sn.integrita ?? 'Integrità'}:</span>
-                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{integrita}/{integrita_max}</span>
+                <span className={styles.labelLeft}>{sn.integrita ?? 'Integrità'}:</span>
+                <span className={styles.valueRight}>{integrita}/{integrita_max}</span>
 
                 {statistiche && (
                     <>
                         <br />
-                        <span style={{ float: 'left', marginLeft: 5 }}>Esperienza:</span>
-                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>
+                        <span className={styles.labelLeft}>Esperienza:</span>
+                        <span className={styles.valueRight}>
                             {Math.floor(esperienza ?? 0)}
                         </span>
                         <br />
-                        <span style={{ float: 'left', marginLeft: 5 }}>Shin:</span>
-                        <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>
+                        <span className={styles.labelLeft}>Shin:</span>
+                        <span className={styles.valueRight}>
                             {Math.floor(shin ?? 0)}
                         </span>
                     </>
                 )}
 
                 <br />
-                <span style={{ float: 'left', marginLeft: 5 }}>{sn.notorieta ?? 'Notorietà'}:</span>
-                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>{Math.floor(notorieta)}</span>
+                <span className={styles.labelLeft}>{sn.notorieta ?? 'Notorietà'}:</span>
+                <span className={styles.valueRight}>{Math.floor(notorieta)}</span>
                 <br /><br />
 
                 {/* ── CARICHE STAFF ─────────────────────────────────────── */}
-                <span style={{ float: 'left', marginLeft: 5 }}>Cariche</span>
-                <span style={{ float: 'right', marginRight: 5, textAlign: 'right' }}>
+                <span className={styles.labelLeft}>Cariche</span>
+                <span className={styles.valueRight}>
                     {staffIcons.map(({ key, file, label }) =>
                         privilegi?.[key] == 1 ? (
                             <img key={key}

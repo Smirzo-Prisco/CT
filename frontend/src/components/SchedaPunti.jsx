@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import SchedaMenu from './SchedaMenu'
+import shared from './shared.module.css'
 
 // ---------------------------------------------------------------------------
 // PAGINAZIONE
@@ -189,7 +190,7 @@ export default function SchedaPunti() {
                                 <tbody>
                                     {records.length === 0
                                         ? <tr><td colSpan={config.colonne.length}
-                                            style={{ textAlign: 'center', padding: 20 }}>
+                                            className={shared.centered}>
                                                 Nessun record trovato.
                                           </td></tr>
                                         : records.map((r, i) => (
