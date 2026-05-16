@@ -75,6 +75,15 @@
     font-style: italic;
 }
 
+.chatoff-typing {
+    font-size: $text-xs;
+    font-style: italic;
+    color: $palette-text-4;
+    padding: 2px 8px;
+    background: $palette-dark-2;
+    min-height: 16px;
+}
+
 .chatoff-input-row {
     display: flex;
     gap: 4px;

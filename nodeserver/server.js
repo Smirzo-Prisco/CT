@@ -69,9 +69,16 @@ io.on('connection', socket => {
         io.to('global').emit('presenti:update');
     });
 
+    // Typing indicator chattina off: broadcast a tutti tranne il mittente
+    socket.on('chatoff:typing', (typing) => {
+        socket.to('global').emit('chatoff:typing', { nome: login, typing: !!typing });
+    });
+
     socket.on('disconnect', () => {
         io.to(`loc:${luogo}`).emit('users:update');
         io.to('global').emit('presenti:update');
+        // Assicura che il typing indicator venga rimosso se il socket cade
+        socket.to('global').emit('chatoff:typing', { nome: login, typing: false });
     });
 });
 
