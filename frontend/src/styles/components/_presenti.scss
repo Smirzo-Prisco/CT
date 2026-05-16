@@ -5,18 +5,15 @@
 
 // Colore specifico per i nomi dei presenti (non in palette globale)
 $presenti-name-color: #c0a49e;
-$presenti-accent:     #ce846f;
+$presenti-accent: #ce846f;
 
-body { font-family: $font-ui; }
+body {
+    font-family: $font-ui;
+}
 
 #online-users-container .iframe_online {
-    overflow: auto;
-    background-color: transparent;
     height: 263px;
-    width: 214px;
-    border: none;
-    margin: auto;
-    display: block;
+    width: 100%;
     background: url("imgs/colonna_dx/box_presenti.png") no-repeat center / 100%;
     position: relative;
     top: 73px;
@@ -48,7 +45,9 @@ div.presente a {
     line-height: 0;
 }
 
-div.link_presenti { margin-top: $space-5; }
+div.link_presenti {
+    margin-top: $space-5;
+}
 
 div.contenitore_presenti {
     width: 168px;
@@ -69,9 +68,13 @@ div.pagina_presenti_estesa img.disponibile {
 }
 
 div.pagina_presenti_estesa a,
-div.pagina_presenti_estesa a:visited { border: none; }
+div.pagina_presenti_estesa a:visited {
+    border: none;
+}
 
-div.pagina_presenti_estesa a:hover { border: none; }
+div.pagina_presenti_estesa a:hover {
+    border: none;
+}
 
 // ── Elenco presenti (PresentiEstesi) ─────────────────────────
 
@@ -101,7 +104,9 @@ div.pagina_presenti_estesa ul.elenco_presenti li.presente {
     margin: 0 0 0 5px;
 }
 
-div.pagina_presenti_estesa div.presenti_estesi { margin: auto; }
+div.pagina_presenti_estesa div.presenti_estesi {
+    margin: auto;
+}
 
 img.presenti_ico {
     margin-left: 2px;
@@ -121,12 +126,15 @@ table.customTable {
     margin: auto;
     text-align: center;
 
-    td, th {
+    td,
+    th {
         border: 1px solid $color-bg;
         padding: $space-1 + 1;
     }
 
-    thead { background-color: $palette-dark-5; }
+    thead {
+        background-color: $palette-dark-5;
+    }
 }
 
 tr.second_header {
