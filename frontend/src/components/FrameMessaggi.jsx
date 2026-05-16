@@ -32,16 +32,16 @@ function buildIcons(hasEvents) {
     const calImg = hasEvents ? 'icon_news_night.gif' : 'icon_news.png'
 
     return [
-        { id: 'mappa',      href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png',      alt: 'Mappa' },
-        { id: 'messaggi',   href: 'main.php?page=messages_center&offset=0',   img: null,                  alt: 'Messaggi' },
-        { id: 'forum',      href: 'main.php?page=forum',                      img: 'icon_forum.png',      alt: 'Forum' },
-        { id: 'uffici',     href: 'main.php?page=uffici',                     img: 'icon_uff.png',        alt: 'Uffici' },
-        { id: 'giocate',    href: 'main.php?page=role_recap',                 img: 'icon_doc.png',        alt: 'Giocate' },
-        { id: 'famiglie',   href: 'main.php?page=servizi_gilde',              img: 'icon_fam.png',        alt: 'Famiglie' },
-        { id: 'mestieri',   href: 'main.php?page=servizi_mestieri',           img: 'icon_job.png',        alt: 'Mestieri' },
-        { id: 'calendario', href: 'main.php?page=agenda_center',              img: calImg,                alt: 'Calendario' },
-        { id: 'gestione',   href: 'main.php?page=gestione',                   img: 'icon_strumenti.png',  alt: 'Gestione' },
-        { id: 'logout',     href: 'logout.php',                               img: 'icon_exit.png',       alt: 'Esci' },
+        { id: 'mappa', href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png', alt: 'Mappa' },
+        { id: 'messaggi', href: 'main.php?page=messages_center&offset=0', img: null, alt: 'Messaggi' },
+        { id: 'forum', href: 'main.php?page=forum', img: 'icon_forum.png', alt: 'Forum' },
+        { id: 'uffici', href: 'main.php?page=uffici', img: 'icon_uff.png', alt: 'Uffici' },
+        { id: 'giocate', href: 'main.php?page=role_recap', img: 'icon_doc.png', alt: 'Giocate' },
+        { id: 'famiglie', href: 'main.php?page=servizi_gilde', img: 'icon_fam.png', alt: 'Famiglie' },
+        { id: 'mestieri', href: 'main.php?page=servizi_mestieri', img: 'icon_job.png', alt: 'Mestieri' },
+        { id: 'calendario', href: 'main.php?page=agenda_center', img: calImg, alt: 'Calendario' },
+        { id: 'gestione', href: 'main.php?page=gestione', img: 'icon_strumenti.png', alt: 'Gestione' },
+        { id: 'logout', href: 'logout.php', img: 'icon_exit.png', alt: 'Esci' },
     ]
 }
 
@@ -96,7 +96,7 @@ export default function FrameMessaggi() {
     const ICONS = buildIcons(hasEvents)
 
     return (
-        <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}>
+        <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0px 0px 20px' }}>
             <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', gridAutoRows: '50px' }}>
                 {ICONS.map(icon => (
                     <div key={icon.id} className="grid-item" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
