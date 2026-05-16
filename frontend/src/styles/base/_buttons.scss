@@ -1,0 +1,168 @@
+// ============================================================
+// _buttons.scss — Sistema di pulsanti
+//
+// Gerarchia:
+//   .btn              → stile base condiviso (sempre presente)
+//   .btn--primary     → azione principale (rust #9a6353)
+//   .btn--secondary   → azione secondaria (outline)
+//   .btn--action      → link/icona (blu #4da6ff)
+//   .btn--danger      → azione distruttiva (rosso)
+//   .btn--success     → conferma (verde)
+//   .btn--ghost       → trasparente con bordo
+//   .btn--icon        → icona senza testo (quadrato)
+//
+// USO: <button class="btn btn--primary">Salva</button>
+// ============================================================
+@use '../tokens' as *;
+@use 'sass:color';
+
+// ── Base ─────────────────────────────────────────────────────
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-1 + 2;
+    padding: $space-2 $space-4;
+    border: 1px solid transparent;
+    border-radius: $radius-md;
+    font-family: inherit;
+    font-size: $text-sm;
+    font-weight: $font-weight-bold;
+    line-height: 1.4;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+        background-color $transition-fast,
+        border-color $transition-fast,
+        color $transition-fast,
+        transform $transition-fast;
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+// ── Varianti ─────────────────────────────────────────────────
+
+.btn--primary {
+    background: $color-primary;
+    border-color: $color-primary;
+    color: $color-text-light;
+
+    &:hover:not(:disabled) {
+        background: $color-primary-hover;
+        border-color: $color-primary-hover;
+        color: $color-text-light;
+    }
+}
+
+.btn--secondary {
+    background: transparent;
+    border-color: $color-primary;
+    color: $color-primary;
+
+    &:hover:not(:disabled) {
+        background: $color-primary;
+        color: $color-text-light;
+    }
+}
+
+.btn--action {
+    background: $color-action;
+    border-color: $color-action;
+    color: $palette-dark-1;
+
+    &:hover:not(:disabled) {
+        background: $color-action-hover;
+        border-color: $color-action-hover;
+        color: $color-text-light;
+    }
+}
+
+.btn--danger {
+    background: $color-danger;
+    border-color: $color-danger;
+    color: $color-text-light;
+
+    &:hover:not(:disabled) {
+        background: color.adjust($color-danger, $lightness: -10%);
+        border-color: color.adjust($color-danger, $lightness: -10%);
+    }
+}
+
+.btn--success {
+    background: $color-success;
+    border-color: $color-success;
+    color: $color-text-light;
+
+    &:hover:not(:disabled) {
+        background: color.adjust($color-success, $lightness: -10%);
+        border-color: color.adjust($color-success, $lightness: -10%);
+    }
+}
+
+.btn--ghost {
+    background: transparent;
+    border-color: $color-border;
+    color: $color-text;
+
+    &:hover:not(:disabled) {
+        border-color: $color-text-muted;
+        color: $color-text-light;
+    }
+}
+
+// ── Modificatori di dimensione ────────────────────────────────
+
+.btn--sm {
+    padding: $space-1 $space-2 + 2;
+    font-size: $text-xs + 1;
+    border-radius: $radius-sm;
+}
+
+.btn--lg {
+    padding: $space-3 $space-6;
+    font-size: $text-lg;
+}
+
+// ── Pulsante solo icona ───────────────────────────────────────
+
+.btn--icon {
+    padding: $space-1;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: $color-action;
+    font-size: $text-lg;
+    border-radius: $radius-md;
+
+    &:hover:not(:disabled) {
+        color: $color-text-light;
+        background: rgb(255 255 255 / 8%);
+    }
+}
+
+// ── Alias legacy (classi già in uso nel progetto) ────────────
+// Mappate sulle nuove varianti per compatibilità retroattiva.
+
+.btn-action   { @extend .btn--icon; }
+.btn-dettagli { @extend .btn; @extend .btn--action; }
+.btn-compra-ok { @extend .btn; @extend .btn--success; }
+.btn-mercato-ko {
+    @extend .btn;
+    background: #909090;
+    border-color: #909090;
+    color: $color-text-light;
+    cursor: default;
+
+    &:hover { background: #909090; }
+}

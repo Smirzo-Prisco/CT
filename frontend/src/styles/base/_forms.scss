@@ -1,0 +1,224 @@
+// ============================================================
+// _forms.scss — Tutti gli elementi di form
+// Regole globali per input, select, textarea, button.
+// Le varianti specifiche di un componente vanno in components/.
+// ============================================================
+@use '../tokens' as *;
+
+// ── Mixin interno per la lista di selettori ───────────────────
+
+@mixin all-inputs {
+    select,
+    input[type='submit'],
+    input[type='button'],
+    input[type='reset'],
+    input[type='text'],
+    input[type='number'],
+    input[type='email'],
+    input[type='password'],
+    input[type='tel'],
+    input[type='url'],
+    input[type='search'],
+    input[type='date'],
+    input[type='time'],
+    input[type='datetime-local'],
+    input[type='month'],
+    input[type='week'],
+    textarea,
+    button {
+        @content;
+    }
+}
+
+@mixin text-inputs {
+    input[type='text'],
+    input[type='number'],
+    input[type='email'],
+    input[type='password'],
+    input[type='tel'],
+    input[type='url'],
+    input[type='search'],
+    input[type='date'],
+    input[type='time'],
+    input[type='datetime-local'],
+    input[type='month'],
+    input[type='week'] {
+        @content;
+    }
+}
+
+@mixin submit-inputs {
+    input[type='submit'],
+    input[type='button'],
+    input[type='reset'] {
+        @content;
+    }
+}
+
+// ── Reset larghezza globale (PHP legacy) ─────────────────────
+
+input,
+textarea,
+select {
+    width: 80%;
+    margin-bottom: $space-2 + 2;
+}
+
+// ── Stile base comune ─────────────────────────────────────────
+
+@include all-inputs {
+    background: $color-surface-input;
+    color: $color-text;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 6px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    box-sizing: border-box;
+    outline: none;
+    transition:
+        background-color $transition-fast,
+        border-color $transition-fast;
+}
+
+// ── Hover ────────────────────────────────────────────────────
+
+@include all-inputs {
+    &:hover {
+        background: $palette-dark-8;
+    }
+}
+
+// ── Focus ────────────────────────────────────────────────────
+
+@include all-inputs {
+    &:focus {
+        border-color: $color-border-focus;
+        box-shadow: $shadow-focus;
+        background: $color-surface-input;
+    }
+}
+
+// ── Active (solo pulsanti) ────────────────────────────────────
+
+@include submit-inputs {
+    &:active,
+    button:active {
+        transform: translateY(1px);
+    }
+}
+
+// ── Disabled ─────────────────────────────────────────────────
+
+@include all-inputs {
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: $palette-dark-4;
+
+        &:hover {
+            background: $palette-dark-4;
+        }
+    }
+}
+
+// ── Specifici per tipo ────────────────────────────────────────
+
+@include submit-inputs {
+    appearance: none;
+    min-width: 60px;
+    text-align: center;
+}
+
+@include text-inputs {
+    cursor: text;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 60px;
+    cursor: text;
+}
+
+button {
+    text-align: center;
+}
+
+// ── Tipi speciali ─────────────────────────────────────────────
+
+input[type='checkbox'],
+input[type='radio'] {
+    width: auto;
+    cursor: pointer;
+    accent-color: $color-border-focus;
+}
+
+input[type='range'] {
+    cursor: pointer;
+    accent-color: $color-border-focus;
+    background: transparent;
+    padding: 0;
+    height: 6px;
+}
+
+input[type='color'] {
+    cursor: pointer;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 0;
+    width: 40px;
+    height: 32px;
+}
+
+input[type='file'] {
+    cursor: pointer;
+    background: $color-surface-input;
+    color: $color-text;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+// Rimuovi spinner da number input
+input[type='number'] {
+    appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        appearance: none;
+        margin: 0;
+    }
+}
+
+::placeholder {
+    color: rgb(from #{$color-text-muted} r g b / 0.5);
+}
+
+// ── Select date inline (giorno/mese/anno) ─────────────────────
+
+select.day,
+select.month,
+select.year {
+    width: 60px;
+    display: inline-block;
+}
+
+// ── Form utility di gestione ─────────────────────────────────
+
+.form-select,
+.searchField {
+    max-height: 30px;
+    margin: 0;
+    padding: 6px 12px;
+    border: 1px solid $palette-dark-8;
+    border-radius: $radius-lg - 3;
+    background: $palette-dark-7;
+    color: $color-text-light;
+    font-size: $text-lg;
+}
+
+.form-select { min-width: 120px; }
+.searchField  { width: 200px; }

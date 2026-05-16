@@ -1,0 +1,93 @@
+// ============================================================
+// _typography.scss — Link, titoli e testo globale
+// ============================================================
+@use '../tokens' as *;
+
+// ── Link ─────────────────────────────────────────────────────
+
+a,
+a:visited {
+    color: $color-text-light;
+    text-decoration: none;
+}
+
+a:hover {
+    color: $color-text-muted;
+}
+
+// ── Titoli sezioni engine ─────────────────────────────────────
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    font-weight: $font-weight-bold;
+}
+
+div.innertube h2,
+div.output h2,
+div.page_title h2 {
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
+    border-bottom: none;
+    padding-bottom: $space-1;
+    margin-top: 0;
+}
+
+// ── Form labels ───────────────────────────────────────────────
+
+div.form_label {
+    font-size: $text-md;
+    font-weight: $font-weight-bold;
+    margin-top: $space-1 + 1;
+}
+
+div.form_info {
+    font-size: $text-md - 1;
+    margin-bottom: $space-4 - 1;
+}
+
+// ── Messaggi di sistema (warning / error) ─────────────────────
+
+div.warning,
+div.error {
+    background-color: $palette-dark-2;
+    font-size: $text-md - 1;
+    text-align: center;
+    margin: $space-4 - 1;
+    font-weight: $font-weight-bold;
+    padding: $space-2 + 2;
+    border: 1px solid $color-bg;
+    color: $color-text;
+    filter: drop-shadow(0 0 5px rgb(0 0 0 / 57%));
+}
+
+// ── Notifiche di salvataggio (save-notification) ──────────────
+
+.save-notification {
+    position: fixed;
+    top: $space-5;
+    right: $space-5;
+    padding: $space-4 - 1 $space-5;
+    border-radius: $radius-lg - 3;
+    color: $color-text-light;
+    z-index: 10000;
+
+    &.success { background: $color-success; }
+    &.warning { background: $color-warning; }
+    &.error   { background: $color-danger; }
+    &.info    { background: $color-info; }
+}
+
+.save-loader {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid $color-text-light;
+    border-radius: $radius-full;
+    border-top-color: transparent;
+    animation: ct-spin 1s linear infinite;
+    margin-right: $space-2;
+}
+
+@keyframes ct-spin {
+    to { transform: rotate(360deg); }
+}

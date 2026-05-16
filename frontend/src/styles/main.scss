@@ -10,11 +10,11 @@
 // ── FASE 1: Design Tokens ─────────────────────────────────
 @use 'tokens';
 
-// ── FASE 2: Base (da aggiungere) ─────────────────────────
-// @use 'base/reset';
-// @use 'base/typography';
-// @use 'base/forms';
-// @use 'base/buttons';
+// ── FASE 2: Base ─────────────────────────────────────────
+@use 'base/reset';
+@use 'base/typography';
+@use 'base/forms';
+@use 'base/buttons';
 
 // ── FASE 3: Componenti (da aggiungere) ───────────────────
 // @use 'components/chat';

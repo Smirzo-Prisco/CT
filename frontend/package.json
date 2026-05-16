@@ -6,8 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:css": "sass src/styles/main.scss ../themes/crystal/tokens.css --style=compressed --no-source-map",
-    "watch:css": "sass --watch src/styles/main.scss ../themes/crystal/tokens.css --no-source-map"
+    "build:css": "sass src/styles/main.scss ../themes/crystal/ct-styles.css --style=compressed --no-source-map",
+    "watch:css": "sass --watch src/styles/main.scss ../themes/crystal/ct-styles.css --no-source-map"
   },
   "dependencies": {
     "react": "^18.3.1",

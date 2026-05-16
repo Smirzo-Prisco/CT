@@ -71,7 +71,6 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
-        <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']; ?>/tokens.css" type="text/css">
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']; ?>/homepage.css" type="text/css">
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/main.css?<?=time()?>" type="text/css">
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/chat.css" type="text/css">
@@ -80,6 +79,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/messaggi.css" type="text/css">
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/forum.css" type="text/css">
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/lettura_bacheca.css" type="text/css">
+        <!-- ct-styles.css: compilato da SCSS, caricato per ultimo così sovrascrive correttamente -->
+        <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/ct-styles.css" type="text/css">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <?php
