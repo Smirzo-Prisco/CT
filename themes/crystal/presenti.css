@@ -1,4 +1,5 @@
-/****************************************************************************/
+/***************************************************************************  */
+
 /* STILE DELLA FINESTRA PRESENTI */
 
 /* HELP: Da qui è possibile modificare:
@@ -6,7 +7,7 @@
 - Le dimensioni e la posizione della finestra dei presenti
 - Lo sfondo della finestra dei presenti */
 
-/*Frame dei presenti*/
+/* Frame dei presenti */
 body { font-family: Lato; }
 
 div.online div.iframe_online {
@@ -33,7 +34,7 @@ div.luogo {
     font-size: 18px;
     font-weight: bolder;
     font-family: Perpetua; 
-    border: solid 0px red;
+    border: solid 0 red;
     text-align: center;
     text-transform: uppercase;
     
@@ -43,7 +44,7 @@ div.presente {
     font-weight: normal;
     font-size: 13px;
     border: none;
-    font-family: DejaVu Serif;
+    font-family: "DejaVu Serif";
     text-align: left;
     position: relative;
     text-transform: capitalize;
@@ -65,16 +66,11 @@ div.link_presenti {
 
 
 div.contenitore_presenti {
-width: 168px; 
-height: 185px; 
-border: none; 
-position: relative; 
-top: 30px; 
-left: 25px;
-overflow-y: auto;
+    padding: 10px;
+    overflow-y: auto;
 }
 
-/*Icone di stato dei presenti*/
+/* Icone di stato dei presenti */
 div.pagina_presenti img.sesso_ico,
 div.pagina_presenti img.status_ico,
 div.pagina_presenti img.disponibile,
@@ -88,7 +84,7 @@ div.pagina_presenti img.disponibile_switch {
 
 }
 
-/*Link nella colonna presenti */
+/* Link nella colonna presenti */
 div.pagina_presenti a,
 div.pagina_presenti a:visited,
 div.pagina_presenti_estesa a,
@@ -102,17 +98,17 @@ div.pagina_presenti_estesa a:hover {
     border: none;
 }
 
-/*Testo nella colonna presenti*/
+/* Testo nella colonna presenti */
 div.pagina_presenti ul.elenco_presenti,
 div.pagina_presenti_estesa ul.elenco_presenti {
     list-style-type: none;
     list-style-position: inside;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
     text-align: left;
 }
 
-/*Nomi dei luoghi*/
+/* Nomi dei luoghi */
 div.pagina_presenti ul.elenco_presenti li.luogo,
 div.pagina_presenti_estesa ul.elenco_presenti li.luogo {
     font-size: 11px;
@@ -124,7 +120,7 @@ div.pagina_presenti_estesa ul.elenco_presenti li.luogo {
 div.pagina_presenti_estesa ul.elenco_presenti li.mappa {
     font-size: 11px;
     font-weight: bold;
-    margin: 3px 0 1px 0;
+    margin: 3px 0 1px;
     text-transform: uppercase;
     
 }
@@ -141,7 +137,7 @@ div.pagina_presenti_estesa div.presenti_estesi {
     margin: auto;
 }
 
-/*Icone presenti*/
+/* Icone presenti */
 img.presenti_ico {
     margin-left: 2px;
     width: 10px;
@@ -149,7 +145,7 @@ img.presenti_ico {
     border: none;
 }
 
-/*NUOVO PRESENTI*/
+/* NUOVO PRESENTI */
 
 table.customTable {
   min-width: 70%;
@@ -189,14 +185,14 @@ tr.third_header a:link {
     font-size: 12px;
     color: #ce846f;
     font-family: "DejaVu Serif";
-    filter: drop-shadow(-1.732px 1px 2px #000000);
+    filter: drop-shadow(-1.732px 1px 2px #000);
     }
     
     tr.third_header a:visited {
     font-size: 12px;
     color: #ce846f;
     font-family: "DejaVu Serif";
-    filter: drop-shadow(-1.732px 1px 2px #000000);
+    filter: drop-shadow(-1.732px 1px 2px #000);
     }
     
 tr.mappa{
