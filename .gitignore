@@ -450,3 +450,5 @@ imgs/
 plugins/
 sounds/
 statuti/
+# Chattina off — log messaggi generato a runtime
+log.html
