@@ -10,8 +10,8 @@
     flex-direction: column;
     // Vincola il pannello alla larghezza della colonna senza mai sforare
     box-sizing: border-box;
-    width: 100%;
-    max-width: 100%;
+    width: 95%;
+    max-width: 95%;
     overflow: hidden;
 }
 
@@ -55,7 +55,7 @@
     line-height: 1.5;
     background: $palette-dark-10;
     box-sizing: border-box;
-    width: 95%;
+    width: 100%;
     word-break: break-word; // i messaggi lunghi vanno a capo invece di sforare
 
     // Messaggi dal log.html
