@@ -39,7 +39,55 @@
             gdrcd_query($result, 'free'); ?>
             </table>
             <br>
-            
+
+            <?php // MESTIERI — immagine + elenco + lavoro libero
+            $query = "SELECT mestiere.nome, mestiere.id_mestiere, mestiere.tipo, mestiere.url_sito, codtipomestiere.descrizione FROM mestiere JOIN codtipomestiere ON mestiere.tipo = codtipomestiere.cod_tipo WHERE mestiere.visibile = 1 ORDER BY mestiere.tipo, mestiere.nome";
+            $result = gdrcd_query($query, 'result');
+            $last_type = -1; ?>
+            <div class="titolo">
+                <img src="/themes/crystal/imgs/mestieri/titolo_mestieri.png" />
+            </div>
+            <br>
+            <table class="customTable">
+                <?php while($row = gdrcd_query($result, 'fetch')):
+                    $numb = gdrcd_query("SELECT COUNT(*) FROM clgpersonaggiomestiere JOIN ruolo_mestiere ON clgpersonaggiomestiere.id_ruolo = ruolo_mestiere.id_ruolo WHERE ruolo_mestiere.mestiere = ".$row['id_mestiere']." && clgpersonaggiomestiere.conferma_mestiere = 1");
+                    if($row['tipo'] != $last_type): ?>
+                        <tr class="second_header">
+                            <td><?=gdrcd_filter('out', $PARAMETERS['names']['job_name']['sing'])?></td>
+                            <td>Statuto</td>
+                            <td><?=gdrcd_filter('out', $PARAMETERS['names']['job_name']['members'])?></td>
+                        </tr>
+                    <?php $last_type = $row['tipo'];
+                    endif; ?>
+                    <tr>
+                        <td width="60%"><div><a href="main.php?page=servizi_mestieri&id_mestiere=<?=$row['id_mestiere']?>"><?=gdrcd_filter('out', $row['nome'])?></a></div></td>
+                        <td width="20%"><div><a href="<?=$row['url_sito']?>?id2=<?=$row['id_mestiere']?>" target="_blank"><i class="fa-solid fa-scroll"></i></a></div></td>
+                        <td><div style="font-size: 12px; color: #8f8f8f; font-family: DejaVu Serif; filter: drop-shadow(0 0 5px rgba(0,0,0,0.57));"><?=$numb['COUNT(*)']?></div></td>
+                    </tr>
+                <?php endwhile;
+                gdrcd_query($result, 'free'); ?>
+            </table>
+            <br><br>
+
+            <?php // LAVORO LIBERO
+            $query_job = "SELECT * FROM ruolo_mestiere JOIN clgpersonaggiolavoro ON ruolo_mestiere.id_ruolo = clgpersonaggiolavoro.id_ruolo JOIN personaggio ON clgpersonaggiolavoro.personaggio = personaggio.nome WHERE mestiere = -1 && personaggio.esperienza > 9 GROUP BY nome_ruolo";
+            $result_job = gdrcd_query($query_job, 'result'); ?>
+            <table class="customTable">
+                <tr class="second_header">
+                    <td>Lavoro Libero</td>
+                    <td><?=gdrcd_filter('out', $PARAMETERS['names']['job_name']['members'])?></td>
+                </tr>
+                <?php while($row_job = gdrcd_query($result_job, 'fetch')):
+                    $numb_job = gdrcd_query("SELECT COUNT(*) FROM clgpersonaggiolavoro JOIN ruolo_mestiere ON clgpersonaggiolavoro.id_ruolo = ruolo_mestiere.id_ruolo JOIN personaggio ON clgpersonaggiolavoro.personaggio = personaggio.nome WHERE ruolo_mestiere.id_ruolo = ".$row_job['id_ruolo']." && personaggio.esperienza > 9"); ?>
+                    <tr>
+                        <td width="80%"><div><a href="main.php?page=servizi_mestieri2&id_ruolo=<?=$row_job['id_ruolo']?>"><?=gdrcd_filter('out', $row_job['nome_ruolo'])?></a></div></td>
+                        <td><div style="font-size: 12px; color: #8f8f8f; font-family: DejaVu Serif; filter: drop-shadow(0 0 5px rgba(0,0,0,0.57));"><?=$numb_job['COUNT(*)']?></div></td>
+                    </tr>
+                <?php endwhile;
+                gdrcd_query($result_job, 'free'); ?>
+            </table>
+            <br><br>
+
     <?php
         } else {
             // RUOLI
