@@ -73,11 +73,6 @@ body {
     width: 180px;
 }
 
-#frame-messaggi-container {
-    position: relative;
-    padding: $space-2 + 2;
-}
-
 #info-location-container,
 #anteprima-scheda-container,
 #online-users-container {
@@ -217,12 +212,6 @@ img.immagine_luogo {
 div.news {
     background: url("imgs/colonna_sx/box_news.png") no-repeat;
     background-size: 100%;
-    position: relative;
-    top: 21px;
-    left: -1%;
-    width: 197px;
-    height: 118px;
-    margin: 0 auto;
 }
 
 // ── Meteo ─────────────────────────────────────────────────────
