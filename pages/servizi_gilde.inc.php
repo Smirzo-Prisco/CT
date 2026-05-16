@@ -16,13 +16,8 @@
             $result = gdrcd_query($query, 'result'); ?>
             <br>
             <table class="customTable">
-                <tr>
-                    <td colspan="3">
-                        <div style="font-size:13px;color:#9a6353;font-family:DejaVu Serif;filter:drop-shadow(0 0 5px rgba(0,0,0,0.57));">Razze</div>
-                    </td>
-                </tr>
                 <tr class="second_header">
-                    <td width="60%"><div><?=gdrcd_filter('out', $PARAMETERS['names']['guild_name']['sing'])?></div></td>
+                    <td width="60%"><div>RAZZE</div></td>
                     <td><div>Statuto</div></td>
                     <td><div><?=gdrcd_filter('out', $PARAMETERS['names']['guild_name']['members'])?></div></td>
                 </tr>
