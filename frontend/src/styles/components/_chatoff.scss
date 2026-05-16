@@ -11,8 +11,9 @@
     // Vincola il pannello alla larghezza della colonna senza mai sforare
     box-sizing: border-box;
     width: 95%;
-    max-width: 95%;
+    max-width: 260px;
     overflow: hidden;
+    margin: 0 auto;
 }
 
 .chatoff-title {
