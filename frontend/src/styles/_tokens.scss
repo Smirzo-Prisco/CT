@@ -10,120 +10,122 @@
 // ── PALETTE (valori crudi, non usare direttamente nel codice) ──────────────
 
 // Sfondi — dal più scuro al più chiaro
-$palette-dark-1:    #0f111d;   // body background
-$palette-dark-2:    #111423;   // surface scura (scrollbar, card nera)
-$palette-dark-3:    #16192b;   // surface componenti
-$palette-dark-4:    #1a1f32;   // disabled bg
-$palette-dark-5:    #1c1f2e;   // header, card bg
-$palette-dark-6:    #20263a;   // input background
-$palette-dark-7:    #2a2d3c;   // select bg
-$palette-dark-8:    #2e3350;   // hover/bordi scuri
-$palette-dark-9:    #2f3550;   // input hover
+$palette-dark-1: #0f111d; // body background
+$palette-dark-2: #111423; // surface scura (scrollbar, card nera)
+$palette-dark-3: #16192b; // surface componenti
+$palette-dark-4: #1a1f32; // disabled bg
+$palette-dark-5: #1c1f2e; // header, card bg
+$palette-dark-6: #20263a; // input background
+$palette-dark-7: #2a2d3c; // select bg
+$palette-dark-8: #2e3350; // hover/bordi scuri
+$palette-dark-9: #2f3550; // input hover
+$palette-dark-10: linear-gradient(rgb(45, 125, 181, 0.4), rgba(0, 20, 60, 0.4));
+; // semi trasparente
 
 // Blu — toni freddi/action
-$palette-blue-1:    #2a3f76;   // accent blu scuro
-$palette-blue-2:    #3a4f86;   // accent blu medio
-$palette-blue-3:    #4a5288;   // focus ring
-$palette-blue-4:    #4da6ff;   // action / link blue
-$palette-blue-5:    #4f7cff;   // button blu primario
+$palette-blue-1: #2a3f76; // accent blu scuro
+$palette-blue-2: #3a4f86; // accent blu medio
+$palette-blue-3: #4a5288; // focus ring
+$palette-blue-4: #4da6ff; // action / link blue
+$palette-blue-5: #4f7cff; // button blu primario
 
 // Brand — il colore caratteristico del progetto
-$palette-rust:      #9a6353;   // colore primario Crystal Tokyo
+$palette-rust: #9a6353; // colore primario Crystal Tokyo
 
 // Testi
-$palette-text-1:    #e0e0e0;   // testo chiaro
-$palette-text-2:    #b4b6bf;   // testo body (default)
-$palette-text-3:    #a7a7a8;   // testo tabelle
-$palette-text-4:    #ccc;      // testo terziario / placeholder
+$palette-text-1: #e0e0e0; // testo chiaro
+$palette-text-2: #b4b6bf; // testo body (default)
+$palette-text-3: #a7a7a8; // testo tabelle
+$palette-text-4: #ccc; // testo terziario / placeholder
 
 // Feedback
-$palette-success:   #27ae60;
-$palette-danger:    #e74c3c;
-$palette-warning:   #f39c12;
-$palette-info:      #17a2b8;
+$palette-success: #27ae60;
+$palette-danger: #e74c3c;
+$palette-warning: #f39c12;
+$palette-info: #17a2b8;
 
 
 // ── SEMANTICA (a cosa serve ogni colore) ───────────────────────────────────
 
 // Sfondo e superfici
-$color-bg:              $palette-dark-1;    // sfondo pagina
-$color-surface:         $palette-dark-3;    // sfondo componenti
-$color-surface-raised:  $palette-dark-5;    // card, header
-$color-surface-input:   $palette-dark-6;    // input, select
+$color-bg: $palette-dark-1; // sfondo pagina
+$color-surface: $palette-dark-3; // sfondo componenti
+$color-surface-raised: $palette-dark-5; // card, header
+$color-surface-input: $palette-dark-6; // input, select
 
 // Bordi
-$color-border:          $palette-dark-8;    // bordi standard
-$color-border-focus:    $palette-blue-3;    // bordo in focus
+$color-border: $palette-dark-8; // bordi standard
+$color-border-focus: $palette-blue-3; // bordo in focus
 
 // Brand / azioni
-$color-primary:         $palette-rust;      // bottone/accento primario
-$color-primary-hover:   #7a4f43;            // hover sul primario
-$color-action:          $palette-blue-4;    // link, icone, azioni secondarie
-$color-action-hover:    $palette-blue-2;    // hover sull'action
+$color-primary: $palette-rust; // bottone/accento primario
+$color-primary-hover: #7a4f43; // hover sul primario
+$color-action: $palette-blue-4; // link, icone, azioni secondarie
+$color-action-hover: $palette-blue-2; // hover sull'action
 
 // Testi
-$color-text:            $palette-text-2;    // testo principale
-$color-text-light:      $palette-text-1;    // testo chiaro / headings
-$color-text-muted:      $palette-text-4;    // testo disabilitato / secondario
+$color-text: $palette-text-2; // testo principale
+$color-text-light: $palette-text-1; // testo chiaro / headings
+$color-text-muted: $palette-text-4; // testo disabilitato / secondario
 
 // Feedback
-$color-success:         $palette-success;
-$color-danger:          $palette-danger;
-$color-warning:         $palette-warning;
-$color-info:            $palette-info;
+$color-success: $palette-success;
+$color-danger: $palette-danger;
+$color-warning: $palette-warning;
+$color-info: $palette-info;
 
 
 // ── SPACING (scala 4px) ────────────────────────────────────────────────────
 
-$space-1:   4px;
-$space-2:   8px;
-$space-3:   12px;
-$space-4:   16px;
-$space-5:   20px;
-$space-6:   24px;
-$space-8:   32px;
-$space-10:  40px;
-$space-12:  48px;
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 20px;
+$space-6: 24px;
+$space-8: 32px;
+$space-10: 40px;
+$space-12: 48px;
 
 
 // ── BORDER RADIUS ──────────────────────────────────────────────────────────
 
-$radius-sm:   4px;
-$radius-md:   6px;
-$radius-lg:   8px;
-$radius-xl:   12px;
+$radius-sm: 4px;
+$radius-md: 6px;
+$radius-lg: 8px;
+$radius-xl: 12px;
 $radius-full: 50%;
 
 
 // ── TIPOGRAFIA ─────────────────────────────────────────────────────────────
 
-$font-base:   Verdana, sans-serif;
-$font-serif:  "DejaVu Serif", serif;
-$font-ui:     Lato, sans-serif;
+$font-base: Verdana, sans-serif;
+$font-serif: "DejaVu Serif", serif;
+$font-ui: Lato, sans-serif;
 
-$text-xs:     10px;
-$text-sm:     11px;   // base del progetto
-$text-md:     13px;
-$text-lg:     14px;
-$text-xl:     16px;
-$text-2xl:    18px;
-$text-3xl:    22px;
+$text-xs: 10px;
+$text-sm: 11px; // base del progetto
+$text-md: 13px;
+$text-lg: 14px;
+$text-xl: 16px;
+$text-2xl: 18px;
+$text-3xl: 22px;
 
 $font-weight-normal: 400;
-$font-weight-bold:   700;
+$font-weight-bold: 700;
 
 
 // ── OMBRE ─────────────────────────────────────────────────────────────────
 
-$shadow-sm:    0 2px 6px rgba(0, 0, 0, 0.4);
-$shadow-md:    0 4px 12px rgba(0, 0, 0, 0.3);
-$shadow-lg:    0 6px 20px rgba(0, 0, 0, 0.6);
+$shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+$shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.6);
 $shadow-focus: 0 0 0 2px rgba($palette-blue-3, 0.2);
 
 
 // ── TRANSIZIONI ────────────────────────────────────────────────────────────
 
-$transition-fast:   0.2s ease;
+$transition-fast: 0.2s ease;
 $transition-normal: 0.3s ease;
 
 
@@ -133,68 +135,68 @@ $transition-normal: 0.3s ease;
 
 :root {
     // Superfici
-    --color-bg:             #{$color-bg};
-    --color-surface:        #{$color-surface};
+    --color-bg: #{$color-bg};
+    --color-surface: #{$color-surface};
     --color-surface-raised: #{$color-surface-raised};
-    --color-surface-input:  #{$color-surface-input};
+    --color-surface-input: #{$color-surface-input};
 
     // Bordi
-    --color-border:         #{$color-border};
-    --color-border-focus:   #{$color-border-focus};
+    --color-border: #{$color-border};
+    --color-border-focus: #{$color-border-focus};
 
     // Brand
-    --color-primary:        #{$color-primary};
-    --color-primary-hover:  #{$color-primary-hover};
-    --color-action:         #{$color-action};
-    --color-action-hover:   #{$color-action-hover};
+    --color-primary: #{$color-primary};
+    --color-primary-hover: #{$color-primary-hover};
+    --color-action: #{$color-action};
+    --color-action-hover: #{$color-action-hover};
 
     // Testi
-    --color-text:           #{$color-text};
-    --color-text-light:     #{$color-text-light};
-    --color-text-muted:     #{$color-text-muted};
+    --color-text: #{$color-text};
+    --color-text-light: #{$color-text-light};
+    --color-text-muted: #{$color-text-muted};
 
     // Feedback
-    --color-success:        #{$color-success};
-    --color-danger:         #{$color-danger};
-    --color-warning:        #{$color-warning};
-    --color-info:           #{$color-info};
+    --color-success: #{$color-success};
+    --color-danger: #{$color-danger};
+    --color-warning: #{$color-warning};
+    --color-info: #{$color-info};
 
     // Spacing
-    --space-1:  #{$space-1};
-    --space-2:  #{$space-2};
-    --space-3:  #{$space-3};
-    --space-4:  #{$space-4};
-    --space-5:  #{$space-5};
-    --space-6:  #{$space-6};
-    --space-8:  #{$space-8};
+    --space-1: #{$space-1};
+    --space-2: #{$space-2};
+    --space-3: #{$space-3};
+    --space-4: #{$space-4};
+    --space-5: #{$space-5};
+    --space-6: #{$space-6};
+    --space-8: #{$space-8};
     --space-10: #{$space-10};
     --space-12: #{$space-12};
 
     // Border radius
-    --radius-sm:   #{$radius-sm};
-    --radius-md:   #{$radius-md};
-    --radius-lg:   #{$radius-lg};
-    --radius-xl:   #{$radius-xl};
+    --radius-sm: #{$radius-sm};
+    --radius-md: #{$radius-md};
+    --radius-lg: #{$radius-lg};
+    --radius-xl: #{$radius-xl};
     --radius-full: #{$radius-full};
 
     // Tipografia
-    --font-base:   #{$font-base};
-    --font-serif:  #{$font-serif};
-    --font-ui:     #{$font-ui};
-    --text-xs:     #{$text-xs};
-    --text-sm:     #{$text-sm};
-    --text-md:     #{$text-md};
-    --text-lg:     #{$text-lg};
-    --text-xl:     #{$text-xl};
-    --text-2xl:    #{$text-2xl};
-    --text-3xl:    #{$text-3xl};
+    --font-base: #{$font-base};
+    --font-serif: #{$font-serif};
+    --font-ui: #{$font-ui};
+    --text-xs: #{$text-xs};
+    --text-sm: #{$text-sm};
+    --text-md: #{$text-md};
+    --text-lg: #{$text-lg};
+    --text-xl: #{$text-xl};
+    --text-2xl: #{$text-2xl};
+    --text-3xl: #{$text-3xl};
 
     // Ombre
-    --shadow-sm:    #{$shadow-sm};
-    --shadow-md:    #{$shadow-md};
-    --shadow-lg:    #{$shadow-lg};
+    --shadow-sm: #{$shadow-sm};
+    --shadow-md: #{$shadow-md};
+    --shadow-lg: #{$shadow-lg};
 
     // Transizioni
-    --transition-fast:   #{$transition-fast};
+    --transition-fast: #{$transition-fast};
     --transition-normal: #{$transition-normal};
 }

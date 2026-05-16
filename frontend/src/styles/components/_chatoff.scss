@@ -4,7 +4,7 @@
 @use '../tokens' as *;
 
 .chatoff-panel {
-    margin-top: 10px;
+    margin-top: 30px;
     border-top: 1px solid $palette-dark-8;
     display: flex;
     flex-direction: column;
@@ -40,7 +40,9 @@
     padding: 0 2px;
     line-height: 1;
 
-    &:hover { color: $palette-text-1; }
+    &:hover {
+        color: $palette-text-1;
+    }
 }
 
 .chatoff-box {
@@ -52,17 +54,19 @@
     font-size: $text-xs;
     color: $palette-text-2;
     line-height: 1.5;
-    background: $palette-dark-2;
+    background: $palette-dark-10;
     box-sizing: border-box;
     width: 100%;
-    word-break: break-word;   // i messaggi lunghi vanno a capo invece di sforare
+    word-break: break-word; // i messaggi lunghi vanno a capo invece di sforare
 
     // Messaggi dal log.html
     .msgln {
         margin: 0 0 2px;
         color: $palette-text-3;
 
-        b { color: #a1c3c8; }
+        b {
+            color: #a1c3c8;
+        }
     }
 }
 
@@ -91,8 +95,14 @@
     border-radius: 3px;
     min-width: 0;
 
-    &::placeholder { color: $palette-text-4; }
-    &:focus { outline: none; border-color: $palette-blue-3; }
+    &::placeholder {
+        color: $palette-text-4;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: $palette-blue-3;
+    }
 }
 
 .chatoff-send-btn {
@@ -105,5 +115,8 @@
     cursor: pointer;
     flex-shrink: 0;
 
-    &:hover { background: $palette-rust; color: $palette-text-1; }
+    &:hover {
+        background: $palette-rust;
+        color: $palette-text-1;
+    }
 }

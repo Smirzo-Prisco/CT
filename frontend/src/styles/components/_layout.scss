@@ -21,13 +21,11 @@ body {
 #framecontentLeft,
 #framecontentRight {
     position: fixed;
-    top: 0;
-    left: 0;
     width: 260px;
     height: 100%;
     box-sizing: border-box; // i 260px includono il padding: evita overflow orizzontale
     overflow-x: hidden;
-    overflow-y: scroll;     // scroll sempre visibile (auto la nasconde se il contenuto è corto)
+    overflow-y: scroll; // scroll sempre visibile (auto la nasconde se il contenuto è corto)
     z-index: 1000;
     transition: transform $transition-normal;
     background-repeat: no-repeat;
@@ -63,17 +61,6 @@ body {
 
 // ── Container diretti nelle colonne ──────────────────────────
 // Sostituiscono la catena innertube > colonne_sx/dx > div.menu/msgs
-
-#framecontentLeft,
-#framecontentRight {
-    padding: $space-1 + 1 $space-1 + 1 $space-1 + 1 $space-2 + 2;
-}
-
-#link-menu-container {
-    position: relative;
-    margin: $space-1 + 1 auto;
-    width: 180px;
-}
 
 #info-location-container,
 #anteprima-scheda-container,
