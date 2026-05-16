@@ -1212,6 +1212,7 @@ div.contenitore_presenti {
   padding: 10px;
   overflow-y: auto;
   height: 100%;
+  border-radius: 5px;
 }
 
 div.pagina_presenti_estesa img.sesso_ico,
