@@ -272,17 +272,20 @@ export default function MapClick() {
      * CT_USER.mappa, chiama api_map.php?op=changemap per replicare l'aggiornamento.
      */
     useEffect(() => {
-        const urlMapId = parseInt(new URLSearchParams(window.location.search).get('map_id') || '0')
-        if (!urlMapId || urlMapId === (window.CT_USER?.mappa ?? 0)) return
-
+        // Chiama sempre op=changemap al mount: imposta ultimo_luogo=-1 nel DB e
+        // notifica i socket. In SPA mode PHP non gira, quindi anche quando il
+        // map_id non cambia (stesso map, pg che torna dalla stanza alla mappa)
+        // il luogo deve diventare -1. Se luogo era già -1, il server lo gestisce
+        // come operazione idempotente. In full-page-reload PHP ha già aggiornato
+        // il DB, ma la seconda chiamata è comunque innocua.
         fetch('/pages/api_map.php?op=changemap', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ map_id: urlMapId }),
+            body: JSON.stringify({ map_id: effectiveMapId }),
         })
             .then(r => r.json())
             .then(d => {
-                if (d.success && window.CT_USER) window.CT_USER.mappa = urlMapId
+                if (d.success && window.CT_USER) window.CT_USER.mappa = effectiveMapId
             })
             .catch(console.error)
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
