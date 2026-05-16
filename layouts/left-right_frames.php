@@ -23,6 +23,11 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 <!-- COLONNA DESTRA -->
 <div id="framecontentRight">
     <div id="anteprima-scheda-container"></div>
+    <div class="presenti_button">
+        <a href="main.php?page=presenti_estesi">
+            <img src="themes/crystal/imgs/menu/presenti.png" alt="Presenti" />
+        </a>
+    </div>
     <div id="online-users-container"></div>
 </div>
 

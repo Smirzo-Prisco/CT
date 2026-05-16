@@ -81,13 +81,6 @@ export default function AnteprimaScheda() {
                     </a>
                 </div>
 
-                {/* Link alla lista presenti estesi */}
-                <div className="presenti_button">
-                    <a href="main.php?page=presenti_estesi">
-                        <img src="../themes/crystal/imgs/menu/presenti.png" alt="Presenti" />
-                    </a>
-                </div>
-
             </div>
         </div>
     )
