@@ -1208,7 +1208,7 @@ div.link_presenti {
 }
 
 div.contenitore_presenti {
-  background: linear-gradient(rgba(0, 20, 60, 0.4), rgba(0, 20, 60, 0.4));
+  background: linear-gradient(rgba(60, 57, 0, 0.4), rgba(0, 20, 60, 0.4));
   padding: 10px;
   overflow-y: auto;
   height: 100%;
