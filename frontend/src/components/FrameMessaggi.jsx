@@ -32,24 +32,36 @@ import { useState, useEffect, useCallback } from 'react'
 // ---------------------------------------------------------------------------
 
 /**
- * Costruisce la configurazione delle icone di navigazione.
- * Alcune icone hanno URL dinamici basati sulla sessione corrente (mappa, luogo).
- * Usa window.CT_USER per leggere mappa e luogo dalla sessione PHP.
+ * Costruisce la configurazione delle 12 icone di navigazione.
+ * Riga 1: mappa, aggiorna, messaggi
+ * Riga 2: forum, uffici, giocate
+ * Riga 3: famiglie, mestieri, calendario
+ * Riga 4: chatoff, gestione, esci
+ *
+ * @param {boolean} hasEvents - true se ci sono eventi oggi (icona calendario animata)
+ * @param {boolean} isNotte   - true se è notte (18–6)
  */
-function buildIcons() {
+function buildIcons(hasEvents, isNotte) {
     const mappa = window.CT_USER?.mappa ?? 1
     const luogo = window.CT_USER?.luogo ?? -1
 
+    const calImg = hasEvents
+        ? (isNotte ? 'icon_news_night.gif' : 'icon_news_night.gif')
+        : 'icon_news.png'
+
     return [
-        { id: 'mappa',     href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png',      alt: 'Mappa'     },
-        { id: 'aggiorna',  href: `main.php?dir=${luogo}`,                    img: 'icon_aggiorna.png',   alt: 'Aggiorna'  },
-        { id: 'messaggi',  href: 'main.php?page=messages_center&offset=0',   img: null,                  alt: 'Messaggi'  }, // img gestita da stato
-        { id: 'forum',     href: 'main.php?page=forum',                      img: 'icon_forum.png',      alt: 'Forum'     },
-        { id: 'uffici',    href: 'main.php?page=uffici',                      img: 'icon_uff.png',        alt: 'Uffici'    },
-        { id: 'giocate',   href: 'main.php?page=role_recap',                  img: 'icon_doc.png',        alt: 'Giocate'   },
-        { id: 'chatoff',   href: null,                                        img: null,                  alt: 'Chat Off', chatoff: true },
-        { id: 'gestione',  href: 'main.php?page=gestione',                    img: 'icon_strumenti.png',  alt: 'Gestione'  },
-        { id: 'logout',    href: 'logout.php',                                img: 'icon_exit.png',       alt: 'Esci'      },
+        { id: 'mappa',      href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png',      alt: 'Mappa'      },
+        { id: 'aggiorna',   href: `main.php?dir=${luogo}`,                    img: 'icon_aggiorna.png',   alt: 'Aggiorna'   },
+        { id: 'messaggi',   href: 'main.php?page=messages_center&offset=0',   img: null,                  alt: 'Messaggi'   }, // img gestita da stato
+        { id: 'forum',      href: 'main.php?page=forum',                      img: 'icon_forum.png',      alt: 'Forum'      },
+        { id: 'uffici',     href: 'main.php?page=uffici',                     img: 'icon_uff.png',        alt: 'Uffici'     },
+        { id: 'giocate',    href: 'main.php?page=role_recap',                 img: 'icon_doc.png',        alt: 'Giocate'    },
+        { id: 'famiglie',   href: 'main.php?page=servizi_gilde',              img: 'icon_fam.png',        alt: 'Famiglie'   },
+        { id: 'mestieri',   href: 'main.php?page=servizi_mestieri',           img: 'icon_job.png',        alt: 'Mestieri'   },
+        { id: 'calendario', href: 'main.php?page=agenda_center',              img: calImg,                alt: 'Calendario' },
+        { id: 'chatoff',    href: null,                                        img: null,                  alt: 'Chat Off',  chatoff: true },
+        { id: 'gestione',   href: 'main.php?page=gestione',                   img: 'icon_strumenti.png',  alt: 'Gestione'   },
+        { id: 'logout',     href: 'logout.php',                               img: 'icon_exit.png',       alt: 'Esci'       },
     ]
 }
 
@@ -112,6 +124,12 @@ export default function FrameMessaggi() {
     /** true se l'audio è abilitato nelle impostazioni del gioco */
     const [allowAudio,     setAllowAudio]     = useState(false)
 
+    /** true se ci sono eventi/appuntamenti oggi */
+    const [hasEvents,      setHasEvents]      = useState(false)
+
+    /** true se è notte (18–6) */
+    const isNotte = (() => { const h = new Date().getHours(); return h >= 18 || h <= 6 })()
+
     // ---------------------------------------------------------------------------
     // FETCH METEO
     // ---------------------------------------------------------------------------
@@ -126,6 +144,13 @@ export default function FrameMessaggi() {
             .then(r => r.json())
             .then(d => { if (d.success) setMeteo(d) })
             .catch(err => console.error('[FrameMessaggi] Errore meteo:', err))
+    }, [])
+
+    useEffect(() => {
+        fetch('/pages/api_global.php?op=events_today')
+            .then(r => r.json())
+            .then(d => { if (d.success) setHasEvents(d.has_events) })
+            .catch(err => console.error('[FrameMessaggi] Errore eventi:', err))
     }, [])
 
     // ---------------------------------------------------------------------------
@@ -213,8 +238,8 @@ export default function FrameMessaggi() {
         ? `${ICO}icon_chat_off_night.gif`
         : `${ICO}icon_chat_off.png`
 
-    /** Configurazione icone con src dinamico per messaggi e chatoff */
-    const ICONS = buildIcons()
+    /** Configurazione icone con src dinamico per messaggi, chatoff e calendario */
+    const ICONS = buildIcons(hasEvents, isNotte)
 
     // ---------------------------------------------------------------------------
     // RENDERING
