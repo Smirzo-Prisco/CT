@@ -849,11 +849,8 @@ img.immagine_pg{
 }
 
 .presenti_button {
-    margin-left: 9px;
-    margin-top: 46px;
-    border: none;
-    position: absolute;
-    top: 210px;
+    margin-left: 20px;
+    margin-top: 25px;
 }
 
 div.calendario_box {

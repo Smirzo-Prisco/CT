@@ -5,22 +5,22 @@ const HEARTBEAT_MS = 120_000
 
 function getRaceIcon(id_razza) {
   const n = parseInt(id_razza, 10)
-  if (n >= 1000  && n < 2000)  return 'Marte.png'
-  if (n >= 2000  && n < 3000)  return 'Mercurio.png'
-  if (n >= 3000  && n < 4000)  return 'Luna.png'
-  if (n >= 4000  && n < 5000)  return 'Giove.png'
-  if (n >= 5000  && n < 6000)  return 'Venere.png'
-  if (n >= 6000  && n < 7000)  return 'Urano.png'
-  if (n >= 7000  && n < 8000)  return 'Nettuno.png'
-  if (n >= 8000  && n < 9000)  return 'Plutone.png'
-  if (n >= 9000  && n < 10000) return 'Saturno.png'
+  if (n >= 1000 && n < 2000) return 'Marte.png'
+  if (n >= 2000 && n < 3000) return 'Mercurio.png'
+  if (n >= 3000 && n < 4000) return 'Luna.png'
+  if (n >= 4000 && n < 5000) return 'Giove.png'
+  if (n >= 5000 && n < 6000) return 'Venere.png'
+  if (n >= 6000 && n < 7000) return 'Urano.png'
+  if (n >= 7000 && n < 8000) return 'Nettuno.png'
+  if (n >= 8000 && n < 9000) return 'Plutone.png'
+  if (n >= 9000 && n < 10000) return 'Saturno.png'
   if (n >= 10000 && n < 11000) return 'Terra.png'
-  if (n === 11000)              return 'Nebbia.png'
+  if (n === 11000) return 'Nebbia.png'
   return 'Png.png'
 }
 
 export default function OnlineUsers() {
-  const [users, setUsers]           = useState([])
+  const [users, setUsers] = useState([])
   const [totalOnline, setTotalOnline] = useState(0)
 
   const fetchPresenti = useCallback((qs = '') => {
@@ -84,15 +84,6 @@ export default function OnlineUsers() {
             </div>
           ))
         )}
-      </div>
-      <div className="link_presenti">
-        <a href="/main.php?page=presenti_estesi" target="_top">
-          <div className="page_title">
-            <h2 className="presenti_title">
-              {totalOnline} {totalOnline === 1 ? 'Utente Presente' : 'Utenti Presenti'}
-            </h2>
-          </div>
-        </a>
       </div>
     </div>
   )
