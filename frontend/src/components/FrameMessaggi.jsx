@@ -50,18 +50,18 @@ function buildIcons(hasEvents, isNotte) {
         : 'icon_news.png'
 
     return [
-        { id: 'mappa',      href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png',      alt: 'Mappa'      },
-        { id: 'aggiorna',   href: `main.php?dir=${luogo}`,                    img: 'icon_aggiorna.png',   alt: 'Aggiorna'   },
-        { id: 'messaggi',   href: 'main.php?page=messages_center&offset=0',   img: null,                  alt: 'Messaggi'   }, // img gestita da stato
-        { id: 'forum',      href: 'main.php?page=forum',                      img: 'icon_forum.png',      alt: 'Forum'      },
-        { id: 'uffici',     href: 'main.php?page=uffici',                     img: 'icon_uff.png',        alt: 'Uffici'     },
-        { id: 'giocate',    href: 'main.php?page=role_recap',                 img: 'icon_doc.png',        alt: 'Giocate'    },
-        { id: 'famiglie',   href: 'main.php?page=servizi_gilde',              img: 'icon_fam.png',        alt: 'Famiglie'   },
-        { id: 'mestieri',   href: 'main.php?page=servizi_mestieri',           img: 'icon_job.png',        alt: 'Mestieri'   },
-        { id: 'calendario', href: 'main.php?page=agenda_center',              img: calImg,                alt: 'Calendario' },
-        { id: 'chatoff',    href: null,                                        img: null,                  alt: 'Chat Off',  chatoff: true },
-        { id: 'gestione',   href: 'main.php?page=gestione',                   img: 'icon_strumenti.png',  alt: 'Gestione'   },
-        { id: 'logout',     href: 'logout.php',                               img: 'icon_exit.png',       alt: 'Esci'       },
+        { id: 'mappa', href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png', alt: 'Mappa' },
+        { id: 'aggiorna', href: `main.php?dir=${luogo}`, img: 'icon_aggiorna.png', alt: 'Aggiorna' },
+        { id: 'messaggi', href: 'main.php?page=messages_center&offset=0', img: null, alt: 'Messaggi' }, // img gestita da stato
+        { id: 'forum', href: 'main.php?page=forum', img: 'icon_forum.png', alt: 'Forum' },
+        { id: 'uffici', href: 'main.php?page=uffici', img: 'icon_uff.png', alt: 'Uffici' },
+        { id: 'giocate', href: 'main.php?page=role_recap', img: 'icon_doc.png', alt: 'Giocate' },
+        { id: 'famiglie', href: 'main.php?page=servizi_gilde', img: 'icon_fam.png', alt: 'Famiglie' },
+        { id: 'mestieri', href: 'main.php?page=servizi_mestieri', img: 'icon_job.png', alt: 'Mestieri' },
+        { id: 'calendario', href: 'main.php?page=agenda_center', img: calImg, alt: 'Calendario' },
+        { id: 'chatoff', href: null, img: null, alt: 'Chat Off', chatoff: true },
+        { id: 'gestione', href: 'main.php?page=gestione', img: 'icon_strumenti.png', alt: 'Gestione' },
+        { id: 'logout', href: 'logout.php', img: 'icon_exit.png', alt: 'Esci' },
     ]
 }
 
@@ -110,22 +110,22 @@ function MeteoBox({ data }) {
 export default function FrameMessaggi() {
 
     /** Dati meteo: { attuale, precedente } */
-    const [meteo,          setMeteo]          = useState(null)
+    const [meteo, setMeteo] = useState(null)
 
     /** true = mostra meteo di ieri, false = oggi */
-    const [showYesterday,  setShowYesterday]  = useState(false)
+    const [showYesterday, setShowYesterday] = useState(false)
 
     /** true se ci sono messaggi privati non letti */
     const [hasNewMessages, setHasNewMessages] = useState(false)
 
     /** true se ci sono messaggi chat off non letti */
-    const [hasNewChatOff,  setHasNewChatOff]  = useState(false)
+    const [hasNewChatOff, setHasNewChatOff] = useState(false)
 
     /** true se l'audio è abilitato nelle impostazioni del gioco */
-    const [allowAudio,     setAllowAudio]     = useState(false)
+    const [allowAudio, setAllowAudio] = useState(false)
 
     /** true se ci sono eventi/appuntamenti oggi */
-    const [hasEvents,      setHasEvents]      = useState(false)
+    const [hasEvents, setHasEvents] = useState(false)
 
     /** true se è notte (18–6) */
     const isNotte = (() => { const h = new Date().getHours(); return h >= 18 || h <= 6 })()
@@ -172,10 +172,10 @@ export default function FrameMessaggi() {
                 // Riproduce il suono solo se ci sono messaggi nuovi,
                 // l'audio è abilitato, e non è già stato riprodotto negli ultimi 10 minuti
                 if (d.hasNew && d.allowAudio) {
-                    const now  = Date.now()
+                    const now = Date.now()
                     const last = parseInt(localStorage.getItem('last_audio_play') || '0', 10)
                     if (now - last > 600_000) {
-                        new Audio('../sounds/sms.wav').play().catch(() => {})
+                        new Audio('../sounds/sms.wav').play().catch(() => { })
                         localStorage.setItem('last_audio_play', String(now))
                     }
                 }
@@ -205,14 +205,14 @@ export default function FrameMessaggi() {
         const sock = window.ctSocket
         if (sock) {
             // Aggiorna icona messaggi privati ad ogni notifica DM
-            sock.on('dm:update',      fetchMessages)
+            sock.on('dm:update', fetchMessages)
             // Aggiorna icona chat off ad ogni notifica chatoff
             sock.on('chatoff:update', fetchChatOff)
         }
 
         return () => {
             if (sock) {
-                sock.off('dm:update',      fetchMessages)
+                sock.off('dm:update', fetchMessages)
                 sock.off('chatoff:update', fetchChatOff)
             }
         }
@@ -258,13 +258,13 @@ export default function FrameMessaggi() {
 
                 {/* Meteo attuale */}
                 <div className={`meteo_box meteo_attuale${showYesterday ? ' ' : ' '}`}
-                     style={{ display: showYesterday ? 'none' : 'flex' }}>
+                    style={{ display: showYesterday ? 'none' : 'flex' }}>
                     <MeteoBox data={meteo?.attuale} />
                 </div>
 
                 {/* Meteo precedente (ieri) */}
                 <div className="meteo_box meteo_precedente"
-                     style={{ display: showYesterday ? 'flex' : 'none' }}>
+                    style={{ display: showYesterday ? 'flex' : 'none' }}>
                     <MeteoBox data={meteo?.precedente} />
                 </div>
 
@@ -284,10 +284,10 @@ export default function FrameMessaggi() {
             {/* I CSS del gridPanel erano inline nel vecchio PHP:                */}
             {/* li ristabiliamo come stili inline React.                         */}
             {/* ================================================================ */}
-            <div id="gridPanel" style={{ display:'flex', justifyContent:'center', alignItems:'center', marginTop:'10px', marginLeft:'22px' }}>
-                <div className="grid" style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:'12px', gridAutoRows:'60px', padding:'10px' }}>
+            <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px', marginLeft: '22px' }}>
+                <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', gridAutoRows: '50px', padding: '20px' }}>
                     {ICONS.map(icon => (
-                        <div key={icon.id} className="grid-item" style={{ display:'flex', justifyContent:'center', alignItems:'center' }}>
+                        <div key={icon.id} className="grid-item" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             {icon.chatoff ? (
                                 /* Chat Off: apre popup */
                                 <a
