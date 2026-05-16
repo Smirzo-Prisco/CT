@@ -77,9 +77,9 @@ export default function InfoLocation() {
      * - Stanza: themes/crystal/imgs/locations/{immagine}
      * - Mappa: mostrare un placeholder (la mappa ha la sua pagina)
      */
-    const imgSrc = data.tipo === 'stanza'
-        ? `/themes/crystal/imgs/locations/${data.immagine || 'ingresso.png'}`
-        : `/themes/crystal/imgs/locations/ingresso.png`
+    // const imgSrc = data.tipo === 'stanza'
+    //     ? `/themes/crystal/imgs/locations/${data.immagine || 'ingresso.png'}`
+    //     : `/themes/crystal/imgs/locations/ingresso.png`
 
     return (
         <div className="pagina_info_location">
@@ -91,15 +91,15 @@ export default function InfoLocation() {
 
             <div className="page_body">
 
-                {/* Immagine del luogo (classe giorno/notte) */}
-                <div className={data.is_notte ? 'info_image_night' : 'info_image'}>
+                {/* Immagine del luogo (classe giorno/notte) — commentata temporaneamente */}
+                {/* <div className={data.is_notte ? 'info_image_night' : 'info_image'}>
                     <img
                         src={imgSrc}
                         className="immagine_luogo"
                         title={data.descrizione || ''}
                         alt={data.nome}
                     />
-                </div>
+                </div> */}
 
                 {/* Nome luogo + anno di gioco — cliccabile per aprire la descrizione */}
                 <div className="info-location-year">
