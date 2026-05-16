@@ -25,8 +25,9 @@ body {
     left: 0;
     width: 260px;
     height: 100%;
-    overflow-x: hidden;   // niente scroll orizzontale: il contenuto deve stare nei 260px
-    overflow-y: auto;     // scroll verticale per raggiungere tutti i componenti
+    box-sizing: border-box; // i 260px includono il padding: evita overflow orizzontale
+    overflow-x: hidden;
+    overflow-y: scroll;     // scroll sempre visibile (auto la nasconde se il contenuto è corto)
     z-index: 1000;
     transition: transform $transition-normal;
     background-repeat: no-repeat;
@@ -332,7 +333,6 @@ img.immagine_pg {
 
 .presenti_button {
     margin-left: 20px;
-    margin-top: 25px;
 }
 
 div.calendario_box {
