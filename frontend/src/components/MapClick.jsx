@@ -301,20 +301,35 @@ export default function MapClick() {
 
     /**
      * Naviga verso una stanza (dir=X) o una pagina (page=X).
-     * Usa CT.navigate per la navigazione SPA (aggiorna DB via API, poi re-render).
-     * Fallback a window.top.location.href se CT.navigate non è ancora disponibile.
+     *
+     * In SPA mode (window.CT.navigate disponibile), PHP non gira:
+     * per le stanze con dir chiama prima op=move via AJAX per aggiornare
+     * DB, sessione e socket (stesso pattern usato da op=changemap al mount).
+     * In full-page-reload, main.php?dir=X gestisce tutto lato PHP.
      *
      * @param {Object} room - Oggetto stanza dalla costante ZONES
      */
-    const navigate = (room) => {
-        let url = null
-        if (room.dir !== undefined) url = `main.php?dir=${room.dir}`
-        else if (room.page) url = `main.php?page=${room.page}`
-        if (!url) return
-
-        if (window.CT?.navigate) window.CT.navigate(url)
-        else window.top.location.href = url
-    }
+    const navigate = useCallback(async (room) => {
+        if (room.dir !== undefined) {
+            const url = `main.php?dir=${room.dir}`
+            if (window.CT?.navigate) {
+                try {
+                    await fetch('/pages/api_map.php?op=move', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ dir: room.dir }),
+                    })
+                } catch { /* ignora errori di rete */ }
+                window.CT.navigate(url)
+            } else {
+                window.top.location.href = url
+            }
+        } else if (room.page) {
+            const url = `main.php?page=${room.page}`
+            if (window.CT?.navigate) window.CT.navigate(url)
+            else window.top.location.href = url
+        }
+    }, [])
 
     // ---------------------------------------------------------------------------
     // POSIZIONAMENTO HOTSPOT
