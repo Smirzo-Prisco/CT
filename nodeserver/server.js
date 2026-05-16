@@ -59,7 +59,14 @@ io.on('connection', socket => {
     // Usata da PresentiEstesi che mostra utenti di tutte le stanze.
     socket.join('global');
 
-    socket.on('disconnect', () => {});
+    // Notifica agli altri utenti nella stessa stanza che la lista presenti
+    // è cambiata (nuovo utente arrivato o tornato dalla chat).
+    io.to(`loc:${luogo}`).emit('users:update');
+
+    socket.on('disconnect', () => {
+        // Notifica agli altri utenti che qualcuno ha lasciato la stanza.
+        io.to(`loc:${luogo}`).emit('users:update');
+    });
 });
 
 httpServer.listen(PORT, HOST, () => {
