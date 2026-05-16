@@ -42,7 +42,6 @@ function buildIcons(hasEvents) {
         { id: 'famiglie',   href: 'main.php?page=servizi_gilde',              img: 'icon_fam.png',        alt: 'Famiglie' },
         { id: 'mestieri',   href: 'main.php?page=servizi_mestieri',           img: 'icon_job.png',        alt: 'Mestieri' },
         { id: 'calendario', href: 'main.php?page=agenda_center',              img: calImg,                alt: 'Calendario' },
-        { id: 'chatoff',    href: null,                                        img: 'icon_chat_off.png',   alt: 'Chat Off', chatoff: true },
         { id: 'gestione',   href: 'main.php?page=gestione',                   img: 'icon_strumenti.png',  alt: 'Gestione' },
         { id: 'logout',     href: 'logout.php',                               img: 'icon_exit.png',       alt: 'Esci' },
     ]
@@ -106,10 +105,6 @@ export default function FrameMessaggi() {
                         {icon.id === 'messaggi' ? (
                             <a id="message-link" href={icon.href}>
                                 <img src={msgIcon} alt={icon.alt} title={icon.alt} />
-                            </a>
-                        ) : icon.chatoff ? (
-                            <a href="javascript:;" onClick={() => document.getElementById('chattina-off-container')?.scrollIntoView({ behavior: 'smooth' })}>
-                                <img src={`${ICO}${icon.img}`} alt={icon.alt} />
                             </a>
                         ) : (
                             <a href={icon.href} target={icon.id === 'logout' ? '_top' : undefined}>
