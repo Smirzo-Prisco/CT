@@ -33,6 +33,17 @@ body {
 
 #framecontentLeft {
     background-image: url("imgs/colonna_sx/colonna_sinistra.png");
+    display: flex;
+    flex-direction: column;
+    gap: $space-2 + 2;   // 10px di spazio uniforme tra ogni componente
+    padding-bottom: $space-2 + 2;
+
+    // Tutti i figli diretti: stessa larghezza, nessun margine individuale
+    > * {
+        width: 100%;
+        box-sizing: border-box;
+        flex-shrink: 0;
+    }
 }
 
 #framecontentRight {
@@ -316,7 +327,7 @@ img.immagine_pg {
 }
 
 .presenti_button {
-    margin-left: 20px;
+    margin-left: 0;
 }
 
 div.calendario_box {
@@ -366,7 +377,7 @@ div.pagina_messaggi {
 // ── Info location e anteprima ─────────────────────────────────
 
 div.pagina_info_location {
-    margin: 0 auto;
+    margin: 0;
     padding: $space-2 + 2;
     background-color: transparent;
     border: none;
