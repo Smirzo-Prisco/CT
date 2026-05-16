@@ -30,6 +30,7 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
         </a>
     </div>
     <div id="online-users-container"></div>
+    <div id="meteo-container"></div>
 </div>
 
 <!-- ====================================================================== -->

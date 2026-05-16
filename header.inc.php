@@ -187,6 +187,9 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
 
             if (document.getElementById('online-users-container'))
                 CT.mount('OnlineUsers', 'online-users-container', {});
+
+            if (document.getElementById('meteo-container'))
+                CT.mount('Meteo', 'meteo-container', {});
         });
         </script>
     </head>

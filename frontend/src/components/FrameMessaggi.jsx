@@ -1,12 +1,10 @@
 /**
  * FrameMessaggi.jsx
  *
- * Box "messaggi e meteo" nella colonna sinistra — rimpiazza pages/frame_messaggi.inc.php
- * e il relativo includes/frame_messaggi.js.
+ * Griglia icone di navigazione nella colonna sinistra.
  *
  * Contenuto:
- *   - Meteo: icone giorno/notte, temperature, vento con toggle "oggi/ieri"
- *   - Griglia 3×3 di icone di navigazione (mappa, aggiorna, messaggi, forum, ecc.)
+ *   - Griglia 4×3 di icone di navigazione (mappa, aggiorna, messaggi, forum, ecc.)
  *   - Notifica messaggi privati: icona animata se ci sono messaggi non letti
  *   - Notifica chat off: icona animata se ci sono messaggi chat off non letti
  *   - Audio: suono sms.wav al primo arrivo di un nuovo messaggio (throttle 10 min)
@@ -16,7 +14,6 @@
  *   - 'chatoff:update' via socket → aggiorna lo stato icona chat off
  *
  * API:
- *   GET pages/api_global.php?op=meteo       → dati meteo (rigenera se scaduti)
  *   GET pages/api_global.php?op=getMessages → stato messaggi non letti
  *   GET pages/api_global.php?op=getChatOff  → stato chat off non letti
  *
@@ -69,51 +66,10 @@ function buildIcons(hasEvents, isNotte) {
 const ICO = '../themes/crystal/imgs/icone/'
 
 // ---------------------------------------------------------------------------
-// COMPONENTE METEO — sezione meteo con toggle oggi/ieri
-// ---------------------------------------------------------------------------
-
-/**
- * Visualizza le condizioni meteo di un giorno (giorno + notte).
- *
- * @param {Object} props.data - Dati meteo del giorno (attuale o precedente)
- */
-/**
- * Renderizza le due colonne giorno/notte del meteo.
- * NON aggiunge un wrapper: il div meteo_box è già nel componente padre.
- */
-function MeteoBox({ data }) {
-    if (!data) return null
-    return (
-        <>
-            <div className="meteo_colonna_sx">
-                <div className="meteo_img">
-                    <img src={`../themes/crystal/imgs/meteo/${data.giorno_img}.png`} alt="Giorno" className="meteo_immagine" />
-                </div>
-                <div className="meteo_temp">Max: <span className="temp_max">{data.temp_max}°C</span></div>
-                <div className="meteo_vento">Vento: <span>{data.vento_giorno}</span></div>
-            </div>
-            <div className="meteo_colonna_dx">
-                <div className="meteo_img">
-                    <img src={`../themes/crystal/imgs/meteo/${data.notte_img}.png`} alt="Notte" className="meteo_immagine" />
-                </div>
-                <div className="meteo_temp">Min: <span className="temp_min">{data.temp_min}°C</span></div>
-                <div className="meteo_vento">Vento: <span>{data.vento_notte}</span></div>
-            </div>
-        </>
-    )
-}
-
-// ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
 export default function FrameMessaggi() {
-
-    /** Dati meteo: { attuale, precedente } */
-    const [meteo, setMeteo] = useState(null)
-
-    /** true = mostra meteo di ieri, false = oggi */
-    const [showYesterday, setShowYesterday] = useState(false)
 
     /** true se ci sono messaggi privati non letti */
     const [hasNewMessages, setHasNewMessages] = useState(false)
@@ -129,22 +85,6 @@ export default function FrameMessaggi() {
 
     /** true se è notte (18–6) */
     const isNotte = (() => { const h = new Date().getHours(); return h >= 18 || h <= 6 })()
-
-    // ---------------------------------------------------------------------------
-    // FETCH METEO
-    // ---------------------------------------------------------------------------
-
-    /**
-     * Carica i dati meteo dall'API.
-     * Il meteo cambia al massimo una volta al giorno (gestito server-side),
-     * quindi basta caricarlo al mount senza aggiornamenti socket.
-     */
-    useEffect(() => {
-        fetch('/pages/api_global.php?op=meteo')
-            .then(r => r.json())
-            .then(d => { if (d.success) setMeteo(d) })
-            .catch(err => console.error('[FrameMessaggi] Errore meteo:', err))
-    }, [])
 
     useEffect(() => {
         fetch('/pages/api_global.php?op=events_today')
@@ -247,44 +187,7 @@ export default function FrameMessaggi() {
 
     return (
         <>
-            {/* ================================================================ */}
-            {/* SEZIONE METEO                                                    */}
-            {/* ================================================================ */}
-            <div className="news">
-                {/* Titolo meteo con toggle oggi/ieri */}
-                <div id="meteo_titolo" className="meteo_titolo">
-                    {showYesterday ? 'METEO DI IERI' : 'METEO OGGI'}
-                </div>
-
-                {/* Meteo attuale */}
-                <div className={`meteo_box meteo_attuale${showYesterday ? ' ' : ' '}`}
-                    style={{ display: showYesterday ? 'none' : 'flex' }}>
-                    <MeteoBox data={meteo?.attuale} />
-                </div>
-
-                {/* Meteo precedente (ieri) */}
-                <div className="meteo_box meteo_precedente"
-                    style={{ display: showYesterday ? 'flex' : 'none' }}>
-                    <MeteoBox data={meteo?.precedente} />
-                </div>
-
-                {/* Freccia toggle oggi/ieri */}
-                <div className="meteo_freccia">
-                    <img
-                        src="../themes/crystal/imgs/forum/freccia_giu.png"
-                        alt="Switch Meteo"
-                        className="switch_meteo"
-                        onClick={() => setShowYesterday(v => !v)}
-                    />
-                </div>
-            </div>
-
-            {/* ================================================================ */}
-            {/* GRIGLIA ICONE 3×3                                                */}
-            {/* I CSS del gridPanel erano inline nel vecchio PHP:                */}
-            {/* li ristabiliamo come stili inline React.                         */}
-            {/* ================================================================ */}
-            <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '40px' }}>
+            <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}>
                 <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', gridAutoRows: '50px' }}>
                     {ICONS.map(icon => (
                         <div key={icon.id} className="grid-item" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

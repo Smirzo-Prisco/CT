@@ -43,6 +43,7 @@ import FrameMessaggi   from './components/FrameMessaggi'
 import AnteprimaScheda from './components/AnteprimaScheda'
 import LinkMenu        from './components/LinkMenu'
 import ChattingOff     from './components/ChattingOff'
+import Meteo           from './components/Meteo'
 
 /**
  * Registry privato dei componenti.
@@ -134,6 +135,9 @@ window.CT.register('LinkMenu', LinkMenu)
 
 /** Chattina off integrata in fondo alla colonna sinistra — si aggiorna via socket chatoff:update */
 window.CT.register('ChattingOff', ChattingOff)
+
+/** Box meteo nella colonna destra — toggle oggi/ieri */
+window.CT.register('Meteo', Meteo)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.
