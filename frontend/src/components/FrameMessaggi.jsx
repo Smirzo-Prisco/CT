@@ -38,7 +38,6 @@ function buildIcons(hasEvents) {
         { id: 'forum', href: 'main.php?page=forum', img: 'icon_forum.png', alt: 'Forum' },
         { id: 'uffici', href: 'main.php?page=uffici', img: 'icon_uff.png', alt: 'Uffici' },
         { id: 'giocate', href: 'main.php?page=role_recap', img: 'icon_doc.png', alt: 'Giocate' },
-        { id: 'mestieri', href: 'main.php?page=servizi_mestieri', img: 'icon_job.png', alt: 'Mestieri' },
         { id: 'calendario', href: 'main.php?page=agenda_center', img: calImg, alt: 'Calendario' },
         { id: 'gestione', href: 'main.php?page=gestione', img: 'icon_strumenti.png', alt: 'Gestione' },
         { id: 'logout', href: 'logout.php', img: 'icon_exit.png', alt: 'Esci' },
