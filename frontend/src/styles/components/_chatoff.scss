@@ -9,6 +9,11 @@
     display: flex;
     flex-direction: column;
     background: $palette-dark-3;
+    // Vincola il pannello alla larghezza della colonna senza mai sforare
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .chatoff-title {
@@ -37,14 +42,18 @@
 }
 
 .chatoff-box {
-    height: 160px;
+    height: 120px;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 6px 8px;
     font-family: $font-serif;
     font-size: $text-xs;
     color: $palette-text-2;
     line-height: 1.5;
     background: $palette-dark-2;
+    box-sizing: border-box;
+    width: 100%;
+    word-break: break-word;   // i messaggi lunghi vanno a capo invece di sforare
 
     // Messaggi dal log.html
     .msgln {
@@ -65,6 +74,8 @@
     gap: 4px;
     padding: 5px 6px;
     background: $palette-dark-5;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .chatoff-input {

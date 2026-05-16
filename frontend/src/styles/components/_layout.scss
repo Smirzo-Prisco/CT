@@ -25,7 +25,8 @@ body {
     left: 0;
     width: 260px;
     height: 100%;
-    overflow: auto;
+    overflow-x: hidden;   // niente scroll orizzontale: il contenuto deve stare nei 260px
+    overflow-y: auto;     // scroll verticale per raggiungere tutti i componenti
     z-index: 1000;
     transition: transform $transition-normal;
     background-repeat: no-repeat;
