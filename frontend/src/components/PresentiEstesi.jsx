@@ -202,7 +202,7 @@ export default function PresentiEstesi() {
     const grouped = groupUsers(users)
 
     return (
-        <div className={`presenti_estesi ${shared.overflowX}`}>
+        <div className="presenti_estesi">
             <table className={`customTable ${shared.fullTable}`}>
                 <thead>
                     <tr>

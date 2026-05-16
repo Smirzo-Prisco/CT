@@ -7,6 +7,24 @@
 $presenti-name-color: #c0a49e;
 $presenti-accent: #ce846f;
 
+// ── Presenti estesi — tabella adattiva senza scroll orizzontale ───────────
+div.presenti_estesi {
+    width: 100%;
+    overflow-x: hidden;
+
+    table {
+        table-layout: auto;  // sovrascrive fullTable (fixed): le colonne si adattano
+        width: 100%;
+    }
+
+    // Limita tutte le immagini nella tabella per evitare overflow
+    img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+}
+
 body {
     font-family: $font-ui;
 }
