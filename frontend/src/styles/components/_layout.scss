@@ -198,10 +198,7 @@ img.immagine_luogo {
     z-index: -1;
 }
 
-div.news {
-    background: url("imgs/colonna_sx/box_news.png") no-repeat;
-    background-size: 100%;
-}
+/* div.news background rimosso: box_news.png è grafica colonna sinistra, ora div.news è a destra */
 
 // ── Meteo ─────────────────────────────────────────────────────
 
