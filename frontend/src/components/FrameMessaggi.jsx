@@ -285,7 +285,7 @@ export default function FrameMessaggi() {
             {/* li ristabiliamo come stili inline React.                         */}
             {/* ================================================================ */}
             <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '40px' }}>
-                <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', gridAutoRows: '50px', padding: '20px' }}>
+                <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', gridAutoRows: '50px' }}>
                     {ICONS.map(icon => (
                         <div key={icon.id} className="grid-item" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             {icon.chatoff ? (
