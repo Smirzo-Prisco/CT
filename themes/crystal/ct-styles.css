@@ -1172,12 +1172,10 @@ body {
 }
 
 #online-users-container .iframe_online {
-  height: 263px;
-  width: 100%;
   background: url("imgs/colonna_dx/box_presenti.png") no-repeat center/100%;
-  position: relative;
-  top: 73px;
-  left: 2%;
+  height: 250px;
+  width: 100%;
+  padding: 10px 35px 0px 40px;
 }
 
 div.luogo {
@@ -1210,12 +1208,7 @@ div.link_presenti {
 }
 
 div.contenitore_presenti {
-  width: 168px;
-  height: 185px;
-  border: none;
-  position: relative;
-  top: 30px;
-  left: 25px;
+  padding: 10px;
   overflow-y: auto;
 }
 
