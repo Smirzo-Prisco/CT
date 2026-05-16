@@ -13,7 +13,7 @@ div.presenti_estesi {
     overflow-x: hidden;
 
     table {
-        table-layout: auto;  // sovrascrive fullTable (fixed): le colonne si adattano
+        table-layout: auto; // sovrascrive fullTable (fixed): le colonne si adattano
         width: 100%;
     }
 
@@ -70,7 +70,7 @@ div.contenitore_presenti {
     padding: 10px;
     overflow-y: auto;
     height: 100%;
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
 // ── Icone stato (PresentiEstesi) ──────────────────────────────
