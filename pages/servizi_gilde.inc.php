@@ -11,9 +11,7 @@
                 <tr><td><div><a class="table-title" href="../documentazione_main.php" target="_blank">AMBIENTAZIONE & REGOLAMENTO</a></div></td></tr>
             </table>
             <br><br>
-    <?php   include('servizi_inclinazione.inc.php');
-
-            // Unica tabella "Razze" — unifica Correnti di cosmos, neutrali e caos
+    <?php   // Unica tabella "Razze" — unifica Correnti di cosmos, neutrali e caos
             $query = "SELECT gilda.nome, gilda.id_gilda FROM gilda WHERE gilda.visibile = 1 AND gilda.tipo != 4 ORDER BY gilda.tipo, gilda.id_gilda";
             $result = gdrcd_query($query, 'result'); ?>
             <br>
