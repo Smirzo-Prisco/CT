@@ -1,0 +1,46 @@
+/* MenuIcons.module.css — icone Famiglie, Mestieri, Calendario */
+
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 4px;
+    margin-top: 8px;
+}
+
+.item {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+}
+
+.item a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.top,
+.inner {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.top {
+    z-index: 1;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+}
+
+.inner {
+    z-index: 0;
+}
+
+.item:hover .top {
+    opacity: 0;
+}
