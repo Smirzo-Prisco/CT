@@ -48,7 +48,7 @@ export default function AnteprimaScheda() {
         fetch(`/pages/api_scheda.php?op=profile&pg=${encodeURIComponent(nome)}`)
             .then(r => r.json())
             .then(d => { if (d.success && d.url_img_chat) setAvatar(d.url_img_chat.trim()) })
-            .catch(() => {})
+            .catch(() => { })
     }, [nome]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
@@ -64,21 +64,14 @@ export default function AnteprimaScheda() {
                 {/* Avatar con classe giorno/notte */}
                 <div className={isNotte ? 'info_pg_night' : 'info_pg'}>
                     {avatar && (
-                        <img
-                            src={avatar}
-                            className="immagine_pg"
-                            alt={nome}
-                        />
+                        <a href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`}>
+                            <img
+                                src={avatar}
+                                className="immagine_pg"
+                                alt={nome}
+                            />
+                        </a>
                     )}
-
-                    {/* Link alla scheda personaggio */}
-                    <a href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`}>
-                        <img
-                            className="scheda_pg"
-                            src="themes/crystal/imgs/colonna_dx/scheda_personaggio.png"
-                            alt="Scheda"
-                        />
-                    </a>
                 </div>
 
             </div>
