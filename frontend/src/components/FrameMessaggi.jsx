@@ -33,11 +33,11 @@ function buildIcons(hasEvents) {
 
     return [
         { id: 'mappa', href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png', alt: 'Mappa' },
+        { id: 'famiglie', href: 'main.php?page=servizi_gilde', img: 'icon_fam.png', alt: 'Famiglie' },
         { id: 'messaggi', href: 'main.php?page=messages_center&offset=0', img: null, alt: 'Messaggi' },
         { id: 'forum', href: 'main.php?page=forum', img: 'icon_forum.png', alt: 'Forum' },
         { id: 'uffici', href: 'main.php?page=uffici', img: 'icon_uff.png', alt: 'Uffici' },
         { id: 'giocate', href: 'main.php?page=role_recap', img: 'icon_doc.png', alt: 'Giocate' },
-        { id: 'famiglie', href: 'main.php?page=servizi_gilde', img: 'icon_fam.png', alt: 'Famiglie' },
         { id: 'mestieri', href: 'main.php?page=servizi_mestieri', img: 'icon_job.png', alt: 'Mestieri' },
         { id: 'calendario', href: 'main.php?page=agenda_center', img: calImg, alt: 'Calendario' },
         { id: 'gestione', href: 'main.php?page=gestione', img: 'icon_strumenti.png', alt: 'Gestione' },
