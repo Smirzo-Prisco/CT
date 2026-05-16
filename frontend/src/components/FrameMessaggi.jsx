@@ -20,7 +20,7 @@
  *   GET pages/api_global.php?op=getMessages → stato messaggi non letti
  *   GET pages/api_global.php?op=getChatOff  → stato chat off non letti
  *
- * Montaggio: via ct:ready su #frame-messaggi-container in frame_messaggi.inc.php
+ * Montaggio: via ct:ready su #frame-messaggi-container in left-right_frames.php
  *
  * @author Crystal Tokyo Dev
  */
