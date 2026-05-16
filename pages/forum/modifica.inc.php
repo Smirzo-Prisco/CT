@@ -5,12 +5,6 @@ document.getElementById('messaggio').value+=NewCode;
 document.rapido.messaggio.focus;
 </script>
 
-<style type="text/css">
-#messaggio_bacheca {
-height: 100%;
-width: 80%;
-}
-</style>
 
 <?php
 $row = gdrcd_query("SELECT titolo, autore, id_araldo, messaggio, id_messaggio_padre FROM messaggioaraldo WHERE id_messaggio=".gdrcd_filter('num', $_REQUEST['what'])."");

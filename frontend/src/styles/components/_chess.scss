@@ -1,0 +1,125 @@
+// ============================================================
+// _chess.scss — Scacchiera (chess.inc.php)
+// ============================================================
+@use '../tokens' as *;
+
+$chess-accent: #ce846f;
+$chess-surface: #1f2235;
+$chess-surface-hover: #2c304a;
+$chess-bg: #14172a;
+
+.piece {
+    display: inline-block;
+    width: 12.5%;
+    font-size: 2em;
+    text-align: center;
+    z-index: 100;
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    color: darkred;
+
+    &.b { top: -85px; color: darkslategray; z-index: 100; }
+}
+
+.blank {
+    color: #fff;
+    border: 1px dashed black;
+    display: inline-block;
+    width: 12.5%;
+    font-size: 2em;
+    color: transparent;
+}
+
+.g { background-color: transparent; color: transparent; }
+.g.blank { color: transparent; }
+
+.chess {
+    border: 1px dashed #000;
+    border-collapse: collapse;
+    padding: $space-1 + 1;
+    height: 500px;
+    width: 500px;
+
+    td {
+        border: 1px dashed #000;
+        padding: $space-1 + 1;
+    }
+}
+
+.delete-piece {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: $chess-surface;
+    color: $chess-accent;
+    border: 1px solid $chess-accent;
+    border-radius: $radius-full;
+    width: 18px;
+    height: 18px;
+    font-size: $text-md - 1;
+    line-height: 16px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background $transition-normal, color $transition-normal;
+
+    &:hover { background-color: $chess-surface-hover; color: #fff; }
+}
+
+// ── Menu chess ────────────────────────────────────────────────
+
+.menu_chess {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: $space-5;
+    font-family: $font-ui;
+    color: $chess-accent;
+
+    .row_chess { margin: $space-2 + 2 0; text-align: center; }
+
+    button,
+    input[type="submit"] {
+        background-color: $chess-surface;
+        color: $chess-accent;
+        border: 1px solid $chess-accent;
+        padding: $space-1 + 1 $space-2 + 2;
+        margin: 3px;
+        font-size: $text-md - 1;
+        cursor: pointer;
+        border-radius: 3px;
+        transition: background $transition-normal;
+
+        &:hover { background-color: $chess-surface-hover; }
+    }
+
+    select,
+    input[type="text"],
+    input[type="file"] {
+        background-color: $chess-bg;
+        color: $chess-accent;
+        border: 1px solid $chess-accent;
+        padding: $space-1 + 1;
+        font-size: $text-md - 1;
+        border-radius: 3px;
+    }
+}
+
+// ── Responsive ────────────────────────────────────────────────
+
+@media screen and (min-width: 480px) {
+    .chessboard {
+        background-repeat: no-repeat;
+        height: 500px;
+        background-size: cover;
+        background-position: center;
+        max-width: 500px;
+        margin: $space-2 + 2 auto;
+        margin-top: $space-2 + 2;
+    }
+
+    .blank        { font-size: 3em; }
+    .piece        { font-size: 1em; color: white; top: 50px; }
+    .piece.b      { top: -120px; }
+}

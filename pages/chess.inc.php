@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include('../includes/constant_values.inc.php');
 include('../config.inc.php');
@@ -34,106 +34,7 @@ if($_GET['reset']=="1"){
 <head>
     <meta charset="UTF-8">
     <title>CT Board</title>
-    <style>
-        body {background-color: #111423;}
-        .piece {display:inline-block;width:12.5%;font-size:2em;text-align:center;z-index:100; cursor:pointer; position:absolute;top:15px;color:darkred}
-        .piece.b {top:-85px;color:darkslategray; z-index: 100;}
-        .blank {color:#FFF;border: 1px dashed black;display:inline-block;width:12.5%;font-size:2em;color:transparent;}
-        .g {background-color:transparent;color:transparent}
-        .g.blank {color:transparent;}
-        @media screen and (min-width: 480px) {
-            .chessboard {
-                background-repeat: no-repeat;
-                height: 500px;
-                background-size: cover;
-                background-position: center;
-                max-width:500px;
-                margin:0 auto;
-                margin-top: 10px;
-            }
-            .blank {font-size:3em;}
-            .piece {font-size:1em; color: white; top:50px;}
-            .piece.b {top:-120px;}
-        }
-        .chess {
-            border:1px dashed #000000;
-            border-collapse:collapse;
-            padding:5px;
-            height: 500px;
-            width: 500px;
-        }
-        .chess td {
-            border:1px dashed #000000;
-            padding:5px;
-        }
-        
-        .menu_chess {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-    font-family: Lato, sans-serif;
-    color: #ce846f;
-}
-
-.menu_chess .row_chess {
-    margin: 10px 0;
-    text-align: center;
-}
-
-.menu_chess button, 
-.menu_chess input[type="submit"] {
-    background-color: #1f2235;
-    color: #ce846f;
-    border: 1px solid #ce846f;
-    padding: 5px 10px;
-    margin: 3px;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background 0.3s;
-}
-
-.menu_chess button:hover, 
-.menu_chess input[type="submit"]:hover {
-    background-color: #2c304a;
-}
-
-.menu_chess select, 
-.menu_chess input[type="text"], 
-.menu_chess input[type="file"] {
-    background-color: #14172a;
-    color: #ce846f;
-    border: 1px solid #ce846f;
-    padding: 5px;
-    font-size: 12px;
-    border-radius: 3px;
-}
-
-.delete-piece {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: #1f2235;
-    color: #ce846f;
-    border: 1px solid #ce846f;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 12px;
-    line-height: 16px;
-    text-align: center;
-    cursor: pointer;
-    padding: 0;
-    transition: background 0.3s, color 0.3s;
-}
-
-.delete-piece:hover {
-    background-color: #2c304a;
-    color: #ffffff;
-}
-
-    </style>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
 </head>

@@ -5,12 +5,6 @@ document.getElementById('messaggio').value+=NewCode;
 document.rapido.messaggio.focus;
 </script>
 
-<style type="text/css">
-#messaggio_bacheca {
-height: 100%;
-width: 80%;
-}
-</style>
 <?php
 $padre = gdrcd_filter('num', $_REQUEST['what']);
 $araldo = gdrcd_filter('num', $_REQUEST['where']);

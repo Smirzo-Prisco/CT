@@ -438,6 +438,17 @@ iframe#myframe { width: 100%; height: 100%; border: none; }
     &:hover, &:focus { color: white; cursor: pointer; }
 }
 
+// ── Reliquie — scroll box (elenco_reliquie) ───────────────────
+
+div.scroll {
+    height: 200px;
+    width: 270px;
+    overflow: auto;
+    padding: 0 $space-2 + 2 0 $space-1 + 1;
+    text-align: justify;
+    font-size: $text-md - 1;
+}
+
 // ── Utility globali ───────────────────────────────────────────
 
 .blank { clear: both; }

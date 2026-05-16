@@ -21,7 +21,13 @@
 @use 'components/presenti';
 @use 'components/messaggi';
 @use 'components/forum';
+@use 'components/forum_extra';
 @use 'components/scheda';
 @use 'components/chat';
 @use 'components/gestione';
 @use 'components/mercato';
+@use 'components/log';
+@use 'components/abilita';
+@use 'components/role_recap';
+@use 'components/chess';
+@use 'components/multi_message';

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 // Verifica se l'utente è un amministratore
 if ($_SESSION['admin'] != 1) {
@@ -79,105 +79,7 @@ echo "</div>";
         
 
 
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-            }
-
-            h2, h3 {
-           r: #444;
-                text-align: center;
-            }
-
-            form {
-                max-width: 600px;
-                margin: 20px auto;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-
-            form label {
-                display: block;
-                margin-bottom: 8px;
-                font-weight: bold;
-            }
-
-            form select {
-                width: 100%;
-                padding: 10px;
-                margin-bottom: 15px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-            }
-
-            form button {
-                width: 100%;
-                padding: 10px;
-                background-color: #5cb85c;
-                border: none;
-                color: #fff;
-                font-size: 16px;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-
-            form button:hover {
-                background-color: #4cae4c;
-            }
-
-            .conversation-list, .message-list {
-                max-width: 800px;
-                margin: 20px auto;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-
-            .conversation-list ul, .message-list ul {
-                list-style: none;
-                padding: 0;
-            }
-
-            .conversation-list li, .message-list li {
-                padding: 10px;
-                border-bottom: 1px solid #ddd;
-            }
-
-            .conversation-list li a, .message-list li p {
-                text-decoration: none;
-            }
-
-            .conversation-list li a:hover {
-                color: #5cb85c;
-            }
-
-            .message-list li {
-                margin-bottom: 15px;
-            }
-
-            .message-list li strong {
-                display: block;
-            }
-
-            .pagination {
-                text-align: center;
-                margin-top: 20px;
-            }
-
-            .pagination a {
-                margin: 0 5px;
-                padding: 10px 15px;
-                text-decoration: none;
-                border-radius: 4px;
-            }
-
-            .pagination a:hover {
-                background-color: #4cae4c;
-            }
-        </style>
+        
     
     
         <h2>Seleziona un Personaggio per visualizzare le conversazioni</h2>

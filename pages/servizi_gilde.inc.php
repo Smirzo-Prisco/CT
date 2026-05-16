@@ -1,13 +1,4 @@
 <link rel="stylesheet" href="themes/crystal/famiglie.css">
-<style>
-.table-title {
-    padding: 5px;
-    font-size: 12px !important;
-    color: #ce846f !important;
-    font-family: 'DejaVu Serif' !important;
-    text-transform: uppercase;
-}
-</style>
 <div class="pagina_servizi_gilde">
     <!-- Titolo della pagina -->
     <div class="page_title"><h2><?php echo gdrcd_filter('out', $PARAMETERS['names']['guild_name']['plur']); ?></h2></div>

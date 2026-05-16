@@ -1,19 +1,5 @@
 <link rel="stylesheet" href="../../themes/crystal/documentazione.css">
 
-<style>
-/* Stili essenziali integrati */
-.feed_container { padding: 30px; display: flex; flex-direction: column; align-items: center; }
-.filter_bar { width: 100%; max-width: 800px; margin-bottom: 30px; }
-.filter_bar input[type="text"] { width: 100%; padding: 10px; border-radius: 10px; border: none; font-size: 16px; }
-.post_card { background-color: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px; margin-bottom: 30px; width: 100%; max-width: 800px; box-shadow: 0 0 10px rgba(255,255,255,0.1); }
-.post_header { display: flex; justify-content: space-between; color: #ce846f; font-size: 14px; margin-bottom: 10px; }
-.post_images img { max-width: 100%; border-radius: 10px; max-height: 300px; margin-right: 10px; }
-.post_description { color: #d6d6d6; font-size: 16px; line-height: 1.4; margin-bottom: 10px; }
-.post_actions { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #999; }
-.comment_section { margin-top: 15px; }
-.comment { border-top: 1px solid rgba(255,255,255,0.1); padding: 8px 0; color: #ccc; font-size: 14px; }
-.like_button { color: #ce846f; cursor: pointer; }
-</style>
 
 <div class="feed_container">
 <?php

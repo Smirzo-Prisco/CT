@@ -1,4 +1,4 @@
-<div class="pagina_gestione_mercato">
+﻿<div class="pagina_gestione_mercato">
 <?php /*Controllo permessi*/
 if($_SESSION['admin'] != 1) {
     echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['not_allowed']).'</div>';
@@ -196,41 +196,3 @@ if ($_POST['load_item'] != "") {
 ?>
 </div>
 
-<style>
-/* Aggiungi un po' di stile per migliorare l'allineamento delle tabelle */
-.panels_box {
-    margin-bottom: 20px;
-}
-
-.elenco_record_gestione {
-    margin: 10px 0;
-}
-
-.table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.casella_titolo, .casella_elemento, .controlli_elenco {
-    padding: 10px;
-    border: 1px solid #ccc;
-}
-
-.titoli_elenco, .elementi_elenco, .controlli_elenco_wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.controlli_elenco_wrapper {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px; /* Aggiungi uno spazio tra i form */
-}
-
-.opzioni_elenco_record_gestione {
-    margin: 0;
-}
-</style>

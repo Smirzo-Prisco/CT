@@ -7,6 +7,16 @@ $gestione-action: $palette-blue-4;   // #4da6ff
 $gestione-surface: $palette-dark-5;  // #1c1f2e
 $gestione-hover:   $palette-dark-8;  // #2e3350
 
+// ── Gilde — titolo tabella (servizi_gilde) ────────────────────
+
+.table-title {
+    padding: $space-1 + 1;
+    font-size: $text-md - 1 !important;
+    color: #ce846f !important;
+    font-family: $font-serif !important;
+    text-transform: uppercase;
+}
+
 // ── Topbar ────────────────────────────────────────────────────
 
 .topbar {

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Accesso solo ad admin e moderatori
 if ($_SESSION['admin'] != 1 && $_SESSION['moderatore'] != 1) {
     echo "<div class='error'>Accesso non autorizzato.</div>";
@@ -22,74 +22,7 @@ $pages = ceil($total / $limit);
 $result = gdrcd_query("SELECT * FROM log_doppi $where ORDER BY DataEvento DESC LIMIT $limit OFFSET $offset", 'result');
 ?>
 
-<style>
-    .log_doppi_wrapper {
-        font-family: 'Lato', sans-serif;
-        background-color: #14172a;
-        padding: 20px;
-        color: #cecece;
-    }
 
-    .log_doppi_wrapper h2 {
-        color: #ce846f;
-        margin-bottom: 10px;
-    }
-
-    .log_doppi_form {
-        margin-bottom: 20px;
-    }
-
-    .log_doppi_form input[type="text"] {
-        padding: 5px;
-        border: 1px solid #888;
-        border-radius: 5px;
-        background-color: #1e2238;
-        color: #cecece;
-    }
-
-    .log_doppi_form input[type="submit"] {
-        background-color: #ce846f;
-        color: #14172a;
-        border: none;
-        padding: 6px 12px;
-        margin-left: 5px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    .log_doppi_table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 10px;
-    }
-
-    .log_doppi_table th, .log_doppi_table td {
-        border: 1px solid #333;
-        padding: 8px;
-        text-align: left;
-        background-color: #1e2238;
-    }
-
-    .log_doppi_table th {
-        background-color: #2b2f4a;
-        color: #ce846f;
-    }
-
-    .log_doppi_pagination {
-        margin-top: 10px;
-        font-size: 14px;
-    }
-
-    .log_doppi_pagination a {
-        color: #ce846f;
-        margin: 0 8px;
-        text-decoration: none;
-    }
-
-    .log_doppi_pagination span {
-        color: #888;
-    }
-</style>
 
 <div class="log_doppi_wrapper">
     <h2>Accessi sospetti - Log doppi</h2>

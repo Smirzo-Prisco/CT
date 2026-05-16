@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if ($_SESSION['admin'] != 1) {
     echo '<div class="error">Non hai i permessi per accedere a questa pagina.</div>';
 } else {
@@ -147,67 +147,7 @@ if ($_SESSION['admin'] != 1) {
         <h2>Gestione Richieste di Accesso ai Log</h2>
     </div>
     <div class="page_body">
-        <style>
-            .log_requests_table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-                font-family: 'Lato', sans-serif;
-            }
-
-            .log_requests_table th, .log_requests_table td {
-                border: 1px solid #444;
-                padding: 10px;
-                text-align: center;
-                color: #ce846f;
-            }
-
-            .log_requests_table th {
-                background-color: #14172a;
-                text-transform: uppercase;
-                font-size: 14px;
-            }
-
-            .log_requests_table tr:nth-child(even) {
-                background-color: rgba(54, 66, 115, 0.2);
-            }
-
-            .log_requests_table tr:nth-child(odd) {
-                background-color: rgba(54, 66, 115, 0.1);
-            }
-
-            .approve_button, .deny_button {
-                padding: 8px 15px;
-                font-size: 14px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-family: 'Lato', sans-serif;
-            }
-
-            .approve_button {
-                background-color: #4caf50;
-                color: white;
-                margin-right: 5px;
-            }
-
-            .deny_button {
-                background-color: #f44336;
-                color: white;
-            }
-
-            .success {
-                color: #4caf50;
-                font-size: 14px;
-                margin-bottom: 20px;
-            }
-
-            .error {
-                color: #f44336;
-                font-size: 14px;
-                margin-bottom: 20px;
-            }
-        </style>
+        
 
         <?php if (gdrcd_query($requests, 'num_rows') > 0) { ?>
             <table class="log_requests_table">

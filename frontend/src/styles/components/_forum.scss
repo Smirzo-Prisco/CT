@@ -6,6 +6,13 @@
 // Colore accent specifico del forum (arancione-rame)
 $forum-accent: #ce846f;
 
+// ── Textarea bacheca (composer e modifica) ────────────────────
+
+#messaggio_bacheca {
+    height: 100%;
+    width: 80%;
+}
+
 // ── Forum PHP classico ────────────────────────────────────────
 
 div.pagina_forum {

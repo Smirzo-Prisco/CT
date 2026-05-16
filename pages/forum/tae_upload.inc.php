@@ -36,19 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['descrizione'])) {
 ?>
 
 <link rel="stylesheet" href="../../themes/crystal/documentazione.css">
-<style>
-    .upload_tae_container { max-width: 700px; margin: 0 auto; padding: 30px; color: #d6d6d6; }
-    .upload_tae_container textarea, .upload_tae_container input[type=text] {
-        width: 100%; padding: 10px; border-radius: 10px; border: none; margin-bottom: 20px;
-        font-family: Lato, sans-serif; font-size: 16px;
-    }
-    .upload_tae_container input[type=submit] {
-        background-color: #ce846f; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; color: #14172a;
-        font-weight: bold;
-    }
-    .upload_tae_container h2 { color: #ce846f; text-align: center; margin-bottom: 20px; }
-    .success, .warning { background-color: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-bottom: 20px; color: #ce846f; }
-</style>
 
 <div class="upload_tae_container">
     <h2><?php echo $modifica ? "Modifica Post" : "Nuovo Post"; ?></h2>

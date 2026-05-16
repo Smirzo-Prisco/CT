@@ -1,0 +1,59 @@
+// ============================================================
+// _multi_message.scss — Form invio messaggi multipli
+//   (mex_privati/multi_message.php)
+// ============================================================
+@use '../tokens' as *;
+
+// Questo file caricato da una pagina standalone (iframe):
+// body occupa tutta la viewport
+
+.multi-message-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    padding: $space-5;
+    background-color: $palette-dark-2;
+    border-radius: $radius-lg;
+    box-shadow: 0 0 10px rgb(0 0 0 / 50%);
+    color: $color-text-light;
+
+    label { margin-bottom: $space-2 + 2; font-weight: $font-weight-bold; }
+
+    input[type="text"],
+    textarea {
+        margin-bottom: 15px;
+        padding: $space-2 + 2;
+        border-radius: $radius-sm;
+        border: 1px solid #444;
+        background-color: #222;
+        color: $color-text-light;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    select {
+        margin-bottom: 15px;
+        padding: $space-2 + 2;
+        border-radius: $radius-sm;
+        border: 1px solid #444;
+        background-color: #222;
+        color: $color-text-light;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    button {
+        padding: $space-2 + 2 15px;
+        border-radius: $radius-sm;
+        border: none;
+        background-color: #1e90ff;
+        color: $color-text-light;
+        font-size: $text-xl;
+        cursor: pointer;
+        transition: background-color $transition-normal;
+        width: 100%;
+
+        &:hover { background-color: #1c86ee; }
+    }
+}

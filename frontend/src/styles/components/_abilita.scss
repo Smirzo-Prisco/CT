@@ -1,0 +1,244 @@
+// ============================================================
+// _abilita.scss — Skill e abilità:
+//   incremento_parametri, mercato_abilita_atarashi,
+//   gst_personaggio_skill
+// ============================================================
+@use '../tokens' as *;
+
+// ── Tabelle gestione skill (gst_personaggio_skill) ────────────
+
+.panels_box { margin-bottom: $space-5; }
+.elenco_record_gestione { margin: $space-2 + 2 0; }
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.titoli_elenco,
+.elementi_elenco,
+.controlli_elenco_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.controlli_elenco_wrapper {
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: $space-2 + 2;
+}
+
+.opzioni_elenco_record_gestione { margin: 0; }
+
+// ── Pannello skill mercato (mercato_abilita_atarashi) ─────────
+
+#skillPanel {
+    font-family: inherit;
+    color: $color-text-light;
+
+    // Accordion
+    .skill-accordion {
+        width: 100%;
+        margin-top: $space-5;
+    }
+
+    .accordion-item {
+        margin-bottom: $space-2 + 2;
+        border-radius: $radius-lg;
+        overflow: hidden;
+        background: #1c2033;
+        border: 1px solid $palette-dark-8;
+    }
+
+    .accordion-header {
+        width: 100%;
+        padding: $space-3 $space-4;
+        font-size: $text-xl;
+        text-align: left;
+        background: $palette-dark-5;
+        color: $color-text-light;
+        border: none;
+        cursor: pointer;
+        outline: none;
+
+        &:hover { background: $palette-dark-2; }
+    }
+
+    .accordion-body {
+        display: none;
+        background: #1c2033;
+        padding: $space-2 + 2 15px;
+    }
+
+    // Riga skill
+    .skill-row {
+        display: grid;
+        grid-template-columns: 25% 55% 20%;
+        gap: $space-2 + 2;
+        align-items: center;
+        background: rgb(255 255 255 / 6%);
+        padding: $space-2 + 2 $space-3;
+        margin-bottom: $space-2;
+        border-radius: $radius-lg;
+        border: 1px solid rgb(255 255 255 / 10%);
+    }
+
+    .skill-left  { font-size: $text-lg; font-weight: $font-weight-bold; }
+    .skill-center small { font-size: $text-md; opacity: 0.8; }
+
+    .skill-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: $space-2;
+    }
+
+    .skill-level {
+        font-size: $text-lg;
+        font-weight: $font-weight-bold;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .btn-up {
+        background: #3b82f6;
+        border: none;
+        color: $color-text-light;
+        font-size: $text-lg;
+        width: 26px;
+        height: 26px;
+        border-radius: $radius-lg - 3;
+        cursor: pointer;
+        transition: $transition-fast;
+
+        &:hover          { background: #2563eb; }
+        &.disabled {
+            background: #6b7280 !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    }
+
+    .btn-save {
+        background: $palette-dark-8;
+        color: $color-text-light;
+        border: 1px solid #fff;
+        padding: $space-3 $space-5;
+        border-radius: $radius-lg;
+        cursor: pointer;
+        width: 100%;
+        margin: $space-2 + 2;
+    }
+
+    .skill-info-bar {
+        background: $palette-dark-8;
+        border: 1px solid $palette-dark-2;
+        padding: $space-3 $space-4;
+        border-radius: $radius-lg;
+        display: flex;
+        justify-content: space-between;
+        font-size: $text-xl;
+
+        span { font-weight: $font-weight-bold; color: #00eaff; }
+    }
+
+    .save-bar {
+        background: rgb(17 20 35 / 95%);
+        padding: $space-2 + 2;
+        border-bottom: 1px solid rgb(255 255 255 / 8%);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+}
+
+// ── Modale descrizione skill ──────────────────────────────────
+
+.skill-modal {
+    position: fixed;
+    inset: 0;
+    background: rgb(0 0 0 / 55%);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+
+    &.open {
+        display: flex;
+        opacity: 1;
+    }
+}
+
+.skill-modal-content {
+    background: rgb(255 255 255 / 80%);
+    backdrop-filter: blur(8px);
+    padding: $space-6 32px;
+    width: 90%;
+    max-width: 520px;
+    border-radius: $radius-xl + 4;
+    box-shadow: 0 8px 32px rgb(0 0 0 / 30%);
+    animation: modal-pop 0.25s ease forwards;
+}
+
+@keyframes modal-pop {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+#skill-modal-descrizione {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: $space-5;
+    line-height: 1.5;
+}
+
+#close-modal {
+    padding: $space-2 + 2 $space-4 + 2;
+    border: none;
+    background: #4a6fff;
+    color: $color-text-light;
+    font-size: 0.95rem;
+    border-radius: $radius-xl - 2;
+    cursor: pointer;
+    transition: background $transition-fast, transform 0.15s ease;
+
+    &:hover  { background: #3956d4; transform: translateY(-2px); }
+    &:active { transform: translateY(0); }
+}
+
+// ── Help animato (incremento_parametri) ───────────────────────
+// Variante di .help-animated con tooltip che si apre verso il basso
+
+.help-container {
+    position: relative;
+
+    .tooltip-animated {
+        // Override posizione: verso il basso invece che sopra
+        top: 15%;
+        bottom: auto;
+        left: 60%;
+
+        &::after {
+            // Freccia verso l'alto
+            bottom: 100%;
+            top: auto;
+            border-color: transparent transparent #3a6ea5 transparent;
+        }
+    }
+
+    &:hover .tooltip-animated {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+        pointer-events: auto;
+    }
+}

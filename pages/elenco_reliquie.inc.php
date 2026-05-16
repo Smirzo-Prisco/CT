@@ -1,17 +1,4 @@
 <link rel="stylesheet" href="themes/crystal/mestieri.css">
-<style type="text/css">
-<!--
-div.scroll {
-height: 200px;
-width: 270px;
-overflow: auto;
-padding: 0px 10px 0px 5px;
-text-align: justify;
-font-size: 12px;
-}
--->
-</style>
-
 <?php
 /*elenco ruoli*/
             $query = gdrcd_query("SELECT * FROM PNG WHERE IDPng = ".gdrcd_filter('num', $_REQUEST['IDPng'])."", 'result');

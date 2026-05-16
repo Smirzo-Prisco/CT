@@ -1,0 +1,132 @@
+// ============================================================
+// _log.scss — Pagine log: autorizza_log, log_doppi, log_msg
+// ============================================================
+@use '../tokens' as *;
+
+$log-accent: #ce846f;
+
+// ── Log richieste (autorizza_log) ─────────────────────────────
+
+.log_requests_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: $space-5;
+    font-family: $font-ui;
+
+    th, td {
+        border: 1px solid #444;
+        padding: $space-2 + 2;
+        text-align: center;
+        color: $log-accent;
+    }
+
+    th {
+        background-color: #14172a;
+        text-transform: uppercase;
+        font-size: $text-lg;
+    }
+
+    tr:nth-child(even) { background-color: rgb(54 66 115 / 20%); }
+    tr:nth-child(odd)  { background-color: rgb(54 66 115 / 10%); }
+}
+
+.approve_button,
+.deny_button {
+    padding: $space-2 15px;
+    font-size: $text-lg;
+    border: none;
+    border-radius: $radius-lg - 3;
+    cursor: pointer;
+    font-family: $font-ui;
+}
+
+.approve_button { background-color: #4caf50; color: white; margin-right: $space-1 + 1; }
+.deny_button    { background-color: #f44336; color: white; }
+
+// ── Log doppi account ─────────────────────────────────────────
+
+.log_doppi_wrapper {
+    font-family: $font-ui;
+    background-color: #14172a;
+    padding: $space-5;
+    color: #cecece;
+
+    h2 { color: $log-accent; margin-bottom: $space-2 + 2; }
+}
+
+.log_doppi_form {
+    margin-bottom: $space-5;
+
+    input[type="text"] {
+        padding: $space-1 + 1;
+        border: 1px solid #888;
+        border-radius: $radius-lg - 3;
+        background-color: #1e2238;
+        color: #cecece;
+    }
+
+    input[type="submit"] {
+        background-color: $log-accent;
+        color: #14172a;
+        border: none;
+        padding: $space-1 + 2 $space-3;
+        margin-left: $space-1 + 1;
+        border-radius: $radius-lg - 3;
+        cursor: pointer;
+    }
+}
+
+.log_doppi_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: $space-2 + 2;
+
+    th, td {
+        border: 1px solid #333;
+        padding: $space-2;
+        text-align: left;
+        background-color: #1e2238;
+    }
+
+    th {
+        background-color: #2b2f4a;
+        color: $log-accent;
+    }
+}
+
+.log_doppi_pagination {
+    margin-top: $space-2 + 2;
+    font-size: $text-lg;
+
+    a    { color: $log-accent; margin: 0 $space-2; text-decoration: none; }
+    span { color: #888; }
+}
+
+// ── Log messaggi privati (log_msg) ────────────────────────────
+
+.conversation-list,
+.message-list {
+    max-width: 800px;
+    margin: $space-5 auto;
+    padding: $space-5;
+    border-radius: $radius-lg;
+    box-shadow: 0 0 10px rgb(0 0 0 / 10%);
+
+    ul { list-style: none; padding: 0; }
+
+    li {
+        padding: $space-2 + 2;
+        border-bottom: 1px solid #ddd;
+    }
+}
+
+.conversation-list li a {
+    text-decoration: none;
+    &:hover { color: #5cb85c; }
+}
+
+.message-list li {
+    margin-bottom: 15px;
+
+    strong { display: block; }
+}
