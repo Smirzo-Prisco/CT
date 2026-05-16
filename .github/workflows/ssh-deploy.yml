@@ -29,5 +29,6 @@ jobs:
             pm2 restart ct-socket || pm2 start server.js --name ct-socket
             cd ${{ secrets.SSH_PATH }}/frontend
             npm install
+            npm run build:css
             npm run build
             chown -R www-data:www-data /var/www/crystaltokyo
