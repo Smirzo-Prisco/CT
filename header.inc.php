@@ -131,9 +131,11 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
              a causa di un die() interno al contenuto della pagina. -->
         <?php if (file_exists(__DIR__ . '/themes/crystal/dist/ct-app.js')): ?>
         <?php if (file_exists(__DIR__ . '/themes/crystal/dist/ct-main.css')): ?>
-        <link rel="stylesheet" href="/themes/crystal/dist/ct-main.css" type="text/css">
+        <?php $css_v = filemtime(__DIR__ . '/themes/crystal/dist/ct-main.css'); ?>
+        <link rel="stylesheet" href="/themes/crystal/dist/ct-main.css?v=<?= $css_v ?>" type="text/css">
         <?php endif; ?>
-        <script type="module" src="/themes/crystal/dist/ct-app.js"></script>
+        <?php $js_v = filemtime(__DIR__ . '/themes/crystal/dist/ct-app.js'); ?>
+        <script type="module" src="/themes/crystal/dist/ct-app.js?v=<?= $js_v ?>"></script>
         <?php endif; ?>
 
         <!-- Listener ct:ready: monta i componenti React sidebar e AppRouter.
