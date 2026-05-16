@@ -289,11 +289,11 @@ export default function FrameMessaggi() {
                     {ICONS.map(icon => (
                         <div key={icon.id} className="grid-item" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             {icon.chatoff ? (
-                                /* Chat Off: apre popup */
+                                /* Chat Off: scrolla al pannello in fondo alla colonna */
                                 <a
                                     id="chatoff-link"
                                     href="javascript:;"
-                                    onClick={() => window.open('../chattina_off.php', 'chat', 'width=650,height=600,resizable,status,scrollbars=1')}
+                                    onClick={() => document.getElementById('chattina-off-container')?.scrollIntoView({ behavior: 'smooth' })}
                                 >
                                     <img src={chatOffIcon} alt={icon.alt} />
                                 </a>

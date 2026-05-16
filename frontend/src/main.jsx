@@ -42,6 +42,7 @@ import InfoLocation   from './components/InfoLocation'
 import FrameMessaggi   from './components/FrameMessaggi'
 import AnteprimaScheda from './components/AnteprimaScheda'
 import LinkMenu        from './components/LinkMenu'
+import ChattingOff     from './components/ChattingOff'
 
 /**
  * Registry privato dei componenti.
@@ -130,6 +131,9 @@ window.CT.register('AnteprimaScheda', AnteprimaScheda)
 
 /** Select gotomap aggiornato via socket + link menu con hover effect */
 window.CT.register('LinkMenu', LinkMenu)
+
+/** Chattina off integrata in fondo alla colonna sinistra — si aggiorna via socket chatoff:update */
+window.CT.register('ChattingOff', ChattingOff)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.

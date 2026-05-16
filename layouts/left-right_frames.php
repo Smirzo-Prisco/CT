@@ -16,8 +16,9 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 <!-- COLONNA SINISTRA -->
 <div id="framecontentLeft">
     <div id="info-location-container"></div>
-    <div id="link-menu-container"></div>
+    <!-- <div id="link-menu-container"></div> -->
     <div id="frame-messaggi-container"></div>
+    <div id="chattina-off-container"></div>
 </div>
 
 <!-- COLONNA DESTRA -->

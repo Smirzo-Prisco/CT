@@ -177,6 +177,9 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             if (document.getElementById('frame-messaggi-container'))
                 CT.mount('FrameMessaggi', 'frame-messaggi-container', {});
 
+            if (document.getElementById('chattina-off-container'))
+                CT.mount('ChattingOff', 'chattina-off-container', {});
+
             if (document.getElementById('anteprima-scheda-container'))
                 CT.mount('AnteprimaScheda', 'anteprima-scheda-container', {});
 

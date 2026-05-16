@@ -1,0 +1,96 @@
+// ============================================================
+// _chatoff.scss — Pannello chattina off (colonna sinistra)
+// ============================================================
+@use '../tokens' as *;
+
+.chatoff-panel {
+    margin-top: 10px;
+    border-top: 1px solid $palette-dark-8;
+    display: flex;
+    flex-direction: column;
+    background: $palette-dark-3;
+}
+
+.chatoff-title {
+    font-family: Perpetua, serif;
+    font-size: $text-sm;
+    text-transform: uppercase;
+    color: $palette-text-2;
+    padding: 6px 10px;
+    background: $palette-dark-5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    letter-spacing: 0.05em;
+}
+
+.chatoff-clear-btn {
+    background: none;
+    border: none;
+    color: $palette-text-4;
+    cursor: pointer;
+    font-size: 10px;
+    padding: 0 2px;
+    line-height: 1;
+
+    &:hover { color: $palette-text-1; }
+}
+
+.chatoff-box {
+    height: 160px;
+    overflow-y: auto;
+    padding: 6px 8px;
+    font-family: $font-serif;
+    font-size: $text-xs;
+    color: $palette-text-2;
+    line-height: 1.5;
+    background: $palette-dark-2;
+
+    // Messaggi dal log.html
+    .msgln {
+        margin: 0 0 2px;
+        color: $palette-text-3;
+
+        b { color: $chat-off; }
+    }
+}
+
+.chatoff-empty {
+    color: $palette-text-4;
+    font-style: italic;
+}
+
+.chatoff-input-row {
+    display: flex;
+    gap: 4px;
+    padding: 5px 6px;
+    background: $palette-dark-5;
+}
+
+.chatoff-input {
+    flex: 1;
+    background: $palette-dark-6;
+    border: 1px solid $palette-dark-8;
+    color: $palette-text-1;
+    font-family: $font-ui;
+    font-size: $text-xs;
+    padding: 3px 6px;
+    border-radius: 3px;
+    min-width: 0;
+
+    &::placeholder { color: $palette-text-4; }
+    &:focus { outline: none; border-color: $palette-blue-3; }
+}
+
+.chatoff-send-btn {
+    background: $palette-dark-8;
+    border: 1px solid $palette-dark-8;
+    color: $palette-text-2;
+    font-size: $text-sm;
+    padding: 2px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    &:hover { background: $palette-rust; color: $palette-text-1; }
+}
