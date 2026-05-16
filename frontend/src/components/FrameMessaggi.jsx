@@ -28,13 +28,11 @@ import { useState, useEffect, useCallback } from 'react'
 
 function buildIcons(hasEvents) {
     const mappa = window.CT_USER?.mappa ?? 1
-    const luogo = window.CT_USER?.luogo ?? -1
 
     const calImg = hasEvents ? 'icon_news_night.gif' : 'icon_news.png'
 
     return [
         { id: 'mappa',      href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png',      alt: 'Mappa' },
-        { id: 'aggiorna',   href: `main.php?dir=${luogo}`,                    img: 'icon_aggiorna.png',   alt: 'Aggiorna' },
         { id: 'messaggi',   href: 'main.php?page=messages_center&offset=0',   img: null,                  alt: 'Messaggi' },
         { id: 'forum',      href: 'main.php?page=forum',                      img: 'icon_forum.png',      alt: 'Forum' },
         { id: 'uffici',     href: 'main.php?page=uffici',                     img: 'icon_uff.png',        alt: 'Uffici' },
