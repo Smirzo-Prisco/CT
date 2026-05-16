@@ -9,71 +9,35 @@
         if(isset($_REQUEST['id_gilda']) === false) { ?>
             <table class="customTable">
                 <tr><td><div><a class="table-title" href="../documentazione_main.php" target="_blank">AMBIENTAZIONE & REGOLAMENTO</a></div></td></tr>
-                <tr><td><a class="table-title" href="../statuti/spiriti/spiriti.html" target="_blank">SPIRITI</a></td></tr>
             </table>
             <br><br>
     <?php   include('servizi_inclinazione.inc.php');
 
-            $query = "SELECT gilda.nome, gilda.id_gilda, gilda.tipo, gilda.immagine, gilda.url_sito, codtipogilda.descrizione FROM gilda JOIN codtipogilda ON gilda.tipo = codtipogilda.cod_tipo WHERE gilda.visibile = 1 and gilda.tipo != 4 ORDER BY gilda.tipo, gilda.id_gilda";
-            $result = gdrcd_query($query, 'result');
-
-            $last_type = -1;
-            
-            while($row = gdrcd_query($result, 'fetch')):
-                /* Conteggio i membri di gilda */
-                $numb = gdrcd_query("SELECT COUNT(*) FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo WHERE ruolo.gilda = ".$row['id_gilda']."");
-                
-                /* Stampo la riga dell'allineamento gilde */
-                if($row['tipo'] != $last_type): ?>
-                    <br>
-                    <table class="customTable">
-                        <tr>
-                            <td colspan="4">
-                                <div style="font-size:13px;color:#9a6353;font-family:DejaVu Serif;filter:drop-shadow(0 0 5px rgba(0,0,0,0.57));"><?=gdrcd_filter('out', $row['descrizione'])?></div>
-                            </td>
-                        </tr>
-                        <tr class="second_header">
-                            <td width="40%"><div><?=gdrcd_filter('out', $PARAMETERS['names']['guild_name']['sing'])?></div></td>
-                            <td width="30%"><div>Reliquia</div></td>
-                            <td><div>Statuto</div></td>
-                            <td><div><?=gdrcd_filter('out', $PARAMETERS['names']['guild_name']['members'])?></div></td>
-                        </tr>
-                <?php $last_type = $row['tipo'];
-                endif; ?>
-                <!--Elenco gilde-->
-                
+            // Unica tabella "Razze" — unifica Correnti di cosmos, neutrali e caos
+            $query = "SELECT gilda.nome, gilda.id_gilda FROM gilda WHERE gilda.visibile = 1 AND gilda.tipo != 4 ORDER BY gilda.tipo, gilda.id_gilda";
+            $result = gdrcd_query($query, 'result'); ?>
+            <br>
+            <table class="customTable">
                 <tr>
-                    <td width="40%"><div><a href="main.php?page=servizi_gilde&id_gilda=<?=$row['id_gilda']?>"><?=gdrcd_filter('out', $row['nome'])?></a></div></td>
-                    <td width="30%">
-                        <div>
-                            <?php
-                                switch ($row['id_gilda']) {
-                                    case 1: $reliquia = 'Reidh'; break;
-                                    case 2: $reliquia = 'Corona di Caos'; break;
-                                    case 3: $reliquia = 'Silver Crystal'; break;
-                                    case 4: $reliquia = 'Nihil'; break;
-                                    case 5: $reliquia = 'Coppa Lunare'; break;
-                                    case 6: $reliquia = 'Albero della Vita'; break;
-                                    case 7: $reliquia = 'Cristallo Corvino'; break;
-                                    default: '';
-                                }
-                            ?>
-                            <a href="main.php?page=elenco_reliquie&IDPng=<?=$row['id_gilda']?>"><?=gdrcd_filter('out', $reliquia)?></a>
-                        </div>
+                    <td colspan="3">
+                        <div style="font-size:13px;color:#9a6353;font-family:DejaVu Serif;filter:drop-shadow(0 0 5px rgba(0,0,0,0.57));">Razze</div>
                     </td>
-                    <td><a href="../statuto_main.php?id=<?=$row['id_gilda'] ?>" target="_blank"><i class="fa-solid fa-scroll"></i></a></td>
+                </tr>
+                <tr class="second_header">
+                    <td width="60%"><div><?=gdrcd_filter('out', $PARAMETERS['names']['guild_name']['sing'])?></div></td>
+                    <td><div>Statuto</div></td>
+                    <td><div><?=gdrcd_filter('out', $PARAMETERS['names']['guild_name']['members'])?></div></td>
+                </tr>
+            <?php while($row = gdrcd_query($result, 'fetch')):
+                $numb = gdrcd_query("SELECT COUNT(*) FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo WHERE ruolo.gilda = ".$row['id_gilda'].""); ?>
+                <tr>
+                    <td width="60%"><div><a href="main.php?page=servizi_gilde&id_gilda=<?=$row['id_gilda']?>"><?=gdrcd_filter('out', $row['nome'])?></a></div></td>
+                    <td><a href="../statuto_main.php?id=<?=$row['id_gilda']?>" target="_blank"><i class="fa-solid fa-scroll"></i></a></td>
                     <td><div style="font-size: 12px; color: #8f8f8f; font-family: DejaVu Serif; filter: drop-shadow(0 0 5px rgba(0,0,0,0.57));"><?=$numb['COUNT(*)']?></div></td>
                 </tr>
-                <?php
-                /************************ CITTADINI POTENZIATI ****************************
-                (Attenzione: sono anche nella sezione in cui si conteggiano i pg)*********/
-                if($row['tipo'] == 4): ?>
-                    </table><br> 
-                <?php
-                endif;
-            endwhile;
-            gdrcd_query($result, 'free');
-            ?>
+            <?php endwhile;
+            gdrcd_query($result, 'free'); ?>
+            </table>
             <br>
             
             <?php // INDIPENDENTI
