@@ -48,7 +48,7 @@ while ($messaggio = gdrcd_query($messaggi_result, 'fetch')) {
         ? date('d-m-', strtotime($messaggio['ora_spedizione'])) . '3077 ' . date('H:i', strtotime($messaggio['ora_spedizione']))
         : date('d-m-Y H:i', strtotime($messaggio['ora_spedizione']));
 
-    echo "<li><strong style='color: #5cb85c;'>{$mittente}</strong> ({$ora_spedizione}): <p style='margin-top: 5px; padding: 10px; border-radius: 5px;'>{$testo}</p></li>";
+    echo "<li><strong class='msg-sender'>{$mittente}</strong> ({$ora_spedizione}): <p class='msg-text'>{$testo}</p></li>";
 }
 echo "</ul></div>";
 

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Confronto oggetti tra oggetto2 e oggetto (solo quelli nel mercato)
 $query = "
     SELECT 
@@ -45,7 +45,7 @@ if (isset($_POST['trasferisci']) && is_array($_POST['oggetti_da_trasferire'])) {
         }
         gdrcd_query($possessori, 'free');
     }
-    echo "<div class='success' style='text-align: center; margin: 20px;'>Oggetti trasferiti con successo.</div>";
+    echo "<div class='success'>Oggetti trasferiti con successo.</div>";
 }
 ?>
 

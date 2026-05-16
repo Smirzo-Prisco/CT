@@ -15,7 +15,17 @@
       "Bash(git commit *)",
       "Bash(php -l layouts/left-right_frames.php)",
       "Bash(grep -v \"SELECT\\\\|DELETE\\\\|UPDATE\\\\|DROP\\\\|WHERE\\\\|#\\\\|//\")",
-      "Bash(grep -v \"ajax_engine\\\\|#\\\\|//\")"
+      "Bash(grep -v \"ajax_engine\\\\|#\\\\|//\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\rbottini\\\\Documents\\\\CT\\\\GIT\\\\CT\" -Directory)",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(cd \"c:\\\\Users\\\\rbottini\\\\Documents\\\\CT\\\\GIT\\\\CT\" && find pages -maxdepth 1 -type f \\\\\\( -name \"*.inc.php\" -o -name \"*.php\" \\\\\\) | sed 's|pages/||' | sed 's/\\\\.inc\\\\.php$//' | sed 's/\\\\.php$//' | sort > /tmp/page_names.txt && head -20 /tmp/page_names.txt)",
+      "Read(//tmp/**)",
+      "Bash(grep -roh \"page=[a-zA-Z_0-9]*\" \"c:\\\\Users\\\\rbottini\\\\Documents\\\\CT\\\\GIT\\\\CT\" --include=\"*.php\" --include=\"*.inc.php\" --include=\"*.jsx\" --include=\"*.js\" 2>/dev/null | grep -v node_modules | sed 's/page=//' | sort -u > /tmp/referenced_pages.txt && wc -l /tmp/referenced_pages.txt && head -30 /tmp/referenced_pages.txt)",
+      "Bash(grep -v \"^[^:]*:[ ]*//\")",
+      "Bash(grep \"\\\\.css$\")"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 require'header.inc.php'; /*Header comune*/
 
@@ -9,12 +9,7 @@ require'header.inc.php'; /*Header comune*/
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <meta charset="utf-8">
 <title>Writer</title>
-<style type="text/css">
-textarea {
-display:block;
-margin:1em 0;
-} 
-</style> 
+ 
 </head>
 <body>
 <center>

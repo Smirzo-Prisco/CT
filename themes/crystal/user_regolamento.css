@@ -1,0 +1,60 @@
+/* user_regolamento.php — Layout legacy regolamento */
+
+body {
+    background-image: url('imgs/bgmanuali.png');
+    background-repeat: repeat;
+}
+
+.tabella {
+    width: 600px;
+    overflow: auto;
+    background: url('imgs/bgmanuali.png') repeat scroll 0 0 #333;
+    height: 550px;
+    top: 10px;
+    border-top: 0 dotted #333;
+    border-bottom: 1px solid #333;
+    border-left: 2px double #333;
+    border-right: 2px double #333;
+}
+
+.sezione {
+    color: #b4b6bf;
+    background-color: #101e2c;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    text-align: center;
+    padding: 4px;
+    margin-right: -2px;
+    border-top: 1px solid #333;
+    border-left: 1px solid #333;
+    border-bottom: 1px solid #333;
+}
+
+.sezione2 {
+    color: #b4b6bf;
+    background-color: #101e2c;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    text-align: center;
+    padding: 4px;
+    margin-left: -2px;
+    border-top: 1px solid #333;
+    border-right: 1px solid #333;
+    border-bottom: 1px solid #333;
+}
+
+.menu1 {
+    margin: 5px -2px 5px 0;
+    line-height: 16px;
+    border-left: 0 dotted #333;
+}
+
+.menu2 {
+    margin: 5px 0 5px -2px;
+    border-right: 0 dotted #333;
+    line-height: 16px;
+}

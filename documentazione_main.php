@@ -1,4 +1,4 @@
-<head>
+﻿<head>
 <link href="https://fonts.googleapis.com/css?family=Amatic+SC" rel="stylesheet">
 <link href="themes/crystal/documentazione.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -6,7 +6,7 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <title>CT - Documentazione</title>  
 </head>
-<style type="text/css"></style>
+
 <body>
 
   <div class="openmenu">

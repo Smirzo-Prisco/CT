@@ -386,6 +386,23 @@ $chat-popup-accent: #6366f1;   // accent popup ricerca utenti
     100% { left: 100%; }
 }
 
+// ── Download log chat (chat_download / chat_download_scelta) ──
+
+iframe.iframe_chat {
+    border: none;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+}
+
+div.chat_window { text-align: center; }
+
+span.look {
+    font-size: $text-md;
+    text-transform: uppercase;
+    color: #ce846f;
+}
+
 // ── Box chat ──────────────────────────────────────────────────
 
 div.chat_box {

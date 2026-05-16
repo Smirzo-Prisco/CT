@@ -1,4 +1,4 @@
-<?php
+﻿<?php
     /* Includo i file necessari */
     include('includes/constant_values.inc.php');
     include('config.inc.php');
@@ -12,13 +12,7 @@
     // Carico l'elenco delle abilità
     $result = gdrcd_query("SELECT * FROM abilita WHERE id_abilita = ".$_GET['id']);
 ?>
-<style>
-    span.look {
-        font-size:13px;
-        text-transform:uppercase;
-        color: #ce846f;
-    }
-</style>
+
 <body style="background-color:transparent;">
     <link rel="stylesheet" href="/themes/crystal/descrizione.css">
     <div id="container"><span class="luogo"><?=$result['nome']?></span><br></div>

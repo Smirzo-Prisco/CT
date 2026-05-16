@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
+﻿<link rel="stylesheet" href="../themes/crystal/famiglie.css">
 
 <?php
 // Se è stata selezionata una tipologia, salvala
@@ -108,12 +108,12 @@ if (isset($_POST['submit']) && $_POST['submit'] == 'Aggiungi Oggetto') {
         )
     ");
 
-    echo "<div class='success' style='text-align: center; margin-top: 20px;'>
+    echo "<div class='success'>
             Oggetto <b>$nome</b> richiesto con successo! Attendi il parere degli admin
           </div>";
 
-    echo "<div style='text-align: center; margin-top: 15px;'>
-        <a href='main.php?page=oggetto_aggiungi_richiesta' class='ares' style='background-color: #0f111d; padding: 5px 10px; text-decoration: none; color: #ce846f; border-radius: 5px; margin: 5px; display: inline-block;'>
+    echo "<div class='action-links'>
+        <a href='main.php?page=oggetto_aggiungi_richiesta' class='ares'>
             Torna al caricamento oggetti
         </a>
         

@@ -7,6 +7,25 @@ $gestione-action: $palette-blue-4;   // #4da6ff
 $gestione-surface: $palette-dark-5;  // #1c1f2e
 $gestione-hover:   $palette-dark-8;  // #2e3350
 
+// ── Link azione post-operazione (oggetti, gestione) ──────────
+
+.ares {
+    background-color: $palette-dark-1;
+    padding: $space-1 + 1 $space-2 + 2;
+    text-decoration: none;
+    color: #ce846f;
+    border-radius: $radius-lg - 3;
+    margin: $space-1 + 1;
+    display: inline-block;
+
+    &:hover, &:visited { color: #ce846f; }
+}
+
+.action-links {
+    text-align: center;
+    margin-top: 15px;
+}
+
 // ── Gilde — titolo tabella (servizi_gilde) ────────────────────
 
 .table-title {

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
@@ -383,10 +383,10 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
             echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr class=tChiaro>';
             echo '<td><input type=hidden Name="nome" value="'.htmlspecialchars($row['nome']).'"> '.htmlspecialchars($row['nome']).'</td>';
             echo '<td><select Name=admin>';
-            echo '<option value="0" style={background:"#FF3030"}> - </option>';
+            echo '<option value="0" style="background-color:#FF3030"> - </option>';
             echo '<option value="1"';
             if ($row['admin'] == 1) echo ' selected';
-            echo ' style={background:"#8080FF"}>Admin</option>';
+            echo ' style="background-color:#8080FF">Admin</option>';
             echo '</select></td>';
             echo '<input type="hidden" name="op" value="change_admin" />';
             echo '<td><input type=submit value="Cambia"></td>';
@@ -396,7 +396,7 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
         echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr>';
         echo '<td><input Name="nome" value="'.htmlspecialchars($row['nome']).'" maxlength=20></td>';
         echo '<td><select Name=tipo_admin>';
-        echo '<option value="1" style={background:gray}>Admin</option>';
+        echo '<option value="1" style="background-color:gray">Admin</option>';
         echo '</select></td>';
         echo '<input type="hidden" name="op" value="new_admin" />';
         echo '<td><input type=submit value="Nuovo"></td>';
@@ -421,12 +421,12 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr class=tChiaro>';
            echo '<td><input type=hidden Name="nome" value="'.htmlspecialchars($row['nome']).'"> '.htmlspecialchars($row['nome']).'</td>';
 	       echo '<td><select Name=master>';
-	       echo '<option value="0" style={background:"#FF3030"}> - </option>';
+	       echo '<option value="0" style="background-color:#FF3030"> - </option>';
 	       echo '<option value="1"';
 	       if ($row['master']==1) {
 		   echo ' selected';
 	                             }
-           echo ' style={background:"#8080FF"}>Master</option>';
+           echo ' style="background-color:#8080FF">Master</option>';
            echo '</select></td>';
            echo '<input type="hidden" name="op" value="change_master" />';
 	       echo '<td><input type=submit value="Cambia"></td>';
@@ -437,7 +437,7 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr>';
 	       echo '<td><input Name="nome" value="'.htmlspecialchars($row['nome']).'" maxlength=20></td>';
 	       echo '<td><select Name=tipo_master>';
-	       echo '<option value="1" style={background:gray}>Master</option>';
+	       echo '<option value="1" style="background-color:gray">Master</option>';
 	       echo '</select></td>';
            echo '<input type="hidden" name="op" value="new_master" />';
            echo '<td><input type=submit value="Nuovo"></td>';
@@ -464,12 +464,12 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr class=tChiaro>';
            echo '<td><input type=hidden Name="nome" value="'.htmlspecialchars($row['nome']).'"> '.htmlspecialchars($row['nome']).'</td>';
 	       echo '<td><select Name=moderatore>';
-	       echo '<option value="0" style={background:"#FF3030"}> - </option>';
+	       echo '<option value="0" style="background-color:#FF3030"> - </option>';
 	       echo '<option value="1"';
 	       if ($row['moderatore']==1) {
 		   echo ' selected';
 	                             }
-           echo ' style={background:"#8080FF"}>Moderatore</option>';
+           echo ' style="background-color:#8080FF">Moderatore</option>';
            echo '</select></td>';
            echo '<input type="hidden" name="op" value="change_moderatore" />';
 	       echo '<td><input type=submit value="Cambia"></td>';
@@ -480,7 +480,7 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr>';
 	       echo '<td><input Name="nome" value="'.htmlspecialchars($row['nome']).'" maxlength=20></td>';
 	       echo '<td><select Name=tipo_moderatore>';
-	       echo '<option value="1" style={background:gray}>Moderatore</option>';
+	       echo '<option value="1" style="background-color:gray">Moderatore</option>';
 	       echo '</select></td>';
            echo '<input type="hidden" name="op" value="new_moderatore" />';
            echo '<td><input type=submit value="Nuovo"></td>';
@@ -507,12 +507,12 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr class=tChiaro>';
            echo '<td><input type=hidden Name="nome" value="'.htmlspecialchars($row['nome']).'"> '.htmlspecialchars($row['nome']).'</td>';
 	       echo '<td><select Name=guida>';
-	       echo '<option value="0" style={background:"#FF3030"}> - </option>';
+	       echo '<option value="0" style="background-color:#FF3030"> - </option>';
 	       echo '<option value="1"';
 	       if ($row['guida']==1) {
 		   echo ' selected';
 	                             }
-           echo ' style={background:"#8080FF"}>Guida</option>';
+           echo ' style="background-color:#8080FF">Guida</option>';
            echo '</select></td>';
            echo '<input type="hidden" name="op" value="change_guida" />';
 	       echo '<td><input type=submit value="Cambia"></td>';
@@ -523,7 +523,7 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr>';
 	       echo '<td><input Name="nome" value="'.htmlspecialchars($row['nome']).'" maxlength=20></td>';
 	       echo '<td><select Name=tipo_guida>';
-	       echo '<option value="1" style={background:gray}>Guida</option>';
+	       echo '<option value="1" style="background-color:gray">Guida</option>';
 	       echo '</select></td>';
            echo '<input type="hidden" name="op" value="new_guida" />';
            echo '<td><input type=submit value="Nuovo"></td>';
@@ -550,12 +550,12 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr class=tChiaro>';
            echo '<td><input type=hidden Name="nome" value="'.htmlspecialchars($row['nome']).'"> '.htmlspecialchars($row['nome']).'</td>';
 	       echo '<td><select Name=grafico>';
-	       echo '<option value="0" style={background:"#FF3030"}> - </option>';
+	       echo '<option value="0" style="background-color:#FF3030"> - </option>';
 	       echo '<option value="1"';
 	       if ($row['grafico']==1) {
 		   echo ' selected';
 	                             }
-           echo ' style={background:"#8080FF"}>Grafico</option>';
+           echo ' style="background-color:#8080FF">Grafico</option>';
            echo '</select></td>';
            echo '<input type="hidden" name="op" value="change_grafico" />';
 	       echo '<td><input type=submit value="Cambia"></td>';
@@ -566,7 +566,7 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr>';
 	       echo '<td><input Name="nome" value="'.htmlspecialchars($row['nome']).'" maxlength=20></td>';
 	       echo '<td><select Name=tipo_grafico>';
-	       echo '<option value="1" style={background:gray}>Grafico</option>';
+	       echo '<option value="1" style="background-color:gray">Grafico</option>';
 	       echo '</select></td>';
            echo '<input type="hidden" name="op" value="new_grafico" />';
            echo '<td><input type=submit value="Nuovo"></td>';
@@ -593,12 +593,12 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr class=tChiaro>';
            echo '<td><input type=hidden Name="nome" value="'.htmlspecialchars($row['nome']).'"> '.htmlspecialchars($row['nome']).'</td>';
 	       echo '<td><select Name=capomestiere>';
-	       echo '<option value="0" style={background:"#FF3030"}> - </option>';
+	       echo '<option value="0" style="background-color:#FF3030"> - </option>';
 	       echo '<option value="1"';
 	       if ($row['capomestiere']==1) {
 		   echo ' selected';
 	                             }
-           echo ' style={background:"#8080FF"}>capomestiere</option>';
+           echo ' style="background-color:#8080FF">capomestiere</option>';
            echo '</select></td>';
            echo '<input type="hidden" name="op" value="change_capomestiere" />';
 	       echo '<td><input type=submit value="Cambia"></td>';
@@ -609,7 +609,7 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
            echo '<form method=Post action="main.php?page=gestione_nomine" class="form_gestione"><tr>';
 	       echo '<td><input Name="nome" value="'.htmlspecialchars($row['nome']).'" maxlength=20></td>';
 	       echo '<td><select Name=tipo_capomestiere>';
-	       echo '<option value="1" style={background:gray}>capomestiere</option>';
+	       echo '<option value="1" style="background-color:gray">capomestiere</option>';
 	       echo '</select></td>';
            echo '<input type="hidden" name="op" value="new_capomestiere" />';
            echo '<td><input type=submit value="Nuovo"></td>';

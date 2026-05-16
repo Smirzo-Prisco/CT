@@ -24,152 +24,11 @@
 // principale continua a funzionare indipendentemente.
 if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit; }
 ?>
-<style>
-	@charset "utf-8";
-
-	body {
-		margin: 0;
-		padding: 0;
-		border: 0;
-		overflow: hidden;
-		height: 100%;
-		max-height: 100%;
-		overflow-y: auto;
-		/* Previeni scroll orizzontale a livello root */
-		overflow-x: hidden;
-		width: 100%;
-		position: relative;
-	}
-
-	#framecontentLeft, #framecontentRight {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 260px;
-		height: 100%;
-		overflow: auto;
-		z-index: 1000;
-		transition: transform 0.3s ease;
-	}
-
-	#framecontentRight {
-		left: auto;
-		right: 0;
-		color: white;
-	}
-
-	#maincontent {
-		position: fixed;
-		top: 0;
-		left: 260px;
-		right: 260px;
-		bottom: 0;
-		overflow: auto;
-		width: calc(100% - 520px);
-		box-sizing: border-box;
-	}
-
-	.innertube {
-		margin: 5px 5px 5px 10px;
-	}
-
-	/* Pulsanti per mobile (nascosti di default su desktop) */
-	.mobile-toggle {
-		display: none;
-		position: fixed;
-		bottom: 10px;
-		z-index: 1001;
-		background: rgba(0,0,0,0.7);
-		color: white;
-		border: none;
-		padding: 10px 15px;
-		cursor: pointer;
-		border-radius: 5px;
-		font-size: 14px;
-	}
-
-	#toggleLeft  { left:  10px; }
-	#toggleRight { right: 10px; }
-
-	/* Media Query per Mobile */
-	@media screen and (max-width: 768px) {
-		body {
-			overflow-x: hidden !important;
-			width: 100% !important;
-			position: relative !important;
-		}
-
-		#framecontentLeft, #framecontentRight {
-			width: 280px;
-			transform: translateX(-100%);
-			visibility: hidden;
-			transition: transform 0.3s ease, visibility 0.3s ease;
-		}
-
-		#framecontentRight {
-			transform: translateX(100%);
-			right: -30px;
-		}
-
-		#framecontentLeft { left: -30px; }
-
-		#framecontentLeft.expanded,
-		#framecontentRight.expanded {
-			transform: translateX(0);
-			visibility: visible;
-		}
-
-		#maincontent {
-			left: 0 !important;
-			right: 0 !important;
-			width: 100% !important;
-			/* RIMOSSO: transform: translateX(0) — anche translateX(0) crea un
-			   containing block per position:fixed, facendo sì che i popup (es.
-			   #pgRolePlayingPanel) si posizionino relativi a #maincontent
-			   invece che al viewport. Reset via left/right/width è sufficiente. */
-			overflow-x: auto !important;
-		}
-
-		.mobile-toggle { display: block; }
-
-		/* Overlay semitrasparente quando una colonna è aperta */
-		.sidebar-overlay {
-			display: none;
-			position: fixed;
-			top: 0; left: 0; right: 0; bottom: 0;
-			background: rgba(0,0,0,0.5);
-			z-index: 999;
-		}
-
-		.sidebar-overlay.active { display: block; }
-
-		/* Reset completo quando le colonne sono chiuse */
-		body.sidebars-closed {
-			overflow-x: hidden !important;
-			width: 100% !important;
-		}
-
-		body.sidebars-closed #maincontent {
-			transform: translateX(0) !important;
-			width: 100% !important;
-			left: 0 !important;
-			right: 0 !important;
-		}
-	}
-
-	/* Previeni overflow orizzontale nel contenuto principale */
-	#maincontent .output {
-		width: 100%;
-		max-width: 100%;
-		box-sizing: border-box;
-	}
-</style>
-
 <!-- ====================================================================== -->
 <!-- COLONNA SINISTRA: InfoLocation + LinkMenu + FrameMessaggi               -->
 <!-- I container React sono montati da footer.inc.php via ct:ready           -->
 <!-- ====================================================================== -->
-<div id="framecontentLeft" style="background-image:url('../themes/crystal/imgs/colonna_sx/colonna_sinistra.png'); background-repeat: no-repeat;">
+<div id="framecontentLeft">
     <div class="innertube">
         <div class="colonne_sx">
             <div class="info"><div id="info-location-container"></div></div>
@@ -183,7 +42,7 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 <!-- COLONNA DESTRA: AnteprimaScheda + MenuIcons + OnlineUsers               -->
 <!-- ====================================================================== -->
 <link rel="stylesheet" href="../themes/crystal/hover.css">
-<div id="framecontentRight" style="background-image:url('../themes/crystal/imgs/colonna_dx/colonna_destra.png'); background-repeat: no-repeat;">
+<div id="framecontentRight">
     <div class="innertube">
         <div class="colonne_dx">
             <div class="anteprima_scheda"><div id="anteprima-scheda-container"></div></div>

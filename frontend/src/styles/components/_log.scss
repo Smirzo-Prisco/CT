@@ -102,6 +102,16 @@ $log-accent: #ce846f;
     span { color: #888; }
 }
 
+// ── Stili messaggi inline (log_msg) ──────────────────────────
+
+.msg-sender { color: $color-success; }
+
+.msg-text {
+    margin-top: $space-1 + 1;
+    padding: $space-2 + 2;
+    border-radius: $radius-lg - 3;
+}
+
 // ── Log messaggi privati (log_msg) ────────────────────────────
 
 .conversation-list,

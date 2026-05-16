@@ -48,11 +48,11 @@ const ZONES = [
         cx: 706, cy: 390,
         desc: 'Odaiba (お台場) è una grande isola artificiale collocata a Est della città. Meta preferita di molti turisti, è nota soprattutto per il famoso lungomare.',
         rooms: [
-            { dir: 50,  img: 'faro.png'          },
-            { dir: 2,   img: 'porto.png'          },
-            { dir: 3,   img: 'ponte.png'          },
-            { dir: 22,  img: 'spiaggia.png'       },
-            { dir: 32,  img: 'regno_di_caos.png'  },
+            { dir: 50, img: 'faro.png' },
+            { dir: 2, img: 'porto.png' },
+            { dir: 3, img: 'ponte.png' },
+            { dir: 22, img: 'spiaggia.png' },
+            { dir: 32, img: 'regno_di_caos.png' },
         ],
     },
     {
@@ -61,11 +61,11 @@ const ZONES = [
         cx: 462, cy: 141,
         desc: 'Il Monte Fuji (富士山 Fuji-san) è il vulcano più alto di tutto il Giappone. Luogo dalla bellezza paesaggistica straordinaria, è considerato uno dei luoghi sacri più importanti.',
         rooms: [
-            { dir: 9,   img: 'bosco.png'          },
-            { dir: 28,  img: 'terme.png'           },
-            { dir: 11,  img: 'stella_prima.png'    },
-            { dir: 428, img: 'nikigori.png'        },
-            { dir: 10,  img: 'altri_luoghi.png'    },
+            { dir: 9, img: 'bosco.png' },
+            { dir: 28, img: 'terme.png' },
+            { dir: 11, img: 'stella_prima.png' },
+            { dir: 428, img: 'nikigori.png' },
+            { dir: 10, img: 'altri_luoghi.png' },
         ],
     },
     {
@@ -74,11 +74,11 @@ const ZONES = [
         cx: 446, cy: 289,
         desc: 'Ueno (上野) è il quartiere in cui risiedono i più importanti musei e parchi di tutta la città. Densamente popolato soprattutto durante la fioritura dei sakura.',
         rooms: [
-            { dir: 43,  img: 'giardini_dei_fiori_del_male.png' },
-            { dir: 16,  img: 'luna_park.png'                   },
-            { dir: 4,   img: 'parco_di_ueno.png'               },
-            { dir: 12,  img: 'periferia_nord.png'              },
-            { dir: 7,   img: 'zoo.png'                         },
+            { dir: 43, img: 'giardini_dei_fiori_del_male.png' },
+            { dir: 16, img: 'luna_park.png' },
+            { dir: 4, img: 'parco_di_ueno.png' },
+            { dir: 12, img: 'periferia_nord.png' },
+            { dir: 7, img: 'zoo.png' },
         ],
     },
     {
@@ -87,10 +87,10 @@ const ZONES = [
         cx: 47, cy: 298,
         desc: 'Shinjuku (新宿区) è il più importante e trafficato nodo di trasporto urbano della metropoli.',
         rooms: [
-            { dir: 27,  img: 'villa_lancaster.png'   },
-            { dir: 14,  img: 'secret_pandora.png'    },
-            { dir: 38,  img: 'stazione.png'          },
-            { dir: 18,  img: 'zona_malfamata.png'    },
+            { dir: 27, img: 'villa_lancaster.png' },
+            { dir: 14, img: 'secret_pandora.png' },
+            { dir: 38, img: 'stazione.png' },
+            { dir: 18, img: 'zona_malfamata.png' },
         ],
     },
     {
@@ -99,11 +99,11 @@ const ZONES = [
         cx: 330, cy: 365,
         desc: 'Chiyoda (千代田) è il centro amministrativo di Tokyo dentro cui è possibile trovare, oltre che molte istituzioni governative, il famoso Palazzo di Cristallo.',
         rooms: [
-            { dir: 36,  img: 'corte.png'                 },
-            { dir: 25,  img: 'ospedale.png'              },
-            { dir: 17,  img: 'palazzo_di_cristallo.png'  },
+            { dir: 36, img: 'corte.png' },
+            { dir: 25, img: 'ospedale.png' },
+            { dir: 17, img: 'palazzo_di_cristallo.png' },
             // Chitoku Academy: compare solo di notte nel vecchio PHP (mostrata per prima di notte)
-            { dir: 26,  img: 'chitoku_academy.png', nightOnly: false },
+            { dir: 26, img: 'chitoku_academy.png', nightOnly: false },
         ],
     },
     {
@@ -112,11 +112,11 @@ const ZONES = [
         cx: 161, cy: 320,
         desc: 'Roppongi (六本木) è nota per l\'ingente numero di locali notturni e, per questo, meta di numerosi turisti ed espatriati occidentali.',
         rooms: [
-            { page: 'servizi_mercato',              img: 'centro_commerciale.png' },
-            { dir: 13,                              img: 'gatto_nero.png'         },
-            { page: 'servizi_prenotazioni_prova',   img: 'hotel_inn.png'          },
-            { dir: 47,                              img: 'terrazza_panoramica.png' },
-            { dir: 35,                              img: 'tokyo_tower.png'        },
+            { page: 'servizi_mercato', img: 'centro_commerciale.png' },
+            { dir: 13, img: 'gatto_nero.png' },
+            { page: 'servizi_prenotazioni_prova', img: 'hotel_inn.png' },
+            { dir: 47, img: 'terrazza_panoramica.png' },
+            { dir: 35, img: 'tokyo_tower.png' },
         ],
     },
     {
@@ -125,11 +125,11 @@ const ZONES = [
         cx: 80, cy: 405,
         desc: 'Shibuya (渋谷) è la zona più conosciuta e affollata di tutta la capitale giapponese, perennemente illuminata da megaschermi e luci. È il quartiere preferito dai giovani.',
         rooms: [
-            { dir: 23,  img: 'centro.png'                    },
-            { dir: 24,  img: 'magic_shop.png'                },
-            { dir: 30,  img: 'Tae.png'                       },
-            { dir: 33,  img: 'harajuku.png'                  },
-            { dir: 8,   img: 'zona_residenziale_ovest.png'   },
+            { dir: 23, img: 'centro.png' },
+            { dir: 24, img: 'magic_shop.png' },
+            { dir: 30, img: 'Tae.png' },
+            { dir: 33, img: 'harajuku.png' },
+            { dir: 8, img: 'zona_residenziale_ovest.png' },
         ],
     },
     {
@@ -138,10 +138,10 @@ const ZONES = [
         cx: 581, cy: 238,
         desc: 'Asakusa (浅草) viene spesso associata alla zona spirituale. Dominata da templi e santuari shinto, è possibile notare persone vestite con abiti tradizionali.',
         rooms: [
-            { dir: 34,  img: 'cimitero.png'              },
-            { dir: 19,  img: 'santuario_di_cosmos.png'   },
-            { dir: 31,  img: 'reggia_lunare.png'         },
-            { dir: 48,  img: 'zona_residenziale_est.png' },
+            { dir: 34, img: 'cimitero.png' },
+            { dir: 19, img: 'santuario_di_cosmos.png' },
+            { dir: 31, img: 'reggia_lunare.png' },
+            { dir: 48, img: 'zona_residenziale_est.png' },
         ],
     },
     {
@@ -150,10 +150,10 @@ const ZONES = [
         cx: 674, cy: 295,
         desc: 'Tsukiji (築地) deve la sua fama al celeberrimo mercato del pesce. A seguito di un terremoto non ancora compreso, molta della zona è costituita da palazzi abbandonati.',
         rooms: [
-            { dir: 21,  img: 'fiume.png'               },
-            { dir: 49,  img: 'palazzo_abbandonato.png' },
-            { dir: 37,  img: 'periferia_sud.png'       },
-            { dir: 20,  img: 'quartier_generale.png'   },
+            { dir: 21, img: 'fiume.png' },
+            { dir: 49, img: 'palazzo_abbandonato.png' },
+            { dir: 37, img: 'periferia_sud.png' },
+            { dir: 20, img: 'quartier_generale.png' },
         ],
     },
 ]
@@ -276,9 +276,9 @@ export default function MapClick() {
         if (!urlMapId || urlMapId === (window.CT_USER?.mappa ?? 0)) return
 
         fetch('/pages/api_map.php?op=changemap', {
-            method:  'POST',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ map_id: urlMapId }),
+            body: JSON.stringify({ map_id: urlMapId }),
         })
             .then(r => r.json())
             .then(d => {
@@ -309,7 +309,7 @@ export default function MapClick() {
     const navigate = (room) => {
         let url = null
         if (room.dir !== undefined) url = `main.php?dir=${room.dir}`
-        else if (room.page)        url = `main.php?page=${room.page}`
+        else if (room.page) url = `main.php?page=${room.page}`
         if (!url) return
 
         if (window.CT?.navigate) window.CT.navigate(url)
@@ -336,12 +336,12 @@ export default function MapClick() {
     const hotspotStyle = (cx, cy) => {
         if (naturalSize.w === 0) return null   // immagine non ancora caricata
         return {
-            position:  'absolute',
-            left:      `${(cx / naturalSize.w) * 100}%`,
-            top:       `${(cy / naturalSize.h) * 100}%`,
+            position: 'absolute',
+            left: `${(cx / naturalSize.w) * 100}%`,
+            top: `${(cy / naturalSize.h) * 100}%`,
             transform: 'translate(-50%, -50%)',
-            cursor:    'pointer',
-            zIndex:    10,
+            cursor: 'pointer',
+            zIndex: 10,
         }
     }
 
@@ -409,13 +409,13 @@ export default function MapClick() {
             {selectedZone && (
                 <div className="menu_mappa" style={{
                     visibility: 'visible',
-                    position:   'relative',   // flusso normale, non absolute
-                    transform:  'none',       // annulla il translate(-170%,-50%) del CSS
-                    width:      '100%',
-                    maxWidth:   '100%',
-                    margin:     '6px 0 0 0',
-                    boxSizing:  'border-box',
-                    textAlign:  'center',
+                    position: 'relative',   // flusso normale, non absolute
+                    transform: 'none',       // annulla il translate(-170%,-50%) del CSS
+                    width: '100%',
+                    maxWidth: '100%',
+                    margin: '6px 0 0 0',
+                    boxSizing: 'border-box',
+                    textAlign: 'center',
                 }}>
                     {/* Nome zona e descrizione */}
                     <strong style={{ display: 'block', marginBottom: '4px', fontSize: '1em' }}>

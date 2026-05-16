@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 
@@ -135,21 +135,21 @@ function createNewObject() {
         )
     ");
 
-    echo "<div class='success' style='text-align: center; margin-top: 20px;'>
+    echo "<div class='success'>
             Oggetto <b>$nome</b> aggiunto con successo!
           </div>";
 
-    echo "<div style='text-align: center; margin-top: 15px;'>
-        <a href='main.php?page=oggetto_aggiungi' class='ares' style='background-color: #0f111d; padding: 5px 10px; text-decoration: none; color: #ce846f; border-radius: 5px; margin: 5px; display: inline-block;'>
+    echo "<div class='action-links'>
+        <a href='main.php?page=oggetto_aggiungi' class='ares'>
             Torna al caricamento oggetti
         </a>
-        <a href='main.php?page=oggetto_assegna&id_oggetto=$id_oggetto' class='ares' style='background-color: #0f111d; padding: 5px 10px; text-decoration: none; color: #ce846f; border-radius: 5px; margin: 5px; display: inline-block;'>
+        <a href='main.php?page=oggetto_assegna&id_oggetto=$id_oggetto' class='ares'>
             Assegna l'oggetto
         </a>
-        <a href='main.php?page=oggetto_mercato&id_oggetto=$id_oggetto' class='ares' style='background-color: #0f111d; padding: 5px 10px; text-decoration: none; color: #ce846f; border-radius: 5px; margin: 5px; display: inline-block;'>
+        <a href='main.php?page=oggetto_mercato&id_oggetto=$id_oggetto' class='ares'>
             Inserisci nel mercato
         </a>
-        <a href='main.php?page=oggetto_modifica&id_oggetto=$id_oggetto' class='ares' style='background-color: #0f111d; padding: 5px 10px; text-decoration: none; color: #ce846f; border-radius: 5px; margin: 5px; display: inline-block;'>
+        <a href='main.php?page=oggetto_modifica&id_oggetto=$id_oggetto' class='ares'>
             Modifica oggetto
         </a>
       </div>";

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 /* Includo i file necessari */
@@ -55,7 +55,7 @@ $background = 'corte.png';
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <title>CT - Documentazione</title>  
 </head>
-<style type="text/css"></style>
+
 <?php if ($id > 0 || $id2 > 0) { ?>
 <body>
 

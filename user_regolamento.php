@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /* Includo i file necessari */
 include('includes/constant_values.inc.php');
 include('config.inc.php');
@@ -12,67 +12,8 @@ $handleDBConnection = gdrcd_connect();
 ?>
 <head>
 <link rel="stylesheet" href="themes/crystal/manuali.css" type="text/css" />
-<style type="text/css">
-body {   background-image: url('themes/crystal/imgs/bgmanuali.png');
-         background-repeat: repeat;
-}
-.tabella
-{
-width:600px;
-overflow:auto;
-background: url('themes/crystal/imgs/bgmanuali.png') repeat scroll 0 0 #333333;
-height:550px; 
-top:10px;
-border-top: 0px dotted #333333;
-border-bottom: 1px  #333333;
-border-left: 2px double #333333;
-border-right: 2px double #333333;
-}
+<link rel="stylesheet" href="themes/crystal/user_regolamento.css" type="text/css" />
 
- .sezione {
-color: #b4b6bf;
-background-color: #101e2c;
-letter-spacing: 0px;
-text-transform: uppercase;
-font-family: Tahoma;
-font-size: 12px;
-text-align: center;
-padding: 4px;
-margin-right:-2px;
-border-top:1px  #333333;
-border-left:1px  #333333;border-bottom:1px  #333333;background-image: url(themes/crystal/imgs/bgmanuali.png) border-right: trasparent;
-}
-
-.sezione2 {
-color: #b4b6bf;
-background-color: #101e2c; 
-letter-spacing: 0px;
-text-transform: uppercase;
-font-family: Tahoma;
-font-size: 12px;
-text-align: center;
-padding: 4px;
-margin-left:-2px;
-border-top:1px #333333;
-border-right:1px #333333; border-bottom:1px #333333; background-image: url()
-}
-
-.menu1{
-margin-top: 5px;
-margin-bottom: 5px;
-margin-right:-2px;
-line-height: 16px;
-border-left: 0px dotted #333333;
-}
-.menu2{
-margin-top: 5px;
-margin-bottom: 5px;
-border-right: 0px dotted #333333;
-margin-left:-2px;
-line-height: 16px;
-}
-
-</style>
 </head>
 <table align="center">
 <tr>
