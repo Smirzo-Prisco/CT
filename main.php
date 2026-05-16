@@ -35,12 +35,15 @@ if (!empty($_GET['map_id']) && is_numeric($_GET['map_id']) && !empty($_SESSION['
         "SELECT ultimo_luogo FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "'"
     )['ultimo_luogo'] ?? -1);
     $_SESSION['mappa'] = (int)$_GET['map_id'];
+    $_SESSION['luogo'] = -1;
     gdrcd_query(
         "UPDATE personaggio SET ultima_mappa=" . gdrcd_filter('num', $_SESSION['mappa']) .
         ", ultimo_luogo=-1 WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "'"
     );
+    session_write_close();
     notifySocketServer('users:update', 'loc:' . $old_luogo);
     notifySocketServer('users:update', 'loc:-1');
+    notifySocketServer('presenti:update', 'global');
 }
 
 // ── Routing ───────────────────────────────────────────────────────────────────
@@ -61,8 +64,11 @@ if (isset($_REQUEST['page'])) {
             "UPDATE personaggio SET ultimo_luogo=" . gdrcd_filter('num', $_REQUEST['dir']) .
             " WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "'"
         );
+        $_SESSION['luogo'] = (int)$_REQUEST['dir'];
+        session_write_close();
         notifySocketServer('users:update', 'loc:' . $old_luogo);
         notifySocketServer('users:update', 'loc:' . (int)$_REQUEST['dir']);
+        notifySocketServer('presenti:update', 'global');
     }
 
 } else {

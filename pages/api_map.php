@@ -199,10 +199,14 @@ switch ($op) {
         // Aggiorno DB e sessione
         gdrcd_query("UPDATE personaggio SET ultimo_luogo = $dir WHERE nome = '$login_f'");
         $_SESSION['luogo'] = $dir;
+        // Rilascia il lock di sessione: InfoLocation chiama op=current subito dopo
+        // aver ricevuto users:update — senza questo la sessione sarebbe ancora bloccata
+        session_write_close();
 
-        // Socket: notifica vecchio luogo e nuovo luogo
+        // Socket: notifica vecchio luogo, nuovo luogo e tutti gli osservatori globali
         notifySocketServer('users:update', 'loc:' . $old_luogo);
         notifySocketServer('users:update', 'loc:' . $dir);
+        notifySocketServer('presenti:update', 'global');
 
         echo json_encode([
             'success'      => true,
@@ -241,10 +245,12 @@ switch ($op) {
         gdrcd_query("UPDATE personaggio SET ultima_mappa = $map_id, ultimo_luogo = -1 WHERE nome = '$login_f'");
         $_SESSION['mappa'] = $map_id;
         $_SESSION['luogo'] = -1;
+        session_write_close();
 
-        // Socket: notifica vecchio luogo (stanza lasciata) e mappa (loc:-1)
+        // Socket: notifica vecchio luogo (stanza lasciata), mappa e osservatori globali
         if ($old_luogo >= 0) notifySocketServer('users:update', 'loc:' . $old_luogo);
         notifySocketServer('users:update', 'loc:-1');
+        notifySocketServer('presenti:update', 'global');
 
         echo json_encode([
             'success'   => true,
