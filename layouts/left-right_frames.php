@@ -2,59 +2,28 @@
 /**
  * left-right_frames.php — Layout a tre colonne per Crystal Tokyo GDR
  *
- * Struttura visiva:
- *   - Colonna sinistra (260px fissa):  InfoLocation, LinkMenu, FrameMessaggi
- *   - Contenuto centrale (adattivo):   pagina corrente (SPA React o PHP classico)
- *   - Colonna destra   (260px fissa):  AnteprimaScheda, MenuIcons, OnlineUsers
+ * Struttura:
+ *   - #framecontentLeft  (260px fissa, sinistra):  InfoLocation, LinkMenu, FrameMessaggi
+ *   - #maincontent       (centro adattivo):         pagina corrente (SPA React o PHP)
+ *   - #framecontentRight (260px fissa, destra):     AnteprimaScheda, OnlineUsers
  *
- * Phase 3.4 — i container sidebar sono hardcoded direttamente in questo file;
- * il loop dinamico su $PARAMETERS['left_column']['box'] / right_column è stato
- * rimosso. Tutti i componenti React vengono montati da footer.inc.php via ct:ready.
- *
- * Compatibilità: il parametro ?css=true era usato da header.inc.php per caricare
- * il CSS del layout come stylesheet separato. Il blocco <style> viene comunque
- * sempre emesso nell'HTML della pagina (inline), quindi il link è ridondante
- * ma mantenuto per non toccare header.inc.php in questa fase.
+ * I componenti React vengono montati via ct:ready (header.inc.php).
  *
  * @author Crystal Tokyo Dev
  */
-
-// Quando richiesto come stylesheet (header.inc.php lo carica via <link>),
-// impostiamo il Content-Type corretto. Il <style> inline nella pagina
-// principale continua a funzionare indipendentemente.
 if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit; }
 ?>
-<!-- ====================================================================== -->
-<!-- COLONNA SINISTRA: InfoLocation + LinkMenu + FrameMessaggi               -->
-<!-- I container React sono montati da footer.inc.php via ct:ready           -->
-<!-- ====================================================================== -->
+<!-- COLONNA SINISTRA -->
 <div id="framecontentLeft">
-    <div class="innertube">
-        <div class="colonne_sx">
-            <div class="info"><div id="info-location-container"></div></div>
-            <div class="menu"><div id="link-menu-container"></div></div>
-            <div class="msgs"><div id="frame-messaggi-container"></div></div>
-        </div>
-    </div>
+    <div id="info-location-container"></div>
+    <div id="link-menu-container"></div>
+    <div id="frame-messaggi-container"></div>
 </div>
 
-<!-- ====================================================================== -->
-<!-- COLONNA DESTRA: AnteprimaScheda + OnlineUsers                           -->
-<!-- ====================================================================== -->
+<!-- COLONNA DESTRA -->
 <div id="framecontentRight">
-    <div class="innertube">
-        <div class="colonne_dx">
-            <div class="anteprima_scheda"><div id="anteprima-scheda-container"></div></div>
-            <div class="online">
-                <div class="pagina_presenti">
-                    <div class="page_title">
-                        <h2><?= gdrcd_filter('out', $MESSAGE['interface']['logged_users']['plur']) ?></h2>
-                    </div>
-                    <div id="online-users-container"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="anteprima-scheda-container"></div>
+    <div id="online-users-container"></div>
 </div>
 
 <!-- ====================================================================== -->

@@ -9,7 +9,7 @@ $presenti-accent:     #ce846f;
 
 body { font-family: $font-ui; }
 
-div.online div.iframe_online {
+#online-users-container .iframe_online {
     overflow: auto;
     background-color: transparent;
     height: 263px;
@@ -43,10 +43,7 @@ div.presente {
     color: $presenti-name-color;
 }
 
-div.presente a,
-div.pagina_presenti a:hover,
-div.pagina_presenti a,
-div.pagina_presenti a:visited {
+div.presente a {
     color: $presenti-name-color;
     line-height: 0;
 }
@@ -63,28 +60,21 @@ div.contenitore_presenti {
     overflow-y: auto;
 }
 
-// ── Icone stato ───────────────────────────────────────────────
+// ── Icone stato (PresentiEstesi) ──────────────────────────────
 
-div.pagina_presenti img.sesso_ico,
-div.pagina_presenti img.status_ico,
-div.pagina_presenti img.disponibile,
 div.pagina_presenti_estesa img.sesso_ico,
 div.pagina_presenti_estesa img.status_ico,
 div.pagina_presenti_estesa img.disponibile {
     margin: 0 2px 0 0;
 }
 
-div.pagina_presenti a,
-div.pagina_presenti a:visited,
 div.pagina_presenti_estesa a,
 div.pagina_presenti_estesa a:visited { border: none; }
 
-div.pagina_presenti a:hover,
 div.pagina_presenti_estesa a:hover { border: none; }
 
-// ── Elenco presenti ───────────────────────────────────────────
+// ── Elenco presenti (PresentiEstesi) ─────────────────────────
 
-div.pagina_presenti ul.elenco_presenti,
 div.pagina_presenti_estesa ul.elenco_presenti {
     list-style: none;
     padding: 0;
@@ -92,7 +82,6 @@ div.pagina_presenti_estesa ul.elenco_presenti {
     text-align: left;
 }
 
-div.pagina_presenti ul.elenco_presenti li.luogo,
 div.pagina_presenti_estesa ul.elenco_presenti li.luogo {
     font-size: $text-sm;
     font-weight: $font-weight-bold;
@@ -107,7 +96,6 @@ div.pagina_presenti_estesa ul.elenco_presenti li.mappa {
     text-transform: uppercase;
 }
 
-div.pagina_presenti ul.elenco_presenti li.presente,
 div.pagina_presenti_estesa ul.elenco_presenti li.presente {
     font-size: $text-sm;
     margin: 0 0 0 5px;

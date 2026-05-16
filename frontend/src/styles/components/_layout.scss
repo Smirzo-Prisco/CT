@@ -59,8 +59,29 @@ body {
     }
 }
 
-.innertube {
-    margin: 5px 5px 5px 10px;
+// ── Container diretti nelle colonne ──────────────────────────
+// Sostituiscono la catena innertube > colonne_sx/dx > div.menu/msgs
+
+#framecontentLeft,
+#framecontentRight {
+    padding: $space-1 + 1 $space-1 + 1 $space-1 + 1 $space-2 + 2;
+}
+
+#link-menu-container {
+    position: relative;
+    margin: $space-1 + 1 auto;
+    width: 180px;
+}
+
+#frame-messaggi-container {
+    position: relative;
+    padding: $space-2 + 2;
+}
+
+#info-location-container,
+#anteprima-scheda-container,
+#online-users-container {
+    position: relative;
 }
 
 // Pulsanti toggle mobile (nascosti su desktop)
@@ -151,25 +172,9 @@ body {
     }
 }
 
-// ── Colonne scrollabili ───────────────────────────────────────
-
-div.colonne_sx {
-    height: 750px;
-    overflow-y: auto;
-}
-
-div.colonne_dx {
-    height: 750px;
-    overflow: hidden auto;
-}
-
 div.output {
     width: 100%;
     background-color: transparent;
-}
-
-div.page_title {
-    display: none;
 }
 
 div.page_body {
@@ -389,8 +394,7 @@ div.pagina_messaggi {
 
 // ── Info location e anteprima ─────────────────────────────────
 
-div.pagina_info_location,
-div.pagina_anteprima_scheda {
+div.pagina_info_location {
     margin: 0 auto;
     padding: $space-2 + 2;
     background-color: transparent;
@@ -486,40 +490,6 @@ div.link_menu {
 div.link_back {
     text-align: center;
     padding: 2px;
-}
-
-div.msgs {
-    margin: -50px auto;
-    padding: $space-2 + 2;
-    width: 180px;
-    height: 250px;
-    border: none;
-    border-radius: $radius-lg - 3;
-    position: relative;
-}
-
-div.menu,
-div.presenti {
-    margin: $space-1 + 1 auto;
-    width: 180px;
-    border: none;
-    border-radius: $radius-lg - 3;
-    padding: 0 !important;
-}
-
-div.presenti {
-    padding: $space-2 + 2;
-    display: none;
-}
-
-div.secondo_menu {
-    margin: $space-1 + 1 auto;
-    padding: $space-2 + 2;
-    margin-left: 50px;
-    width: 180px;
-    border-radius: $radius-lg - 3;
-    margin-top: -8px;
-    display: none;
 }
 
 // ── Immagini decorative ───────────────────────────────────────

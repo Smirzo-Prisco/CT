@@ -104,10 +104,12 @@ export default function InfoLocation() {
                 {/* Nome luogo + anno di gioco — cliccabile per aprire la descrizione */}
                 <div className="info-location-year">
                     {`Anno ${data.anno}`}
-                    <a
-                        href="#"
-                        onClick={e => { e.preventDefault(); openDescription() }}
-                    >{data.nome}</a>
+                    <div>
+                        <a
+                            href="#"
+                            onClick={e => { e.preventDefault(); openDescription() }}
+                        >{data.nome}</a>
+                    </div>
                 </div>
             </div>
         </div>
