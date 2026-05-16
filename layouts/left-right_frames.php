@@ -39,14 +39,12 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 </div>
 
 <!-- ====================================================================== -->
-<!-- COLONNA DESTRA: AnteprimaScheda + MenuIcons + OnlineUsers               -->
+<!-- COLONNA DESTRA: AnteprimaScheda + OnlineUsers                           -->
 <!-- ====================================================================== -->
-<link rel="stylesheet" href="../themes/crystal/hover.css">
 <div id="framecontentRight">
     <div class="innertube">
         <div class="colonne_dx">
             <div class="anteprima_scheda"><div id="anteprima-scheda-container"></div></div>
-            <div class="icons"><div id="menu-icons-container"></div></div>
             <div class="online">
                 <div class="pagina_presenti">
                     <div class="page_title">

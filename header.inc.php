@@ -180,9 +180,6 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             if (document.getElementById('anteprima-scheda-container'))
                 CT.mount('AnteprimaScheda', 'anteprima-scheda-container', {});
 
-            if (document.getElementById('menu-icons-container'))
-                CT.mount('MenuIcons', 'menu-icons-container', {});
-
             if (document.getElementById('online-users-container'))
                 CT.mount('OnlineUsers', 'online-users-container', {});
         });
