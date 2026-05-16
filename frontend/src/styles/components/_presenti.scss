@@ -12,7 +12,7 @@ body {
 }
 
 #online-users-container .iframe_online {
-    background: linear-gradient(rgba(0, 20, 60, 0.4), rgba(0, 20, 60, 0.4)), url("imgs/colonna_dx/box_presenti.png") no-repeat center / 100%;
+    background: url("imgs/colonna_dx/box_presenti.png") no-repeat center / 100%;
     height: 250px;
     width: 100%;
     padding: 10px 35px 0px 40px;
@@ -48,8 +48,10 @@ div.link_presenti {
 }
 
 div.contenitore_presenti {
+    background: linear-gradient(rgba(0, 20, 60, 0.4), rgba(0, 20, 60, 0.4));
     padding: 10px;
     overflow-y: auto;
+    height: 100%;
 }
 
 // ── Icone stato (PresentiEstesi) ──────────────────────────────
