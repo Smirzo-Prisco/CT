@@ -1,0 +1,46 @@
+// ============================================================
+// _messaggi.scss — Messaggi privati
+// ============================================================
+@use '../tokens' as *;
+
+div.pagina_messages_center {}
+
+div.pagina_messages_center div.elementi_elenco { height: 40px; }
+
+div.read_message_box {
+    width: 100%;
+    margin: 0 auto;
+    color: $color-text-light;
+    font-size: smaller;
+
+    div.infos {
+        clear: both;
+        text-align: left;
+
+        span.title { font-style: italic; }
+        span.body  { font-weight: $font-weight-bold; }
+    }
+}
+
+div.read_message_box_text {
+    clear: both;
+    border: 1px solid $color-bg;
+    background-color: #1a2240;
+    padding: $space-2 + 2;
+    margin: $space-5 0 $space-1 + 1 0;
+    border-radius: $radius-lg - 3;
+}
+
+div.read_message_box_forms {
+    clear: both;
+    margin-bottom: $space-10;
+}
+
+div.read_message_box_form {
+    float: right;
+
+    input {
+        height: 20px;
+        width: 20px;
+    }
+}

@@ -1,0 +1,174 @@
+// ============================================================
+// _presenti.scss — Lista giocatori online (presenti)
+// ============================================================
+@use '../tokens' as *;
+
+// Colore specifico per i nomi dei presenti (non in palette globale)
+$presenti-name-color: #c0a49e;
+$presenti-accent:     #ce846f;
+
+body { font-family: $font-ui; }
+
+div.online div.iframe_online {
+    overflow: auto;
+    background-color: transparent;
+    height: 263px;
+    width: 214px;
+    border: none;
+    margin: auto;
+    display: block;
+    background: url("imgs/colonna_dx/box_presenti.png") no-repeat center / 100%;
+    position: relative;
+    top: 73px;
+    left: 2%;
+}
+
+div.luogo {
+    margin: 20px 10px 0 0;
+    font-size: $text-2xl;
+    font-weight: $font-weight-bold;
+    font-family: Perpetua, serif;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+div.presente {
+    font-weight: $font-weight-normal;
+    font-size: $text-md;
+    border: none;
+    font-family: $font-serif;
+    text-align: left;
+    position: relative;
+    text-transform: capitalize;
+    color: $presenti-name-color;
+}
+
+div.presente a,
+div.pagina_presenti a:hover,
+div.pagina_presenti a,
+div.pagina_presenti a:visited {
+    color: $presenti-name-color;
+    line-height: 0;
+}
+
+div.link_presenti { margin-top: $space-5; }
+
+div.contenitore_presenti {
+    width: 168px;
+    height: 185px;
+    border: none;
+    position: relative;
+    top: 30px;
+    left: 25px;
+    overflow-y: auto;
+}
+
+// ── Icone stato ───────────────────────────────────────────────
+
+div.pagina_presenti img.sesso_ico,
+div.pagina_presenti img.status_ico,
+div.pagina_presenti img.disponibile,
+div.pagina_presenti_estesa img.sesso_ico,
+div.pagina_presenti_estesa img.status_ico,
+div.pagina_presenti_estesa img.disponibile {
+    margin: 0 2px 0 0;
+}
+
+div.pagina_presenti a,
+div.pagina_presenti a:visited,
+div.pagina_presenti_estesa a,
+div.pagina_presenti_estesa a:visited { border: none; }
+
+div.pagina_presenti a:hover,
+div.pagina_presenti_estesa a:hover { border: none; }
+
+// ── Elenco presenti ───────────────────────────────────────────
+
+div.pagina_presenti ul.elenco_presenti,
+div.pagina_presenti_estesa ul.elenco_presenti {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+div.pagina_presenti ul.elenco_presenti li.luogo,
+div.pagina_presenti_estesa ul.elenco_presenti li.luogo {
+    font-size: $text-sm;
+    font-weight: $font-weight-bold;
+    margin: 3px 0 1px 8px;
+    text-transform: uppercase;
+}
+
+div.pagina_presenti_estesa ul.elenco_presenti li.mappa {
+    font-size: $text-sm;
+    font-weight: $font-weight-bold;
+    margin: 3px 0 1px 0;
+    text-transform: uppercase;
+}
+
+div.pagina_presenti ul.elenco_presenti li.presente,
+div.pagina_presenti_estesa ul.elenco_presenti li.presente {
+    font-size: $text-sm;
+    margin: 0 0 0 5px;
+}
+
+div.pagina_presenti_estesa div.presenti_estesi { margin: auto; }
+
+img.presenti_ico {
+    margin-left: 2px;
+    width: 10px;
+    height: 10px;
+    border: none;
+}
+
+// ── Tabella presenti estesa ───────────────────────────────────
+
+table.customTable {
+    min-width: 70%;
+    background-color: $palette-dark-5;
+    border-collapse: collapse;
+    border: 1px solid $color-bg;
+    color: $color-text;
+    margin: auto;
+    text-align: center;
+
+    td, th {
+        border: 1px solid $color-bg;
+        padding: $space-1 + 1;
+    }
+
+    thead { background-color: $palette-dark-5; }
+}
+
+tr.second_header {
+    background: url('imgs/presenti/barra.png');
+    font-size: $text-xs;
+    color: $palette-text-3;
+    font-family: $font-serif;
+}
+
+tr.third_header {
+    background: url('imgs/presenti/barra_mappa_chat.png');
+
+    a:link,
+    a:visited {
+        font-size: $text-md - 1;
+        color: $presenti-accent;
+        font-family: $font-serif;
+        filter: drop-shadow(-1.732px 1px 2px #000);
+    }
+}
+
+tr.mappa {
+    font-size: $text-md - 1;
+    color: #8f8f8f;
+    font-family: $font-serif;
+}
+
+tr.presente a:link,
+a:visited {
+    font-size: $text-sm;
+    color: $palette-text-3;
+    font-family: $font-serif;
+}

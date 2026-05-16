@@ -1,0 +1,478 @@
+// ============================================================
+// _gestione.scss — Pannello staff: topbar, tabelle, form modali
+// ============================================================
+@use '../tokens' as *;
+
+$gestione-action: $palette-blue-4;   // #4da6ff
+$gestione-surface: $palette-dark-5;  // #1c1f2e
+$gestione-hover:   $palette-dark-8;  // #2e3350
+
+// ── Topbar ────────────────────────────────────────────────────
+
+.topbar {
+    max-height: 40px;
+    gap: 15px;
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: $gestione-surface;
+    padding: $space-3 $space-5;
+    box-shadow: $shadow-sm;
+    z-index: 10;
+
+    a {
+        text-decoration: none;
+        color: $color-text-light;
+        padding: $space-1 + 2 $space-3;
+        margin: 0 !important;
+        border-radius: $radius-lg - 3;
+        transition: background $transition-normal;
+        font-size: $text-lg;
+
+        &.back        { background: $gestione-hover; }
+        &.back:hover  { background: $gestione-action; }
+        &.add         { background: $gestione-action; }
+        &.add:hover   { background: $gestione-hover; }
+    }
+
+    .btn-action.right { margin-left: auto; }
+}
+
+// ── Dashboard ─────────────────────────────────────────────────
+
+header {
+    background: $gestione-surface;
+    padding: $space-5;
+    text-align: center;
+    font-size: $text-3xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: 1px;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: $space-5;
+    padding: $space-5;
+}
+
+.card {
+    background: $gestione-surface;
+    border-radius: $radius-lg;
+    padding: $space-5;
+    text-align: center;
+    transition: transform $transition-fast, background $transition-normal;
+
+    &:hover {
+        transform: translateY(-5px);
+        background: $gestione-hover;
+    }
+
+    i {
+        font-size: 40px;
+        margin-bottom: $space-2 + 2;
+        color: $gestione-action;
+    }
+
+    h3 { font-size: $text-xl; }
+}
+
+.sub-menu {
+    list-style: none;
+    padding: $space-2 + 2 0 0;
+    margin: 0;
+
+    li { margin: $space-1 + 1 0; }
+
+    a {
+        color: $color-text-muted;
+        font-size: $text-lg;
+        text-decoration: none;
+
+        &:hover { color: $gestione-action; }
+    }
+}
+
+// ── Tabelle item-list ─────────────────────────────────────────
+
+.item-list {
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: $gestione-surface;
+        color: $palette-text-3;
+        font-family: $font-serif;
+        font-size: $text-sm;
+        letter-spacing: 2px;
+    }
+
+    th, td {
+        border: 1px solid #333 !important;
+        padding: $space-2 !important;
+        text-align: left;
+    }
+
+    th { background: $gestione-hover !important; }
+
+    td.azioni {
+        display: flex;
+        gap: $space-1 + 2;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+// ── Pulsante azione icona ─────────────────────────────────────
+
+.btn-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $gestione-action;
+    font-size: $text-lg;
+    margin: 0 $space-1;
+    padding: $space-1;
+    transition: color $transition-normal;
+
+    &:hover { color: $color-text-light; }
+    i { pointer-events: none; }
+}
+
+// ── Filtri ────────────────────────────────────────────────────
+
+.filter-form {
+    display: flex;
+    align-items: center;
+    gap: $space-2 + 2;
+    flex-grow: 1;
+    padding: $space-2 + 2;
+
+    label {
+        align-items: center;
+        color: $color-text-muted;
+        font-size: $text-lg;
+        cursor: pointer;
+    }
+
+    input[type="radio"] {
+        margin-right: $space-1 + 2;
+        accent-color: $gestione-action;
+    }
+}
+
+// ── Checkbox immagine ─────────────────────────────────────────
+
+.checkbox-img {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+
+    input[type="checkbox"] { display: none; }
+
+    label {
+        cursor: pointer;
+        display: inline-block;
+        margin: $space-1 + 1;
+        border: 2px solid transparent;
+        border-radius: $radius-md;
+        transition: $transition-normal;
+
+        img { width: 15px; height: 15px; object-fit: cover; border-radius: $radius-md; }
+    }
+
+    input[type="checkbox"]:checked + label {
+        border-color: $gestione-action;
+        box-shadow: 0 0 8px rgb(77 166 255 / 60%);
+    }
+}
+
+// ── Leggenda compatta ─────────────────────────────────────────
+
+.legend-compact {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    background: $gestione-surface;
+    border-radius: $radius-md;
+
+    div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: $text-md - 1;
+        color: $color-text-muted;
+    }
+
+    i {
+        font-size: $text-2xl;
+        margin-bottom: $space-1;
+        color: $gestione-action;
+    }
+
+    &.tooltip, &.tooltip-buy, &.tooltip-sell {
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        background: white;
+        border: 1px solid $color-border;
+        border-radius: $radius-lg - 3;
+        padding: $space-2 + 2;
+        box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
+        z-index: 10000;
+        min-width: 150px;
+        transition: opacity $transition-normal;
+    }
+
+    &.tooltip     { top: 100%; left: 100%; }
+    &.tooltip-buy { bottom: 130%; right: 170%; }
+    &.tooltip-sell{ top: 200%; right: 200%; }
+}
+
+.help-icon {
+    position: relative;
+    cursor: help;
+    color: #666;
+    font-size: 1.2em;
+
+    &:hover .tooltip,
+    &:hover .tooltip-buy,
+    &:hover .tooltip-sell { visibility: visible; opacity: 1; }
+}
+
+// ── Tabella responsive ────────────────────────────────────────
+
+.ct-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    font-size: $text-sm;
+    color: $palette-text-3;
+    font-family: $font-serif;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+    }
+
+    th, td {
+        padding: $space-3 $space-2;
+        text-align: left;
+        border-bottom: 1px solid $color-border;
+    }
+
+    th { font-weight: $font-weight-bold; }
+    .azioni { white-space: nowrap; }
+
+    .action-buttons {
+        display: flex;
+        gap: $space-1 + 1;
+        flex-wrap: nowrap;
+    }
+
+    .btn-action {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: $space-1 + 1;
+        color: $gestione-action;
+        transition: color $transition-normal;
+
+        &:hover { color: $color-text-light; }
+    }
+}
+
+// ── Modal modifica personaggio ────────────────────────────────
+
+.pg-edit-container {
+    display: none;
+    position: fixed;
+    inset: 0;
+    overflow-y: auto;
+    background-color: rgb(0 0 0 / 70%);
+    z-index: 1000;
+    justify-content: center;
+    padding: $space-5;
+    box-sizing: border-box;
+
+    .modal-content {
+        background: $color-bg;
+        border-radius: $radius-xl;
+        box-shadow: $shadow-lg;
+        height: auto;
+        max-width: 800px;
+        margin: 40px auto;
+        position: relative;
+        overflow-y: auto;
+        padding: 0 30px;
+    }
+
+    h1 { text-align: center; margin-bottom: $space-6; color: $color-text-muted; }
+
+    label {
+        display: block;
+        margin-bottom: $space-1 + 2;
+        font-weight: 600;
+        color: $color-text-muted;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="number"],
+    input[type="email"],
+    select,
+    textarea {
+        width: 95%;
+        padding: $space-3;
+        border: 1px solid $color-text-muted;
+        border-radius: $radius-lg;
+        font-size: 15px;
+        transition: border-color $transition-fast;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: #4f7cff;
+        outline: none;
+    }
+
+    textarea { min-height: 100px; resize: vertical; }
+
+    button {
+        background: #4f7cff;
+        color: $color-text-light;
+        border: none;
+        padding: $space-3 $space-5;
+        font-size: $text-xl;
+        border-radius: $radius-lg;
+        cursor: pointer;
+        transition: background $transition-fast;
+        height: 45px;
+        margin-top: $space-1 + 1;
+
+        &:hover { background: #3a63d1; }
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+        padding: $space-5;
+        border-radius: $radius-lg;
+        border-left: 4px solid #007bff;
+    }
+
+    .actions { text-align: center; margin-top: $space-6; }
+
+    .input-with-button {
+        display: flex;
+        gap: $space-2;
+
+        input  { flex: 1; }
+        button { white-space: nowrap; }
+    }
+
+    .form-container { width: 100%; }
+
+    .form-row {
+        display: flex;
+        gap: $space-5;
+        margin-bottom: $space-5;
+    }
+
+    .form-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 0;
+
+        label { display: block; margin-bottom: $space-1 + 1; font-weight: $font-weight-bold; }
+
+        input, select {
+            width: 100%;
+            padding: $space-2 $space-3;
+            border: 1px solid $color-border;
+            border-radius: $radius-sm;
+            box-sizing: border-box;
+        }
+    }
+
+    .checkbox-group,
+    .radio-group {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin: $space-2 15px;
+    }
+
+    .inline-group .input-with-button {
+        display: flex;
+        gap: $space-2 + 2;
+
+        input  { flex: 1; }
+        button {
+            padding: $space-2 $space-4;
+            background-color: #007bff;
+            color: $color-text-light;
+            border: none;
+            border-radius: $radius-sm;
+            cursor: pointer;
+            white-space: nowrap;
+
+            &:hover { background-color: #0056b3; }
+        }
+    }
+
+    @media (width <= 768px) {
+        padding: $space-2 + 2;
+        align-items: flex-start;
+
+        .modal-content { max-height: 95vh; padding: 15px; margin-top: $space-5; }
+
+        input[type="text"],
+        input[type="url"],
+        input[type="number"],
+        input[type="email"],
+        select,
+        textarea { width: 100%; box-sizing: border-box; }
+
+        .form-row { flex-direction: column; gap: 15px; }
+        .inline-group .input-with-button { flex-direction: column; button { width: 100%; } }
+    }
+
+    @media (width <= 480px) {
+        .modal-content { padding: $space-3; border-radius: $radius-lg; }
+        h1 { font-size: 1.5rem; margin-bottom: 15px; }
+    }
+}
+
+// ── Responsive gestione ───────────────────────────────────────
+
+@media (width <= 768px) {
+    .card { padding: 15px; i { font-size: 32px; } h3 { font-size: $text-xl; } }
+    .ct-table-responsive { border: 1px solid $color-border; border-radius: $radius-sm; }
+    .ct-table-responsive table { min-width: 100%; }
+
+    @media (width <= 480px) {
+        .dashboard { grid-template-columns: 1fr; }
+        .card i { font-size: 28px; margin-right: $space-2 + 2; }
+        .card h3 { display: inline-block; vertical-align: middle; }
+    }
+}
+
+@media (width <= 1024px) and (width >= 769px) {
+    .ct-table-responsive {
+        table { font-size: $text-lg; }
+        th, td { padding: $space-2 $space-1 + 2; }
+        .action-buttons { flex-direction: column; gap: 3px; }
+        .btn-action { padding: 3px; }
+    }
+}
+
+@media only screen and (width <= 768px) {
+    .topbar { flex-wrap: wrap; }
+    .filter-form { order: 3; width: 100%; margin-top: $space-2 + 2; }
+}

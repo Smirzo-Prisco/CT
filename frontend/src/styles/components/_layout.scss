@@ -1,0 +1,488 @@
+// ============================================================
+// _layout.scss — Layout 3 colonne, modali, colonne sidebar
+// ============================================================
+@use '../tokens' as *;
+
+// ── Struttura frame principale ────────────────────────────────
+
+#framecontentLeft,
+#framecontentRight {
+    display: table;
+    z-index: 1;
+}
+
+#framecontentLeft  { background: url("imgs/colonna_sx/colonna_sinistra.png"); }
+#framecontentRight { background: url("imgs/colonna_dx/colonna_destra.png"); }
+
+div.innertube {
+    margin: 0;
+    display: table-cell;
+    vertical-align: top;
+}
+
+div.colonne_sx {
+    height: 750px;
+    overflow-y: auto;
+}
+
+div.colonne_dx {
+    height: 750px;
+    overflow: hidden auto;
+}
+
+div.output {
+    width: 100%;
+    background-color: transparent;
+}
+
+div.page_title { display: none; }
+div.page_body  { text-align: center; }
+
+// ── Sidebar sinistra — luogo e meteo ─────────────────────────
+
+div.info_image,
+div.info_image_night {
+    text-align: center;
+    border: none;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+    height: 220px;
+    width: 100%;
+}
+
+div.info_image       { background-image: url("imgs/colonna_sx/cerchio_descrizioneluogo.png"); }
+div.info_image_night { background-image: url("imgs/colonna_sx/cerchio_descrizioneluogo_night.png"); }
+
+img.immagine_luogo {
+    text-align: center;
+    border: none;
+    border-radius: $radius-full;
+    width: 173px;
+    height: 173px;
+    margin-top: 27px;
+    margin-left: 8px;
+    position: relative;
+    z-index: -1;
+}
+
+div.box_stato_luogo {
+    padding-top: 2px;
+    margin-bottom: 15px;
+    visibility: hidden;
+    height: 18px;
+}
+
+div.news {
+    background: url("imgs/colonna_sx/box_news.png") no-repeat;
+    background-size: 100%;
+    position: relative;
+    top: 21px;
+    left: -1%;
+    width: 197px;
+    height: 118px;
+    margin: 0 auto;
+}
+
+// ── Meteo ─────────────────────────────────────────────────────
+
+.meteo_titolo {
+    color: $color-primary;
+    font-size: $text-sm;
+    text-transform: uppercase;
+    font-weight: $font-weight-bold;
+    text-align: center;
+    margin-bottom: $space-2 + 2;
+    padding-top: $space-2 + 2;
+}
+
+.meteo_box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1px;
+    font-family: $font-base;
+    color: $color-text;
+    font-size: $text-sm;
+}
+
+.meteo_colonna_sx,
+.meteo_colonna_dx {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 48%;
+    text-align: center;
+}
+
+.meteo_img         { margin-bottom: $space-1 + 1; }
+.meteo_immagine    { width: 30px; height: 31px; }
+.meteo_temp,
+.meteo_vento       { margin-bottom: $space-1 + 1; text-align: center; }
+
+.meteo_freccia {
+    position: absolute;
+    top: $space-2 + 2;
+    right: $space-2 + 2;
+    width: 20px;
+    height: auto;
+    cursor: pointer;
+
+    img { width: 20px; height: 20px; }
+}
+
+.meteo_precedente  { display: none; }
+.meteo_attuale     { display: flex; }
+
+div.meteo_image_replacement {
+    text-align: center;
+    margin: 0 auto;
+    margin-top: -30px;
+}
+
+img.meteo_image { width: auto; height: auto; }
+
+// ── Sidebar destra — avatar PG ────────────────────────────────
+
+div.info_pg,
+div.info_pg_night {
+    text-align: center;
+    border: none;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+    width: 100%;
+    height: 220px;
+    margin: -1px auto;
+}
+
+div.info_pg       { background-image: url("imgs/colonna_dx/cerchio_avatar.png"); }
+div.info_pg_night { background-image: url("imgs/colonna_dx/cerchio_avatar_night.png"); }
+
+img.immagine_pg {
+    text-align: center;
+    border: none;
+    border-radius: $radius-full;
+    width: 173px;
+    height: 173px;
+    margin-top: 29px;
+    margin-right: 8px;
+    position: relative;
+    z-index: -1;
+}
+
+.presenti_button {
+    margin-left: 9px;
+    margin-top: 46px;
+    border: none;
+    position: absolute;
+    top: 210px;
+}
+
+div.calendario_box { margin-left: 25px; }
+
+div#calendario_role {
+    position: absolute;
+    margin-top: -67px;
+    margin-left: 80px;
+}
+
+// ── Iframe interni ────────────────────────────────────────────
+
+iframe.iframe_icon {
+    height: 104px;
+    width: 200px;
+    border: none;
+    position: relative;
+    top: 71px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+div.pagina_icon {
+    text-align: center;
+    font-size: $text-lg;
+}
+
+iframe.iframe_messaggi {
+    height: 394px;
+    width: 190px;
+    border: none;
+}
+
+div.pagina_messaggi {
+    text-align: center;
+    font-size: $text-lg;
+
+    a, a:visited {
+        text-decoration: none;
+        color: red;
+    }
+}
+
+// ── Info location e anteprima ─────────────────────────────────
+
+div.pagina_info_location,
+div.pagina_anteprima_scheda {
+    margin: 0 auto;
+    padding: $space-2 + 2;
+    background-color: transparent;
+    border: none;
+}
+
+.info-location-year {
+    font-size: $text-xl;
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+
+    a {
+        font-size: $text-xl;
+        font-weight: $font-weight-bold;
+        color: $color-primary;
+        cursor: pointer;
+    }
+}
+
+// ── Mappa cliccabile ──────────────────────────────────────────
+
+div.mappaclick_map {
+    margin: $space-5 auto;
+
+    a {
+        font-size: $text-md;
+        font-weight: $font-weight-bold;
+    }
+}
+
+div#descriptionLoc {
+    position: absolute;
+    width: 200px;
+    background-color: #cfcfcf;
+    padding: $space-5;
+    font-size: $text-md - 1;
+    border: 1px solid #666;
+    font-family: $font-base;
+    text-align: left;
+    border-radius: $radius-lg - 3;
+    display: none;
+    z-index: 9999;
+}
+
+div.mappaclick_more {
+    padding-top: $space-2 + 2;
+
+    a {
+        background-color: #cfcfcf;
+        padding: $space-2;
+        margin-right: $space-2 + 2;
+        border-radius: $radius-lg - 3;
+    }
+}
+
+// ── Menu di gioco ─────────────────────────────────────────────
+
+select#gotomap {
+    width: 160px;
+    margin: 0 auto $space-4 - 1;
+    display: none;
+}
+
+div.link_menu {
+    padding: 0 0 0 $space-5;
+    font-size: 5px;
+
+    a {
+        display: block;
+        padding: $space-1 + 1;
+        text-align: left;
+
+        &:hover { text-decoration: none; border-radius: $radius-lg - 3; }
+    }
+
+    a.sprite {
+        display: block;
+        width: 50px;
+        height: 50px;
+        background: no-repeat top left;
+
+        &:hover { background-position: 0 100%; }
+    }
+}
+
+// ── Contenitori generici ──────────────────────────────────────
+
+div.link_back {
+    text-align: center;
+    padding: 2px;
+}
+
+div.msgs {
+    margin: -50px auto;
+    padding: $space-2 + 2;
+    width: 180px;
+    height: 250px;
+    border: none;
+    border-radius: $radius-lg - 3;
+    position: relative;
+}
+
+div.menu,
+div.presenti {
+    margin: $space-1 + 1 auto;
+    width: 180px;
+    border: none;
+    border-radius: $radius-lg - 3;
+    padding: 0 !important;
+}
+
+div.presenti {
+    padding: $space-2 + 2;
+    display: none;
+}
+
+div.secondo_menu {
+    margin: $space-1 + 1 auto;
+    padding: $space-2 + 2;
+    margin-left: 50px;
+    width: 180px;
+    border-radius: $radius-lg - 3;
+    margin-top: -8px;
+    display: none;
+}
+
+// ── Immagini decorative ───────────────────────────────────────
+
+img.descrizione { margin-left: 18px; margin-top: 0; z-index: 1; border: none; }
+img.scheda_pg   { margin-left: -13px; z-index: 1; border: none; }
+img.menu_img    { height: 70%; width: 70%; }
+
+// ── Modal generica ────────────────────────────────────────────
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    inset: 0;
+    overflow: auto;
+    background-color: rgb(0 0 0 / 40%);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background: url("imgs/items/Pannelli.png") no-repeat center / contain;
+    margin: 5% auto 15%;
+    width: 500px;
+    height: 500px;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: $font-weight-bold;
+    color: $color-text-muted;
+    cursor: pointer;
+    transition: color $transition-fast;
+
+    &:hover, &:focus { color: white; cursor: pointer; }
+}
+
+.animate { animation: animatezoom 0.6s; }
+
+@keyframes animatezoom {
+    from { transform: scale(0); }
+    to   { transform: scale(1); }
+}
+
+.container2 {
+    padding: 30px;
+    text-align: center;
+    color: $color-text-light;
+    height: 75%;
+}
+
+.imgcontainer { text-align: center; margin: 24px 0 12px; position: relative; }
+
+iframe#myframe { width: 100%; height: 100%; border: none; }
+
+// ── Modal calendario ──────────────────────────────────────────
+
+.modal_calendario {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    inset: 0;
+    overflow: auto;
+    background-color: rgb(0 0 0 / 40%);
+    padding-top: 60px;
+}
+
+.modal-content_calendario {
+    background: url("imgs/items/Pannelli.png") no-repeat center / contain;
+    margin: 5% auto 15%;
+    width: 500px;
+    height: 500px;
+}
+
+.close_calendario {
+    position: absolute;
+    right: 25px;
+    top: 0;
+    color: $color-text-light;
+    font-size: 20px;
+    font-weight: $font-weight-bold;
+
+    &:hover, &:focus { color: white; cursor: pointer; }
+}
+
+// ── Utility globali ───────────────────────────────────────────
+
+.blank { clear: both; }
+
+.truncate-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 4.5em;
+    line-height: 1.5em;
+}
+
+div.elenco_record_gioco { padding: $space-5; }
+
+div.elementi_elenco {
+    padding-top: $space-1 + 1;
+    text-align: center;
+    min-height: 20px;
+}
+
+div.titoli_elenco {
+    font-size: $text-md;
+    font-weight: $font-weight-bold;
+}
+
+div.elenco_record_gestione table {
+    width: 95%;
+    margin: $space-2 + 2 auto;
+}
+
+div.capitolo_elenco {
+    font-weight: $font-weight-bold;
+    font-size: $text-md;
+    text-align: left;
+    padding: $space-1 + 1 $space-1 + 1 $space-1 + 1 $space-5;
+    background-color: #c9c9c9;
+}
+
+td.casella_elemento,
+div.elementi_elenco { font-size: $text-md - 1; }
+
+div.elementi_elenco a {
+    font-weight: $font-weight-bold;
+    &:hover { text-decoration: none; }
+}

@@ -1,0 +1,1122 @@
+// ============================================================
+// _chat.scss — Chat, pannello GDR e popup utenti
+// ============================================================
+@use '../tokens' as *;
+
+// Colori specifici della chat non presenti nei token globali
+$chat-sussurro:     #ffd28a;   // messaggio sussurrato
+$chat-dice:         #3267a5;   // tiro di dado
+$chat-master-head:  #05a4c1;   // intestazione master
+$chat-mod-head:     #d7b500;   // intestazione moderazione
+$chat-me:           #d89d8c;   // il proprio nome nella chat
+$chat-off:          #a1c3c8;   // messaggio off
+$chat-popup-accent: #6366f1;   // accent popup ricerca utenti
+
+// ── Pannello GDR (container principale) ──────────────────────
+
+.gdr-panel-container {
+    // Variabili CSS locali per retrocompatibilità col markup esistente
+    --primary-dark:    #{$color-bg};
+    --secondary-dark:  #{$palette-dark-5};
+    --accent-color:    #{$palette-blue-1};
+    --accent-light:    #{$palette-blue-2};
+    --text-light:      #{$color-text-light};
+    --text-lighter:    #{$color-text-light};
+    --success-color:   #{$color-success};
+    --danger-color:    #{$color-danger};
+    --warning-color:   #{$color-warning};
+    --border-radius:   #{$radius-lg};
+    --box-shadow:      #{$shadow-md};
+    --transition:      all #{$transition-normal};
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    width: 100%;
+    overflow-y: auto;
+    background-color: var(--primary-dark);
+    color: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+}
+
+.gdr-modal-overlay {
+    position: relative;
+    height: 95%;
+    background-color: rgb(0 0 0 / 70%);
+    display: flex;
+    z-index: 10000;
+    padding: $space-5;
+}
+
+// ── Header pannello ───────────────────────────────────────────
+
+.gdr-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--secondary-dark);
+    padding: 15px $space-5;
+    border-radius: $radius-lg $radius-lg 0 0;
+}
+
+.gdr-logo {
+    font-size: 1.5rem;
+    font-weight: $font-weight-bold;
+    color: var(--text-lighter);
+}
+
+.gdr-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-full;
+    transition: var(--transition);
+
+    &:hover { background-color: rgb(255 255 255 / 10%); }
+}
+
+.gdr-main-controls {
+    display: flex;
+    gap: $space-2 + 2;
+}
+
+.gdr-control-btn {
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: $radius-full;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+
+    &:hover {
+        background-color: var(--accent-light);
+        transform: translateY(-2px);
+    }
+
+    img { max-width: 70%; max-height: 70%; }
+}
+
+// ── Bottoni pannello ──────────────────────────────────────────
+
+.gdr-button {
+    width: 100%;
+    padding: $space-2 + 2;
+    border: 1px solid rgb(255 255 255 / 10%);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background-color: var(--accent-color);
+    color: var(--text-lighter);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+
+    &:hover { background-color: var(--accent-light); }
+
+    &:disabled,
+    &[disabled] {
+        background-color: rgb(255 255 255 / 10%) !important;
+        color: rgb(255 255 255 / 40%) !important;
+        cursor: not-allowed !important;
+        opacity: 0.6 !important;
+        transform: none !important;
+        box-shadow: none !important;
+
+        &:hover { background-color: rgb(255 255 255 / 10%) !important; }
+    }
+}
+
+.gdr-btn-danger {
+    background-color: var(--danger-color);
+    &:hover { background-color: #c0392b; }
+
+    &:disabled, &[disabled] {
+        background-color: rgb(231 76 60 / 30%) !important;
+    }
+}
+
+.gdr-btn-success {
+    background-color: var(--success-color);
+    &:hover { background-color: #219653; }
+
+    &:disabled, &[disabled] {
+        background-color: rgb(39 174 96 / 30%) !important;
+        border-color: rgb(255 255 255 / 10%) !important;
+        &:hover { background-color: rgb(39 174 96 / 30%) !important; }
+    }
+}
+
+.gdr-btn-warning {
+    background-color: var(--warning-color);
+    &:hover { background-color: #e67e22; }
+}
+
+// ── Form elementi pannello ────────────────────────────────────
+
+.gdr-form-group { margin-bottom: 15px; }
+
+.gdr-label {
+    display: block;
+    margin-bottom: $space-1 + 1;
+    font-weight: 500;
+    color: var(--text-lighter);
+}
+
+.gdr-select,
+.gdr-input,
+.gdr-textarea {
+    width: 100%;
+    padding: $space-2 + 2;
+    border: 1px solid rgb(255 255 255 / 10%);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background-color: rgb(255 255 255 / 10%);
+    color: var(--text-light);
+    transition: var(--transition);
+
+    &:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        background-color: var(--accent-light);
+    }
+}
+
+// ── Tabs ──────────────────────────────────────────────────────
+
+.gdr-tabs {
+    display: flex;
+    background-color: var(--secondary-dark);
+    overflow-x: auto;
+}
+
+.gdr-tab {
+    padding: 15px $space-5;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+    white-space: nowrap;
+    color: var(--text-light);
+
+    &.active {
+        border-bottom-color: var(--accent-color);
+        color: var(--text-lighter);
+        font-weight: $font-weight-bold;
+    }
+
+    &:hover:not(.active) { background-color: rgb(255 255 255 / 5%); }
+}
+
+.gdr-tab-content {
+    display: none;
+    padding: $space-5;
+    flex: 1;
+    overflow-y: auto;
+
+    &.active { display: block; }
+}
+
+// ── Card e griglia ────────────────────────────────────────────
+
+.gdr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: $space-5;
+}
+
+.gdr-card {
+    background-color: var(--secondary-dark);
+    border-radius: var(--border-radius);
+    padding: $space-5;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+}
+
+.gdr-card-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--text-lighter);
+    border-bottom: 1px solid rgb(255 255 255 / 10%);
+    padding-bottom: $space-2 + 2;
+}
+
+// ── Pannello master ───────────────────────────────────────────
+
+.gdr-master-panel {
+    background-color: rgb(243 156 18 / 10%);
+    border-left: 4px solid var(--warning-color);
+    padding: 15px;
+    margin-bottom: $space-5;
+    border-radius: 0 $radius-lg $radius-lg 0;
+}
+
+.gdr-master-panel-title {
+    color: var(--warning-color);
+    font-weight: $font-weight-bold;
+    margin-bottom: $space-2 + 2;
+}
+
+.gdr-char-counter {
+    font-size: 0.8rem;
+    color: #aaa;
+    text-align: right;
+    margin-top: $space-1 + 1;
+}
+
+// ── Modal scrittura libera ────────────────────────────────────
+
+.gdr-writing-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0 0 0 / 70%);
+    z-index: 10001;
+    align-items: center;
+    justify-content: center;
+}
+
+.gdr-writing-modal-content {
+    background-color: var(--primary-dark);
+    border-radius: var(--border-radius);
+    padding: $space-5;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--box-shadow);
+    border: 1px solid rgb(255 255 255 / 10%);
+}
+
+.gdr-writing-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $space-5;
+}
+
+.gdr-close-writing-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-light);
+    width: auto;
+}
+
+// ── Status sessione ───────────────────────────────────────────
+
+.gdr-session-status {
+    display: flex;
+    align-items: center;
+    gap: $space-2 + 2;
+    padding: $space-2 15px;
+    background: linear-gradient(135deg, rgb(42 63 118 / 30%), rgb(58 79 134 / 20%));
+    border-radius: 20px;
+    border: 1px solid rgb(42 63 118 / 50%);
+    position: relative;
+    overflow: hidden;
+    margin: 0 15px;
+
+    &.inactive {
+        opacity: 0.6;
+
+        .gdr-pulse-dot {
+            background-color: #7f8c8d;
+            animation: none;
+        }
+
+        .gdr-status-text { text-shadow: none; color: var(--text-light); }
+        .gdr-animated-border { display: none; }
+    }
+}
+
+.gdr-pulse-dot {
+    width: 12px;
+    height: 12px;
+    background-color: $color-success;
+    border-radius: $radius-full;
+    animation: gdr-pulse 2s infinite;
+    box-shadow: 0 0 0 0 rgb(39 174 96 / 70%);
+}
+
+.gdr-status-text {
+    color: var(--text-lighter);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-shadow: 0 0 10px rgb(39 174 96 / 50%);
+}
+
+.gdr-animated-border {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgb(39 174 96 / 40%), transparent);
+    animation: gdr-shine 3s infinite;
+}
+
+@keyframes gdr-pulse {
+    0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgb(39 174 96 / 70%); }
+    70%  { transform: scale(1);    box-shadow: 0 0 0 10px rgb(39 174 96 / 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgb(39 174 96 / 0); }
+}
+
+@keyframes gdr-shine {
+    0%   { left: -100%; }
+    100% { left: 100%; }
+}
+
+// ── Box chat ──────────────────────────────────────────────────
+
+div.chat_box {
+    position: absolute;
+    top: 0;
+    bottom: 180px;
+    left: 5px;
+    overflow: auto;
+    font-size: $text-xl;
+    text-align: justify;
+    width: 99%;
+}
+
+div.pagina_frame_chat div.page_body div.panels_box {
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+    right: 10px;
+}
+
+img.chat_avatar {
+    margin: $space-2;
+    display: block;
+    float: left;
+    position: relative;
+}
+
+// ── Tipi di riga chat ─────────────────────────────────────────
+
+@mixin chat-row-base { margin-top: 3px; }
+
+div.chat_row_A { @include chat-row-base; text-align: justify; }
+div.chat_row_P { @include chat-row-base; text-align: justify; padding: 0 $space-2 + 2 0 0; }
+div.chat_row_Z { @include chat-row-base; }
+div.chat_row_N { @include chat-row-base; }
+div.chat_row_I { @include chat-row-base; text-align: center; }
+div.chat_row_Y { @include chat-row-base; text-align: center; }
+
+div.chat_row_A span.color2,
+div.chat_row_P span.color2,
+div.chat_row_N span.color2 { margin-top: 3px; color: #000; font-weight: $font-weight-bold; }
+div.chat_row_Z span.color2 { margin-top: 3px; color: blue; font-weight: $font-weight-bold; }
+
+div.chat_row_M,
+div.chat_row_X,
+div.chat_row_G {
+    font-size: $text-sm;
+    color: $color-text;
+    text-align: justify;
+}
+
+div.chat_row_S,
+div.chat_row_Q {
+    @include chat-row-base;
+    font-size: $text-md;
+    font-family: $font-serif;
+    color: $chat-sussurro;
+}
+
+div.chat_row_D {
+    @include chat-row-base;
+    font-weight: $font-weight-bold;
+    font-size: x-small;
+    color: $chat-dice;
+}
+
+div.chat_row_C {
+    @include chat-row-base;
+    font-weight: $font-weight-bold;
+    font-size: x-small;
+}
+
+// ── Span chat ─────────────────────────────────────────────────
+
+span.chat_sussurro {
+    font-size: $text-md;
+    font-family: $font-serif;
+    color: $chat-sussurro;
+}
+
+span.chat_time {
+    font-size: $text-md;
+    color: $palette-text-3;
+    font-family: $font-serif;
+    margin-right: 3px;
+}
+
+span.chat_name {
+    font-size: $text-md;
+    color: $palette-text-3;
+    font-family: $font-serif;
+    text-align: justify;
+}
+
+span.chat_msg {
+    color: $palette-text-3;
+    font-size: 15px;
+    font-family: $font-serif;
+    text-align: justify;
+}
+
+span.chat_msg_off {
+    color: $chat-off;
+    font-size: $text-md - 1;
+    font-family: $font-base;
+}
+
+span.chat_msg_sussurro {
+    color: #000;
+    font-size: $text-md - 1;
+}
+
+span.chat_skill {
+    font-size: $text-md - 1;
+    color: $chat-dice;
+    font-family: $font-base;
+}
+
+span.intestazione_moderazione {
+    font-size: $text-lg;
+    color: $chat-mod-head;
+    font-family: $font-serif;
+    text-align: center;
+    filter: drop-shadow(-0.866px 0.5px 6.5px rgb(0 0 0 / 57%));
+    text-transform: uppercase;
+}
+
+span.intestazione_master {
+    font-size: 15px;
+    color: $chat-master-head;
+    font-family: $font-serif;
+    text-align: center;
+    filter: drop-shadow(-0.866px 0.5px 6.5px rgb(0 0 0 / 57%));
+    text-transform: uppercase;
+}
+
+span.chat_master {
+    font-size: $text-xl;
+    color: $palette-text-3;
+    font-family: $font-serif;
+    text-align: justify;
+}
+
+span.chat_me,
+span.chat_me_master {
+    text-decoration: underline dotted $chat-me;
+    text-transform: uppercase;
+    color: $chat-me;
+}
+
+// ── Form inserimento chat ─────────────────────────────────────
+
+div.form_row { clear: both; text-align: left; }
+
+input#tag     { width: 90px; }
+input#message { width: 320px; }
+
+// Override input/select scoped alla chat (stile differente dal base)
+div.pagina_frame_chat {
+    input {
+        border: 2px solid #000;
+        border-radius: $radius-sm;
+        background-color: $palette-dark-5;
+        color: $color-text-light;
+        margin-top: $space-1 + 1;
+        width: auto;
+    }
+
+    select {
+        border: 2px solid #03060a;
+        border-radius: $radius-sm;
+        background-color: $palette-dark-5;
+        color: $color-text-light;
+        margin-top: $space-1 + 1;
+        width: auto;
+    }
+}
+
+span.casella_info { display: none; }
+
+// ── Slide animati ─────────────────────────────────────────────
+
+#slide, #slide_weapon, #slide_object, #slide_master {
+    height: 0;
+    overflow: hidden;
+    transition: 1s height ease-in-out;
+
+    &.start {
+        height: 31px;
+        width: max-content;
+        margin-top: $space-1 + 1;
+    }
+}
+
+input.chat_button {
+    border: none;
+    background-color: transparent;
+}
+
+input.azione { width: 350px; }
+
+// ── Modal log chat ────────────────────────────────────────────
+
+#customModal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0 0 0 / 40%);
+
+    .custom-modal-content {
+        background-color: $color-bg;
+        color: $color-text;
+        margin: 1% auto;
+        padding: $space-5;
+        border: 1px solid $color-bg;
+        border-radius: $radius-lg - 3;
+        width: 90%;
+        max-width: 800px;
+    }
+
+    .custom-close {
+        color: $color-text-light;
+        float: right;
+        font-size: 28px;
+        font-weight: $font-weight-bold;
+
+        &:hover, &:focus {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    }
+
+    .tab {
+        display: flex;
+        justify-content: center;
+        border-bottom: 1px solid $color-bg;
+        background-color: #1a2240;
+
+        button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px $space-4;
+            transition: $transition-normal;
+            font-size: 17px;
+            color: $color-text-light;
+            flex: 1;
+            max-width: 200px;
+
+            &:hover, &.active { background-color: $color-bg; }
+        }
+    }
+
+    .tabcontent {
+        display: none;
+        padding: $space-5;
+        border: 1px solid $color-bg;
+        border-top: none;
+        color: $color-text;
+    }
+
+    .customTable {
+        table-layout: fixed;
+        width: 100%;
+
+        select, button { width: 100%; }
+        td { padding-right: $space-2 + 2; }
+
+        td:nth-child(1) { width: 70%; }
+        td:nth-child(2) { width: 30%; }
+    }
+}
+
+// ── Casella input chat ────────────────────────────────────────
+
+div.casella_chat {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-right: 30px;
+
+    a { margin: 0; }
+}
+
+textarea.chat_textarea {
+    width: 100%;
+    height: 80px;
+    box-sizing: border-box;
+    resize: none;
+    flex-grow: 1;
+    margin-right: $space-2 + 2;
+}
+
+div.casella_chat_info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: $space-1 + 1;
+    width: 70%;
+}
+
+button.chat_button {
+    background-color: #007bff;
+    color: $color-text-light;
+    border: none;
+    padding: $space-1 + 1 $space-2 + 2;
+    cursor: pointer;
+    border-radius: 3px;
+
+    &:hover { background-color: #0056b3; }
+}
+
+// ── Icone e utility chat ──────────────────────────────────────
+
+.div_rosso {
+    width: 100px;
+    height: 80px;
+    background-color: transparent;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: $space-1 + 1;
+    padding: $space-1 + 1;
+
+    a { display: block; width: 100%; height: 100%; text-align: center; margin: 0; padding: 0; }
+    img { display: block; width: 25px; height: 25px; text-align: center; }
+}
+
+.chat_icon { width: 30px; height: 30px; display: block; margin: 0 auto; }
+
+.countdown_text {
+    font-size: $text-lg;
+    color: $color-danger;
+    margin-bottom: $space-2 + 2;
+    font-weight: $font-weight-bold;
+}
+
+.countdown-container { position: relative; text-align: center; margin-bottom: $space-1 + 1; }
+
+.styled-button {
+    background-color: #161827;
+    border: 2px solid #07080e;
+    border-radius: $radius-lg - 3;
+    font-size: $text-xs;
+    color: #8f8f8f;
+    font-family: $font-serif;
+    padding: $space-1;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover { background-color: #202233; color: #bfbfbf; }
+}
+
+// ── Popup ricerca utenti ──────────────────────────────────────
+
+.user-search-popup__overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgb(24 28 49 / 80%);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
+
+.user-search-popup__container {
+    background: $palette-dark-5;
+    border-radius: $radius-xl;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgb(0 0 0 / 40%);
+    animation: user-search-popup__fadeIn 0.3s ease;
+    border: 1px solid #2a2f4a;
+}
+
+@keyframes user-search-popup__fadeIn {
+    from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+    to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+
+.user-search-popup__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $space-5 $space-6;
+    border-bottom: 1px solid #2a2f4a;
+    background: linear-gradient(135deg, #1a1f36 0%, $palette-dark-5 100%);
+    border-radius: $radius-xl $radius-xl 0 0;
+}
+
+.user-search-popup__title {
+    margin: 0;
+    color: $color-text-light;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.user-search-popup__close-btn {
+    background: #2a2f4a;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #94a3b8;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-lg;
+    transition: all $transition-fast;
+
+    &:hover { background: #3f445e; color: $color-text-light; transform: rotate(90deg); }
+}
+
+.user-search-popup__search-section {
+    padding: $space-6;
+    position: relative;
+    border-bottom: 1px solid #2a2f4a;
+    background: #1a1f36;
+}
+
+.user-search-popup__search-input {
+    width: 100%;
+    padding: 14px $space-4;
+    background: #0f1324;
+    border: 2px solid #2a2f4a;
+    border-radius: $radius-lg;
+    font-size: $text-lg;
+    box-sizing: border-box;
+    transition: all $transition-normal;
+    color: $color-text-light;
+    font-family: inherit;
+
+    &::placeholder { color: #64748b; }
+
+    &:focus {
+        outline: none;
+        border-color: $chat-popup-accent;
+        background: #0f1324;
+        box-shadow: 0 0 0 3px rgb(99 102 241 / 20%);
+        color: $color-text-light;
+    }
+}
+
+.user-search-popup__autocomplete-list {
+    position: absolute;
+    top: calc(100% - 40px);
+    left: $space-6;
+    right: $space-6;
+    background: #1a1f36;
+    border: 2px solid $chat-popup-accent;
+    border-top: none;
+    border-radius: 0 0 $radius-lg $radius-lg;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 10001;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 40%);
+}
+
+.user-search-popup__autocomplete-item {
+    padding: 14px $space-4;
+    cursor: pointer;
+    border-bottom: 1px solid #2a2f4a;
+    transition: all $transition-fast;
+    color: $color-text-light;
+    font-size: $text-lg;
+
+    &:hover { background: #252a45; color: #fff; }
+    &:last-child { border-bottom: none; }
+    &--selected { background: #1e3a8a; color: #fff; font-weight: 500; }
+}
+
+.user-search-popup__selected-section {
+    padding: $space-6;
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #1a1f36;
+}
+
+.user-search-popup__selected-title {
+    margin: 0 0 $space-4;
+    color: #94a3b8;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.user-search-popup__selected-list {
+    min-height: 120px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 2px dashed #2a2f4a;
+    border-radius: $radius-lg;
+    padding: $space-4;
+    background: #0f1324;
+}
+
+.user-search-popup__empty-message {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+    padding: $space-5;
+    font-size: $text-lg;
+}
+
+.user-search-popup__selected-user {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $space-3 $space-4;
+    margin-bottom: $space-2 + 2;
+    background: #252a45;
+    border: 1px solid #2a2f4a;
+    border-radius: $radius-md;
+    transition: all $transition-fast;
+
+    &:hover { border-color: $chat-popup-accent; background: #2a2f4a; transform: translateY(-1px); }
+    &:last-child { margin-bottom: 0; }
+}
+
+.user-search-popup__user-name {
+    font-weight: 500;
+    color: $color-text-light;
+    font-size: $text-lg;
+}
+
+.user-search-popup__remove-btn {
+    background: $color-danger;
+    color: $color-text-light;
+    border: none;
+    border-radius: $radius-sm;
+    padding: $space-1 + 2 $space-3;
+    cursor: pointer;
+    font-size: $text-md - 1;
+    font-weight: 500;
+    transition: all $transition-fast;
+
+    &:hover { background: #b91c1c; transform: scale(1.05); }
+}
+
+.user-search-popup__footer {
+    padding: $space-5 $space-6;
+    border-top: 1px solid #2a2f4a;
+    display: flex;
+    gap: $space-3;
+    justify-content: flex-end;
+    background: linear-gradient(135deg, $palette-dark-5 0%, #1a1f36 100%);
+    border-radius: 0 0 $radius-xl $radius-xl;
+}
+
+.user-search-popup__confirm-btn {
+    background: linear-gradient(135deg, $chat-popup-accent 0%, #4f46e5 100%);
+    color: $color-text-light;
+    border: none;
+    padding: $space-3 28px;
+    border-radius: $radius-lg;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: $text-lg;
+    transition: all $transition-fast;
+    min-width: 120px;
+    box-shadow: 0 2px 8px rgb(99 102 241 / 30%);
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgb(99 102 241 / 40%);
+    }
+
+    &:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
+}
+
+.user-search-popup__cancel-btn {
+    background: #374151;
+    color: $color-text-light;
+    border: 1px solid #4b5563;
+    padding: $space-3 28px;
+    border-radius: $radius-lg;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: $text-lg;
+    transition: all $transition-fast;
+    min-width: 120px;
+
+    &:hover { background: #4b5563; color: #fff; transform: translateY(-1px); }
+}
+
+.user-search-popup__loading {
+    display: none;
+    text-align: center;
+    padding: $space-3;
+    color: #94a3b8;
+    font-style: italic;
+
+    &::after {
+        content: '...';
+        animation: user-search-popup__loadingDots 1.5s infinite;
+    }
+}
+
+@keyframes user-search-popup__loadingDots {
+    0%, 20% { content: '.'; }
+    40%      { content: '..'; }
+    60%, 100%{ content: '...'; }
+}
+
+.user-search-popup__trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2 + 2;
+    padding: $space-3 $space-5;
+    background: linear-gradient(135deg, $chat-popup-accent 0%, #4f46e5 100%);
+    color: $color-text-light;
+    border: none;
+    border-radius: $radius-lg;
+    cursor: pointer;
+    font-size: $text-lg;
+    font-weight: 600;
+    transition: all $transition-fast;
+    box-shadow: 0 2px 8px rgb(99 102 241 / 30%);
+
+    &:hover {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgb(99 102 241 / 40%);
+    }
+}
+
+.user-search-popup__trigger-icon {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+}
+
+// ── Scrollbar popup ───────────────────────────────────────────
+
+.user-search-popup__selected-list,
+.user-search-popup__autocomplete-list {
+    &::-webkit-scrollbar       { width: 6px; }
+    &::-webkit-scrollbar-track { background: #1a1f36; border-radius: 3px; }
+    &::-webkit-scrollbar-thumb {
+        background: $chat-popup-accent;
+        border-radius: 3px;
+        &:hover { background: #4f46e5; }
+    }
+}
+
+// ── Responsive chat ───────────────────────────────────────────
+
+@media screen and (width <= 1024px) {
+    .gdr-header    { flex-direction: column; gap: 15px; }
+    .gdr-main-controls { width: 100%; justify-content: space-around; }
+    .gdr-control-btn { width: 40px; height: 40px; }
+    .gdr-grid      { grid-template-columns: 1fr; }
+    .gdr-tabs      { flex-wrap: wrap; }
+    .gdr-tab       { flex: 1; min-width: 120px; text-align: center; }
+    .gdr-session-status { margin: $space-1 + 1 0; order: 3; width: 100%; justify-content: center; }
+
+    div.casella_chat { flex-wrap: wrap; padding-bottom: $space-2 + 2; width: 100%; }
+    textarea.chat_textarea { height: 80px; margin-bottom: $space-2 + 2; overflow: hidden; }
+    div.form_chat  { width: 100%; overflow: hidden; }
+    div.form_row   { display: flex; flex-direction: column; justify-content: center; align-items: stretch; width: 100%; padding-bottom: $space-5; overflow: hidden; }
+    .div_rosso     { display: flex; justify-content: space-around; align-items: center; width: 100%; padding-left: 0; overflow: hidden; }
+    .div_rosso a img, .div_rosso img { width: 25px; height: 25px; }
+    .chat_icon     { width: 24px; height: 24px; }
+    .styled-button { font-size: $text-md - 1; }
+
+    div.casella_chat_info {
+        position: absolute;
+        bottom: 0;
+        right: $space-2 + 2;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        width: 50%;
+        padding: $space-1 + 1;
+        overflow: hidden;
+    }
+}
+
+@media screen and (width <= 768px) {
+    div.casella_chat { display: flex; flex-flow: row wrap; justify-content: space-between; width: 100%; }
+    textarea.chat_textarea { height: 70px; overflow: hidden; }
+    div.form_chat  { width: 100%; overflow-x: hidden; }
+    div.form_row   { display: flex; flex-direction: column; justify-content: center; align-items: stretch; width: 100%; }
+    .div_rosso     { display: flex; justify-content: space-around; align-items: center; width: 100%; padding-left: 0; }
+    .div_rosso a img { width: 22px; height: 22px; }
+    .chat_icon     { width: 22px; height: 22px; }
+    button.chat_button { width: 100%; padding: $space-2 + 2; }
+    .countdown_text { font-size: $text-xl; }
+    .countdown-container { margin-bottom: $space-2 + 2; }
+    .styled-button { width: 100%; padding: $space-2 + 2; font-size: $text-lg; }
+
+    div.casella_chat_info {
+        position: absolute;
+        bottom: 0;
+        right: $space-2 + 2;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        width: 50%;
+        padding: $space-1 + 1;
+        overflow: hidden;
+    }
+
+    .user-search-popup__container { width: 95%; margin: $space-2 + 2; max-height: 90vh; }
+    .user-search-popup__header,
+    .user-search-popup__search-section,
+    .user-search-popup__selected-section { padding: $space-5; }
+    .user-search-popup__footer { padding: $space-4 $space-5; flex-direction: column; }
+    .user-search-popup__confirm-btn,
+    .user-search-popup__cancel-btn { width: 100%; margin-bottom: $space-2; }
+    .user-search-popup__autocomplete-list { left: $space-5; right: $space-5; }
+}
+
+@media (width <= 480px) {
+    .user-search-popup__title { font-size: 1.1em; }
+    .user-search-popup__selected-user { flex-direction: column; align-items: flex-start; gap: $space-2 + 2; }
+    .user-search-popup__remove-btn { align-self: flex-end; }
+}

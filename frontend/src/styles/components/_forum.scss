@@ -1,0 +1,346 @@
+// ============================================================
+// _forum.scss — Forum e lettura bacheca
+// ============================================================
+@use '../tokens' as *;
+
+// Colore accent specifico del forum (arancione-rame)
+$forum-accent: #ce846f;
+
+// ── Forum PHP classico ────────────────────────────────────────
+
+div.pagina_forum {
+    font-size: $text-lg;
+
+    div.panels_box {
+        border: none;
+        margin-top: $space-2 + 2;
+        color: $color-text-light;
+        border-radius: $radius-lg - 3;
+
+        table { width: 100%; }
+        tr    { margin: 2px; }
+    }
+}
+
+div.forum_date_big {
+    font-size: $text-xs;
+    color: $palette-text-3;
+    font-family: $font-serif;
+    text-align: left;
+    margin-top: 2px;
+    padding-left: 15px;
+    padding-top: $space-1 + 1;
+}
+
+div.forum_date_big_right {
+    font-size: $text-md - 1;
+    color: #8f8f8f;
+    font-family: $font-serif;
+    text-align: center;
+    margin-top: 2px;
+    padding-top: $space-1 + 1;
+}
+
+div.elementi_elenco div.forum_date_big { width: auto; }
+
+div.forum_column {
+    text-align: left;
+    margin-top: 2px;
+    padding-left: 15px;
+    font-size: $text-md - 1;
+    color: $palette-text-3;
+    font-family: $font-serif;
+}
+
+div.forum_date_small {
+    font-size: $text-xs;
+    color: $palette-text-3;
+    font-family: $font-serif;
+    text-align: left;
+    margin-top: 2px;
+    padding-left: 15px;
+    clear: both;
+}
+
+div.forum_post_title {
+    font-size: $text-md - 1;
+    color: $palette-text-3;
+    font-family: $font-serif;
+    text-transform: uppercase;
+}
+
+td.forum_main_post_author,
+td.forum_other_post_author {
+    width: 16px;
+    vertical-align: top;
+}
+
+td.forum_main_post_message,
+td.forum_other_post_message { vertical-align: text-top; }
+
+div.forum_post_author { margin-bottom: $space-5; }
+
+div.forum_post_message {
+    text-align: left;
+    padding: $space-2 + 2;
+    font-size: $text-md;
+    color: #8f8f8f;
+    font-family: "DejaVu Sans";
+}
+
+div.forum_post_modify,
+a:link {
+    font-size: $text-sm;
+    letter-spacing: 2px;
+    color: $palette-text-3;
+    font-family: $font-serif;
+    text-align: center;
+    margin: 40px 0 $space-5 0;
+    text-transform: uppercase;
+}
+
+img.img_forum_avatar {
+    height: 125px;
+    width: 125px;
+}
+
+div.header_thread {
+    font-size: 15px;
+    text-align: center;
+    color: $forum-accent;
+    font-family: $font-serif;
+    text-transform: uppercase;
+}
+
+// ── Paginazione generica ──────────────────────────────────────
+
+.pagination {
+    margin: $space-5 0;
+
+    a {
+        padding: $space-2 $space-4;
+        margin: 0 $space-1;
+        border: 1px solid $color-border;
+        text-decoration: none;
+        color: $color-action;
+
+        &.active {
+            background-color: $color-action;
+            color: $color-text-light;
+            border-color: $color-action;
+        }
+
+        &:hover:not(.active) { background-color: $color-border; }
+    }
+}
+
+// ── Forum React (lettura_bacheca.css) ─────────────────────────
+
+.forum-container_ct {
+    width: 90%;
+    margin: $space-5 auto;
+    background-color: #1e2133;
+    padding: $space-5;
+    border-radius: $radius-lg;
+    box-shadow: 0 0 15px rgb(0 0 0 / 50%);
+}
+
+.forum-thread-title_ct {
+    font-size: $text-2xl + 6;
+    color: $forum-accent;
+    text-align: center;
+    padding: $space-2 + 2 0;
+    border-bottom: 2px solid $forum-accent;
+    position: relative;
+}
+
+.forum-post_ct {
+    display: flex;
+    background-color: #15182a;
+    border-radius: $radius-lg;
+    margin: 15px 0;
+    padding: 15px;
+    box-shadow: 0 0 10px rgb(0 0 0 / 20%);
+}
+
+.forum-author_ct {
+    width: 20%;
+    text-align: center;
+    padding: $space-2 + 2;
+    border-right: 2px solid #282b3a;
+
+    img {
+        width: 80px;
+        height: 80px;
+        border-radius: $radius-full;
+        margin-bottom: $space-2 + 2;
+    }
+
+    .author-name_ct {
+        font-weight: $font-weight-bold;
+        color: $forum-accent;
+    }
+}
+
+.forum-content_ct {
+    width: 80%;
+    padding: $space-2 + 2 $space-5;
+
+    .post-title_ct {
+        font-size: $text-2xl;
+        color: $forum-accent;
+        text-align: left;
+    }
+
+    .post-message_ct {
+        margin-top: $space-2 + 2;
+        line-height: 1.6;
+        text-align: justify;
+    }
+
+    .post-date_ct {
+        margin-top: $space-2 + 2;
+        font-size: $text-md - 1;
+        color: #7f7f7f;
+        text-align: left;
+    }
+}
+
+.forum-actions_ct {
+    text-align: right;
+    margin-top: $space-2 + 2;
+}
+
+.goto-last-post_ct {
+    position: absolute;
+    top: $space-2 + 2;
+    right: $space-2 + 2;
+    font-size: $text-lg;
+    color: $forum-accent;
+    cursor: pointer;
+
+    &:hover { text-decoration: underline; }
+}
+
+.move-thread-container {
+    text-align: right;
+    margin-top: 15px;
+
+    select,
+    button {
+        padding: $space-1 + 1;
+        font-size: $text-lg;
+        background-color: #282b3a;
+        color: $forum-accent;
+        border: none;
+        border-radius: $radius-lg - 3;
+    }
+}
+
+// ── Form risposta forum ───────────────────────────────────────
+
+.panels_box_ct {
+    padding: $space-5;
+    background-color: #1e2133;
+    border-radius: $radius-lg;
+    box-shadow: 0 0 15px rgb(0 0 0 / 50%);
+    margin: $space-5 auto;
+    width: 90%;
+}
+
+.form_gioco_ct {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form_field_ct {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.textarea_ct {
+    width: 90%;
+    height: 150px;
+    padding: $space-2 + 2;
+    border-radius: $radius-lg - 3;
+    border: none;
+    background-color: #15182a;
+    color: #7f7f7f;
+    font-family: $font-ui;
+    font-size: $text-lg;
+    resize: vertical;
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 5px rgb($forum-accent, 0.8);
+    }
+}
+
+.form_submit_ct {
+    text-align: right;
+    width: 100%;
+    display: flex;
+    gap: $space-2 + 2;
+    margin-top: 15px;
+}
+
+.submit_btn_ct {
+    padding: $space-2 + 2 $space-5;
+    background-color: $forum-accent;
+    color: #1e2133;
+    border: none;
+    border-radius: $radius-lg - 3;
+    cursor: pointer;
+    font-size: $text-lg;
+    text-transform: uppercase;
+    transition: background-color $transition-normal;
+}
+
+.select_anonimo_ct {
+    background-color: #1e2133;
+    color: $forum-accent;
+    border: 1px solid $forum-accent;
+    border-radius: $radius-lg - 3;
+    padding: $space-1 + 2;
+    font-family: $font-ui;
+}
+
+// ── Responsive ────────────────────────────────────────────────
+
+@media screen and (max-width: 1024px) {
+    div.pagina_forum { font-size: $text-md; }
+    div.forum_post_message { font-size: $text-md - 1; padding: $space-2; }
+    img.img_forum_avatar { height: 100px; width: 100px; }
+    div.header_thread { font-size: $text-lg; }
+}
+
+@media screen and (max-width: 768px) {
+    div.pagina_forum { font-size: $text-md - 1; }
+    div.forum_post_message { font-size: $text-sm; padding: 6px; }
+    img.img_forum_avatar { height: 80px; width: 80px; }
+    div.header_thread { font-size: $text-md; }
+
+    div.forum_column,
+    div.forum_date_big,
+    div.forum_date_small { padding-left: $space-2 + 2; }
+
+    td.forum_main_post_author,
+    td.forum_other_post_author { width: 10px; }
+}
+
+@media screen and (max-width: 480px) {
+    div.pagina_forum { font-size: $text-sm; }
+    div.forum_post_message { font-size: $text-xs; padding: $space-1 + 1; }
+    img.img_forum_avatar { height: 60px; width: 60px; }
+    div.header_thread { font-size: $text-md - 1; }
+
+    div.forum_column,
+    div.forum_date_big,
+    div.forum_date_small { padding-left: $space-1 + 1; }
+
+    td.forum_main_post_author,
+    td.forum_other_post_author { width: 8px; }
+    div.forum_post_title { font-size: $text-xs; }
+}

@@ -1,0 +1,568 @@
+// ============================================================
+// _scheda.scss — Scheda personaggio, equipaggiamento, punti
+// ============================================================
+@use '../tokens' as *;
+
+// Colori specifici della scheda
+$scheda-title-color:  #89aee7;   // blu chiaro per titoli sezione
+$scheda-body-text:    #8f8f8f;   // testo corpo scheda
+$scheda-bg-box:       #181c30;   // sfondo box interni
+$scheda-bg-header:    #0c0d17;   // sfondo header box
+$scheda-bg-slot:      #1a2240;   // sfondo slot equipaggiamento
+$scheda-border:       #090a11;   // bordo generale scheda
+$scheda-border-dark:  #070a1b;   // bordo scuro
+
+// ── Contenitore principale ────────────────────────────────────
+
+div.pagina_scheda {
+    margin: 0 auto;
+    width: max-content;
+    max-width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: $font-weight-bold;
+    font-size: $text-md;
+    margin-bottom: 6px;
+    color: $scheda-title-color;
+    font-weight: $font-weight-normal;
+
+    div.form_info { color: $color-text; }
+}
+
+.scheda_page_body {
+    margin: auto;
+    width: 100%;
+}
+
+.pg-infos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+// ── Ritratto ─────────────────────────────────────────────────
+
+div.ritratto {
+    margin: 2px;
+    float: left;
+    font-size: $text-md - 1;
+    text-align: center;
+    border: 2px solid $scheda-border-dark;
+
+    div.ritratto_nome {
+        font-size: $text-lg;
+        font-weight: $font-weight-bold;
+        display: none;
+    }
+
+    div.ritratto_avatar {
+        width: 300px;
+        height: 400px;
+        margin: auto;
+        overflow: hidden;
+    }
+
+    div.ritratto_invia_messaggio { margin: $space-1 + 1 0 0 0; }
+}
+
+div.ritratto_avatar img {
+    max-width: 300px;
+    max-height: 400px;
+    margin: 0 auto;
+}
+
+// ── Profilo ───────────────────────────────────────────────────
+
+div.profilo {
+    margin: 2px;
+    float: right;
+    font-size: $text-xs;
+    width: 260px;
+    color: $color-text-light;
+
+    div.profilo_voce {
+        text-align: justify;
+        clear: both;
+        height: 20px;
+        line-height: 0;
+    }
+}
+
+div.profilo_voce {
+    div.profilo_voce_label {
+        width: 40%;
+        float: left;
+        margin-left: $space-1 + 1;
+        line-height: 0;
+    }
+
+    div.profilo_voce_valore {
+        text-align: right;
+        width: 50%;
+        float: right;
+        margin-right: $space-1 + 1;
+        line-height: 0;
+    }
+}
+
+img.profilo_img_gilda {
+    height: 15px;
+    width: 15px;
+}
+
+div.profilo_status {
+    margin: $space-1 + 1;
+    clear: both;
+    height: 100px;
+    text-align: justify;
+}
+
+// ── Box interni ───────────────────────────────────────────────
+
+div.primo_box {
+    width: 100%;
+    border-radius: $radius-xl - 2;
+    background-color: $scheda-bg-box;
+    border: 1px solid $scheda-border;
+    font-size: $text-md - 1;
+    color: $scheda-body-text;
+    font-family: "DejaVu Sans";
+}
+
+div.header_box {
+    padding: 0;
+    width: 100%;
+    height: 15px;
+    background-color: $scheda-bg-header;
+    border: 1px solid $scheda-border;
+}
+
+div.secondo_box {
+    padding: $space-1 + 1;
+    width: 300px;
+    border-radius: $radius-xl - 2;
+    background-color: $scheda-bg-box;
+    border: 1px solid $scheda-border;
+}
+
+div.terzo_box {
+    padding: $space-1 + 1;
+    width: 300px;
+    border-radius: $radius-xl - 2;
+    border: none;
+    font-size: $text-md - 1;
+    color: $scheda-body-text;
+    font-family: "DejaVu Sans";
+    text-align: center;
+}
+
+div.body_box {
+    border: 2px solid $scheda-border-dark;
+    margin: auto;
+    height: min-content;
+    font-size: $text-xs;
+    color: $color-text-light;
+    clear: both;
+    text-transform: none;
+}
+
+td.casella_titolo {
+    background-color: $scheda-bg-slot;
+    border: 2px solid $scheda-border-dark;
+}
+
+div.note {
+    text-align: left;
+    float: left;
+    width: 600px;
+    background-color: $scheda-bg-header;
+    border: 1px solid $scheda-border;
+}
+
+div.particolari {
+    float: left;
+    text-align: left;
+    width: 700px;
+    background-color: $scheda-bg-header;
+    border: 1px solid $scheda-border;
+}
+
+div.background {
+    margin: $space-2 + 6 auto $space-1 + 1 auto;
+    clear: both;
+    max-width: 567px;
+    overflow-x: auto;
+
+    img { max-width: 563px; }
+}
+
+// ── Titoli e menu scheda ─────────────────────────────────────
+
+div.title,
+div.titolo_box_scheda {
+    text-align: center;
+    font-size: 15px;
+    color: $color-text-light;
+    text-transform: uppercase;
+    width: 305px;
+    height: 20px;
+    background-color: $color-surface;
+    border: 1px solid $scheda-border;
+    margin: 0 auto;
+}
+
+div.title           { border-radius: 0 $radius-xl - 2 0 $radius-xl - 2; }
+div.titolo_box_scheda { border-radius: $radius-xl - 2 0 $radius-xl - 2 0; }
+
+div.titolo_box {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: $font-weight-bold;
+    font-size: $text-md;
+    color: $scheda-title-color;
+    display: none;
+}
+
+div.menu_scheda {
+    text-align: center;
+    font-size: $text-lg;
+    height: 35px;
+    margin: auto;
+    padding: $space-2 + 2;
+
+    a {
+        color: $color-text-light;
+        font-size: $text-xs;
+        padding: 3px;
+        text-transform: uppercase;
+    }
+}
+
+// ── Abilità ───────────────────────────────────────────────────
+
+div.elenco_abilita {
+    margin: $space-2 + 6 auto $space-1 + 1 auto;
+    clear: both;
+
+    table { margin: 2px auto $space-1 + 1 auto; }
+    td    { vertical-align: top; }
+}
+
+div.abilita_scheda_nome { width: 110px; font-size: $text-md - 1; }
+div.abilita_scheda_car  { width: 70px;  font-size: $text-md - 1; }
+div.abilita_scheda_tank { width: 20px;  font-size: $text-md - 1; }
+div.abilita_scheda_sub  { width: 35px;  font-size: $text-md - 1; }
+
+div.titolo_skill_page {
+    width: 50%;
+    height: 20px;
+    border: 1px solid $scheda-border-dark;
+    line-height: 21px;
+    margin: auto;
+    background: url(imgs/scheda/header_skill.png) center / cover;
+}
+
+.skill_incr.active,
+.skill_decr.active   { visibility: visible; }
+.skill_incr.inactive,
+.skill_decr.inactive { visibility: hidden; }
+
+.hidden_row { display: none; overflow: hidden; }
+
+ul { list-style-type: none; }
+
+.blue,
+.green {
+    width: 77%;
+    padding: $space-2 + 2;
+    font-size: $text-md;
+    color: $scheda-body-text;
+    font-family: "DejaVu Sans";
+    text-align: justify;
+}
+
+hr { background-color: $scheda-border-dark; }
+
+// ── Equipaggiamento — slot omino ─────────────────────────────
+
+div.modifica_scheda { margin: $space-2 + 6; }
+div.box_equip       { margin-top: 100px; }
+
+div.omino_bianco_box {
+    margin: 0 auto;
+    width: max-content;
+    height: 300px;
+    text-align: center;
+}
+
+img.omino_bianco_img {
+    margin-top: 40px;
+    height: 226px;
+}
+
+// Slot equipaggiamento (stile condiviso)
+@mixin slot-equip {
+    width: 70px;
+    height: 70px;
+    border: 2px solid $scheda-border-dark;
+    margin-top: $space-1 + 1;
+    background-color: $scheda-bg-slot;
+}
+
+div.omino_bianco_armdx  { @include slot-equip; img { width: 70px; height: 70px; } }
+div.omino_bianco_armsx  { @include slot-equip; img { width: 48px; height: 35px; } }
+div.omino_bianco_chest  { @include slot-equip; img { width: 50px; height: 49px; } }
+div.omino_bianco_legs   { @include slot-equip; img { width: 50px; height: 49px; } }
+div.omino_bianco_feet   { @include slot-equip; img { width: 50px; height: 45px; } }
+div.omino_bianco_head   { @include slot-equip; img { width: 50px; height: 45px; } }
+div.omino_bianco_neck   { @include slot-equip; img { width: 48px; height: 35px; } }
+div.omino_bianco_ring   { @include slot-equip; img { width: 29px; height: 19px; } }
+
+// ── Inventario ────────────────────────────────────────────────
+
+div.pagina_scheda_oggetti,
+div.pagina_scheda_equip {
+    td.casella_elemento { font-size: $text-md - 1; padding: 3px; }
+
+    div.inventario_img { width: 122px; img { height: 120px; width: 120px; } }
+    div.inventario_nome {
+        width: 122px;
+        font-size: $text-md - 1;
+        text-transform: uppercase;
+    }
+    div.inventario_quantita { width: 122px; }
+    div.form_label { font-size: $text-md - 1; margin: 0; }
+    input { font-size: $text-md - 1; margin: 0; }
+    form  { text-align: center; margin: 0 0 $space-1 0; }
+}
+
+div.inventario_riga_proprieta { width: 80px; }
+textarea.form_textarea { height: 50px; }
+
+// ── Slider (carousel scheda) ─────────────────────────────────
+
+.slider {
+    margin: auto;
+    width: 60%;
+    text-align: center;
+    overflow: hidden;
+
+    > a {
+        display: inline-flex;
+        width: 3.5rem;
+        height: 3.5rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: $radius-full;
+        margin: 0 0 1rem 0;
+        border: 1px solid $scheda-border-dark;
+        background-color: $scheda-bg-slot;
+        text-decoration: none;
+        position: relative;
+
+        &:active { top: 1px; }
+        &:focus   { background: #000; }
+    }
+}
+
+.slides {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar       { width: 10px; height: 10px; }
+    &::-webkit-scrollbar-thumb { background: $scheda-bg-slot; border-radius: $radius-xl - 2; }
+    &::-webkit-scrollbar-track { background: transparent; }
+
+    > div {
+        scroll-snap-align: start;
+        flex-shrink: 0;
+        width: max-content;
+        height: max-content;
+        margin-right: 50px;
+        border-radius: $radius-xl - 2;
+        transform: scale(1);
+        transition: transform 0.5s;
+        position: relative;
+        display: block;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+@supports (scroll-snap-type) { .slider > a { display: none; } }
+
+// ── Help tooltip ──────────────────────────────────────────────
+
+.help-animated {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #3a6ea5, #2a5685);
+    color: $color-text-light;
+    border-radius: $radius-full;
+    cursor: help;
+    font-weight: $font-weight-bold;
+    font-size: $text-sm;
+    box-shadow: 0 2px 4px rgb(58 110 165 / 30%);
+    transition: all $transition-normal;
+    margin: 0 3px;
+    vertical-align: middle;
+    position: relative;
+    z-index: 10;
+
+    &:hover {
+        transform: scale(1.2);
+        box-shadow: 0 3px 8px rgb(58 110 165 / 50%);
+    }
+}
+
+.tooltip-animated {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    background: #1a1a2e;
+    color: $color-text-light;
+    padding: $space-2 + 2 $space-3;
+    border-radius: $radius-md;
+    width: 180px;
+    font-size: $text-sm;
+    line-height: 1.2;
+    box-shadow: $shadow-md;
+    border: 1px solid #3a6ea5;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 1000;
+    user-select: none;
+    pointer-events: none;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: #3a6ea5;
+    }
+}
+
+.help-animated:hover ~ .tooltip-animated,
+span[style*="position:relative"]:hover .tooltip-animated {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+// ── Paginazione scheda punti ──────────────────────────────────
+
+.scheda-pager {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: $space-1;
+    margin: $space-4 auto;
+    flex-wrap: wrap;
+
+    button {
+        min-width: 30px;
+        height: 28px;
+        padding: 0 $space-2;
+        background-color: $color-surface;
+        border: 1px solid #090a10;
+        border-radius: $radius-md;
+        color: $scheda-title-color;
+        font-size: $text-sm;
+        font-family: "DejaVu Sans", sans-serif;
+        cursor: pointer;
+        transition: background-color 0.15s, color 0.15s;
+
+        &:hover:not(.active) {
+            background-color: #1e2240;
+            color: $color-text-light;
+        }
+
+        &.active {
+            background-color: $color-primary;
+            border-color: $color-primary;
+            color: #fff;
+            cursor: default;
+            font-weight: $font-weight-bold;
+        }
+
+        &.nav {
+            color: $color-primary;
+            font-size: $text-md;
+        }
+    }
+
+    .ellipsis {
+        color: $scheda-body-text;
+        font-size: $text-md - 1;
+        padding: 0 2px;
+        line-height: 28px;
+    }
+}
+
+// ── Responsive ────────────────────────────────────────────────
+
+@media screen and (max-width: 1024px) {
+    div.pagina_scheda { width: 90%; margin: auto; }
+    div.ritratto div.ritratto_avatar { width: 250px; height: 350px; }
+    div.ritratto_avatar img { max-width: 250px; max-height: 350px; }
+    div.profilo { width: 100%; font-size: $text-md - 1; }
+    div.primo_box, div.secondo_box, div.terzo_box { font-size: $text-md - 1; }
+    .blue, .green { width: 90%; font-size: $text-md - 1; }
+}
+
+@media screen and (max-width: 768px) {
+    div.pagina_scheda { width: 95%; }
+    div.ritratto div.ritratto_avatar { width: 200px; height: 300px; }
+    div.ritratto_avatar img { max-width: 200px; max-height: 300px; }
+    div.profilo { font-size: $text-xs; width: 100%; }
+    div.primo_box, div.secondo_box, div.terzo_box { font-size: $text-sm; }
+    .blue, .green { width: 85%; font-size: $text-sm; }
+
+    .menu_scheda {
+        overflow-x: auto;
+        overflow-y: visible;
+        white-space: nowrap;
+        width: 100%;
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 120px !important;
+        margin-bottom: -120px !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    div.pagina_scheda { width: 100%; }
+    div.ritratto div.ritratto_avatar { width: 180px; height: 250px; }
+    div.ritratto_avatar img { max-width: 180px; max-height: 250px; }
+    div.profilo { font-size: 9px; width: 100%; }
+    div.primo_box, div.secondo_box, div.terzo_box { width: 100%; font-size: $text-xs; }
+    .blue, .green { width: 100%; font-size: $text-xs; }
+
+    .menu_scheda {
+        overflow-x: auto;
+        overflow-y: visible;
+        white-space: nowrap;
+        width: 100%;
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 120px !important;
+        margin-bottom: -120px !important;
+    }
+}

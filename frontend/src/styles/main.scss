@@ -16,10 +16,12 @@
 @use 'base/forms';
 @use 'base/buttons';
 
-// ── FASE 3: Componenti (da aggiungere) ───────────────────
-// @use 'components/chat';
-// @use 'components/scheda';
-// @use 'components/forum';
-// @use 'components/presenti';
-// @use 'components/gestione';
-// @use 'components/mercato';
+// ── FASE 3: Componenti ───────────────────────────────────
+@use 'components/layout';
+@use 'components/presenti';
+@use 'components/messaggi';
+@use 'components/forum';
+@use 'components/scheda';
+@use 'components/chat';
+@use 'components/gestione';
+@use 'components/mercato';
