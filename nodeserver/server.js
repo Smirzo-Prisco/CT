@@ -59,13 +59,19 @@ io.on('connection', socket => {
     // Usata da PresentiEstesi che mostra utenti di tutte le stanze.
     socket.join('global');
 
-    // Notifica agli altri utenti nella stessa stanza che la lista presenti
-    // è cambiata (nuovo utente arrivato o tornato dalla chat).
-    io.to(`loc:${luogo}`).emit('users:update');
+    // Notifica agli utenti nella stessa stanza (users:update) e a tutti
+    // gli osservatori globali come PresentiEstesi (presenti:update su global).
+    // Il setImmediate evita la race condition con InfoLocation: il listener
+    // React si registra nel primo tick dopo il mount, ma l'evento socket
+    // arriva prima. Rimandando al tick successivo il componente è già pronto.
+    setImmediate(() => {
+        io.to(`loc:${luogo}`).emit('users:update');
+        io.to('global').emit('presenti:update');
+    });
 
     socket.on('disconnect', () => {
-        // Notifica agli altri utenti che qualcuno ha lasciato la stanza.
         io.to(`loc:${luogo}`).emit('users:update');
+        io.to('global').emit('presenti:update');
     });
 });
 
