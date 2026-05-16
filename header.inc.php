@@ -71,6 +71,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
+        <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']; ?>/tokens.css" type="text/css">
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']; ?>/homepage.css" type="text/css">
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/main.css?<?=time()?>" type="text/css">
         <link rel="stylesheet" href="themes/<?=$PARAMETERS['themes']['current_theme']?>/chat.css" type="text/css">

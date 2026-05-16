@@ -1,0 +1,25 @@
+// ============================================================
+// main.scss — Entry point SCSS Crystal Tokyo
+//
+// Ordine di importazione (non modificare):
+//   1. tokens    → variabili e CSS custom properties (:root)
+//   2. base      → reset, tipografia, form, bottoni (globale)
+//   3. components → stili specifici per area/pagina
+// ============================================================
+
+// ── FASE 1: Design Tokens ─────────────────────────────────
+@use 'tokens';
+
+// ── FASE 2: Base (da aggiungere) ─────────────────────────
+// @use 'base/reset';
+// @use 'base/typography';
+// @use 'base/forms';
+// @use 'base/buttons';
+
+// ── FASE 3: Componenti (da aggiungere) ───────────────────
+// @use 'components/chat';
+// @use 'components/scheda';
+// @use 'components/forum';
+// @use 'components/presenti';
+// @use 'components/gestione';
+// @use 'components/mercato';

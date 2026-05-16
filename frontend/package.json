@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:css": "sass src/styles/main.scss ../themes/crystal/tokens.css --style=compressed --no-source-map",
+    "watch:css": "sass --watch src/styles/main.scss ../themes/crystal/tokens.css --no-source-map"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -13,6 +15,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
+    "sass": "^1.99.0",
     "vite": "^6.0.0"
   }
 }
