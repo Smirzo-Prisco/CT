@@ -217,6 +217,19 @@ div.titolo_box_scheda {
 div.title           { border-radius: 0 $radius-xl - 2 0 $radius-xl - 2; }
 div.titolo_box_scheda { border-radius: $radius-xl - 2 0 $radius-xl - 2 0; }
 
+.level-stat {
+    float: left;
+    margin-left: 5px;
+    position: relative;
+}
+
+.level-table {
+    width: 100%;
+    margin-top: 5px;
+    border-collapse: collapse;
+    text-align: center;
+}
+
 div.titolo_box {
     text-align: center;
     text-transform: uppercase;

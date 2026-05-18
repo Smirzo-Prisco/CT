@@ -95,22 +95,21 @@ export default function FrameMessaggi() {
     const ICONS = buildIcons(hasEvents)
 
     return (
-        <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0', paddingBottom: '30px' }}>
-            <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '18px', rowGap: '0' }}>
+        <div id="gridPanel">
+            <div className="grid">
                 {ICONS.map(icon => (
-                    <div key={icon.id} className="grid-item"
-                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '-25px' }}>
+                    <div key={icon.id} className="grid-item">
                         {icon.id === 'messaggi' ? (
-                            <a id="message-link" href={icon.href} title={icon.alt} style={{ lineHeight: 0 }}>
-                                <img src={msgIcon} alt={icon.alt} style={{ display: 'block' }} />
+                            <a id="message-link" className="icon-link" href={icon.href} title={icon.alt}>
+                                <img src={msgIcon} alt={icon.alt} />
                             </a>
                         ) : (
-                            <a href={icon.href} title={icon.alt} style={{ lineHeight: 0 }}
+                            <a className="icon-link" href={icon.href} title={icon.alt}
                                target={icon.id === 'logout' ? '_top' : undefined}>
-                                <img src={`${ICO}${icon.img}`} alt={icon.alt} style={{ display: 'block' }} />
+                                <img src={`${ICO}${icon.img}`} alt={icon.alt} />
                             </a>
                         )}
-                        <span className="icon-label" style={{ marginTop: '-10px' }}>{icon.alt}</span>
+                        <span className="icon-label">{icon.alt}</span>
                     </div>
                 ))}
             </div>

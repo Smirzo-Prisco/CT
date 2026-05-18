@@ -129,12 +129,12 @@ function SchedaProfilo({ profile }) {
                     <>
                         <div className="header_box">▪ STATISTICHE ▪</div><br />
 
-                        <span style={{ float:'left', marginLeft:'5px', position:'relative' }}>
+                        <span className="level-stat">
                             Livello
                             <span className="help-animated">?</span>
                             <div className="tooltip-animated">
                                 <strong>Il livello si calcola in base alla somma di tutte le statistiche, se il personaggio appartiene ad una famiglia</strong><br />
-                                <table style={{ width:'100%', marginTop:'5px', borderCollapse:'collapse', textAlign:'center' }}>
+                                <table className="level-table">
                                     <tbody>
                                         <tr><th className="form-group form-column">Livello</th><th className="form-group form-column">Fino a</th></tr>
                                         <tr><td>1</td><td>50</td></tr>
@@ -280,7 +280,7 @@ export default function Scheda() {
                 />
 
                 {/* ── Nome e cognome ───────────────────────────────────── */}
-                <div className="title" style={{ marginTop: '40px' }}>{nome} {cognome}</div>
+                <div className="title scheda-pg-name">{nome} {cognome}</div>
 
                 {/* ── Riga principale: avatar + profilo ────────────────── */}
                 <div className="pg-infos">

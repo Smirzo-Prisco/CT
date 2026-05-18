@@ -368,6 +368,36 @@ img.immagine_pg {
     }
 }
 
+// ── Griglia icone (FrameMessaggi) ─────────────────────────────
+
+#gridPanel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding-bottom: 30px;
+}
+
+#gridPanel .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 18px;
+    row-gap: 0;
+}
+
+#gridPanel .grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: -25px;
+}
+
+.icon-link {
+    line-height: 0;
+
+    img { display: block; }
+}
+
 .icon-label {
     font-size: 9px;
     color: $palette-text-4;
@@ -376,6 +406,19 @@ img.immagine_pg {
     pointer-events: none;
     margin: 0;
     padding: 0;
+    margin-top: -10px;
+}
+
+// ── Avatar link (AnteprimaScheda) ─────────────────────────────
+
+.avatar-link {
+    display: block;
+}
+
+// ── Nome personaggio in scheda ────────────────────────────────
+
+.scheda-pg-name {
+    margin-top: 40px;
 }
 
 div.calendario_box {
