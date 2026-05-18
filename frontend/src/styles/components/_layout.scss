@@ -334,6 +334,14 @@ img.immagine_pg {
     margin-left: 0;
 }
 
+.icon-label {
+    font-size: $text-xs;
+    color: $palette-text-4;
+    text-align: center;
+    line-height: 1.2;
+    pointer-events: none;
+}
+
 div.calendario_box {
     margin-left: 25px;
 }
