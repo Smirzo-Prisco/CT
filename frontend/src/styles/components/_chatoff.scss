@@ -5,6 +5,7 @@
 
 .chatoff-panel {
     border: 1px solid $palette-dark-8;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     background: $palette-dark-10;
@@ -44,7 +45,7 @@
 }
 
 .chatoff-box {
-    height: 250px;
+    height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 6px 8px;
