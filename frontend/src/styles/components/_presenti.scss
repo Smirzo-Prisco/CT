@@ -66,7 +66,7 @@ div.link_presenti {
 }
 
 div.contenitore_presenti {
-    background: linear-gradient(rgb(45, 125, 181, 0.4), rgba(0, 20, 60, 0.4));
+    background: $palette-dark-10;
     padding: 10px;
     overflow-y: auto;
     height: 100%;
