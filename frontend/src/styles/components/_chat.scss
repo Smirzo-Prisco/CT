@@ -406,10 +406,8 @@ span.look {
 // ── Layout chat: flex column per far terminare chat_box dove inizia panels_box ──
 
 div.pagina_frame_chat {
-    // Si aggancia a #ct-app-content (position:relative) come containing block:
-    // bypassa il problema di height:100% con overflow:auto sui genitori.
-    position: absolute;
-    inset: 0;
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
