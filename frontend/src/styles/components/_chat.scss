@@ -403,24 +403,36 @@ span.look {
     color: #ce846f;
 }
 
+// ── Layout chat: flex column per far terminare chat_box dove inizia panels_box ──
+
+div.pagina_frame_chat {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+div.pagina_frame_chat div.page_body {
+    flex: 1;
+    min-height: 0;           // necessario per flex: i figli possono essere più piccoli del contenuto
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-align: left;
+}
+
 // ── Box chat ──────────────────────────────────────────────────
 
 div.chat_box {
-    position: absolute;
-    top: 0;
-    bottom: 180px;
-    left: 5px;
+    flex: 1;
+    min-height: 0;
     overflow: auto;
+    padding-left: 5px;
     font-size: $text-xl;
     text-align: justify;
-    width: 99%;
 }
 
 div.pagina_frame_chat div.page_body div.panels_box {
-    position: absolute;
-    bottom: 0;
-    left: 10px;
-    right: 10px;
+    flex-shrink: 0;
 }
 
 img.chat_avatar {
