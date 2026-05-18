@@ -10,45 +10,12 @@
     flex-direction: column;
     background: $palette-dark-10;
     box-sizing: border-box;
-    width: 100%;      // sempre 100% del container: nessun calcolo percentuale ambiguo
+    width: 80%;
     max-width: 100%;
     overflow: hidden;
-    // Su desktop la colonna applica già padding, il pannello si restringe visivamente
-    // tramite il padding del container (non tramite width %)
-
-    @media screen and (max-width: 768px) {
-        border: none !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        margin: 0 !important;
-    }
+    margin: 0 auto;
 }
 
-@media screen and (max-width: 768px) {
-    .chatoff-title,
-    .chatoff-box,
-    .chatoff-typing,
-    .chatoff-input-row,
-    .chatoff-input {
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        min-width: 0 !important;
-    }
-
-    .chatoff-box {
-        height: 80px !important;
-        background: rgba(0, 0, 0, 0.3) !important;
-    }
-
-    .chatoff-title {
-        background: transparent !important;
-        padding: 3px 6px !important;
-    }
-
-    .chatoff-input-row {
-        background: transparent !important;
-    }
-}
 
 .chatoff-title {
     font-family: Perpetua, serif;
