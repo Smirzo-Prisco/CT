@@ -95,19 +95,19 @@ export default function FrameMessaggi() {
     const ICONS = buildIcons(hasEvents)
 
     return (
-        <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0px 0px 20px' }}>
-            <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '8px', rowGap: '1px' }}>
+        <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0' }}>
+            <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '6px', rowGap: '0' }}>
                 {ICONS.map(icon => (
                     <div key={icon.id} className="grid-item"
-                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0px' }}>
+                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         {icon.id === 'messaggi' ? (
-                            <a id="message-link" href={icon.href} title={icon.alt}>
-                                <img src={msgIcon} alt={icon.alt} />
+                            <a id="message-link" href={icon.href} title={icon.alt} style={{ lineHeight: 0 }}>
+                                <img src={msgIcon} alt={icon.alt} style={{ width: '28px', height: '28px', display: 'block' }} />
                             </a>
                         ) : (
-                            <a href={icon.href} title={icon.alt}
+                            <a href={icon.href} title={icon.alt} style={{ lineHeight: 0 }}
                                target={icon.id === 'logout' ? '_top' : undefined}>
-                                <img src={`${ICO}${icon.img}`} alt={icon.alt} />
+                                <img src={`${ICO}${icon.img}`} alt={icon.alt} style={{ width: '28px', height: '28px', display: 'block' }} />
                             </a>
                         )}
                         <span className="icon-label">{icon.alt}</span>
