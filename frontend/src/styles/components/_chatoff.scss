@@ -16,8 +16,23 @@
     margin: 0 auto;
 
     @media screen and (max-width: 768px) {
-        width: 100%;
-        margin: 0;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        min-width: 0 !important;
+    }
+}
+
+// Forza tutti gli elementi interni a non sforare su mobile
+@media screen and (max-width: 768px) {
+    .chatoff-title,
+    .chatoff-box,
+    .chatoff-typing,
+    .chatoff-input-row,
+    .chatoff-input {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        min-width: 0 !important;
     }
 }
 
