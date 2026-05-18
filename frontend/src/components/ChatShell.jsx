@@ -251,29 +251,10 @@ export default function ChatShell() {
                 <div className="panels_box">
                     <div className="form_chat">
                         <form method="post" id="chat_form_messages">
-                            <div className="form_row">
-                                <div className="casella_chat">
 
-                                    {/* Riga 1: contatore, bottone pannello, help, tag, submit */}
-                                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%', gap:'6px' }}>
-                                        <span className="gdr-char-counter">
-                                            <span id="rimanenti">0</span> caratteri
-                                        </span>
-
-                                        {showPanelBtn && (
-                                            <a href="#" id="openPanelBtn">
-                                                <img title="Pannello GDR" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" />
-                                            </a>
-                                        )}
-
-                                        <a href="#" onClick={(e) => { e.preventDefault(); window.open('chat_help.proc.php','Help','toolbar=no,width=500,height=500') }}>
-                                            <img src="themes/crystal/imgs/chat/help.png" alt="Info" className="chat_icon" />
-                                        </a>
-                                        <input type="text" name="action_tag" className="action-tag" maxLength={30} placeholder="TAG max 30" />
-                                        <input type="submit" value={submit_label} />
-                                    </div>
-
-                                </div>
+                            {/* Riga 1: submit */}
+                            <div style={{ display:'flex', justifyContent:'flex-end', width:'100%' }}>
+                                <input type="submit" value={submit_label} />
                             </div>
 
                             {/* Riga 2: textarea */}
@@ -289,10 +270,21 @@ export default function ChatShell() {
                                 }}
                             />
 
-                            {/* Riga 3: status role */}
-                            <div style={{ display:'flex', alignItems:'center', width:'100%', gap:'10px', padding:'4px 0' }}>
+                            {/* Riga 3: tag, contatore, icone, status role */}
+                            <div style={{ display:'flex', alignItems:'center', width:'100%', gap:'8px', flexWrap:'wrap' }}>
                                 <input type="hidden" id="id_role" defaultValue="" />
-
+                                <input type="text" name="action_tag" className="action-tag" maxLength={30} placeholder="TAG max 30" />
+                                <span className="gdr-char-counter">
+                                    <span id="rimanenti">0</span> caratteri
+                                </span>
+                                {showPanelBtn && (
+                                    <a href="#" id="openPanelBtn">
+                                        <img title="Pannello GDR" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" />
+                                    </a>
+                                )}
+                                <a href="#" onClick={(e) => { e.preventDefault(); window.open('chat_help.proc.php','Help','toolbar=no,width=500,height=500') }}>
+                                    <img src="themes/crystal/imgs/chat/help.png" alt="Info" className="chat_icon" />
+                                </a>
                                 <div className="gdr-session-status inactive" id="gdrSessionStatus">
                                     <div className="gdr-pulse-dot"></div>
                                     <span className="gdr-status-text">
