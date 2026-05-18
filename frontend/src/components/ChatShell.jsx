@@ -251,25 +251,11 @@ export default function ChatShell() {
                 <div className="panels_box">
                     <div className="form_chat">
                         <form method="post" id="chat_form_messages">
-
-                            {/* Textarea — onKeyUp chiama le funzioni di chat.js se già caricate */}
-                            <textarea
-                                className="chat_textarea"
-                                name="message"
-                                id="message"
-                                placeholder="Scrivi la tua azione"
-                                maxLength={maxlength}
-                                onKeyUp={(e) => {
-                                    window.conta?.(e.target)
-                                    if (pulsanti.can_master_msg) window.masterMessageLength?.(e.target, maxlength)
-                                }}
-                            />
-
                             <div className="form_row">
                                 <div className="casella_chat">
 
-                                    {/* Riga contatore, bottone pannello, help, tag */}
-                                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%' }}>
+                                    {/* Riga 1: contatore, bottone pannello, help, tag, submit */}
+                                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%', gap:'6px' }}>
                                         <span className="gdr-char-counter">
                                             <span id="rimanenti">0</span> caratteri
                                         </span>
@@ -284,34 +270,47 @@ export default function ChatShell() {
                                             <img src="themes/crystal/imgs/chat/help.png" alt="Info" className="chat_icon" />
                                         </a>
                                         <input type="text" name="action_tag" className="action-tag" maxLength={30} placeholder="TAG max 30" />
-                                    </div>
-
-                                    {/* Riga status role + submit */}
-                                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%', gap:'10px' }}>
-                                        <input type="hidden" id="id_role" defaultValue="" />
-
-                                        <div className="gdr-session-status inactive" id="gdrSessionStatus">
-                                            <div className="gdr-pulse-dot"></div>
-                                            <span className="gdr-status-text">
-                                                <span id="roleInProgress" style={{ display:'none' }}>Role in Corso...</span>
-                                            </span>
-                                            <div className="gdr-animated-border"></div>
-                                            <i id="quitRole"
-                                               onClick={() => window.quitRole?.(login)}
-                                               className="fa-solid fa-power-off"
-                                               style={{ cursor:'pointer', display:'none', fontSize:'16px' }}></i>
-                                            <i id="pgRolePlaying"
-                                               onClick={() => document.getElementById('pgRolePlayingPanel').style.display='block'}
-                                               className="fa-solid fa-users"
-                                               style={{ cursor:'pointer', display:'none', fontSize:'16px' }}></i>
-                                            <i id="addPgToRoleBtn"
-                                               onClick={() => window.addPgToRole?.()}
-                                               className="fa-solid fa-play"
-                                               style={{ cursor:'pointer', color:'green' }}> Avvia!</i>
-                                        </div>
-
                                         <input type="submit" value={submit_label} />
                                     </div>
+
+                                </div>
+                            </div>
+
+                            {/* Riga 2: textarea */}
+                            <textarea
+                                className="chat_textarea"
+                                name="message"
+                                id="message"
+                                placeholder="Scrivi la tua azione"
+                                maxLength={maxlength}
+                                onKeyUp={(e) => {
+                                    window.conta?.(e.target)
+                                    if (pulsanti.can_master_msg) window.masterMessageLength?.(e.target, maxlength)
+                                }}
+                            />
+
+                            {/* Riga 3: status role */}
+                            <div style={{ display:'flex', alignItems:'center', width:'100%', gap:'10px', padding:'4px 0' }}>
+                                <input type="hidden" id="id_role" defaultValue="" />
+
+                                <div className="gdr-session-status inactive" id="gdrSessionStatus">
+                                    <div className="gdr-pulse-dot"></div>
+                                    <span className="gdr-status-text">
+                                        <span id="roleInProgress" style={{ display:'none' }}>Role in Corso...</span>
+                                    </span>
+                                    <div className="gdr-animated-border"></div>
+                                    <i id="quitRole"
+                                       onClick={() => window.quitRole?.(login)}
+                                       className="fa-solid fa-power-off"
+                                       style={{ cursor:'pointer', display:'none', fontSize:'16px' }}></i>
+                                    <i id="pgRolePlaying"
+                                       onClick={() => document.getElementById('pgRolePlayingPanel').style.display='block'}
+                                       className="fa-solid fa-users"
+                                       style={{ cursor:'pointer', display:'none', fontSize:'16px' }}></i>
+                                    <i id="addPgToRoleBtn"
+                                       onClick={() => window.addPgToRole?.()}
+                                       className="fa-solid fa-play"
+                                       style={{ cursor:'pointer', color:'green' }}> Avvia!</i>
                                 </div>
                             </div>
                         </form>
