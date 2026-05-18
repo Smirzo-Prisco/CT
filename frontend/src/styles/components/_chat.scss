@@ -437,6 +437,8 @@ div.chat_box {
 
 div.pagina_frame_chat div.page_body div.panels_box {
     flex-shrink: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 img.chat_avatar {
@@ -1094,7 +1096,7 @@ button.chat_button {
     div.casella_chat { flex-wrap: wrap; padding-bottom: $space-2 + 2; width: 100%; }
     textarea.chat_textarea { height: 80px; margin-bottom: $space-2 + 2; overflow: hidden; }
     div.form_chat  { width: 100%; overflow: hidden; }
-    div.form_row   { display: flex; flex-direction: column; justify-content: center; align-items: stretch; width: 100%; padding-bottom: $space-5; overflow: hidden; }
+    div.form_row   { display: flex; flex-direction: column; justify-content: center; align-items: stretch; width: 100%; padding-bottom: 0; overflow: hidden; }
     .div_rosso     { display: flex; justify-content: space-around; align-items: center; width: 100%; padding-left: 0; overflow: hidden; }
     .div_rosso a img, .div_rosso img { width: 25px; height: 25px; }
     .chat_icon     { width: 24px; height: 24px; }
