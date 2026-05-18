@@ -10,9 +10,14 @@
     flex-direction: column;
     background: $palette-dark-10;
     box-sizing: border-box;
-    width: 100%;
+    width: 80%;
     overflow: hidden;
-    margin: 0;
+    margin: 0 auto;
+
+    @media screen and (max-width: 768px) {
+        width: 100%;
+        margin: 0;
+    }
 }
 
 .chatoff-title {
