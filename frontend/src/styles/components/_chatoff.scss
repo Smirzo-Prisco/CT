@@ -10,19 +10,17 @@
     flex-direction: column;
     background: $palette-dark-10;
     box-sizing: border-box;
-    width: 80%;
-    max-width: 100%;  // non sfora mai il genitore
+    width: 100%;      // sempre 100% del container: nessun calcolo percentuale ambiguo
+    max-width: 100%;
     overflow: hidden;
-    margin: 0 auto;
+    // Su desktop la colonna applica già padding, il pannello si restringe visivamente
+    // tramite il padding del container (non tramite width %)
 
     @media screen and (max-width: 768px) {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        min-width: 0 !important;
         border: none !important;
         border-radius: 0 !important;
         background: transparent !important;
+        margin: 0 !important;
     }
 }
 

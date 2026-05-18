@@ -142,7 +142,7 @@ export default function ChattingOff() {
         : `${names.join(', ')} stanno scrivendo...`
 
     return (
-        <div className="chatoff-panel" style={{ maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
+        <div className="chatoff-panel" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
 
             <div className="chatoff-title">
                 Chat Off

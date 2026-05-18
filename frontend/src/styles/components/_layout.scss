@@ -103,8 +103,10 @@ body {
 // nascosto su mobile per evitare problemi di layout
 #chattina-off-container {
     overflow: hidden;
+    width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    contain: inline-size; // il contenuto non può influenzare la larghezza del container
 }
 
 // Pulsanti toggle mobile (nascosti su desktop)
