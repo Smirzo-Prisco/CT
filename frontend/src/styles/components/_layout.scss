@@ -62,10 +62,17 @@ body {
         flex-shrink: 0;
     }
 
-    // Riduci il padding dell'anteprima scheda per avvicinarla alla cima
+    gap: 0;
+
+    // Nessun padding extra: immagine scheda il più vicino possibile alla cima
     div.pagina_info_location {
-        padding-top: 2px;
-        padding-bottom: 2px;
+        padding: 0;
+    }
+
+    // Rimuove il margine del titolo nel contesto della colonna destra
+    .page_title h2 {
+        margin: 0;
+        padding: 0;
     }
 }
 
