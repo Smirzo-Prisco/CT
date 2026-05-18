@@ -313,7 +313,7 @@ function ComposeView({ onSend, onCancel, sending, defaultDest = '' }) {
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
-export default function MessagesInbox() {
+export default function MessagesInbox({ toPg = null }) {
 
     // --- stato lista ---
     /** Tutte le conversazioni dalla API */
@@ -351,8 +351,9 @@ export default function MessagesInbox() {
     const selectedConvRef = useRef(null)
     useEffect(() => { selectedConvRef.current = selectedConv }, [selectedConv])
 
-    // Ref per eseguire l'auto-open da ?to= una sola volta al mount
-    const autoOpenHandled = useRef(false)
+    // Ultimo valore di toPg già gestito: evita di riaprire la stessa conversazione
+    // se il componente ri-renderizza senza che la prop sia cambiata
+    const lastHandledTo = useRef(null)
 
     // ---------------------------------------------------------------------------
     // FETCH LISTA
@@ -462,20 +463,18 @@ export default function MessagesInbox() {
      * Eseguito una sola volta al mount grazie ad autoOpenHandled.
      */
     useEffect(() => {
-        if (loadingList || autoOpenHandled.current) return
-        const to = new URLSearchParams(window.location.search).get('to')
-        if (!to) return
-        autoOpenHandled.current = true
+        if (loadingList || !toPg || toPg === lastHandledTo.current) return
+        lastHandledTo.current = toPg
         const match = conversations.find(
-            c => c.tipo === 'individuale' && c.display_name.toLowerCase() === to.toLowerCase()
+            c => c.tipo === 'individuale' && c.display_name.toLowerCase() === toPg.toLowerCase()
         )
         if (match) {
             openConversation(match)
         } else {
-            setComposeDest(to)
+            setComposeDest(toPg)
             setView('compose')
         }
-    }, [loadingList, conversations, openConversation])
+    }, [loadingList, conversations, openConversation, toPg])
 
     // ---------------------------------------------------------------------------
     // INVIO RISPOSTA

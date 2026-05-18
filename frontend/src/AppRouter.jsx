@@ -184,6 +184,7 @@ function readParams() {
     return {
         page: p.get('page'),
         dir:  dirRaw !== null ? parseInt(dirRaw, 10) : null,
+        to:   p.get('to') ?? null,
     }
 }
 
@@ -299,5 +300,5 @@ export default function AppRouter({ isStaff = false }) {
     // ── Pagina React migrata (page=X) ─────────────────────────────────────
     route.css.forEach(injectCSS)
     const Component = route.component
-    return <Component isStaff={isStaff} />
+    return <Component isStaff={isStaff} toPg={params.to} />
 }
