@@ -431,15 +431,25 @@ div.pagina_frame_chat div.page_body {
 // ── Box chat ──────────────────────────────────────────────────
 
 div.chat_box {
+    position: relative; // sovrascrive position:absolute di chat.css
     flex: 1;
     min-height: 0;
     overflow: auto;
     padding-left: 5px;
     font-size: $text-xl;
     text-align: justify;
+    // azzera top/bottom/left/width rimasti da chat.css
+    top: auto;
+    bottom: auto;
+    left: auto;
+    width: 100%;
 }
 
 div.pagina_frame_chat div.page_body div.panels_box {
+    position: relative; // sovrascrive position:absolute di chat.css
+    bottom: auto;
+    left: auto;
+    right: auto;
     flex-shrink: 0;
     margin-bottom: 0;
     padding-bottom: 0;
