@@ -64,7 +64,8 @@ export default function AnteprimaScheda() {
                 {/* Avatar con classe giorno/notte */}
                 <div className={isNotte ? 'info_pg_night' : 'info_pg'}>
                     {avatar && (
-                        <a href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`}>
+                        <a href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`}
+                           style={{ display: 'block' }}>
                             <img
                                 src={avatar}
                                 className="immagine_pg"

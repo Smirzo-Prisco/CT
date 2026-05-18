@@ -95,7 +95,7 @@ export default function FrameMessaggi() {
     const ICONS = buildIcons(hasEvents)
 
     return (
-        <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0' }}>
+        <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0', paddingBottom: '30px' }}>
             <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '18px', rowGap: '0' }}>
                 {ICONS.map(icon => (
                     <div key={icon.id} className="grid-item"
