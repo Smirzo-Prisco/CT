@@ -62,7 +62,9 @@
     background: transparent;
     box-sizing: border-box;
     width: 100%;
-    word-break: break-word; // i messaggi lunghi vanno a capo invece di sforare
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word; // forza il break anche su parole/URL senza spazi
 
     // Messaggi dal log.html
     .msgln {

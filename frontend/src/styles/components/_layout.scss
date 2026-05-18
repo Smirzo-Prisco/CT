@@ -98,7 +98,14 @@ body {
 }
 
 // ── Container diretti nelle colonne ──────────────────────────
-// Sostituiscono la catena innertube > colonne_sx/dx > div.menu/msgs
+
+// Il container della chattina off deve essere strettamente contenuto
+// nella colonna: overflow:hidden blocca qualsiasi sforamento figlio
+#chattina-off-container {
+    overflow: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
+}
 
 // Pulsanti toggle mobile (nascosti su desktop)
 .mobile-toggle {
