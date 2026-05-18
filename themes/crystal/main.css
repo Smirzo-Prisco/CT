@@ -749,11 +749,8 @@ div.innertube {
     vertical-align: top;
 }
 
-#framecontentRight{
-    background: url("imgs/colonna_dx/colonna_destra.png");
-    z-index: 1;
-    }
-    
+
+
 #framecontentLeft{
     background: url("imgs/colonna_sx/colonna_sinistra.png");
     z-index: 1;
