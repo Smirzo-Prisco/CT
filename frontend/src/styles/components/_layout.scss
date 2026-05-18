@@ -35,11 +35,11 @@ body {
     background-image: url("imgs/colonna_sx/colonna_sinistra.png");
     display: flex;
     flex-direction: column;
-    gap: $space-2 + 2;   // 10px di spazio uniforme tra ogni componente
+    gap: $space-2 + 2; // 10px di spazio uniforme tra ogni componente
     padding-bottom: $space-2 + 2;
 
     // Tutti i figli diretti: stessa larghezza, nessun margine individuale
-    > * {
+    >* {
         width: 100%;
         box-sizing: border-box;
         flex-shrink: 0;
@@ -74,8 +74,7 @@ body {
 // Sostituiscono la catena innertube > colonne_sx/dx > div.menu/msgs
 
 #info-location-container,
-#anteprima-scheda-container,
-#online-users-container {
+#anteprima-scheda-container {
     position: relative;
 }
 
