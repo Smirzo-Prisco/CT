@@ -60,7 +60,7 @@ const COLONNE = [
         class: 'potenziamento-box',
         links: [
             { label: 'ABILITÀ',              url: 'main.php?page=mercato_abilita_atarashi' },
-            { label: 'TALENTI',              url: 'main.php?page=mercato_talento' },
+            // { label: 'TALENTI',              url: 'main.php?page=mercato_talento' },
             { label: 'INCREMENTO PARAMETRI', url: 'main.php?page=incremento_parametri' },
             // { label: 'AUMENTO SPIRITO',      url: 'main.php?page=level_up' },
         ],
