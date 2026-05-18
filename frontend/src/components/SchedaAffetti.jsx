@@ -87,18 +87,6 @@ export default function SchedaAffetti() {
     const [selected, setSelected] = useState(null)
     const [error,    setError]    = useState(null)
     const iframeRef = useRef(null)
-    const menuRef   = useRef(null)
-
-    // scheda.css ha un media query mobile che imposta margin-bottom: -120px !important
-    // su .menu_scheda per dare spazio ai sub-menu della scheda standard.
-    // Sulla pagina affetti (con tabella a 2 colonne) questo crea un overlap enorme.
-    // setProperty con 'important' sovrascrive il !important del CSS.
-    useEffect(() => {
-        if (menuRef.current) {
-            menuRef.current.style.setProperty('margin-bottom', '0', 'important')
-            menuRef.current.style.setProperty('padding-bottom', '10px', 'important')
-        }
-    }, [])
 
     useEffect(() => {
         if (!pg) { setError('Personaggio non specificato'); return }
@@ -136,7 +124,7 @@ export default function SchedaAffetti() {
 
     return (
         <div className="pagina_scheda">
-            <div className="menu_scheda" ref={menuRef}>
+            <div className="menu_scheda">
                 <SchedaMenu
                     pg={pg}
                     isOwn={is_own}

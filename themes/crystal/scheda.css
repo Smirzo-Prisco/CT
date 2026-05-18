@@ -807,16 +807,13 @@ span[style*="position:relative"]:hover .tooltip-animated {
 
     .menu_scheda {
         /* menu */
-        overflow-x: auto;        /* Scroll orizzontale quando necessario */
-        overflow-y: visible;      /* Nasconde scroll verticale */
-        white-space: nowrap;     /* Impedisce il wrap del contenuto */
-        width: 100%;             /* Occupa tutta la larghezza disponibile */
-        max-width: 100%;         /* Non supera la larghezza del parent */
-        -webkit-overflow-scrolling: touch; /* Scroll fluido su iOS */
-        scrollbar-width: none;  /* Nasconde la scrollbar in Chrome/Safari/Edge */
-        /* Dai spazio in basso per il submenu */
-        padding-bottom: 120px !important;
-        margin-bottom: -120px !important;    /* Compensa visivamente */
+        overflow-x: auto;
+        overflow-y: visible;
+        white-space: nowrap;
+        width: 100%;
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
 }
 
@@ -854,16 +851,13 @@ span[style*="position:relative"]:hover .tooltip-animated {
 
     .menu_scheda {
         /* menu */
-        overflow-x: auto;        /* Scroll orizzontale quando necessario */
-        overflow-y: visible;      /* Nasconde scroll verticale */
-        white-space: nowrap;     /* Impedisce il wrap del contenuto */
-        width: 100%;             /* Occupa tutta la larghezza disponibile */
-        max-width: 100%;         /* Non supera la larghezza del parent */
-        -webkit-overflow-scrolling: touch; /* Scroll fluido su iOS */
-        scrollbar-width: none;  /* Nasconde la scrollbar in Chrome/Safari/Edge */
-        /* Dai spazio in basso per il submenu */
-        padding-bottom: 120px !important;
-        margin-bottom: -120px !important;    /* Compensa visivamente */
+        overflow-x: auto;
+        overflow-y: visible;
+        white-space: nowrap;
+        width: 100%;
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
 }
 /* ── Paginazione scheda punti ───────────────────────────────────────────── */
