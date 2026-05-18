@@ -11,6 +11,7 @@
     background: $palette-dark-10;
     box-sizing: border-box;
     width: 80%;
+    max-width: 100%;  // non sfora mai il genitore
     overflow: hidden;
     margin: 0 auto;
 
@@ -86,6 +87,11 @@
     padding: 2px 8px;
     background: $palette-dark-2;
     min-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .chatoff-input-row {
