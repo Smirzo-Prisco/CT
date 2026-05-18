@@ -132,19 +132,6 @@ div.background img {
     max-width: 563px;
 }
 
-/*Menu' interno scheda*/
-div.menu_scheda {
-    /* margin: 0 3px 5px 5px; */
-    /* margin-left: 10px; */
-    /* width: 751px; */
-    /* float: left; */
-    /* color: #e2e2e2;*/
-    text-align: center;
-    font-size: 14px;
-    height: 35px;
-    margin: auto;
-    padding:10px;
-}
 
 /*Box abilità*/
 div.elenco_abilita {
@@ -390,12 +377,6 @@ div.pagina_scheda_oggetti form {
 
 /****************************************************************************/
 
-div.menu_scheda a {
-    color: #e2e2e2;
-    font-size: 10px;
-    padding: 3px;
-    text-transform: uppercase; 
-}
 
 div.ritratto_nome {
     /*margin: 5px 0 0 0;*/
@@ -782,16 +763,6 @@ span[style*="position:relative"]:hover .tooltip-animated {
         font-size: 11px;
     }
 
-    .menu_scheda {
-        /* menu */
-        overflow-x: auto;
-        overflow-y: visible;
-        white-space: nowrap;
-        width: 100%;
-        max-width: 100%;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-    }
 }
 
 /* For very small mobile devices (480px and smaller) */
@@ -826,16 +797,6 @@ span[style*="position:relative"]:hover .tooltip-animated {
         font-size: 10px;
     }
 
-    .menu_scheda {
-        /* menu */
-        overflow-x: auto;
-        overflow-y: visible;
-        white-space: nowrap;
-        width: 100%;
-        max-width: 100%;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-    }
 }
 /* ── Paginazione scheda punti ───────────────────────────────────────────── */
 .scheda-pager {

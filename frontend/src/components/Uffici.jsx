@@ -33,7 +33,7 @@ const COLONNE = [
             { label: 'ALBERGO', url: 'main.php?page=servizi_prenotazioni_prova' },
             { label: 'ANAGRAFE', url: 'main.php?page=anagrafe' },
             { label: 'BANCA', url: 'main.php?page=servizi_banca' },
-            { label: 'CENTRO COMMERCIALE', url: 'main.php?page=servizi_mercato' },
+            { label: 'MERCATO', url: 'main.php?page=servizi_mercato' },
             { label: 'CAMBIO PASSWORD', url: 'main.php?page=user_cambio_pass' },
             // { label: 'LISTA SPIRITI',       url: 'main.php?page=user_razze' },
             { label: 'PATROCINIO VOLTI', url: 'main.php?page=elenco_volti' },
@@ -61,7 +61,7 @@ const COLONNE = [
         links: [
             { label: 'ABILITÀ', url: 'main.php?page=mercato_abilita_atarashi' },
             // { label: 'TALENTI',              url: 'main.php?page=mercato_talento' },
-            { label: 'INCREMENTO PARAMETRI', url: 'main.php?page=incremento_parametri' },
+            { label: 'PARAMETRI', url: 'main.php?page=incremento_parametri' },
             // { label: 'AUMENTO SPIRITO',      url: 'main.php?page=level_up' },
         ],
     },
