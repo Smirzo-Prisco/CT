@@ -503,7 +503,7 @@ function renderOnlineUsers(container, data) {
         users.forEach(user => {
             html += `
                         <div class="presente">
-                            <a href="javascript:;" onclick="window.open('../pages/mex_privati/multi_message.php?destinatari=${user.nome}', 'titolo', 'width=650, height=600, resizable, status, scrollbars=1, location');" target="_top">
+                            <a href="javascript:;" onclick="window.CT.navigate('main.php?page=messages_center&to=${encodeURIComponent(user.nome)}');" target="_top">
                                 <img src="../themes/crystal/imgs/race_presenti/Sms.png">
                             </a>
                             &nbsp;&nbsp;
@@ -537,11 +537,9 @@ function renderUserItem(user) {
         </div>
     `;
 }
-/** Apri SMS (compatibilità con funzioni esistenti) */
+/** Apri DM con destinatario pre-selezionato */
 function openMultiMessage(userName) {
-    window.open(`../pages/mex_privati/multi_message.php?destinatari=${encodeURIComponent(userName)}`,
-        'titolo',
-        'width=650, height=600, resizable, status, scrollbars=1, location');
+    window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(userName)}`)
 }
 /** Apri scheda personaggio (compatibilità con funzioni esistenti) */
 function openCharacterSheet(userName) { window.top.location.href = `main.php?page=scheda&pg=${userName}`; }
