@@ -20,10 +20,12 @@
         max-width: 100% !important;
         margin: 0 !important;
         min-width: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: transparent !important;
     }
 }
 
-// Forza tutti gli elementi interni a non sforare su mobile
 @media screen and (max-width: 768px) {
     .chatoff-title,
     .chatoff-box,
@@ -33,6 +35,20 @@
         max-width: 100% !important;
         box-sizing: border-box !important;
         min-width: 0 !important;
+    }
+
+    .chatoff-box {
+        height: 80px !important;
+        background: rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .chatoff-title {
+        background: transparent !important;
+        padding: 3px 6px !important;
+    }
+
+    .chatoff-input-row {
+        background: transparent !important;
     }
 }
 
