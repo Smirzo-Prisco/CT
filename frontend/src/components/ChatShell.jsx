@@ -372,14 +372,13 @@ export default function ChatShell() {
                 </div>
             </div>
 
-        </>, document.body)}
-
             {/* ================================================================ */}
-            {/* PANNELLO GDR — position:relative, dentro pagina_frame_chat      */}
-            {/* Non in portal: non è un overlay full-screen ma un pannello che   */}
-            {/* occupa l'area di #maincontent con height:95% relativo ad essa.  */}
+            {/* PANNELLO GDR — in portal per uscire dal flex container          */}
+            {/* position:fixed con le stesse coordinate di pagina_frame_chat    */}
             {/* ================================================================ */}
-            <div className="gdr-modal-overlay" id="chatPanel" style={{ display:'none' }}>
+            <div className="gdr-modal-overlay" id="chatPanel"
+                 style={{ display:'none', position:'fixed', top:0,
+                          left:'260px', right:'260px', bottom:0 }}>
                 <div className="gdr-panel-container">
 
                     {/* Header pannello con pulsanti di azione */}
@@ -665,6 +664,8 @@ export default function ChatShell() {
 
                 </div>
             </div>
+
+        </>, document.body)}
 
             {/* ================================================================ */}
             {/* MODALE — Modifica azione                                        */}
