@@ -104,17 +104,17 @@ function SchedaProfilo({ profile }) {
                 <span className={styles.valueRight}>{natoa}</span>
                 <br />
 
-                {lavoro && (
+                {/* lavoro && (
                     <>
                         <span className={styles.labelLeft}>Lavoro:</span>
                         <span className={styles.valueRight}>{lavoro}</span>
                         <br />
                     </>
-                )}
+                )*/}
 
-                <span className={styles.labelLeft}>{sn.race_sing ?? 'Spirito'}:</span>
+                {/* <span className={styles.labelLeft}>{sn.race_sing ?? 'Spirito'}:</span>
                 <span className={styles.valueRight}>{razza}</span>
-                <br />
+                <br /> */}
 
                 <span className={styles.labelLeft}>Famiglia:</span>
                 <span className={styles.valueRight}>{nome_ruolo}</span>
