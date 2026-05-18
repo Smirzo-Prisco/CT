@@ -99,12 +99,16 @@ body {
 
 // ── Container diretti nelle colonne ──────────────────────────
 
-// Il container della chattina off deve essere strettamente contenuto
-// nella colonna: overflow:hidden blocca qualsiasi sforamento figlio
+// Il container della chattina off: contenuto nella colonna su desktop,
+// nascosto su mobile per evitare problemi di layout
 #chattina-off-container {
     overflow: hidden;
     max-width: 100%;
     box-sizing: border-box;
+
+    @media screen and (max-width: 768px) {
+        display: none;
+    }
 }
 
 // Pulsanti toggle mobile (nascosti su desktop)
