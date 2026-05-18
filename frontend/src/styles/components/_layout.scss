@@ -62,8 +62,6 @@ body {
     overflow: auto;
     width: calc(100% - 520px);
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
 
     .output {
         width: 100%;
@@ -172,19 +170,10 @@ body {
 div.output {
     width: 100%;
     background-color: transparent;
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    position: relative;
 }
 
 #ct-app-content {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+    height: 100%;
 }
 
 div.page_body {
