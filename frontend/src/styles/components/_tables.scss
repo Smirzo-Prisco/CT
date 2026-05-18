@@ -1,0 +1,167 @@
+// ============================================================
+// _tables.scss — Crystal Tokyo: tabelle responsive
+//
+// Gestisce la classe .ct-table-responsive usata nelle
+// pagine di gestione (lista utenti, personaggi, ecc.).
+//
+// @use: tokens → $font-serif, $text-sm, $text-lg, $palette-text-3,
+//               $color-border, $color-action, $space-2, $space-3,
+//               $radius-sm, $transition-normal
+// ============================================================
+
+@use '../tokens' as *;
+
+/************** Gestione personaggio - Lista utenti ********************/
+
+// ── Contenitore principale ──────────────────────────────────────────
+.ct-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    font-size: $text-sm;        // 11px
+    color: $palette-text-3;     // #a7a7a8
+    font-family: $font-serif;   // "DejaVu Serif"
+}
+
+// ── Struttura tabella ───────────────────────────────────────────────
+.ct-table-responsive table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; // larghezza minima per desktop
+}
+
+.ct-table-responsive th,
+.ct-table-responsive td {
+    padding: $space-3 $space-2; // 12px 8px
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.ct-table-responsive th {
+    font-weight: bold;
+}
+
+// ── Colonna azioni ──────────────────────────────────────────────────
+.ct-table-responsive .azioni {
+    white-space: nowrap;
+}
+
+.ct-table-responsive .action-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: nowrap;
+}
+
+// ── Bottoni azione ──────────────────────────────────────────────────
+.ct-table-responsive .btn-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $space-1 $space-1;  // 5px (usa $space-1 = 4px, vicino)
+    color: $color-action;        // #4da6ff
+    transition: color $transition-normal; // 0.3s ease
+}
+
+.ct-table-responsive .btn-action:hover {
+    color: white;
+}
+
+// ── Responsive: mobile (≤ 768px) ────────────────────────────────────
+@media (width <= 768px) {
+    .ct-table-responsive table {
+        min-width: 100%;
+    }
+
+    .ct-table-responsive {
+        border: 1px solid #ddd;
+        border-radius: $radius-sm; // 4px
+    }
+
+    // ── Responsive: mobile stretto (≤ 480px) — layout a card ────────
+    @media (width <= 480px) {
+        .ct-table-responsive table,
+        .ct-table-responsive thead,
+        .ct-table-responsive tbody,
+        .ct-table-responsive th,
+        .ct-table-responsive td,
+        .ct-table-responsive tr {
+            display: block;
+        }
+
+        // Nasconde l'intestazione della tabella (label via data-attr)
+        .ct-table-responsive thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        .ct-table-responsive tr {
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        .ct-table-responsive td {
+            border: none;
+            position: relative;
+            padding-left: 50%;
+            padding-right: 10px;
+            display: flex;
+            align-items: center;
+            min-height: 40px;
+        }
+
+        // Etichetta colonna iniettata via data-label
+        .ct-table-responsive td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            width: 45%;
+            padding-right: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .ct-table-responsive .azioni,
+        .ct-table-responsive .action-buttons {
+            display: block;
+            white-space: normal;
+        }
+
+        .ct-table-responsive .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .ct-table-responsive td[data-label="Avatar"] {
+            justify-content: center;
+            padding-left: 10px;
+        }
+
+        .ct-table-responsive td[data-label="Avatar"]::before {
+            display: none;
+        }
+    }
+}
+
+// ── Responsive: tablet (769px – 1024px) ─────────────────────────────
+@media (width <= 1024px) and (width >= 769px) {
+    .ct-table-responsive table {
+        font-size: $text-lg; // 14px
+    }
+
+    .ct-table-responsive th,
+    .ct-table-responsive td {
+        padding: $space-2 6px; // 8px 6px
+    }
+
+    .ct-table-responsive .action-buttons {
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .ct-table-responsive .btn-action {
+        padding: 3px;
+    }
+}

@@ -4,30 +4,30 @@
 @use '../tokens' as *;
 
 // Colori specifici della chat non presenti nei token globali
-$chat-sussurro:     #ffd28a;   // messaggio sussurrato
-$chat-dice:         #3267a5;   // tiro di dado
-$chat-master-head:  #05a4c1;   // intestazione master
-$chat-mod-head:     #d7b500;   // intestazione moderazione
-$chat-me:           #d89d8c;   // il proprio nome nella chat
-$chat-off:          #a1c3c8;   // messaggio off
-$chat-popup-accent: #6366f1;   // accent popup ricerca utenti
+$chat-sussurro: #ffd28a; // messaggio sussurrato
+$chat-dice: #3267a5; // tiro di dado
+$chat-master-head: #05a4c1; // intestazione master
+$chat-mod-head: #d7b500; // intestazione moderazione
+$chat-me: #d89d8c; // il proprio nome nella chat
+$chat-off: #a1c3c8; // messaggio off
+$chat-popup-accent: #6366f1; // accent popup ricerca utenti
 
 // ── Pannello GDR (container principale) ──────────────────────
 
 .gdr-panel-container {
     // Variabili CSS locali per retrocompatibilità col markup esistente
-    --primary-dark:    #{$color-bg};
-    --secondary-dark:  #{$palette-dark-5};
-    --accent-color:    #{$palette-blue-1};
-    --accent-light:    #{$palette-blue-2};
-    --text-light:      #{$color-text-light};
-    --text-lighter:    #{$color-text-light};
-    --success-color:   #{$color-success};
-    --danger-color:    #{$color-danger};
-    --warning-color:   #{$color-warning};
-    --border-radius:   #{$radius-lg};
-    --box-shadow:      #{$shadow-md};
-    --transition:      all #{$transition-normal};
+    --primary-dark: #{$color-bg};
+    --secondary-dark: #{$palette-dark-5};
+    --accent-color: #{$palette-blue-1};
+    --accent-light: #{$palette-blue-2};
+    --text-light: #{$color-text-light};
+    --text-lighter: #{$color-text-light};
+    --success-color: #{$color-success};
+    --danger-color: #{$color-danger};
+    --warning-color: #{$color-warning};
+    --border-radius: #{$radius-lg};
+    --box-shadow: #{$shadow-md};
+    --transition: all #{$transition-normal};
 
     * {
         margin: 0;
@@ -87,7 +87,9 @@ $chat-popup-accent: #6366f1;   // accent popup ricerca utenti
     border-radius: $radius-full;
     transition: var(--transition);
 
-    &:hover { background-color: rgb(255 255 255 / 10%); }
+    &:hover {
+        background-color: rgb(255 255 255 / 10%);
+    }
 }
 
 .gdr-main-controls {
@@ -112,7 +114,10 @@ $chat-popup-accent: #6366f1;   // accent popup ricerca utenti
         transform: translateY(-2px);
     }
 
-    img { max-width: 70%; max-height: 70%; }
+    img {
+        max-width: 70%;
+        max-height: 70%;
+    }
 }
 
 // ── Bottoni pannello ──────────────────────────────────────────
@@ -129,7 +134,9 @@ $chat-popup-accent: #6366f1;   // accent popup ricerca utenti
     font-weight: 500;
     transition: var(--transition);
 
-    &:hover { background-color: var(--accent-light); }
+    &:hover {
+        background-color: var(--accent-light);
+    }
 
     &:disabled,
     &[disabled] {
@@ -140,38 +147,56 @@ $chat-popup-accent: #6366f1;   // accent popup ricerca utenti
         transform: none !important;
         box-shadow: none !important;
 
-        &:hover { background-color: rgb(255 255 255 / 10%) !important; }
+        &:hover {
+            background-color: rgb(255 255 255 / 10%) !important;
+        }
     }
 }
 
 .gdr-btn-danger {
     background-color: var(--danger-color);
-    &:hover { background-color: #c0392b; }
 
-    &:disabled, &[disabled] {
+    &:hover {
+        background-color: #c0392b;
+    }
+
+    &:disabled,
+    &[disabled] {
         background-color: rgb(231 76 60 / 30%) !important;
     }
 }
 
 .gdr-btn-success {
     background-color: var(--success-color);
-    &:hover { background-color: #219653; }
 
-    &:disabled, &[disabled] {
+    &:hover {
+        background-color: #219653;
+    }
+
+    &:disabled,
+    &[disabled] {
         background-color: rgb(39 174 96 / 30%) !important;
         border-color: rgb(255 255 255 / 10%) !important;
-        &:hover { background-color: rgb(39 174 96 / 30%) !important; }
+
+        &:hover {
+            background-color: rgb(39 174 96 / 30%) !important;
+        }
     }
 }
 
 .gdr-btn-warning {
     background-color: var(--warning-color);
-    &:hover { background-color: #e67e22; }
+
+    &:hover {
+        background-color: #e67e22;
+    }
 }
 
 // ── Form elementi pannello ────────────────────────────────────
 
-.gdr-form-group { margin-bottom: 15px; }
+.gdr-form-group {
+    margin-bottom: 15px;
+}
 
 .gdr-label {
     display: block;
@@ -221,7 +246,9 @@ $chat-popup-accent: #6366f1;   // accent popup ricerca utenti
         font-weight: $font-weight-bold;
     }
 
-    &:hover:not(.active) { background-color: rgb(255 255 255 / 5%); }
+    &:hover:not(.active) {
+        background-color: rgb(255 255 255 / 5%);
+    }
 }
 
 .gdr-tab-content {
@@ -230,7 +257,9 @@ $chat-popup-accent: #6366f1;   // accent popup ricerca utenti
     flex: 1;
     overflow-y: auto;
 
-    &.active { display: block; }
+    &.active {
+        display: block;
+    }
 }
 
 // ── Card e griglia ────────────────────────────────────────────
@@ -344,8 +373,14 @@ $chat-popup-accent: #6366f1;   // accent popup ricerca utenti
             animation: none;
         }
 
-        .gdr-status-text { text-shadow: none; color: var(--text-light); }
-        .gdr-animated-border { display: none; }
+        .gdr-status-text {
+            text-shadow: none;
+            color: var(--text-light);
+        }
+
+        .gdr-animated-border {
+            display: none;
+        }
     }
 }
 
@@ -376,14 +411,30 @@ $chat-popup-accent: #6366f1;   // accent popup ricerca utenti
 }
 
 @keyframes gdr-pulse {
-    0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgb(39 174 96 / 70%); }
-    70%  { transform: scale(1);    box-shadow: 0 0 0 10px rgb(39 174 96 / 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgb(39 174 96 / 0); }
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgb(39 174 96 / 70%);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgb(39 174 96 / 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgb(39 174 96 / 0);
+    }
 }
 
 @keyframes gdr-shine {
-    0%   { left: -100%; }
-    100% { left: 100%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
 }
 
 // ── Download log chat (chat_download / chat_download_scelta) ──
@@ -395,7 +446,9 @@ iframe.iframe_chat {
     margin: 0;
 }
 
-div.chat_window { text-align: center; }
+div.chat_window {
+    text-align: center;
+}
 
 span.look {
     font-size: $text-md;
@@ -417,6 +470,7 @@ div.pagina_frame_chat {
     flex-direction: column;
     overflow: hidden;
     z-index: 0;
+    background: $palette-blue-2;
 }
 
 div.pagina_frame_chat div.page_body {
@@ -464,19 +518,52 @@ img.chat_avatar {
 
 // ── Tipi di riga chat ─────────────────────────────────────────
 
-@mixin chat-row-base { margin-top: 3px; }
+@mixin chat-row-base {
+    margin-top: 3px;
+}
 
-div.chat_row_A { @include chat-row-base; text-align: justify; }
-div.chat_row_P { @include chat-row-base; text-align: justify; padding: 0 $space-2 + 2 0 0; }
-div.chat_row_Z { @include chat-row-base; }
-div.chat_row_N { @include chat-row-base; }
-div.chat_row_I { @include chat-row-base; text-align: center; }
-div.chat_row_Y { @include chat-row-base; text-align: center; }
+div.chat_row_A {
+    @include chat-row-base;
+    text-align: justify;
+}
+
+div.chat_row_P {
+    @include chat-row-base;
+    text-align: justify;
+    padding: 0 $space-2 + 2 0 0;
+}
+
+div.chat_row_Z {
+    @include chat-row-base;
+}
+
+div.chat_row_N {
+    @include chat-row-base;
+}
+
+div.chat_row_I {
+    @include chat-row-base;
+    text-align: center;
+}
+
+div.chat_row_Y {
+    @include chat-row-base;
+    text-align: center;
+}
 
 div.chat_row_A span.color2,
 div.chat_row_P span.color2,
-div.chat_row_N span.color2 { margin-top: 3px; color: #000; font-weight: $font-weight-bold; }
-div.chat_row_Z span.color2 { margin-top: 3px; color: blue; font-weight: $font-weight-bold; }
+div.chat_row_N span.color2 {
+    margin-top: 3px;
+    color: #000;
+    font-weight: $font-weight-bold;
+}
+
+div.chat_row_Z span.color2 {
+    margin-top: 3px;
+    color: blue;
+    font-weight: $font-weight-bold;
+}
 
 div.chat_row_M,
 div.chat_row_X,
@@ -587,10 +674,18 @@ span.chat_me_master {
 
 // ── Form inserimento chat ─────────────────────────────────────
 
-div.form_row { clear: both; text-align: left; }
+div.form_row {
+    clear: both;
+    text-align: left;
+}
 
-input#tag     { width: 90px; }
-input#message { width: 320px; }
+input#tag {
+    width: 90px;
+}
+
+input#message {
+    width: 320px;
+}
 
 // Override input/select scoped alla chat (stile differente dal base)
 div.pagina_frame_chat {
@@ -613,11 +708,16 @@ div.pagina_frame_chat {
     }
 }
 
-span.casella_info { display: none; }
+span.casella_info {
+    display: none;
+}
 
 // ── Slide animati ─────────────────────────────────────────────
 
-#slide, #slide_weapon, #slide_object, #slide_master {
+#slide,
+#slide_weapon,
+#slide_object,
+#slide_master {
     height: 0;
     overflow: hidden;
     transition: 1s height ease-in-out;
@@ -634,7 +734,9 @@ input.chat_button {
     background-color: transparent;
 }
 
-input.azione { width: 350px; }
+input.azione {
+    width: 350px;
+}
 
 // ── Modal log chat ────────────────────────────────────────────
 
@@ -666,7 +768,8 @@ input.azione { width: 350px; }
         font-size: 28px;
         font-weight: $font-weight-bold;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             color: white;
             text-decoration: none;
             cursor: pointer;
@@ -691,7 +794,10 @@ input.azione { width: 350px; }
             flex: 1;
             max-width: 200px;
 
-            &:hover, &.active { background-color: $color-bg; }
+            &:hover,
+            &.active {
+                background-color: $color-bg;
+            }
         }
     }
 
@@ -707,11 +813,22 @@ input.azione { width: 350px; }
         table-layout: fixed;
         width: 100%;
 
-        select, button { width: 100%; }
-        td { padding-right: $space-2 + 2; }
+        select,
+        button {
+            width: 100%;
+        }
 
-        td:nth-child(1) { width: 70%; }
-        td:nth-child(2) { width: 30%; }
+        td {
+            padding-right: $space-2 + 2;
+        }
+
+        td:nth-child(1) {
+            width: 70%;
+        }
+
+        td:nth-child(2) {
+            width: 30%;
+        }
     }
 }
 
@@ -725,7 +842,9 @@ div.casella_chat {
     width: 100%;
     margin-right: 30px;
 
-    a { margin: 0; }
+    a {
+        margin: 0;
+    }
 }
 
 textarea.chat_textarea {
@@ -753,7 +872,9 @@ button.chat_button {
     cursor: pointer;
     border-radius: 3px;
 
-    &:hover { background-color: #0056b3; }
+    &:hover {
+        background-color: #0056b3;
+    }
 }
 
 // ── Icone e utility chat ──────────────────────────────────────
@@ -768,11 +889,29 @@ button.chat_button {
     gap: $space-1 + 1;
     padding: $space-1 + 1;
 
-    a { display: block; width: 100%; height: 100%; text-align: center; margin: 0; padding: 0; }
-    img { display: block; width: 25px; height: 25px; text-align: center; }
+    a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    img {
+        display: block;
+        width: 25px;
+        height: 25px;
+        text-align: center;
+    }
 }
 
-.chat_icon { width: 30px; height: 30px; display: block; margin: 0 auto; }
+.chat_icon {
+    width: 30px;
+    height: 30px;
+    display: block;
+    margin: 0 auto;
+}
 
 .countdown_text {
     font-size: $text-lg;
@@ -781,7 +920,11 @@ button.chat_button {
     font-weight: $font-weight-bold;
 }
 
-.countdown-container { position: relative; text-align: center; margin-bottom: $space-1 + 1; }
+.countdown-container {
+    position: relative;
+    text-align: center;
+    margin-bottom: $space-1 + 1;
+}
 
 .styled-button {
     background-color: #161827;
@@ -795,7 +938,10 @@ button.chat_button {
     cursor: pointer;
     text-align: center;
 
-    &:hover { background-color: #202233; color: #bfbfbf; }
+    &:hover {
+        background-color: #202233;
+        color: #bfbfbf;
+    }
 }
 
 // ── Popup ricerca utenti ──────────────────────────────────────
@@ -825,8 +971,15 @@ button.chat_button {
 }
 
 @keyframes user-search-popup__fadeIn {
-    from { opacity: 0; transform: scale(0.9) translateY(-20px); }
-    to   { opacity: 1; transform: scale(1)   translateY(0); }
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .user-search-popup__header {
@@ -860,7 +1013,11 @@ button.chat_button {
     border-radius: $radius-lg;
     transition: all $transition-fast;
 
-    &:hover { background: #3f445e; color: $color-text-light; transform: rotate(90deg); }
+    &:hover {
+        background: #3f445e;
+        color: $color-text-light;
+        transform: rotate(90deg);
+    }
 }
 
 .user-search-popup__search-section {
@@ -882,7 +1039,9 @@ button.chat_button {
     color: $color-text-light;
     font-family: inherit;
 
-    &::placeholder { color: #64748b; }
+    &::placeholder {
+        color: #64748b;
+    }
 
     &:focus {
         outline: none;
@@ -917,9 +1076,20 @@ button.chat_button {
     color: $color-text-light;
     font-size: $text-lg;
 
-    &:hover { background: #252a45; color: #fff; }
-    &:last-child { border-bottom: none; }
-    &--selected { background: #1e3a8a; color: #fff; font-weight: 500; }
+    &:hover {
+        background: #252a45;
+        color: #fff;
+    }
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &--selected {
+        background: #1e3a8a;
+        color: #fff;
+        font-weight: 500;
+    }
 }
 
 .user-search-popup__selected-section {
@@ -965,8 +1135,15 @@ button.chat_button {
     border-radius: $radius-md;
     transition: all $transition-fast;
 
-    &:hover { border-color: $chat-popup-accent; background: #2a2f4a; transform: translateY(-1px); }
-    &:last-child { margin-bottom: 0; }
+    &:hover {
+        border-color: $chat-popup-accent;
+        background: #2a2f4a;
+        transform: translateY(-1px);
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
 }
 
 .user-search-popup__user-name {
@@ -986,7 +1163,10 @@ button.chat_button {
     font-weight: 500;
     transition: all $transition-fast;
 
-    &:hover { background: #b91c1c; transform: scale(1.05); }
+    &:hover {
+        background: #b91c1c;
+        transform: scale(1.05);
+    }
 }
 
 .user-search-popup__footer {
@@ -1018,7 +1198,13 @@ button.chat_button {
         box-shadow: 0 4px 12px rgb(99 102 241 / 40%);
     }
 
-    &:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
+    &:disabled {
+        background: #374151;
+        color: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
 }
 
 .user-search-popup__cancel-btn {
@@ -1033,7 +1219,11 @@ button.chat_button {
     transition: all $transition-fast;
     min-width: 120px;
 
-    &:hover { background: #4b5563; color: #fff; transform: translateY(-1px); }
+    &:hover {
+        background: #4b5563;
+        color: #fff;
+        transform: translateY(-1px);
+    }
 }
 
 .user-search-popup__loading {
@@ -1050,9 +1240,20 @@ button.chat_button {
 }
 
 @keyframes user-search-popup__loadingDots {
-    0%, 20% { content: '.'; }
-    40%      { content: '..'; }
-    60%, 100%{ content: '...'; }
+
+    0%,
+    20% {
+        content: '.';
+    }
+
+    40% {
+        content: '..';
+    }
+
+    60%,
+    100% {
+        content: '...';
+    }
 }
 
 .user-search-popup__trigger-btn {
@@ -1087,34 +1288,114 @@ button.chat_button {
 
 .user-search-popup__selected-list,
 .user-search-popup__autocomplete-list {
-    &::-webkit-scrollbar       { width: 6px; }
-    &::-webkit-scrollbar-track { background: #1a1f36; border-radius: 3px; }
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #1a1f36;
+        border-radius: 3px;
+    }
+
     &::-webkit-scrollbar-thumb {
         background: $chat-popup-accent;
         border-radius: 3px;
-        &:hover { background: #4f46e5; }
+
+        &:hover {
+            background: #4f46e5;
+        }
     }
 }
 
 // ── Responsive chat ───────────────────────────────────────────
 
-@media screen and (width <= 1024px) {
-    .gdr-header    { flex-direction: column; gap: 15px; }
-    .gdr-main-controls { width: 100%; justify-content: space-around; }
-    .gdr-control-btn { width: 40px; height: 40px; }
-    .gdr-grid      { grid-template-columns: 1fr; }
-    .gdr-tabs      { flex-wrap: wrap; }
-    .gdr-tab       { flex: 1; min-width: 120px; text-align: center; }
-    .gdr-session-status { margin: $space-1 + 1 0; order: 3; width: 100%; justify-content: center; }
+@media screen and (width <=1024px) {
+    .gdr-header {
+        flex-direction: column;
+        gap: 15px;
+    }
 
-    div.casella_chat { flex-wrap: wrap; padding-bottom: $space-2 + 2; width: 100%; }
-    textarea.chat_textarea { height: 80px; margin-bottom: $space-2 + 2; overflow: hidden; }
-    div.form_chat  { width: 100%; overflow: hidden; }
-    div.form_row   { display: flex; flex-direction: column; justify-content: center; align-items: stretch; width: 100%; padding-bottom: 0; overflow: hidden; }
-    .div_rosso     { display: flex; justify-content: space-around; align-items: center; width: 100%; padding-left: 0; overflow: hidden; }
-    .div_rosso a img, .div_rosso img { width: 25px; height: 25px; }
-    .chat_icon     { width: 24px; height: 24px; }
-    .styled-button { font-size: $text-md - 1; }
+    .gdr-main-controls {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .gdr-control-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .gdr-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gdr-tabs {
+        flex-wrap: wrap;
+    }
+
+    .gdr-tab {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+    }
+
+    .gdr-session-status {
+        margin: $space-1 + 1 0;
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+
+    div.casella_chat {
+        flex-wrap: wrap;
+        padding-bottom: $space-2 + 2;
+        width: 100%;
+    }
+
+    textarea.chat_textarea {
+        height: 80px;
+        margin-bottom: $space-2 + 2;
+        overflow: hidden;
+    }
+
+    div.form_chat {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    div.form_row {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+        width: 100%;
+        padding-bottom: 0;
+        overflow: hidden;
+    }
+
+    .div_rosso {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        padding-left: 0;
+        overflow: hidden;
+    }
+
+    .div_rosso a img,
+    .div_rosso img {
+        width: 25px;
+        height: 25px;
+    }
+
+    .chat_icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .styled-button {
+        font-size: $text-md - 1;
+    }
 
     div.casella_chat_info {
         position: absolute;
@@ -1129,19 +1410,73 @@ button.chat_button {
     }
 }
 
-@media screen and (width <= 768px) {
-    div.pagina_frame_chat { left: 0; right: 0; }
-    div.casella_chat { display: flex; flex-flow: row wrap; justify-content: space-between; width: 100%; }
-    textarea.chat_textarea { height: 70px; overflow: hidden; }
-    div.form_chat  { width: 100%; overflow-x: hidden; }
-    div.form_row   { display: flex; flex-direction: column; justify-content: center; align-items: stretch; width: 100%; }
-    .div_rosso     { display: flex; justify-content: space-around; align-items: center; width: 100%; padding-left: 0; }
-    .div_rosso a img { width: 22px; height: 22px; }
-    .chat_icon     { width: 22px; height: 22px; }
-    button.chat_button { width: 100%; padding: $space-2 + 2; }
-    .countdown_text { font-size: $text-xl; }
-    .countdown-container { margin-bottom: $space-2 + 2; }
-    .styled-button { width: 100%; padding: $space-2 + 2; font-size: $text-lg; }
+@media screen and (width <=768px) {
+    div.pagina_frame_chat {
+        left: 0;
+        right: 0;
+    }
+
+    div.casella_chat {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    textarea.chat_textarea {
+        height: 70px;
+        overflow: hidden;
+    }
+
+    div.form_chat {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    div.form_row {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .div_rosso {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        padding-left: 0;
+    }
+
+    .div_rosso a img {
+        width: 22px;
+        height: 22px;
+    }
+
+    .chat_icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    button.chat_button {
+        width: 100%;
+        padding: $space-2 + 2;
+    }
+
+    .countdown_text {
+        font-size: $text-xl;
+    }
+
+    .countdown-container {
+        margin-bottom: $space-2 + 2;
+    }
+
+    .styled-button {
+        width: 100%;
+        padding: $space-2 + 2;
+        font-size: $text-lg;
+    }
 
     div.casella_chat_info {
         position: absolute;
@@ -1155,18 +1490,47 @@ button.chat_button {
         overflow: hidden;
     }
 
-    .user-search-popup__container { width: 95%; margin: $space-2 + 2; max-height: 90vh; }
+    .user-search-popup__container {
+        width: 95%;
+        margin: $space-2 + 2;
+        max-height: 90vh;
+    }
+
     .user-search-popup__header,
     .user-search-popup__search-section,
-    .user-search-popup__selected-section { padding: $space-5; }
-    .user-search-popup__footer { padding: $space-4 $space-5; flex-direction: column; }
+    .user-search-popup__selected-section {
+        padding: $space-5;
+    }
+
+    .user-search-popup__footer {
+        padding: $space-4 $space-5;
+        flex-direction: column;
+    }
+
     .user-search-popup__confirm-btn,
-    .user-search-popup__cancel-btn { width: 100%; margin-bottom: $space-2; }
-    .user-search-popup__autocomplete-list { left: $space-5; right: $space-5; }
+    .user-search-popup__cancel-btn {
+        width: 100%;
+        margin-bottom: $space-2;
+    }
+
+    .user-search-popup__autocomplete-list {
+        left: $space-5;
+        right: $space-5;
+    }
 }
 
-@media (width <= 480px) {
-    .user-search-popup__title { font-size: 1.1em; }
-    .user-search-popup__selected-user { flex-direction: column; align-items: flex-start; gap: $space-2 + 2; }
-    .user-search-popup__remove-btn { align-self: flex-end; }
+@media (width <=480px) {
+    .user-search-popup__title {
+        font-size: 1.1em;
+    }
+
+    .user-search-popup__selected-user {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $space-2 + 2;
+    }
+
+    .user-search-popup__remove-btn {
+        align-self: flex-end;
+    }
 }

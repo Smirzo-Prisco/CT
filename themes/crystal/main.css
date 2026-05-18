@@ -5,23 +5,6 @@
 	* @author Blancks
 */
 
-/** * Parametri di default nella pagina
-*/
-:root {
-    --primary-color: #070A1B;
-    --secondary-color: #181c31;
-    --accent-color: #2a3f76;
-    --accent-light: #3a4f86;
-    --text-light: #e0e0e0;
-    --text-lighter: #e0e0e0;
-    --success-color: #27ae60;
-    --danger-color: #e74c3c;
-    --warning-color: #f39c12;
-    --border-radius: 8px;
-    --box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
-    --transition: all 0.3s ease;
-}
-
 body {
     padding: 0;
     margin: 0;
