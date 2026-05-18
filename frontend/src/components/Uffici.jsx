@@ -46,7 +46,7 @@ const COLONNE = [
         alt:   'Strumenti',
         class: 'strumenti-box',
         links: [
-            { label: 'SCEGLI LAVORO',                      url: 'main.php?page=scegli_lavoro' },
+            // { label: 'SCEGLI LAVORO',                      url: 'main.php?page=scegli_lavoro' },
             { label: 'OGGETTO PERSONALIZZATO',             url: 'main.php?page=oggetto_aggiungi_richiesta' },
             { label: 'POTENZIA CITTADINO',                 url: 'main.php?page=scegli_umano' },
             // { label: 'SCEGLI CORRENTE E VIA',              url: 'main.php?page=scegli_inclinazione' },
