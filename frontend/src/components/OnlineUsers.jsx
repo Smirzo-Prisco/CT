@@ -3,34 +3,14 @@ import shared from './shared.module.css'
 
 const HEARTBEAT_MS = 120_000
 
-function getRaceIcon(id_razza) {
-  const n = parseInt(id_razza, 10)
-  if (n >= 1000 && n < 2000) return 'Marte.png'
-  if (n >= 2000 && n < 3000) return 'Mercurio.png'
-  if (n >= 3000 && n < 4000) return 'Luna.png'
-  if (n >= 4000 && n < 5000) return 'Giove.png'
-  if (n >= 5000 && n < 6000) return 'Venere.png'
-  if (n >= 6000 && n < 7000) return 'Urano.png'
-  if (n >= 7000 && n < 8000) return 'Nettuno.png'
-  if (n >= 8000 && n < 9000) return 'Plutone.png'
-  if (n >= 9000 && n < 10000) return 'Saturno.png'
-  if (n >= 10000 && n < 11000) return 'Terra.png'
-  if (n === 11000) return 'Nebbia.png'
-  return 'Png.png'
-}
-
 export default function OnlineUsers() {
   const [users, setUsers] = useState([])
-  const [totalOnline, setTotalOnline] = useState(0)
 
   const fetchPresenti = useCallback((qs = '') => {
     fetch('/pages/api_map.php?op=presenti' + qs)
       .then(r => r.json())
       .then(data => {
-        if (data.success) {
-          setUsers(data.users)
-          setTotalOnline(data.total_online)
-        }
+        if (data.success) setUsers(data.users)
       })
       .catch(console.error)
   }, [])
@@ -65,10 +45,9 @@ export default function OnlineUsers() {
                 <img src="/themes/crystal/imgs/race_presenti/Sms.png" alt="Messaggio" />
               </a>
               &nbsp;&nbsp;
-              <img
-                src={`/themes/crystal/imgs/race_presenti/${getRaceIcon(user.id_razza)}`}
-                alt=""
-              />
+              {user.gruppo_img && (
+                <img src={`/themes/crystal/${user.gruppo_img}`} alt="" width="20" height="20" />
+              )}
               &nbsp;&nbsp;
               <a
                 href={`/main.php?page=scheda&pg=${encodeURIComponent(user.nome)}`}

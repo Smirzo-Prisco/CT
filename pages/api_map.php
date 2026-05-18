@@ -285,9 +285,11 @@ switch ($op) {
         $result = gdrcd_query(
             "SELECT p.nome, p.cognome, p.permessi, p.sesso, p.id_razza,
                     p.disponibile, p.is_invisible,
-                    m.stanza_apparente, m.nome AS luogo_nome
+                    m.stanza_apparente, m.nome AS luogo_nome,
+                    ru_fam.immagine AS fam_img
              FROM personaggio p
-             LEFT JOIN mappa m ON p.ultimo_luogo = m.id
+             LEFT JOIN mappa  m      ON p.ultimo_luogo  = m.id
+             LEFT JOIN ruolo  ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
              WHERE p.ora_entrata > p.ora_uscita
                AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
                AND p.ultimo_luogo = $luogo
@@ -308,6 +310,7 @@ switch ($op) {
                     'disponibile'      => (int)$row['disponibile'],
                     'is_invisible'     => (int)$row['is_invisible'],
                     'luogo_nome'       => $row['stanza_apparente'] ?: ($row['luogo_nome'] ?? ''),
+                    'gruppo_img'       => $row['fam_img'] ? 'imgs/guilds/' . $row['fam_img'] : '',
                 ];
             }
         }
