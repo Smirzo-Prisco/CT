@@ -62,7 +62,7 @@
             </table>
             <br><br>
 
-            <?php // LAVORO LIBERO
+            <?php /* LAVORO LIBERO — commentato
             $query_job = "SELECT * FROM ruolo_mestiere JOIN clgpersonaggiolavoro ON ruolo_mestiere.id_ruolo = clgpersonaggiolavoro.id_ruolo JOIN personaggio ON clgpersonaggiolavoro.personaggio = personaggio.nome WHERE mestiere = -1 && personaggio.esperienza > 9 GROUP BY nome_ruolo";
             $result_job = gdrcd_query($query_job, 'result'); ?>
             <table class="customTable">
@@ -80,6 +80,7 @@
                 gdrcd_query($result_job, 'free'); ?>
             </table>
             <br><br>
+            */ ?>
 
     <?php
         } else {

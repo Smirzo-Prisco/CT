@@ -22,8 +22,6 @@
     position: relative;
 }
 
-.ufficio-header { margin-bottom: 15px; }
-
 .header-image {
     max-width: 100%;
     height: auto;
@@ -61,28 +59,32 @@
 .ufficio-content a:hover  { color: #666; }
 .ufficio-content a:focus  { outline: 2px solid #333; outline-offset: 2px; }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .uffici-container { gap: 30px; }
     .ufficio-content  { width: 210px; height: 260px; }
     .ufficio-content a { font-size: 12px; margin: 7px 0; }
 }
-@media (max-width: 768px) {
+
+@media (width <= 768px) {
     .uffici-container { padding: 15px; gap: 25px; }
     .ufficio-content  { width: 190px; height: 240px; padding: 15px; }
     .ufficio-content a { font-size: 11px; margin: 6px 0; }
 }
-@media (max-width: 650px) {
+
+@media (width <= 650px) {
     .uffici-container { flex-direction: column; align-items: center; gap: 40px; }
     .ufficio-colonna  { width: 100%; max-width: 300px; }
     .ufficio-content  { width: 250px; height: 220px; padding: 20px; }
     .ufficio-content a { font-size: 12px; margin: 5px 0; }
 }
-@media (max-width: 480px) {
+
+@media (width <= 480px) {
     .uffici-container { padding: 10px; gap: 30px; }
     .ufficio-content  { width: 220px; height: 200px; padding: 15px; }
     .ufficio-content a { font-size: 11px; margin: 4px 0; }
 }
-@media (max-width: 380px) {
+
+@media (width <= 380px) {
     .ufficio-content  { width: 200px; height: 180px; padding: 12px; }
     .ufficio-content a { font-size: 10px; margin: 3px 0; }
 }
