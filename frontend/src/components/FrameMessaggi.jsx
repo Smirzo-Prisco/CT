@@ -33,7 +33,7 @@ function buildIcons(hasEvents) {
 
     return [
         { id: 'mappa', href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png', alt: 'Mappa' },
-        { id: 'famiglie', href: 'main.php?page=servizi_gilde', img: 'icon_fam.png', alt: 'Famiglie' },
+        { id: 'famiglie', href: 'main.php?page=servizi_gilde', img: 'icon_fam.png', alt: 'Info' },
         { id: 'messaggi', href: 'main.php?page=messages_center&offset=0', img: null, alt: 'Messaggi' },
         { id: 'forum', href: 'main.php?page=forum', img: 'icon_forum.png', alt: 'Forum' },
         { id: 'uffici', href: 'main.php?page=uffici', img: 'icon_uff.png', alt: 'Uffici' },
@@ -99,7 +99,7 @@ export default function FrameMessaggi() {
             <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
                 {ICONS.map(icon => (
                     <div key={icon.id} className="grid-item"
-                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
                         {icon.id === 'messaggi' ? (
                             <a id="message-link" href={icon.href} title={icon.alt}>
                                 <img src={msgIcon} alt={icon.alt} />
