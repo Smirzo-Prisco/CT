@@ -1,4 +1,7 @@
-body, ul, li, a{
+.menu_scheda,
+.menu_scheda ul,
+.menu_scheda li,
+.menu_scheda a {
   margin: 0;
   padding: 0;
   border: 0;
