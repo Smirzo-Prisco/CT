@@ -51,6 +51,22 @@ body {
     right: 0;
     color: $color-text-light;
     background-image: url("imgs/colonna_dx/colonna_destra.png");
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: $space-2 + 2;
+
+    > * {
+        width: 100%;
+        box-sizing: border-box;
+        flex-shrink: 0;
+    }
+
+    // Riduci il padding dell'anteprima scheda per avvicinarla alla cima
+    div.pagina_info_location {
+        padding-top: 2px;
+        padding-bottom: 2px;
+    }
 }
 
 #maincontent {
@@ -72,11 +88,6 @@ body {
 
 // ── Container diretti nelle colonne ──────────────────────────
 // Sostituiscono la catena innertube > colonne_sx/dx > div.menu/msgs
-
-#info-location-container,
-#anteprima-scheda-container {
-    position: relative;
-}
 
 // Pulsanti toggle mobile (nascosti su desktop)
 .mobile-toggle {
