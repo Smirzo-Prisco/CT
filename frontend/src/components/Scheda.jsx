@@ -46,10 +46,7 @@ function formatDate(dateStr) {
  * @param {string} nome - Nome del destinatario
  */
 function openSmsFrame(nome) {
-    const url = `pages/mex_privati/multi_message.php?destinatari=${encodeURIComponent(nome)}`
-    if (typeof window.changeFrame === 'function') window.changeFrame(url)
-    const modal = document.getElementById('id01')
-    if (modal) modal.style.display = 'block'
+    window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(nome)}`)
 }
 
 // ---------------------------------------------------------------------------

@@ -256,8 +256,8 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
  * @param {Function} props.onCancel - Callback per annullare
  * @param {boolean}  props.sending  - true durante l'invio
  */
-function ComposeView({ onSend, onCancel, sending }) {
-    const [dest,   setDest]   = useState('')
+function ComposeView({ onSend, onCancel, sending, defaultDest = '' }) {
+    const [dest,   setDest]   = useState(defaultDest)
     const [testo,  setTesto]  = useState('')
     const [ongame, setOngame] = useState(0)
 
@@ -343,11 +343,16 @@ export default function MessagesInbox() {
      *   'compose' — form nuovo messaggio
      */
     const [view, setView] = useState('list')
+    /** Destinatario pre-compilato nella vista compose (da ?to= URL param) */
+    const [composeDest, setComposeDest] = useState('')
 
     // Ref alla conversazione aperta: usato dal listener socket per aggiornare
     // il thread senza passarlo come dipendenza all'useEffect (evita ri-registrazioni)
     const selectedConvRef = useRef(null)
     useEffect(() => { selectedConvRef.current = selectedConv }, [selectedConv])
+
+    // Ref per eseguire l'auto-open da ?to= una sola volta al mount
+    const autoOpenHandled = useRef(false)
 
     // ---------------------------------------------------------------------------
     // FETCH LISTA
@@ -445,6 +450,32 @@ export default function MessagesInbox() {
 
         return () => { if (sock) sock.off('dm:update') }
     }, [fetchList, fetchThreadSilent])
+
+    // ---------------------------------------------------------------------------
+    // AUTO-OPEN DA ?to= URL PARAM
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Dopo il caricamento iniziale della lista, legge il parametro ?to= dalla URL.
+     * Se esiste una conversazione individuale con quel nome la apre direttamente;
+     * altrimenti passa alla vista compose con il destinatario pre-compilato.
+     * Eseguito una sola volta al mount grazie ad autoOpenHandled.
+     */
+    useEffect(() => {
+        if (loadingList || autoOpenHandled.current) return
+        const to = new URLSearchParams(window.location.search).get('to')
+        if (!to) return
+        autoOpenHandled.current = true
+        const match = conversations.find(
+            c => c.tipo === 'individuale' && c.display_name.toLowerCase() === to.toLowerCase()
+        )
+        if (match) {
+            openConversation(match)
+        } else {
+            setComposeDest(to)
+            setView('compose')
+        }
+    }, [loadingList, conversations, openConversation])
 
     // ---------------------------------------------------------------------------
     // INVIO RISPOSTA
@@ -658,6 +689,7 @@ export default function MessagesInbox() {
                     onSend={sendNew}
                     onCancel={() => setView('list')}
                     sending={sending}
+                    defaultDest={composeDest}
                 />
             </div>
         </div>
