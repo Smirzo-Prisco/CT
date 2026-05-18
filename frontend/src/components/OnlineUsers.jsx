@@ -77,7 +77,7 @@ export default function OnlineUsers() {
               <a
                 href={`/main.php?page=scheda&pg=${encodeURIComponent(user.nome)}`}
                 target="_top"
-                style={{ fontSize: '13px', fontFamily: 'DejaVu Serif', textTransform: 'capitalize', color: '#c0a49e', letterSpacing: '0px' }}
+                className="online-user-link"
               >
                 {user.nome}
               </a>

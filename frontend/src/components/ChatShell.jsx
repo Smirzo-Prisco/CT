@@ -253,7 +253,7 @@ export default function ChatShell() {
                         <form method="post" id="chat_form_messages">
 
                             {/* Riga 1: submit */}
-                            <div style={{ display:'flex', justifyContent:'flex-end', width:'100%' }}>
+                            <div className="chat-submit-row">
                                 <input type="submit" value={submit_label} />
                             </div>
 
@@ -271,7 +271,7 @@ export default function ChatShell() {
                             />
 
                             {/* Riga 3: tag, contatore, icone, status role */}
-                            <div style={{ display:'flex', alignItems:'center', width:'100%', gap:'8px', flexWrap:'wrap' }}>
+                            <div className="chat-action-controls">
                                 <input type="hidden" id="id_role" defaultValue="" />
                                 <input type="text" name="action_tag" className="action-tag" maxLength={30} placeholder="TAG max 30" />
                                 <span className="gdr-char-counter">
@@ -301,8 +301,7 @@ export default function ChatShell() {
                                        style={{ cursor:'pointer', display:'none', fontSize:'16px' }}></i>
                                     <i id="addPgToRoleBtn"
                                        onClick={() => window.addPgToRole?.()}
-                                       className="fa-solid fa-play"
-                                       style={{ cursor:'pointer', color:'green' }}> Avvia!</i>
+                                       className="fa-solid fa-play chat-avvia-btn"> Avvia!</i>
                                 </div>
                             </div>
                         </form>
@@ -357,16 +356,16 @@ export default function ChatShell() {
                         <h3 className="user-search-popup__title">Personaggi giocanti</h3>
                         <button id="closePopupAdd" className="user-search-popup__close-btn">&times;</button>
                     </div>
-                    <div style={{ padding:'12px' }}>
+                    <div className="pg-role-body">
                         <div id="simpleUsersTable">
-                            <div style={{ display:'grid', gridTemplateColumns:'1fr 60px 60px 60px 80px', gap:'8px', padding:'6px 8px', backgroundColor:'rgba(42,63,118,0.3)', borderRadius:'6px', marginBottom:'4px', fontSize:'0.85rem' }}>
+                            <div className="pg-role-header">
                                 <div>Nome</div>
-                                <div style={{ textAlign:'center' }}>Giocante</div>
-                                <div style={{ textAlign:'center' }}>Turno inviato</div>
-                                <div style={{ textAlign:'center' }}>Turno chiuso</div>
-                                <div style={{ textAlign:'center' }}>Azione</div>
+                                <div>Giocante</div>
+                                <div>Turno inviato</div>
+                                <div>Turno chiuso</div>
+                                <div>Azione</div>
                             </div>
-                            <div id="pgRolePlayingList" style={{ maxHeight:'220px', overflowY:'auto' }}></div>
+                            <div id="pgRolePlayingList" className="pg-role-list"></div>
                         </div>
                     </div>
                 </div>

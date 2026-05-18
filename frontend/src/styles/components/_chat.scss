@@ -679,9 +679,48 @@ span.chat_me_master {
 
 // ── Form inserimento chat ─────────────────────────────────────
 
-div.form_row {
-    clear: both;
-    text-align: left;
+div.form_row { clear: both; text-align: left; }
+
+.chat-submit-row {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.chat-action-controls {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chat-avvia-btn {
+    cursor: pointer;
+    color: green;
+}
+
+// ── Pannello personaggi giocanti ──────────────────────────────
+
+.pg-role-body {
+    padding: 12px;
+}
+
+.pg-role-header {
+    display: grid;
+    grid-template-columns: 1fr 60px 60px 60px 80px;
+    gap: 8px;
+    padding: 6px 8px;
+    background-color: rgba(42, 63, 118, 0.3);
+    border-radius: 6px;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.pg-role-list {
+    max-height: 220px;
+    overflow-y: auto;
 }
 
 input#tag {

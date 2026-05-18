@@ -65,6 +65,14 @@ div.link_presenti {
     margin-top: $space-5;
 }
 
+.online-user-link {
+    font-size: $text-md;
+    font-family: $font-serif;
+    text-transform: capitalize;
+    color: $presenti-name-color;
+    letter-spacing: 0;
+}
+
 div.contenitore_presenti {
     background: $palette-dark-10;
     padding: 10px;
