@@ -3,5 +3,12 @@
 /* ── Righe profilo (float layout) ──────────────────────────── */
 .labelLeft  { float: left; margin-left: 5px; }
 .valueRight { float: right; margin-right: 5px; text-align: right; }
-.levelValue { float: right; margin-right: 5px; text-align: right; color: yellow; font-weight: bold; }
+
+.levelValue {
+    float: right;
+    margin-right: 5px;
+    text-align: right;
+    color: var(--color-primary);
+    font-weight: bold;
+}
 .boldValue  { float: right; margin-right: 5px; text-align: right; font-weight: bold; }
