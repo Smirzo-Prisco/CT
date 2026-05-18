@@ -129,7 +129,26 @@ function SchedaProfilo({ profile }) {
                     <>
                         <div className="header_box">▪ STATISTICHE ▪</div><br />
 
-                        <span className={styles.labelLeft}>Livello</span>
+                        <span style={{ float:'left', marginLeft:'5px', position:'relative' }}>
+                            Livello
+                            <span className="help-animated">?</span>
+                            <div className="tooltip-animated">
+                                <strong>Il livello si calcola in base alla somma di tutte le statistiche, se il personaggio appartiene ad una famiglia</strong><br />
+                                <table style={{ width:'100%', marginTop:'5px', borderCollapse:'collapse', textAlign:'center' }}>
+                                    <tbody>
+                                        <tr><th className="form-group form-column">Livello</th><th className="form-group form-column">Fino a</th></tr>
+                                        <tr><td>1</td><td>50</td></tr>
+                                        <tr><td>2</td><td>75</td></tr>
+                                        <tr><td>3</td><td>105</td></tr>
+                                        <tr><td>4</td><td>140</td></tr>
+                                        <tr><td>5</td><td>180</td></tr>
+                                        <tr><td>6</td><td>225</td></tr>
+                                        <tr><td>7</td><td>275</td></tr>
+                                        <tr><td>8</td><td>330</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </span>
                         <span className={styles.levelValue}>
                             {statistiche.livello}
                         </span>
