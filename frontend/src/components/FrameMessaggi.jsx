@@ -102,12 +102,12 @@ export default function FrameMessaggi() {
                          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         {icon.id === 'messaggi' ? (
                             <a id="message-link" href={icon.href} title={icon.alt} style={{ lineHeight: 0 }}>
-                                <img src={msgIcon} alt={icon.alt} style={{ width: '28px', height: '28px', display: 'block' }} />
+                                <img src={msgIcon} alt={icon.alt} style={{ display: 'block' }} />
                             </a>
                         ) : (
                             <a href={icon.href} title={icon.alt} style={{ lineHeight: 0 }}
                                target={icon.id === 'logout' ? '_top' : undefined}>
-                                <img src={`${ICO}${icon.img}`} alt={icon.alt} style={{ width: '28px', height: '28px', display: 'block' }} />
+                                <img src={`${ICO}${icon.img}`} alt={icon.alt} style={{ display: 'block' }} />
                             </a>
                         )}
                         <span className="icon-label">{icon.alt}</span>
