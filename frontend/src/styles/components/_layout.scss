@@ -170,12 +170,13 @@ body {
 div.output {
     width: 100%;
     background-color: transparent;
-    // height:100% propaga l'altezza di #maincontent ai componenti React figli
     height: 100%;
+    position: relative;
 }
 
 #ct-app-content {
     height: 100%;
+    position: relative;
 }
 
 div.page_body {
