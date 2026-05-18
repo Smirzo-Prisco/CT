@@ -463,26 +463,7 @@
     }
 }
 
-div.chat_box {
-    position: absolute;
-    top: 0;        /* Mantieni o aumenta leggermente questo valore */
-    bottom: 180px;    /* Aumenta questo valore per ridurre l'altezza della chat box */
-    left: 5px;
-    overflow: auto;
-    font-size: 16px;
-    text-align: justify;
-    width: 99%;
-}
-
-
-div.pagina_frame_chat div.page_body div.panels_box {
-    position: absolute;
-    bottom: 0;
-    left: 10px;
-    right: 10px;
-}
-
-/**	* Fine fix */
+/**	* Fine fix — regole chat_box e panels_box rimosse: gestite da ct-styles.css */
 
 /** * Avatar di chat
 	* @author Blancks
