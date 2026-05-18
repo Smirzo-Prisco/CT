@@ -49,11 +49,7 @@ export default function OnlineUsers() {
     }
   }, [fetchPresenti])
 
-  const openMsg = (nome) => window.open(
-    `/pages/mex_privati/multi_message.php?destinatari=${encodeURIComponent(nome)}`,
-    'titolo',
-    'width=650,height=600,resizable,status,scrollbars=1,location'
-  )
+  const openMsg = (nome) => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(nome)}`)
 
   return (
     <div className="iframe_online">
@@ -65,7 +61,7 @@ export default function OnlineUsers() {
         ) : (
           users.map(user => (
             <div key={user.nome} className="presente">
-              <a href="javascript:;" onClick={() => openMsg(user.nome)}>
+              <a href="#" onClick={e => { e.preventDefault(); openMsg(user.nome) }}>
                 <img src="/themes/crystal/imgs/race_presenti/Sms.png" alt="Messaggio" />
               </a>
               &nbsp;&nbsp;

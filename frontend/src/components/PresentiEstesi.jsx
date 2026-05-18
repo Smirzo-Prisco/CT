@@ -71,12 +71,8 @@ function groupUsers(users) {
  * @param {Object} props.user - Dati utente restituiti dall'API
  */
 function UserRow({ user }) {
-    /** Apre la finestra popup per i messaggi privati */
-    const openSms = () => window.open(
-        `pages/mex_privati/multi_message.php?destinatari=${encodeURIComponent(user.nome)}`,
-        'titolo',
-        'width=650,height=600,resizable,status,scrollbars=1,location'
-    )
+    /** Naviga alla pagina DM con il destinatario pre-selezionato */
+    const openSms = () => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(user.nome)}`)
 
     return (
         <tr className="presente">
