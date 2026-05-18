@@ -18,7 +18,7 @@ body, ul, li, a{
 
 .menuItem{
   width: 120px;
-  height:10px;
+  height:25px;
   background-color: #16192b;
   border: 1px solid #090a10;
   border-radius: 10px;

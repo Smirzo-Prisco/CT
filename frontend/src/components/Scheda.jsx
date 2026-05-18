@@ -280,7 +280,7 @@ export default function Scheda() {
                 />
 
                 {/* ── Nome e cognome ───────────────────────────────────── */}
-                <div className="title">{nome} {cognome}</div>
+                <div className="title" style={{ marginTop: '40px' }}>{nome} {cognome}</div>
 
                 {/* ── Riga principale: avatar + profilo ────────────────── */}
                 <div className="pg-infos">
