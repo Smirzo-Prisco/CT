@@ -251,19 +251,29 @@ export default function ChatShell() {
                 <div className="panels_box">
                     <div className="form_chat">
                         <form method="post" id="chat_form_messages">
+
+                            {/* Textarea — onKeyUp chiama le funzioni di chat.js se già caricate */}
+                            <textarea
+                                className="chat_textarea"
+                                name="message"
+                                id="message"
+                                placeholder="Scrivi la tua azione"
+                                maxLength={maxlength}
+                                onKeyUp={(e) => {
+                                    window.conta?.(e.target)
+                                    if (pulsanti.can_master_msg) window.masterMessageLength?.(e.target, maxlength)
+                                }}
+                            />
+
                             <div className="form_row">
                                 <div className="casella_chat">
 
-                                    {/* Riga superiore: contatore, bottone pannello, help, tag */}
+                                    {/* Riga contatore, bottone pannello, help, tag */}
                                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%' }}>
                                         <span className="gdr-char-counter">
                                             <span id="rimanenti">0</span> caratteri
                                         </span>
 
-                                        {/* Bottone apertura pannello GDR:
-                                            - id="openPanelBtn" usato da chat.js (livello modulo, riga ~497)
-                                            - visibile a staff sempre e a non-staff solo con role attiva
-                                              (no FOUC: la condizione è già corretta al primo render) */}
                                         {showPanelBtn && (
                                             <a href="#" id="openPanelBtn">
                                                 <img title="Pannello GDR" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" />
@@ -276,11 +286,10 @@ export default function ChatShell() {
                                         <input type="text" name="action_tag" className="action-tag" maxLength={30} placeholder="TAG max 30" />
                                     </div>
 
-                                    {/* Riga inferiore: status role, submit */}
+                                    {/* Riga status role + submit */}
                                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%', gap:'10px' }}>
                                         <input type="hidden" id="id_role" defaultValue="" />
 
-                                        {/* Indicatore stato role con pulsanti avvio/abbandono */}
                                         <div className="gdr-session-status inactive" id="gdrSessionStatus">
                                             <div className="gdr-pulse-dot"></div>
                                             <span className="gdr-status-text">
@@ -305,19 +314,6 @@ export default function ChatShell() {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Textarea — onKeyUp chiama le funzioni di chat.js se già caricate */}
-                            <textarea
-                                className="chat_textarea"
-                                name="message"
-                                id="message"
-                                placeholder="Scrivi la tua azione"
-                                maxLength={maxlength}
-                                onKeyUp={(e) => {
-                                    window.conta?.(e.target)
-                                    if (pulsanti.can_master_msg) window.masterMessageLength?.(e.target, maxlength)
-                                }}
-                            />
                         </form>
                     </div>
                 </div>
