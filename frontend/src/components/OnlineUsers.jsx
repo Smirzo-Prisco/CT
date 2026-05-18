@@ -46,7 +46,7 @@ export default function OnlineUsers() {
               </a>
               &nbsp;&nbsp;
               {user.gruppo_img && (
-                <img src={`/${user.gruppo_img}`} alt="" width="20" height="20" />
+                <img src={`/${user.gruppo_img}`} alt="" style={{ height: '14px', width: 'auto' }} />
               )}
               &nbsp;&nbsp;
               <a

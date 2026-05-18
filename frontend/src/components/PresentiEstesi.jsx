@@ -78,31 +78,31 @@ function UserRow({ user }) {
         <tr className="presente">
 
             {/* Avatar del personaggio */}
-            <td width="5%">
+            <td width="10%" style={{ textAlign: 'center' }}>
                 <img width="50" height="50" src={user.url_img_chat} alt={user.nome} />
             </td>
 
             {/* Link per messaggio privato */}
-            <td>
+            <td style={{ textAlign: 'center' }}>
                 <a href="#" onClick={e => { e.preventDefault(); openSms() }}>
                     <img src="themes/crystal/imgs/presenti/sms_presenti.png" alt="Invia SMS" />
                 </a>
             </td>
 
-            {/* Icona razza */}
-            <td>
+            {/* Icona razza — nascosta */}
+            <td style={{ display: 'none' }}>
                 <img src={user.razza_img} alt={user.razza_nome} title={user.razza_nome} />
             </td>
 
-            {/* Icona famiglia / inclinazione / gilda */}
-            <td>
+            {/* Icona famiglia / inclinazione / gilda (rinominata Razza nell'header) */}
+            <td style={{ textAlign: 'center' }}>
                 {user.gruppo_img && (
                     <img width="25" height="25" src={user.gruppo_img} alt={user.gruppo_nome} title={user.gruppo_nome} />
                 )}
             </td>
 
             {/* Icona mestiere */}
-            <td>
+            <td style={{ textAlign: 'center' }}>
                 {user.mestiere_img && (
                     <img width="25" height="25" src={user.mestiere_img} alt={user.mestiere_nome} title={user.mestiere_nome} />
                 )}
@@ -118,7 +118,7 @@ function UserRow({ user }) {
             </td>
 
             {/* Icone cariche staff */}
-            <td>
+            <td style={{ textAlign: 'center' }}>
                 {STAFF_ICONS.filter(ic => user.staff[ic.key]).map(ic => (
                     <img key={ic.key} src={ic.src} width="20" height="20" title={ic.title} alt={ic.title} />
                 ))}
@@ -214,8 +214,8 @@ export default function PresentiEstesi() {
                     <tr className="second_header">
                         <td>AVATAR</td>
                         <td>SMS</td>
+                        <td style={{ display: 'none' }}>RAZZA ICO</td>
                         <td>RAZZA</td>
-                        <td>FAMIGLIA</td>
                         <td>LAVORO</td>
                         <td>NOME E COGNOME</td>
                         <td>CARICHE</td>

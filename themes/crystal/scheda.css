@@ -515,16 +515,18 @@ div.titolo_skill_page {
     background-size: cover;
 }
 
-hr{
+div.pagina_scheda hr {
 	background-color: #070a1b;
 }
 
-.hidden_row { 
-            display: none; 
-            overflow: hidden; 
-        } 
-        
-ul {
+.hidden_row {
+            display: none;
+            overflow: hidden;
+        }
+
+div.pagina_scheda ul,
+div.pagina_scheda_equip ul,
+div.pagina_scheda_oggetti ul {
     list-style-type: none;
 }
 
