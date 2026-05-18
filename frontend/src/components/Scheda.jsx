@@ -29,6 +29,16 @@ import styles from './Scheda.module.css'
 // ---------------------------------------------------------------------------
 
 /**
+ * Rimuove i tag <style> dall'HTML del DB prima di iniettarlo nel DOM.
+ * Un <style> nel contenuto del personaggio verrebbe applicato globalmente
+ * alla pagina, interferendo con il layout (es. la lista presenti).
+ */
+function stripStyles(html) {
+    if (!html) return ''
+    return html.replace(/<style[\s\S]*?<\/style>/gi, '')
+}
+
+/**
  * Formatta una stringa data MySQL in formato italiano leggibile.
  * @param {string|null} dateStr
  * @returns {string}
@@ -312,9 +322,9 @@ export default function Scheda() {
                         <div className="particolari">
                             {/* Contenuto HTML grezzo dal DB — solo utenti autenticati */}
                             <div className="green"
-                                dangerouslySetInnerHTML={{ __html: particolari ?? '' }} />
+                                dangerouslySetInnerHTML={{ __html: stripStyles(particolari) }} />
                             <div className="blue"
-                                dangerouslySetInnerHTML={{ __html: note_fato ?? '' }} />
+                                dangerouslySetInnerHTML={{ __html: stripStyles(note_fato) }} />
                         </div>
                     </div>
                 )}
@@ -323,7 +333,7 @@ export default function Scheda() {
                 <div className="background">
                     <br />
                     <div className="body_box"
-                        dangerouslySetInnerHTML={{ __html: principale ?? '' }} />
+                        dangerouslySetInnerHTML={{ __html: stripStyles(principale) }} />
                 </div>
 
             </div>{/* fine scheda_page_body */}
