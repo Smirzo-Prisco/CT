@@ -37,7 +37,7 @@ const COLONNE = [
             { label: 'CAMBIO PASSWORD', url: 'main.php?page=user_cambio_pass' },
             // { label: 'LISTA SPIRITI',       url: 'main.php?page=user_razze' },
             { label: 'PATROCINIO VOLTI', url: 'main.php?page=elenco_volti' },
-            { label: 'ELENCO STAFF', url: 'main.php?page=elenco_staff' },
+            { label: 'STAFF', url: 'main.php?page=elenco_staff' },
         ],
     },
     {
@@ -47,8 +47,8 @@ const COLONNE = [
         class: 'strumenti-box',
         links: [
             // { label: 'SCEGLI LAVORO',                      url: 'main.php?page=scegli_lavoro' },
-            { label: 'OGGETTO PERSONALIZZATO', url: 'main.php?page=oggetto_aggiungi_richiesta' },
-            { label: 'POTENZIA CITTADINO', url: 'main.php?page=scegli_umano' },
+            { label: 'CREA OGGETTO', url: 'main.php?page=oggetto_aggiungi_richiesta' },
+            { label: 'POTENZIA UMANO', url: 'main.php?page=scegli_umano' },
             // { label: 'SCEGLI CORRENTE E VIA',              url: 'main.php?page=scegli_inclinazione' },
             { label: 'SCEGLI MESTIERE', url: 'main.php?page=scegli_mestiere' },
         ],

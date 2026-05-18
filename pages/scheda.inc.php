@@ -11,6 +11,6 @@
  * e carica i dati tramite api_scheda.php?op=profile.
  */
 ?>
-<link rel="stylesheet" href="/themes/crystal/scheda.css">
+<!-- <link rel="stylesheet" href="/themes/crystal/scheda.css"> -->
 <link rel="stylesheet" href="/themes/crystal/scheda_menu.css">
 <div id="ct-app-content"></div>

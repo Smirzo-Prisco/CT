@@ -87,55 +87,55 @@ const ROUTES = {
     },
     scheda: {
         component: Scheda,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css'],
     },
     scheda_storia: {
         component: SchedaSub,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css'],
     },
     scheda_dice: {
         component: SchedaSub,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css'],
     },
     scheda_off: {
         component: SchedaSub,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css'],
     },
     scheda_skills: {
         component: SchedaSkills,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css'],
     },
     scheda_trans: {
         component: SchedaTrans,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css'],
     },
     scheda_modifica: {
         component: SchedaModifica,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css', '/themes/crystal/mestieri.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css', '/themes/crystal/mestieri.css'],
     },
     scheda_affetti: {
         component: SchedaAffetti,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_affetto.css', '/themes/crystal/volti.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_affetto.css', '/themes/crystal/volti.css'],
     },
     scheda_px: {
         component: SchedaPunti,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css'],
     },
     scheda_px_shin: {
         component: SchedaPunti,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css'],
     },
     scheda_px_mestiere: {
         component: SchedaPunti,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css'],
     },
     scheda_equip: {
         component: SchedaEquip,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_equip.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_equip.css'],
     },
     scheda_oggetti: {
         component: SchedaOggetti,
-        css: ['/themes/crystal/scheda.css', '/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_equip.css'],
+        css: [/* '/themes/crystal/scheda.css', */'/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_equip.css'],
     },
     gestione: {
         component: Gestione,
