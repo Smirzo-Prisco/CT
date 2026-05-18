@@ -96,10 +96,10 @@ export default function FrameMessaggi() {
 
     return (
         <div id="gridPanel" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0px 0px 20px' }}>
-            <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '8px', rowGap: '4px' }}>
                 {ICONS.map(icon => (
                     <div key={icon.id} className="grid-item"
-                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0px' }}>
                         {icon.id === 'messaggi' ? (
                             <a id="message-link" href={icon.href} title={icon.alt}>
                                 <img src={msgIcon} alt={icon.alt} />
