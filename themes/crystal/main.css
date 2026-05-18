@@ -738,16 +738,6 @@ div.elenco_record_gestione table {
 
 /** * Allineamento verticale delle colonne 
 */
-#framecontentLeft, #framecontentRight {
-    display: table;
-}
-
-/** * margine delle colonne */
-div.innertube {
-    margin: 0;
-    display: table-cell;
-    vertical-align: top;
-}
 
 
 
