@@ -78,15 +78,9 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             return $theme_path . '/' . $file . '?v=' . (file_exists($abs) ? filemtime($abs) : 0);
         };
         ?>
-        <link rel="stylesheet" href="<?=$css_v('homepage.css')?>" type="text/css">
         <link rel="stylesheet" href="<?=$css_v('main.css')?>" type="text/css">
-        <link rel="stylesheet" href="<?=$css_v('chat.css')?>" type="text/css">
-        <link rel="stylesheet" href="<?=$css_v('presenti.css')?>" type="text/css">
-        <link rel="stylesheet" href="<?=$css_v('scheda.css')?>" type="text/css">
-        <link rel="stylesheet" href="<?=$css_v('messaggi.css')?>" type="text/css">
-        <link rel="stylesheet" href="<?=$css_v('forum.css')?>" type="text/css">
-        <link rel="stylesheet" href="<?=$css_v('lettura_bacheca.css')?>" type="text/css">
-        <!-- ct-styles.css: compilato da SCSS, caricato per ultimo così sovrascrive correttamente -->
+        <!-- ct-styles.css: compilato da SCSS, source of truth — sovrascrive main.css e tutti i vecchi CSS -->
+        <!-- homepage.css, chat.css, presenti.css, scheda.css, messaggi.css, forum.css, lettura_bacheca.css rimossi: tutte le regole sono ora in ct-styles.css -->
         <link rel="stylesheet" href="<?=$css_v('ct-styles.css')?>" type="text/css">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">

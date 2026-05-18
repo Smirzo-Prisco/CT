@@ -129,6 +129,50 @@ img.presenti_ico {
     border: none;
 }
 
+// ── Colonna presenti classica (presenti.inc.php, frame_online.inc.php) ───────
+// Questi selettori erano in presenti.css ma non in SCSS.
+// La pagina usa div.pagina_presenti > div.elenco_presenti > div.luogo + div.presente.
+
+div.pagina_presenti {
+    img.sesso_ico,
+    img.status_ico,
+    img.disponibile {
+        margin: 0 2px 0 0;
+    }
+
+    // Link interni alla colonna
+    a,
+    a:visited {
+        border: none;
+        color: $presenti-name-color;
+    }
+
+    a:hover {
+        border: none;
+    }
+
+    // Lista testuale (usata anche con ul se presente)
+    ul.elenco_presenti {
+        list-style-type: none;
+        list-style-position: inside;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+    }
+
+    ul.elenco_presenti li.luogo {
+        font-size: $text-sm;
+        font-weight: $font-weight-bold;
+        margin: 3px 0 1px 8px;
+        text-transform: uppercase;
+    }
+
+    ul.elenco_presenti li.presente {
+        font-size: $text-sm;
+        margin: 0 0 0 5px;
+    }
+}
+
 // ── Tabella presenti estesa ───────────────────────────────────
 
 table.customTable {

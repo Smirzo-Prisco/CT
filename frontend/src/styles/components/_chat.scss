@@ -47,8 +47,13 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
 }
 
 .gdr-modal-overlay {
-    position: relative;
-    height: 95%;
+    // Overlay: copre l'intera pagina_frame_chat (position:fixed) senza
+    // spostare i fratelli flex. position:absolute la toglie dal flusso.
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: rgb(0 0 0 / 70%);
     display: flex;
     z-index: 10000;

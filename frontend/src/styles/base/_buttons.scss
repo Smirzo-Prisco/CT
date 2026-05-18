@@ -166,3 +166,27 @@
 
     &:hover { background: #909090; }
 }
+
+// Alias Bootstrap-like usati in gestione_gilde.inc.php e gestione_oggetti.inc.php
+// (corrispondono a .btn + variante colore + taglia).
+// Migrati da chat.css che li definiva originariamente.
+
+.btn-primary {
+    // Stile coerente con il sistema di pulsanti del progetto
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: $color-text-light;
+    border: none;
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgb(102 126 234 / 30%);
+    }
+}
+
+.btn-sm {
+    padding: $space-1 + 2 $space-2 + 2;
+    font-size: $text-md - 1;
+    min-width: 32px;
+    height: 32px;
+}
