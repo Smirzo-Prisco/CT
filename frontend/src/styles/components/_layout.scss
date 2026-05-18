@@ -25,7 +25,7 @@ body {
     height: 100%;
     box-sizing: border-box; // i 260px includono il padding: evita overflow orizzontale
     overflow-x: hidden;
-    overflow-y: scroll; // scroll sempre visibile (auto la nasconde se il contenuto è corto)
+    overflow-y: auto;
     z-index: 1000;
     transition: transform $transition-normal;
     background-repeat: no-repeat;
