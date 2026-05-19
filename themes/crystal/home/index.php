@@ -26,7 +26,10 @@ if ($PARAMETERS['settings']['protection'] == 'ON'){
         <header>
             <div class="logo">Crystal Tokyo GDR</div>
             <nav>
-                <ul class="navigation">
+                <button id="hamburgerBtn" class="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <ul class="navigation" id="mainNav">
                     <li><a href="#" id="loginBtn">Login</a></li>
                     <li><a href="#" id="registrazioneBtn">REGISTRAZIONE</a></li>
                     <li><a href="../documentazione_main.php" target="_blank">AMBIENTAZIONE</a></li>

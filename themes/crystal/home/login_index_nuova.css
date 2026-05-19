@@ -27,6 +27,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
 }
 
 .logo {
@@ -195,10 +196,63 @@ header {
     }
 }
 
+/* ── Hamburger button ───────────────────────────────────────────── */
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.hamburger span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #fff;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+}
+
+/* Animazione X quando aperto */
+.hamburger.open span:nth-child(1) { transform: translateY(8.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg); }
+
 @media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    .navigation {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #333;
+        padding: 10px 0;
+        z-index: 10000;
+    }
+
+    .navigation.open {
+        display: flex;
+    }
+
     .navigation li {
         display: block;
-        margin-right: 0px;
+        margin: 0;
+        padding: 8px 20px;
+    }
+
+    .navigation a {
+        display: block;
     }
 }
 

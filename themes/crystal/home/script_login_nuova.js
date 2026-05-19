@@ -37,6 +37,35 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
     passwordRecoveryDiv.style.display = 'block';
 });
 
+// ── Hamburger menu ────────────────────────────────────────────────────────
+
+(function () {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const nav       = document.getElementById('mainNav');
+    if (!hamburger || !nav) return;
+
+    hamburger.addEventListener('click', () => {
+        const open = nav.classList.toggle('open');
+        hamburger.classList.toggle('open', open);
+    });
+
+    // Chiudi il menu cliccando su un link
+    nav.addEventListener('click', e => {
+        if (e.target.tagName === 'A') {
+            nav.classList.remove('open');
+            hamburger.classList.remove('open');
+        }
+    });
+
+    // Chiudi il menu cliccando fuori
+    document.addEventListener('click', e => {
+        if (!nav.contains(e.target) && e.target !== hamburger) {
+            nav.classList.remove('open');
+            hamburger.classList.remove('open');
+        }
+    });
+}());
+
 // ── Modale Registrazione ──────────────────────────────────────────────────
 
 (function () {
@@ -53,14 +82,15 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
     let optionsLoaded = false;
     let terminiLoaded = false;
 
+    const contentBox  = document.querySelector('.content-box');
+    const bottomBanner = document.getElementById('bottomBanner');
+
     function positionModal() {
         if (window.innerWidth <= 768) {
-            const header     = document.querySelector('header');
-            const banner     = document.getElementById('bottomBanner');
-            const headerH    = header ? header.getBoundingClientRect().bottom : 60;
-            const bannerTop  = banner ? banner.getBoundingClientRect().top : window.innerHeight;
-            const top        = headerH + 10;
-            const maxHeight  = bannerTop - top - 10;
+            const header  = document.querySelector('header');
+            const headerH = header ? header.getBoundingClientRect().bottom : 60;
+            const top     = headerH + 10;
+            const maxHeight = window.innerHeight - top - 10;
             modal.style.top       = top + 'px';
             modal.style.transform = 'translateX(-50%)';
             modal.style.maxHeight = maxHeight + 'px';
@@ -71,19 +101,19 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
         }
     }
 
-    const contentBox = document.querySelector('.content-box');
-
     function openModal() {
+        if (bottomBanner) bottomBanner.style.display = 'none';
+        if (contentBox)   contentBox.style.display   = 'none';
         modal.style.display = 'block';
         positionModal();
-        if (contentBox) contentBox.style.display = 'none';
         if (!optionsLoaded) loadOptions();
         if (!terminiLoaded) loadTermini();
     }
 
     function closeModal() {
         modal.style.display = 'none';
-        if (contentBox) contentBox.style.display = '';
+        if (bottomBanner) bottomBanner.style.display = '';
+        if (contentBox)   contentBox.style.display   = '';
     }
 
     function makeToggle(btn, div, labelOpen, labelClose) {
