@@ -20,7 +20,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import SchedaMenu from './SchedaMenu'
 import styles from './Scheda.module.css'
 
@@ -29,13 +29,36 @@ import styles from './Scheda.module.css'
 // ---------------------------------------------------------------------------
 
 /**
- * Rimuove i tag <style> dall'HTML del DB prima di iniettarlo nel DOM.
- * Un <style> nel contenuto del personaggio verrebbe applicato globalmente
- * alla pagina, interferendo con il layout (es. la lista presenti).
+ * Estrae i blocchi <style> dall'HTML, aggiunge il prefisso .pagina_scheda
+ * a ogni selettore CSS e restituisce { html, css } separati.
+ * I selettori body/html vengono sostituiti con .pagina_scheda.
+ * Questo consente al CSS scritto nei campi del personaggio di operare
+ * solo all'interno della scheda senza colpire il resto della pagina.
  */
-function stripStyles(html) {
-    if (!html) return ''
-    return html.replace(/<style[\s\S]*?<\/style>/gi, '')
+function extractAndScopeStyles(html) {
+    if (!html) return { html: '', css: '' }
+    let css = ''
+    const cleaned = html.replace(/<style[\s\S]*?>([\s\S]*?)<\/style>/gi, (_, block) => {
+        css += block
+        return ''
+    })
+    if (!css) return { html, css: '' }
+    // Prefissa ogni selettore con .pagina_scheda
+    const scoped = css.replace(/([^@{}]+)\{/g, (_, selector) => {
+        const prefixed = selector
+            .split(',')
+            .map(s => {
+                const t = s.trim()
+                if (!t) return ''
+                // body e html → .pagina_scheda come radice
+                return t.replace(/^(body|html)\b/, '.pagina_scheda')
+                        .replace(/^(?!\.pagina_scheda)/, '.pagina_scheda ')
+            })
+            .filter(Boolean)
+            .join(', ')
+        return `${prefixed} {`
+    })
+    return { html: cleaned, css: scoped }
 }
 
 /**
@@ -269,6 +292,29 @@ export default function Scheda() {
             particolari, note_fato, principale,
             data_iscrizione, ora_entrata, url_media } = profile
 
+    // Estrae <style> dai campi DB e li inietta in <head> scopati a .pagina_scheda.
+    // L'elemento <style> viene rimosso al dismount del componente.
+    const scopedStyleEl = useRef(null)
+    useEffect(() => {
+        const sources = [principale, particolari, note_fato]
+        const allCss = sources
+            .map(s => extractAndScopeStyles(s).css)
+            .filter(Boolean)
+            .join('\n')
+        if (scopedStyleEl.current) scopedStyleEl.current.remove()
+        if (allCss) {
+            const el = document.createElement('style')
+            el.textContent = allCss
+            document.head.appendChild(el)
+            scopedStyleEl.current = el
+        }
+        return () => { if (scopedStyleEl.current) scopedStyleEl.current.remove() }
+    }, [principale, particolari, note_fato])
+
+    const { html: principaleHtml } = extractAndScopeStyles(principale)
+    const { html: particolariHtml } = extractAndScopeStyles(particolari)
+    const { html: noteFatoHtml }    = extractAndScopeStyles(note_fato)
+
     return (
         <div className="pagina_scheda">
             <div className="page_title">
@@ -322,9 +368,9 @@ export default function Scheda() {
                         <div className="particolari">
                             {/* Contenuto HTML grezzo dal DB — solo utenti autenticati */}
                             <div className="green"
-                                dangerouslySetInnerHTML={{ __html: stripStyles(particolari) }} />
+                                dangerouslySetInnerHTML={{ __html: particolariHtml }} />
                             <div className="blue"
-                                dangerouslySetInnerHTML={{ __html: stripStyles(note_fato) }} />
+                                dangerouslySetInnerHTML={{ __html: noteFatoHtml }} />
                         </div>
                     </div>
                 )}
@@ -333,7 +379,7 @@ export default function Scheda() {
                 <div className="background">
                     <br />
                     <div className="body_box"
-                        dangerouslySetInnerHTML={{ __html: stripStyles(principale) }} />
+                        dangerouslySetInnerHTML={{ __html: principaleHtml }} />
                 </div>
 
             </div>{/* fine scheda_page_body */}
