@@ -103,11 +103,8 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
     closeEl.addEventListener('click', closeModal);
     window.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
-    // Sezioni già aperte: il primo click le chiude
     makeToggle(infoBtn, infoDiv, 'ℹ Informazioni sul gioco', '✕ Chiudi informazioni');
     makeToggle(tcBtn,  tcDiv,  'ℹ Termini e Condizioni',   '✕ Chiudi termini');
-    infoBtn.textContent = '✕ Chiudi informazioni';
-    tcBtn.textContent   = '✕ Chiudi termini';
 
     document.getElementById('regForm').addEventListener('submit', function (e) {
         if (!document.getElementById('regTc').checked) {

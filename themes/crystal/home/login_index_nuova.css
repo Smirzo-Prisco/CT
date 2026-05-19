@@ -424,9 +424,18 @@ header {
 
 /* ── Modale Registrazione ───────────────────────────────────────────── */
 
-#registrazioneContent .reg-box {
-    max-height: 85vh;
+/* Sovrascrive il centramento verticale generico: la modale parte sempre
+   a 70px dal top (sotto il menu) e si estende verso il basso con scroll */
+#registrazioneContent {
+    top: 70px;
+    transform: translateX(-50%);
+    max-height: calc(100vh - 90px);
     overflow-y: auto;
+}
+
+#registrazioneContent .reg-box {
+    max-height: none;
+    overflow-y: visible;
 }
 
 #registrazioneContent .input-group small {
