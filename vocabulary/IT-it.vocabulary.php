@@ -63,24 +63,21 @@ $MESSAGE['register']['fields']['stats'] = 'Caratteristiche';
 $MESSAGE['register']['fields']['stats_info'] = 'La somma dei punteggi deve essere';
 $MESSAGE['register']['summary'] = 'Riepilogo';
 /* Condizioni */
-$MESSAGE['register']['disclaimer'] = "Le presenti condizioni generali d'uso sono da considerarsi assolutamente vincolanti tra la gestione del sito e l'utente che vuole registrarsi per usufruire dei servizi offerti dalla piattaforma di gioco.<br>
-La seguente piattaforma di gioco offre un servizio di gioco di ruolo online senza scopo di lucro (play by chat). Il servizio offerto è infatti pienamente gratuito e non contiene alcun elemento di gioco d'azzardo nè altre forme di pagamento in valuta corrente.<br>
-Su Crystaltokyo gdr è richiesto l'assoluto rispetto di tutti i giocatori. Per tale motivo l'utente è caldamente inviato ad astenersi da comportamenti che possano turbare il sereno svolgimento del gioco. Ogni attacco di cyberbullismo verrà riportato alle competenti autorità ai sensi di legge. I personaggi creati al solo scopo di disturbare il gioco saranno esclusi immediatamente dalla partecipazione alla piattaforma.<br>
-Crystaltokyo gdr è vietato ai minori di 16 anni. Nel caso in cui si venisse a conoscenza della presenza di un utente minore d'età, quest'ultimo sarà immediatamente allontanato dalla land.<br>
-Su Crystaltokyo gdr possono essere affrontate infatti anche le seguenti tematiche: religione, droghe, sesso, violenza e crimine.<br>
-Per poter partecipare al gioco, è necessario effettuare l'iscrizione; al termine della stessa, vi verrà inviata la password di accesso tramite e-mail. Dopo il primo accesso, sarà possibile modificare la password e integrare l'avatar del personaggio con altri dati e descrizioni. Si raccomanda agli utenti la scelta di una password non chiaramente riconducibile alla vostra identità reale (evitate di scegliere una password con nome e cognome, semplici date di nascita o luoghi di provenienza).<br>
-È vietato divulgare la password dei propri pg a terze persone, così come il proprio indirizzo e-mail. Il sito non si assume nessuna responsabilità per le iniziative personali dei singoli Utenti che vogliano spontaneamente rivelare ad altri le proprie informazioni personali.<br>
-Gli utenti, prima dell'iscrizione, sono invitati a prendere visione dell'informativa privacy adeguata alle norme di legge nazionale e dell'Unione Europea.<br>
-La messaggeria interna al portale (SMS) non è da considerarsi privata ma solo una messaggistica diretta ai fini di gioco. Per tale motivo essa può essere monitorata in qualunque momento dal proprietario del database o da persone sue incaricate (moderatori) senza necessità di preavviso.<br>
-Si sconsiglia l'uso prolungato del pc o di altro strumento elettronico. Per tale motivo si consiglia di effettuare delle pause ogni ora di gioco, di non giocare per troppe ore consecutive e di staccare del gioco qualora sopraggiungano stati ansiosi o di stress.<br>
-Il codice HTML, il codice ASP/PHP, la base dati sono proprietà di Romeo Gentile e di Ketty Pelati.<br>
-Per la comprensione più completa del gioco si consiglia di prendere visione dei manuali e delle caratteristiche degli spiriti.";
-$MESSAGE['register']['rules_read'] = "Crystaltokyo gdr nasce da una rielaborazione di molti elementi classici del fumetto giapponese e di alcuni elementi di culto della tradizione occidentale che confluiscono in una realtà metropolitana postmoderna.<br>
-L'ambientazione può considerarsi a tutti gli effetti una invenzione del gestore e dei più stretti collaboratori.<br>
-Il sito è stato creato e viene mantenuto gratuitamente, con il solo scopo ricreativo e senza alcuno scopo di lucro; qualsiasi riferimento a fatti e persone all'interno del gioco è puramente casuale.<br>
-Lo Staff non si assume nessuna responsabilità per la scelta delle immagini da parte degli utenti; tuttavia qualora una immagine dovesse ledere la normativa vigente in materia di privacy (ai sensi del D. Lgs 196/2003 ed attuale regolamento (ue) 2016/679, si provvederà immediatamente alla sua rimozione.<br>
-Tutte le immagini prelevate da eventuali siti esterni sono state inserite solo dopo l'autorizzazione dei legittimi proprietari.<br>
-A seguito di un eventuale abbandono della piattaforma di gioco da parte di un Utente, lo stesso non vanta alcun diritto di proprietà intellettuale su: grafica, eventuali spunti forniti alla documentazione di gioco, personaggi creati e personaggi non giocanti (se specificamente autorizzati dalla gestione), storie create e circostanze che si sono verificate in gioco, che restano a tutti gli effetti parte integrante della land e perciò di proprietà della stessa.";
+$MESSAGE['register']['disclaimer'] = "Le presenti condizioni sono vincolanti tra la gestione del sito e l'utente che si registra alla piattaforma.
+Il servizio
+Crystal Tokyo GDR è una piattaforma di gioco di ruolo online (play-by-chat) completamente gratuita, senza scopo di lucro e priva di qualsiasi elemento di gioco d'azzardo o pagamento in valuta corrente.
+Età minima e contenuti
+La piattaforma è vietata ai minori di 16 anni. Il gioco può trattare tematiche mature quali religione, droghe, sesso, violenza e crimine. Gli utenti minorenni saranno immediatamente allontanati.
+Comportamento
+È richiesto il rispetto assoluto verso tutti i giocatori. Comportamenti di cyberbullismo saranno segnalati alle autorità competenti. I personaggi creati al solo scopo di disturbare il gioco saranno bannati immediatamente.
+Registrazione e account
+L'iscrizione è necessaria per accedere al gioco. Al termine della registrazione verrà inviata una password via email. Si raccomanda di scegliere una password non riconducibile alla propria identità reale e di non divulgarla a terzi. La piattaforma non si assume responsabilità per la divulgazione volontaria di dati personali da parte degli utenti.
+Privacy e messaggistica
+La messaggistica interna non è da considerarsi privata: può essere monitorata in qualsiasi momento dalla gestione o dai moderatori. Prima dell'iscrizione si invita a prendere visione dell'informativa privacy, conforme al GDPR (Regolamento UE 2016/679).
+Proprietà intellettuale
+Il codice, la grafica, la base dati e tutti i contenuti della piattaforma sono di proprietà della gestione. In caso di abbandono, l'utente non vanta alcun diritto su grafica, personaggi, storie o contenuti creati durante la partecipazione al gioco.
+Salute
+Si sconsiglia l'uso prolungato della piattaforma. Si consiglia di effettuare pause regolari e di interrompere il gioco in caso di stati ansiosi o di stress.";
 /* Benvenuti */
 $MESSAGE['register']['welcome']['message']['subject'] = 'Registrazione a';
 $MESSAGE['register']['welcome']['message'][0] = 'Lo staff di';
