@@ -12,8 +12,13 @@ body {
   text-align: center;
 }
 
+/* Il titolo di pagina non serve: è già impresso nell'immagine di sfondo */
+.pagina_iscrizione .page_title {
+  display: none;
+}
+
 #fase_0 {
-  background-image: url(imgs/iscrizione/sfondo_iscrizione_completo_corretto.png);
+  background-image: url("imgs/iscrizione/sfondo_iscrizione_completo_corretto.png");
   background-size: contain;
   position: absolute;
   top: 0;
@@ -22,6 +27,7 @@ body {
   width: 100%;
   background-repeat: no-repeat;
   background-position: center top;
+  z-index: 1;
 }
 
 .disclaimer {
@@ -32,7 +38,7 @@ body {
   text-align: left;
   font-size: 12px;
   color: #8f8f8f;
-  font-family: "DejaVu Serif";
+  font-family: "DejaVu Serif", serif;
   margin: 5% auto 0;
   padding-left: 4%;
 }
@@ -45,7 +51,7 @@ body {
   text-align: left;
   font-size: 12px;
   color: #8f8f8f;
-  font-family: "DejaVu Serif";
+  font-family: "DejaVu Serif", serif;
   margin: 5% auto 0;
   padding-left: 4%;
 }
@@ -58,7 +64,7 @@ body {
   text-align: left;
   font-size: 12px;
   color: #8f8f8f;
-  font-family: "DejaVu Serif";
+  font-family: "DejaVu Serif", serif;
   margin: 5% auto 0;
   padding-left: 4%;
 }
@@ -67,12 +73,14 @@ body {
   #fase_0 {
     background-size: cover;
   }
+
   .disclaimer {
     width: 70%;
     height: 25%;
     margin-top: 12.5%;
     padding-left: 10%;
   }
+
   .info {
     width: 70%;
     height: 25%;
@@ -82,7 +90,7 @@ body {
 }
 
 #fase_uno {
-  background-image: url(imgs/iscrizione/sfondo_iscrizione_completo_Dettagli_corretto.png);
+  background-image: url("imgs/iscrizione/sfondo_iscrizione_completo_Dettagli_corretto.png");
   background-size: contain;
   position: absolute;
   top: 0;
@@ -91,6 +99,7 @@ body {
   width: 100%;
   background-repeat: no-repeat;
   background-position: center top;
+  z-index: 1;
 }
 
 .container_dettagli {
@@ -99,7 +108,7 @@ body {
   overflow: auto;
   text-align: center;
   color: #8f8f8f;
-  font-family: "DejaVu Serif";
+  font-family: "DejaVu Serif", serif;
   margin: 5% auto 0;
   padding-left: 3%;
   border: none;
@@ -112,7 +121,7 @@ body {
 }
 
 #fase_due {
-  background-image: url(imgs/iscrizione/sfondo_iscrizione_completo_Dettagli.png);
+  background-image: url("imgs/iscrizione/sfondo_iscrizione_completo_Dettagli.png");
   background-size: contain;
   position: absolute;
   top: 0;
@@ -121,6 +130,7 @@ body {
   width: 100%;
   background-repeat: no-repeat;
   background-position: center top;
+  z-index: 1;
 }
 
 .container_recap {
@@ -129,7 +139,7 @@ body {
   overflow: auto;
   text-align: center;
   color: #8f8f8f;
-  font-family: "DejaVu Serif";
+  font-family: "DejaVu Serif", serif;
   margin: 5% auto 0;
   padding-left: 3%;
   border: none;
