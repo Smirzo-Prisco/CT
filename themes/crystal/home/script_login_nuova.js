@@ -44,7 +44,8 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
     const nav       = document.getElementById('mainNav');
     if (!hamburger || !nav) return;
 
-    hamburger.addEventListener('click', () => {
+    hamburger.addEventListener('click', e => {
+        e.stopPropagation();
         const open = nav.classList.toggle('open');
         hamburger.classList.toggle('open', open);
     });
@@ -57,9 +58,9 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
         }
     });
 
-    // Chiudi il menu cliccando fuori
+    // Chiudi il menu cliccando fuori (esclude hamburger e i suoi span interni)
     document.addEventListener('click', e => {
-        if (!nav.contains(e.target) && e.target !== hamburger) {
+        if (!nav.contains(e.target) && !hamburger.contains(e.target)) {
             nav.classList.remove('open');
             hamburger.classList.remove('open');
         }
