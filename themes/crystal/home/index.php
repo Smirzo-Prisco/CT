@@ -28,7 +28,7 @@ if ($PARAMETERS['settings']['protection'] == 'ON'){
             <nav>
                 <ul class="navigation">
                     <li><a href="#" id="loginBtn">Login</a></li>
-                    <li><a href="index.php?page=iscrizione" target="_blank">REGISTRAZIONE</a></li>
+                    <li><a href="iscrizione.php" target="_blank">REGISTRAZIONE</a></li>
                     <li><a href="../documentazione_main.php" target="_blank">AMBIENTAZIONE</a></li>
                     <li><a href="/docs/il_gioco.html">Il Gioco</a></li>
                     <li><a href="#" id="reportLink">SEGNALA</a></li>
