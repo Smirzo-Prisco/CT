@@ -7,25 +7,49 @@ document.addEventListener("DOMContentLoaded", function() {
     customBox.style.backgroundColor = bodyBgColor;
 });
 
-const loginBtn = document.getElementById('loginBtn');
+const loginBtn     = document.getElementById('loginBtn');
 const loginContent = document.getElementById('loginContent');
-const closeBtn = document.querySelector('.close');
+const closeBtn     = document.querySelector('.close');
 
-// Aggiungi un gestore di eventi al pulsante di login per aprire la finestra modale
-loginBtn.addEventListener('click', () => {
-    loginContent.style.display = 'block';
-});
-
-// Aggiungi un gestore di eventi per il pulsante di chiusura della finestra modale
-closeBtn.addEventListener('click', () => {
-    loginContent.style.display = 'none';
-});
-
-// Chiudi la finestra modale cliccando al di fuori di essa
-window.addEventListener('click', (event) => {
-    if (event.target === loginContent) {
-        loginContent.style.display = 'none';
+function positionLoginModal() {
+    if (window.innerWidth <= 768) {
+        const header  = document.querySelector('header');
+        const headerH = header ? header.getBoundingClientRect().bottom : 60;
+        const top     = headerH + 10;
+        loginContent.style.top       = top + 'px';
+        loginContent.style.transform = 'translateX(-50%)';
+        loginContent.style.maxHeight = (window.innerHeight - top - 10) + 'px';
+        loginContent.style.overflowY = 'auto';
+    } else {
+        loginContent.style.top       = '';
+        loginContent.style.transform = '';
+        loginContent.style.maxHeight = '';
+        loginContent.style.overflowY = '';
     }
+}
+
+function openLoginModal() {
+    const bb  = document.getElementById('bottomBanner');
+    const cb  = document.querySelector('.content-box');
+    if (bb) bb.style.display = 'none';
+    if (cb) cb.style.display = 'none';
+    loginContent.style.display = 'block';
+    positionLoginModal();
+}
+
+function closeLoginModal() {
+    const bb = document.getElementById('bottomBanner');
+    const cb = document.querySelector('.content-box');
+    loginContent.style.display = 'none';
+    if (bb) bb.style.display = '';
+    if (cb) cb.style.display = '';
+}
+
+loginBtn.addEventListener('click', openLoginModal);
+closeBtn.addEventListener('click', closeLoginModal);
+
+window.addEventListener('click', (event) => {
+    if (event.target === loginContent) closeLoginModal();
 });
 
 // Aggiungi un gestore di eventi al link "Recupero password"
