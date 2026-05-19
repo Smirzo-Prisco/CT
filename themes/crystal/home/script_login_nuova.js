@@ -55,10 +55,12 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
 
     function positionModal() {
         if (window.innerWidth <= 768) {
-            const header    = document.querySelector('header');
-            const headerH   = header ? header.getBoundingClientRect().bottom : 60;
-            const top       = headerH + 10;
-            const maxHeight = window.innerHeight - top - 10;
+            const header     = document.querySelector('header');
+            const banner     = document.getElementById('bottomBanner');
+            const headerH    = header ? header.getBoundingClientRect().bottom : 60;
+            const bannerTop  = banner ? banner.getBoundingClientRect().top : window.innerHeight;
+            const top        = headerH + 10;
+            const maxHeight  = bannerTop - top - 10;
             modal.style.top       = top + 'px';
             modal.style.transform = 'translateX(-50%)';
             modal.style.maxHeight = maxHeight + 'px';

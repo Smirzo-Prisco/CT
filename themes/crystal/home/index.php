@@ -176,7 +176,7 @@ I giocatori possono creare il proprio personaggio scegliendo una famiglia e un m
         </div>
 
         <!-- Bandiera Palestina con scritta -->
-        <div style="position:fixed; bottom:20px; right:20px; z-index:9999; background:rgba(255,255,255,0.2); padding:10px; border-radius:8px; text-align:center; max-width:250px;">
+        <div id="bottomBanner" style="position:fixed; bottom:20px; right:20px; z-index:9999; background:rgba(255,255,255,0.2); padding:10px; border-radius:8px; text-align:center; max-width:250px;">
             <a href="https://globalsumudflotilla.org/" target="_blank" style="display:block; width:120px; height:80px; margin:0 auto 10px auto; background-image:url('https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Palestine.svg'); background-size:cover; background-position:center; border:2px solid #000; border-radius:6px;">
             </a>
             <div style="font-size:12px; color:white; font-weight:bold; line-height:1.2;">
