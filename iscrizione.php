@@ -545,4 +545,7 @@ MESTIERE (<a style="font-size: 18px; color: #8f8f8f; font-family: DejaVu Serif; 
 </div>
 </div>
 
-<?php require 'footer.inc.php'; ?>
+<?php
+$scripts = $scripts ?? [];
+require 'footer.inc.php';
+?>
