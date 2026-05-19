@@ -71,15 +71,19 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
         }
     }
 
+    const contentBox = document.querySelector('.content-box');
+
     function openModal() {
         modal.style.display = 'block';
         positionModal();
+        if (contentBox) contentBox.style.display = 'none';
         if (!optionsLoaded) loadOptions();
         if (!terminiLoaded) loadTermini();
     }
 
     function closeModal() {
         modal.style.display = 'none';
+        if (contentBox) contentBox.style.display = '';
     }
 
     function makeToggle(btn, div, labelOpen, labelClose) {
