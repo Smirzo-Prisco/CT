@@ -78,6 +78,14 @@ Proprietà intellettuale
 Il codice, la grafica, la base dati e tutti i contenuti della piattaforma sono di proprietà della gestione. In caso di abbandono, l'utente non vanta alcun diritto su grafica, personaggi, storie o contenuti creati durante la partecipazione al gioco.
 Salute
 Si sconsiglia l'uso prolungato della piattaforma. Si consiglia di effettuare pause regolari e di interrompere il gioco in caso di stati ansiosi o di stress.";
+/* Informazioni */
+$MESSAGE['register']['rules_read'] = "Crystaltokyo gdr nasce da una rielaborazione di molti elementi classici del fumetto giapponese e di alcuni elementi di culto della tradizione occidentale che confluiscono in una realtà metropolitana postmoderna.<br>
+L'ambientazione può considerarsi a tutti gli effetti una invenzione del gestore e dei più stretti collaboratori.<br>
+Il sito è stato creato e viene mantenuto gratuitamente, con il solo scopo ricreativo e senza alcuno scopo di lucro; qualsiasi riferimento a fatti e persone all'interno del gioco è puramente casuale.<br>
+Lo Staff non si assume nessuna responsabilità per la scelta delle immagini da parte degli utenti; tuttavia qualora una immagine dovesse ledere la normativa vigente in materia di privacy (ai sensi del D. Lgs 196/2003 ed attuale regolamento (ue) 2016/679, si provvederà immediatamente alla sua rimozione.<br>
+Tutte le immagini prelevate da eventuali siti esterni sono state inserite solo dopo l'autorizzazione dei legittimi proprietari.<br>
+A seguito di un eventuale abbandono della piattaforma di gioco da parte di un Utente, lo stesso non vanta alcun diritto di proprietà intellettuale su: grafica, eventuali spunti forniti alla documentazione di gioco, personaggi creati e personaggi non giocanti (se specificamente autorizzati dalla gestione), storie create e circostanze che si sono verificate in gioco, che restano a tutti gli effetti parte integrante della land e perciò di proprietà della stessa.";
+
 /* Benvenuti */
 $MESSAGE['register']['welcome']['message']['subject'] = 'Registrazione a';
 $MESSAGE['register']['welcome']['message'][0] = 'Lo staff di';
