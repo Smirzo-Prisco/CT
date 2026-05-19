@@ -406,12 +406,9 @@ export default function MapClick() {
                                 title={zone.name}
                             >
                                 <div style={{
-                                    width: '14px', height: '14px',
+                                    width: '23px', height: '23px',
                                     borderRadius: '50%',
-                                    backgroundColor: openZone === zone.id ? '#ffcc00' : 'rgba(255,255,255,0.7)',
-                                    border: '2px solid rgba(0,0,0,0.5)',
-                                    boxShadow: '0 0 6px rgba(0,0,0,0.6)',
-                                    transition: 'background-color 0.2s',
+                                    backgroundColor: 'transparent',
                                 }} />
                             </div>
                         )

@@ -48,7 +48,7 @@ const COLONNE = [
         links: [
             // { label: 'SCEGLI LAVORO',                      url: 'main.php?page=scegli_lavoro' },
             { label: 'CREA OGGETTO', url: 'main.php?page=oggetto_aggiungi_richiesta' },
-            { label: 'POTENZIA UMANO', url: 'main.php?page=scegli_umano' },
+            // { label: 'POTENZIA UMANO', url: 'main.php?page=scegli_umano' },
             // { label: 'SCEGLI CORRENTE E VIA',              url: 'main.php?page=scegli_inclinazione' },
             { label: 'SCEGLI MESTIERE', url: 'main.php?page=scegli_mestiere' },
         ],
