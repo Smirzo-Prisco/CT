@@ -53,8 +53,25 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
     let optionsLoaded = false;
     let terminiLoaded = false;
 
+    function positionModal() {
+        if (window.innerWidth <= 768) {
+            const header    = document.querySelector('header');
+            const headerH   = header ? header.getBoundingClientRect().bottom : 60;
+            const top       = headerH + 10;
+            const maxHeight = window.innerHeight - top - 10;
+            modal.style.top       = top + 'px';
+            modal.style.transform = 'translateX(-50%)';
+            modal.style.maxHeight = maxHeight + 'px';
+        } else {
+            modal.style.top       = '';
+            modal.style.transform = '';
+            modal.style.maxHeight = '';
+        }
+    }
+
     function openModal() {
         modal.style.display = 'block';
+        positionModal();
         if (!optionsLoaded) loadOptions();
         if (!terminiLoaded) loadTermini();
     }

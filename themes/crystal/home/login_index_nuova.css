@@ -424,8 +424,7 @@ header {
 
 /* ── Modale Registrazione ───────────────────────────────────────────── */
 
-/* Sovrascrive il centramento verticale generico: la modale parte sempre
-   a 70px dal top (sotto il menu) e si estende verso il basso con scroll */
+/* Desktop: parte 70px dal top, scroll interno */
 #registrazioneContent {
     top: 70px;
     transform: translateX(-50%);
@@ -436,6 +435,15 @@ header {
 #registrazioneContent .reg-box {
     max-height: none;
     overflow-y: visible;
+}
+
+/* Mobile: posizione calcolata via JS (data-top / data-maxh),
+   larghezza quasi piena schermo */
+@media (width <= 768px) {
+    #registrazioneContent {
+        width: 96%;
+        max-width: 96%;
+    }
 }
 
 #registrazioneContent .input-group small {
