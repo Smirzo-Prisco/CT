@@ -260,6 +260,7 @@ export default function Scheda() {
     const [profile, setProfile] = useState(null)
     const [error, setError]     = useState(null)
     const [noteFatoOpen, setNoteFatoOpen] = useState(false)
+    const scopedStyleEl = useRef(null)
 
     useEffect(() => {
         if (!pg) { setError('Personaggio non specificato'); return }
@@ -271,6 +272,24 @@ export default function Scheda() {
             })
             .catch(() => setError('Errore di rete'))
     }, [pg])
+
+    // Inietta in <head> il CSS dai campi DB, limitato a .pagina_scheda.
+    // Rimosso automaticamente quando si lascia la scheda.
+    useEffect(() => {
+        if (!profile) return
+        const allCss = [profile.principale, profile.particolari, profile.note_fato]
+            .map(s => extractAndScopeStyles(s).css)
+            .filter(Boolean)
+            .join('\n')
+        if (scopedStyleEl.current) scopedStyleEl.current.remove()
+        if (allCss) {
+            const el = document.createElement('style')
+            el.textContent = allCss
+            document.head.appendChild(el)
+            scopedStyleEl.current = el
+        }
+        return () => { if (scopedStyleEl.current) scopedStyleEl.current.remove() }
+    }, [profile])
 
     if (error) {
         return (
@@ -291,25 +310,6 @@ export default function Scheda() {
     const { nome, cognome, is_own, is_staff, is_admin, is_master,
             particolari, note_fato, principale,
             data_iscrizione, ora_entrata, url_media } = profile
-
-    // Estrae <style> dai campi DB e li inietta in <head> scopati a .pagina_scheda.
-    // L'elemento <style> viene rimosso al dismount del componente.
-    const scopedStyleEl = useRef(null)
-    useEffect(() => {
-        const sources = [principale, particolari, note_fato]
-        const allCss = sources
-            .map(s => extractAndScopeStyles(s).css)
-            .filter(Boolean)
-            .join('\n')
-        if (scopedStyleEl.current) scopedStyleEl.current.remove()
-        if (allCss) {
-            const el = document.createElement('style')
-            el.textContent = allCss
-            document.head.appendChild(el)
-            scopedStyleEl.current = el
-        }
-        return () => { if (scopedStyleEl.current) scopedStyleEl.current.remove() }
-    }, [principale, particolari, note_fato])
 
     const { html: principaleHtml } = extractAndScopeStyles(principale)
     const { html: particolariHtml } = extractAndScopeStyles(particolari)
