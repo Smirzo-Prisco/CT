@@ -421,3 +421,87 @@ header {
         font-size: 0.8rem;
     }
 }
+
+/* ── Modale Registrazione ───────────────────────────────────────────── */
+
+#registrazioneContent .reg-box {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+#registrazioneContent .input-group small {
+    display: block;
+    font-size: 11px;
+    color: #888;
+    margin-top: 3px;
+}
+
+#registrazioneContent .input-group select {
+    width: 100%;
+    padding: 8px 10px;
+    background-color: #1a1e2e;
+    color: #b4b6bf;
+    border: 1px solid #3a3f5e;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+#registrazioneContent .input-group a {
+    color: #9a6353;
+    font-weight: bold;
+}
+
+/* Riga checkbox T&C */
+.tc-group { margin-top: 12px; }
+
+.tc-check-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #b4b6bf;
+}
+
+.tc-check-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.tc-check-row label { cursor: pointer; }
+
+/* Bottone inline che sembra un link */
+.tc-link {
+    background: none;
+    border: none;
+    color: #9a6353;
+    cursor: pointer;
+    font-size: inherit;
+    padding: 0;
+    text-decoration: underline;
+}
+
+.tc-link:hover { color: #c0705a; }
+
+/* Contenitore testo T&C espandibile */
+.tc-content {
+    margin-top: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #111423;
+    border: 1px solid #2a2f4a;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 11px;
+    color: #888;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.tc-content h4 {
+    color: #9a6353;
+    margin: 8px 0 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+}

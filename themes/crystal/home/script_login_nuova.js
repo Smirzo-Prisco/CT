@@ -37,6 +37,81 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
     passwordRecoveryDiv.style.display = 'block';
 });
 
+// ── Modale Registrazione ──────────────────────────────────────────────────
+
+(function () {
+    const btn     = document.getElementById('registrazioneBtn');
+    const modal   = document.getElementById('registrazioneContent');
+    const closeEl = document.getElementById('closeRegModal');
+    const tcBtn   = document.getElementById('tcToggleBtn');
+    const tcDiv   = document.getElementById('tcContent');
+    const tcText  = document.getElementById('tcText');
+
+    let optionsLoaded = false;
+    let terminiLoaded = false;
+
+    function openModal() {
+        modal.style.display = 'block';
+        if (!optionsLoaded) loadOptions();
+        if (!terminiLoaded) loadTermini();
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    function loadOptions() {
+        fetch('/pages/api_iscrizione.php?op=options')
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) return;
+                optionsLoaded = true;
+
+                const razzaEl    = document.getElementById('regRazza');
+                const mestiereEl = document.getElementById('regMestiere');
+
+                razzaEl.innerHTML = data.razze.map(
+                    r => `<option value="${r.id}">${r.nome}</option>`
+                ).join('');
+
+                mestiereEl.innerHTML = data.mestieri.map(
+                    m => `<option value="${m.id}">${m.nome}</option>`
+                ).join('');
+            })
+            .catch(() => {});
+    }
+
+    function loadTermini() {
+        fetch('/pages/api_iscrizione.php?op=termini')
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) return;
+                terminiLoaded = true;
+                tcText.innerHTML =
+                    '<h4>Condizioni generali d\'uso</h4>' + data.disclaimer +
+                    '<h4>Regolamento</h4>' + data.regolamento;
+            })
+            .catch(() => {});
+    }
+
+    btn.addEventListener('click', e => { e.preventDefault(); openModal(); });
+    closeEl.addEventListener('click', closeModal);
+    window.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    tcBtn.addEventListener('click', () => {
+        const visible = tcDiv.style.display !== 'none';
+        tcDiv.style.display = visible ? 'none' : 'block';
+        tcBtn.textContent = visible ? 'Termini e Condizioni' : 'Nascondi';
+    });
+
+    document.getElementById('regForm').addEventListener('submit', function (e) {
+        if (!document.getElementById('regTc').checked) {
+            e.preventDefault();
+            alert('Devi accettare i Termini e Condizioni per procedere.');
+        }
+    });
+}());
+
 document.addEventListener("DOMContentLoaded", function() {
     // Ottieni il riferimento al link "SEGNALA"
     var reportLink = document.querySelector('#reportLink');

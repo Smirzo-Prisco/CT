@@ -28,7 +28,7 @@ if ($PARAMETERS['settings']['protection'] == 'ON'){
             <nav>
                 <ul class="navigation">
                     <li><a href="#" id="loginBtn">Login</a></li>
-                    <li><a href="iscrizione.php" target="_blank">REGISTRAZIONE</a></li>
+                    <li><a href="#" id="registrazioneBtn">REGISTRAZIONE</a></li>
                     <li><a href="../documentazione_main.php" target="_blank">AMBIENTAZIONE</a></li>
                     <li><a href="/docs/il_gioco.html">Il Gioco</a></li>
                     <li><a href="#" id="reportLink">SEGNALA</a></li>
@@ -82,6 +82,66 @@ I giocatori possono creare il proprio personaggio scegliendo una famiglia e un m
                         <button type="submit" class="submit-button">Recupera password</button>
                     </form>
                 </div>
+            </div>
+        </div>
+
+        <!-- MODALE REGISTRAZIONE -->
+        <div id="registrazioneContent" class="custom-content" style="display:none;">
+            <div class="custom-box reg-box">
+                <span id="closeRegModal" class="close">&times;</span>
+                <h2>Registrazione</h2>
+
+                <form id="regForm" method="post" action="iscrizione.php">
+                    <input type="hidden" name="fase" value="2">
+                    <input type="hidden" name="genere" value="m">
+
+                    <div class="input-group">
+                        <label>E-MAIL</label>
+                        <input type="email" name="email" placeholder="Inserisci la tua e-mail" required>
+                        <small>Inserire un'e-mail valida, altrimenti non sarà possibile completare la registrazione</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label>NOME</label>
+                        <input type="text" name="nome" placeholder="Nome personaggio" required maxlength="20">
+                        <small>Max 20 caratteri, solo lettere, iniziale maiuscola</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label>COGNOME</label>
+                        <input type="text" name="cognome" placeholder="Cognome personaggio" maxlength="20">
+                        <small>Max 20 caratteri, solo lettere, iniziale maiuscola</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label>SPIRITO (<a href="/statuti/spiriti/spiriti.html" target="_blank">?</a>)</label>
+                        <select name="razza" id="regRazza" required>
+                            <option value="">Caricamento...</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>MESTIERE (<a href="/statuti/mestieri/mestieri_info.html" target="_blank">?</a>)</label>
+                        <select name="mestiere" id="regMestiere" required>
+                            <option value="">Caricamento...</option>
+                        </select>
+                    </div>
+
+                    <!-- Termini e condizioni -->
+                    <div class="input-group tc-group">
+                        <div class="tc-check-row">
+                            <input type="checkbox" id="regTc" required>
+                            <label for="regTc">Ho letto e accetto i <button type="button" id="tcToggleBtn" class="tc-link">Termini e Condizioni</button></label>
+                        </div>
+                        <div id="tcContent" class="tc-content" style="display:none;">
+                            <div id="tcText"><em>Caricamento...</em></div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <button type="submit" class="submit-button">Avanti &rsaquo;</button>
+                    </div>
+                </form>
             </div>
         </div>
 
