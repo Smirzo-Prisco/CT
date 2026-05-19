@@ -2,16 +2,23 @@
   --width: 1vw;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 body {
   background-color: #000;
   text-align: center;
-  margin: 0;
 }
 
 #fase_0 {
   background-image: url(imgs/iscrizione/sfondo_iscrizione_completo_corretto.png);
   background-size: contain;
-  min-height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
   width: 100%;
   background-repeat: no-repeat;
   background-position: center top;
@@ -44,7 +51,7 @@ body {
 }
 
 .accetto {
-   position: relative;
+  position: relative;
   width: 30%;
   height: calc(var(--width)*653*1920/94800);
   overflow: auto;
@@ -66,7 +73,6 @@ body {
     margin-top: 12.5%;
     padding-left: 10%;
   }
-  
   .info {
     width: 70%;
     height: 25%;
@@ -78,7 +84,10 @@ body {
 #fase_uno {
   background-image: url(imgs/iscrizione/sfondo_iscrizione_completo_Dettagli_corretto.png);
   background-size: contain;
-  min-height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
   width: 100%;
   background-repeat: no-repeat;
   background-position: center top;
@@ -105,7 +114,10 @@ body {
 #fase_due {
   background-image: url(imgs/iscrizione/sfondo_iscrizione_completo_Dettagli.png);
   background-size: contain;
-  min-height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
   width: 100%;
   background-repeat: no-repeat;
   background-position: center top;
