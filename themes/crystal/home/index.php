@@ -127,14 +127,23 @@ I giocatori possono creare il proprio personaggio scegliendo una famiglia e un m
                         </select>
                     </div>
 
+                    <!-- Informazioni sul gioco -->
+                    <div class="input-group tc-group">
+                        <button type="button" id="infoToggleBtn" class="tc-link">&#9432; Informazioni sul gioco</button>
+                        <div id="infoContent" class="tc-content" style="display:none;">
+                            <div id="infoText"><em>Caricamento...</em></div>
+                        </div>
+                    </div>
+
                     <!-- Termini e condizioni -->
                     <div class="input-group tc-group">
-                        <div class="tc-check-row">
-                            <input type="checkbox" id="regTc" required>
-                            <label for="regTc">Ho letto e accetto i <button type="button" id="tcToggleBtn" class="tc-link">Termini e Condizioni</button></label>
-                        </div>
+                        <button type="button" id="tcToggleBtn" class="tc-link">&#9432; Termini e Condizioni</button>
                         <div id="tcContent" class="tc-content" style="display:none;">
                             <div id="tcText"><em>Caricamento...</em></div>
+                        </div>
+                        <div class="tc-check-row" style="margin-top:8px;">
+                            <input type="checkbox" id="regTc" required>
+                            <label for="regTc">Ho letto e accetto i Termini e Condizioni</label>
                         </div>
                     </div>
 

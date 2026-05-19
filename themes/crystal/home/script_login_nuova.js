@@ -40,12 +40,15 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
 // ── Modale Registrazione ──────────────────────────────────────────────────
 
 (function () {
-    const btn     = document.getElementById('registrazioneBtn');
-    const modal   = document.getElementById('registrazioneContent');
-    const closeEl = document.getElementById('closeRegModal');
-    const tcBtn   = document.getElementById('tcToggleBtn');
-    const tcDiv   = document.getElementById('tcContent');
-    const tcText  = document.getElementById('tcText');
+    const btn       = document.getElementById('registrazioneBtn');
+    const modal     = document.getElementById('registrazioneContent');
+    const closeEl   = document.getElementById('closeRegModal');
+    const tcBtn     = document.getElementById('tcToggleBtn');
+    const tcDiv     = document.getElementById('tcContent');
+    const tcText    = document.getElementById('tcText');
+    const infoBtn   = document.getElementById('infoToggleBtn');
+    const infoDiv   = document.getElementById('infoContent');
+    const infoText  = document.getElementById('infoText');
 
     let optionsLoaded = false;
     let terminiLoaded = false;
@@ -60,21 +63,24 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
         modal.style.display = 'none';
     }
 
+    function makeToggle(btn, div, labelOpen, labelClose) {
+        btn.addEventListener('click', () => {
+            const visible = div.style.display !== 'none';
+            div.style.display = visible ? 'none' : 'block';
+            btn.textContent = visible ? labelOpen : labelClose;
+        });
+    }
+
     function loadOptions() {
         fetch('/pages/api_iscrizione.php?op=options')
             .then(r => r.json())
             .then(data => {
                 if (!data.success) return;
                 optionsLoaded = true;
-
-                const razzaEl    = document.getElementById('regRazza');
-                const mestiereEl = document.getElementById('regMestiere');
-
-                razzaEl.innerHTML = data.razze.map(
+                document.getElementById('regRazza').innerHTML = data.razze.map(
                     r => `<option value="${r.id}">${r.nome}</option>`
                 ).join('');
-
-                mestiereEl.innerHTML = data.mestieri.map(
+                document.getElementById('regMestiere').innerHTML = data.mestieri.map(
                     m => `<option value="${m.id}">${m.nome}</option>`
                 ).join('');
             })
@@ -87,9 +93,8 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
             .then(data => {
                 if (!data.success) return;
                 terminiLoaded = true;
-                tcText.innerHTML =
-                    '<h4>Condizioni generali d\'uso</h4>' + data.disclaimer +
-                    '<h4>Regolamento</h4>' + data.regolamento;
+                infoText.innerHTML = data.regolamento;
+                tcText.innerHTML   = data.disclaimer;
             })
             .catch(() => {});
     }
@@ -98,11 +103,8 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
     closeEl.addEventListener('click', closeModal);
     window.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
-    tcBtn.addEventListener('click', () => {
-        const visible = tcDiv.style.display !== 'none';
-        tcDiv.style.display = visible ? 'none' : 'block';
-        tcBtn.textContent = visible ? 'Termini e Condizioni' : 'Nascondi';
-    });
+    makeToggle(infoBtn, infoDiv, 'ℹ Informazioni sul gioco', '✕ Chiudi informazioni');
+    makeToggle(tcBtn,  tcDiv,  'ℹ Termini e Condizioni',   '✕ Chiudi termini');
 
     document.getElementById('regForm').addEventListener('submit', function (e) {
         if (!document.getElementById('regTc').checked) {
