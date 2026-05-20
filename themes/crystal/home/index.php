@@ -101,7 +101,7 @@ I giocatori possono creare il proprio personaggio scegliendo una famiglia e un m
                     <div class="input-group">
                         <label>E-MAIL</label>
                         <input type="email" name="email" placeholder="Inserisci la tua e-mail" required>
-                        <small>Inserire un'e-mail valida, altrimenti non sarà possibile completare la registrazione</small>
+                        <small>Inserire un'e-mail valida</small>
                     </div>
 
                     <div class="input-group">
@@ -117,7 +117,7 @@ I giocatori possono creare il proprio personaggio scegliendo una famiglia e un m
                     </div>
 
                     <div class="input-group">
-                        <label>SPIRITO (<a href="/statuti/spiriti/spiriti.html" target="_blank">?</a>)</label>
+                        <label>RAZZA (<a href="/statuti/spiriti/spiriti.html" target="_blank">?</a>)</label>
                         <select name="razza" id="regRazza" required>
                             <option value="">Caricamento...</option>
                         </select>
