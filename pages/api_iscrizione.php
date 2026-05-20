@@ -17,9 +17,9 @@ $op = $_GET['op'] ?? '';
 if ($op === 'options') {
 
     $razze = [];
-    $r = gdrcd_query("SELECT id_razza, nome_razza FROM razza WHERE iscrizione=1 ORDER BY nome_razza", 'result');
+    $r = gdrcd_query("SELECT id_gilda, nome FROM gilda WHERE visibile=1 ORDER BY nome", 'result');
     while ($row = gdrcd_query($r, 'fetch')) {
-        $razze[] = ['id' => (int)$row['id_razza'], 'nome' => $row['nome_razza']];
+        $razze[] = ['id' => (int)$row['id_gilda'], 'nome' => $row['nome']];
     }
     gdrcd_query($r, 'free');
 
