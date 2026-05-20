@@ -1034,13 +1034,13 @@ function elaborateDefence($id_role, $turn, &$riepilogo) {
         $target = $r['target'];
         $d20 = $r['dice'];
         
-        if(!in_array($striker, $difensori)) array_push($difensori, $striker); // Salvo colui che lancia lo scudo. Mi serve per impedire che possa difendersi con i dadi
+        $difensori[$striker] = true; // Salvo colui che lancia lo scudo. Mi serve per impedire che possa difendersi con i dadi
         
         // Se il dado è 10 o superiore, la difesa ha successo
         if($d20 < 10) $scudo = 0;
         else {
             $scudo = 1;
-            if(!in_array($target, $intoccabili)) array_push($intoccabili, $target); // Salvo i bersagli difesi come intoccabili
+            $intoccabili[$target] = true; // Salvo i bersagli difesi come intoccabili
         }
 
         if (!isset($riepilogo[$target])) $riepilogo[$target] = array(); // Inizializzo l'array del pg
@@ -1088,7 +1088,7 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
             switch ($sottotipo) {
                 case 'usa_creatura': // Indipendentemente dal bersaglio selezionato, il castatore dà vita alla sua creatura
                     if($dice >= 10) {
-                        $exists = gdrcd_query("SELECT count(*) as creatura FROM personaggio WHERE nome = 'creatura di $striker'")['creauta'];
+                        $exists = gdrcd_query("SELECT count(*) as creatura FROM personaggio WHERE nome = 'creatura di $striker'")['creatura'];
                         
                         // Controllo se la creatura è già presente
                         if($exists > 0) $msg .= $pgTag." ha già una creatura in gioco.<br>";
@@ -1101,7 +1101,7 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                 break;
                 case 'danni_dimezzati_nonostante_scudo': // Se il bersaglio è scudato, subisce comunque metà danno
                     // Tolgo il bersaglio dagli intoccabili, così da poter elaborare l'attacco con danni dimezzati nella fase di elaborazione degli attacchi
-                    if(in_array($target, $intoccabili)) $intoccabili = array_diff($intoccabili, [$target]);
+                    unset($intoccabili[$target]);
                 break;
                 case 'creatura_attacca_padrone': // L'attacco con creatura viene rivolto verso colui che lo esegue
                     if($dice >= 10) {
@@ -1118,7 +1118,7 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                 case 'annulla_attacchi_verso_bersaglio': // In dubbio
                     if($dice >= 10) {
                         // Se non è presente nell'array "intoccabili", lo aggiungo
-                        if(!in_array($target, $intoccabili)) array_push($intoccabili, $target);
+                        $intoccabili[$target] = true;
                         $msg .= $pgTag." lancia una skill generica che annulla ogni attacco verso $target per questo turno.<br>";
                     } else $msg .= $pgTag." tenta di lanciare una skill generica che annulla ogni attacco verso $target per questo turno, ma fallisce.<br>";
                 break;
@@ -1156,7 +1156,7 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
 
 // Elaboro tutte le azioni di attacco del turno, tenendo conto delle difese riuscite e fallite
 function elaborateAttack($id_role, $turn, $intoccabili, $difensori, &$riepilogo) {
-    $defaultDamage = 25;
+    $defaultDamage = 15;
 
     // Prendo tutte le azioni d'attacco del turno
     $result = gdrcd_query("SELECT * FROM role_fights WHERE id_role = $id_role AND turn = $turn AND car IN ('destrezza', 'mente', 'potere') ORDER BY id ASC", 'result');
@@ -1186,10 +1186,9 @@ function elaborateAttack($id_role, $turn, $intoccabili, $difensori, &$riepilogo)
 
         // Elaboro l'attacco verso tutti i bersagli tenendo conto delle difese riuscite e fallite
         elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, $defaultDamage, $riepilogo);
-        // $riepilogo = $elaborateAttackTarget['riepilogo']; // Riepilogo aggiornato con eventuali danni subiti dai bersagli
     }
 
-    return; // array('riepilogo' => $riepilogo);
+    return;
 }
 
 // Per ogni azione di attacco del turno, per ogni bersaglio...
@@ -1202,7 +1201,7 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
     foreach($targets as $k => $target) {
         $carDifesa = getDefenceCar(strtolower($r['car']), $target); // Recupero le info sulla caratteristica usata per il tiro di difesa
         $damage = 0; // Inizializzo il danno subito dal bersaglio
-        $defaultDamage = 15; // Danno di default da scalare al bersaglio se non riesce a difendersi
+        // $defaultDamage = 15; // Danno di default da scalare al bersaglio se non riesce a difendersi
         $durata = 0; // Inizializzo la durata (in turni) di eventuali effetti applicati al bersaglio
         $moltiplicatore = 1; // Inizializzo il moltiplicatore di danno
         $dadoDifesa = 0; // Inizializzo il dado di difesa, che servirà per il calcolo del danno in caso di difese fallite che consentono comunque di lanciare un dado di difesa
@@ -1213,7 +1212,7 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
             
         // Se il bersaglio può lanciare un dado automatico di difesa perché non ha lanciato uno scudo in questo turno e neanche nel precedente
         if($can_send === 1) {
-            if(!in_array($target, $difensori)) { // Se non ha usato lo scudo in questo turno, significa che deve difendersi con un dado
+            if(!isset($difensori[$target])) { // Se non ha usato lo scudo in questo turno, significa che deve difendersi con un dado
                 // In base al dado di attacco, devo lanciare il dado di difesa
                 $dadoDifesa = lanciaStat($id_role, $striker, $target, true, $carDifesa['nome'], $carDifesa['nome'], $carDifesa['car'], $carDifesa['punti'], 0, 0)['risultato'];
 
@@ -1225,8 +1224,8 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
 
                     // Se il bersalio subisce danni sull'integrità e scende sotto un tot, subisce la durata
                     $durata = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
-                }
-            } else $damage = in_array($target, $intoccabili) ? 0 : $defaultDamage; // In questo caso il bersaglio ha usato lo scudo su qualcuno o su se stesso
+                } // Se è stato scudato, il danno è zero, altrimenti è quello di default
+            } else $damage = isset($intoccabili[$target]) ? 0 : $defaultDamage; // In questo caso il bersaglio ha usato lo scudo su qualcuno o su se stesso
         } else $damage = $defaultDamage; // Se non può lanciare il dado di difesa, subisce il danno di default
     
         // Salvo tutti gli attacchi ricevuti
@@ -1235,10 +1234,10 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
             'danno' => $damage,
             'punti' => $carDifesa['punti'], // Punti di salute o integrità prima dell'attacco
             'punti_type' => $carDifesa['type'], // Salute o integrità
-            'intoccabile' => in_array($target, $intoccabili), // Se è scudato o meno
+            'intoccabile' => isset($intoccabili[$target]), // Se è scudato o meno
             'can_send' => $can_send, // Se può lanciare un dado di difesa o meno
             'durata' => $durata, // Durata di eventuali mentali (in turni)
-            'scudo_fallito' => in_array($target, $difensori) ? true : false, // Se ha tentato di difendersi con lo scudo ma ha fallito
+            'scudo_fallito' => isset($difensori[$target]), // Se ha tentato di difendersi con lo scudo ma ha fallito
             'formula' => [
                 'dadoAttacco' => $dice,
                 'dadoDifesa' => $dadoDifesa,
