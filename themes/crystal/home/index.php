@@ -117,7 +117,8 @@ I giocatori possono creare il proprio personaggio scegliendo una famiglia e un m
                     </div>
 
                     <div class="input-group">
-                        <label>RAZZA (<a href="/statuti/spiriti/spiriti.html" target="_blank">?</a>)</label>
+                        <!-- /statuti/spiriti/spiriti.html -->
+                        <label>RAZZA (<a href="/statuti/inclinazioni/inclinazioni_vecchie.html" target="_blank">?</a>)</label>
                         <select name="razza" id="regRazza" required>
                             <option value="">Caricamento...</option>
                         </select>
