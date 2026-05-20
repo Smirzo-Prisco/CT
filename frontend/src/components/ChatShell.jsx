@@ -156,12 +156,6 @@ export default function ChatShell() {
         return () => sock.off('role:update', onRoleUpdate)
     }, [])
 
-    // Quando una role si avvia il bottone del pannello GDR compare nel DOM:
-    // bisogna riattaccare i listener di chat.js altrimenti i click non funzionano.
-    useEffect(() => {
-        if (roleActive) window.initChatListeners?.()
-    }, [roleActive])
-
     /**
      * Ascolta 'combat:attack_incoming': aggiunge un prompt di difesa per ogni
      * attacco che coinvolge il pg corrente come bersaglio.
@@ -364,7 +358,11 @@ export default function ChatShell() {
                                     <span id="rimanenti">0</span> caratteri
                                 </span>
                                 {showPanelBtn && (
-                                    <a href="#" id="openPanelBtn">
+                                    <a href="#" id="openPanelBtn" onClick={e => {
+                                        e.preventDefault()
+                                        const p = document.getElementById('chatPanel')
+                                        if (p) p.style.display = 'flex'
+                                    }}>
                                         <img title="Pannello GDR" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" />
                                     </a>
                                 )}

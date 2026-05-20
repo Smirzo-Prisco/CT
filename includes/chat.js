@@ -690,21 +690,16 @@ window.initChatListeners = function () {
     // anche da pagine che non hanno ancora renderizzato il pannello GDR
     var chat_skill = document.getElementById('chat_skill');
     var livello_skill = document.getElementById('livello_skill');
-    if (chat_skill)    chat_skill.addEventListener('change', aggiornaLivelli);         // aggiorna il livello max consentito al pg
-    if (livello_skill) livello_skill.addEventListener('change', aggiornaLimiteDaLivello); // aggiorna il limite bersagli
+    // removeEventListener+addEventListener su funzioni nominate: idempotente
+    if (chat_skill)    { chat_skill.removeEventListener('change', aggiornaLivelli);          chat_skill.addEventListener('change', aggiornaLivelli); }
+    if (livello_skill) { livello_skill.removeEventListener('change', aggiornaLimiteDaLivello); livello_skill.addEventListener('change', aggiornaLimiteDaLivello); }
 
-    // Il campo è una textarea, quindi devo catturare l'evento scatenato dal pulsante "Enter" della tastiera
+    // Assegnazione .on* invece di addEventListener: idempotente (sostituisce invece di accumulare)
     var chat_message = document.getElementById("message");
-    if (chat_message) chat_message.addEventListener("keydown", function (event) { if (event.key === "Enter" && !event.shiftKey) sendChatMessage(); });
+    if (chat_message) chat_message.onkeydown = function (event) { if (event.key === "Enter" && !event.shiftKey) sendChatMessage(); };
 
-    // Devo catturare l'evento "submit" del form di invio azione al click su invia
     var chat_form = document.getElementById("chat_form_messages");
-    if (chat_form) {
-        chat_form.addEventListener("submit", function (event) {
-            event.preventDefault();
-            sendChatMessage();
-        });
-    }
+    if (chat_form) chat_form.onsubmit = function (event) { event.preventDefault(); sendChatMessage(); };
 
     // Apertura funestra di scrittura libera
     var btn_scritturaLibera = document.getElementById("gdrOpenTextareaButton");
