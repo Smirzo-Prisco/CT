@@ -247,6 +247,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             $messaggio = gdrcd_filter('in', $messaggio);
             chatInsertMessage($luogo, $login, null, $messaggio, 'C', null, '', null);
+            checkTurnEnd($luogo, $login, $id_role); // Il difensore ha compiuto la sua azione
 
             echo json_encode(['success' => true, 'scelta' => $scelta, 'dice' => $dice]);
             exit;
