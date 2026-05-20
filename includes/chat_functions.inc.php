@@ -812,12 +812,12 @@ function checkTurnEnd($location, $user, $id_role) {
         $last_id = (int)gdrcd_query("SELECT MAX(id) AS last_id FROM chat")['last_id'];
 
         // Quindi recupero tutti i pg che hanno azionato
-        $pgs = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND `sent` = 1 AND role_session_players.end IS NULL", 'result');
+        $pgs = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND `sent` = 1 AND close_turn = 0 AND role_session_players.end IS NULL", 'result');
 
         // Se trovo solo un pg, significa che è da solo nella role, quindi attendo che se ne aggiungano altri prima di proporre la chiusura del turno
         if(gdrcd_query($pgs, 'num_rows') === 1) return;
 
-        // E mando un sussurro ad ognuno di loro per chiedere se vogliono chiudere il turno
+        // Mando un sussurro ad ognuno di loro per chiedere se vogliono chiudere il turno
         foreach($pgs as $pg) {
             $last_id++;
             $pgName = $pg['pg_name'];
@@ -1185,14 +1185,14 @@ function elaborateAttack($id_role, $turn, $intoccabili, $difensori, &$riepilogo)
         }
 
         // Elaboro l'attacco verso tutti i bersagli tenendo conto delle difese riuscite e fallite
-        elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, $defaultDamage, $riepilogo);
+        elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, $defaultDamage, $riepilogo, $turn);
     }
 
     return;
 }
 
 // Per ogni azione di attacco del turno, per ogni bersaglio...
-function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, $defaultDamage, &$riepilogo) {
+function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, $defaultDamage, &$riepilogo, $turn) {
     $striker = $r['striker']; // Attaccante
     $dice = $r['dice']; // Dado di attacco
     if (!isset($riepilogo[$striker])) $riepilogo[$striker] = array(); // Inizializzo l'array del pg
@@ -1201,30 +1201,43 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
     foreach($targets as $k => $target) {
         $carDifesa = getDefenceCar(strtolower($r['car']), $target); // Recupero le info sulla caratteristica usata per il tiro di difesa
         $damage = 0; // Inizializzo il danno subito dal bersaglio
-        // $defaultDamage = 15; // Danno di default da scalare al bersaglio se non riesce a difendersi
         $durata = 0; // Inizializzo la durata (in turni) di eventuali effetti applicati al bersaglio
         $moltiplicatore = 1; // Inizializzo il moltiplicatore di danno
         $dadoDifesa = 0; // Inizializzo il dado di difesa, che servirà per il calcolo del danno in caso di difese fallite che consentono comunque di lanciare un dado di difesa
 
         if (!isset($riepilogo[$target])) $riepilogo[$target] = array(); // Inizializzo l'array del pg
-        
+
         $can_send = (int)gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$target'")['can_send'];
-            
+
+        // Risposta immediata: il bersaglio ha scelto esplicitamente come reagire prima della fine turno
+        $dadoRisposta = gdrcd_query("SELECT dice FROM role_fights WHERE id_role=$id_role AND turn=$turn AND striker='$target' AND target='$striker' AND car='dado_risposta' LIMIT 1");
+        $subisce      = gdrcd_query("SELECT id   FROM role_fights WHERE id_role=$id_role AND turn=$turn AND striker='$target' AND target='$striker' AND car='subisce'       LIMIT 1");
+
         // Se il bersaglio può lanciare un dado automatico di difesa perché non ha lanciato uno scudo in questo turno e neanche nel precedente
         if($can_send === 1) {
             if(!isset($difensori[$target])) { // Se non ha usato lo scudo in questo turno, significa che deve difendersi con un dado
-                // In base al dado di attacco, devo lanciare il dado di difesa
-                $dadoDifesa = lanciaStat($id_role, $striker, $target, true, $carDifesa['nome'], $carDifesa['nome'], $carDifesa['car'], $carDifesa['punti'], 0, 0)['risultato'];
 
-                // Se il dado di attacco è maggiore di quello di difesa, il bersaglio subisce il danno
-                if($dice > $dadoDifesa) {
-                    // Altrimenti subisce il danno
-                    $moltiplicatore = (float)gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level'])['danno'];
-                    $damage = (($dice - $dadoDifesa) * $moltiplicatore / count($targets)); // Divido il danno tra i bersagli
+                if ($subisce) {
+                    // Il bersaglio ha scelto esplicitamente di subire: danno fisso, nessun dado di difesa
+                    $damage = $defaultDamage;
+                } elseif ($dadoRisposta) {
+                    // Il bersaglio ha già tirato il dado in risposta immediata: usa quel risultato
+                    $dadoDifesa = (int)$dadoRisposta['dice'];
+                    if($dice > $dadoDifesa) {
+                        $moltiplicatore = (float)gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level'])['danno'];
+                        $damage = (($dice - $dadoDifesa) * $moltiplicatore / count($targets));
+                        $durata = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
+                    }
+                } else {
+                    // Nessuna risposta immediata: auto-lancia il dado di difesa
+                    $dadoDifesa = lanciaStat($id_role, $striker, $target, true, $carDifesa['nome'], $carDifesa['nome'], $carDifesa['car'], $carDifesa['punti'], 0, 0)['risultato'];
+                    if($dice > $dadoDifesa) {
+                        $moltiplicatore = (float)gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level'])['danno'];
+                        $damage = (($dice - $dadoDifesa) * $moltiplicatore / count($targets));
+                        $durata = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
+                    }
+                }
 
-                    // Se il bersalio subisce danni sull'integrità e scende sotto un tot, subisce la durata
-                    $durata = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
-                } // Se è stato scudato, il danno è zero, altrimenti è quello di default
             } else $damage = isset($intoccabili[$target]) ? 0 : $defaultDamage; // In questo caso il bersaglio ha usato lo scudo su qualcuno o su se stesso
         } else $damage = $defaultDamage; // Se non può lanciare il dado di difesa, subisce il danno di default
     
@@ -1457,12 +1470,57 @@ function getRolePgs($id_role, $active = false) {
     return $users;
 }
 
-// Registra un'azione di combattimento nella role
+// Registra un'azione di combattimento nella role e restituisce l'ID inserito
 function fight($id_role, $striker, $target, $id_skill, $level, $car, $dice, $recap='') {
     $turn = getTurn($id_role);
     $query = "INSERT INTO role_fights (id_role, turn, striker, `target`, car, id_skill, level, dice, result)
             VALUES ($id_role, $turn, '$striker', '$target', '$car', $id_skill, $level, $dice, '$recap')";
     gdrcd_query($query);
+    return (int)gdrcd_query("SELECT LAST_INSERT_ID() as id")['id'];
+}
+
+/**
+ * Emette via socket l'evento 'combat:attack_incoming' verso tutti i pg nella stanza.
+ * Ogni bersaglio riceve le opzioni disponibili (dado/scudo/subisce) calcolate server-side:
+ * - scudo: solo se il pg ha la skill difensiva e non l'ha già usata nel turno corrente.
+ * - dado/subisce: sempre disponibili se can_send = 1.
+ */
+function notifyAttackIncoming($id_role, $luogo, $striker, array $targets, $car, $dice, $id_fight, $turn) {
+    $targetsInfo = [];
+    foreach ($targets as $t) {
+        $t = trim($t);
+        if (!$t) continue;
+
+        $canSend = (int)(gdrcd_query(
+            "SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$t'"
+        )['can_send'] ?? 1);
+
+        $choices = [];
+        if ($canSend === 1) {
+            $choices[] = 'dado';
+
+            $hasShield = (int)gdrcd_query(
+                "SELECT COUNT(*) as n FROM clgpersonaggioabilita cpa
+                 JOIN abilita a ON cpa.id_abilita = a.id_abilita
+                 WHERE cpa.nome = '$t' AND a.tipo = 'Difensiva'"
+            )['n'];
+            $alreadyShielded = checkMultipleLounch($id_role, $t, ["'difesa'"], $turn);
+
+            if ($hasShield > 0 && !$alreadyShielded) $choices[] = 'scudo';
+        }
+        $choices[] = 'subisce';
+
+        $targetsInfo[$t] = ['can_send' => $canSend, 'choices' => $choices];
+    }
+
+    notifySocketServer('combat:attack_incoming', 'chat:' . (int)$luogo, [
+        'id_fight' => (int)$id_fight,
+        'attacker' => $striker,
+        'targets'  => $targetsInfo,
+        'car'      => $car,
+        'dice'     => (int)$dice,
+        'turn'     => (int)$turn,
+    ]);
 }
 
 // Controlla che non siano stati inviati più lanci in un singolo turno

@@ -1578,3 +1578,44 @@ button.chat_button {
         align-self: flex-end;
     }
 }
+
+// ── Prompt difesa immediata ───────────────────────────────────────────────
+
+.attack-prompt {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $space-2;
+    padding: $space-2 $space-3;
+    background: #1a1228;
+    border-left: 3px solid #9a3535;
+    margin: $space-1 0;
+}
+
+.attack-prompt-text {
+    flex: 1;
+    font-size: $text-sm;
+    color: $color-text;
+}
+
+.attack-prompt-buttons {
+    display: flex;
+    gap: $space-2;
+    flex-wrap: wrap;
+}
+
+.attack-prompt-btn {
+    padding: $space-1 + 2 $space-3;
+    border: none;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    font-size: $text-sm;
+    font-weight: $font-weight-bold;
+    transition: opacity $transition-fast;
+
+    &:hover { opacity: 0.85; }
+
+    &.btn-dado    { background: #2a5298; color: #fff; }
+    &.btn-scudo   { background: #2d6a4f; color: #fff; }
+    &.btn-subisce { background: #6b2121; color: #fff; }
+}

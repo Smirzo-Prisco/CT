@@ -161,8 +161,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $sussurro = isset($messaggio_talento['testo']) ? gdrcd_filter('in', $messaggio_talento['testo']) : $sussurro;
 
             /**************************** AZIONI   ************************************************/
-            fight($id_role, $login, implode(',', $bersaglio), $skill, $livello, $car, $dice, 'usa una skill '.$skill_info['tipo']);
+            $id_fight = fight($id_role, $login, implode(',', $bersaglio), $skill, $livello, $car, $dice, 'usa una skill '.$skill_info['tipo']);
             chatInsertMessage($luogo, $login, null, $messaggio.$tiro, 'C', $sussurro, '', null); // Messaggio in chat
+
+            // Notifica i bersagli in tempo reale per la risposta immediata
+            if (in_array($car, ['destrezza', 'mente', 'potere'])) {
+                notifyAttackIncoming($id_role, $luogo, $login, $bersaglio, $car, $dice, $id_fight, $turn);
+            }
             assegnaPuntoShin($luogo, $login); // Assegna il punto Shin se necessario
             gestionePoliziaAutomatica($luogo); // Gestione della polizia automatica
             gestisciSkillTemporanea($skill, $login); // Gestisci le skill temporanee
@@ -180,7 +185,74 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             ));
             exit;
             break;
-        case 'tiraDadoChat':
+        /**
+         * risposta_immediata — il bersaglio risponde a un attacco prima della fine turno.
+         * Salva la scelta in role_fights (dado_risposta / difesa / subisce) e
+         * pubblica un messaggio "Risultato provvisorio" visibile a tutti in chat.
+         * L'elaborazione di fine turno legge questi record e li usa al posto dell'auto-difesa.
+         */
+        case 'risposta_immediata':
+            $login    = $_SESSION['login'];
+            $luogo    = $_SESSION['luogo'];
+            $id_role  = locationActiveRole($luogo);
+            $scelta   = $data['scelta']   ?? '';
+            $id_fight = (int)($data['id_fight'] ?? 0);
+            $turn     = getTurn($id_role);
+
+            // Validazione: l'attacco esiste, appartiene alla role corrente e il login è tra i bersagli
+            $fightRow = gdrcd_query("SELECT * FROM role_fights WHERE id = $id_fight AND id_role = $id_role AND turn = $turn");
+            if (!$fightRow) {
+                echo json_encode(['success' => false, 'message' => 'Attacco non trovato']);
+                exit;
+            }
+            $fightTargets = array_map('trim', explode(',', $fightRow['target']));
+            if (!in_array($login, $fightTargets)) {
+                echo json_encode(['success' => false, 'message' => 'Non sei tra i bersagli di questo attacco']);
+                exit;
+            }
+
+            $attacker  = $fightRow['striker'];
+            $messaggio = '';
+            $dice      = 0;
+
+            switch ($scelta) {
+                case 'dado':
+                    $carDifesa  = getDefenceCar($fightRow['car'], $login);
+                    $pg         = gdrcd_query("SELECT * FROM personaggio WHERE nome = '$login'");
+                    $diceResult = lanciaStat($id_role, $attacker, $login, true, $carDifesa['nome'], $carDifesa['nome'], $carDifesa['car'], $carDifesa['punti'], 0, 0);
+                    $dice       = $diceResult['risultato'];
+                    fight($id_role, $login, $attacker, 0, 0, 'dado_risposta', $dice, 'risposta immediata dado');
+                    $sussurroStr = $diceResult['sussurro'] ? " ({$diceResult['sussurro']})" : '';
+                    $messaggio = "<i>Risultato provvisorio:</i> $login tira il dado di difesa e ottiene <b>$dice</b>$sussurroStr contro l'attacco di $attacker";
+                    break;
+
+                case 'scudo':
+                    $dice       = mt_rand(1, 20);
+                    $shieldSkill = gdrcd_query("SELECT cpa.id_abilita FROM clgpersonaggioabilita cpa JOIN abilita a ON cpa.id_abilita = a.id_abilita WHERE cpa.nome = '$login' AND a.tipo = 'Difensiva' LIMIT 1");
+                    $id_skill   = $shieldSkill ? (int)$shieldSkill['id_abilita'] : 0;
+                    fight($id_role, $login, $login, $id_skill, 0, 'difesa', $dice, 'risposta immediata scudo');
+                    $esito     = $dice >= 10 ? 'con successo' : 'senza successo';
+                    $messaggio = "<i>Risultato provvisorio:</i> $login usa lo scudo con un tiro di <b>$dice/20</b> $esito";
+                    break;
+
+                case 'subisce':
+                    fight($id_role, $login, $attacker, 0, 0, 'subisce', 0, 'risposta immediata subisce');
+                    $messaggio = "<i>Risultato provvisorio:</i> $login decide di subire l'attacco di $attacker";
+                    break;
+
+                default:
+                    echo json_encode(['success' => false, 'message' => 'Scelta non valida']);
+                    exit;
+            }
+
+            $messaggio = gdrcd_filter('in', $messaggio);
+            chatInsertMessage($luogo, $login, null, $messaggio, 'C', null, '', null);
+
+            echo json_encode(['success' => true, 'scelta' => $scelta, 'dice' => $dice]);
+            exit;
+            break;
+
+        case 'tiraDadoChat': // Funzione ormai inutilizzata, la lascio soltanto perché magari un giorno vorremo reintrodurre i dadi
             $login = $_SESSION['login'];
             $luogo = $_SESSION['luogo'];
             $dice_type = isset($data['dice_type']) ? gdrcd_filter('in', gdrcd_angs($data['dice_type'])) : '';

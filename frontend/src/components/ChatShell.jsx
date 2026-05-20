@@ -19,7 +19,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import ChatViewer    from './ChatViewer'
 import TargetSelector from './TargetSelector'
@@ -103,6 +103,14 @@ export default function ChatShell() {
     /** Ref allo <style> iniettato per le preferenze tipografiche */
     const styleRef = useRef(null)
 
+    /**
+     * Lista degli attacchi in arrivo per cui il pg corrente deve scegliere
+     * come rispondere. Ogni elemento: { id_fight, attacker, car, choices }.
+     * Vengono aggiunti dal socket 'combat:attack_incoming' e rimossi dopo
+     * la risposta o quando il turno viene elaborato.
+     */
+    const [attackPrompts, setAttackPrompts] = useState([])
+
     // -----------------------------------------------------------------------
     // FETCH DATI SHELL
     // -----------------------------------------------------------------------
@@ -146,6 +154,47 @@ export default function ChatShell() {
 
         sock.on('role:update', onRoleUpdate)
         return () => sock.off('role:update', onRoleUpdate)
+    }, [])
+
+    /**
+     * Ascolta 'combat:attack_incoming': aggiunge un prompt di difesa per ogni
+     * attacco che coinvolge il pg corrente come bersaglio.
+     * Dipende da shell perché ha bisogno di shell.login.
+     */
+    useEffect(() => {
+        if (!shell) return
+        const sock = window.ctSocket
+        if (!sock) return
+        const myLogin = shell.login
+
+        const onAttackIncoming = (data) => {
+            if (!data?.targets?.[myLogin]) return
+            const myInfo = data.targets[myLogin]
+            setAttackPrompts(prev => {
+                if (prev.some(p => p.id_fight === data.id_fight)) return prev
+                return [...prev, {
+                    id_fight: data.id_fight,
+                    attacker: data.attacker,
+                    car:      data.car,
+                    choices:  myInfo.choices,
+                }]
+            })
+        }
+
+        sock.on('combat:attack_incoming', onAttackIncoming)
+        return () => sock.off('combat:attack_incoming', onAttackIncoming)
+    }, [shell])
+
+    /** Invia la scelta di difesa al server e rimuove il prompt dalla lista. */
+    const handleDefenseChoice = useCallback((id_fight, scelta) => {
+        fetch('/pages/api_chat.php?op=risposta_immediata', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ id_fight, scelta }),
+        })
+            .then(r => r.json())
+            .then(d => { if (d.success) setAttackPrompts(prev => prev.filter(p => p.id_fight !== id_fight)) })
+            .catch(() => {})
     }, [])
 
     // -----------------------------------------------------------------------
@@ -244,6 +293,37 @@ export default function ChatShell() {
                 <div id="pagina_chat" className="chat_box">
                     <ChatViewer />
                 </div>
+
+                {/* ============================================================ */}
+                {/* PROMPT DIFESA IMMEDIATA — compare quando si è bersaglio      */}
+                {/* ============================================================ */}
+                {attackPrompts.map(prompt => (
+                    <div key={prompt.id_fight} className="attack-prompt">
+                        <span className="attack-prompt-text">
+                            <b>{prompt.attacker}</b> ti attacca con <b>{prompt.car}</b> — come rispondi?
+                        </span>
+                        <div className="attack-prompt-buttons">
+                            {prompt.choices.includes('dado') && (
+                                <button type="button" className="attack-prompt-btn btn-dado"
+                                    onClick={() => handleDefenseChoice(prompt.id_fight, 'dado')}>
+                                    🎲 Dado
+                                </button>
+                            )}
+                            {prompt.choices.includes('scudo') && (
+                                <button type="button" className="attack-prompt-btn btn-scudo"
+                                    onClick={() => handleDefenseChoice(prompt.id_fight, 'scudo')}>
+                                    🛡 Scudo
+                                </button>
+                            )}
+                            {prompt.choices.includes('subisce') && (
+                                <button type="button" className="attack-prompt-btn btn-subisce"
+                                    onClick={() => handleDefenseChoice(prompt.id_fight, 'subisce')}>
+                                    💔 Subisci
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                ))}
 
                 {/* ============================================================ */}
                 {/* FORM INSERIMENTO AZIONE                                      */}
