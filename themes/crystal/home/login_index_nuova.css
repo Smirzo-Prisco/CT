@@ -234,19 +234,25 @@ header {
     }
 
     .navigation {
-        display: none;
+        display: flex;
         flex-direction: column;
         position: absolute;
         top: 100%;
         left: 0;
         width: 100%;
         background-color: #333;
-        padding: 10px 0;
+        padding: 0;
         z-index: 10000;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
     }
 
     .navigation.open {
-        display: flex;
+        max-height: 400px;
+        opacity: 1;
+        padding: 10px 0;
     }
 
     .navigation li {
