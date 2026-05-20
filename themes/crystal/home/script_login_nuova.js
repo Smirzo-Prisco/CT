@@ -29,6 +29,10 @@ function positionLoginModal() {
 }
 
 function openLoginModal() {
+    // Chiude la modale registrazione se aperta
+    const regModal = document.getElementById('registrazioneContent');
+    if (regModal) regModal.style.display = 'none';
+
     const bb  = document.getElementById('bottomBanner');
     const cb  = document.querySelector('.content-box');
     if (bb) bb.style.display = 'none';
@@ -127,6 +131,9 @@ document.getElementById('passwordRecoveryLink').addEventListener('click', functi
     }
 
     function openModal() {
+        // Chiude la modale login se aperta (senza ripristinare gli elementi)
+        loginContent.style.display = 'none';
+
         if (bottomBanner) bottomBanner.style.display = 'none';
         if (contentBox)   contentBox.style.display   = 'none';
         modal.style.display = 'block';
