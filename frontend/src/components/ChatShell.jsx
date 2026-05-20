@@ -156,6 +156,12 @@ export default function ChatShell() {
         return () => sock.off('role:update', onRoleUpdate)
     }, [])
 
+    // Quando una role si avvia il bottone del pannello GDR compare nel DOM:
+    // bisogna riattaccare i listener di chat.js altrimenti i click non funzionano.
+    useEffect(() => {
+        if (roleActive) window.initChatListeners?.()
+    }, [roleActive])
+
     /**
      * Ascolta 'combat:attack_incoming': aggiunge un prompt di difesa per ogni
      * attacco che coinvolge il pg corrente come bersaglio.

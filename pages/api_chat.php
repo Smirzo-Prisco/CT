@@ -165,7 +165,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             chatInsertMessage($luogo, $login, null, $messaggio.$tiro, 'C', $sussurro, '', null); // Messaggio in chat
 
             // Notifica i bersagli in tempo reale per la risposta immediata
-            if (in_array($car, ['destrezza', 'mente', 'potere'])) {
+            if (in_array(strtolower($car), ['destrezza', 'mente', 'potere'])) {
                 notifyAttackIncoming($id_role, $luogo, $login, $bersaglio, $car, $dice, $id_fight, $turn);
             }
             assegnaPuntoShin($luogo, $login); // Assegna il punto Shin se necessario
