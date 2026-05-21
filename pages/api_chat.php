@@ -484,6 +484,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             exit;
             break;
         case 'get_chat_messages':
+            // Se il client invia last=0 (primo caricamento o refresh di pagina),
+            // azzera la sessione così la query restituisce i messaggi recenti
+            if ((int)($data['last'] ?? -1) === 0) $_SESSION['last_message'] = 0;
             $last_message = $_SESSION['last_message'];
             $login = $_SESSION['login'];
             $luogo = $_SESSION['luogo'];
