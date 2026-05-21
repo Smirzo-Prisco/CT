@@ -150,7 +150,7 @@
 
     // Funzione per determinare l'icona in base alla piattaforma
     function getIconByPlatform(luogo) {
-        const luogoLower = luogo.toLowerCase();
+        const luogoLower = (luogo ?? '').toLowerCase();
         if (luogoLower.includes('telegram')) return 'fas fa-paper-plane';
         if (luogoLower.includes('discord')) return 'fab fa-discord';
         if (luogoLower.includes('whatsapp')) return 'fab fa-whatsapp';
@@ -222,7 +222,7 @@
         const isToday = game.data === oggi;
         
         return `
-            <div class="game-card" data-status="${game.inCorso ? 'in-corso' : 'conclusa'}" data-date="${game.data}" data-place="${game.luogo.toLowerCase()}">
+            <div class="game-card" data-status="${game.inCorso ? 'in-corso' : 'conclusa'}" data-date="${game.data}" data-place="${(game.luogo ?? '').toLowerCase()}">
                 <div class="game-header">
                     <div>
                         <a href="main.php?dir=${game.luogo_id}">
@@ -362,7 +362,7 @@
         // Filtro per luogo (chat di gioco)
         if (placeFilter !== 'all') {
             filtered = filtered.filter(game => {
-                const luogo = game.luogo.toLowerCase();
+                const luogo = (game.luogo ?? '').toLowerCase();
                 if (placeFilter === 'telegram') return luogo.includes('telegram');
                 if (placeFilter === 'discord') return luogo.includes('discord');
                 if (placeFilter === 'whatsapp') return luogo.includes('whatsapp');
