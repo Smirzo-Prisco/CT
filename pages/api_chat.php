@@ -247,7 +247,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             $messaggio = gdrcd_filter('in', $messaggio);
             chatInsertMessage($luogo, $login, null, $messaggio, 'C', null, '', null);
-            checkTurnEnd($luogo, $login, $id_role); // Il difensore ha compiuto la sua azione
+            // Non chiamiamo checkTurnEnd: la difesa è una reazione, non l'azione principale del turno.
+            // B deve ancora poter inviare la sua azione regolare senza essere bloccato da sent=1.
 
             echo json_encode(['success' => true, 'scelta' => $scelta, 'dice' => $dice]);
             exit;
