@@ -642,7 +642,9 @@ export default function Forum({ isStaff = false }) {
                 </div>
 
                 <div className={styles.buttonsBar}>
-                    <button onClick={() => setView('compose')}>Nuovo Messaggio</button>
+                    <button onClick={() => setView('compose')}>
+                        {isStaff && currentSection?.tipo === 1 ? 'Nuova Quest' : 'Nuovo Messaggio'}
+                    </button>
                     <button onClick={markAllRead}>Segna tutto come letto</button>
                     <button onClick={backToSections}>Torna indietro</button>
                 </div>
