@@ -57,3 +57,7 @@
 .pagination      { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 10px; justify-content: center; }
 .backBar         { margin-bottom: 10px; }
 .loadingSmall    { color: #aaa; }
+
+/* ── ComposeQuest ──────────────────────────────────────────── */
+.questHeader     { text-align: center; color: #ce846f; padding: 8px; font-family: 'DejaVu Serif'; }
+.pgPuntiTable    { width: 100%; margin-top: 10px; }

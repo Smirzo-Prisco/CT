@@ -328,6 +328,190 @@ function PostForm({ isNew, chiuso, sending, onSubmit, onCancel }) {
 }
 
 // ---------------------------------------------------------------------------
+// SUB-COMPONENTE: form inserimento quest
+// ---------------------------------------------------------------------------
+
+/**
+ * Opzioni tipologia quest (identiche al vecchio composer_quest.inc.php).
+ */
+const TIPOLOGIE_QUEST = [
+    'Assegnazione Esperienza o Notorietà',
+    'Quest Singola', 'Quest di Gilda', 'Evento',
+    'Prima parte', 'Seconda parte', 'Terza parte',
+    'Quarta parte', 'Quinta parte', 'Sesta parte',
+    'Settima parte', 'Ottava parte', 'Nona parte',
+    'Finale',
+]
+
+/**
+ * Form strutturato per la creazione di un resoconto quest.
+ * Mostra i campi standard (titolo, tipologia, partecipanti, ecc.)
+ * e, se la sezione ha punti > 0, 20 righe per assegnare XP ai pg.
+ *
+ * @param {Object}   props.section  - Sezione corrente (con campo punti)
+ * @param {boolean}  props.sending  - true durante l'invio
+ * @param {Function} props.onSubmit - Callback con i dati del form
+ * @param {Function} props.onCancel - Callback per tornare indietro
+ */
+function ComposeQuest({ section, sending, onSubmit, onCancel }) {
+    const [titolo,      setTitolo]      = useState('')
+    const [tipologia,   setTipologia]   = useState(TIPOLOGIE_QUEST[0])
+    const [partec,      setPartec]      = useState('')
+    const [location,    setLocation]    = useState('')
+    const [riassunto,   setRiassunto]   = useState('')
+    const [conseguenze, setConseguenze] = useState('')
+    const [note,        setNote]        = useState('')
+    const [valutazioni, setValutazioni] = useState('')
+
+    /** 20 righe vuote per i punti partecipanti */
+    const [pgPunti, setPgPunti] = useState(() =>
+        Array.from({ length: 20 }, () => ({ nome: '', exp: 0, shin: 0, notorieta: 0, mestiere: 0 }))
+    )
+
+    const showPunti = (section?.punti ?? 0) > 0
+
+    /** -5 … +10 step 0.5 (come il PHP: j da -10 a 20, value = j/2) */
+    const expOpts = Array.from({ length: 31 }, (_, i) => (i - 10) / 2)
+    /** -10 … +10 step 1 */
+    const notOpts = Array.from({ length: 21 }, (_, i) => i - 10)
+
+    const updatePg = (i, field, value) =>
+        setPgPunti(prev => { const n = [...prev]; n[i] = { ...n[i], [field]: value }; return n })
+
+    const handleSubmit = () => {
+        if (!titolo.trim()) return
+        onSubmit({
+            titolo, tipologia, partecipanti: partec,
+            location, riassunto, conseguenze, note, valutazioni,
+            partecipanti_punti: showPunti ? pgPunti.filter(p => p.nome.trim()) : [],
+        })
+    }
+
+    /** Stile comune per input/select nei campi quest */
+    const inputStyle = { width: '100%', boxSizing: 'border-box' }
+
+    return (
+        <div className="pagina_forum">
+            <div className={styles.backBar}>
+                <button onClick={onCancel}>← {section?.nome}</button>
+            </div>
+
+            <table className="customTable" style={{ width: '100%' }}>
+                <tbody>
+                    <tr><td colSpan="2" className={styles.questHeader}>INSERIMENTO QUEST</td></tr>
+
+                    <tr className="second_header"><td colSpan="2"><b>TITOLO QUEST</b></td></tr>
+                    <tr><td colSpan="2">
+                        <input type="text" value={titolo} onChange={e => setTitolo(e.target.value)}
+                            placeholder="Inserire titolo quest" className="ares" style={inputStyle} />
+                    </td></tr>
+
+                    <tr className="second_header"><td colSpan="2"><b>TIPOLOGIA QUEST</b></td></tr>
+                    <tr><td colSpan="2">
+                        <select value={tipologia} onChange={e => setTipologia(e.target.value)} className="ares">
+                            {TIPOLOGIE_QUEST.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                    </td></tr>
+
+                    <tr className="second_header"><td colSpan="2"><b>PARTECIPANTI</b></td></tr>
+                    <tr><td colSpan="2">
+                        <input type="text" value={partec} onChange={e => setPartec(e.target.value)}
+                            placeholder="Inserire partecipanti" className="ares" style={inputStyle} />
+                    </td></tr>
+
+                    <tr className="second_header"><td colSpan="2"><b>LOCATION</b></td></tr>
+                    <tr><td colSpan="2">
+                        <input type="text" value={location} onChange={e => setLocation(e.target.value)}
+                            placeholder="Inserire location" className="ares" style={inputStyle} />
+                    </td></tr>
+
+                    <tr className="second_header"><td colSpan="2"><b>RIASSUNTO QUEST</b></td></tr>
+                    <tr><td colSpan="2">
+                        <textarea value={riassunto} onChange={e => setRiassunto(e.target.value)}
+                            placeholder="Inserire riassunto quest (max 500 caratteri)"
+                            className="ares" rows="4" style={inputStyle} />
+                    </td></tr>
+
+                    <tr className="second_header"><td colSpan="2"><b>CONSEGUENZE QUEST</b></td></tr>
+                    <tr><td colSpan="2">
+                        <textarea value={conseguenze} onChange={e => setConseguenze(e.target.value)}
+                            placeholder="Inserire conseguenze quest (eventi, conseguenze pg, alterazioni ambientazioni ecc)"
+                            className="ares" rows="4" style={inputStyle} />
+                    </td></tr>
+
+                    <tr className="second_header"><td colSpan="2"><b>NOTE</b></td></tr>
+                    <tr><td colSpan="2">
+                        <textarea value={note} onChange={e => setNote(e.target.value)}
+                            placeholder="Inserire note quest (punti salute, potenziamento oggetti di gilda, skill acquisite, oggetti ecc)"
+                            className="ares" rows="4" style={inputStyle} />
+                    </td></tr>
+
+                    <tr className="second_header"><td colSpan="2"><b>VALUTAZIONI</b></td></tr>
+                    <tr><td colSpan="2">
+                        <textarea value={valutazioni} onChange={e => setValutazioni(e.target.value)}
+                            placeholder="Inserire valutazioni pg"
+                            className="ares" rows="4" style={inputStyle} />
+                    </td></tr>
+                </tbody>
+            </table>
+
+            {/* Righe punti partecipanti — solo per sezioni con punti > 0 */}
+            {showPunti && (
+                <table className={`customTable ${styles.pgPuntiTable}`}>
+                    <thead>
+                        <tr className="second_header">
+                            <td>Pg</td>
+                            <td>Exp</td>
+                            <td>Shin</td>
+                            <td>Notorietà</td>
+                            <td>P Mestiere</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pgPunti.map((pg, i) => (
+                            <tr key={i}>
+                                <td>
+                                    <input type="text" value={pg.nome}
+                                        onChange={e => updatePg(i, 'nome', e.target.value)}
+                                        className="ares" style={{ width: '150px' }} />
+                                </td>
+                                <td>
+                                    <select value={pg.exp} onChange={e => updatePg(i, 'exp', parseFloat(e.target.value))} className="ares">
+                                        {expOpts.map(v => <option key={v} value={v}>{v}</option>)}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select value={pg.shin} onChange={e => updatePg(i, 'shin', parseFloat(e.target.value))} className="ares">
+                                        {expOpts.map(v => <option key={v} value={v}>{v}</option>)}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select value={pg.notorieta} onChange={e => updatePg(i, 'notorieta', parseInt(e.target.value))} className="ares">
+                                        {notOpts.map(v => <option key={v} value={v}>{v}</option>)}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select value={pg.mestiere} onChange={e => updatePg(i, 'mestiere', parseFloat(e.target.value))} className="ares">
+                                        {expOpts.map(v => <option key={v} value={v}>{v}</option>)}
+                                    </select>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+
+            <div className={styles.buttonsBar} style={{ marginTop: '10px' }}>
+                <button onClick={handleSubmit} disabled={sending || !titolo.trim()}>
+                    {sending ? 'Invio...' : 'Invia Quest'}
+                </button>
+                <button onClick={onCancel}>Annulla</button>
+            </div>
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
@@ -561,6 +745,29 @@ export default function Forum({ isStaff = false }) {
             .finally(() => setSending(false))
     }
 
+    /**
+     * Invia un resoconto quest nella sezione corrente.
+     * @param {Object} formData - Tutti i campi del form ComposeQuest
+     */
+    const sendNewQuest = (formData) => {
+        if (sending) return
+        setSending(true)
+        fetch('/pages/api_forum.php?op=post_quest', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ araldo: currentSection?.id, padre: -1, ...formData }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setView('threads')
+                    fetchThreads(currentSection.id, 1)
+                } else alert(data.message || 'Errore nell\'invio')
+            })
+            .catch(console.error)
+            .finally(() => setSending(false))
+    }
+
     // ---------------------------------------------------------------------------
     // RENDERING
     // ---------------------------------------------------------------------------
@@ -642,7 +849,7 @@ export default function Forum({ isStaff = false }) {
                 </div>
 
                 <div className={styles.buttonsBar}>
-                    <button onClick={() => setView('compose')}>
+                    <button onClick={() => setView(isStaff && currentSection?.tipo === 1 ? 'compose_quest' : 'compose')}>
                         {isStaff && currentSection?.tipo === 1 ? 'Nuova Quest' : 'Nuovo Messaggio'}
                     </button>
                     <button onClick={markAllRead}>Segna tutto come letto</button>
@@ -702,6 +909,18 @@ export default function Forum({ isStaff = false }) {
                     </>
                 )}
             </div>
+        )
+    }
+
+    // --- VISTA INSERIMENTO QUEST ---
+    if (view === 'compose_quest') {
+        return (
+            <ComposeQuest
+                section={currentSection}
+                sending={sending}
+                onSubmit={sendNewQuest}
+                onCancel={() => setView('threads')}
+            />
         )
     }
 

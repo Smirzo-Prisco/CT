@@ -74,7 +74,7 @@ switch ($op) {
     // SECTIONS — sezioni visibili all'utente (raggruppate per tipo)
     // -------------------------------------------------------------------------
     case 'sections':
-        $result = gdrcd_query("SELECT id_araldo, nome, descrizione, tipo, proprietari
+        $result = gdrcd_query("SELECT id_araldo, nome, descrizione, tipo, proprietari, punti
             FROM araldo WHERE invisibile = 0 ORDER BY tipo, id_araldo", 'result');
 
         $sections = [];
@@ -100,6 +100,7 @@ switch ($op) {
                 'tipo'        => (int)$row['tipo'],
                 'tipo_label'  => $label,
                 'non_letti'   => (int)$unread['n'],
+                'punti'       => (int)$row['punti'],
             ];
         }
         gdrcd_query($result, 'free');
@@ -384,6 +385,140 @@ switch ($op) {
               )");
 
         echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // POST_QUEST — crea un resoconto quest con campi strutturati (solo master/admin)
+    // -------------------------------------------------------------------------
+    case 'post_quest':
+        if ($_SESSION['master'] != 1 && $_SESSION['admin'] != 1) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Non autorizzato']);
+            exit;
+        }
+
+        $araldo_id = (int)($data['araldo'] ?? 0);
+        $padre     = (int)($data['padre']  ?? -1);
+        $titolo    = trim($data['titolo']       ?? '');
+        $tipologia = trim($data['tipologia']    ?? '');
+        $partec    = trim($data['partecipanti'] ?? '');
+        $location  = trim($data['location']     ?? '');
+        $riassunto = trim($data['riassunto']    ?? '');
+        $cons      = trim($data['conseguenze']  ?? '');
+        $note      = trim($data['note']         ?? '');
+        $valu      = trim($data['valutazioni']  ?? '');
+        $pg_punti  = is_array($data['partecipanti_punti'] ?? null) ? $data['partecipanti_punti'] : [];
+
+        if (empty($titolo)) {
+            echo json_encode(['success' => false, 'message' => 'Titolo mancante']);
+            exit;
+        }
+
+        // Verifica accesso alla sezione
+        $section = gdrcd_query("SELECT id_araldo, tipo, proprietari, punti FROM araldo
+            WHERE id_araldo = $araldo_id AND invisibile = 0 LIMIT 1");
+        if (!$section || !can_access_section($section)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Accesso negato']);
+            exit;
+        }
+
+        // Corpo HTML formattato della quest (identico al vecchio insert_quest.inc.php)
+        $t_h  = htmlspecialchars($titolo);
+        $tp_h = htmlspecialchars($tipologia);
+        $l_h  = htmlspecialchars($location);
+        $p_h  = htmlspecialchars($partec);
+        $r_h  = htmlspecialchars($riassunto);
+        $c_h  = htmlspecialchars($cons);
+        $n_h  = htmlspecialchars($note);
+        $v_h  = htmlspecialchars($valu);
+
+        $testo_quest = "<center>
+<font color=\"#9a6353\" style=\"font-size:20px; text-transform: uppercase;\"><b>$t_h</b></font><br>
+<font color=\"#9a6353\" style=\"font-size:12px;\">$tp_h</font>
+</center><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Luogo</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$l_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Partecipanti</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$p_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Riassunto</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$r_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Conseguenze</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$c_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Note</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$n_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Valutazioni</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$v_h</font>";
+
+        $login_f = gdrcd_filter('in', $login);
+
+        // Inserisce il post nella bacheca
+        gdrcd_query("INSERT INTO messaggioaraldo
+            (id_messaggio_padre, id_araldo, titolo, messaggio, autore, data_messaggio, data_ultimo_messaggio, giornalista, anonimo)
+            VALUES ($padre, $araldo_id, '" . gdrcd_filter('in', $titolo) . "', '" . gdrcd_filter('in', $testo_quest) . "',
+            '$login_f', NOW(), NOW(), 'no', 'no')");
+
+        $new_id    = (int)gdrcd_query('', 'last_id');
+        $thread_id = ($padre == -1) ? $new_id : $padre;
+
+        if ($padre != -1) {
+            gdrcd_query("UPDATE messaggioaraldo SET data_ultimo_messaggio = NOW() WHERE id_messaggio = $padre");
+            gdrcd_query("DELETE FROM araldo_letto WHERE thread_id = $padre AND nome != '$login_f'");
+        }
+
+        // Inserisce i dati grezzi nella tabella messaggio_quest
+        gdrcd_query("INSERT INTO messaggio_quest
+            (id_messaggio, autore, titolo, location, partecipanti, riassunto, conseguenze, note, valutazioni, tipologia)
+            VALUES ($thread_id, '$login_f',
+            '" . gdrcd_filter('in', $titolo)    . "',
+            '" . gdrcd_filter('in', $location)  . "',
+            '" . gdrcd_filter('in', $partec)    . "',
+            '" . gdrcd_filter('in', $riassunto) . "',
+            '" . gdrcd_filter('in', $cons)      . "',
+            '" . gdrcd_filter('in', $note)      . "',
+            '" . gdrcd_filter('in', $valu)      . "',
+            '" . gdrcd_filter('in', $tipologia) . "')");
+
+        // XP al master in base alla tipologia
+        $master_xp = match(true) {
+            in_array($tipologia, ['Quest Singola', 'Evento']) => 2,
+            $tipologia === 'Quest di Gilda'                   => 1,
+            $tipologia === 'Assegnazione Esperienza o Notorietà' => 0,
+            default                                           => 3,
+        };
+
+        if ($master_xp > 0) {
+            gdrcd_query("INSERT INTO Punti (nome, esperienza, data_evento, id_messaggio, commento)
+                VALUES ('$login_f', '$master_xp', NOW(), '$thread_id', 'Master della quest')");
+            gdrcd_query("UPDATE personaggio SET esperienza = esperienza + $master_xp, esperienza_r = esperienza_r + $master_xp
+                WHERE nome = '$login_f'");
+        }
+
+        // Punti ai partecipanti (solo se la sezione lo prevede)
+        if ((int)$section['punti'] > 0) {
+            foreach ($pg_punti as $pg) {
+                $pg_nome = trim($pg['nome'] ?? '');
+                $pg_exp  = (float)($pg['exp']       ?? 0);
+                $pg_shin = (float)($pg['shin']      ?? 0);
+                $pg_not  = (int)($pg['notorieta']   ?? 0);
+                $pg_mest = (float)($pg['mestiere']  ?? 0);
+
+                if ($pg_nome === '' || ($pg_exp == 0 && $pg_shin == 0 && $pg_not == 0 && $pg_mest == 0)) continue;
+
+                $pg_f = gdrcd_filter('in', $pg_nome);
+                gdrcd_query("INSERT INTO Punti (nome, esperienza, notorieta, mestiere, shin, data_evento, id_messaggio, commento)
+                    VALUES ('$pg_f', '$pg_exp', '$pg_not', '$pg_mest', '$pg_shin', NOW(), '$thread_id', '')");
+                gdrcd_query("UPDATE personaggio SET
+                    esperienza = esperienza + '$pg_exp',
+                    esperienza_r = esperienza_r + '$pg_exp',
+                    notorieta = notorieta + '$pg_not',
+                    esperienza_mestiere = esperienza_mestiere + '$pg_mest',
+                    shin = shin + '$pg_shin'
+                    WHERE nome = '$pg_f'");
+            }
+        }
+
+        echo json_encode(['success' => true, 'thread_id' => $thread_id]);
         break;
 
     default:
