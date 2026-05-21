@@ -242,7 +242,7 @@ export default function PresentiEstesi() {
                                     {stanza && (
                                         <tr className="third_header">
                                             <td colSpan="8" className={shared.schedaUpper}>
-                                                <a href={`main.php?dir=${utenti[0].ultimo_luogo}&map_id=${utenti[0].ultima_mappa}`}>
+                                                <a href={`main.php?dir=${utenti[0].ultimo_luogo}`}>
                                                     {stanza}
                                                 </a>
                                             </td>

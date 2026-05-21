@@ -96,7 +96,7 @@ export default function LinkMenu({ menuItems = [], menuTitle = '', theme = 'crys
                     value={
                         // Valore selezionato: URL della stanza corrente o della mappa corrente
                         curLuogo >= 0
-                            ? `main.php?dir=${curLuogo}&map_id=${curMappa}`
+                            ? `main.php?dir=${curLuogo}`
                             : `main.php?page=mappaclick&map_id=${curMappa}`
                     }
                 >

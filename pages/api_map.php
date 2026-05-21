@@ -86,7 +86,7 @@ switch ($op) {
             if (!isset($maps[$mapKey])) $maps[$mapKey] = ['id' => (int)$row['id_click'], 'nome' => $row['nome_mappa'], 'stanze' => []];
             if (!empty($row['nome_stanza'])) {
                 if ($row['chat'] != 0) {
-                    $url = 'main.php?dir=' . $row['id'] . '&map_id=' . $row['id_click'];
+                    $url = 'main.php?dir=' . $row['id'];
                 } elseif ($row['id_mappa_collegata'] != 0) {
                     $url = 'main.php?page=mappaclick&map_id=' . $row['id_mappa_collegata'];
                 } else {
