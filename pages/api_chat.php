@@ -1226,7 +1226,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 WHERE pa.nome = '$login_f' ORDER BY a.tipo DESC, a.id_abilita DESC", 'result');
             while ($row = gdrcd_query($res_ab, 'fetch')) {
                 $item = ['id'    => (int)$row['id_abilita'],
-                         'nome'  => gdrcd_filter('out', $row['nome']),
+                         'nome'  => $row['nome'],
                          'grado' => (int)$row['grado'],
                          'usi'   => $row['usi'],
                          'tipo'  => $row['tipo']];
