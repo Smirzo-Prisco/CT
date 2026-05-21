@@ -253,6 +253,73 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             exit;
             break;
 
+        /**
+         * pending_attacks — restituisce gli attacchi del turno corrente che
+         * coinvolgono il pg loggato come bersaglio e a cui non ha ancora risposto.
+         * Usato da ChatShell al mount per ripristinare i pulsanti difesa dopo un refresh.
+         */
+        case 'pending_attacks':
+            $login   = $_SESSION['login'];
+            $luogo   = $_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+
+            if (!$id_role) { echo json_encode(['success' => true, 'attacks' => []]); exit; }
+
+            $turn = getTurn($id_role);
+
+            // Attacchi che: coinvolgono $login come bersaglio (target CSV) nel turno corrente
+            // e per cui $login non ha ancora inserito dado_risposta/subisce/difesa
+            $res = gdrcd_query("
+                SELECT rf.id, rf.striker, rf.car, rf.dice
+                FROM role_fights rf
+                WHERE rf.id_role = $id_role
+                  AND rf.turn    = $turn
+                  AND rf.car     IN ('destrezza','mente','potere')
+                  AND FIND_IN_SET('$login', rf.target) > 0
+                  AND NOT EXISTS (
+                    SELECT 1 FROM role_fights r2
+                    WHERE r2.id_role = rf.id_role
+                      AND r2.turn    = rf.turn
+                      AND r2.striker = '$login'
+                      AND (
+                        (r2.car IN ('dado_risposta','subisce') AND r2.target = rf.striker)
+                        OR r2.car = 'difesa'
+                      )
+                  )
+            ", 'result');
+
+            $attacks = [];
+            while ($row = gdrcd_query($res, 'fetch')) {
+                $canSend = (int)(gdrcd_query(
+                    "SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login'"
+                )['can_send'] ?? 1);
+
+                $choices = [];
+                if ($canSend === 1) {
+                    $choices[] = 'dado';
+                    $hasShield = (int)gdrcd_query(
+                        "SELECT COUNT(*) as n FROM clgpersonaggioabilita cpa
+                         JOIN abilita a ON cpa.id_abilita = a.id_abilita
+                         WHERE cpa.nome = '$login' AND a.tipo = 'Difensiva'"
+                    )['n'];
+                    $alreadyShielded = checkMultipleLounch($id_role, $login, ["'difesa'"], $turn);
+                    if ($hasShield > 0 && !$alreadyShielded) $choices[] = 'scudo';
+                }
+                $choices[] = 'subisce';
+
+                $attacks[] = [
+                    'id_fight' => (int)$row['id'],
+                    'attacker' => $row['striker'],
+                    'car'      => $row['car'],
+                    'choices'  => $choices,
+                ];
+            }
+            gdrcd_query($res, 'free');
+
+            echo json_encode(['success' => true, 'attacks' => $attacks]);
+            exit;
+            break;
+
         case 'tiraDadoChat': // Funzione ormai inutilizzata, la lascio soltanto perché magari un giorno vorremo reintrodurre i dadi
             $login = $_SESSION['login'];
             $luogo = $_SESSION['luogo'];

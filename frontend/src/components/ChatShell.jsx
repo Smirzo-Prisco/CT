@@ -157,6 +157,21 @@ export default function ChatShell() {
     }, [])
 
     /**
+     * Al mount (o dopo un refresh), recupera gli attacchi pendenti del turno
+     * corrente a cui il pg non ha ancora risposto e ripristina i pulsanti difesa.
+     */
+    useEffect(() => {
+        if (!shell) return
+        fetch('/pages/api_chat.php?op=pending_attacks', { method: 'POST' })
+            .then(r => r.json())
+            .then(d => {
+                if (!d.success || !d.attacks?.length) return
+                setAttackPrompts(d.attacks)
+            })
+            .catch(() => {})
+    }, [shell])
+
+    /**
      * Ascolta 'combat:attack_incoming': aggiunge un prompt di difesa per ogni
      * attacco che coinvolge il pg corrente come bersaglio.
      * Dipende da shell perché ha bisogno di shell.login.
