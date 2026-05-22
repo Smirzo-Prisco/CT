@@ -117,14 +117,14 @@ div.forum_post_message {
     font-family: "DejaVu Sans";
 }
 
-div.forum_post_modify, a:link {
+div.forum_post_modify {
     font-size: 11px;
     letter-spacing: 2px;
     color: #a7a7a8;
     font-family: "DejaVu Serif";
     text-align: center;
     margin: 40px 0 20px 0;
-    text-transform: uppercase; 
+    text-transform: uppercase;
 }
 
 img.img_forum_avatar {
