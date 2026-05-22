@@ -617,7 +617,8 @@ function lanciaStat($id_role, $login, $bersaglio, $bonus_stats, $dice_type, $nom
         if ($dice_type !== 'Usa dado master' && $dice_type !== 'AttCreatura' && $dice_type !== 'DifCreatura') {
             $sussurro = "$num/20";
 
-            if ($bonus_caratteristica > 0) $sussurro .= " + $bonus_caratteristica";
+            if ($bonus_caratteristica > 0)      $sussurro .= " + $bonus_caratteristica";
+            elseif ($bonus_caratteristica < 0)  $sussurro .= " - " . abs($bonus_caratteristica);
             if ($dice_bonus > 0) $sussurro .= " + $dice_bonus di bonus";
             if ($dice_malus > 0) $sussurro .= " - $dice_malus di malus";
             if ($malus_salute > 0) $sussurro .= " - $malus_salute di malus per la salute";
