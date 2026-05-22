@@ -536,7 +536,14 @@ switch ($op) {
             }
         }
 
-        echo json_encode(['success' => true, 'thread_id' => $thread_id]);
+        // DEBUG TEMPORANEO — rilegge dal DB per verificare cosa è stato effettivamente salvato
+        $dbg = gdrcd_query("SELECT LEFT(messaggio, 200) AS snippet FROM messaggioaraldo WHERE id_messaggio = $new_id");
+        echo json_encode([
+            'success'         => true,
+            'thread_id'       => $thread_id,
+            '_debug_snippet'  => $dbg ? $dbg['snippet'] : 'NULL',
+            '_debug_testo_len' => strlen($testo_quest),
+        ]);
         break;
 
     default:
