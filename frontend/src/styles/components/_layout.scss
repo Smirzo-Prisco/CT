@@ -477,6 +477,14 @@ div.pagina_info_location {
     border: none;
 }
 
+.info-location-anno {
+    display: block;
+    font-size: $text-lg;
+    font-weight: normal;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
 .info-location-year {
     font-size: $text-xl;
     font-weight: $font-weight-bold;

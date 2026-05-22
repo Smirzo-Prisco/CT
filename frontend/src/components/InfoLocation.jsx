@@ -53,17 +53,6 @@ export default function InfoLocation() {
         return () => { if (sock) sock.off('users:update', fetchLocation) }
     }, [fetchLocation])
 
-    // Apre la descrizione del luogo nel modal iframe del layout
-    const openDescription = () => {
-        if (data?.luogo >= 0) {
-            if (typeof changeFrame === 'function') {
-                changeFrame(`pages/descrizione_chat.php?id=${data.luogo}`)
-            }
-            const modal = document.getElementById('id01')
-            if (modal) modal.style.display = 'block'
-        }
-    }
-
     // ---------------------------------------------------------------------------
     // Rendering
     // ---------------------------------------------------------------------------
@@ -72,14 +61,13 @@ export default function InfoLocation() {
         return <div className="pagina_info_location"><div className={shared.muted}>...</div></div>
     }
 
-    /**
-     * Immagine del luogo:
-     * - Stanza: themes/crystal/imgs/locations/{immagine}
-     * - Mappa: mostrare un placeholder (la mappa ha la sua pagina)
-     */
-    // const imgSrc = data.tipo === 'stanza'
-    //     ? `/themes/crystal/imgs/locations/${data.immagine || 'ingresso.png'}`
-    //     : `/themes/crystal/imgs/locations/ingresso.png`
+    /** Naviga alla stanza corrente via CT.navigate (SPA) o href diretto */
+    const goToRoom = (e) => {
+        e.preventDefault()
+        const url = `main.php?dir=${data.luogo}`
+        if (window.CT?.navigate) window.CT.navigate(url)
+        else window.top.location.href = url
+    }
 
     return (
         <div className="pagina_info_location">
@@ -91,24 +79,17 @@ export default function InfoLocation() {
 
             <div className="page_body">
 
-                {/* Immagine del luogo (classe giorno/notte) — commentata temporaneamente */}
-                {/* <div className={data.is_notte ? 'info_image_night' : 'info_image'}>
-                    <img
-                        src={imgSrc}
-                        className="immagine_luogo"
-                        title={data.descrizione || ''}
-                        alt={data.nome}
-                    />
-                </div> */}
-
-                {/* Nome luogo + anno di gioco — cliccabile per aprire la descrizione */}
+                {/* Anno + nome luogo */}
                 <div className="info-location-year">
-                    {`Anno ${data.anno}`}
+                    <span className="info-location-anno">{`Anno ${data.anno}`}</span>
                     <div>
-                        <a
-                            href="#"
-                            onClick={e => { e.preventDefault(); openDescription() }}
-                        >{data.nome}</a>
+                        {data.tipo === 'stanza' ? (
+                            <a href={`main.php?dir=${data.luogo}`} onClick={goToRoom}>
+                                {data.nome}
+                            </a>
+                        ) : (
+                            <span>{data.nome}</span>
+                        )}
                     </div>
                 </div>
             </div>
