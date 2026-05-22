@@ -61,3 +61,7 @@
 /* ── ComposeQuest ──────────────────────────────────────────── */
 .questHeader     { text-align: center; color: #ce846f; padding: 8px; font-family: 'DejaVu Serif'; }
 .pgPuntiTable    { width: 100%; margin-top: 10px; }
+
+/* ── PuntiTable (tabella valutazioni quest) ────────────────── */
+.puntiTable      { width: 100%; margin-bottom: 10px; font-size: 12px; }
+.puntiName       { color: #ce846f; text-decoration: none; }

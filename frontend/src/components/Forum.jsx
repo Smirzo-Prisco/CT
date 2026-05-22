@@ -328,6 +328,49 @@ function PostForm({ isNew, chiuso, sending, onSubmit, onCancel }) {
 }
 
 // ---------------------------------------------------------------------------
+// SUB-COMPONENTE: tabella punti assegnati (visibile solo a master/admin)
+// ---------------------------------------------------------------------------
+
+/**
+ * Tabella che mostra i punti (exp, shin, notorietà) assegnati ai partecipanti
+ * di un thread quest. Corrisponde alla "sezione valutazioni" del vecchio read.inc.php.
+ *
+ * @param {Array} props.puntiList - Array di { nome, exp, shin, notorieta, commento }
+ */
+function PuntiTable({ puntiList }) {
+    if (!puntiList || puntiList.length === 0) return null
+    return (
+        <table className={`customTable ${styles.puntiTable}`}>
+            <thead>
+                <tr className="second_header">
+                    <td className={styles.theadColor}>Personaggio</td>
+                    <td className={styles.theadColor}>Esperienza</td>
+                    <td className={styles.theadColor}>Shin</td>
+                    <td className={styles.theadColor}>Notorietà</td>
+                    <td className={styles.theadColor}>Commento</td>
+                </tr>
+            </thead>
+            <tbody>
+                {puntiList.map((p, i) => (
+                    <tr key={i}>
+                        <td>
+                            <a href={`main.php?page=scheda&pg=${encodeURIComponent(p.nome)}`}
+                               className={styles.puntiName}>
+                                {p.nome}
+                            </a>
+                        </td>
+                        <td>{p.exp !== 0 ? p.exp : '—'}</td>
+                        <td>{p.shin !== 0 ? p.shin : '—'}</td>
+                        <td>{p.notorieta !== 0 ? p.notorieta : '—'}</td>
+                        <td>{p.commento || ''}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    )
+}
+
+// ---------------------------------------------------------------------------
 // SUB-COMPONENTE: form inserimento quest
 // ---------------------------------------------------------------------------
 
@@ -545,6 +588,9 @@ export default function Forum({ isStaff = false }) {
     /** Testo di ricerca nella lista thread */
     const [searchQuery,     setSearchQuery]     = useState('')
 
+    /** Punti assegnati nel thread corrente (da Punti table, solo per master/admin) */
+    const [puntiList,       setPuntiList]       = useState([])
+
     // --- stati UI ---
     const [loadingSections, setLoadingSections] = useState(true)
     const [loadingThreads,  setLoadingThreads]  = useState(false)
@@ -598,7 +644,10 @@ export default function Forum({ isStaff = false }) {
         fetch(`/pages/api_forum.php?op=read&thread=${threadId}`)
             .then(r => r.json())
             .then(data => {
-                if (data.success) setMessages(data.messages)
+                if (data.success) {
+                    setMessages(data.messages)
+                    setPuntiList(data.punti_list ?? [])
+                }
                 setLoadingRead(false)
             })
             .catch(err => { console.error('[Forum] Errore lettura:', err); setLoadingRead(false) })
@@ -681,6 +730,7 @@ export default function Forum({ isStaff = false }) {
         setView('threads')
         setCurrentThread(null)
         setMessages([])
+        setPuntiList([])
         // Ricarica i thread per aggiornare lo stato letto
         if (currentSection) fetchThreads(currentSection.id, page)
     }
@@ -957,7 +1007,11 @@ export default function Forum({ isStaff = false }) {
                     <>
                         {/* Tutti i messaggi del thread */}
                         {messages.map((msg, i) => (
-                            <PostCard key={msg.id} msg={msg} isFirst={i === 0} />
+                            <div key={msg.id}>
+                                <PostCard msg={msg} isFirst={i === 0} />
+                                {/* Tabella punti partecipanti — visibile solo a master/admin, solo sul post radice */}
+                                {i === 0 && <PuntiTable puntiList={puntiList} />}
+                            </div>
                         ))}
 
                         {/* Form risposta */}

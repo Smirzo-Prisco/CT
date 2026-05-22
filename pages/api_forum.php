@@ -226,12 +226,30 @@ switch ($op) {
         } while ($post = gdrcd_query($result, 'fetch'));
         gdrcd_query($result, 'free');
 
+        // Punti assegnati al thread (solo per master/admin)
+        $punti_list = [];
+        if ($_SESSION['master'] == 1 || $_SESSION['admin'] == 1) {
+            $px_res = gdrcd_query("SELECT nome, esperienza, shin, notorieta, commento
+                FROM Punti WHERE id_messaggio = $thread_id ORDER BY nome", 'result');
+            while ($px = gdrcd_query($px_res, 'fetch')) {
+                $punti_list[] = [
+                    'nome'      => $px['nome'],
+                    'exp'       => (float)$px['esperienza'],
+                    'shin'      => (float)$px['shin'],
+                    'notorieta' => (int)$px['notorieta'],
+                    'commento'  => $px['commento'],
+                ];
+            }
+            gdrcd_query($px_res, 'free');
+        }
+
         echo json_encode([
             'success'    => true,
             'sezione_id' => (int)$messages[0]['padre'] == -1 ? $post['id_araldo'] : null,
             'thread_id'  => $thread_id,
             'chiuso'     => $messages[0]['chiuso'],
             'messages'   => $messages,
+            'punti_list' => $punti_list,
         ]);
         break;
 
