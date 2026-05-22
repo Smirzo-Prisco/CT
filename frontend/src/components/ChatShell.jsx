@@ -100,6 +100,9 @@ export default function ChatShell() {
      */
     const [roleActive, setRoleActive] = useState(false)
 
+    /** Tab attiva nel pannello GDR: 'dice' | 'skills' | 'master' | 'writing' */
+    const [activeTab, setActiveTab] = useState('dice')
+
     /** Ref allo <style> iniettato per le preferenze tipografiche */
     const styleRef = useRef(null)
 
@@ -131,6 +134,16 @@ export default function ChatShell() {
                 } else setError(d.error || 'Errore caricamento chat')
             })
             .catch(() => setError('Errore di rete'))
+    }, [])
+
+    /**
+     * Espone window.updateRoleActive per permettere a role_session.js di
+     * aggiornare roleActive direttamente dopo addPgToRole/quitRole, senza
+     * aspettare il round-trip del socket 'role:update'.
+     */
+    useEffect(() => {
+        window.updateRoleActive = setRoleActive
+        return () => { delete window.updateRoleActive }
     }, [])
 
     /**
@@ -522,16 +535,20 @@ export default function ChatShell() {
 
                     {/* Tab bar */}
                     <div className="gdr-tabs">
-                        <div className="gdr-tab active" id="defaultOpen" data-tab="dice">Dadi e Tiri</div>
-                        <div className="gdr-tab" data-tab="skills">Abilità e Armi</div>
+                        <div className={`gdr-tab${activeTab === 'dice' ? ' active' : ''}`} id="defaultOpen"
+                             onClick={() => setActiveTab('dice')}>Dadi e Tiri</div>
+                        <div className={`gdr-tab${activeTab === 'skills' ? ' active' : ''}`}
+                             onClick={() => setActiveTab('skills')}>Abilità e Armi</div>
                         {pulsanti.is_staff && (
-                            <div className="gdr-tab" data-tab="master" onClick={() => window.getPngRolePlaying?.()}>Gestione Master</div>
+                            <div className={`gdr-tab${activeTab === 'master' ? ' active' : ''}`}
+                                 onClick={() => { setActiveTab('master'); window.getPngRolePlaying?.() }}>Gestione Master</div>
                         )}
-                        <div className="gdr-tab" data-tab="writing">Scrittura</div>
+                        <div className={`gdr-tab${activeTab === 'writing' ? ' active' : ''}`}
+                             onClick={() => setActiveTab('writing')}>Scrittura</div>
                     </div>
 
                     {/* ── TAB: DADI E TIRI ─────────────────────────────────── */}
-                    <div className="gdr-tab-content active" id="dice-tab">
+                    <div className={`gdr-tab-content${activeTab === 'dice' ? ' active' : ''}`} id="dice-tab">
                         <div className="gdr-grid">
                             {/* Dado generico */}
                             <div className="gdr-card">
@@ -583,7 +600,7 @@ export default function ChatShell() {
                     </div>
 
                     {/* ── TAB: ABILITÀ E ARMI ──────────────────────────────── */}
-                    <div className="gdr-tab-content" id="skills-tab">
+                    <div className={`gdr-tab-content${activeTab === 'skills' ? ' active' : ''}`} id="skills-tab">
                         <div className="gdr-master-panel">
                             <div className="gdr-master-panel-title">Attenzione!</div>
                             <p>È possibile selezionare una quantità di bersagli pari al livello selezionato dell'abilità.</p>
@@ -652,7 +669,7 @@ export default function ChatShell() {
 
                     {/* ── TAB: GESTIONE MASTER (solo staff) ────────────────── */}
                     {pulsanti.is_staff && (
-                        <div className="gdr-tab-content" id="master-tab">
+                        <div className={`gdr-tab-content${activeTab === 'master' ? ' active' : ''}`} id="master-tab">
                             <div className="gdr-master-panel">
                                 <div className="gdr-master-panel-title">Area Master</div>
                                 <p>Questa area è riservata ai Master per la gestione dei personaggi e PNG.</p>
@@ -741,7 +758,7 @@ export default function ChatShell() {
                     )}
 
                     {/* ── TAB: SCRITTURA ───────────────────────────────────── */}
-                    <div className="gdr-tab-content" id="writing-tab">
+                    <div className={`gdr-tab-content${activeTab === 'writing' ? ' active' : ''}`} id="writing-tab">
                         <div className="gdr-grid">
                             <div className="gdr-card">
                                 <div className="gdr-card-title">Imposta caratteri</div>

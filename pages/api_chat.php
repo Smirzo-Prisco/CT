@@ -805,11 +805,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 exit;
             }
 
-            // Se sono l'unico pg nella role e sto cercando di inviare un messaggio che non è tra quelli permessi senza role attiva, blocco l'invio
-            if(count(getRolePgs($id_role)) == 1 && !$typePermitted) {
-                echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi inviare un\'azione se sei l\'unico pg nella role'));
-                exit;
-            }
+
 
             // Se il personaggio che invia è soggetto a una skill di durata, scalo i punti (integrità) e controllo se ne ha troppo pochi
             checkSkillEffect($login, $location);

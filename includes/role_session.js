@@ -9,6 +9,7 @@ function addPgToRole() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
+                    window.updateRoleActive?.(true)
                     if (window.refreshChat) window.refreshChat();
                 } else showNotification(data.message, 'error');
             })
@@ -27,6 +28,7 @@ function quitRole(user) {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
+                    window.updateRoleActive?.(false)
                     if (window.refreshChat) window.refreshChat();
 
                     // Chiudi il popup dopo successo
