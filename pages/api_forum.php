@@ -195,11 +195,13 @@ switch ($op) {
             exit;
         }
 
-        // Segna come letto
+        // Segna come letto — include araldo_id (NOT NULL nella tabella)
         $already_read = gdrcd_query("SELECT COUNT(*) AS n FROM araldo_letto
             WHERE nome = '" . gdrcd_filter('in', $login) . "' AND thread_id = $thread_id");
         if ($already_read['n'] == 0) {
-            gdrcd_query("INSERT INTO araldo_letto (nome, thread_id) VALUES ('" . gdrcd_filter('in', $login) . "', $thread_id)");
+            $araldo_id_r = (int)$post['id_araldo'];
+            gdrcd_query("INSERT IGNORE INTO araldo_letto (nome, araldo_id, thread_id)
+                VALUES ('" . gdrcd_filter('in', $login) . "', $araldo_id_r, $thread_id)");
         }
 
         // Costruisci la risposta con padre + risposte
@@ -323,7 +325,11 @@ switch ($op) {
         $check = gdrcd_query("SELECT COUNT(*) AS n FROM araldo_letto
             WHERE nome = '" . gdrcd_filter('in', $login) . "' AND thread_id = $thread_id");
         if ($check['n'] == 0) {
-            gdrcd_query("INSERT INTO araldo_letto (nome, thread_id) VALUES ('" . gdrcd_filter('in', $login) . "', $thread_id)");
+            $mr_araldo = gdrcd_query("SELECT id_araldo FROM messaggioaraldo
+                WHERE id_messaggio = $thread_id AND id_messaggio_padre = -1 LIMIT 1");
+            $mr_araldo_id = $mr_araldo ? (int)$mr_araldo['id_araldo'] : 0;
+            gdrcd_query("INSERT IGNORE INTO araldo_letto (nome, araldo_id, thread_id)
+                VALUES ('" . gdrcd_filter('in', $login) . "', $mr_araldo_id, $thread_id)");
         }
         echo json_encode(['success' => true]);
         break;
@@ -393,8 +399,8 @@ switch ($op) {
 
         // Inserisce in araldo_letto tutti i thread della sezione non ancora letti
         $login_f = gdrcd_filter('in', $login);
-        gdrcd_query("INSERT IGNORE INTO araldo_letto (nome, thread_id)
-            SELECT '$login_f', ma.id_messaggio
+        gdrcd_query("INSERT IGNORE INTO araldo_letto (nome, araldo_id, thread_id)
+            SELECT '$login_f', ma.id_araldo, ma.id_messaggio
             FROM messaggioaraldo ma
             WHERE ma.id_araldo = $araldo_id
               AND ma.id_messaggio_padre = -1
@@ -536,14 +542,7 @@ switch ($op) {
             }
         }
 
-        // DEBUG TEMPORANEO — rilegge dal DB per verificare cosa è stato effettivamente salvato
-        $dbg = gdrcd_query("SELECT LEFT(messaggio, 200) AS snippet FROM messaggioaraldo WHERE id_messaggio = $new_id");
-        echo json_encode([
-            'success'         => true,
-            'thread_id'       => $thread_id,
-            '_debug_snippet'  => $dbg ? $dbg['snippet'] : 'NULL',
-            '_debug_testo_len' => strlen($testo_quest),
-        ]);
+        echo json_encode(['success' => true, 'thread_id' => $thread_id]);
         break;
 
     default:
