@@ -347,8 +347,9 @@ export default function ChatShell() {
                     <div className="form_chat">
                         <form method="post" id="chat_form_messages">
 
-                            {/* Riga 1: submit */}
+                            {/* Riga 1: tag (sinistra) + submit (destra) */}
                             <div className="chat-submit-row">
+                                <input type="text" name="action_tag" className="action-tag" maxLength={30} placeholder="TAG max 30" />
                                 <input type="submit" value={submit_label} />
                             </div>
 
@@ -365,10 +366,9 @@ export default function ChatShell() {
                                 }}
                             />
 
-                            {/* Riga 3: tag, contatore, icone, status role */}
+                            {/* Riga 3: contatore, icone, status role */}
                             <div className="chat-action-controls">
                                 <input type="hidden" id="id_role" defaultValue="" />
-                                <input type="text" name="action_tag" className="action-tag" maxLength={30} placeholder="TAG max 30" />
                                 <span className="gdr-char-counter">
                                     <span id="rimanenti">0</span> caratteri
                                 </span>

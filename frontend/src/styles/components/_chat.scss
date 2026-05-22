@@ -726,8 +726,16 @@ div.form_row {
 
 .chat-submit-row {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
+    gap: 8px;
+}
+
+.action-tag {
+    flex: 1;
+    min-width: 0;
+    max-width: 160px;
 }
 
 .chat-action-controls {
