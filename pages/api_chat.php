@@ -491,8 +491,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 }
             }
 
-            // Se il pg ha il supporto di un'abilità (talento)
-            $totale = $d20 + $destrezza + $bonus_arma + $bonus_talento;
+            // Il bonus talento si applica solo se il pg ha la relativa abilità (corpo a corpo / tipo arma)
+            $totale = $d20 + $destrezza + $bonus_arma + ($check_abilita > 0 ? $bonus_talento : 0);
             $sussurro .= "$d20/20 + $destrezza".($check_abilita > 0 ? " + $bonus_arma (bonus arma) $sussurro_specifico" : '');
 
             /*******    MALUS SALUTE    **********/
@@ -510,9 +510,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             $messaggio = "$login $descrizione_attacco <u>$bersaglio</u>$arma_body con un tiro totale di destrezza di $totale";
             
-            // Registro l'attacco
-            fight($id_role, $login, $bersaglio, 0, 1, 'destrezza', $totale, $descrizione_attacco); // Funzione di gestione combattimenti
-            
+            // Registro l'attacco e notifico il bersaglio in tempo reale
+            $id_fight = fight($id_role, $login, $bersaglio, 0, 1, 'destrezza', $totale, $descrizione_attacco);
+            notifyAttackIncoming($id_role, $luogo, $login, [$bersaglio], 'destrezza', $totale, $id_fight, $turn);
+
             // Inserisci i messaggi in chat
             chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro);
             
