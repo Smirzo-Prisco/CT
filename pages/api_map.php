@@ -26,27 +26,28 @@ switch ($op) {
 
         if ($luogo >= 0) {
             // Il personaggio è in una stanza specifica
-            $row = gdrcd_query("SELECT mappa.nome, mappa.descrizione, mappa.stato,
-                    mappa.immagine, mappa.stanza_apparente, mappa.privata,
+            $row = gdrcd_query("SELECT mappa.nome, mappa.descrizione, mappa.descrizione_immagine,
+                    mappa.stato, mappa.immagine, mappa.stanza_apparente, mappa.privata,
                     mappa_click.meteo, mappa_click.nome AS nome_zona
                 FROM mappa
                 LEFT JOIN mappa_click ON mappa_click.id_click = mappa.id_mappa
                 WHERE mappa.id = $luogo LIMIT 1");
 
             echo json_encode([
-                'success'        => true,
-                'tipo'           => 'stanza',
-                'luogo'          => $luogo,
-                'mappa'          => $mappa,
-                'nome'           => $row['nome'] ?? '',
-                'nome_zona'      => $row['nome_zona'] ?? '',
-                'descrizione'    => $row['descrizione'] ?? '',
-                'stato'          => $row['stato'] ?? '',
-                'immagine'       => $row['immagine'] ?? 'ingresso.png',
-                'privata'        => (bool)($row['privata'] ?? false),
-                'meteo'          => $row['meteo'] ?? '',
-                'is_notte'       => $isNotte,
-                'anno'           => date('Y', strtotime('+1053 years')),
+                'success'              => true,
+                'tipo'                 => 'stanza',
+                'luogo'                => $luogo,
+                'mappa'                => $mappa,
+                'nome'                 => $row['nome'] ?? '',
+                'nome_zona'            => $row['nome_zona'] ?? '',
+                'descrizione'          => $row['descrizione'] ?? '',
+                'descrizione_immagine' => $row['descrizione_immagine'] ?? '',
+                'stato'                => $row['stato'] ?? '',
+                'immagine'             => $row['immagine'] ?? 'ingresso.png',
+                'privata'              => (bool)($row['privata'] ?? false),
+                'meteo'                => $row['meteo'] ?? '',
+                'is_notte'             => $isNotte,
+                'anno'                 => date('Y', strtotime('+1053 years')),
             ]);
         } else {
             // Il personaggio è sulla mappa (luogo = -1)

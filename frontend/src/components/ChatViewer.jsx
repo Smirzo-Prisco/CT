@@ -5,6 +5,11 @@ export default function ChatViewer() {
   const lastIdRef = useRef(0)
   const bottomRef = useRef(null)
 
+  /** true quando c'è una role attiva — nasconde la descrizione stanza */
+  const [hasRole,  setHasRole]  = useState(false)
+  /** Dati descrizione della stanza corrente (da api_map.php?op=current) */
+  const [roomDesc, setRoomDesc] = useState(null)
+
   const fetchMessages = useCallback(() => {
     fetch('pages/api_chat.php?op=get_chat_messages', {
       method: 'POST',
@@ -27,6 +32,8 @@ export default function ChatViewer() {
         setEl('addPgToRoleBtn', el => { el.style.display = data.canQuit  ? 'none'  : 'block' })
         window.isInRole = data.canQuit
 
+        setHasRole(!!data.activeRole)
+
         if (data.messages.length > 0) {
           const withHtml = data.messages.filter(m => m.html)
           if (withHtml.length > 0) {
@@ -41,18 +48,39 @@ export default function ChatViewer() {
       .catch(console.error)
   }, [])
 
+  /** Recupera la descrizione della stanza corrente */
+  const fetchRoomDesc = useCallback(() => {
+    fetch('/pages/api_map.php?op=current')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.tipo === 'stanza') setRoomDesc(d)
+        else setRoomDesc(null)
+      })
+      .catch(() => {})
+  }, [])
+
   useEffect(() => {
     fetchMessages()
+    fetchRoomDesc()
 
     const sock = window.ctSocket
-    if (sock) sock.on('chat:update', fetchMessages)
+    if (sock) {
+      sock.on('chat:update', fetchMessages)
+      // Aggiorna la descrizione quando il pg cambia stanza
+      sock.on('users:update', fetchRoomDesc)
+    }
 
     // Espone alle funzioni globali in chat.js
     window.refreshChat = fetchMessages
     window.clearChat   = () => { setMessages([]); lastIdRef.current = 0 }
 
-    return () => { if (sock) sock.off('chat:update', fetchMessages) }
-  }, [fetchMessages])
+    return () => {
+      if (sock) {
+        sock.off('chat:update', fetchMessages)
+        sock.off('users:update', fetchRoomDesc)
+      }
+    }
+  }, [fetchMessages, fetchRoomDesc])
 
   // Scroll automatico quando arrivano nuovi messaggi
   useEffect(() => {
@@ -61,6 +89,28 @@ export default function ChatViewer() {
 
   return (
     <div className="chat_inner">
+
+      {/* Descrizione stanza — visibile solo quando la chat è vuota e nessuna role è attiva */}
+      {messages.length === 0 && !hasRole && roomDesc && (
+        <div className="chat-room-desc">
+          {roomDesc.descrizione_immagine && (
+            <img
+              className="chat-room-desc__img"
+              src={`/themes/crystal/imgs/descrizioni/${roomDesc.descrizione_immagine}`}
+              alt={roomDesc.nome}
+            />
+          )}
+          <p className="chat-room-desc__nome">{roomDesc.nome}</p>
+          {roomDesc.stato && (
+            <p className="chat-room-desc__stato">Stato: {roomDesc.stato}</p>
+          )}
+          <div
+            className="chat-room-desc__testo"
+            dangerouslySetInnerHTML={{ __html: roomDesc.descrizione }}
+          />
+        </div>
+      )}
+
       {messages.map((msg, i) => (
         <div key={msg.id ?? i} dangerouslySetInnerHTML={{ __html: msg.html }} />
       ))}

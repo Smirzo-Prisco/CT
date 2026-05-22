@@ -97,6 +97,46 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
     }
 }
 
+// ── Descrizione stanza (chat vuota, nessuna role attiva) ──────
+
+.chat-room-desc {
+    padding: $space-4 $space-4 $space-5;
+    text-align: center;
+    opacity: 0.9;
+
+    &__img {
+        width: 100%;
+        max-height: 180px;
+        object-fit: cover;
+        border-radius: $radius-md;
+        margin-bottom: $space-3;
+        display: block;
+    }
+
+    &__nome {
+        font-size: 0.85rem;
+        font-weight: $font-weight-bold;
+        color: #ce846f;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: $space-1;
+    }
+
+    &__stato {
+        font-size: 0.7rem;
+        color: #a7a7a8;
+        margin-bottom: $space-3;
+        font-style: italic;
+    }
+
+    &__testo {
+        font-size: 0.75rem;
+        color: #8f8f8f;
+        line-height: 1.7;
+        text-align: justify;
+    }
+}
+
 .gdr-main-controls {
     display: flex;
     gap: $space-2 + 2;
@@ -679,7 +719,10 @@ span.chat_me_master {
 
 // ── Form inserimento chat ─────────────────────────────────────
 
-div.form_row { clear: both; text-align: left; }
+div.form_row {
+    clear: both;
+    text-align: left;
+}
 
 .chat-submit-row {
     display: flex;
@@ -693,6 +736,7 @@ div.form_row { clear: both; text-align: left; }
     width: 100%;
     gap: 8px;
     flex-wrap: wrap;
+    justify-content: space-around;
 }
 
 .chat-avvia-btn {
@@ -1613,9 +1657,22 @@ button.chat_button {
     font-weight: $font-weight-bold;
     transition: opacity $transition-fast;
 
-    &:hover { opacity: 0.85; }
+    &:hover {
+        opacity: 0.85;
+    }
 
-    &.btn-dado    { background: #2a5298; color: #fff; }
-    &.btn-scudo   { background: #2d6a4f; color: #fff; }
-    &.btn-subisce { background: #6b2121; color: #fff; }
+    &.btn-dado {
+        background: #2a5298;
+        color: #fff;
+    }
+
+    &.btn-scudo {
+        background: #2d6a4f;
+        color: #fff;
+    }
+
+    &.btn-subisce {
+        background: #6b2121;
+        color: #fff;
+    }
 }
