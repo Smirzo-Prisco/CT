@@ -348,7 +348,7 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
 
 .gdr-char-counter {
     font-size: 0.8rem;
-    color: #aaa;
+    color: $color-text-secondary;
     text-align: right;
     margin-top: $space-1 + 1;
 }
@@ -414,7 +414,7 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
         opacity: 0.6;
 
         .gdr-pulse-dot {
-            background-color: #7f8c8d;
+            background-color: $color-text-secondary;
             animation: none;
         }
 

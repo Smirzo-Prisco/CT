@@ -27,9 +27,9 @@
     font-family: Perpetua, serif;
     font-size: $text-sm;
     text-transform: uppercase;
-    color: $palette-text-1;
+    color: $color-text-title;
     padding: 6px 10px;
-    background: $palette-blue-2;
+    background: $color-surface;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -130,7 +130,7 @@
 }
 
 .chatoff-send-btn {
-    background: $palette-blue-2;
+    background: $color-surface;
     border: 1px solid $palette-dark-8;
     color: $palette-text-2;
     font-size: $text-sm;

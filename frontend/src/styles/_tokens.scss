@@ -29,7 +29,7 @@ $palette-blue-1: #2a3f76; // accent blu scuro
 $palette-blue-2: #3a4f86; // accent blu medio
 $palette-blue-3: #4a5288; // focus ring
 $palette-blue-4: #4da6ff; // action / link blue
-$palette-blue-5: #4f7cff; // button blu primario
+$palette-blue-5: #111827; // sfondo superfici e componenti
 $palette-blue-6: #AEE7FF;
 
 // Brand — il colore caratteristico del progetto
@@ -38,11 +38,11 @@ $aaa: #7a4f43;
 
 // Testi
 $palette-text-1: #AEE7FF; // testo chiaro
-$palette-text-2: #b4b6bf; // testo body (default)
-$palette-text-3: #a7a7a8; // testo tabelle
+$palette-text-2: #111827; // testo heading (titoli)
+$palette-text-3: #D6C6A5; // testo titoli
 $palette-text-4: #ccc; // testo terziario / placeholder
 $palette-text-5: rgb(192, 164, 158); // testo disabilitato
-$palette-text-6: #c0a49e;
+$palette-text-6: #C8F1FF; // testo hover
 $palette-text-7: #9FA7B8; // testo secondario
 $palette-text-8: #E8E6E3; // testo primario
 
@@ -57,7 +57,7 @@ $palette-info: #17a2b8;
 
 // Sfondo e superfici
 $color-bg: $palette-dark-12; // sfondo pagina
-$color-surface: $palette-dark-3; // sfondo componenti
+$color-surface: $palette-blue-5; // sfondo componenti
 $color-surface-raised: $palette-dark-5; // card, header
 $color-surface-input: $palette-dark-6; // input, select
 
@@ -66,16 +66,17 @@ $color-border: $palette-text-8; // bordi standard
 $color-border-focus: $palette-blue-6; // bordo in focus
 
 // Brand / azioni
-$color-primary: $palette-rust; // bottone/accento primario
-$color-primary-hover: $palette-blue-6; // hover sul primario
-$color-action: $palette-blue-6; // link, icone, azioni secondarie
+$color-primary: $palette-text-1; // bottone/accento primario
+$color-primary-hover: $palette-text-6; // hover sul primario
+$color-action: $palette-text-1; // link, icone, azioni secondarie
 $color-action-hover: $palette-blue-6; // hover sull'action
 
 // Testi
 $color-text: $palette-text-8; // testo principale
 $color-text-secondary: $palette-text-7; // testo secondario
-$color-text-light: $palette-text-1; // testo chiaro / headings
+$color-text-light: $palette-text-2; // testo chiaro / headings
 $color-text-muted: $palette-text-4; // testo disabilitato / secondario
+$color-text-title: $palette-text-3;
 
 // Feedback
 $color-success: $palette-success;

@@ -488,7 +488,7 @@ div.pagina_info_location {
 .info-location-year {
     font-size: $text-xl;
     font-weight: $font-weight-bold;
-    color: $color-primary;
+    color: $color-text-title;
 
     // a:link e a:visited hanno specificità (0,0,1,1) = 11, uguale a .info-location-year a.
     // Aggiungendo il contesto padre la specificità sale a (0,1,1,1) = 21 e batte la regola globale.
