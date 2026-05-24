@@ -3,14 +3,14 @@
 // ============================================================
 @use '../tokens' as *;
 
-$gestione-action: $palette-blue-4;   // #4da6ff
-$gestione-surface: $palette-dark-5;  // #1c1f2e
-$gestione-hover:   $palette-dark-8;  // #2e3350
+$gestione-action: $palette-blue-alt;   // #4da6ff
+$gestione-surface: $palette-surface-raised;  // #1c1f2e
+$gestione-hover:   $palette-surface-hover;  // #2e3350
 
 // ── Link azione post-operazione (oggetti, gestione) ──────────
 
 .ares {
-    background-color: $palette-dark-1;
+    background-color: $palette-surface-deep;
     padding: $space-1 + 1 $space-2 + 2;
     text-decoration: none;
     color: #ce846f;
@@ -131,7 +131,7 @@ header {
         width: 100%;
         border-collapse: collapse;
         background: $gestione-surface;
-        color: $palette-text-3;
+        color: $palette-text-title;
         font-family: $font-serif;
         font-size: $text-sm;
         letter-spacing: 2px;
@@ -276,7 +276,7 @@ header {
     width: 100%;
     overflow-x: auto;
     font-size: $text-sm;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-serif;
 
     table {

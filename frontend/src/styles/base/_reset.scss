@@ -41,7 +41,7 @@ li {
 ::-webkit-scrollbar {
     width: 5px;
     height: 10px;
-    background: $palette-dark-2;
+    background: $palette-surface-dark;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -52,5 +52,5 @@ li {
 // Firefox
 * {
     scrollbar-width: thin;
-    scrollbar-color: #828a99 #{$palette-dark-2};
+    scrollbar-color: #828a99 #{$palette-surface-dark};
 }

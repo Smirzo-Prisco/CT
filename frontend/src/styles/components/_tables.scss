@@ -4,7 +4,7 @@
 // Gestisce la classe .ct-table-responsive usata nelle
 // pagine di gestione (lista utenti, personaggi, ecc.).
 //
-// @use: tokens → $font-serif, $text-sm, $text-lg, $palette-text-3,
+// @use: tokens → $font-serif, $text-sm, $text-lg, $palette-text-title,
 //               $color-border, $color-action, $space-2, $space-3,
 //               $radius-sm, $transition-normal
 // ============================================================
@@ -18,7 +18,7 @@
     width: 100%;
     overflow-x: auto;
     font-size: $text-sm;        // 11px
-    color: $palette-text-3;     // #a7a7a8
+    color: $palette-text-title;     // #a7a7a8
     font-family: $font-serif;   // "DejaVu Serif"
 }
 

@@ -31,7 +31,7 @@ div.pagina_forum {
 
 div.forum_date_big {
     font-size: $text-xs;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-serif;
     text-align: left;
     margin-top: 2px;
@@ -55,13 +55,13 @@ div.forum_column {
     margin-top: 2px;
     padding-left: 15px;
     font-size: $text-md - 1;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-serif;
 }
 
 div.forum_date_small {
     font-size: $text-xs;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-serif;
     text-align: left;
     margin-top: 2px;
@@ -71,7 +71,7 @@ div.forum_date_small {
 
 div.forum_post_title {
     font-size: $text-md - 1;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-serif;
     text-transform: uppercase;
 }
@@ -99,7 +99,7 @@ div.forum_post_modify,
 a:link {
     font-size: $text-sm;
     letter-spacing: 2px;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-serif;
     text-align: center;
     margin: 40px 0 $space-5 0;

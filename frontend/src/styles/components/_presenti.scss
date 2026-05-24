@@ -170,7 +170,7 @@ div.pagina_presenti {
 
 table.customTable {
     min-width: 70%;
-    background-color: $palette-dark-5;
+    background-color: $palette-surface-raised;
     border-collapse: collapse;
     border: 1px solid $color-bg;
     color: $color-text;
@@ -184,14 +184,14 @@ table.customTable {
     }
 
     thead {
-        background-color: $palette-dark-5;
+        background-color: $palette-surface-raised;
     }
 }
 
 tr.second_header {
     background: url('imgs/presenti/barra.png');
     font-size: $text-xs;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-serif;
 }
 
@@ -216,6 +216,6 @@ tr.mappa {
 tr.presente a:link,
 a:visited {
     font-size: $text-sm;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-serif;
 }

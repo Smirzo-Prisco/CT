@@ -17,9 +17,9 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
 .gdr-panel-container {
     // Variabili CSS locali per retrocompatibilità col markup esistente
     --primary-dark: #{$color-bg};
-    --secondary-dark: #{$palette-dark-5};
-    --accent-color: #{$palette-blue-1};
-    --accent-light: #{$palette-blue-2};
+    --secondary-dark: #{$palette-surface-raised};
+    --accent-color: #{$palette-blue-dark};
+    --accent-light: #{$palette-blue-mid};
     --text-light: #{$color-text-light};
     --text-lighter: #{$color-text-light};
     --success-color: #{$color-success};
@@ -648,7 +648,7 @@ span.chat_sussurro {
 
 span.chat_time {
     font-size: $text-md;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-chat;
     margin-right: 3px;
 }
@@ -704,7 +704,7 @@ span.intestazione_master {
 
 span.chat_master {
     font-size: $text-xl;
-    color: $palette-text-3;
+    color: $palette-text-title;
     font-family: $font-chat;
     text-align: justify;
 }
@@ -787,7 +787,7 @@ div.pagina_frame_chat {
     input {
         border: 2px solid $color-border;
         border-radius: $radius-sm;
-        background-color: $palette-dark-5;
+        background-color: $palette-surface-raised;
         color: $color-text-light;
         margin-top: $space-1 + 1;
         width: auto;
@@ -796,7 +796,7 @@ div.pagina_frame_chat {
     select {
         border: 2px solid $color-border;
         border-radius: $radius-sm;
-        background-color: $palette-dark-5;
+        background-color: $palette-surface-raised;
         color: $color-text-light;
         margin-top: $space-1 + 1;
         width: auto;
@@ -1053,7 +1053,7 @@ button.chat_button {
 }
 
 .user-search-popup__container {
-    background: $palette-dark-5;
+    background: $palette-surface-raised;
     border-radius: $radius-xl;
     width: 90%;
     max-width: 500px;
@@ -1083,7 +1083,7 @@ button.chat_button {
     align-items: center;
     padding: $space-5 $space-6;
     border-bottom: 1px solid #2a2f4a;
-    background: linear-gradient(135deg, #1a1f36 0%, $palette-dark-5 100%);
+    background: linear-gradient(135deg, #1a1f36 0%, $palette-surface-raised 100%);
     border-radius: $radius-xl $radius-xl 0 0;
 }
 
@@ -1270,7 +1270,7 @@ button.chat_button {
     display: flex;
     gap: $space-3;
     justify-content: flex-end;
-    background: linear-gradient(135deg, $palette-dark-5 0%, #1a1f36 100%);
+    background: linear-gradient(135deg, $palette-surface-raised 0%, #1a1f36 100%);
     border-radius: 0 0 $radius-xl $radius-xl;
 }
 

@@ -48,7 +48,7 @@
         border-radius: $radius-lg;
         overflow: hidden;
         background: #1c2033;
-        border: 1px solid $palette-dark-8;
+        border: 1px solid $palette-surface-hover;
     }
 
     .accordion-header {
@@ -56,13 +56,13 @@
         padding: $space-3 $space-4;
         font-size: $text-xl;
         text-align: left;
-        background: $palette-dark-5;
+        background: $palette-surface-raised;
         color: $color-text-light;
         border: none;
         cursor: pointer;
         outline: none;
 
-        &:hover { background: $palette-dark-2; }
+        &:hover { background: $palette-surface-dark; }
     }
 
     .accordion-body {
@@ -121,7 +121,7 @@
     }
 
     .btn-save {
-        background: $palette-dark-8;
+        background: $palette-surface-hover;
         color: $color-text-light;
         border: 1px solid #fff;
         padding: $space-3 $space-5;
@@ -132,8 +132,8 @@
     }
 
     .skill-info-bar {
-        background: $palette-dark-8;
-        border: 1px solid $palette-dark-2;
+        background: $palette-surface-hover;
+        border: 1px solid $palette-surface-dark;
         padding: $space-3 $space-4;
         border-radius: $radius-lg;
         display: flex;

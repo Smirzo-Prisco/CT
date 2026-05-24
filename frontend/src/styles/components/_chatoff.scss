@@ -4,11 +4,11 @@
 @use '../tokens' as *;
 
 .chatoff-panel {
-    border: 1px solid $palette-dark-8;
+    border: 1px solid $palette-surface-hover;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    background: $palette-dark-10;
+    background: $palette-gradient-overlay;
     box-sizing: border-box;
     max-width: 100%;
     overflow: hidden;
@@ -41,14 +41,14 @@
 .chatoff-clear-btn {
     background: none;
     border: none;
-    color: $palette-text-4;
+    color: $palette-text-muted;
     cursor: pointer;
     font-size: 10px;
     padding: 0 2px;
     line-height: 1;
 
     &:hover {
-        color: $palette-text-1;
+        color: $palette-action;
     }
 }
 
@@ -80,16 +80,16 @@
 }
 
 .chatoff-empty {
-    color: $palette-text-4;
+    color: $palette-text-muted;
     font-style: italic;
 }
 
 .chatoff-typing {
     font-size: $text-xs;
     font-style: $font-chat;
-    color: $palette-text-4;
+    color: $palette-text-muted;
     padding: 2px 8px;
-    background: $palette-dark-2;
+    background: $palette-surface-dark;
     min-height: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -110,9 +110,9 @@
 
 .chatoff-input {
     flex: 1;
-    background: $palette-blue-2;
-    border: 1px solid $palette-dark-8;
-    color: $palette-text-1;
+    background: $palette-blue-mid;
+    border: 1px solid $palette-surface-hover;
+    color: $palette-action;
     font-family: $font-ui;
     font-size: $text-xs;
     padding: 3px 6px;
@@ -120,19 +120,19 @@
     min-width: 0;
 
     &::placeholder {
-        color: $palette-text-4;
+        color: $palette-text-muted;
     }
 
     &:focus {
         outline: none;
-        border-color: $palette-blue-3;
+        border-color: $palette-blue-focus;
     }
 }
 
 .chatoff-send-btn {
     background: $color-surface;
-    border: 1px solid $palette-dark-8;
-    color: $palette-text-2;
+    border: 1px solid $palette-surface-hover;
+    color: $palette-surface;
     font-size: $text-sm;
     border-radius: 3px;
     cursor: pointer;
@@ -140,6 +140,6 @@
 
     &:hover {
         background: $palette-rust;
-        color: $palette-text-1;
+        color: $palette-action;
     }
 }

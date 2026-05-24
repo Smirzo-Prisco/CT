@@ -11,12 +11,15 @@
 // Valori ufficiali del design system. Usare questi nei nuovi componenti.
 
 // Sfondi (dal più scuro al più chiaro)
-$palette-bg: #060814; // corpo pagina
-$palette-surface: #111827; // pannelli, card, superfici
-$palette-surface-raised: #1c1f2e; // card elevata, header
-$palette-surface-input: #1c2033; // input, textarea
-$palette-surface-select: #2a2d3c; // select, dropdown
-$palette-surface-hover: #2e3350; // hover e bordi scuri
+$palette-bg:               #060814;   // corpo pagina
+$palette-surface-deep:     #0f111d;   // tra bg e surface (pulsanti, contenitori molto scuri)
+$palette-surface-dark:     #111423;   // card scura, scrollbar
+$palette-surface:          #111827;   // pannelli, card, superfici
+$palette-surface-disabled: #1a1f32;   // stato disabilitato
+$palette-surface-raised:   #1c1f2e;   // card elevata, header
+$palette-surface-input:    #1c2033;   // input, textarea
+$palette-surface-select:   #2a2d3c;   // select, dropdown
+$palette-surface-hover:    #2e3350;   // hover e bordi scuri
 
 // Azioni / Link (azzurro ghiaccio)
 $palette-action: #AEE7FF; // link, accento primario
@@ -48,38 +51,6 @@ $palette-info: #17a2b8;
 // Gradiente overlay
 $palette-gradient-overlay: linear-gradient(rgba(17, 24, 39, 0.4), rgba(0, 20, 60, 0.4));
 
-
-// ── ALIAS DI RETROCOMPATIBILITÀ ───────────────────────────────────────────
-// Usati da componenti esistenti. Non usare nei nuovi file.
-
-$palette-dark-1: #0f111d;
-$palette-dark-2: #111423;
-$palette-dark-3: #16192b;
-$palette-dark-4: #1a1f32;
-$palette-dark-5: $palette-surface-raised;
-$palette-dark-6: $palette-surface-input;
-$palette-dark-7: $palette-surface-select;
-$palette-dark-8: $palette-surface-hover;
-$palette-dark-9: #2f3550;
-$palette-dark-10: $palette-gradient-overlay;
-$palette-dark-11: #1A2240;
-$palette-dark-12: $palette-bg;
-
-$palette-blue-1: $palette-blue-dark;
-$palette-blue-2: $palette-blue-mid;
-$palette-blue-3: $palette-blue-focus;
-$palette-blue-4: $palette-blue-alt;
-$palette-blue-5: $palette-surface; // superficie (nome fuorviante, alias storico)
-$palette-blue-6: $palette-action;
-
-$palette-text-1: $palette-action;
-$palette-text-2: $palette-surface; // bg scuro per testo invertito (alias storico)
-$palette-text-3: $palette-text-title;
-$palette-text-4: $palette-text-muted;
-$palette-text-5: $palette-text-disabled;
-$palette-text-6: $palette-action-hover;
-$palette-text-7: $palette-text-secondary;
-$palette-text-8: $palette-text;
 
 
 // ── SEMANTICA (a cosa serve ogni colore) ───────────────────────────────────

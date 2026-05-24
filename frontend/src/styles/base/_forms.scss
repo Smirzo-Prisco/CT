@@ -86,7 +86,7 @@ select {
 
 @include all-inputs {
     &:hover {
-        background: $palette-dark-8;
+        background: $palette-surface-hover;
     }
 }
 
@@ -115,10 +115,10 @@ select {
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        background: $palette-dark-4;
+        background: $palette-surface-disabled;
 
         &:hover {
-            background: $palette-dark-4;
+            background: $palette-surface-disabled;
         }
     }
 }
@@ -213,9 +213,9 @@ select.year {
     max-height: 30px;
     margin: 0;
     padding: 6px 12px;
-    border: 1px solid $palette-dark-8;
+    border: 1px solid $palette-surface-hover;
     border-radius: $radius-lg - 3;
-    background: $palette-dark-7;
+    background: $palette-surface-select;
     color: $color-text-light;
     font-size: $text-lg;
 }
