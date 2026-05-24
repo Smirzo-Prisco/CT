@@ -298,19 +298,16 @@ document.head.appendChild(stylePginRole);
 /*****************************************************************************/
 function gdrSetSessionActive(isActive) {
     const statusElement = document.getElementById('gdrSessionStatus');
-    const roleInProgress = document.getElementById('roleInProgress');
     const addPgToRoleBtn = document.getElementById('addPgToRoleBtn');
 
     if (isActive) {
         statusElement.classList.add('active');
         statusElement.classList.remove('inactive');
         addPgToRoleBtn.textContent = ' Join!';
-        roleInProgress.style.display = 'block';
     } else {
         statusElement.classList.add('inactive');
         statusElement.classList.remove('active');
         addPgToRoleBtn.textContent = ' Avvia!';
-        roleInProgress.style.display = 'none';
     }
 }
 
