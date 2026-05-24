@@ -459,7 +459,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione, selezione errata del bersaglio!'));
                     exit;
                 }
-                
+
+                // Se il pg ha già usato la sua azione nel turno precedente (attacco + scudo), non può attaccare
+                $can_send = (int)gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login'")['can_send'];
+                if ($can_send === 0) {
+                    echo json_encode(array('success' => false, 'message' => 'Attenzione, hai già usato la tua azione nel turno precedente!'));
+                    exit;
+                }
+
                 // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno
                 if(checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'"], $turn)) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi effettuare due lanci nello stesso turno'));
