@@ -166,7 +166,7 @@ function closeTurn() {
                 // Esegue refresh della chat
                 if (window.refreshChat) window.refreshChat();
 
-                document.getElementById("chatPanel").style.display = "none";
+                window.closeChatPanel?.();
             } else showNotification(data.message, 'error');
         })
         .catch(err => console.error('Errore caricamento chat:', err));

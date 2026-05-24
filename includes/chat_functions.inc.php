@@ -813,8 +813,12 @@ function checkTurnEnd($location, $user, $id_role) {
         // Recupero tutti i pg che hanno azionato ma non ancora chiuso il turno
         $pgs = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND `sent` = 1 AND close_turn = 0 AND role_session_players.end IS NULL", 'result');
 
-        // Se trovo solo un pg, significa che è da solo nella role: attendo altri prima di proporre la chiusura
-        if(gdrcd_query($pgs, 'num_rows') === 1) return;
+        // Se c'è un solo pg TOTALE nella role, è da solo: non proporgli la chiusura
+        // (non usare num_rows di $pgs: conta solo i pg con close_turn=0, non quelli
+        // già auto-chiusi, e farebbe scattare il return in modo errato nelle sessioni
+        // a due giocatori dove uno ha già chiuso il turno con un lancio)
+        $totalActive = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM role_session_players WHERE id_role = $id_role AND `end` IS NULL")['n'] ?? 0);
+        if ($totalActive <= 1) return;
 
         $turn = getTurn($id_role);
         $last_id = (int)gdrcd_query("SELECT MAX(id) AS last_id FROM chat")['last_id'];

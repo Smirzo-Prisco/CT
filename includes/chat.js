@@ -32,7 +32,7 @@ async function pulisciChat() {
             .then(data => {
                 if (window.clearChat) window.clearChat();
 
-                document.getElementById("chatPanel").style.display = "none";
+                window.closeChatPanel?.();
             })
             .catch(err => console.error('Errore caricamento chat:', err));
     }
@@ -143,7 +143,7 @@ function tiraDadoChat() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById("chatPanel").style.display = "none";
+                    window.closeChatPanel?.();
                     // Esegue refresh della chat
                     } else showNotification(data.message, 'error');
             })
@@ -174,7 +174,7 @@ function usaAttaccoChat() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                document.getElementById("chatPanel").style.display = "none";
+                window.closeChatPanel?.();
 
             } else showNotification(data.message, 'error');
         })
@@ -221,7 +221,7 @@ function tiraSkillChat() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById("chatPanel").style.display = "none";
+                    window.closeChatPanel?.();
                     // Esegue refresh della chat
                     } else showNotification(data.message, 'error');
             })
@@ -266,7 +266,7 @@ function setCharLimit() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                document.getElementById("chatPanel").style.display = "none";
+                window.closeChatPanel?.();
 
             } else showNotification(data.message, 'error');
         })
@@ -314,7 +314,7 @@ function usaOggettoChat() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                document.getElementById("chatPanel").style.display = "none";
+                window.closeChatPanel?.();
 
             } else showNotification(data.message, 'error');
         })
@@ -338,7 +338,7 @@ function tiraDadoGenericoChat() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                document.getElementById("chatPanel").style.display = "none";
+                window.closeChatPanel?.();
 
             } else showNotification(data.message, 'error');
         })
@@ -371,7 +371,7 @@ function editMasterPgChat() {
     })
         .then(res => res.json())
         .then(data => {
-            document.getElementById("chatPanel").style.display = "none";
+            window.closeChatPanel?.();
 
         })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -389,7 +389,7 @@ function newMasterPng() {
     })
         .then(res => res.json())
         .then(data => {
-            document.getElementById("chatPanel").style.display = "none";
+            window.closeChatPanel?.();
 
             getPngRolePlaying(); // Aggiorna la lista dei png nella sezione master del pannello chat
         })
@@ -416,7 +416,7 @@ function newMasterPngAction() {
     })
         .then(res => res.json())
         .then(data => {
-            document.getElementById("chatPanel").style.display = "none";
+            window.closeChatPanel?.();
 
         })
         .catch(err => console.error('Errore caricamento chat:', err));
@@ -494,40 +494,20 @@ document.head.appendChild(vibrateStyle);
 /*********************** PANNELLO CHAT ***************************************/
 /*****************************************************************************/
 // Gestione apertura/chiusura modale principale.
-// Null-check necessario: se lo script viene iniettato dinamicamente (SPA) e
-// l'elemento non è ancora nel DOM, non lanciamo un TypeError che bloccherebbe
-// tutta l'esecuzione del file — inclusa la definizione di window.initChatListeners.
-var _openPanelBtn = document.getElementById('openPanelBtn');
-if (_openPanelBtn) _openPanelBtn.addEventListener('click', function () {
-    document.getElementById('chatPanel').style.display = 'flex';
-});
-
+// Il pannello GDR è gestito da React (ChatShell.jsx via window.openChatPanel /
+// window.closeChatPanel). I listener legacy qui sotto sono rimasti come
+// fallback ma usano le callback React per non bypassare lo state.
+// Il listener su openPanelBtn è rimosso: React gestisce onClick direttamente.
 var _gdrCloseBtn = document.getElementById('gdrCloseBtn');
 if (_gdrCloseBtn) _gdrCloseBtn.addEventListener('click', function () {
-    document.getElementById('chatPanel').style.display = 'none';
+    window.closeChatPanel?.();
 });
 
-// Gestione Tabs
-document.querySelectorAll('.gdr-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        // Rimuovi classe active da tutti i tab
-        document.querySelectorAll('.gdr-tab').forEach(t => {
-            t.classList.remove('active');
-        });
-
-        // Aggiungi classe active al tab cliccato
-        tab.classList.add('active');
-
-        // Nascondi tutti i contenuti
-        document.querySelectorAll('.gdr-tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-
-        // Mostra il contenuto corrispondente
-        const tabId = tab.getAttribute('data-tab');
-        document.getElementById(`${tabId}-tab`).classList.add('active');
-    });
-});
+// Gestione Tabs: rimossa — i tab del pannello GDR sono gestiti da React
+// (setActiveTab in ChatShell.jsx). Il listener precedente chiamava
+// document.getElementById(`${tabId}-tab`) su un data-tab inesistente nei
+// div React, causando un TypeError che rimuoveva la classe active da tutti
+// i tab-content lasciando il pannello vuoto.
 
 // Contatore caratteri per azione PNG
 document.getElementById('message').addEventListener('input', function () {
@@ -761,14 +741,12 @@ window.initChatListeners = function () {
     var customSpan = document.getElementsByClassName("custom-close")[0];
     var chatPanel = document.getElementById("chatPanel");
 
-    if (customImg) customImg.onclick = function () { chatPanel.style.display = "block"; }
-    if (customSpan) customSpan.onclick = function () { chatPanel.style.display = "none"; }
+    if (customImg) customImg.onclick = function () { window.openChatPanel?.(); }
+    if (customSpan) customSpan.onclick = function () { window.closeChatPanel?.(); }
 
-    window.onclick = function (event) { if (event.target == chatPanel) chatPanel.style.display = "none"; }
+    window.onclick = function (event) { if (event.target == chatPanel) window.closeChatPanel?.(); }
 
-    // Apre la prima tab per default
-    var chat_panel = document.getElementById("defaultOpen");
-    if (chat_panel) chat_panel.click();
+    // Apertura prima tab: non necessario, React inizializza activeTab = 'dice' di default.
 
     // Apre popup per parametri 
     /*

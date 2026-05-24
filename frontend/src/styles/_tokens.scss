@@ -11,15 +11,15 @@
 // Valori ufficiali del design system. Usare questi nei nuovi componenti.
 
 // Sfondi (dal più scuro al più chiaro)
-$palette-bg:               #060814;   // corpo pagina
-$palette-surface-deep:     #0f111d;   // tra bg e surface (pulsanti, contenitori molto scuri)
-$palette-surface-dark:     #111423;   // card scura, scrollbar
-$palette-surface:          #111827;   // pannelli, card, superfici
-$palette-surface-disabled: #1a1f32;   // stato disabilitato
-$palette-surface-raised:   #1c1f2e;   // card elevata, header
-$palette-surface-input:    #1c2033;   // input, textarea
-$palette-surface-select:   #2a2d3c;   // select, dropdown
-$palette-surface-hover:    #2e3350;   // hover e bordi scuri
+$palette-bg: #060814; // corpo pagina
+$palette-surface-deep: #0f111d; // tra bg e surface (pulsanti, contenitori molto scuri)
+$palette-surface-dark: #111423; // card scura, scrollbar
+$palette-surface: #111827; // pannelli, card, superfici
+$palette-surface-disabled: #1a1f32; // stato disabilitato
+$palette-surface-raised: #1c1f2e; // card elevata, header
+$palette-surface-input: #1c2033; // input, textarea
+$palette-surface-select: #2a2d3c; // select, dropdown
+$palette-surface-hover: #2e3350; // hover e bordi scuri
 
 // Azioni / Link (azzurro ghiaccio)
 $palette-action: #AEE7FF; // link, accento primario

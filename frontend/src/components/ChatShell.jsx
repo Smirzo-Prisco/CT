@@ -150,6 +150,19 @@ export default function ChatShell() {
     }, [])
 
     /**
+     * Espone window.openChatPanel / window.closeChatPanel affinché chat.js e
+     * role_session.js possano aprire/chiudere il pannello GDR tramite React
+     * state invece di manipolare style.display direttamente. Senza questo,
+     * il DOM e panelOpen divergono: la prossima setPanelOpen(true) diventa
+     * un no-op e il pannello mostra contenuto vuoto.
+     */
+    useEffect(() => {
+        window.openChatPanel  = () => setPanelOpen(true)
+        window.closeChatPanel = () => setPanelOpen(false)
+        return () => { delete window.openChatPanel; delete window.closeChatPanel }
+    }, [])
+
+    /**
      * Ascolta l'evento socket 'role:update' per aggiornare roleActive in
      * tempo reale quando una role inizia o termina nella stanza corrente.
      *
@@ -218,14 +231,17 @@ export default function ChatShell() {
 
     /** Invia la scelta di difesa al server e rimuove il prompt dalla lista. */
     const handleDefenseChoice = useCallback((id_fight, scelta) => {
+        // Rimozione ottimistica: il prompt sparisce subito al click senza
+        // aspettare la risposta del server (evita il "pulsante rimane visibile").
+        setAttackPrompts(prev => prev.filter(p => p.id_fight !== id_fight))
         fetch('/pages/api_chat.php?op=risposta_immediata', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify({ id_fight, scelta }),
         })
             .then(r => r.json())
-            .then(d => { if (d.success) setAttackPrompts(prev => prev.filter(p => p.id_fight !== id_fight)) })
-            .catch(() => {})
+            .then(d => { if (!d.success) console.error('[handleDefenseChoice]', d.message) })
+            .catch(err => console.error('[handleDefenseChoice]', err))
     }, [])
 
     // -----------------------------------------------------------------------
