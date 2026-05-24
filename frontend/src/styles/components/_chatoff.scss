@@ -57,9 +57,9 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 6px 8px;
-    font-family: $font-serif;
-    font-size: $text-xs;
-    color: $palette-text-5;
+    font-family: $font-chat;
+    font-size: $text-sm;
+    color: $color-text;
     line-height: 1.5;
     background: transparent;
     box-sizing: border-box;
@@ -71,7 +71,7 @@
     // Messaggi dal log.html
     .msgln {
         margin: 0 0 2px;
-        color: $palette-text-3;
+        color: $color-text;
 
         b {
             color: #a1c3c8;
@@ -86,7 +86,7 @@
 
 .chatoff-typing {
     font-size: $text-xs;
-    font-style: italic;
+    font-style: $font-chat;
     color: $palette-text-4;
     padding: 2px 8px;
     background: $palette-dark-2;
