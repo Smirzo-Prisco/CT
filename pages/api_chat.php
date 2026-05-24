@@ -254,17 +254,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // B deve ancora poter inviare la sua azione regolare senza essere bloccato da sent=1.
 
             if ($id_role) {
-                // Se il difensore è l'unico rimasto con close_turn=0, questa difesa è la sua ultima
-                // azione del turno: chiudiamo il suo turno, che a sua volta chiude il turno globale.
-                $othersOpen = gdrcd_query(
-                    "SELECT id FROM role_session_players
-                     WHERE id_role = $id_role AND pg_name != '$login' AND close_turn = 0 AND `end` IS NULL LIMIT 1",
-                    'result'
-                );
-                if ($othersOpen && gdrcd_query($othersOpen, 'num_rows') === 0) {
-                    closePgTurn($id_role, $login, $luogo);
+                if ($scelta === 'scudo') {
+                    // Lo scudo è un lancio (car='difesa'): se il pg ha già inviato l'azione testuale
+                    // (sent=1) il suo turno si chiude automaticamente, esattamente come per attacchi e skill.
+                    // Se non ha ancora inviato l'azione, il turno rimane aperto; checkTurnEnd lo
+                    // rileverà tramite hasTurnLaunch quando invierà il testo.
+                    checkAutoCloseAfterLaunch($id_role, $login, $luogo);
                 } else {
-                    // Altri giocatori devono ancora chiudere: controlla solo se si può chiudere già ora
+                    // dado/subisce: semplici reazioni, non chiudono il turno del difensore.
                     checkTurnCanClose($id_role, $luogo);
                 }
             }
