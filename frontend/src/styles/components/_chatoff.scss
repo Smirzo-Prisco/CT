@@ -5,7 +5,7 @@
 
 .chatoff-panel {
     border: 1px solid $palette-surface-hover;
-    border-radius: 8px;
+    border-radius: $radius-lg;
     display: flex;
     flex-direction: column;
     background: $palette-gradient-overlay;
@@ -100,7 +100,7 @@
 
 .chatoff-input-row {
     display: flex;
-    gap: 4px;
+    gap: $space-1;
     padding: 0px 6px;
     background: rgba(0, 0, 0, 0);
     box-sizing: border-box;

@@ -62,7 +62,7 @@ div.contenitore_presenti {
     padding: 10px;
     overflow-y: auto;
     height: 100%;
-    border-radius: 8px;
+    border-radius: $radius-lg;
 }
 
 // ── Icone stato (PresentiEstesi) ──────────────────────────────

@@ -728,7 +728,7 @@ div.form_row {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    gap: 8px;
+    gap: $space-2;
 }
 
 .action-tag {
@@ -741,7 +741,7 @@ div.form_row {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 8px;
+    gap: $space-2;
     flex-wrap: wrap;
     justify-content: space-around;
 }
@@ -754,17 +754,17 @@ div.form_row {
 // ── Pannello personaggi giocanti ──────────────────────────────
 
 .pg-role-body {
-    padding: 12px;
+    padding: $space-3;
 }
 
 .pg-role-header {
     display: grid;
     grid-template-columns: 1fr 60px 60px 60px 80px;
-    gap: 8px;
+    gap: $space-2;
     padding: 6px 8px;
     background-color: rgba(42, 63, 118, 0.3);
     border-radius: 6px;
-    margin-bottom: 4px;
+    margin-bottom: $space-1;
     font-size: 0.85rem;
     text-align: center;
 }

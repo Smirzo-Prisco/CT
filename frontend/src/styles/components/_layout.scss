@@ -53,7 +53,7 @@ body {
     background-image: url("imgs/colonna_dx/colonna_destra.png");
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: $space-1;
     padding-bottom: $space-2 + 2;
 
     >* {

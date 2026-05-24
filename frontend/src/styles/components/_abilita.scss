@@ -47,7 +47,7 @@
         margin-bottom: $space-2 + 2;
         border-radius: $radius-lg;
         overflow: hidden;
-        background: #1c2033;
+        background: $color-surface-input;
         border: 1px solid $palette-surface-hover;
     }
 
@@ -67,7 +67,7 @@
 
     .accordion-body {
         display: none;
-        background: #1c2033;
+        background: $color-surface-input;
         padding: $space-2 + 2 15px;
     }
 
