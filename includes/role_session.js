@@ -298,16 +298,16 @@ document.head.appendChild(stylePginRole);
 /*****************************************************************************/
 function gdrSetSessionActive(isActive) {
     const statusElement = document.getElementById('gdrSessionStatus');
-    const addPgToRoleBtn = document.getElementById('addPgToRoleBtn');
+    // const addPgToRoleBtn = document.getElementById('addPgToRoleBtn');
 
     if (isActive) {
         statusElement.classList.add('active');
         statusElement.classList.remove('inactive');
-        addPgToRoleBtn.textContent = ' Join!';
+        // addPgToRoleBtn.textContent = ' Join!';
     } else {
         statusElement.classList.add('inactive');
         statusElement.classList.remove('active');
-        addPgToRoleBtn.textContent = ' Avvia!';
+        // addPgToRoleBtn.textContent = ' Avvia!';
     }
 }
 

@@ -410,7 +410,7 @@ export default function ChatShell() {
                                                 style={{ cursor: 'pointer', display: 'none', fontSize: '16px' }}></i>
                                             <i id="addPgToRoleBtn"
                                                 onClick={() => window.addPgToRole?.()}
-                                                className="fa-solid fa-play chat-avvia-btn"> Avvia!</i>
+                                                className="fa-solid fa-play chat-avvia-btn"></i>
                                         </div>
                                     </div>
                                     <input type="submit" value={submit_label} />
