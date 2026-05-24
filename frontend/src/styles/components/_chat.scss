@@ -515,7 +515,7 @@ div.pagina_frame_chat {
     flex-direction: column;
     overflow: hidden;
     z-index: 0;
-    background: $palette-dark-11;
+    background: $color-bg;
 }
 
 div.pagina_frame_chat div.page_body {
@@ -785,7 +785,7 @@ input#message {
 // Override input/select scoped alla chat (stile differente dal base)
 div.pagina_frame_chat {
     input {
-        border: 2px solid #000;
+        border: 2px solid $palette-blue-4;
         border-radius: $radius-sm;
         background-color: $palette-dark-5;
         color: $color-text-light;
@@ -794,7 +794,7 @@ div.pagina_frame_chat {
     }
 
     select {
-        border: 2px solid #03060a;
+        border: 2px solid $palette-blue-4;
         border-radius: $radius-sm;
         background-color: $palette-dark-5;
         color: $color-text-light;
