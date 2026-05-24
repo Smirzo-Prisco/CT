@@ -801,31 +801,40 @@ function endRoleSession($location) {
     chatInsertMessage($location, 'System', null, 'Role conclusa!', 'N');
 }
 
-// Controllo se tutti i pg hanno inviato, così propongo la chiudura del turno a tutti quanti
+// Controllo se tutti i pg hanno inviato, così propongo la chiusura del turno a tutti quanti
 function checkTurnEnd($location, $user, $id_role) {
     gdrcd_query("UPDATE role_session_players SET `sent` = 1 WHERE id_role = $id_role AND pg_name LIKE '%$user%'"); // Il pg ha azionato, sent = 1
     // Cerco tutti i pg che non hanno ancora azionato nel turno corrente
     $result = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND `sent` = 0 AND role_session_players.end IS NULL", 'result');
-    
+
     // Se non li trovo, significa che tutti hanno azionato
     if ($result && gdrcd_query($result, 'num_rows') === 0) {
-        // Prendo l'id dell'ultimo messaggio in chat per evitare conflitti con i messaggi successivi al controllo del turno
-        $last_id = (int)gdrcd_query("SELECT MAX(id) AS last_id FROM chat")['last_id'];
-
-        // Quindi recupero tutti i pg che hanno azionato
+        // Recupero tutti i pg che hanno azionato ma non ancora chiuso il turno
         $pgs = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND `sent` = 1 AND close_turn = 0 AND role_session_players.end IS NULL", 'result');
 
-        // Se trovo solo un pg, significa che è da solo nella role, quindi attendo che se ne aggiungano altri prima di proporre la chiusura del turno
+        // Se trovo solo un pg, significa che è da solo nella role: attendo altri prima di proporre la chiusura
         if(gdrcd_query($pgs, 'num_rows') === 1) return;
 
-        // Mando un sussurro ad ognuno di loro per chiedere se vogliono chiudere il turno
+        $turn = getTurn($id_role);
+        $last_id = (int)gdrcd_query("SELECT MAX(id) AS last_id FROM chat")['last_id'];
+
         foreach($pgs as $pg) {
-            $last_id++;
             $pgName = $pg['pg_name'];
-            $msg = '<button onclick="closePgTurn('.$id_role.', '.$last_id.', `'.$pgName.'`);">Chiudi il turno</button>';
-            
-            chatInsertMessage($location, 'System', $pgName, $msg, 'Q');
+
+            if (hasTurnLaunch($id_role, $pgName, $turn)) {
+                // Ha già un lancio nel turno: chiusura automatica senza chiedere
+                gdrcd_query("UPDATE role_session_players SET close_turn = 1 WHERE id_role = $id_role AND pg_name = '$pgName' AND `end` IS NULL");
+            } else {
+                // Nessun lancio: chiede conferma via sussurro
+                $last_id++;
+                $msg = '<button onclick="closePgTurn('.$id_role.', '.$last_id.', `'.$pgName.'`);">Chiudi il turno</button>';
+                chatInsertMessage($location, 'System', $pgName, $msg, 'Q');
+            }
         }
+
+        // Se tutti sono stati auto-chiusi (nessun bottone necessario), chiude il turno subito
+        $stillOpen = gdrcd_query("SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1", 'result');
+        if ($stillOpen && gdrcd_query($stillOpen, 'num_rows') === 0) closeTurn($id_role, $location);
     }
 }
 
@@ -1529,6 +1538,18 @@ function checkMultipleLounch($id_role, $striker, $type, $turn) {
     $result = gdrcd_query("SELECT * FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$striker' AND car IN (".implode(',', $type).")", 'result');
 
     return ($result && gdrcd_query($result, 'num_rows') > 0);
+}
+
+// Verifica se il pg ha già effettuato almeno un lancio (attacco o difesa) nel turno corrente
+function hasTurnLaunch($id_role, $pgName, $turn) {
+    $result = gdrcd_query("SELECT id FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pgName' AND car NOT IN ('dado_risposta', 'subisce') LIMIT 1", 'result');
+    return $result && gdrcd_query($result, 'num_rows') > 0;
+}
+
+// Se il pg ha già inviato l'azione testuale, chiude il suo turno automaticamente dopo un lancio
+function checkAutoCloseAfterLaunch($id_role, $pgName, $location) {
+    $row = gdrcd_query("SELECT sent FROM role_session_players WHERE id_role = $id_role AND pg_name = '$pgName' AND `end` IS NULL");
+    if ($row && (int)$row['sent'] === 1) closePgTurn($id_role, $pgName, $location);
 }
 
 function getTurn($id_role) {

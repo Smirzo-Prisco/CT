@@ -262,7 +262,7 @@ img.immagine_luogo {
     width: 100%;
     padding: 1px;
     font-family: $font-base;
-    color: $color-text;
+    color: $palette-text-6;
     font-size: $text-sm;
 }
 
@@ -403,7 +403,7 @@ img.immagine_pg {
 
 .icon-label {
     font-size: 9px;
-    color: $palette-text-4;
+    color: $palette-text-6;
     text-align: center;
     line-height: 1;
     pointer-events: none;

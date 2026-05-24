@@ -7,12 +7,10 @@
 - Le dimensioni e la posizione della finestra dei presenti
 - Lo sfondo della finestra dei presenti */
 
-/* Frame dei presenti */
-body { font-family: Lato; }
+/* Frame dei presenti
 
 div.online div.iframe_online {
     overflow: auto;
-    background-color: transparent;
     height: 263px;
     width: 214px;
     border: none;
@@ -62,7 +60,7 @@ line-height: 0;
 div.link_presenti {
     margin-top: 20px;
 }
-
+*/
 
 
 div.contenitore_presenti {

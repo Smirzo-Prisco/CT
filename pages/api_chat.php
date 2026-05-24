@@ -176,6 +176,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Aggiorna la salute del personaggio se la skill lanciata non è un talento
             if($car != 'talento') gdrcd_query("UPDATE personaggio SET salute = salute-1 WHERE nome = '$login'");
 
+            // Se il pg ha già inviato l'azione testuale, chiude il suo turno automaticamente
+            checkAutoCloseAfterLaunch($id_role, $login, $luogo);
+
             // Risposta JSON per AJAX
             echo json_encode(array(
                 'success' => true,
@@ -519,6 +522,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             
             // Gestione della polizia automatica
             gestionePoliziaAutomatica($luogo);
+
+            // Se il pg ha già inviato l'azione testuale, chiude il suo turno automaticamente
+            checkAutoCloseAfterLaunch($id_role, $login, $luogo);
 
             echo json_encode(array('success' => true, 'message' => 'Attacco eseguito con successo.', 'tipo attacco' => $tipo_attacco));
 
