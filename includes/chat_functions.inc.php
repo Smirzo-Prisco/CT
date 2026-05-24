@@ -1574,12 +1574,14 @@ function hasPendingUnrespondedAttacks($id_role, $turn) {
 }
 
 /**
- * Chiude il turno solo se entrambe le condizioni sono soddisfatte:
- *   1. Tutti i pg attivi hanno close_turn = 1
- *   2. Nessun attacco è rimasto senza risposta (il bersaglio ha scelto dado/scudo/subisce)
- * Viene chiamata da closePgTurn e checkTurnEnd in sostituzione della chiamata
- * diretta a closeTurn, per evitare che il turno si chiuda prima che il bersaglio
- * abbia avuto modo di rispondere all'attacco appena ricevuto.
+ * Chiude il turno quando tutti i pg attivi hanno close_turn = 1.
+ * Viene chiamata da closePgTurn, checkTurnEnd e risposta_immediata.
+ *
+ * Non blocca più su hasPendingUnrespondedAttacks: se un pg ha confermato
+ * la chiusura del turno senza rispondere a un attacco, elaborateTurn gestisce
+ * il caso con un tiro automatico di difesa (riga ~1240).
+ * La risposta_immediata rimane utile: i pg che rispondono PRIMA di chiudere
+ * vedranno il loro tiro usato da elaborateTurn; chi non risponde prende il tiro auto.
  */
 function checkTurnCanClose($id_role, $location) {
     $stillOpen = gdrcd_query(
@@ -1587,9 +1589,6 @@ function checkTurnCanClose($id_role, $location) {
         'result'
     );
     if (!$stillOpen || gdrcd_query($stillOpen, 'num_rows') > 0) return; // Qualcuno deve ancora chiudere
-
-    $turn = getTurn($id_role);
-    if (hasPendingUnrespondedAttacks($id_role, $turn)) return; // Attacchi ancora in attesa di risposta
 
     closeTurn($id_role, $location);
 }
