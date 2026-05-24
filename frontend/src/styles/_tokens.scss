@@ -22,7 +22,6 @@ $palette-dark-9: #2f3550; // input hover
 $palette-dark-10: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 20, 60, 0.4));
 $palette-dark-11: #1A2240;
 $palette-dark-12: #060814;
-$palette-dark-13: #D6C6A5; // Primary
 // semi trasparente
 
 // Blu — toni freddi/action
@@ -45,6 +44,7 @@ $palette-text-4: #ccc; // testo terziario / placeholder
 $palette-text-5: rgb(192, 164, 158); // testo disabilitato
 $palette-text-6: #c0a49e;
 $palette-text-7: #9E8456; // testo secondario
+$palette-text-8: #D6C6A5; // testo primario
 
 // Feedback
 $palette-success: #27ae60;
@@ -62,7 +62,7 @@ $color-surface-raised: $palette-dark-5; // card, header
 $color-surface-input: $palette-dark-6; // input, select
 
 // Bordi
-$color-border: $palette-dark-13; // bordi standard
+$color-border: $palette-text-8; // bordi standard
 $color-border-focus: $palette-blue-6; // bordo in focus
 
 // Brand / azioni
@@ -72,7 +72,7 @@ $color-action: $palette-blue-6; // link, icone, azioni secondarie
 $color-action-hover: $palette-blue-6; // hover sull'action
 
 // Testi
-$color-text: $palette-dark-13; // testo principale
+$color-text: $palette-text-8; // testo principale
 $color-text-secondary: $palette-text-7; // testo secondario
 $color-text-light: $palette-text-1; // testo chiaro / headings
 $color-text-muted: $palette-text-4; // testo disabilitato / secondario
