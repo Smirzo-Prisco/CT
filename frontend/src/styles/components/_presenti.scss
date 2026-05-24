@@ -21,10 +21,6 @@ div.presenti_estesi {
     }
 }
 
-body {
-    font-family: $font-ui;
-}
-
 #online-users-container .iframe_online {
     background: url("imgs/colonna_dx/box_presenti.png") no-repeat center / 100%;
     height: 260px;
@@ -36,7 +32,6 @@ div.luogo {
     margin: 20px 10px 0 0;
     font-size: $text-2xl;
     font-weight: $font-weight-bold;
-    font-family: Perpetua, serif;
     text-align: center;
     text-transform: uppercase;
 }
@@ -44,10 +39,6 @@ div.luogo {
 div.presente {
     font-weight: $font-weight-normal;
     font-size: $text-md;
-    border: none;
-    font-family: $font-serif;
-    text-align: left;
-    position: relative;
     color: $color-action;
 }
 
@@ -62,8 +53,6 @@ div.link_presenti {
 
 .online-user-link {
     font-size: $text-md;
-    font-family: $font-serif;
-    color: $color-action;
     letter-spacing: 0;
 }
 
