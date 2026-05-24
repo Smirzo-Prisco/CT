@@ -1590,6 +1590,19 @@ function hasPendingUnrespondedAttacks($id_role, $turn) {
  * vedranno il loro tiro usato da elaborateTurn; chi non risponde prende il tiro auto.
  */
 function checkTurnCanClose($id_role, $location) {
+    // Auto-chiude i pg che hanno già inviato l'azione testuale e hanno almeno un lancio nel turno:
+    // potrebbero essere rimasti con close_turn=0 se checkTurnEnd è scattato prima che lanciassero.
+    $turn = getTurn($id_role);
+    $candidates = gdrcd_query(
+        "SELECT pg_name FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND sent = 1 AND `end` IS NULL",
+        'result'
+    );
+    while ($pg = gdrcd_query($candidates, 'fetch')) {
+        if (hasTurnLaunch($id_role, $pg['pg_name'], $turn)) {
+            gdrcd_query("UPDATE role_session_players SET close_turn = 1 WHERE id_role = $id_role AND pg_name = '{$pg['pg_name']}' AND `end` IS NULL");
+        }
+    }
+
     $stillOpen = gdrcd_query(
         "SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
         'result'
