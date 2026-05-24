@@ -9,6 +9,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
     require_once(__DIR__ . '/../includes/chat_functions.inc.php');
     
     // IMPORTANTE: Solo per le richieste AJAX
+    // Impedisce che warning/notice PHP finiscano nell'output e corrompano il JSON
+    ini_set('display_errors', 0);
     header('Content-Type: application/json');
 
     if (empty($_SESSION['login'])) {

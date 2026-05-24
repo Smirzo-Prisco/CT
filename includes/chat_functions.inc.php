@@ -1181,7 +1181,8 @@ function elaborateAttack($id_role, $turn, $intoccabili, $difensori, &$riepilogo)
             $level = (int)getLevelPg(getTotStatsPg($striker));
             
             // In base al suo livello, prendo l'integrità stabilita da scalare
-            $integrita = (int)gdrcd_query("SELECT integrita FROM gilda_soglie WHERE livello = $level")['integrita'];
+            $sgRow = gdrcd_query("SELECT integrita FROM gilda_soglie WHERE livello = $level");
+            $integrita = $sgRow ? (int)$sgRow['integrita'] : 0;
 
             $riepilogo[$target]['subisce'][] = array(
                 'esito' => 1, // 1 = perde punti, 0 = respinge l'attacco
@@ -1208,6 +1209,7 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
     // Per ogni bersaglio di questo attaccato
     foreach($targets as $k => $target) {
         $carDifesa = getDefenceCar(strtolower($r['car']), $target); // Recupero le info sulla caratteristica usata per il tiro di difesa
+        if ($carDifesa === null) continue; // car d'attacco sconosciuta, non elaborabile
         $damage = 0; // Inizializzo il danno subito dal bersaglio
         $durata = 0; // Inizializzo la durata (in turni) di eventuali effetti applicati al bersaglio
         $moltiplicatore = 1; // Inizializzo il moltiplicatore di danno
@@ -1215,7 +1217,8 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
 
         if (!isset($riepilogo[$target])) $riepilogo[$target] = array(); // Inizializzo l'array del pg
 
-        $can_send = (int)gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$target'")['can_send'];
+        $canRow = gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$target'");
+        $can_send = $canRow ? (int)$canRow['can_send'] : 1;
 
         // Risposta immediata: il bersaglio ha scelto esplicitamente come reagire prima della fine turno
         $dadoRisposta = gdrcd_query("SELECT dice FROM role_fights WHERE id_role=$id_role AND turn=$turn AND striker='$target' AND target='$striker' AND car='dado_risposta' LIMIT 1");
@@ -1232,7 +1235,8 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                     // Il bersaglio ha già tirato il dado in risposta immediata: usa quel risultato
                     $dadoDifesa = (int)$dadoRisposta['dice'];
                     if($dice > $dadoDifesa) {
-                        $moltiplicatore = (float)gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level'])['danno'];
+                        $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level']);
+                        $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
                         $damage = (($dice - $dadoDifesa) * $moltiplicatore / count($targets));
                         $durata = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
                     }
@@ -1240,7 +1244,8 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                     // Nessuna risposta immediata: auto-lancia il dado di difesa
                     $dadoDifesa = lanciaStat($id_role, $striker, $target, true, $carDifesa['nome'], $carDifesa['nome'], $carDifesa['car'], $carDifesa['punti'], 0, 0)['risultato'];
                     if($dice > $dadoDifesa) {
-                        $moltiplicatore = (float)gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level'])['danno'];
+                        $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level']);
+                        $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
                         $damage = (($dice - $dadoDifesa) * $moltiplicatore / count($targets));
                         $durata = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
                     }
@@ -1452,7 +1457,8 @@ function setCanSend($id_role) {
     $pgsGiocanti = getRolePgs($id_role, true);
     
     foreach($pgsGiocanti as $pg) {
-        $can_send = (int)gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$pg'")['can_send'];
+        $canRow = gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$pg'");
+        $can_send = $canRow ? (int)$canRow['can_send'] : 1;
         // Prendo tutti i lanci fatti dal pg nel turno corrente
         $result = gdrcd_query("SELECT * FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pg'", 'result');
         $lanci = gdrcd_query($result, 'num_rows');
