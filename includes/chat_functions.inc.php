@@ -823,7 +823,7 @@ function checkTurnEnd($location, $user, $id_role) {
         $turn = getTurn($id_role);
         $last_id = (int)gdrcd_query("SELECT MAX(id) AS last_id FROM chat")['last_id'];
 
-        foreach($pgs as $pg) {
+        while ($pg = gdrcd_query($pgs, 'fetch')) {
             $pgName = $pg['pg_name'];
 
             if (hasTurnLaunch($id_role, $pgName, $turn)) {
@@ -1652,6 +1652,7 @@ function scaloPunti($pg, $damage, $type) {
 // Se l'integrità scende sotto una certa soglia, registro la durata della skill in base al danno provocato
 function registraDurata($type, $punti, $danno, $pg, $id_role) {
     $salute = ($punti - $danno);
+    $turni = 0;
     $msg = '';
 
     // Se parliamo di integrità ed è compresa tra 60 e 20, registro la durata in base al danno provocato
