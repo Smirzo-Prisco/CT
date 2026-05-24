@@ -7,82 +7,111 @@
 // ============================================================
 
 
-// ── PALETTE (valori crudi, non usare direttamente nel codice) ──────────────
+// ── PALETTE CANONICA ──────────────────────────────────────────────────────
+// Valori ufficiali del design system. Usare questi nei nuovi componenti.
 
-// Sfondi — dal più scuro al più chiaro
-$palette-dark-1: #0f111d; // body background
-$palette-dark-2: #111423; // surface scura (scrollbar, card nera)
-$palette-dark-3: #16192b; // surface componenti
-$palette-dark-4: #1a1f32; // disabled bg
-$palette-dark-5: #1c1f2e; // header, card bg
-$palette-dark-6: #1c2033; // input background
-$palette-dark-7: #2a2d3c; // select bg
-$palette-dark-8: #2e3350; // hover/bordi scuri
-$palette-dark-9: #2f3550; // input hover
-$palette-dark-10: linear-gradient(rgba(17, 24, 39, 0.4), rgba(0, 20, 60, 0.4));
-$palette-dark-11: #1A2240;
-$palette-dark-12: #060814;
-// semi trasparente
+// Sfondi (dal più scuro al più chiaro)
+$palette-bg:              #060814;   // corpo pagina
+$palette-surface:         #111827;   // pannelli, card, superfici
+$palette-surface-raised:  #1c1f2e;   // card elevata, header
+$palette-surface-input:   #1c2033;   // input, textarea
+$palette-surface-select:  #2a2d3c;   // select, dropdown
+$palette-surface-hover:   #2e3350;   // hover e bordi scuri
 
-// Blu — toni freddi/action
-$palette-blue-1: #2a3f76; // accent blu scuro
-$palette-blue-2: #3a4f86; // accent blu medio
-$palette-blue-3: #4a5288; // focus ring
-$palette-blue-4: #4da6ff; // action / link blue
-$palette-blue-5: #111827; // sfondo superfici e componenti
-$palette-blue-6: #AEE7FF;
+// Azioni / Link (azzurro ghiaccio)
+$palette-action:          #AEE7FF;   // link, accento primario
+$palette-action-hover:    #C8F1FF;   // hover su link / azioni
 
-// Brand — il colore caratteristico del progetto
-$palette-rust: #9a6353; // colore primario Crystal Tokyo
-$aaa: #7a4f43;
+// Brand
+$palette-rust:            #9a6353;   // colore primario Crystal Tokyo
+$palette-rust-dark:       #7a4f43;   // variante scura del brand
 
 // Testi
-$palette-text-1: #AEE7FF; // testo chiaro
-$palette-text-2: #111827; // testo heading (titoli)
-$palette-text-3: #D6C6A5; // testo titoli
-$palette-text-4: #ccc; // testo terziario / placeholder
-$palette-text-5: rgb(192, 164, 158); // testo disabilitato
-$palette-text-6: #C8F1FF; // testo hover
-$palette-text-7: #9FA7B8; // testo secondario
-$palette-text-8: #E8E6E3; // testo primario
+$palette-text:            #E8E6E3;   // testo principale
+$palette-text-secondary:  #A8A6B3;   // testo secondario / note
+$palette-text-title:      #D6C6A5;   // titoli, sezioni, dettagli (non su blocchi lunghi)
+$palette-text-muted:      #ccc;      // placeholder, terziario
+$palette-text-disabled:   rgb(192, 164, 158); // stato disabilitato
+
+// Blu tecnici / accenti (non per link)
+$palette-blue-dark:       #2a3f76;
+$palette-blue-mid:        #3a4f86;
+$palette-blue-focus:      #4a5288;
+$palette-blue-alt:        #4da6ff;
 
 // Feedback
-$palette-success: #27ae60;
-$palette-danger: #e74c3c;
-$palette-warning: #f39c12;
-$palette-info: #17a2b8;
+$palette-success:         #27ae60;
+$palette-danger:          #e74c3c;
+$palette-warning:         #f39c12;
+$palette-info:            #17a2b8;
+
+// Gradiente overlay
+$palette-gradient-overlay: linear-gradient(rgba(17, 24, 39, 0.4), rgba(0, 20, 60, 0.4));
+
+
+// ── ALIAS DI RETROCOMPATIBILITÀ ───────────────────────────────────────────
+// Usati da componenti esistenti. Non usare nei nuovi file.
+
+$palette-dark-1:   #0f111d;
+$palette-dark-2:   #111423;
+$palette-dark-3:   #16192b;
+$palette-dark-4:   #1a1f32;
+$palette-dark-5:   $palette-surface-raised;
+$palette-dark-6:   $palette-surface-input;
+$palette-dark-7:   $palette-surface-select;
+$palette-dark-8:   $palette-surface-hover;
+$palette-dark-9:   #2f3550;
+$palette-dark-10:  $palette-gradient-overlay;
+$palette-dark-11:  #1A2240;
+$palette-dark-12:  $palette-bg;
+
+$palette-blue-1:   $palette-blue-dark;
+$palette-blue-2:   $palette-blue-mid;
+$palette-blue-3:   $palette-blue-focus;
+$palette-blue-4:   $palette-blue-alt;
+$palette-blue-5:   $palette-surface;    // superficie (nome fuorviante, alias storico)
+$palette-blue-6:   $palette-action;
+
+$palette-text-1:   $palette-action;
+$palette-text-2:   $palette-surface;    // bg scuro per testo invertito (alias storico)
+$palette-text-3:   $palette-text-title;
+$palette-text-4:   $palette-text-muted;
+$palette-text-5:   $palette-text-disabled;
+$palette-text-6:   $palette-action-hover;
+$palette-text-7:   $palette-text-secondary;
+$palette-text-8:   $palette-text;
 
 
 // ── SEMANTICA (a cosa serve ogni colore) ───────────────────────────────────
 
 // Sfondo e superfici
-$color-bg: $palette-dark-12; // sfondo pagina
-$color-surface: $palette-blue-5; // sfondo componenti
-$color-surface-raised: $palette-dark-5; // card, header
-$color-surface-input: $palette-dark-6; // input, select
+$color-bg:              $palette-bg;
+$color-surface:         $palette-surface;
+$color-surface-raised:  $palette-surface-raised;
+$color-surface-input:   $palette-surface-input;
 
 // Bordi
-$color-border: $palette-text-8; // bordi standard
-$color-border-focus: $palette-blue-6; // bordo in focus
+$color-border:          $palette-text;
+$color-border-focus:    $palette-action;
 
 // Brand / azioni
-$color-primary: $palette-text-1; // bottone/accento primario
-$color-primary-hover: $palette-text-6; // hover sul primario
-$color-action: $palette-text-1; // link, icone, azioni secondarie
-$color-action-hover: $palette-blue-6; // hover sull'action
+$color-primary:         $palette-action;
+$color-primary-hover:   $palette-action-hover;
+$color-action:          $palette-action;
+$color-action-hover:    $palette-action-hover;
 
 // Testi
-$color-text: $palette-text-8; // testo principale
-$color-text-secondary: $palette-text-7; // testo secondario
-$color-text-light: $palette-text-2; // testo chiaro / headings
-$color-text-muted: $palette-text-4; // testo disabilitato / secondario
-$color-text-title: $palette-text-3;
+$color-text:            $palette-text;
+$color-text-secondary:  $palette-text-secondary;
+$color-text-title:      $palette-text-title;
+$color-text-light:      $palette-text-title;   // headings in contesti speciali
+$color-text-muted:      $palette-text-muted;
 
 // Feedback
-$color-success: $palette-success;
-$color-danger: $palette-danger;
-$color-warning: $palette-warning;
-$color-info: $palette-info;
+$color-success:  $palette-success;
+$color-danger:   $palette-danger;
+$color-warning:  $palette-warning;
+$color-info:     $palette-info;
 
 
 // ── SPACING (scala 4px) ────────────────────────────────────────────────────
@@ -115,7 +144,7 @@ $font-ui: Lato, sans-serif;
 
 $text-2xs: 10px;
 $text-xs: 10px;
-$text-sm: 11px; // base del progetto
+$text-sm: 11px;
 $text-md: 13px;
 $text-lg: 14px;
 $text-xl: 16px;
@@ -131,7 +160,7 @@ $font-weight-bold: 700;
 $shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
 $shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
 $shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.6);
-$shadow-focus: 0 0 0 2px rgba($palette-blue-3, 0.2);
+$shadow-focus: 0 0 0 2px rgba($palette-blue-focus, 0.2);
 
 
 // ── TRANSIZIONI ────────────────────────────────────────────────────────────
@@ -141,8 +170,7 @@ $transition-normal: 0.3s ease;
 
 
 // ── CSS CUSTOM PROPERTIES ──────────────────────────────────────────────────
-// Queste variabili sono usabili da qualsiasi file CSS o PHP via var(--xxx).
-// Le variabili $scss qui sopra sono usabili solo nei file .scss.
+// Usabili da qualsiasi file CSS o PHP via var(--xxx).
 
 :root {
     // Superfici
@@ -163,6 +191,8 @@ $transition-normal: 0.3s ease;
 
     // Testi
     --color-text: #{$color-text};
+    --color-text-secondary: #{$color-text-secondary};
+    --color-text-title: #{$color-text-title};
     --color-text-light: #{$color-text-light};
     --color-text-muted: #{$color-text-muted};
 
