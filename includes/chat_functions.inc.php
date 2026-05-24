@@ -1125,13 +1125,6 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                         $msg .= $pgTag." lancia una skill generica che annulla ogni lancio di $target.<br>";
                     } else $msg .= $pgTag." tenta di lanciare una skill generica che annulla ogni lancio di $target, ma fallisce.<br>";
                 break;
-                case 'annulla_attacchi_verso_bersaglio': // In dubbio
-                    if($dice >= 10) {
-                        // Se non è presente nell'array "intoccabili", lo aggiungo
-                        $intoccabili[$target] = true;
-                        $msg .= $pgTag." lancia una skill generica che annulla ogni attacco verso $target per questo turno.<br>";
-                    } else $msg .= $pgTag." tenta di lanciare una skill generica che annulla ogni attacco verso $target per questo turno, ma fallisce.<br>";
-                break;
                 case 'malus_10ps_scudo_30ps_bersaglio_meno30ps': // Non si può fare
                     // Controllo se il bersaglio ha meno di 30 salute
                     // Se si, tolgo 10 salute allo striker e

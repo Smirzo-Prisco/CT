@@ -621,7 +621,7 @@ div.chat_row_S,
 div.chat_row_Q {
     @include chat-row-base;
     font-size: $text-md;
-    font-family: $font-serif;
+    font-family: $font-chat;
     color: $chat-sussurro;
 }
 
@@ -642,28 +642,28 @@ div.chat_row_C {
 
 span.chat_sussurro {
     font-size: $text-md;
-    font-family: $font-serif;
+    font-family: $font-chat;
     color: $chat-sussurro;
 }
 
 span.chat_time {
     font-size: $text-md;
     color: $palette-text-3;
-    font-family: $font-serif;
+    font-family: $font-chat;
     margin-right: 3px;
 }
 
 span.chat_name {
     font-size: $text-md;
     color: $palette-text-3;
-    font-family: $font-serif;
+    font-family: $font-chat;
     text-align: justify;
 }
 
 span.chat_msg {
-    color: $palette-text-3;
+    color: $palette-text;
     font-size: 15px;
-    font-family: $font-serif;
+    font-family: $font-chat;
     text-align: justify;
 }
 
@@ -687,7 +687,7 @@ span.chat_skill {
 span.intestazione_moderazione {
     font-size: $text-lg;
     color: $chat-mod-head;
-    font-family: $font-serif;
+    font-family: $font-chat;
     text-align: center;
     filter: drop-shadow(-0.866px 0.5px 6.5px rgb(0 0 0 / 57%));
     text-transform: uppercase;
@@ -696,7 +696,7 @@ span.intestazione_moderazione {
 span.intestazione_master {
     font-size: 15px;
     color: $chat-master-head;
-    font-family: $font-serif;
+    font-family: $font-chat;
     text-align: center;
     filter: drop-shadow(-0.866px 0.5px 6.5px rgb(0 0 0 / 57%));
     text-transform: uppercase;
@@ -705,7 +705,7 @@ span.intestazione_master {
 span.chat_master {
     font-size: $text-xl;
     color: $palette-text-3;
-    font-family: $font-serif;
+    font-family: $font-chat;
     text-align: justify;
 }
 
@@ -1027,7 +1027,7 @@ button.chat_button {
     border-radius: $radius-lg - 3;
     font-size: $text-xs;
     color: #8f8f8f;
-    font-family: $font-serif;
+    font-family: $font-chat;
     padding: $space-1;
     text-transform: uppercase;
     cursor: pointer;

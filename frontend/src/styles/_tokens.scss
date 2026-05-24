@@ -11,39 +11,39 @@
 // Valori ufficiali del design system. Usare questi nei nuovi componenti.
 
 // Sfondi (dal più scuro al più chiaro)
-$palette-bg:              #060814;   // corpo pagina
-$palette-surface:         #111827;   // pannelli, card, superfici
-$palette-surface-raised:  #1c1f2e;   // card elevata, header
-$palette-surface-input:   #1c2033;   // input, textarea
-$palette-surface-select:  #2a2d3c;   // select, dropdown
-$palette-surface-hover:   #2e3350;   // hover e bordi scuri
+$palette-bg: #060814; // corpo pagina
+$palette-surface: #111827; // pannelli, card, superfici
+$palette-surface-raised: #1c1f2e; // card elevata, header
+$palette-surface-input: #1c2033; // input, textarea
+$palette-surface-select: #2a2d3c; // select, dropdown
+$palette-surface-hover: #2e3350; // hover e bordi scuri
 
 // Azioni / Link (azzurro ghiaccio)
-$palette-action:          #AEE7FF;   // link, accento primario
-$palette-action-hover:    #C8F1FF;   // hover su link / azioni
+$palette-action: #AEE7FF; // link, accento primario
+$palette-action-hover: #C8F1FF; // hover su link / azioni
 
 // Brand
-$palette-rust:            #9a6353;   // colore primario Crystal Tokyo
-$palette-rust-dark:       #7a4f43;   // variante scura del brand
+$palette-rust: #9a6353; // colore primario Crystal Tokyo
+$palette-rust-dark: #7a4f43; // variante scura del brand
 
 // Testi
-$palette-text:            #E8E6E3;   // testo principale
-$palette-text-secondary:  #A8A6B3;   // testo secondario / note
-$palette-text-title:      #D6C6A5;   // titoli, sezioni, dettagli (non su blocchi lunghi)
-$palette-text-muted:      #ccc;      // placeholder, terziario
-$palette-text-disabled:   rgb(192, 164, 158); // stato disabilitato
+$palette-text: #E8E6E3; // testo principale
+$palette-text-secondary: #A8A6B3; // testo secondario / note
+$palette-text-title: #D6C6A5; // titoli, sezioni, dettagli (non su blocchi lunghi)
+$palette-text-muted: #ccc; // placeholder, terziario
+$palette-text-disabled: rgb(192, 164, 158); // stato disabilitato
 
 // Blu tecnici / accenti (non per link)
-$palette-blue-dark:       #2a3f76;
-$palette-blue-mid:        #3a4f86;
-$palette-blue-focus:      #4a5288;
-$palette-blue-alt:        #4da6ff;
+$palette-blue-dark: #2a3f76;
+$palette-blue-mid: #3a4f86;
+$palette-blue-focus: #4a5288;
+$palette-blue-alt: #4da6ff;
 
 // Feedback
-$palette-success:         #27ae60;
-$palette-danger:          #e74c3c;
-$palette-warning:         #f39c12;
-$palette-info:            #17a2b8;
+$palette-success: #27ae60;
+$palette-danger: #e74c3c;
+$palette-warning: #f39c12;
+$palette-info: #17a2b8;
 
 // Gradiente overlay
 $palette-gradient-overlay: linear-gradient(rgba(17, 24, 39, 0.4), rgba(0, 20, 60, 0.4));
@@ -52,66 +52,66 @@ $palette-gradient-overlay: linear-gradient(rgba(17, 24, 39, 0.4), rgba(0, 20, 60
 // ── ALIAS DI RETROCOMPATIBILITÀ ───────────────────────────────────────────
 // Usati da componenti esistenti. Non usare nei nuovi file.
 
-$palette-dark-1:   #0f111d;
-$palette-dark-2:   #111423;
-$palette-dark-3:   #16192b;
-$palette-dark-4:   #1a1f32;
-$palette-dark-5:   $palette-surface-raised;
-$palette-dark-6:   $palette-surface-input;
-$palette-dark-7:   $palette-surface-select;
-$palette-dark-8:   $palette-surface-hover;
-$palette-dark-9:   #2f3550;
-$palette-dark-10:  $palette-gradient-overlay;
-$palette-dark-11:  #1A2240;
-$palette-dark-12:  $palette-bg;
+$palette-dark-1: #0f111d;
+$palette-dark-2: #111423;
+$palette-dark-3: #16192b;
+$palette-dark-4: #1a1f32;
+$palette-dark-5: $palette-surface-raised;
+$palette-dark-6: $palette-surface-input;
+$palette-dark-7: $palette-surface-select;
+$palette-dark-8: $palette-surface-hover;
+$palette-dark-9: #2f3550;
+$palette-dark-10: $palette-gradient-overlay;
+$palette-dark-11: #1A2240;
+$palette-dark-12: $palette-bg;
 
-$palette-blue-1:   $palette-blue-dark;
-$palette-blue-2:   $palette-blue-mid;
-$palette-blue-3:   $palette-blue-focus;
-$palette-blue-4:   $palette-blue-alt;
-$palette-blue-5:   $palette-surface;    // superficie (nome fuorviante, alias storico)
-$palette-blue-6:   $palette-action;
+$palette-blue-1: $palette-blue-dark;
+$palette-blue-2: $palette-blue-mid;
+$palette-blue-3: $palette-blue-focus;
+$palette-blue-4: $palette-blue-alt;
+$palette-blue-5: $palette-surface; // superficie (nome fuorviante, alias storico)
+$palette-blue-6: $palette-action;
 
-$palette-text-1:   $palette-action;
-$palette-text-2:   $palette-surface;    // bg scuro per testo invertito (alias storico)
-$palette-text-3:   $palette-text-title;
-$palette-text-4:   $palette-text-muted;
-$palette-text-5:   $palette-text-disabled;
-$palette-text-6:   $palette-action-hover;
-$palette-text-7:   $palette-text-secondary;
-$palette-text-8:   $palette-text;
+$palette-text-1: $palette-action;
+$palette-text-2: $palette-surface; // bg scuro per testo invertito (alias storico)
+$palette-text-3: $palette-text-title;
+$palette-text-4: $palette-text-muted;
+$palette-text-5: $palette-text-disabled;
+$palette-text-6: $palette-action-hover;
+$palette-text-7: $palette-text-secondary;
+$palette-text-8: $palette-text;
 
 
 // ── SEMANTICA (a cosa serve ogni colore) ───────────────────────────────────
 
 // Sfondo e superfici
-$color-bg:              $palette-bg;
-$color-surface:         $palette-surface;
-$color-surface-raised:  $palette-surface-raised;
-$color-surface-input:   $palette-surface-input;
+$color-bg: $palette-bg;
+$color-surface: $palette-surface;
+$color-surface-raised: $palette-surface-raised;
+$color-surface-input: $palette-surface-input;
 
 // Bordi
-$color-border:          $palette-text;
-$color-border-focus:    $palette-action;
+$color-border: $palette-text;
+$color-border-focus: $palette-action;
 
 // Brand / azioni
-$color-primary:         $palette-action;
-$color-primary-hover:   $palette-action-hover;
-$color-action:          $palette-action;
-$color-action-hover:    $palette-action-hover;
+$color-primary: $palette-action;
+$color-primary-hover: $palette-action-hover;
+$color-action: $palette-action;
+$color-action-hover: $palette-action-hover;
 
 // Testi
-$color-text:            $palette-text;
-$color-text-secondary:  $palette-text-secondary;
-$color-text-title:      $palette-text-title;
-$color-text-light:      $palette-text-title;   // headings in contesti speciali
-$color-text-muted:      $palette-text-muted;
+$color-text: $palette-text;
+$color-text-secondary: $palette-text-secondary;
+$color-text-title: $palette-text-title;
+$color-text-light: $palette-text-title; // headings in contesti speciali
+$color-text-muted: $palette-text-muted;
 
 // Feedback
-$color-success:  $palette-success;
-$color-danger:   $palette-danger;
-$color-warning:  $palette-warning;
-$color-info:     $palette-info;
+$color-success: $palette-success;
+$color-danger: $palette-danger;
+$color-warning: $palette-warning;
+$color-info: $palette-info;
 
 
 // ── SPACING (scala 4px) ────────────────────────────────────────────────────
@@ -139,6 +139,7 @@ $radius-full: 50%;
 // ── TIPOGRAFIA ─────────────────────────────────────────────────────────────
 
 $font-base: Verdana, sans-serif;
+$font-chat: "Inter", serif;
 $font-serif: "DejaVu Serif", serif;
 $font-ui: Lato, sans-serif;
 

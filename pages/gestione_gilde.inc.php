@@ -416,12 +416,6 @@ if($_SESSION['admin'] != 1) {
                         </label>
                     </div>
                     <div class="radio-group">
-                        <input type="radio" name="sottotipo" value="annulla_attacchi_verso_bersaglio" id="annulla_attacchi_verso_bersaglio">
-                        <label for="annulla_attacchi_verso_bersaglio">
-                            Annulla tutti gli attacchi verso il bersaglio selezionato.
-                        </label>
-                    </div>
-                    <div class="radio-group">
                         <input type="radio" name="sottotipo" value="danno_doppio" id="danno_doppio">
                         <label for="danno_doppio">
                             Raddoppia il danno subito dal bersaglio.
