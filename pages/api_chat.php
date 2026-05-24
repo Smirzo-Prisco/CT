@@ -253,6 +253,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Non chiamiamo checkTurnEnd: la difesa è una reazione, non l'azione principale del turno.
             // B deve ancora poter inviare la sua azione regolare senza essere bloccato da sent=1.
 
+            // Dopo aver registrato la risposta, controlla se il turno può ora chiudersi.
+            // Questo gestisce il caso in cui tutti avevano già close_turn=1 ma mancava questa risposta.
+            if ($id_role) checkTurnCanClose($id_role, $luogo);
+
             echo json_encode(['success' => true, 'scelta' => $scelta, 'dice' => $dice]);
             exit;
             break;

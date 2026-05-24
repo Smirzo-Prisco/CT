@@ -759,7 +759,8 @@ function getWeaponAttack ($id_arma, $pg_name, $bonus_talento) {
 
 /************* Gestione ROLEPLAYS ******************************/
 function addPgToRole($id_role, $pg_name, $location, $png = 0) {
-    gdrcd_query("INSERT INTO role_session_players (id_role, pg_name, png) VALUES ($id_role, '$pg_name', $png)");
+    // can_send = 1 garantisce che il pg possa vedere dado/scudo sin dal primo turno
+    gdrcd_query("INSERT INTO role_session_players (id_role, pg_name, png, can_send) VALUES ($id_role, '$pg_name', $png, 1)");
     chatInsertMessage($location, 'System', $pg_name, " si è ha aggiunto alla role", 'N');
 }
 
@@ -832,9 +833,9 @@ function checkTurnEnd($location, $user, $id_role) {
             }
         }
 
-        // Se tutti sono stati auto-chiusi (nessun bottone necessario), chiude il turno subito
+        // Se tutti sono stati auto-chiusi (nessun bottone necessario), chiude il turno subito (solo se nessun attacco è in sospeso)
         $stillOpen = gdrcd_query("SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1", 'result');
-        if ($stillOpen && gdrcd_query($stillOpen, 'num_rows') === 0) closeTurn($id_role, $location);
+        if ($stillOpen && gdrcd_query($stillOpen, 'num_rows') === 0) checkTurnCanClose($id_role, $location);
     }
 }
 
@@ -846,8 +847,8 @@ function closePgTurn($id_role, $pgName, $location) {
     // Verifico se tutti i pg, ignorando i png, hanno scelto di chiudere il turno
     $result = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL", 'result');
 
-    // Se tutti hanno scelto di chiudere il turno, chiudo il turno
-    if ($result && gdrcd_query($result, 'num_rows') == 0) closeTurn($id_role, $location); // Chiudo il turno elaborando i dati
+    // Se tutti hanno scelto di chiudere il turno, chiudo il turno (solo se nessun attacco è in sospeso)
+    if ($result && gdrcd_query($result, 'num_rows') == 0) checkTurnCanClose($id_role, $location);
 }
 
 // Chiudo il turno
@@ -1524,6 +1525,69 @@ function notifyAttackIncoming($id_role, $luogo, $striker, array $targets, $car, 
         'dice'     => (int)$dice,
         'turn'     => (int)$turn,
     ]);
+}
+
+/**
+ * Verifica se esistono attacchi nel turno corrente a cui i bersagli non hanno ancora risposto.
+ * Un attacco è "in sospeso" se il bersaglio non ha registrato né dado_risposta,
+ * né difesa (scudo), né subisce per quell'attaccante.
+ * Usato da checkTurnCanClose per bloccare la chiusura automatica del turno
+ * finché il bersaglio non ha avuto modo di scegliere come difendersi.
+ */
+function hasPendingUnrespondedAttacks($id_role, $turn) {
+    $attacks = gdrcd_query(
+        "SELECT striker, target FROM role_fights
+         WHERE id_role = $id_role AND turn = $turn AND car IN ('destrezza', 'mente', 'potere')",
+        'result'
+    );
+    if (!$attacks || gdrcd_query($attacks, 'num_rows') === 0) return false;
+
+    while ($row = gdrcd_query($attacks, 'fetch')) {
+        $attacker = $row['striker'];
+        $targets  = array_map('trim', explode(',', $row['target']));
+        foreach ($targets as $target) {
+            if (!$target) continue;
+            // Risposta diretta (dado_risposta o subisce) verso l'attaccante specifico
+            $directResponse = gdrcd_query(
+                "SELECT id FROM role_fights
+                 WHERE id_role = $id_role AND turn = $turn AND striker = '$target'
+                 AND target = '$attacker' AND car IN ('dado_risposta', 'subisce') LIMIT 1",
+                'result'
+            );
+            // Scudo (difesa) — copre tutti gli attacchi del turno per quel pg
+            $shield = gdrcd_query(
+                "SELECT id FROM role_fights
+                 WHERE id_role = $id_role AND turn = $turn AND striker = '$target' AND car = 'difesa' LIMIT 1",
+                'result'
+            );
+            if (
+                (!$directResponse || gdrcd_query($directResponse, 'num_rows') === 0) &&
+                (!$shield         || gdrcd_query($shield,          'num_rows') === 0)
+            ) return true; // Questo bersaglio non ha ancora risposto
+        }
+    }
+    return false;
+}
+
+/**
+ * Chiude il turno solo se entrambe le condizioni sono soddisfatte:
+ *   1. Tutti i pg attivi hanno close_turn = 1
+ *   2. Nessun attacco è rimasto senza risposta (il bersaglio ha scelto dado/scudo/subisce)
+ * Viene chiamata da closePgTurn e checkTurnEnd in sostituzione della chiamata
+ * diretta a closeTurn, per evitare che il turno si chiuda prima che il bersaglio
+ * abbia avuto modo di rispondere all'attacco appena ricevuto.
+ */
+function checkTurnCanClose($id_role, $location) {
+    $stillOpen = gdrcd_query(
+        "SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
+        'result'
+    );
+    if (!$stillOpen || gdrcd_query($stillOpen, 'num_rows') > 0) return; // Qualcuno deve ancora chiudere
+
+    $turn = getTurn($id_role);
+    if (hasPendingUnrespondedAttacks($id_role, $turn)) return; // Attacchi ancora in attesa di risposta
+
+    closeTurn($id_role, $location);
 }
 
 // Controlla che non siano stati inviati più lanci in un singolo turno

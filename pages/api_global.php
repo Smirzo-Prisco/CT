@@ -100,6 +100,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         // EVENTS_TODAY — verifica se ci sono eventi/appuntamenti oggi per l'utente
         // Usato da MenuIcons.jsx per l'icona Calendario animata
         // -------------------------------------------------------------------------
+        case 'getOpenRoles': // Controlla se ci sono giocate (role session) ancora aperte
+            $n = (int)gdrcd_query("SELECT COUNT(*) AS n FROM role_sessions WHERE end IS NULL AND freezed IS NULL")['n'];
+            echo json_encode(['success' => true, 'has_open_roles' => $n > 0]);
+            break;
+
         case 'events_today':
             $login_f = gdrcd_filter('in', $_SESSION['login']);
             $sql = gdrcd_query("SELECT COUNT(*) AS n FROM appuntamenti

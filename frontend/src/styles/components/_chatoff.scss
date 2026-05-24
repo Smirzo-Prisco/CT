@@ -130,16 +130,6 @@
 }
 
 .chatoff-send-btn {
-    background: $color-surface;
-    border: 1px solid $palette-surface-hover;
-    color: $palette-surface;
-    font-size: $text-sm;
-    border-radius: 3px;
-    cursor: pointer;
+    // Tutto lo stile è ereditato dallo stile globale @include all-inputs in _forms.scss
     flex-shrink: 0;
-
-    &:hover {
-        background: $palette-rust;
-        color: $palette-action;
-    }
 }
