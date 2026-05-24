@@ -253,9 +253,21 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Non chiamiamo checkTurnEnd: la difesa è una reazione, non l'azione principale del turno.
             // B deve ancora poter inviare la sua azione regolare senza essere bloccato da sent=1.
 
-            // Dopo aver registrato la risposta, controlla se il turno può ora chiudersi.
-            // Questo gestisce il caso in cui tutti avevano già close_turn=1 ma mancava questa risposta.
-            if ($id_role) checkTurnCanClose($id_role, $luogo);
+            if ($id_role) {
+                // Se il difensore è l'unico rimasto con close_turn=0, questa difesa è la sua ultima
+                // azione del turno: chiudiamo il suo turno, che a sua volta chiude il turno globale.
+                $othersOpen = gdrcd_query(
+                    "SELECT id FROM role_session_players
+                     WHERE id_role = $id_role AND pg_name != '$login' AND close_turn = 0 AND `end` IS NULL LIMIT 1",
+                    'result'
+                );
+                if ($othersOpen && gdrcd_query($othersOpen, 'num_rows') === 0) {
+                    closePgTurn($id_role, $login, $luogo);
+                } else {
+                    // Altri giocatori devono ancora chiudere: controlla solo se si può chiudere già ora
+                    checkTurnCanClose($id_role, $luogo);
+                }
+            }
 
             echo json_encode(['success' => true, 'scelta' => $scelta, 'dice' => $dice]);
             exit;
