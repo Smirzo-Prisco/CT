@@ -826,11 +826,11 @@ function checkTurnEnd($location, $user, $id_role) {
         while ($pg = gdrcd_query($pgs, 'fetch')) {
             $pgName = $pg['pg_name'];
 
-            if (hasTurnLaunch($id_role, $pgName, $turn)) {
-                // Ha già un lancio nel turno: chiusura automatica senza chiedere
+            if (hasShieldLaunch($id_role, $pgName, $turn)) {
+                // Ha già uno scudo (car='difesa') nel turno: chiusura automatica senza chiedere
                 gdrcd_query("UPDATE role_session_players SET close_turn = 1 WHERE id_role = $id_role AND pg_name = '$pgName' AND `end` IS NULL");
             } else {
-                // Nessun lancio: chiede conferma via sussurro
+                // Nessun scudo: chiede conferma via sussurro
                 $last_id++;
                 $msg = '<button onclick="closePgTurn('.$id_role.', '.$last_id.', `'.$pgName.'`);">Chiudi il turno</button>';
                 chatInsertMessage($location, 'System', $pgName, $msg, 'Q');
@@ -1590,19 +1590,6 @@ function hasPendingUnrespondedAttacks($id_role, $turn) {
  * vedranno il loro tiro usato da elaborateTurn; chi non risponde prende il tiro auto.
  */
 function checkTurnCanClose($id_role, $location) {
-    // Auto-chiude i pg che hanno già inviato l'azione testuale e hanno almeno un lancio nel turno:
-    // potrebbero essere rimasti con close_turn=0 se checkTurnEnd è scattato prima che lanciassero.
-    $turn = getTurn($id_role);
-    $candidates = gdrcd_query(
-        "SELECT pg_name FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND sent = 1 AND `end` IS NULL",
-        'result'
-    );
-    while ($pg = gdrcd_query($candidates, 'fetch')) {
-        if (hasTurnLaunch($id_role, $pg['pg_name'], $turn)) {
-            gdrcd_query("UPDATE role_session_players SET close_turn = 1 WHERE id_role = $id_role AND pg_name = '{$pg['pg_name']}' AND `end` IS NULL");
-        }
-    }
-
     $stillOpen = gdrcd_query(
         "SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
         'result'
@@ -1622,6 +1609,12 @@ function checkMultipleLounch($id_role, $striker, $type, $turn) {
 // Verifica se il pg ha già effettuato almeno un lancio (attacco o difesa) nel turno corrente
 function hasTurnLaunch($id_role, $pgName, $turn) {
     $result = gdrcd_query("SELECT id FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pgName' AND car NOT IN ('dado_risposta', 'subisce') LIMIT 1", 'result');
+    return $result && gdrcd_query($result, 'num_rows') > 0;
+}
+
+// Verifica se il pg ha lanciato uno scudo (car='difesa') nel turno corrente
+function hasShieldLaunch($id_role, $pgName, $turn) {
+    $result = gdrcd_query("SELECT id FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pgName' AND car = 'difesa' LIMIT 1", 'result');
     return $result && gdrcd_query($result, 'num_rows') > 0;
 }
 

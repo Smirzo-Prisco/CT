@@ -178,8 +178,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Aggiorna la salute del personaggio se la skill lanciata non è un talento
             if($car != 'talento') gdrcd_query("UPDATE personaggio SET salute = salute-1 WHERE nome = '$login'");
 
-            // Se il pg ha già inviato l'azione testuale, chiude il suo turno automaticamente
-            checkAutoCloseAfterLaunch($id_role, $login, $luogo);
+            // Solo lo scudo (car='difesa') chiude il turno automaticamente se sent=1.
+            // Le skill di attacco richiedono che il pg clicchi il bottone "Chiudi il turno".
+            if ($car === 'difesa') checkAutoCloseAfterLaunch($id_role, $login, $luogo);
 
             // Risposta JSON per AJAX
             echo json_encode(array(
@@ -257,10 +258,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             if ($id_role) {
                 if ($scelta === 'scudo') {
-                    // Lo scudo è un lancio (car='difesa'): se il pg ha già inviato l'azione testuale
-                    // (sent=1) il suo turno si chiude automaticamente, esattamente come per attacchi e skill.
+                    // Lo scudo (car='difesa') chiude il turno automaticamente se sent=1.
                     // Se non ha ancora inviato l'azione, il turno rimane aperto; checkTurnEnd lo
-                    // rileverà tramite hasTurnLaunch quando invierà il testo.
+                    // rileverà tramite hasShieldLaunch quando invierà il testo.
                     checkAutoCloseAfterLaunch($id_role, $login, $luogo);
                 } else {
                     // dado/subisce: semplici reazioni, non chiudono il turno del difensore.
@@ -545,8 +545,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Gestione della polizia automatica
             gestionePoliziaAutomatica($luogo);
 
-            // Se il pg ha già inviato l'azione testuale, chiude il suo turno automaticamente
-            checkAutoCloseAfterLaunch($id_role, $login, $luogo);
+            // L'attacco fisico non chiude il turno automaticamente: il pg deve cliccare "Chiudi il turno".
 
             echo json_encode(array('success' => true, 'message' => 'Attacco eseguito con successo.', 'tipo attacco' => $tipo_attacco));
 
