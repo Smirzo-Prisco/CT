@@ -39,12 +39,10 @@ div.luogo {
 div.presente {
     font-weight: $font-weight-normal;
     font-size: $text-md;
-    color: $color-action;
     text-transform: none;
 }
 
 div.presente a {
-    color: $color-action;
     line-height: 0;
 }
 
@@ -55,6 +53,7 @@ div.link_presenti {
 .online-user-link {
     font-size: $text-md;
     letter-spacing: 0;
+    text-transform: capitalize;
 }
 
 div.contenitore_presenti {

@@ -1,7 +1,7 @@
 /**
  * FrameMessaggi.jsx
  *
- * Griglia icone di navigazione nella colonna sinistra.
+ * Griglia icone di navigazione nella colonna destra.
  *
  * Contenuto:
  *   - Griglia 3×N di icone di navigazione (mappa, aggiorna, messaggi, forum, ecc.)
