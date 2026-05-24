@@ -63,13 +63,12 @@ div.link_presenti {
 .online-user-link {
     font-size: $text-md;
     font-family: $font-serif;
-    text-transform: capitalize;
     color: $color-action;
     letter-spacing: 0;
 }
 
 div.contenitore_presenti {
-    background: $palette-dark-10;
+    background: $palette-gradient-overlay;
     padding: 10px;
     overflow-y: auto;
     height: 100%;
