@@ -103,6 +103,9 @@ export default function ChatShell() {
     /** Tab attiva nel pannello GDR: 'dice' | 'skills' | 'master' | 'writing' */
     const [activeTab, setActiveTab] = useState('dice')
 
+    /** Visibilità del pannello GDR — gestita via state per garantire il re-render */
+    const [panelOpen, setPanelOpen] = useState(false)
+
     /** Ref allo <style> iniettato per le preferenze tipografiche */
     const styleRef = useRef(null)
 
@@ -388,8 +391,7 @@ export default function ChatShell() {
                                 {showPanelBtn && (
                                     <a href="#" id="openPanelBtn" onClick={e => {
                                         e.preventDefault()
-                                        const p = document.getElementById('chatPanel')
-                                        if (p) p.style.display = 'flex'
+                                        setPanelOpen(true)
                                     }}>
                                         <img title="Pannello GDR" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" />
                                     </a>
@@ -488,7 +490,7 @@ export default function ChatShell() {
             {/* position:fixed con le stesse coordinate di pagina_frame_chat    */}
             {/* ================================================================ */}
             <div className="gdr-modal-overlay" id="chatPanel"
-                 style={{ display:'none', position:'fixed', top:0,
+                 style={{ display: panelOpen ? 'flex' : 'none', position:'fixed', top:0,
                           left:'260px', right:'260px', bottom:0 }}>
                 <div className="gdr-panel-container">
 
@@ -530,7 +532,7 @@ export default function ChatShell() {
                                 </a>
                             )}
                         </div>
-                        <button className="gdr-close-btn" id="gdrCloseBtn">&times;</button>
+                        <button className="gdr-close-btn" id="gdrCloseBtn" onClick={() => setPanelOpen(false)}>&times;</button>
                     </div>
 
                     {/* Tab bar */}
