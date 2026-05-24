@@ -162,6 +162,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode(array('success' => true, 'message' => "Turno chiuso"));
             break;
         case 'closeTurn': // Chiudo il turno fornzatamente, indipendentemente da tutto
+            if (!isAdminMasterMod($_SESSION)) {
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                exit;
+            }
+
             $location = $_SESSION['luogo'];
             $id_role = locationActiveRole($location);
             
