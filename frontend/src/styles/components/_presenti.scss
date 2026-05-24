@@ -3,10 +3,6 @@
 // ============================================================
 @use '../tokens' as *;
 
-// Colore specifico per i nomi dei presenti (non in palette globale)
-$presenti-name-color: #c0a49e;
-$presenti-accent: #ce846f;
-
 // ── Presenti estesi — tabella adattiva senza scroll orizzontale ───────────
 div.presenti_estesi {
     width: 100%;
@@ -52,11 +48,11 @@ div.presente {
     font-family: $font-serif;
     text-align: left;
     position: relative;
-    color: $presenti-name-color;
+    color: $color-action;
 }
 
 div.presente a {
-    color: $presenti-name-color;
+    color: $color-action;
     line-height: 0;
 }
 
@@ -68,7 +64,7 @@ div.link_presenti {
     font-size: $text-md;
     font-family: $font-serif;
     text-transform: capitalize;
-    color: $presenti-name-color;
+    color: $color-action;
     letter-spacing: 0;
 }
 
@@ -152,7 +148,7 @@ div.pagina_presenti {
     a,
     a:visited {
         border: none;
-        color: $presenti-name-color;
+        color: $color-action;
     }
 
     a:hover {
@@ -216,7 +212,7 @@ tr.third_header {
     a:link,
     a:visited {
         font-size: $text-md - 1;
-        color: $presenti-accent;
+        color: $color-action;
         font-family: $font-serif;
         filter: drop-shadow(-1.732px 1px 2px #000);
     }
