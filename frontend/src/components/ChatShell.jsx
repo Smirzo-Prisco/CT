@@ -307,7 +307,7 @@ export default function ChatShell() {
 
     return (
         <>
-        <div className="pagina_frame_chat">
+        <div className={`pagina_frame_chat${roleActive ? ' role-active' : ''}`}>
             <div className="page_body">
 
                 {/* Accesso negato a stanza privata */}
