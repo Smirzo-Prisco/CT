@@ -21,7 +21,9 @@ $palette-dark-8: #2e3350; // hover/bordi scuri
 $palette-dark-9: #2f3550; // input hover
 $palette-dark-10: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 20, 60, 0.4));
 $palette-dark-11: #1A2240;
-; // semi trasparente
+$palette-dark-12: #060814;
+$palette-dark-13: #D6C6A5;
+// semi trasparente
 
 // Blu — toni freddi/action
 $palette-blue-1: #2a3f76; // accent blu scuro
@@ -29,9 +31,11 @@ $palette-blue-2: #3a4f86; // accent blu medio
 $palette-blue-3: #4a5288; // focus ring
 $palette-blue-4: #4da6ff; // action / link blue
 $palette-blue-5: #4f7cff; // button blu primario
+$palette-blue-6: #AEE7FF;
 
 // Brand — il colore caratteristico del progetto
 $palette-rust: #9a6353; // colore primario Crystal Tokyo
+$aaa: #7a4f43;
 
 // Testi
 $palette-text-1: #e0e0e0; // testo chiaro
@@ -51,18 +55,18 @@ $palette-info: #17a2b8;
 // ── SEMANTICA (a cosa serve ogni colore) ───────────────────────────────────
 
 // Sfondo e superfici
-$color-bg: $palette-dark-11; // sfondo pagina
+$color-bg: $palette-dark-12; // sfondo pagina
 $color-surface: $palette-dark-3; // sfondo componenti
 $color-surface-raised: $palette-dark-5; // card, header
 $color-surface-input: $palette-dark-6; // input, select
 
 // Bordi
-$color-border: $palette-dark-8; // bordi standard
+$color-border: $palette-dark-13; // bordi standard
 $color-border-focus: $palette-blue-3; // bordo in focus
 
 // Brand / azioni
 $color-primary: $palette-rust; // bottone/accento primario
-$color-primary-hover: #7a4f43; // hover sul primario
+$color-primary-hover: $palette-blue-6; // hover sul primario
 $color-action: $palette-blue-4; // link, icone, azioni secondarie
 $color-action-hover: $palette-blue-2; // hover sull'action
 
@@ -106,6 +110,7 @@ $font-base: Verdana, sans-serif;
 $font-serif: "DejaVu Serif", serif;
 $font-ui: Lato, sans-serif;
 
+$text-2xs: 10px;
 $text-xs: 10px;
 $text-sm: 11px; // base del progetto
 $text-md: 13px;
