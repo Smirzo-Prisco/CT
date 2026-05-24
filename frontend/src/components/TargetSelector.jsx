@@ -192,7 +192,7 @@ export default function TargetSelector() {
     // Se non ci sono bersagli disponibili, mostra un messaggio informativo
     if (!users.length) {
         return (
-            <div style={{ padding: '10px', color: '#aaa', fontStyle: 'italic' }}>
+            <div style={{ padding: '10px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
                 Nessun bersaglio disponibile
             </div>
         )

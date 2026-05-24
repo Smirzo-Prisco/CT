@@ -623,9 +623,9 @@ export default function MessagesInbox({ toPg = null }) {
                             style={{ display: activeTab === 'off' ? 'block' : 'none' }}
                         >
                             {loadingList ? (
-                                <p style={{ padding: '10px', color: '#aaa' }}>Caricamento...</p>
+                                <p style={{ padding: '10px', color: 'var(--color-text-muted)' }}>Caricamento...</p>
                             ) : convOff.length === 0 ? (
-                                <p style={{ padding: '10px', color: '#aaa', fontStyle: 'italic' }}>Nessun messaggio OFF.</p>
+                                <p style={{ padding: '10px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>Nessun messaggio OFF.</p>
                             ) : (
                                 convOff.map(conv => (
                                     <ConvItem key={`${conv.tipo}-${conv.conversazione_id}`} conv={conv} isSelected={false} onClick={openConversation} />
@@ -638,9 +638,9 @@ export default function MessagesInbox({ toPg = null }) {
                             style={{ display: activeTab === 'on' ? 'block' : 'none' }}
                         >
                             {loadingList ? (
-                                <p style={{ padding: '10px', color: '#aaa' }}>Caricamento...</p>
+                                <p style={{ padding: '10px', color: 'var(--color-text-muted)' }}>Caricamento...</p>
                             ) : convOn.length === 0 ? (
-                                <p style={{ padding: '10px', color: '#aaa', fontStyle: 'italic' }}>Nessun messaggio ON.</p>
+                                <p style={{ padding: '10px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>Nessun messaggio ON.</p>
                             ) : (
                                 convOn.map(conv => (
                                     <ConvItem key={`${conv.tipo}-${conv.conversazione_id}`} conv={conv} isSelected={false} onClick={openConversation} />

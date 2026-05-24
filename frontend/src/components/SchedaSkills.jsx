@@ -130,9 +130,9 @@ function SkillGroup({ categoria, lista }) {
                 <tr className="second_header">
                     <td colSpan="1" style={{
                         textTransform: 'uppercase',
-                        fontSize:      13,
-                        color:         '#9a6353',
-                        fontFamily:    'DejaVu Serif',
+                        fontSize:      'var(--text-md)',
+                        color:         'var(--palette-rust)',
+                        fontFamily:    'var(--font-serif)',
                         filter:        'drop-shadow(0 0 5px rgba(0,0,0,0.57))',
                     }}>
                         {categoria}

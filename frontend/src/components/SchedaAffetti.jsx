@@ -140,12 +140,12 @@ export default function SchedaAffetti() {
                         {/* Intestazione colonne */}
                         <tr style={{ background: "url('/themes/crystal/imgs/presenti/barra.png')", border: '1px solid #090a11' }}>
                             <td style={{ border: 'none' }}>
-                                <div className="faces" style={{ fontFamily: 'DejaVu Serif', color: '#ce846f', fontSize: 12 }}>
+                                <div className="faces" style={{ fontFamily: 'var(--font-serif)', color: '#ce846f', fontSize: 12 }}>
                                     <div className="faces_info">PERSONAGGI</div>
                                 </div>
                             </td>
                             <td style={{ border: 'none' }}>
-                                <div className="faces" style={{ fontFamily: 'DejaVu Serif', color: '#ce846f', fontSize: 12 }}>
+                                <div className="faces" style={{ fontFamily: 'var(--font-serif)', color: '#ce846f', fontSize: 12 }}>
                                     <div className="faces_info">DETTAGLIO</div>
                                 </div>
                             </td>

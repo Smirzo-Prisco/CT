@@ -261,7 +261,7 @@ export default function PresentiEstesi() {
                     {/* Messaggio quando non ci sono utenti online */}
                     {users.length === 0 && (
                         <tr>
-                            <td colSpan="7" style={{ textAlign: 'center', padding: '20px', color: '#666', fontStyle: 'italic' }}>
+                            <td colSpan="7" style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
                                 Nessun utente online
                             </td>
                         </tr>
