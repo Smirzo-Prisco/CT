@@ -150,7 +150,7 @@ function SchedaProfilo({ profile }) {
                 <span className={styles.valueRight}>{nome_ruolo}</span>
                 <br />
 
-                <span className={styles.labelLeft}>Ruolo:</span>
+                <span className={styles.labelLeft}>Mestiere:</span>
                 <span className={styles.valueRight}>{nome_ruolo_mestiere}</span>
                 <br /><br />
 
