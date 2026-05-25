@@ -850,29 +850,20 @@ function closePgTurn($id_role, $pgName, $location) {
 
     // Verifico se tutti i pg, ignorando i png, hanno scelto di chiudere il turno
     $result = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL", 'result');
-    $stillOpen = gdrcd_query($result, 'num_rows');
-    $resultType = is_object($result) ? get_class($result) : gettype($result);
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] closePgTurn: id_role=$id_role pgName=$pgName still_open=$stillOpen result_type=$resultType cond=".($result && $stillOpen == 0 ? 'TRUE' : 'FALSE')."\n", FILE_APPEND);
 
     // Se tutti hanno scelto di chiudere il turno, chiudo il turno (solo se nessun attacco è in sospeso)
-    if ($result && $stillOpen == 0) checkTurnCanClose($id_role, $location);
+    if ($result && gdrcd_query($result, 'num_rows') == 0) checkTurnCanClose($id_role, $location);
 }
 
 // Chiudo il turno
 function closeTurn($id_role, $location) {
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] closeTurn: START id_role=$id_role
-", FILE_APPEND);
     // Rispettare l'ordine dell'esecuzione dei metodi
     setCanSend($id_role); // Impedisco o consento al pg di lanciare nel prossimo turno
     $msgElaboration = elaborateTurn($id_role); // Elaboro il turno per calcolare eventuali danni
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] closeTurn: elaborateTurn done, updating DB
-", FILE_APPEND);
     gdrcd_query("UPDATE role_sessions SET turn = (turn + 1) WHERE id_role = $id_role"); // Passo al turno successivo
     gdrcd_query("UPDATE role_session_players SET `sent` = 0, close_turn = 0 WHERE id_role = $id_role"); // Riporto tutti i pg a sent = 0 e riapro il turno per tutti
     chatInsertMessage($location, 'System', NULL, $msgElaboration, 'N');
     chatInsertMessage($location, 'System', NULL, 'Turno chiuso! Iniziate il turno successivo...', 'N');
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] closeTurn: DONE
-", FILE_APPEND);
 }
 
 /*************************  ELABORAZIONE TURNO */
@@ -1013,8 +1004,6 @@ function elaboratePrint($riepilogo) {
 
 // Elabora i dati sul combattimento nel singolo turno
 function elaborateTurn($id_role) {
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] elaborateTurn: START id_role=$id_role
-", FILE_APPEND);
     $turn = getTurn($id_role);
     $esito = "<b><u>Risultati turno $turn:</u></b><br>";
     $riepilogo = array();
@@ -1601,22 +1590,12 @@ function hasPendingUnrespondedAttacks($id_role, $turn) {
  * vedranno il loro tiro usato da elaborateTurn; chi non risponde prende il tiro auto.
  */
 function checkTurnCanClose($id_role, $location) {
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose ENTRY: id_role=$id_role\n", FILE_APPEND);
-    try {
-        $stillOpen = gdrcd_query(
-            "SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
-            'result',
-            true
-        );
-    } catch (Exception $e) {
-        file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose DB ERROR: ".$e->getMessage()."\n", FILE_APPEND);
-        return;
-    }
-    $n = $stillOpen ? gdrcd_query($stillOpen, 'num_rows') : -1;
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose: id_role=$id_role still_open=$n\n", FILE_APPEND);
-    if (!$stillOpen || $n > 0) return;
+    $stillOpen = gdrcd_query(
+        "SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
+        'result'
+    );
+    if (!$stillOpen || gdrcd_query($stillOpen, 'num_rows') > 0) return;
 
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose: => closeTurn\n", FILE_APPEND);
     closeTurn($id_role, $location);
 }
 
@@ -1629,23 +1608,20 @@ function checkMultipleLounch($id_role, $striker, $type, $turn) {
 
 // Verifica se il pg ha già effettuato almeno un lancio (attacco o difesa) nel turno corrente
 function hasTurnLaunch($id_role, $pgName, $turn) {
-    $result = gdrcd_query("SELECT id FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pgName' AND car NOT IN ('dado_risposta', 'subisce') LIMIT 1", 'result');
+    $result = gdrcd_query("SELECT 1 FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pgName' AND car NOT IN ('dado_risposta', 'subisce') LIMIT 1", 'result');
     return $result && gdrcd_query($result, 'num_rows') > 0;
 }
 
 // Verifica se il pg ha lanciato uno scudo (car='difesa') nel turno corrente
 function hasShieldLaunch($id_role, $pgName, $turn) {
-    $result = gdrcd_query("SELECT id FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pgName' AND car = 'difesa' LIMIT 1", 'result');
+    $result = gdrcd_query("SELECT 1 FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pgName' AND car = 'difesa' LIMIT 1", 'result');
     return $result && gdrcd_query($result, 'num_rows') > 0;
 }
 
 // Se il pg ha già inviato l'azione testuale, chiude il suo turno automaticamente dopo un lancio
 function checkAutoCloseAfterLaunch($id_role, $pgName, $location) {
     $row = gdrcd_query("SELECT sent FROM role_session_players WHERE id_role = $id_role AND pg_name = '$pgName' AND `end` IS NULL");
-    $sent = $row ? (int)$row['sent'] : -1;
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkAutoCloseAfterLaunch: id_role=$id_role pgName=$pgName sent=$sent
-", FILE_APPEND);
-    if ($row && $sent === 1) closePgTurn($id_role, $pgName, $location);
+    if ($row && (int)$row['sent'] === 1) closePgTurn($id_role, $pgName, $location);
 }
 
 function getTurn($id_role) {
