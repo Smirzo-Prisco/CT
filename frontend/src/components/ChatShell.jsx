@@ -405,7 +405,7 @@ export default function ChatShell() {
                                                 className="fa-solid fa-power-off"
                                                 style={{ cursor: 'pointer', display: 'none', fontSize: '16px' }}></i>
                                             <i id="pgRolePlaying"
-                                                onClick={() => document.getElementById('pgRolePlayingPanel').style.display = 'block'}
+                                                onClick={() => document.getElementById('pgRolePlayingPanel').style.display = 'flex'}
                                                 className="fa-solid fa-users"
                                                 style={{ cursor: 'pointer', display: 'none', fontSize: '16px' }}></i>
                                             <i id="addPgToRoleBtn"
