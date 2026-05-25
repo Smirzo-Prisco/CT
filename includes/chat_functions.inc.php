@@ -1584,21 +1584,49 @@ function hasPendingUnrespondedAttacks($id_role, $turn) {
 }
 
 /**
- * Chiude il turno quando tutti i pg attivi hanno close_turn = 1.
- * Viene chiamata da closePgTurn, checkTurnEnd e risposta_immediata.
+ * Chiude il turno quando tutti i pg attivi hanno close_turn = 1
+ * e non ci sono attacchi in sospeso senza risposta.
  *
- * Non blocca più su hasPendingUnrespondedAttacks: se un pg ha confermato
- * la chiusura del turno senza rispondere a un attacco, elaborateTurn gestisce
- * il caso con un tiro automatico di difesa (riga ~1240).
- * La risposta_immediata rimane utile: i pg che rispondono PRIMA di chiudere
- * vedranno il loro tiro usato da elaborateTurn; chi non risponde prende il tiro auto.
+ * Se un pg ha chiuso il turno ma riceve un attacco dopo la chiusura,
+ * il turno rimane aperto finché il bersaglio non risponde (dado/scudo/subisce).
+ * Questo garantisce che il bersaglio possa sempre scegliere come difendersi.
+ *
+ * Viene chiamata da closePgTurn, checkTurnEnd e risposta_immediata.
  */
 function checkTurnCanClose($id_role, $location) {
+    // Prima condizione: tutti i pg attivi devono aver chiuso il turno
     $stillOpen = gdrcd_query(
         "SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
         'result'
     );
     if (!$stillOpen || gdrcd_query($stillOpen, 'num_rows') > 0) return;
+
+    // Seconda condizione: nessun attacco deve essere rimasto senza risposta da un pg attivo (png esclusi)
+    $turn = getTurn($id_role);
+    $pendingAttacks = gdrcd_query("
+        SELECT 1
+        FROM role_fights rf
+        JOIN role_session_players rsp
+            ON rsp.id_role = rf.id_role
+            AND FIND_IN_SET(rsp.pg_name, rf.target) > 0
+            AND rsp.end IS NULL
+            AND rsp.png = 0
+        WHERE rf.id_role = $id_role
+          AND rf.turn    = $turn
+          AND rf.car     IN ('destrezza', 'mente', 'potere')
+          AND NOT EXISTS (
+              SELECT 1 FROM role_fights r2
+              WHERE r2.id_role = rf.id_role
+                AND r2.turn    = rf.turn
+                AND r2.striker = rf.target
+                AND (
+                  (r2.car IN ('dado_risposta', 'subisce') AND r2.target = rf.striker)
+                  OR r2.car = 'difesa'
+                )
+          )
+        LIMIT 1
+    ", 'result');
+    if ($pendingAttacks && gdrcd_query($pendingAttacks, 'num_rows') > 0) return;
 
     closeTurn($id_role, $location);
 }
