@@ -106,6 +106,9 @@ export default function ChatShell() {
     /** Visibilità del pannello GDR — gestita via state per garantire il re-render */
     const [panelOpen, setPanelOpen] = useState(false)
 
+    /** Nasconde il pulsante cura dopo che è stato usato con successo */
+    const [curaDone, setCuraDone] = useState(false)
+
     /** Ref allo <style> iniettato per le preferenze tipografiche */
     const styleRef = useRef(null)
 
@@ -396,8 +399,17 @@ export default function ChatShell() {
                                             </a>
                                         )}
                                         {/* Cura pg: sopra la textarea, fuori dal pannello per renderlo accessibile a tutti */}
-                                        {pulsanti.show_cura && (
-                                            <a href="#" onClick={(e) => { e.preventDefault(); window.curaPg?.() }}>
+                                        {pulsanti.show_cura && !curaDone && (
+                                            <a href="#" onClick={e => {
+                                                e.preventDefault()
+                                                fetch('pages/api_chat.php?op=curaPg')
+                                                    .then(r => r.json())
+                                                    .then(data => {
+                                                        if (data.success) setCuraDone(true)
+                                                        else alert(data.message)
+                                                    })
+                                                    .catch(err => console.error('Errore cura pg:', err))
+                                            }}>
                                                 <img src="themes/crystal/imgs/chat/cura.png" alt="Cura PG" className="chat_icon" />
                                             </a>
                                         )}
