@@ -1455,20 +1455,24 @@ function getDefenceCar($attack_car, $target) {
 function setCanSend($id_role) {
     $turn = getTurn($id_role);
     $pgsGiocanti = getRolePgs($id_role, true);
-    
-    foreach($pgsGiocanti as $pg) {
-        $canRow = gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$pg'");
-        $can_send = $canRow ? (int)$canRow['can_send'] : 1;
-        // Prendo tutti i lanci fatti dal pg nel turno corrente
-        $result = gdrcd_query("SELECT * FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pg'", 'result');
-        $lanci = gdrcd_query($result, 'num_rows');
 
-        /* Dato che già impedisco di lanciare due scudi o due attacchi nello stesso turno,
-        se trovo più di un lancio, significa che il pg ha lanciato sia uno scudo che un attacco.
-        Se trovo un solo lancio e can_send = 0, significa che il pg ha lanciato uno scudo (dato che non è possibile lanciare attacchi se can_send = 0)
-        rinunciando anche all'attacco nel turno successivo.
-        Quindi metto il campo can_send = 0 per il prossimo turno */
-        $can = (($lanci > 1 || ($lanci === 1 && $can_send === 0)) ? 0 : 1);
+    foreach($pgsGiocanti as $pg) {
+        // Conta solo le azioni attive del turno (esclude dado_risposta e subisce, che sono reazioni passive a un attacco subìto)
+        $result = gdrcd_query(
+            "SELECT 1 FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pg' AND car NOT IN ('dado_risposta', 'subisce')",
+            'result'
+        );
+        $lanci = $result ? gdrcd_query($result, 'num_rows') : 0;
+
+        // Verifica se il pg ha usato lo scudo (car='difesa') in questo turno
+        $shRes = gdrcd_query(
+            "SELECT 1 FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$pg' AND car = 'difesa' LIMIT 1",
+            'result'
+        );
+        $hasShield = $shRes && gdrcd_query($shRes, 'num_rows') > 0;
+
+        // can_send = 0 se ha usato lo scudo (costa il turno successivo) OPPURE ha eseguito 2+ azioni attive (es. attacco + scudo)
+        $can = ($hasShield || $lanci > 1) ? 0 : 1;
         gdrcd_query("UPDATE role_session_players SET can_send = $can WHERE id_role = $id_role AND pg_name = '$pg'", 'result');
     }
 }

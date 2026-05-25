@@ -43,7 +43,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             /**************************** CONTROLLI   ************************************************/
                 // Se il pg ha già lanciato un attacco e uno scudo nel turno precedente, non può attaccare
                 if ($skill_info['tipo'] != 'Difensiva' && $can_send === 0) {
-                    echo json_encode(array('success' => false, 'message' => 'Attenzione, hai già usato la tua azione per lanciare uno scudo!'));
+                    echo json_encode(array('success' => false, 'message' => 'Attenzione, non puoi agire: nel turno precedente hai già usato lo scudo difensivo.'));
                     exit;
                 }
                 // Se il pg non è nella role della chat
@@ -474,7 +474,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 // Se il pg ha già usato la sua azione nel turno precedente (attacco + scudo), non può attaccare
                 $can_send = (int)gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login'")['can_send'];
                 if ($can_send === 0) {
-                    echo json_encode(array('success' => false, 'message' => 'Attenzione, hai già usato la tua azione nel turno precedente!'));
+                    echo json_encode(array('success' => false, 'message' => 'Attenzione, non puoi attaccare: nel turno precedente hai già usato lo scudo difensivo.'));
                     exit;
                 }
 
