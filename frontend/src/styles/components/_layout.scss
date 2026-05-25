@@ -67,7 +67,7 @@ body {
         padding: 0;
         // Margini negativi: "ritaglia" lo spazio vuoto dentro il cerchio avatar
         // senza toccare le dimensioni del cerchio (che romperebbe le proporzioni)
-        margin-top: -40px;
+        // margin-top: -40px;
         margin-bottom: -40px;
     }
 
@@ -486,7 +486,7 @@ div.pagina_messaggi {
 
 div.pagina_info_location {
     margin: 0;
-    padding: $space-2 + 2;
+    // padding: $space-2 + 2;
     background-color: transparent;
     border: none;
 }
