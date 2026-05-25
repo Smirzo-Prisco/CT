@@ -383,12 +383,40 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
-    // READALL — segna tutti i thread di una sezione come letti
+    // READALL — segna come letti tutti i thread di una sezione o di tutte
+    //           le sezioni accessibili (araldo=0)
     // -------------------------------------------------------------------------
     case 'readall':
         $araldo_id = (int)($data['araldo'] ?? 0);
+        $login_f   = gdrcd_filter('in', $login);
 
-        // Verifica accesso alla sezione
+        if ($araldo_id === 0) {
+            // Modalità globale: raccoglie gli ID di tutte le sezioni accessibili
+            $res = gdrcd_query("SELECT id_araldo, tipo, proprietari FROM araldo
+                WHERE invisibile = 0", 'result');
+            $ids = [];
+            while ($row = gdrcd_query($res, 'fetch')) {
+                if (can_access_section($row)) $ids[] = (int)$row['id_araldo'];
+            }
+            gdrcd_query($res, 'free');
+
+            if (!empty($ids)) {
+                $in = implode(',', $ids);
+                gdrcd_query("INSERT IGNORE INTO araldo_letto (nome, araldo_id, thread_id)
+                    SELECT '$login_f', ma.id_araldo, ma.id_messaggio
+                    FROM messaggioaraldo ma
+                    WHERE ma.id_araldo IN ($in)
+                      AND ma.id_messaggio_padre = -1
+                      AND ma.id_messaggio NOT IN (
+                          SELECT thread_id FROM araldo_letto WHERE nome = '$login_f'
+                      )");
+            }
+
+            echo json_encode(['success' => true]);
+            break;
+        }
+
+        // Modalità sezione singola: verifica accesso
         $section = gdrcd_query("SELECT id_araldo, tipo, proprietari FROM araldo
             WHERE id_araldo = $araldo_id AND invisibile = 0 LIMIT 1");
         if (!$section || !can_access_section($section)) {
@@ -398,7 +426,6 @@ switch ($op) {
         }
 
         // Inserisce in araldo_letto tutti i thread della sezione non ancora letti
-        $login_f = gdrcd_filter('in', $login);
         gdrcd_query("INSERT IGNORE INTO araldo_letto (nome, araldo_id, thread_id)
             SELECT '$login_f', ma.id_araldo, ma.id_messaggio
             FROM messaggioaraldo ma

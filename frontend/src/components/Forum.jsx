@@ -705,23 +705,18 @@ export default function Forum({ isStaff = false }) {
     }
 
     /**
-     * Segna tutti i thread della sezione corrente come letti.
-     * Chiama op=readall, poi ricarica la lista sezioni per aggiornare i badge.
+     * Segna come letti tutti i thread di tutte le sezioni accessibili.
+     * Chiama op=readall con araldo=0 (globale), poi ricarica le sezioni
+     * per aggiornare i badge non-letti.
      */
     const markAllRead = () => {
-        if (!currentSection) return
         fetch('/pages/api_forum.php?op=readall', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ araldo: currentSection.id }),
+            body:    JSON.stringify({ araldo: 0 }),
         })
             .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    fetchThreads(currentSection.id, page)
-                    fetchSections()
-                }
-            })
+            .then(data => { if (data.success) fetchSections() })
             .catch(console.error)
     }
 
@@ -826,6 +821,9 @@ export default function Forum({ isStaff = false }) {
     if (view === 'sections') {
         return (
             <div className="pagina_forum">
+                <div className={styles.buttonsBar}>
+                    <button onClick={markAllRead}>Leggi tutto</button>
+                </div>
                 {loadingSections ? (
                     <p className={styles.loadingText}>Caricamento sezioni...</p>
                 ) : (
@@ -902,7 +900,6 @@ export default function Forum({ isStaff = false }) {
                     <button onClick={() => setView(isStaff && currentSection?.tipo === 1 ? 'compose_quest' : 'compose')}>
                         {isStaff && currentSection?.tipo === 1 ? 'Nuova Quest' : 'Nuovo Messaggio'}
                     </button>
-                    <button onClick={markAllRead}>Segna tutto come letto</button>
                     <button onClick={backToSections}>Torna indietro</button>
                 </div>
 
