@@ -1602,17 +1602,21 @@ function hasPendingUnrespondedAttacks($id_role, $turn) {
  */
 function checkTurnCanClose($id_role, $location) {
     file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose ENTRY: id_role=$id_role\n", FILE_APPEND);
-    $stillOpen = gdrcd_query(
-        "SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
-        'result'
-    );
+    try {
+        $stillOpen = gdrcd_query(
+            "SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
+            'result',
+            true
+        );
+    } catch (Exception $e) {
+        file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose DB ERROR: ".$e->getMessage()."\n", FILE_APPEND);
+        return;
+    }
     $n = $stillOpen ? gdrcd_query($stillOpen, 'num_rows') : -1;
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose: id_role=$id_role still_open=$n
-", FILE_APPEND);
-    if (!$stillOpen || $n > 0) return; // Qualcuno deve ancora chiudere
+    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose: id_role=$id_role still_open=$n\n", FILE_APPEND);
+    if (!$stillOpen || $n > 0) return;
 
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose: => closeTurn
-", FILE_APPEND);
+    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose: => closeTurn\n", FILE_APPEND);
     closeTurn($id_role, $location);
 }
 
