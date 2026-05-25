@@ -862,7 +862,7 @@ function closeTurn($id_role, $location) {
     $msgElaboration = elaborateTurn($id_role); // Elaboro il turno per calcolare eventuali danni
     gdrcd_query("UPDATE role_sessions SET turn = (turn + 1) WHERE id_role = $id_role"); // Passo al turno successivo
     gdrcd_query("UPDATE role_session_players SET `sent` = 0, close_turn = 0 WHERE id_role = $id_role"); // Riporto tutti i pg a sent = 0 e riapro il turno per tutti
-    chatInsertMessage($location, 'System', NULL, $msgElaboration, 'N');
+    if ($msgElaboration !== '') chatInsertMessage($location, 'System', NULL, $msgElaboration, 'N');
     chatInsertMessage($location, 'System', NULL, 'Turno chiuso! Iniziate il turno successivo...', 'N');
 }
 
@@ -1030,7 +1030,7 @@ function elaborateTurn($id_role) {
     // Mi manca da calcolare la durata
     // Mi manca la gestione dei turni di durata di una generica (in base al d20 delle generiche)
 
-    if (empty($riepilogo)) $msg = "Nessuno scontro in questo turno.";
+    if (empty($riepilogo)) return '';
 
     return $esito.$msg;
 }
