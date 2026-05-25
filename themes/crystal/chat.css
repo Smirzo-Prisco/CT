@@ -402,12 +402,8 @@
 }
 
 /* Variante per sessione non attiva */
-.gdr-session-status.inactive {
-    opacity: 0.6;
-}
-
 .gdr-session-status.inactive .gdr-pulse-dot {
-    background-color: #7f8c8d;
+    background-color: #e74c3c;
     animation: none;
 }
 
