@@ -24,8 +24,13 @@ div.pagina_forum {
         color: $color-text-light;
         border-radius: $radius-lg - 3;
 
-        table { width: 100%; }
-        tr    { margin: 2px; }
+        table {
+            width: 100%;
+        }
+
+        tr {
+            margin: 2px;
+        }
     }
 }
 
@@ -48,7 +53,9 @@ div.forum_date_big_right {
     padding-top: $space-1 + 1;
 }
 
-div.elementi_elenco div.forum_date_big { width: auto; }
+div.elementi_elenco div.forum_date_big {
+    width: auto;
+}
 
 div.forum_column {
     text-align: left;
@@ -83,9 +90,13 @@ td.forum_other_post_author {
 }
 
 td.forum_main_post_message,
-td.forum_other_post_message { vertical-align: text-top; }
+td.forum_other_post_message {
+    vertical-align: text-top;
+}
 
-div.forum_post_author { margin-bottom: $space-5; }
+div.forum_post_author {
+    margin-bottom: $space-5;
+}
 
 div.forum_post_message {
     text-align: left;
@@ -102,7 +113,6 @@ a:link {
     color: $palette-text-title;
     font-family: $font-serif;
     text-align: center;
-    margin: 40px 0 $space-5 0;
     text-transform: uppercase;
 }
 
@@ -137,7 +147,9 @@ div.header_thread {
             border-color: $color-action;
         }
 
-        &:hover:not(.active) { background-color: $color-border; }
+        &:hover:not(.active) {
+            background-color: $color-border;
+        }
     }
 }
 
@@ -226,7 +238,9 @@ div.header_thread {
     color: $forum-accent;
     cursor: pointer;
 
-    &:hover { text-decoration: underline; }
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 .move-thread-container {
@@ -317,37 +331,87 @@ div.header_thread {
 // ── Responsive ────────────────────────────────────────────────
 
 @media screen and (max-width: 1024px) {
-    div.pagina_forum { font-size: $text-md; }
-    div.forum_post_message { font-size: $text-md - 1; padding: $space-2; }
-    img.img_forum_avatar { height: 100px; width: 100px; }
-    div.header_thread { font-size: $text-lg; }
+    div.pagina_forum {
+        font-size: $text-md;
+    }
+
+    div.forum_post_message {
+        font-size: $text-md - 1;
+        padding: $space-2;
+    }
+
+    img.img_forum_avatar {
+        height: 100px;
+        width: 100px;
+    }
+
+    div.header_thread {
+        font-size: $text-lg;
+    }
 }
 
 @media screen and (max-width: 768px) {
-    div.pagina_forum { font-size: $text-md - 1; }
-    div.forum_post_message { font-size: $text-sm; padding: 6px; }
-    img.img_forum_avatar { height: 80px; width: 80px; }
-    div.header_thread { font-size: $text-md; }
+    div.pagina_forum {
+        font-size: $text-md - 1;
+    }
+
+    div.forum_post_message {
+        font-size: $text-sm;
+        padding: 6px;
+    }
+
+    img.img_forum_avatar {
+        height: 80px;
+        width: 80px;
+    }
+
+    div.header_thread {
+        font-size: $text-md;
+    }
 
     div.forum_column,
     div.forum_date_big,
-    div.forum_date_small { padding-left: $space-2 + 2; }
+    div.forum_date_small {
+        padding-left: $space-2 + 2;
+    }
 
     td.forum_main_post_author,
-    td.forum_other_post_author { width: 10px; }
+    td.forum_other_post_author {
+        width: 10px;
+    }
 }
 
 @media screen and (max-width: 480px) {
-    div.pagina_forum { font-size: $text-sm; }
-    div.forum_post_message { font-size: $text-xs; padding: $space-1 + 1; }
-    img.img_forum_avatar { height: 60px; width: 60px; }
-    div.header_thread { font-size: $text-md - 1; }
+    div.pagina_forum {
+        font-size: $text-sm;
+    }
+
+    div.forum_post_message {
+        font-size: $text-xs;
+        padding: $space-1 + 1;
+    }
+
+    img.img_forum_avatar {
+        height: 60px;
+        width: 60px;
+    }
+
+    div.header_thread {
+        font-size: $text-md - 1;
+    }
 
     div.forum_column,
     div.forum_date_big,
-    div.forum_date_small { padding-left: $space-1 + 1; }
+    div.forum_date_small {
+        padding-left: $space-1 + 1;
+    }
 
     td.forum_main_post_author,
-    td.forum_other_post_author { width: 8px; }
-    div.forum_post_title { font-size: $text-xs; }
+    td.forum_other_post_author {
+        width: 8px;
+    }
+
+    div.forum_post_title {
+        font-size: $text-xs;
+    }
 }
