@@ -910,25 +910,23 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $ps = 10; // Punti salute da curare
             $actual_healt = gdrcd_query("SELECT salute FROM personaggio WHERE nome = '$login'");
 
-            // Limita il recupero della salute a massimo 50 punti
-            if (($ps + $actual_healt['salute']) > 50) $ps = 50 - $actual_healt['salute'];
+            // Limita il recupero della salute a massimo 99 punti
+            if (($ps + $actual_healt['salute']) > 99) $ps = 99 - $actual_healt['salute'];
 
             // Verifica se il personaggio può essere curato
             $paziente = gdrcd_query("SELECT * FROM cure WHERE nome = '$login'", 'result');
 
-            if ($actual_healt['salute'] < 50 && (gdrcd_query($paziente, 'num_rows') < 1)) { // Se non esiste un record di cura, crea un nuovo record e cura il personaggio
+            if ($actual_healt['salute'] < 99 && (gdrcd_query($paziente, 'num_rows') < 1)) { // Se non esiste un record di cura, crea un nuovo record e cura il personaggio
                 gdrcd_query("UPDATE personaggio SET salute = salute + '".$ps."' WHERE nome = '$login'");
                 gdrcd_query("INSERT INTO cure (nome, data_cura) VALUES ('$login', NOW())");
 
                 chatInsertMessage($luogo, 'Master', null, "Il personaggio $login cura 10 punti salute!", 'N');
-            } elseif ($actual_healt['salute'] < 50 && $date_power_cura < $new_day_cura) { // Se esiste un record di cura e il giorno è nuovo, aggiorna la cura
+            } elseif ($actual_healt['salute'] < 99 && $date_power_cura < $new_day_cura) { // Se esiste un record di cura e il giorno è nuovo, aggiorna la cura
                 gdrcd_query("UPDATE personaggio SET salute = salute + '".$ps."' WHERE nome = '$login'");
                 gdrcd_query("UPDATE cure SET data_cura = NOW() WHERE nome = '$login'");
-                
+
                 chatInsertMessage($luogo, 'Master', null, "Il personaggio $login cura 10 punti salute!", 'N');
-            // Se la salute è superiore a 50, non permettere la cura
-            } elseif ($actual_healt['salute'] > 50) chatInsertMessage($luogo, 'System', $login, "Non puoi usare questo comando se hai oltre 50 punti salute. Usa gli oggetti presenti nel mercato!", 'S');
-            else chatInsertMessage($luogo, 'System', $login, "Ti sei già curato per oggi. Torna domani!", 'S'); // Altrimenti, informa il giocatore che si è già curato oggi
+            } else chatInsertMessage($luogo, 'System', $login, "Ti sei già curato per oggi. Torna domani!", 'S'); // Altrimenti, informa il giocatore che si è già curato oggi
              
             echo json_encode(array('success' => true, 'message' => 'Operazione di cura eseguita con successo.'));
 
@@ -1238,10 +1236,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Visibilità pulsanti
             $show_backchat   = (float)$pg['esperienza'] > 19;
             $backchat_on     = (int)$pg['back_chat'] === 1;
-            $num_cura        = (int)gdrcd_query("SELECT COUNT(*) AS n FROM chat
-                                    WHERE stanza = $luogo AND mittente = '$login_f' AND tipo = 'P'")['n'];
-            $show_cura       = ($luogo === 25 && $num_cura > 3
-                                && (int)$pg['salute'] > 0 && (int)$pg['salute'] < 50);
+            $show_cura       = ($luogo === 25 && (int)$pg['salute'] > 0 && (int)$pg['salute'] < 99);
             $show_pulisci    = $is_staff;
             $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
             $can_master_msg  = $is_admin || $is_master;
