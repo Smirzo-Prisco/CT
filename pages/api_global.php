@@ -213,11 +213,30 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $login = gdrcd_filter('in', $_SESSION['login']);
 
             // --- Messaggi non letti individuali ---
-            $row_individuali = gdrcd_query(gdrcd_query("SELECT COUNT(*) AS cnt FROM conversazioni_individuali WHERE utente_nome = '$login' AND lettura = 0", 'result'), 'fetch');
+            // Conta solo conversazioni che hanno almeno un messaggio visibile in lista
+            // (stesso filtro di api_messages.php?op=list), per evitare che conversazioni
+            // vuote o orfane con lettura=0 tengano l'icona animata in eterno.
+            $row_individuali = gdrcd_query(gdrcd_query("
+                SELECT COUNT(*) AS cnt FROM conversazioni_individuali c
+                WHERE c.utente_nome = '$login' AND c.lettura = 0
+                  AND EXISTS (
+                      SELECT 1 FROM sms s
+                      WHERE s.id_conversazione = c.id_conversazione
+                        AND s.mittente_nome != s.destinatario_nome
+                  )
+            ", 'result'), 'fetch');
             $cntNewMessageIndividuali = $row_individuali['cnt'];
 
             // --- Messaggi non letti gruppi ---
-            $row_gruppo = gdrcd_query(gdrcd_query("SELECT COUNT(*) AS cnt FROM partecipazione_gruppo WHERE utente_nome = '$login' AND lettura = 0", 'result'), 'fetch');
+            $row_gruppo = gdrcd_query(gdrcd_query("
+                SELECT COUNT(*) AS cnt FROM partecipazione_gruppo pg
+                WHERE pg.utente_nome = '$login' AND pg.lettura = 0
+                  AND EXISTS (
+                      SELECT 1 FROM sms s
+                      WHERE s.gruppo_id = pg.gruppo_id
+                        AND s.is_globale = 0
+                  )
+            ", 'result'), 'fetch');
             $cntNewMessageGruppo = $row_gruppo['cnt'];
 
             // --- Totale messaggi non letti ---
