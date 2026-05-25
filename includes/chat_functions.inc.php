@@ -838,7 +838,7 @@ function checkTurnEnd($location, $user, $id_role) {
         }
 
         // Se tutti sono stati auto-chiusi (nessun bottone necessario), chiude il turno subito (solo se nessun attacco è in sospeso)
-        $stillOpen = gdrcd_query("SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1", 'result');
+        $stillOpen = gdrcd_query("SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1", 'result');
         if ($stillOpen && gdrcd_query($stillOpen, 'num_rows') === 0) checkTurnCanClose($id_role, $location);
     }
 }
@@ -1604,7 +1604,7 @@ function checkTurnCanClose($id_role, $location) {
     file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose ENTRY: id_role=$id_role\n", FILE_APPEND);
     try {
         $stillOpen = gdrcd_query(
-            "SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
+            "SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
             'result',
             true
         );
