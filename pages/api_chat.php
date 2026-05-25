@@ -887,11 +887,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
         case 'curaPg':
             $login = $_SESSION['login'];
-            $luogo = $_SESSION['luogo'];
+            $luogo = (int)$_SESSION['luogo'];
 
-            // Se il pg non è nella role della chat
-            if (!pgIsInRole($login, $luogo) &&  !isAdminMasterMod($_SESSION)) {
-                echo json_encode(array('success' => false, 'message' => 'Attenzione, nessuna role attiva per il tuo pg!'));
+            // La cura è disponibile solo nell'ospedale (stanza 25)
+            if ($luogo !== 25) {
+                echo json_encode(array('success' => false, 'message' => 'Puoi usare questo comando solo in ospedale.'));
                 exit;
             }
 

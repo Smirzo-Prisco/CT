@@ -38,12 +38,14 @@ async function pulisciChat() {
     }
 }
 
-// Ruoli apicali cancellano la chat di gioco
+// Cura il personaggio in ospedale (+10 HP, una volta al giorno)
 async function curaPg() {
     fetch(ns_chat.api_file + '?' + ns_chat.param + '=curaPg')
         .then(res => res.json())
-        .then(data => {})
-        .catch(err => console.error('Errore caricamento chat:', err));
+        .then(data => {
+            if (!data.success) alert(data.message);
+        })
+        .catch(err => console.error('Errore cura pg:', err));
 }
 
 // Applica la funzione di debounce al pulsante del back_chat
