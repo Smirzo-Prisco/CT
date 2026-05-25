@@ -851,8 +851,8 @@ function closePgTurn($id_role, $pgName, $location) {
     // Verifico se tutti i pg, ignorando i png, hanno scelto di chiudere il turno
     $result = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL", 'result');
     $stillOpen = gdrcd_query($result, 'num_rows');
-    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] closePgTurn: id_role=$id_role pgName=$pgName still_open=$stillOpen
-", FILE_APPEND);
+    $resultType = is_object($result) ? get_class($result) : gettype($result);
+    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] closePgTurn: id_role=$id_role pgName=$pgName still_open=$stillOpen result_type=$resultType cond=".($result && $stillOpen == 0 ? 'TRUE' : 'FALSE')."\n", FILE_APPEND);
 
     // Se tutti hanno scelto di chiudere il turno, chiudo il turno (solo se nessun attacco è in sospeso)
     if ($result && $stillOpen == 0) checkTurnCanClose($id_role, $location);
@@ -1601,6 +1601,7 @@ function hasPendingUnrespondedAttacks($id_role, $turn) {
  * vedranno il loro tiro usato da elaborateTurn; chi non risponde prende il tiro auto.
  */
 function checkTurnCanClose($id_role, $location) {
+    file_put_contents(__DIR__."/../gdr_debug.log", date("H:i:s")." [GDR] checkTurnCanClose ENTRY: id_role=$id_role\n", FILE_APPEND);
     $stillOpen = gdrcd_query(
         "SELECT id FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
         'result'
