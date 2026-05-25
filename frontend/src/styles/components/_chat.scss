@@ -60,6 +60,20 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
     padding: $space-5;
 }
 
+// ── Reset a:link globale per i link interni alla chat ─────────
+// Il selettore globale a:link in _forum.scss applicava margin/letter-spacing
+// /text-transform non voluti ai link della chat (es. .gdr-control-btn).
+// Questo override esplicito rimuove quei valori dal contesto chat.
+.gdr-panel-container a:link {
+    margin: 0;
+    letter-spacing: normal;
+    text-transform: none;
+    font-size: inherit;
+    font-family: inherit;
+    text-align: initial;
+    color: inherit;
+}
+
 // ── Header pannello ───────────────────────────────────────────
 
 .gdr-header {

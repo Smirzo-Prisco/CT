@@ -401,6 +401,20 @@ img.immagine_pg {
     }
 }
 
+// ── Stili tipografici link icone (scoped alla colonna destra) ─────────────
+// Replica le proprietà che in precedenza arrivavano dal selettore globale
+// a:link in _forum.scss, ora scoped a div.pagina_forum per non inquinare
+// altri contesti (chat, presenti, ecc.).
+#gridPanel .icon-link {
+    font-size: $text-sm;
+    letter-spacing: 2px;
+    color: $palette-text-title;
+    font-family: $font-serif;
+    text-align: center;
+    margin: 40px 0 $space-5 0;
+    text-transform: uppercase;
+}
+
 .icon-label {
     font-size: $text-sm;
     color: $color-text-secondary;
