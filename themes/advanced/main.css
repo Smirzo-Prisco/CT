@@ -96,10 +96,7 @@ div.logout_box {
     padding: 10px;
     text-align: center;
     background-color: #D9D9D9;
-    border: solid 1px #333;
-    border-radius: 5px; /* Bordi arrotondati */
-    border-radius: 5px;
-    border-radius: 5px;
+    border: solid 1px #333; /* Bordi arrotondati */
     border-radius: 5px;
 }
 
@@ -119,19 +116,19 @@ div.innertube h2, div.output h2, div.page_title h2 {
 }
 
 /** * Stile dei contenitori grigi con i bordini arrotondati
-*/
+
 div.pagina_info_location, div.msgs, div.menu, div.presenti, div.output {
     margin: 5px auto;
     padding: 10px;
     width: 180px;
     background-color: #b9b9b9;
     border: solid 1px #444;
-    border-radius: 5px; /* Bordi arrotondati */
+    border-radius: 5px;
     border-radius: 5px;
     border-radius: 5px;
     border-radius: 5px;
 }
-
+*/
 div.output {
     position: absolute;
     inset: 0;
@@ -197,10 +194,7 @@ div.link_menu a {
 
 div.link_menu a:hover {
     background-color: #cfcfcf;
-    text-decoration: none;
-    border-radius: 5px; /* Bordi arrotondati */
-    border-radius: 5px;
-    border-radius: 5px;
+    text-decoration: none; /* Bordi arrotondati */
     border-radius: 5px;
 }
 
@@ -239,10 +233,7 @@ div#descriptionLoc {
     font-size: 12px;
     border: solid 1px #666;
     font-family: Verdana, Sans;
-    text-align: left;
-    border-radius: 5px; /* Bordi arrotondati */
-    border-radius: 5px;
-    border-radius: 5px;
+    text-align: left; /* Bordi arrotondati */
     border-radius: 5px;
     display: none; /* NON TOCCARE* Di configurazione: nasconde la tip in partenza */
     z-index: 9999; /* NON TOCCARE* Di configurazione: mostra la tooltip sopra gli altri link */
@@ -257,10 +248,7 @@ div.mappaclick_more {
 div.mappaclick_more a {
     background-color: #cfcfcf;
     padding: 8px;
-    margin-right: 10px;
-    border-radius: 5px; /* Bordi arrotondati */
-    border-radius: 5px;
-    border-radius: 5px;
+    margin-right: 10px; /* Bordi arrotondati */
     border-radius: 5px;
 }
 
@@ -272,10 +260,7 @@ div.elenco_record_gioco {
 
 div.elenco_record_gioco table {
     width: 100%;
-    background-color: #d1d1d1;
-    border-radius: 5px; /* Bordi arrotondati */
-    border-radius: 5px;
-    border-radius: 5px;
+    background-color: #d1d1d1; /* Bordi arrotondati */
     border-radius: 5px;
 }
 
