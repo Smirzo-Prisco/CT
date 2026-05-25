@@ -32,8 +32,8 @@ const COLONNE = [
         links: [
             { label: 'ALBERGO', url: 'main.php?page=servizi_prenotazioni_prova' },
             { label: 'ANAGRAFE', url: 'main.php?page=anagrafe' },
-            { label: 'BANCA', url: 'main.php?page=servizi_banca' },
-            { label: 'MERCATO', url: 'main.php?page=servizi_mercato' },
+            // { label: 'BANCA', url: 'main.php?page=servizi_banca' },
+            // { label: 'MERCATO', url: 'main.php?page=servizi_mercato' },
             { label: 'CAMBIO PASSWORD', url: 'main.php?page=user_cambio_pass' },
             // { label: 'LISTA SPIRITI',       url: 'main.php?page=user_razze' },
             { label: 'PATROCINIO VOLTI', url: 'main.php?page=elenco_volti' },

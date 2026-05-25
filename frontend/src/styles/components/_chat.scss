@@ -703,6 +703,7 @@ div.form_row {
     justify-content: space-between;
     width: 100%;
     gap: $space-2;
+    max-height: 50px;
 }
 
 .action-tag {
