@@ -395,6 +395,12 @@ export default function ChatShell() {
                                                 <img title="Pannello GDR" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" />
                                             </a>
                                         )}
+                                        {/* Cura pg: sopra la textarea, fuori dal pannello per renderlo accessibile a tutti */}
+                                        {pulsanti.show_cura && (
+                                            <a href="#" onClick={(e) => { e.preventDefault(); window.curaPg?.() }}>
+                                                <img src="themes/crystal/imgs/chat/cura.png" alt="Cura PG" className="chat_icon" />
+                                            </a>
+                                        )}
                                         <a href="#" onClick={(e) => { e.preventDefault(); window.open('chat_help.proc.php', 'Help', 'toolbar=no,width=500,height=500') }}>
                                             <img src="themes/crystal/imgs/chat/help.png" alt="Info" className="chat_icon" />
                                         </a>
@@ -527,12 +533,6 @@ export default function ChatShell() {
                                         </a>
                                     )}
 
-                                    {/* Cura pg: solo in ospedale (luogo=25) con condizioni di salute */}
-                                    {pulsanti.show_cura && (
-                                        <a href="#" onClick={(e) => { e.preventDefault(); window.curaPg?.() }} className="gdr-control-btn">
-                                            <img src="themes/crystal/imgs/chat/cura.png" alt="Cura pg" />
-                                        </a>
-                                    )}
 
                                     {/* Pulisci chat: solo staff */}
                                     {pulsanti.show_pulisci && (
