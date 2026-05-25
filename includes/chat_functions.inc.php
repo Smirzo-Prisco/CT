@@ -1149,9 +1149,10 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                 break;
                 case 'più_15_punti_salute': // Cura
                     if($dice >= 10) {
+                        gdrcd_query("UPDATE personaggio SET salute = salute - 15 WHERE nome = '$striker'");
                         gdrcd_query("UPDATE personaggio SET salute = salute + 15 WHERE nome = '$target'");
-                        $msg .= $pgTag." lancia una skill generica che cura $target con 15 punti salute.<br>";
-                    } else $msg .= $pgTag." tenta di lanciare una skill generica che cura $target con 15 punti salute, ma fallisce.<br>";
+                        $msg .= $pgTag." lancia una skill generica che sottrae a $striker 15 punti salute e li dona a $target.<br>";
+                    } else $msg .= $pgTag." tenta di lanciare una skill generica che sottrae a $striker 15 punti salute e li dona a $target, ma fallisce.<br>";
                 break;
             }
 

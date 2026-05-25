@@ -448,7 +448,7 @@ if($_SESSION['admin'] != 1) {
                     <div class="radio-group">
                         <input type="radio" name="sottotipo" value="più_15_punti_salute" id="più_15_punti_salute">
                         <label for="più_15_punti_salute">
-                            +15 ps al bersaglio.
+                            Toglie 15 ps al castatore e li assegna al bersaglio.
                         </label>
                     </div>
                 </div>

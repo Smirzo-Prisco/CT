@@ -411,10 +411,8 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
     margin: 0 15px;
 
     &.inactive {
-        opacity: 0.6;
-
         .gdr-pulse-dot {
-            background-color: $color-text-secondary;
+            background-color: #e74c3c;
             animation: none;
         }
     }
