@@ -82,12 +82,6 @@ export default function TargetSelector() {
                 // Filtra solo i nomi che esistono ancora nella lista aggiornata
                 const ancora = prev.filter(n => newUsers.includes(n))
 
-                if (ancora.length < prev.length) {
-                    // Calcola chi è stato rimosso e notifica l'utente
-                    const rimossi = prev.filter(n => !newUsers.includes(n))
-                    alert(`Bersaglio/i rimosso/i perché uscito dalla stanza: ${rimossi.join(', ')}`)
-                }
-
                 return ancora
             })
         } catch (e) {

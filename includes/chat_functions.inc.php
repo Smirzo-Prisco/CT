@@ -940,16 +940,16 @@ function elaboratePrint($riepilogo) {
                     continue;
                 }
 
-                // Non può lanciare a causa dello scudo lanciato nel turno precedente, quindi perde i punti di default
-                if (isset($subisce['can_send']) && $subisce['can_send'] === 0) {
-                    $msg .= "$pgTag non può difendere perché ha già tirato un'abilità', perciò perde $danno punti $punti_type,";
+                // Se ha lanciato lo scudo e ha fallito, subisce il danno di default (perché non può lanciare il dado di difesa)
+                if (isset($subisce['scudo_fallito']) && $subisce['scudo_fallito']) {
+                    $msg .= "$pgTag ha utilizzato uno scudo e non riesce a difendersi, perdendo $danno punti $punti_type,";
                     $msg .= " passando da $punti a ".($punti - $danno)."<br>";
                     continue;
                 }
 
-                // Se ha lanciato lo scudo e ha fallito, subisce il danno di default (perché non può lanciare il dado di difesa)
-                if (isset($subisce['scudo_fallito']) && $subisce['scudo_fallito']) {
-                    $msg .= "$pgTag ha utilizzato uno scudo e non riesce a difendersi, perdendo $danno punti $punti_type,";
+                // Non può usare il dado di difesa automatico in questo turno, quindi subisce il danno di default
+                if (isset($subisce['can_send']) && $subisce['can_send'] === 0) {
+                    $msg .= "$pgTag non riesce a difendersi, perciò perde $danno punti $punti_type,";
                     $msg .= " passando da $punti a ".($punti - $danno)."<br>";
                     continue;
                 }
