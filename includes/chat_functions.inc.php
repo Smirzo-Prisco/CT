@@ -1703,14 +1703,11 @@ function registraDurata($type, $punti, $danno, $pg, $id_role) {
         if ($salute < 20) return "<br>$type di $pg è troppo bassa per subire gli effetti della skill.<br>";
         if ($salute < 60) {
             // Calcolo i turni in base al danno provocato
-            switch ($danno) {
-                case ($danno >= 50): $turni = 12;
-                case ($danno >= 40): $turni = 8;
-                case ($danno >= 30): $turni = 4;
-                case ($danno >= 20): $turni = 2;
-                case ($danno >= 1): $turni = 1;
-                default: $turni = 0;
-            }
+            if      ($danno >= 50) $turni = 12;
+            elseif  ($danno >= 40) $turni = 8;
+            elseif  ($danno >= 30) $turni = 4;
+            elseif  ($danno >= 20) $turni = 2;
+            elseif  ($danno >= 1)  $turni = 1;
             // Elimino eventuali durate ancora attive per evitare sovrapposizioni
             gdrcd_query("DELETE FROM role_durations WHERE pg_name = '$pg'");
 
