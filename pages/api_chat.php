@@ -835,8 +835,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
 
 
-            // Se il personaggio che invia è soggetto a una skill di durata, scalo i punti (integrità) e controllo se ne ha troppo pochi
-            checkSkillEffect($login, $location);
+            // Se il personaggio che invia è soggetto a una skill di durata, scalo i punti (integrità) — solo per le azioni P (una per turno)
+            if ($m_type === 'P') checkSkillEffect($login, $location);
             /**************************** FINE  CONTROLLI   ************************************************/
 
             // Determina se è un sussurro, un messaggio normale o comando stanza privata

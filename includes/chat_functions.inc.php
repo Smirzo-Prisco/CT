@@ -965,9 +965,8 @@ function elaboratePrint($riepilogo) {
                         $msg .= "$pgTag perde $danno punti $punti_type $formulaStr";
                         $msg .= " passando da $punti punti $punti_type a ".($punti_post <= 0 ? "0 <strong>(è svampato signò!)</strong><br>" : "$punti_post $punti_type<br>");
 
-                        // Se il bersaglio subisce danni sull'integrità e scende sotto un tot, subisce la durata
-                        if (is_numeric($subisce['durata']) && $subisce['durata'] > 0) $msg .= " Inoltre, gli effetti della skill dureranno per {$subisce['durata']} turni.<br>";
-                        else $msg .= $subisce['durata'];
+                        // Se presente, aggiunge il messaggio di durata (effetto attivo o integrità troppo bassa)
+                        if (!empty($subisce['durata_msg'])) $msg .= " {$subisce['durata_msg']}<br>";
                     }
                 }
             }
@@ -1212,7 +1211,8 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
         $carDifesa = getDefenceCar(strtolower($r['car']), $target); // Recupero le info sulla caratteristica usata per il tiro di difesa
         if ($carDifesa === null) continue; // car d'attacco sconosciuta, non elaborabile
         $damage = 0; // Inizializzo il danno subito dal bersaglio
-        $durata = 0; // Inizializzo la durata (in turni) di eventuali effetti applicati al bersaglio
+        $durata = 0;    // Inizializzo la durata (in turni) di eventuali effetti applicati al bersaglio
+        $durataMsg = ''; // Messaggio da mostrare nel riepilogo per effetti di durata
         $moltiplicatore = 1; // Inizializzo il moltiplicatore di danno
         $dadoDifesa = 0; // Inizializzo il dado di difesa, che servirà per il calcolo del danno in caso di difese fallite che consentono comunque di lanciare un dado di difesa
 
@@ -1239,7 +1239,9 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                         $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level']);
                         $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
                         $damage = (($dice - $dadoDifesa) * $moltiplicatore / count($targets));
-                        $durata = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
+                        $durataResult = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
+                        $durata = $durataResult['turni'];
+                        $durataMsg = $durataResult['msg'];
                     }
                 } else {
                     // Nessuna risposta immediata: auto-lancia il dado di difesa
@@ -1248,7 +1250,9 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                         $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level']);
                         $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
                         $damage = (($dice - $dadoDifesa) * $moltiplicatore / count($targets));
-                        $durata = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
+                        $durataResult = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
+                        $durata = $durataResult['turni'];
+                        $durataMsg = $durataResult['msg'];
                     }
                 }
 
@@ -1263,7 +1267,8 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
             'punti_type' => $carDifesa['type'], // Salute o integrità
             'intoccabile' => isset($intoccabili[$target]), // Se è scudato o meno
             'can_send' => $can_send, // Se può lanciare un dado di difesa o meno
-            'durata' => $durata, // Durata di eventuali mentali (in turni)
+            'durata' => $durata,         // Durata di eventuali mentali (in turni)
+            'durata_msg' => $durataMsg,  // Messaggio descrittivo dell'effetto di durata
             'scudo_fallito' => isset($difensori[$target]), // Se ha tentato di difendersi con lo scudo ma ha fallito
             'formula' => [
                 'dadoAttacco' => $dice,
@@ -1700,7 +1705,7 @@ function registraDurata($type, $punti, $danno, $pg, $id_role) {
 
     // Se parliamo di integrità ed è compresa tra 60 e 20, registro la durata in base al danno provocato
     if($type === 'integrità') {
-        if ($salute < 20) return "<br>$type di $pg è troppo bassa per subire gli effetti della skill.<br>";
+        if ($salute < 20) return ['turni' => 0, 'msg' => "L'$type di $pg è troppo bassa per subire gli effetti della skill."];
         if ($salute < 60) {
             // Calcolo i turni in base al danno provocato
             if      ($danno >= 50) $turni = 12;
@@ -1708,17 +1713,18 @@ function registraDurata($type, $punti, $danno, $pg, $id_role) {
             elseif  ($danno >= 30) $turni = 4;
             elseif  ($danno >= 20) $turni = 2;
             elseif  ($danno >= 1)  $turni = 1;
+
             // Elimino eventuali durate ancora attive per evitare sovrapposizioni
             gdrcd_query("DELETE FROM role_durations WHERE pg_name = '$pg'");
 
             // Registro la durata della skill in base al danno provocato
             gdrcd_query("INSERT INTO role_durations (id_role, pg_name, duration, current_turn, `type`) VALUES ($id_role, '$pg', $turni, 0, '$type')");
-    
-            $msg .= "A causa del danno subito, oltre agli effetti della skill, $pg perderà 5 punti $type per i prossimi $turni turni.";
+
+            $msg = "A causa del danno subito $pg perderà 5 punti $type per i prossimi $turni turni.";
         }
     }
 
-    return $turni;
+    return ['turni' => $turni, 'msg' => $msg];
 }
 
 // Controllo se il pg è sottoposto a una durata e, in caso affermativo, scalare i punti per la durata della skill, aggiornare i turni e cancellare la durata al termine
