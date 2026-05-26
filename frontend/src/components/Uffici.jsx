@@ -30,27 +30,32 @@ const COLONNE = [
         alt: 'Utilità',
         class: 'utilita-box',
         links: [
-            { label: 'ALBERGO', url: 'main.php?page=servizi_prenotazioni_prova' },
+            { label: 'ABILITÀ', url: 'main.php?page=mercato_abilita_atarashi' },
+            { label: 'PARAMETRI', url: 'main.php?page=incremento_parametri' },
             { label: 'ANAGRAFE', url: 'main.php?page=anagrafe' },
+            { label: 'STAFF', url: 'main.php?page=elenco_staff' },
+            { label: 'CAMBIO PASSWORD', url: 'main.php?page=user_cambio_pass' },
+            { label: 'PATROCINIO VOLTI', url: 'main.php?page=elenco_volti' },
+            { label: 'ALBERGO', url: 'main.php?page=servizi_prenotazioni_prova' },
+            { label: 'CREA OGGETTO', url: 'main.php?page=oggetto_aggiungi_richiesta' },
+            { label: 'SCEGLI MESTIERE', url: 'main.php?page=scegli_mestiere' },
+            // { label: 'LISTA SPIRITI',       url: 'main.php?page=user_razze' },
             // { label: 'BANCA', url: 'main.php?page=servizi_banca' },
             // { label: 'MERCATO', url: 'main.php?page=servizi_mercato' },
-            { label: 'CAMBIO PASSWORD', url: 'main.php?page=user_cambio_pass' },
-            // { label: 'LISTA SPIRITI',       url: 'main.php?page=user_razze' },
-            { label: 'PATROCINIO VOLTI', url: 'main.php?page=elenco_volti' },
-            { label: 'STAFF', url: 'main.php?page=elenco_staff' },
         ],
     },
+    /*
     {
         key: 'strumenti',
         img: '/themes/crystal/imgs/uffici/uffici_strumenti.png',
         alt: 'Strumenti',
         class: 'strumenti-box',
         links: [
-            // { label: 'SCEGLI LAVORO',                      url: 'main.php?page=scegli_lavoro' },
             { label: 'CREA OGGETTO', url: 'main.php?page=oggetto_aggiungi_richiesta' },
+            { label: 'SCEGLI MESTIERE', url: 'main.php?page=scegli_mestiere' },
+            // { label: 'SCEGLI LAVORO',                      url: 'main.php?page=scegli_lavoro' },
             // { label: 'POTENZIA UMANO', url: 'main.php?page=scegli_umano' },
             // { label: 'SCEGLI CORRENTE E VIA',              url: 'main.php?page=scegli_inclinazione' },
-            { label: 'SCEGLI MESTIERE', url: 'main.php?page=scegli_mestiere' },
         ],
     },
     {
@@ -60,11 +65,12 @@ const COLONNE = [
         class: 'potenziamento-box',
         links: [
             { label: 'ABILITÀ', url: 'main.php?page=mercato_abilita_atarashi' },
-            // { label: 'TALENTI',              url: 'main.php?page=mercato_talento' },
             { label: 'PARAMETRI', url: 'main.php?page=incremento_parametri' },
             // { label: 'AUMENTO SPIRITO',      url: 'main.php?page=level_up' },
+            // { label: 'TALENTI',              url: 'main.php?page=mercato_talento' },
         ],
     },
+    */
 ]
 
 // ---------------------------------------------------------------------------
