@@ -187,19 +187,19 @@ export default function SchedaModifica() {
                                 <SectionHeader>Descrizioni</SectionHeader>
 
                                 <FormRow label="Background" valignTop>
-                                    <textarea className={`ares ${styles.fullWidth}`} rows="15"
+                                    <textarea className={`form_input ${styles.fullWidth}`} rows="15"
                                         value={form.principale ?? ''} onChange={upd('principale')} />
                                 </FormRow>
                                 <FormRow label="Storia" valignTop>
-                                    <textarea className={`ares ${styles.fullWidth}`} rows="15"
+                                    <textarea className={`form_input ${styles.fullWidth}`} rows="15"
                                         value={form.storia ?? ''} onChange={upd('storia')} />
                                 </FormRow>
                                 <FormRow label="Dice di sé" valignTop>
-                                    <textarea className={`ares ${styles.fullWidth}`} rows="15"
+                                    <textarea className={`form_input ${styles.fullWidth}`} rows="15"
                                         value={form.descrizione ?? ''} onChange={upd('descrizione')} />
                                 </FormRow>
                                 <FormRow label="Off" valignTop>
-                                    <textarea className={`ares ${styles.fullWidth}`} rows="15"
+                                    <textarea className={`form_input ${styles.fullWidth}`} rows="15"
                                         value={form.off ?? ''} onChange={upd('off')} />
                                 </FormRow>
 

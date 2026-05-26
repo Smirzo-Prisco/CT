@@ -16,18 +16,37 @@ $scheda-border-dark:  #070a1b;   // bordo scuro
 
 div.pagina_scheda {
     margin: 0 auto;
-    width: max-content;
+    width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     text-align: center;
     text-transform: uppercase;
-    font-weight: $font-weight-bold;
+    font-weight: $font-weight-normal;
     font-size: $text-md;
     margin-bottom: 6px;
     color: $scheda-title-color;
-    font-weight: $font-weight-normal;
 
     div.form_info { color: $color-text; }
+
+    // ── Tabella form modifica ─────────────────────────────────
+    table.customTable { width: 100%; }
+
+    // ── Campi form modifica (input e textarea) ────────────────
+    .form_input {
+        background-color: $palette-surface-input;
+        color: $color-text;
+        font-family: $font-ui;
+        font-size: $text-md;
+        border: 1px solid $palette-surface-hover;
+        border-radius: $radius-sm;
+        padding: $space-1 + 1 $space-2;
+        box-sizing: border-box;
+
+        &:focus {
+            outline: none;
+            border-color: $scheda-title-color;
+        }
+    }
 }
 
 .scheda_page_body {
