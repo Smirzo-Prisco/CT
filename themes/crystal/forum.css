@@ -166,7 +166,7 @@ div.header_thread {
         padding: 8px;
     }
 
-    div.forum_post_modify, a:link {
+    div.forum_post_modify, div.pagina_forum a:link {
         font-size: 10px;
     }
 
@@ -191,7 +191,7 @@ div.header_thread {
         padding: 6px;
     }
 
-    div.forum_post_modify, a:link {
+    div.forum_post_modify, div.pagina_forum a:link {
         font-size: 9px;
         letter-spacing: 1px;
     }
@@ -228,7 +228,7 @@ div.header_thread {
         padding: 5px;
     }
 
-    div.forum_post_modify, a:link {
+    div.forum_post_modify, div.pagina_forum a:link {
         font-size: 8px;
     }
 

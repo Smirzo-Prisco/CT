@@ -11,6 +11,19 @@ a:visited {
     text-decoration: none;
 }
 
+// Stile generale dei link non visitati: font serif, uppercase, colore titolo.
+// Ogni area che necessita valori diversi applica un override scoped
+// (es. .gdr-panel-container a:link in _chat.scss).
+a:link {
+    font-size: $text-sm;
+    letter-spacing: 2px;
+    color: $palette-text-title;
+    font-family: $font-serif;
+    text-align: center;
+    margin: 40px 0 $space-5 0;
+    text-transform: uppercase;
+}
+
 a:hover {
     color: $color-text-muted;
 }
