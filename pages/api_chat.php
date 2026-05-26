@@ -77,7 +77,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 }
                 
                 // Se sto lanciando una mental, devo verificare se non l'ho già lanciato in questo turno
-                if($skill_info['sottotipo'] === 'comando' && checkMentaleComando($id_role, $bersaglio, $turn)) {
+                if($skill_info['sottotipo'] === 'comando' && checkMentaleComando($id_role, $login, $bersaglio, $turn)) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi lanciare due mentali di comando sullo stesso bersaglio per due turni di fila'));
                     exit;
                 }

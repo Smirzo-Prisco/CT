@@ -1185,9 +1185,9 @@ function elaborateAttack($id_role, $turn, $intoccabili, $difensori, &$riepilogo)
             $sgRow = gdrcd_query("SELECT integrita FROM gilda_soglie WHERE livello = $level");
             $integrita = $sgRow ? (int)$sgRow['integrita'] : 0;
 
-            $riepilogo[$target]['subisce'][] = array(
+            $riepilogo[$striker]['subisce'][] = array(
                 'esito' => 1, // 1 = perde punti, 0 = respinge l'attacco
-                'pg' => $target,
+                'pg' => $striker,
                 'danno' => $integrita,
                 'punti' => 'integrita', // Salute o integrità
                 'msg' => " e perde $integrita punti integrità per aver lanciato nuovamente una mentale di tipo comando"
@@ -1662,10 +1662,12 @@ function getTurn($id_role) {
 }
 
 // Quando lancio una skill mentale di comando, controllo che non sia stata lanciata un'altra mentale di comando sullo stesso pg nel turno precedente
-function checkMentaleComando($id_role, $turn) {
+function checkMentaleComando($id_role, $striker, $bersaglio, $turn) {
     $query = "SELECT role_fights.* FROM role_fights
             INNER JOIN abilita ON role_fights.id_skill = abilita.id_abilita
-            WHERE role_fights.id_role = $id_role AND role_fights.turn = ($turn-1) AND role_fights.target = '$bersaglio' AND role_fights.car = 'Mente'
+            WHERE role_fights.id_role = $id_role AND role_fights.turn = ($turn-1)
+            AND role_fights.striker = '$striker' AND role_fights.target = '$bersaglio'
+            AND role_fights.car = 'mente'
             AND abilita.sottotipo = 'comando'";
     $result = gdrcd_query($query, 'result');
 
@@ -1673,10 +1675,12 @@ function checkMentaleComando($id_role, $turn) {
 }
 
 // Serve per capire se l'attaccante ha già lanciato una skill mentale di comando nel turno precedente, così da scalare l'integrità al pg che ha lanciato l'attacco mentale
-function scaloIntegritaDoppioComando($id_role, $bersaglio, $turn) {
+function scaloIntegritaDoppioComando($id_role, $striker, $turn) {
     $query = "SELECT role_fights.* FROM role_fights
             INNER JOIN abilita ON role_fights.id_skill = abilita.id_abilita
-            WHERE role_fights.id_role = $id_role AND role_fights.turn = ($turn-1) AND role_fights.car = 'Mente'
+            WHERE role_fights.id_role = $id_role AND role_fights.turn = ($turn-1)
+            AND role_fights.striker = '$striker'
+            AND role_fights.car = 'mente'
             AND abilita.sottotipo = 'comando'";
     $result = gdrcd_query($query, 'result');
 
