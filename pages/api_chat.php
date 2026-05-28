@@ -339,6 +339,25 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             exit;
             break;
 
+        /**
+         * pending_close_turn — controlla se il pg loggato deve ancora confermare
+         * la chiusura del turno (sent=1 ma close_turn=0).
+         * Usato da ChatShell al mount per ripristinare il prompt dopo un refresh.
+         */
+        case 'pending_close_turn':
+            $login   = $_SESSION['login'];
+            $luogo   = $_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+
+            if (!$id_role) { echo json_encode(['success' => true, 'pending' => false]); exit; }
+
+            $row = gdrcd_query("SELECT sent, close_turn FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login' AND `end` IS NULL");
+            $pending = $row && (int)$row['sent'] === 1 && (int)$row['close_turn'] === 0 && !(bool)hasShieldLaunch($id_role, $login, getTurn($id_role));
+
+            echo json_encode(['success' => true, 'pending' => $pending, 'id_role' => (int)$id_role]);
+            exit;
+            break;
+
         case 'tiraDadoChat': // Funzione ormai inutilizzata, la lascio soltanto perché magari un giorno vorremo reintrodurre i dadi
             $login = $_SESSION['login'];
             $luogo = $_SESSION['luogo'];

@@ -120,6 +120,13 @@ export default function ChatShell() {
      */
     const [attackPrompts, setAttackPrompts] = useState([])
 
+    /**
+     * Prompt di chiusura turno: compare quando tutti i pg hanno dichiarato
+     * le loro azioni e il server richiede conferma via 'combat:close_turn'.
+     * Null se non c'è nulla da confermare, { id_role } altrimenti.
+     */
+    const [closeTurnPrompt, setCloseTurnPrompt] = useState(null)
+
     // -----------------------------------------------------------------------
     // FETCH DATI SHELL
     // -----------------------------------------------------------------------
@@ -204,6 +211,20 @@ export default function ChatShell() {
     }, [shell])
 
     /**
+     * Al mount (o dopo un refresh), controlla se il pg deve ancora confermare
+     * la chiusura del turno e ripristina il prompt se necessario.
+     */
+    useEffect(() => {
+        if (!shell) return
+        fetch('/pages/api_chat.php?op=pending_close_turn', { method: 'POST' })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success && d.pending) setCloseTurnPrompt({ id_role: d.id_role })
+            })
+            .catch(() => {})
+    }, [shell])
+
+    /**
      * Ascolta 'combat:attack_incoming': aggiunge un prompt di difesa per ogni
      * attacco che coinvolge il pg corrente come bersaglio.
      * Dipende da shell perché ha bisogno di shell.login.
@@ -230,6 +251,38 @@ export default function ChatShell() {
 
         sock.on('combat:attack_incoming', onAttackIncoming)
         return () => sock.off('combat:attack_incoming', onAttackIncoming)
+    }, [shell])
+
+    /**
+     * Ascolta 'combat:close_turn': mostra il prompt di chiusura turno se
+     * il messaggio è indirizzato al pg corrente.
+     */
+    useEffect(() => {
+        if (!shell) return
+        const sock = window.ctSocket
+        if (!sock) return
+        const myLogin = shell.login
+
+        const onCloseTurn = (data) => {
+            if (data?.pg_name !== myLogin) return
+            setCloseTurnPrompt({ id_role: data.id_role })
+        }
+
+        sock.on('combat:close_turn', onCloseTurn)
+        return () => sock.off('combat:close_turn', onCloseTurn)
+    }, [shell])
+
+    /** Conferma la chiusura del turno e rimuove il prompt. */
+    const handleCloseTurn = useCallback((id_role) => {
+        setCloseTurnPrompt(null)
+        fetch('/pages/api_roleSession.php?op=closePgTurn', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_role, suss_id: 0, pgName: shell?.login }),
+        })
+            .then(r => r.json())
+            .then(d => { if (!d.success) console.error('[handleCloseTurn]', d.message) })
+            .catch(err => console.error('[handleCloseTurn]', err))
     }, [shell])
 
     /** Invia la scelta di difesa al server e rimuove il prompt dalla lista. */
@@ -374,6 +427,23 @@ export default function ChatShell() {
                             </div>
                         </div>
                     ))}
+
+                    {/* ============================================================ */}
+                    {/* PROMPT CHIUSURA TURNO — compare quando tutti hanno agito     */}
+                    {/* ============================================================ */}
+                    {closeTurnPrompt && (
+                        <div className="attack-prompt">
+                            <span className="attack-prompt-text">
+                                Tutti i personaggi hanno dichiarato le loro azioni.
+                            </span>
+                            <div className="attack-prompt-buttons">
+                                <button type="button" className="attack-prompt-btn btn-dado"
+                                    onClick={() => handleCloseTurn(closeTurnPrompt.id_role)}>
+                                    ✅ Chiudi il turno
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {/* ============================================================ */}
                     {/* FORM INSERIMENTO AZIONE                                      */}

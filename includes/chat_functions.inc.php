@@ -821,7 +821,6 @@ function checkTurnEnd($location, $user, $id_role) {
         if ($totalActive <= 1) return;
 
         $turn = getTurn($id_role);
-        $last_id = (int)gdrcd_query("SELECT MAX(id) AS last_id FROM chat")['last_id'];
 
         while ($pg = gdrcd_query($pgs, 'fetch')) {
             $pgName = $pg['pg_name'];
@@ -830,10 +829,11 @@ function checkTurnEnd($location, $user, $id_role) {
                 // Ha già uno scudo (car='difesa') nel turno: chiusura automatica senza chiedere
                 gdrcd_query("UPDATE role_session_players SET close_turn = 1 WHERE id_role = $id_role AND pg_name = '$pgName' AND `end` IS NULL");
             } else {
-                // Nessun scudo: chiede conferma via sussurro
-                $last_id++;
-                $msg = '<button onclick="closePgTurn('.$id_role.', '.$last_id.', `'.$pgName.'`);">Chiudi il turno</button>';
-                chatInsertMessage($location, 'System', $pgName, $msg, 'Q');
+                // Nessun scudo: notifica real-time tramite socket, il prompt appare in chat
+                notifySocketServer('combat:close_turn', 'chat:' . (int)$location, [
+                    'id_role' => (int)$id_role,
+                    'pg_name' => $pgName,
+                ]);
             }
         }
 
