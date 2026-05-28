@@ -464,6 +464,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $bonus_arma = 0;
             $check_abilita = 0;
             $malus_salute = 0;
+            $is_devia = false;
+            $car_fight = 'destrezza';
 
             // Ottieni informazioni sul pg
             $pg = gdrcd_query("SELECT * FROM personaggio WHERE nome = '$login'");
@@ -515,21 +517,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $check_abilita = gdrcd_query("SELECT COUNT(*) AS n_fisico FROM clgpersonaggioabilita WHERE id_abilita = 44 AND nome = '$login'")['n_fisico'];
                 $sussurro_specifico = "+ $bonus_talento (talento corpo a corpo)";
             } elseif ($tipo_attacco == 'devia_attacco') { // ***** Devia attacco fisico   *****
-                $malus_devia = 0;
-                if ($salute <= 50) {
-                    if ($salute > 40)     $malus_devia = 1;
-                    elseif ($salute > 30) $malus_devia = 3;
-                    elseif ($salute > 20) $malus_devia = 5;
-                    elseif ($salute > 0)  $malus_devia = 10;
-                }
-                $totale_devia = $d20 + $destrezza - $malus_devia;
-                $sussurro_devia = "$d20/20 + $destrezza" . ($malus_devia > 0 ? " - $malus_devia (malus salute)" : '') . " = $totale_devia";
-                $messaggio = "$login tenta di deviare l'attacco fisico di <u>$bersaglio</u> con un tiro di destrezza di $totale_devia";
-                fight($id_role, $login, $bersaglio, 0, 1, 'devia', $totale_devia, 'devia attacco');
-                chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro_devia);
-                gestionePoliziaAutomatica($luogo);
-                echo json_encode(['success' => true, 'message' => 'Deviazione dichiarata con successo.']);
-                exit;
+                $is_devia = true;
+                $car_fight = 'devia';
+                $descrizione_attacco = 'devia attacco';
+                // malus salute, totale, messaggio e sussurro calcolati nel blocco comune
 
             } elseif ($tipo_attacco == 'creatura') { // ***** Attacco con CREATURA   *****
                 // Controllo se esiste la creatura
@@ -554,7 +545,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             // Il bonus talento si applica solo se il pg ha la relativa abilità (corpo a corpo / tipo arma)
             $totale = $d20 + $destrezza + $bonus_arma + ($check_abilita > 0 ? $bonus_talento : 0);
-            $sussurro .= "$d20/20 + $destrezza".($check_abilita > 0 ? " + $bonus_arma (bonus arma) $sussurro_specifico" : '');
 
             /*******    MALUS SALUTE    **********/
             if ($salute <= 50) {
@@ -562,28 +552,33 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 elseif ($salute > 30) $malus_salute = 3;
                 elseif ($salute > 20) $malus_salute = 5;
                 elseif ($salute > 0) $malus_salute = 10;
-                
+
                 $totale -= $malus_salute;
             }
-
-            if ($malus_salute > 0) $sussurro .= " - $malus_salute di malus per la salute = $totale";
             /*******    FINE    MALUS SALUTE    **********/
 
-            $messaggio = "$login $descrizione_attacco <u>$bersaglio</u>$arma_body con un tiro totale di destrezza di $totale";
-            
-            // Registro l'attacco e notifico il bersaglio in tempo reale
-            $id_fight = fight($id_role, $login, $bersaglio, 0, 1, 'destrezza', $totale, $descrizione_attacco);
-            notifyAttackIncoming($id_role, $luogo, $login, [$bersaglio], 'destrezza', $totale, $id_fight, $turn);
+            // Messaggio e sussurro dipendono dal tipo di attacco
+            if ($is_devia) {
+                $sussurro = "$d20/20 + $destrezza" . ($malus_salute > 0 ? " - $malus_salute (malus salute)" : '') . " = $totale";
+                $messaggio = "$login tenta di deviare l'attacco fisico di <u>$bersaglio</u> con un tiro di destrezza di $totale";
+            } else {
+                $sussurro .= "$d20/20 + $destrezza" . ($check_abilita > 0 ? " + $bonus_arma (bonus arma) $sussurro_specifico" : '');
+                if ($malus_salute > 0) $sussurro .= " - $malus_salute di malus per la salute = $totale";
+                $messaggio = "$login $descrizione_attacco <u>$bersaglio</u>$arma_body con un tiro totale di destrezza di $totale";
+            }
 
-            // Inserisci i messaggi in chat
+            // Registro l'attacco
+            $id_fight = fight($id_role, $login, $bersaglio, 0, 1, $car_fight, $totale, $descrizione_attacco);
+
+            // Notifica bersaglio in tempo reale (solo per attacchi fisici/arma, non per devia)
+            if (!$is_devia) {
+                notifyAttackIncoming($id_role, $luogo, $login, [$bersaglio], 'destrezza', $totale, $id_fight, $turn);
+            }
+
             chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro);
-            
-            // Gestione della polizia automatica
             gestionePoliziaAutomatica($luogo);
 
-            // L'attacco fisico non chiude il turno automaticamente: il pg deve cliccare "Chiudi il turno".
-
-            echo json_encode(array('success' => true, 'message' => 'Attacco eseguito con successo.', 'tipo attacco' => $tipo_attacco));
+            echo json_encode(['success' => true, 'message' => $is_devia ? 'Deviazione dichiarata con successo.' : 'Attacco eseguito con successo.', 'tipo_attacco' => $tipo_attacco]);
 
             break;
         case 'tiraDadoGenericoChat':

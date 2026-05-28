@@ -1541,8 +1541,9 @@ function setCanSend($id_role) {
         );
         $hasShield = $shRes && gdrcd_query($shRes, 'num_rows') > 0;
 
-        // can_send = 0 se ha usato lo scudo (costa il turno successivo) OPPURE ha eseguito 2+ azioni attive (es. attacco + scudo)
-        $can = ($hasShield || $lanci > 1) ? 0 : 1;
+        // can_send = 0 solo se ha usato lo scudo E ha anche eseguito un'altra azione nello stesso turno.
+        // Lo scudo da solo non penalizza il turno successivo.
+        $can = ($hasShield && $lanci > 1) ? 0 : 1;
         gdrcd_query("UPDATE role_session_players SET can_send = $can WHERE id_role = $id_role AND pg_name = '$pg'", 'result');
     }
 }
