@@ -867,157 +867,270 @@ function closeTurn($id_role, $location) {
 }
 
 /*************************  ELABORAZIONE TURNO */
-function elaboratePrint($riepilogo) {
-    $msg = "";
+
+/**
+ * Genera il riepilogo del turno come HTML card-based con inline CSS.
+ *
+ * Struttura output:
+ *   1. Header turno (se $turn passato)
+ *   2. Action cards — una per ogni azione (difesa, devia, generica, attacco)
+ *   3. Kill notifications (PNG eliminati)
+ *   4. Summary grid — una card per PG con danni totali PS/INT
+ *
+ * Esegue anche gli effetti collaterali: scaloPunti() e killPng().
+ *
+ * @param array    $riepilogo  Dati strutturati del turno
+ * @param int|null $turn       Numero turno per l'header
+ * @return string              HTML pronto per l'inserimento in chat
+ */
+function elaboratePrint($riepilogo, $turn = null) {
+    if (empty($riepilogo)) return '';
+
+    // ── Helper closures ───────────────────────────────────────────────────────
+
+    // Avatar circle: iniziali + colore derivato dal nome
+    $mkAvatar = function(string $name, int $size = 36) : string {
+        $init = strtoupper(mb_substr($name, 0, 2));
+        $hue  = abs(crc32($name) % 360);
+        $fs   = $size <= 28 ? 10 : 12;
+        return "<span style=\"display:inline-flex;align-items:center;justify-content:center;"
+             . "width:{$size}px;height:{$size}px;border-radius:50%;"
+             . "background:hsl($hue,50%,60%);font-weight:700;font-size:{$fs}px;"
+             . "color:#fff;flex-shrink:0;vertical-align:middle;\">{$init}</span>";
+    };
+
+    // Barra HP orizzontale: $after = punti residui, max statico 100
+    $mkHpBar = function(int $after, string $label = 'PS') : string {
+        $pct = max(0, min(100, $after));
+        $col = $pct > 50 ? '#4caf50' : ($pct > 25 ? '#ff9800' : '#f44336');
+        return "<div style=\"display:flex;align-items:center;gap:6px;margin-top:6px;\">"
+             . "<span style=\"font-size:10px;color:#888;min-width:22px;\">{$label}</span>"
+             . "<div style=\"flex:1;background:#252836;border-radius:3px;height:6px;overflow:hidden;\">"
+             . "<div style=\"width:{$pct}%;height:100%;background:{$col};\"></div>"
+             . "</div>"
+             . "<span style=\"font-size:11px;color:#aaa;min-width:52px;text-align:right;\">{$after}/100</span>"
+             . "</div>";
+    };
+
+    // Badge colorato allineato a destra nel flex row
+    $mkBadge = function(string $txt, string $bg, string $fg = '#fff') : string {
+        return "<span style=\"background:{$bg};color:{$fg};border-radius:4px;"
+             . "padding:2px 8px;font-size:11px;white-space:nowrap;margin-left:auto;\">{$txt}</span>";
+    };
+
+    // Stili riutilizzati
+    $cs  = "background:#181b28;border:1px solid #2d3348;border-radius:8px;padding:12px;margin-bottom:8px;";
+    $row = "display:flex;align-items:center;gap:8px;flex-wrap:wrap;";
+    $nm  = "font-weight:700;color:#cfd8dc;font-size:13px;";
+
+    // Indice subisce: "bersaglio|attaccante" → dati per arricchire le attack card
+    $subIdx = [];
+    foreach ($riepilogo as $pg => $dati) {
+        if (!isset($dati['subisce'])) continue;
+        foreach ($dati['subisce'] as $sub) {
+            $subIdx["{$pg}|" . ($sub['pg'] ?? '')] = $sub;
+        }
+    }
+
+    // ── Assemblaggio HTML ─────────────────────────────────────────────────────
+
+    $html = "<div style=\"font-family:Arial,sans-serif;max-width:680px;\">";
+
+    // Header turno
+    if ($turn !== null) {
+        $html .= "<div style=\"background:#12141f;border:1px solid #3a3f5c;border-radius:8px;"
+               . "padding:10px 14px;margin-bottom:12px;\">"
+               . "<span style=\"font-weight:700;font-size:15px;color:#7986cb;\">&#9876; Risultati Turno {$turn}</span>"
+               . "</div>";
+    }
+
+    // Action cards
+    $cardsHtml = '';
+    foreach ($riepilogo as $pg => $dati) {
+
+        // Difeso: questo PG è il difensore/protettore
+        if (isset($dati['difeso'])) {
+            foreach ($dati['difeso'] as $difeso) {
+                $badge = $difeso['esito'] === 1
+                       ? $mkBadge('Protezione riuscita', '#1b5e20', '#a5d6a7')
+                       : $mkBadge('Protezione fallita', '#4a1010', '#ef9a9a');
+                $av2   = ($difeso['pg'] !== $pg)
+                       ? $mkAvatar($difeso['pg']) . "<span style=\"{$nm}\">{$difeso['pg']}</span>"
+                       : "<span style=\"{$nm}\">se stesso</span>";
+                $cardsHtml .= "<div style=\"{$cs}\"><div style=\"{$row}\">"
+                            . $mkAvatar($pg) . "<span style=\"{$nm}\">{$pg}</span>"
+                            . "<span style=\"color:#555;margin:0 2px;\">&#128737;</span>"
+                            . $av2 . $badge . "</div></div>";
+            }
+        }
+
+        // Difende: volutamente omesso — già coperto dalla card difeso del protettore
+
+        // Devia
+        if (isset($dati['devia'])) {
+            foreach ($dati['devia'] as $dev) {
+                if ($dev['success']) {
+                    $badge = $mkBadge('Deviato', '#1b5e20', '#a5d6a7');
+                } elseif (($dev['reason'] ?? '') === 'no_attack') {
+                    $badge = $mkBadge('Nessun attacco', '#2a2a10', '#ffcc80');
+                } else {
+                    $badge = $mkBadge('Fallito', '#4a1010', '#ef9a9a');
+                }
+                $detail = isset($dev['executor_die'], $dev['attacker_die'])
+                        ? "<div style=\"font-size:11px;color:#9e9e9e;margin-top:5px;\">Dado: {$dev['executor_die']} vs {$dev['attacker_die']}</div>"
+                        : (($dev['reason'] ?? '') === 'no_attack'
+                            ? "<div style=\"font-size:11px;color:#9e9e9e;margin-top:5px;\">{$dev['attacker']} non ha effettuato attacchi fisici</div>"
+                            : '');
+                $cardsHtml .= "<div style=\"{$cs}\"><div style=\"{$row}\">"
+                            . $mkAvatar($pg) . "<span style=\"{$nm}\">{$pg}</span>"
+                            . "<span style=\"color:#555;margin:0 2px;\">&#8617;</span>"
+                            . $mkAvatar($dev['attacker']) . "<span style=\"{$nm}\">{$dev['attacker']}</span>"
+                            . $badge . "</div>{$detail}</div>";
+            }
+        }
+
+        // Generiche
+        if (isset($dati['generica']) && is_array($dati['generica'])) {
+            foreach ($dati['generica'] as $gen) {
+                $cardsHtml .= "<div style=\"background:#181b28;border:1px solid #2d3348;"
+                            . "border-left:3px solid #7986cb;border-radius:8px;"
+                            . "padding:10px 12px;margin-bottom:8px;\">"
+                            . "<div style=\"font-size:12px;color:#cfd8dc;\">{$gen}</div></div>";
+            }
+        }
+
+        // Attacca: una card per attacco
+        if (isset($dati['attacca'])) {
+            foreach ($dati['attacca'] as $att) {
+                $target   = $att['pg'];
+                $danno    = (int)($att['danno'] ?? 0);
+                $ptype    = $att['punti_type'] ?? 'salute';
+                $ptLabel  = $ptype === 'integrita' ? 'INT' : 'PS';
+                $sub      = $subIdx["{$target}|{$pg}"] ?? null;
+                $shielded = $sub && !empty($sub['intoccabile']);
+
+                if ($shielded) {
+                    $badge = $mkBadge('Scudato', '#1a3a5c', '#90caf9');
+                } elseif ($danno <= 0) {
+                    $badge = $mkBadge('Mancato', '#3a2c10', '#ffcc80');
+                } else {
+                    $badge = $mkBadge('Colpito', '#4a1010', '#ef9a9a');
+                }
+
+                $formulaHtml = '';
+                if (isset($att['formula']) && is_array($att['formula'])) {
+                    $f      = $att['formula'];
+                    $dA     = (int)($f['dadoAttacco']    ?? 0);
+                    $dD     = (int)($f['dadoDifesa']     ?? 0);
+                    $cA     = htmlspecialchars(ucfirst((string)($f['car_attacco'] ?? '')));
+                    $cD     = htmlspecialchars(ucfirst((string)($f['car_difesa']  ?? '')));
+                    $mul    = (int)($f['moltiplicatore'] ?? 1);
+                    $res    = $danno > 0
+                            ? " = <b style=\"color:#ef9a9a;\">{$danno}&nbsp;{$ptLabel}</b>"
+                            : " = <b style=\"color:#888;\">0</b>";
+                    $formulaHtml = "<div style=\"font-size:11px;color:#9e9e9e;margin-top:6px;\">"
+                                 . "({$dA}&nbsp;{$cA} &#8722; {$dD}&nbsp;{$cD}) &times; {$mul}{$res}</div>";
+                } elseif ($sub && isset($sub['msg'])) {
+                    $formulaHtml = "<div style=\"font-size:11px;color:#9e9e9e;margin-top:6px;\">{$sub['msg']}</div>";
+                }
+
+                $hpHtml = '';
+                if (!$shielded && $sub && !isset($sub['msg'])) {
+                    $punti  = max(0, (int)($sub['punti'] ?? 100));
+                    $after  = max(0, $punti - $danno);
+                    $hpHtml = $mkHpBar($after, $ptLabel);
+                    if (!empty($sub['durata_msg'])) {
+                        $hpHtml .= "<div style=\"font-size:11px;color:#ffb74d;margin-top:4px;\">{$sub['durata_msg']}</div>";
+                    }
+                }
+
+                $noteHtml = '';
+                if ($sub && !empty($sub['scudo_fallito'])) {
+                    $noteHtml = "<div style=\"font-size:11px;color:#ff9800;margin-top:4px;\">&#9888; Scudo fallito</div>";
+                } elseif ($sub && isset($sub['can_send']) && (int)$sub['can_send'] === 0) {
+                    $noteHtml = "<div style=\"font-size:11px;color:#ff9800;margin-top:4px;\">&#9888; Nessuna difesa disponibile</div>";
+                }
+
+                $cardsHtml .= "<div style=\"{$cs}\"><div style=\"{$row}\">"
+                            . $mkAvatar($pg) . "<span style=\"{$nm}\">{$pg}</span>"
+                            . "<span style=\"color:#666;font-size:18px;margin:0 2px;\">&#x2192;</span>"
+                            . $mkAvatar($target) . "<span style=\"{$nm}\">{$target}</span>"
+                            . $badge . "</div>{$formulaHtml}{$hpHtml}{$noteHtml}</div>";
+            }
+        }
+    }
+
+    if ($cardsHtml) $html .= "<div style=\"margin-bottom:12px;\">{$cardsHtml}</div>";
+
+    // Kill notifications + Summary grid (chiama anche scaloPunti / killPng)
+    $killHtml    = '';
+    $summaryHtml = '';
 
     foreach ($riepilogo as $pg => $dati) {
-        $pgTag = "<font color='#9a6353'><b>$pg</b></font>";
-
-        /************** DIFESA - Stampo eventuali difese riuscite o fallite **********/
-
-        // Difeso (può subire molteplici difese da diversi difensori)
-        if (isset($dati['difeso'])) {
-            $msg .= "$pgTag tenta di proteggere ";
-
-            foreach ($dati['difeso'] as $k => $difeso) {
-                $msg .= ($k > 0) ? " e anche da " : ""; // E anche da...
-                $msg .= $difeso['pg'] === $pg ? "se stesso" : $difeso['pg']; // Difensore
-
-                // Se la difesa ha successo
-                if($difeso['esito'] === 1) $msg .= " con successo, al netto di eventuali skill generiche.<br>";
-                else $msg .= " senza successo<br>";
-            }
-        }
-
-        // Difende (uno solo, non può difendere più volte in un turno)
-        if (isset($dati['difende'][0]) && $dati['difende'][0]['pg'] !== $pg) {
-            $difende = $dati['difende'][0];
-            $msg .= "$pgTag difende {$difende['pg']}";
-            $msg .= $difende['esito'] === 1 ? " con successo.<br>" : " senza successo.<br>";
-        }
-
-        /************** DEVIA - Stampo esito deviazione attacco fisico ***************/
-        if (isset($dati['devia'])) {
-            foreach ($dati['devia'] as $devia) {
-                if ($devia['success']) {
-                    $msg .= "$pgTag devia con successo l'attacco fisico di {$devia['attacker']} ({$devia['executor_die']} vs {$devia['attacker_die']}).<br>";
-                } elseif ($devia['reason'] === 'no_attack') {
-                    $msg .= "$pgTag ha tentato di deviare l'attacco di {$devia['attacker']}, ma non ha effettuato attacchi fisici questo turno.<br>";
-                } else {
-                    $msg .= "$pgTag ha tentato di deviare l'attacco di {$devia['attacker']} ma non ci riesce ({$devia['executor_die']} vs {$devia['attacker_die']}).<br>";
-                }
-            }
-        }
-
-        /************** GENERICHE - Stampo eventuali generiche attive ****************/
-        if (isset($dati['generica']) && is_array($dati['generica'])) {
-            foreach ($dati['generica'] as $generica) $msg .= "$generica<br>";
-        }
-
-        /******************************** ATTACCO ************************************/
         $ps = 0;
         $pi = 0;
 
-        if (isset($dati['attacca'])) {
-            foreach ($dati['attacca'] as $attacco) {
-                $punti_type = $attacco['punti_type'] ?? 'salute';
-                $danno = $attacco['danno'];
-                $msg .= "$pgTag attacca ".($attacco['pg'] === $pg ? "se stesso" : $attacco['pg']);
-
-                if($attacco['danno'] > 0) $msg .= " con successo, togliendogli $danno punti $punti_type. <br>";
-                else $msg .= " ma va a vuoto.<br>";
-            }
-        }
-
-        // Subisce (può subire molteplici danni da diversi attaccanti)
         if (isset($dati['subisce'])) {
-            foreach ($dati['subisce'] as $subisce) {
-                $danno = $subisce['danno'] ?? 0;
-                $punti = $subisce['punti'] ?? 0;
-                $punti_post = $punti - $danno;
-                $punti_type = $subisce['punti_type'] ?? 'salute';
-
-                // Sommo i danni per avere i totali
-                if ($subisce['punti_type'] === 'salute') $ps += $subisce['danno'];
-                elseif ($subisce['punti_type'] === 'integrita') $pi += $subisce['danno'];
-
-                // Se è già settato un messaggio specifico, uso quello
-                if (isset($subisce['msg'])) {
-                    $msg .= $subisce['msg'] . "<br>";
-                    continue;
-                }
-
-                // Verifico se è stato scudato
-                if (isset($subisce['intoccabile']) && $subisce['intoccabile']) {
-                    $msg .= "$pgTag subisce un attacco da " . ($subisce['pg'] === $pg ? "se stesso" : $subisce['pg']) . " ma lo scudo lo protegge e non riporta alcun danno.<br>";
-                    continue;
-                }
-
-                // Se ha lanciato lo scudo e ha fallito, subisce il danno di default (perché non può lanciare il dado di difesa)
-                if (isset($subisce['scudo_fallito']) && $subisce['scudo_fallito']) {
-                    $msg .= "$pgTag ha utilizzato uno scudo e non riesce a difendersi, perdendo $danno punti $punti_type,";
-                    $msg .= " passando da $punti a ".($punti - $danno)."<br>";
-                    continue;
-                }
-
-                // Non può usare il dado di difesa automatico in questo turno, quindi subisce il danno di default
-                if (isset($subisce['can_send']) && $subisce['can_send'] === 0) {
-                    $msg .= "$pgTag non riesce a difendersi, perciò perde $danno punti $punti_type,";
-                    $msg .= " passando da $punti a ".($punti - $danno)."<br>";
-                    continue;
-                }
-
-                if(isset($subisce['formula'])) {
-                    $formula    = $subisce['formula'];
-                    $formulaStr = "<c><b>({$formula['dadoAttacco']} {$formula['car_attacco']} - {$formula['dadoDifesa']} {$formula['car_difesa']}) * {$formula['moltiplicatore']}</b></c>";
-
-                    // Se la difesa supera l'attacco, significa che $pg respinge l'attacco e non subisce danni
-                    if ($formula['dadoDifesa'] >= $formula['dadoAttacco']) {
-                        $msg .= "$pgTag respinge l'attacco di {$subisce['pg']} $formulaStr<br>";
-                    } else {
-                        $msg .= "$pgTag perde $danno punti $punti_type $formulaStr";
-                        $msg .= " passando da $punti punti $punti_type a ".($punti_post <= 0 ? "0 <strong>(è svampato signò!)</strong><br>" : "$punti_post $punti_type<br>");
-
-                        // Se presente, aggiunge il messaggio di durata (effetto attivo o integrità troppo bassa)
-                        if (!empty($subisce['durata_msg'])) $msg .= " {$subisce['durata_msg']}<br>";
-                    }
-                }
+            foreach ($dati['subisce'] as $sub) {
+                $d = (int)($sub['danno'] ?? 0);
+                if (($sub['punti_type'] ?? 'salute') === 'salute') $ps += $d;
+                else $pi += $d;
             }
         }
 
-        /************** CALCOLO DANNI *******************************************/
-        // Se è presente $pg['totale_salute'], non devo calcolare il danno totale, altrimenti lo calcolo sommando tutti i danni subiti
-        if ($ps > 0 || $pi > 0 || isset($dati['totale_salute'])) {
-            $msg .= "$pgTag in questo turno perde in totale ";
-            $msg .= isset($dati['totale_salute'])
-                    ? $dati['totale_salute'] . " punti salute e " . $dati['totale_integrita'] . " punti integrità<br>"
-                    : $ps . " punti salute e " . $pi . " punti integrità<br>";
-        }
+        scaloPunti($pg, $ps, 'salute');
+        scaloPunti($pg, $pi, 'integrita');
 
-        /****************************** SCALO PUNTI  **************************************/
-        scaloPunti($pg, $ps, 'salute'); // Scalo i punti al bersaglio
-        scaloPunti($pg, $pi, 'integrita'); // Scalo i punti al bersaglio
-
-        // Se è un png e la salute scende sotto zero, lo elimino
+        // Logica originale preservata: $ps <= 0 = nessun danno salute questo turno
         if ($ps <= 0) {
             $isPng = gdrcd_query("SELECT png FROM role_session_players WHERE pg_name = '$pg'")['png'] ?? 0;
-
             if ($isPng == 1) {
-                $msg .= "$pgTag viene eliminato dallo scontro.<br>";
-                killPng($pg); // Elimino il png
+                $killHtml .= "<div style=\"background:#4a0000;border:1px solid #8b0000;border-radius:8px;"
+                           . "padding:8px 12px;margin-bottom:8px;font-size:12px;color:#ef9a9a;\">"
+                           . "&#x2620; <b>{$pg}</b> viene eliminato dallo scontro.</div>";
+                killPng($pg);
             }
         }
 
-        $msg .= "<hr>"; // Separatore tra i bersagli
+        $hasData = isset($dati['attacca']) || isset($dati['subisce'])
+                || isset($dati['difende']) || isset($dati['difeso'])
+                || isset($dati['devia'])   || isset($dati['generica']);
+        if (!$hasData) continue;
+
+        // Override totali da generiche post, altrimenti somma subisce
+        $dispPs = isset($dati['totale_salute'])    ? (int)$dati['totale_salute']    : $ps;
+        $dispPi = isset($dati['totale_integrita']) ? (int)$dati['totale_integrita'] : $pi;
+
+        $hue  = abs(crc32($pg) % 360);
+        $init = strtoupper(mb_substr($pg, 0, 2));
+        $dmgH = '';
+        if ($dispPs > 0) $dmgH .= "<div style=\"font-size:12px;color:#ef9a9a;margin-top:2px;\">&#x2212;{$dispPs} PS</div>";
+        if ($dispPi > 0) $dmgH .= "<div style=\"font-size:12px;color:#ce93d8;margin-top:2px;\">&#x2212;{$dispPi} INT</div>";
+        if (!$dmgH)      $dmgH  = "<div style=\"font-size:12px;color:#66bb6a;margin-top:2px;\">Illeso</div>";
+
+        $summaryHtml .= "<div style=\"background:#181b28;border:1px solid #2d3348;"
+                      . "border-radius:8px;padding:10px 8px;text-align:center;\">"
+                      . "<div style=\"display:inline-flex;align-items:center;justify-content:center;"
+                      . "width:40px;height:40px;border-radius:50%;background:hsl($hue,50%,60%);"
+                      . "font-weight:700;font-size:13px;color:#fff;\">{$init}</div>"
+                      . "<div style=\"font-weight:700;color:#cfd8dc;margin:6px 0 2px;font-size:13px;"
+                      . "word-break:break-word;\">{$pg}</div>"
+                      . $dmgH . "</div>";
     }
 
-    return $msg;
+    if ($killHtml)    $html .= $killHtml;
+    if ($summaryHtml) {
+        $html .= "<div style=\"display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));"
+               . "gap:8px;\">{$summaryHtml}</div>";
+    }
+
+    $html .= '</div>';
+    return $html;
 }
 
 // Elabora i dati sul combattimento nel singolo turno
 function elaborateTurn($id_role) {
     $turn = getTurn($id_role);
-    $esito = "<b><u>Risultati turno $turn:</u></b><br>";
     $riepilogo = array();
     
     /****************************** ELABORA LE DIFESE  **************************************/
@@ -1041,14 +1154,14 @@ function elaborateTurn($id_role) {
     elaborateGenerichePost($id_role, $turn, $riepilogo);
 
     /****************************** STAMPA RIEPILOGO e TOGLIE I PUNTI  **************************************/
-    $msg = elaboratePrint($riepilogo);
+    $msg = elaboratePrint($riepilogo, $turn);
     // Manca la creazione della creatura quando lancio le skill generiche di un certo tipo
     // Mi manca da calcolare la durata
     // Mi manca la gestione dei turni di durata di una generica (in base al d20 delle generiche)
 
     if (empty($riepilogo)) return '';
 
-    return $esito.$msg;
+    return $msg;
 }
 
 // Elaboro le deviazioni: confronto il dado dell'esecutore con quello dell'attaccante dichiarato.
