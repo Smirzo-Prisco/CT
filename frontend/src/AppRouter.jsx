@@ -256,6 +256,9 @@ export default function AppRouter({ isStaff = false }) {
                 const data = await resp.json()
                 if (data.success) {
                     if (window.CT_USER) window.CT_USER.luogo = dir
+                    // Aggiorna le room socket: la connessione esistente era
+                    // iscritta a chat:${old} — deve passare a chat:${dir}
+                    window.ctSocket?.emit('room:change', { newLuogo: dir })
                     window.history.pushState({}, '', url)
                     setParams(readParams())
                 } else {

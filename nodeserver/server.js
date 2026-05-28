@@ -69,6 +69,17 @@ io.on('connection', socket => {
         io.to('global').emit('presenti:update');
     });
 
+    // Cambio stanza SPA: lascia le vecchie room chat/loc e joina le nuove
+    socket.on('room:change', ({ newLuogo }) => {
+        const nl = parseInt(newLuogo, 10);
+        if (isNaN(nl)) return;
+        for (const room of [...socket.rooms]) {
+            if (room.startsWith('chat:') || room.startsWith('loc:')) socket.leave(room);
+        }
+        socket.join(`chat:${nl}`);
+        socket.join(`loc:${nl}`);
+    });
+
     // Typing indicator chattina off: broadcast a tutti tranne il mittente
     socket.on('chatoff:typing', (typing) => {
         socket.to('global').emit('chatoff:typing', { nome: login, typing: !!typing });
