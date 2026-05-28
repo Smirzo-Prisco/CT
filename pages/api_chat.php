@@ -479,7 +479,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 }
 
                 // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno
-                if(checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'"], $turn)) {
+                if(checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'", "'devia'"], $turn)) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi effettuare due lanci nello stesso turno'));
                     exit;
                 }
@@ -495,6 +495,23 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $descrizione_attacco = "attacca fisicamente";
                 $check_abilita = gdrcd_query("SELECT COUNT(*) AS n_fisico FROM clgpersonaggioabilita WHERE id_abilita = 44 AND nome = '$login'")['n_fisico'];
                 $sussurro_specifico = "+ $bonus_talento (talento corpo a corpo)";
+            } elseif ($tipo_attacco == 'devia_attacco') { // ***** Devia attacco fisico   *****
+                $malus_devia = 0;
+                if ($salute <= 50) {
+                    if ($salute > 40)     $malus_devia = 1;
+                    elseif ($salute > 30) $malus_devia = 3;
+                    elseif ($salute > 20) $malus_devia = 5;
+                    elseif ($salute > 0)  $malus_devia = 10;
+                }
+                $totale_devia = $d20 + $destrezza - $malus_devia;
+                $sussurro_devia = "$d20/20 + $destrezza" . ($malus_devia > 0 ? " - $malus_devia (malus salute)" : '') . " = $totale_devia";
+                $messaggio = "$login tenta di deviare l'attacco fisico di <u>$bersaglio</u> con un tiro di destrezza di $totale_devia";
+                fight($id_role, $login, $bersaglio, 0, 1, 'devia', $totale_devia, 'devia attacco');
+                chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro_devia);
+                gestionePoliziaAutomatica($luogo);
+                echo json_encode(['success' => true, 'message' => 'Deviazione dichiarata con successo.']);
+                exit;
+
             } elseif ($tipo_attacco == 'creatura') { // ***** Attacco con CREATURA   *****
                 // Controllo se esiste la creatura
                 $result = gdrcd_query("SELECT * FROM personaggio WHERE nome = 'creatura di $login'", 'result');

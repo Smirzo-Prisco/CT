@@ -896,6 +896,19 @@ function elaboratePrint($riepilogo) {
             $msg .= $difende['esito'] === 1 ? " con successo.<br>" : " senza successo.<br>";
         }
 
+        /************** DEVIA - Stampo esito deviazione attacco fisico ***************/
+        if (isset($dati['devia'])) {
+            foreach ($dati['devia'] as $devia) {
+                if ($devia['success']) {
+                    $msg .= "$pgTag devia con successo l'attacco fisico di {$devia['attacker']} ({$devia['executor_die']} vs {$devia['attacker_die']}).<br>";
+                } elseif ($devia['reason'] === 'no_attack') {
+                    $msg .= "$pgTag ha tentato di deviare l'attacco di {$devia['attacker']}, ma non ha effettuato attacchi fisici questo turno.<br>";
+                } else {
+                    $msg .= "$pgTag ha tentato di deviare l'attacco di {$devia['attacker']} ma non ci riesce ({$devia['executor_die']} vs {$devia['attacker_die']}).<br>";
+                }
+            }
+        }
+
         /************** GENERICHE - Stampo eventuali generiche attive ****************/
         if (isset($dati['generica']) && is_array($dati['generica'])) {
             foreach ($dati['generica'] as $generica) $msg .= "$generica<br>";
@@ -1016,6 +1029,10 @@ function elaborateTurn($id_role) {
     $elaborateGenerichePre = elaborateGenerichePre($id_role, $turn, $intoccabili, $riepilogo);
     $intoccabili = $elaborateGenerichePre['intoccabili']; // Aggiorno gli intoccabili con eventuali protezioni generiche riuscite
     
+    /****************************** DEVIA ATTACCO  **************************************/
+    // Elaboro prima le deviazioni: se riescono cancellano l'attacco fisico dal DB prima di elaborateAttack
+    elaborateDevia($id_role, $turn, $riepilogo);
+
     /****************************** ELABORA GLI ATTACCHI  **************************************/
     elaborateAttack($id_role, $turn, $intoccabili, $difensori, $riepilogo);
     
@@ -1032,6 +1049,53 @@ function elaborateTurn($id_role) {
     if (empty($riepilogo)) return '';
 
     return $esito.$msg;
+}
+
+// Elaboro le deviazioni: confronto il dado dell'esecutore con quello dell'attaccante dichiarato.
+// Se l'esecutore supera l'attaccante, l'attacco fisico (car='destrezza') viene cancellato prima dell'elaborazione danni.
+function elaborateDevia($id_role, $turn, &$riepilogo) {
+    $result = gdrcd_query("SELECT * FROM role_fights WHERE id_role = $id_role AND turn = $turn AND car = 'devia' ORDER BY id ASC", 'result');
+    if (!$result) return;
+
+    while ($r = gdrcd_query($result, 'fetch')) {
+        $executor = $r['striker'];
+        $attacker = $r['target'];
+        $executor_die = (int)$r['dice'];
+
+        if (!isset($riepilogo[$executor])) $riepilogo[$executor] = [];
+
+        // Cerco l'attacco fisico dell'attaccante dichiarato in questo turno
+        $attackRow = gdrcd_query("SELECT dice FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$attacker' AND car = 'destrezza' LIMIT 1");
+
+        if (!$attackRow) {
+            $riepilogo[$executor]['devia'][] = [
+                'attacker' => $attacker,
+                'success'  => false,
+                'reason'   => 'no_attack',
+            ];
+            continue;
+        }
+
+        $attacker_die = (int)$attackRow['dice'];
+
+        if ($executor_die > $attacker_die) {
+            gdrcd_query("DELETE FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$attacker' AND car = 'destrezza'");
+            $riepilogo[$executor]['devia'][] = [
+                'attacker'     => $attacker,
+                'success'      => true,
+                'executor_die' => $executor_die,
+                'attacker_die' => $attacker_die,
+            ];
+        } else {
+            $riepilogo[$executor]['devia'][] = [
+                'attacker'     => $attacker,
+                'success'      => false,
+                'reason'       => 'failed',
+                'executor_die' => $executor_die,
+                'attacker_die' => $attacker_die,
+            ];
+        }
+    }
 }
 
 // Elaboro tutte le azioni di difesa del turno

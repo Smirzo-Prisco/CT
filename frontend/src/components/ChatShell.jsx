@@ -670,8 +670,9 @@ export default function ChatShell() {
                                             <label className="gdr-label" htmlFor="tipo_attacco">Tipo di attacco</label>
                                             <select className="gdr-select" id="tipo_attacco" name="arma">
                                                 <option value="0">Attacca</option>
-                                                <optgroup label="Attacco fisico">
-                                                    <option value="attacco_fisico">Attacco fisico</option>
+                                                <optgroup label="Intervento fisico">
+                                                    <option value="attacco_fisico">Attacca fisicamente</option>
+                                                    <option value="devia_attacco">Devia l&apos;attacco di</option>
                                                 </optgroup>
                                                 {oggetti.armi.length > 0 && (
                                                     <optgroup label="Armi">
