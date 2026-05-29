@@ -104,6 +104,12 @@ La barra comandi della chat è stata riorganizzata: il campo TAG si trova ora so
 
 ---
 
+## Collegamento rapido al luogo
+
+Il nome del luogo corrente nella colonna sinistra è ora cliccabile: permette di raggiungere direttamente la stanza senza passare dalla mappa.
+
+---
+
 ## Descrizione del luogo in chat
 
 Quando la chat è vuota e non è in corso nessuna role, viene mostrata la descrizione del luogo corrente con immagine e testo, per dare contesto ambientale anche in assenza di messaggi recenti.
