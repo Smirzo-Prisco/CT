@@ -1031,7 +1031,7 @@ function elaboratePrint($riepilogo, $turn = null) {
 
                 $noteHtml = '';
                 if ($sub && !empty($sub['scudo_fallito'])) {
-                    $noteHtml = "<div class=\"ct-turn__note\">&#9888; Scudo fallito</div>";
+                    $noteHtml = "<div class=\"ct-turn__note\">&#9888; Attacco fallito</div>";
                 } elseif ($sub && isset($sub['can_send']) && (int)$sub['can_send'] === 0) {
                     $noteHtml = "<div class=\"ct-turn__note\">&#9888; Nessuna difesa disponibile</div>";
                 }
