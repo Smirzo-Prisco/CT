@@ -1630,3 +1630,248 @@ button.chat_button:hover {
 .user-search-popup__autocomplete-list::-webkit-scrollbar-thumb:hover {
     background: #4f46e5;
 }
+
+/* ===== CT-TURN: riepilogo turno di combattimento (messaggi tipo N) ============
+   Solo background:hsl() sugli avatar e width:% sulla barra HP restano inline,
+   perché calcolati dinamicamente in PHP. Tutto il resto è qui.
+   ============================================================================ */
+
+.ct-turn {
+    font-family: Arial, sans-serif;
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+/* Header turno */
+.ct-turn__header {
+    background: #12141f;
+    border: 1px solid #3a3f5c;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #7986cb;
+}
+
+/* Contenitore action cards */
+.ct-turn__cards {
+    margin-bottom: 12px;
+}
+
+/* Singola card azione */
+.ct-turn__card {
+    background: #181b28;
+    border: 1px solid #2d3348;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.ct-turn__card--generic {
+    border-left: 3px solid #7986cb;
+    padding: 10px 12px;
+}
+
+.ct-turn__card--kill {
+    background: #4a0000;
+    border-color: #8b0000;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #ef9a9a;
+}
+
+/* Riga flex dentro la card */
+.ct-turn__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Avatar cerchio — background:hsl() resta inline (calcolato da PHP) */
+.ct-turn__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 12px;
+    color: #fff;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+/* Nome PG */
+.ct-turn__name {
+    font-weight: 700;
+    color: #cfd8dc;
+    font-size: 13px;
+}
+
+/* Connettore tra nomi (→, ↩, 🛡) */
+.ct-turn__connector {
+    color: #666;
+    font-size: 16px;
+    margin: 0 2px;
+}
+
+/* Badge allineato a destra nel flex row */
+.ct-turn__badge {
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+.ct-turn__badge--hit {
+    background: #4a1010;
+    color: #ef9a9a;
+}
+
+.ct-turn__badge--miss {
+    background: #3a2c10;
+    color: #ffcc80;
+}
+
+.ct-turn__badge--shield {
+    background: #1a3a5c;
+    color: #90caf9;
+}
+
+.ct-turn__badge--ok {
+    background: #1b5e20;
+    color: #a5d6a7;
+}
+
+.ct-turn__badge--fail {
+    background: #4a1010;
+    color: #ef9a9a;
+}
+
+.ct-turn__badge--noatk {
+    background: #2a2a10;
+    color: #ffcc80;
+}
+
+/* Riga formula dadi */
+.ct-turn__formula {
+    font-size: 11px;
+    color: #9e9e9e;
+    margin-top: 6px;
+}
+
+.ct-turn__formula b { color: #ef9a9a; }
+
+/* Barra HP */
+.ct-turn__hpbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.ct-turn__hpbar__label {
+    font-size: 10px;
+    color: #888;
+    min-width: 22px;
+}
+
+.ct-turn__hpbar__track {
+    flex: 1;
+    background: #252836;
+    border-radius: 3px;
+    height: 6px;
+    overflow: hidden;
+}
+
+/* width:% resta inline — calcolato da PHP */
+.ct-turn__hpbar__fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+.ct-turn__hpbar__fill--high { background: #4caf50; }
+.ct-turn__hpbar__fill--mid  { background: #ff9800; }
+.ct-turn__hpbar__fill--low  { background: #f44336; }
+
+.ct-turn__hpbar__value {
+    font-size: 11px;
+    color: #aaa;
+    min-width: 52px;
+    text-align: right;
+}
+
+/* Note (scudo fallito, nessuna difesa, durata effetto) */
+.ct-turn__note {
+    font-size: 11px;
+    color: #ff9800;
+    margin-top: 4px;
+}
+
+.ct-turn__note--duration {
+    color: #ffb74d;
+}
+
+/* Testo generico dentro card generica */
+.ct-turn__generic-text {
+    font-size: 12px;
+    color: #cfd8dc;
+}
+
+/* Summary grid */
+.ct-turn__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+}
+
+.ct-turn__pg-card {
+    background: #181b28;
+    border: 1px solid #2d3348;
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+/* Avatar summary — background:hsl() resta inline */
+.ct-turn__pg-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+}
+
+.ct-turn__pg-name {
+    font-weight: 700;
+    color: #cfd8dc;
+    margin: 6px 0 2px;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.ct-turn__pg-dmg--ps {
+    font-size: 12px;
+    color: #ef9a9a;
+    margin-top: 2px;
+}
+
+.ct-turn__pg-dmg--int {
+    font-size: 12px;
+    color: #ce93d8;
+    margin-top: 2px;
+}
+
+.ct-turn__pg-ok {
+    font-size: 12px;
+    color: #66bb6a;
+    margin-top: 2px;
+}

@@ -869,7 +869,10 @@ function closeTurn($id_role, $location) {
 /*************************  ELABORAZIONE TURNO */
 
 /**
- * Genera il riepilogo del turno come HTML card-based con inline CSS.
+ * Genera il riepilogo del turno come HTML card-based.
+ * Stile gestito da .ct-turn__* in chat.css.
+ * Solo background:hsl() sugli avatar e width:% sulla barra HP restano inline
+ * perché calcolati dinamicamente.
  *
  * Struttura output:
  *   1. Header turno (se $turn passato)
@@ -888,40 +891,29 @@ function elaboratePrint($riepilogo, $turn = null) {
 
     // ── Helper closures ───────────────────────────────────────────────────────
 
-    // Avatar circle: iniziali + colore derivato dal nome
-    $mkAvatar = function(string $name, int $size = 36) : string {
+    // Solo background:hsl() inline — tutto il resto dalla classe .ct-turn__avatar
+    $mkAvatar = function(string $name) : string {
         $init = strtoupper(mb_substr($name, 0, 2));
         $hue  = abs(crc32($name) % 360);
-        $fs   = $size <= 28 ? 10 : 12;
-        return "<span style=\"display:inline-flex;align-items:center;justify-content:center;"
-             . "width:{$size}px;height:{$size}px;border-radius:50%;"
-             . "background:hsl($hue,50%,60%);font-weight:700;font-size:{$fs}px;"
-             . "color:#fff;flex-shrink:0;vertical-align:middle;\">{$init}</span>";
+        return "<span class=\"ct-turn__avatar\" style=\"background:hsl($hue,50%,60%)\">{$init}</span>";
     };
 
-    // Barra HP orizzontale: $after = punti residui, max statico 100
+    // Solo width:% inline — tutto il resto dalle classi .ct-turn__hpbar__*
     $mkHpBar = function(int $after, string $label = 'PS') : string {
-        $pct = max(0, min(100, $after));
-        $col = $pct > 50 ? '#4caf50' : ($pct > 25 ? '#ff9800' : '#f44336');
-        return "<div style=\"display:flex;align-items:center;gap:6px;margin-top:6px;\">"
-             . "<span style=\"font-size:10px;color:#888;min-width:22px;\">{$label}</span>"
-             . "<div style=\"flex:1;background:#252836;border-radius:3px;height:6px;overflow:hidden;\">"
-             . "<div style=\"width:{$pct}%;height:100%;background:{$col};\"></div>"
+        $pct   = max(0, min(100, $after));
+        $level = $pct > 50 ? 'high' : ($pct > 25 ? 'mid' : 'low');
+        return "<div class=\"ct-turn__hpbar\">"
+             . "<span class=\"ct-turn__hpbar__label\">{$label}</span>"
+             . "<div class=\"ct-turn__hpbar__track\">"
+             . "<div class=\"ct-turn__hpbar__fill ct-turn__hpbar__fill--{$level}\" style=\"width:{$pct}%\"></div>"
              . "</div>"
-             . "<span style=\"font-size:11px;color:#aaa;min-width:52px;text-align:right;\">{$after}/100</span>"
+             . "<span class=\"ct-turn__hpbar__value\">{$after}/100</span>"
              . "</div>";
     };
 
-    // Badge colorato allineato a destra nel flex row
-    $mkBadge = function(string $txt, string $bg, string $fg = '#fff') : string {
-        return "<span style=\"background:{$bg};color:{$fg};border-radius:4px;"
-             . "padding:2px 8px;font-size:11px;white-space:nowrap;margin-left:auto;\">{$txt}</span>";
+    $mkBadge = function(string $txt, string $variant) : string {
+        return "<span class=\"ct-turn__badge ct-turn__badge--{$variant}\">{$txt}</span>";
     };
-
-    // Stili riutilizzati
-    $cs  = "background:#181b28;border:1px solid #2d3348;border-radius:8px;padding:12px;margin-bottom:8px;";
-    $row = "display:flex;align-items:center;gap:8px;flex-wrap:wrap;";
-    $nm  = "font-weight:700;color:#cfd8dc;font-size:13px;";
 
     // Indice subisce: "bersaglio|attaccante" → dati per arricchire le attack card
     $subIdx = [];
@@ -934,17 +926,12 @@ function elaboratePrint($riepilogo, $turn = null) {
 
     // ── Assemblaggio HTML ─────────────────────────────────────────────────────
 
-    $html = "<div style=\"font-family:Arial,sans-serif;max-width:680px;\">";
+    $html = "<div class=\"ct-turn\">";
 
-    // Header turno
     if ($turn !== null) {
-        $html .= "<div style=\"background:#12141f;border:1px solid #3a3f5c;border-radius:8px;"
-               . "padding:10px 14px;margin-bottom:12px;\">"
-               . "<span style=\"font-weight:700;font-size:15px;color:#7986cb;\">&#9876; Risultati Turno {$turn}</span>"
-               . "</div>";
+        $html .= "<div class=\"ct-turn__header\">&#9876; Risultati Turno {$turn}</div>";
     }
 
-    // Action cards
     $cardsHtml = '';
     foreach ($riepilogo as $pg => $dati) {
 
@@ -952,14 +939,14 @@ function elaboratePrint($riepilogo, $turn = null) {
         if (isset($dati['difeso'])) {
             foreach ($dati['difeso'] as $difeso) {
                 $badge = $difeso['esito'] === 1
-                       ? $mkBadge('Protezione riuscita', '#1b5e20', '#a5d6a7')
-                       : $mkBadge('Protezione fallita', '#4a1010', '#ef9a9a');
+                       ? $mkBadge('Protezione riuscita', 'ok')
+                       : $mkBadge('Protezione fallita', 'fail');
                 $av2   = ($difeso['pg'] !== $pg)
-                       ? $mkAvatar($difeso['pg']) . "<span style=\"{$nm}\">{$difeso['pg']}</span>"
-                       : "<span style=\"{$nm}\">se stesso</span>";
-                $cardsHtml .= "<div style=\"{$cs}\"><div style=\"{$row}\">"
-                            . $mkAvatar($pg) . "<span style=\"{$nm}\">{$pg}</span>"
-                            . "<span style=\"color:#555;margin:0 2px;\">&#128737;</span>"
+                       ? $mkAvatar($difeso['pg']) . "<span class=\"ct-turn__name\">{$difeso['pg']}</span>"
+                       : "<span class=\"ct-turn__name\">se stesso</span>";
+                $cardsHtml .= "<div class=\"ct-turn__card\"><div class=\"ct-turn__row\">"
+                            . $mkAvatar($pg) . "<span class=\"ct-turn__name\">{$pg}</span>"
+                            . "<span class=\"ct-turn__connector\">&#128737;</span>"
                             . $av2 . $badge . "</div></div>";
             }
         }
@@ -970,21 +957,21 @@ function elaboratePrint($riepilogo, $turn = null) {
         if (isset($dati['devia'])) {
             foreach ($dati['devia'] as $dev) {
                 if ($dev['success']) {
-                    $badge = $mkBadge('Deviato', '#1b5e20', '#a5d6a7');
+                    $badge = $mkBadge('Deviato', 'ok');
                 } elseif (($dev['reason'] ?? '') === 'no_attack') {
-                    $badge = $mkBadge('Nessun attacco', '#2a2a10', '#ffcc80');
+                    $badge = $mkBadge('Nessun attacco', 'noatk');
                 } else {
-                    $badge = $mkBadge('Fallito', '#4a1010', '#ef9a9a');
+                    $badge = $mkBadge('Fallito', 'fail');
                 }
                 $detail = isset($dev['executor_die'], $dev['attacker_die'])
-                        ? "<div style=\"font-size:11px;color:#9e9e9e;margin-top:5px;\">Dado: {$dev['executor_die']} vs {$dev['attacker_die']}</div>"
+                        ? "<div class=\"ct-turn__formula\">Dado: {$dev['executor_die']} vs {$dev['attacker_die']}</div>"
                         : (($dev['reason'] ?? '') === 'no_attack'
-                            ? "<div style=\"font-size:11px;color:#9e9e9e;margin-top:5px;\">{$dev['attacker']} non ha effettuato attacchi fisici</div>"
+                            ? "<div class=\"ct-turn__formula\">{$dev['attacker']} non ha effettuato attacchi fisici</div>"
                             : '');
-                $cardsHtml .= "<div style=\"{$cs}\"><div style=\"{$row}\">"
-                            . $mkAvatar($pg) . "<span style=\"{$nm}\">{$pg}</span>"
-                            . "<span style=\"color:#555;margin:0 2px;\">&#8617;</span>"
-                            . $mkAvatar($dev['attacker']) . "<span style=\"{$nm}\">{$dev['attacker']}</span>"
+                $cardsHtml .= "<div class=\"ct-turn__card\"><div class=\"ct-turn__row\">"
+                            . $mkAvatar($pg) . "<span class=\"ct-turn__name\">{$pg}</span>"
+                            . "<span class=\"ct-turn__connector\">&#8617;</span>"
+                            . $mkAvatar($dev['attacker']) . "<span class=\"ct-turn__name\">{$dev['attacker']}</span>"
                             . $badge . "</div>{$detail}</div>";
             }
         }
@@ -992,10 +979,8 @@ function elaboratePrint($riepilogo, $turn = null) {
         // Generiche
         if (isset($dati['generica']) && is_array($dati['generica'])) {
             foreach ($dati['generica'] as $gen) {
-                $cardsHtml .= "<div style=\"background:#181b28;border:1px solid #2d3348;"
-                            . "border-left:3px solid #7986cb;border-radius:8px;"
-                            . "padding:10px 12px;margin-bottom:8px;\">"
-                            . "<div style=\"font-size:12px;color:#cfd8dc;\">{$gen}</div></div>";
+                $cardsHtml .= "<div class=\"ct-turn__card ct-turn__card--generic\">"
+                            . "<div class=\"ct-turn__generic-text\">{$gen}</div></div>";
             }
         }
 
@@ -1010,11 +995,11 @@ function elaboratePrint($riepilogo, $turn = null) {
                 $shielded = $sub && !empty($sub['intoccabile']);
 
                 if ($shielded) {
-                    $badge = $mkBadge('Scudato', '#1a3a5c', '#90caf9');
+                    $badge = $mkBadge('Scudato', 'shield');
                 } elseif ($danno <= 0) {
-                    $badge = $mkBadge('Mancato', '#3a2c10', '#ffcc80');
+                    $badge = $mkBadge('Mancato', 'miss');
                 } else {
-                    $badge = $mkBadge('Colpito', '#4a1010', '#ef9a9a');
+                    $badge = $mkBadge('Colpito', 'hit');
                 }
 
                 $formulaHtml = '';
@@ -1026,12 +1011,12 @@ function elaboratePrint($riepilogo, $turn = null) {
                     $cD     = htmlspecialchars(ucfirst((string)($f['car_difesa']  ?? '')));
                     $mul    = (int)($f['moltiplicatore'] ?? 1);
                     $res    = $danno > 0
-                            ? " = <b style=\"color:#ef9a9a;\">{$danno}&nbsp;{$ptLabel}</b>"
+                            ? " = <b>{$danno}&nbsp;{$ptLabel}</b>"
                             : " = <b style=\"color:#888;\">0</b>";
-                    $formulaHtml = "<div style=\"font-size:11px;color:#9e9e9e;margin-top:6px;\">"
+                    $formulaHtml = "<div class=\"ct-turn__formula\">"
                                  . "({$dA}&nbsp;{$cA} &#8722; {$dD}&nbsp;{$cD}) &times; {$mul}{$res}</div>";
                 } elseif ($sub && isset($sub['msg'])) {
-                    $formulaHtml = "<div style=\"font-size:11px;color:#9e9e9e;margin-top:6px;\">{$sub['msg']}</div>";
+                    $formulaHtml = "<div class=\"ct-turn__formula\">{$sub['msg']}</div>";
                 }
 
                 $hpHtml = '';
@@ -1040,27 +1025,27 @@ function elaboratePrint($riepilogo, $turn = null) {
                     $after  = max(0, $punti - $danno);
                     $hpHtml = $mkHpBar($after, $ptLabel);
                     if (!empty($sub['durata_msg'])) {
-                        $hpHtml .= "<div style=\"font-size:11px;color:#ffb74d;margin-top:4px;\">{$sub['durata_msg']}</div>";
+                        $hpHtml .= "<div class=\"ct-turn__note ct-turn__note--duration\">{$sub['durata_msg']}</div>";
                     }
                 }
 
                 $noteHtml = '';
                 if ($sub && !empty($sub['scudo_fallito'])) {
-                    $noteHtml = "<div style=\"font-size:11px;color:#ff9800;margin-top:4px;\">&#9888; Scudo fallito</div>";
+                    $noteHtml = "<div class=\"ct-turn__note\">&#9888; Scudo fallito</div>";
                 } elseif ($sub && isset($sub['can_send']) && (int)$sub['can_send'] === 0) {
-                    $noteHtml = "<div style=\"font-size:11px;color:#ff9800;margin-top:4px;\">&#9888; Nessuna difesa disponibile</div>";
+                    $noteHtml = "<div class=\"ct-turn__note\">&#9888; Nessuna difesa disponibile</div>";
                 }
 
-                $cardsHtml .= "<div style=\"{$cs}\"><div style=\"{$row}\">"
-                            . $mkAvatar($pg) . "<span style=\"{$nm}\">{$pg}</span>"
-                            . "<span style=\"color:#666;font-size:18px;margin:0 2px;\">&#x2192;</span>"
-                            . $mkAvatar($target) . "<span style=\"{$nm}\">{$target}</span>"
+                $cardsHtml .= "<div class=\"ct-turn__card\"><div class=\"ct-turn__row\">"
+                            . $mkAvatar($pg) . "<span class=\"ct-turn__name\">{$pg}</span>"
+                            . "<span class=\"ct-turn__connector\">&#x2192;</span>"
+                            . $mkAvatar($target) . "<span class=\"ct-turn__name\">{$target}</span>"
                             . $badge . "</div>{$formulaHtml}{$hpHtml}{$noteHtml}</div>";
             }
         }
     }
 
-    if ($cardsHtml) $html .= "<div style=\"margin-bottom:12px;\">{$cardsHtml}</div>";
+    if ($cardsHtml) $html .= "<div class=\"ct-turn__cards\">{$cardsHtml}</div>";
 
     // Kill notifications + Summary grid (chiama anche scaloPunti / killPng)
     $killHtml    = '';
@@ -1085,9 +1070,7 @@ function elaboratePrint($riepilogo, $turn = null) {
         if ($ps <= 0) {
             $isPng = gdrcd_query("SELECT png FROM role_session_players WHERE pg_name = '$pg'")['png'] ?? 0;
             if ($isPng == 1) {
-                $killHtml .= "<div style=\"background:#4a0000;border:1px solid #8b0000;border-radius:8px;"
-                           . "padding:8px 12px;margin-bottom:8px;font-size:12px;color:#ef9a9a;\">"
-                           . "&#x2620; <b>{$pg}</b> viene eliminato dallo scontro.</div>";
+                $killHtml .= "<div class=\"ct-turn__card ct-turn__card--kill\">&#x2620; <b>{$pg}</b> viene eliminato dallo scontro.</div>";
                 killPng($pg);
             }
         }
@@ -1104,25 +1087,18 @@ function elaboratePrint($riepilogo, $turn = null) {
         $hue  = abs(crc32($pg) % 360);
         $init = strtoupper(mb_substr($pg, 0, 2));
         $dmgH = '';
-        if ($dispPs > 0) $dmgH .= "<div style=\"font-size:12px;color:#ef9a9a;margin-top:2px;\">&#x2212;{$dispPs} PS</div>";
-        if ($dispPi > 0) $dmgH .= "<div style=\"font-size:12px;color:#ce93d8;margin-top:2px;\">&#x2212;{$dispPi} INT</div>";
-        if (!$dmgH)      $dmgH  = "<div style=\"font-size:12px;color:#66bb6a;margin-top:2px;\">Illeso</div>";
+        if ($dispPs > 0) $dmgH .= "<div class=\"ct-turn__pg-dmg--ps\">&#x2212;{$dispPs} PS</div>";
+        if ($dispPi > 0) $dmgH .= "<div class=\"ct-turn__pg-dmg--int\">&#x2212;{$dispPi} INT</div>";
+        if (!$dmgH)      $dmgH  = "<div class=\"ct-turn__pg-ok\">Illeso</div>";
 
-        $summaryHtml .= "<div style=\"background:#181b28;border:1px solid #2d3348;"
-                      . "border-radius:8px;padding:10px 8px;text-align:center;\">"
-                      . "<div style=\"display:inline-flex;align-items:center;justify-content:center;"
-                      . "width:40px;height:40px;border-radius:50%;background:hsl($hue,50%,60%);"
-                      . "font-weight:700;font-size:13px;color:#fff;\">{$init}</div>"
-                      . "<div style=\"font-weight:700;color:#cfd8dc;margin:6px 0 2px;font-size:13px;"
-                      . "word-break:break-word;\">{$pg}</div>"
+        $summaryHtml .= "<div class=\"ct-turn__pg-card\">"
+                      . "<div class=\"ct-turn__pg-avatar\" style=\"background:hsl($hue,50%,60%)\">{$init}</div>"
+                      . "<div class=\"ct-turn__pg-name\">{$pg}</div>"
                       . $dmgH . "</div>";
     }
 
     if ($killHtml)    $html .= $killHtml;
-    if ($summaryHtml) {
-        $html .= "<div style=\"display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));"
-               . "gap:8px;\">{$summaryHtml}</div>";
-    }
+    if ($summaryHtml) $html .= "<div class=\"ct-turn__summary\">{$summaryHtml}</div>";
 
     $html .= '</div>';
     return $html;
