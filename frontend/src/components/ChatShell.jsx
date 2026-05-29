@@ -285,11 +285,24 @@ export default function ChatShell() {
             .catch(err => console.error('[handleCloseTurn]', err))
     }, [shell])
 
-    /** Invia la scelta di difesa al server e rimuove il prompt dalla lista. */
+    /** Invia la scelta di difesa al server e aggiorna i prompt rimanenti. */
     const handleDefenseChoice = useCallback((id_fight, scelta) => {
-        // Rimozione ottimistica: il prompt sparisce subito al click senza
-        // aspettare la risposta del server (evita il "pulsante rimane visibile").
-        setAttackPrompts(prev => prev.filter(p => p.id_fight !== id_fight))
+        // Aggiornamento ottimistico in base alla scelta:
+        //   scudo  → rimuove TUTTI i prompt (lo scudo occupa l'intera azione del turno)
+        //   dado   → rimuove il prompt corrente e toglie 'scudo' dagli altri
+        //            (dopo aver lanciato un dado non si può più usare lo scudo)
+        //   subisce → rimuove solo il prompt corrente, gli altri restano invariati
+        setAttackPrompts(prev => {
+            if (scelta === 'scudo') return []
+            const remaining = prev.filter(p => p.id_fight !== id_fight)
+            if (scelta === 'dado') {
+                return remaining.map(p => ({
+                    ...p,
+                    choices: p.choices.filter(c => c !== 'scudo'),
+                }))
+            }
+            return remaining
+        })
         fetch('/pages/api_chat.php?op=risposta_immediata', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
