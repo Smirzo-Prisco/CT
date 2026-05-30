@@ -47,6 +47,7 @@ import SchedaEquip    from './components/SchedaEquip'
 import SchedaOggetti  from './components/SchedaOggetti'
 import Gestione       from './components/Gestione'
 import Uffici         from './components/Uffici'
+import RoleRecap      from './components/RoleRecap'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -148,6 +149,10 @@ const ROUTES = {
         css: [
             '/themes/crystal/uffici_layout.css',
         ],
+    },
+    role_recap: {
+        component: RoleRecap,
+        css: [],
     },
 }
 
