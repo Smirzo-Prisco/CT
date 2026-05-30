@@ -53,7 +53,7 @@ function GildeTable({ gilde, onSelectGilda }) {
                                 nel contesto di navigazione principale, non in una scheda vuota */}
                             <a
                                 href="#"
-                                onClick={e => { e.preventDefault(); navigate(`/statuto_main.php?id=${g.id}`) }}
+                                onClick={e => { e.preventDefault(); navigate(`main.php?page=statuto_main&id=${g.id}`) }}
                                 title="Statuto"
                             >
                                 <i className="fa-solid fa-scroll" />
@@ -121,7 +121,7 @@ function MestieriSection({ mestieri }) {
                                                 href="#"
                                                 onClick={e => {
                                                     e.preventDefault()
-                                                    navigate(`${m.url_sito}?id2=${m.id}`)
+                                                    navigate(`main.php?page=statuto_main&id2=${m.id}`)
                                                 }}
                                                 title="Statuto"
                                             >
