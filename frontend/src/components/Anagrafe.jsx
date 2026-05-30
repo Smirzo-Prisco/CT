@@ -131,6 +131,13 @@ export default function Anagrafe() {
     return (
         <div className="anagrafe">
 
+            {/* ── Link indietro (in cima) ───────────────────────────────────── */}
+            <div className="panels_link anagrafe-back">
+                <span style={{ cursor: 'pointer' }} onClick={() => navigate('main.php?page=uffici')}>
+                    Torna indietro
+                </span>
+            </div>
+
             {/* ── Barra statistiche ─────────────────────────────────────────── */}
             {stats && (
                 <div className="anagrafe-stats">
@@ -156,11 +163,12 @@ export default function Anagrafe() {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                 />
-                {search && (
-                    <button className="anagrafe-search-clear" onClick={() => setSearch('')}>
-                        × Azzera
-                    </button>
-                )}
+                <button
+                    className={`anagrafe-search-clear${!search ? ' inactive' : ''}`}
+                    onClick={() => setSearch('')}
+                >
+                    × Azzera
+                </button>
             </div>
 
             {/* ── Alfabeto ──────────────────────────────────────────────────── */}
@@ -219,12 +227,12 @@ export default function Anagrafe() {
                                     <div className="anagrafe-row-sub">{parts.join(' — ')}</div>
                                 </div>
 
-                                {pg.razza?.nome && (
+                                {pg.gilda?.nome && (
                                     <span
                                         className="anagrafe-row-badge"
-                                        style={badgeStyle(pg.razza.nome)}
+                                        style={badgeStyle(pg.gilda.nome)}
                                     >
-                                        {pg.razza.nome}
+                                        {pg.gilda.nome}
                                     </span>
                                 )}
                             </div>
@@ -233,12 +241,6 @@ export default function Anagrafe() {
                 </div>
             ))}
 
-            {/* ── Link indietro ─────────────────────────────────────────────── */}
-            <div className="panels_link" style={{ marginTop: '20px' }}>
-                <span style={{ cursor: 'pointer' }} onClick={() => navigate('main.php?page=uffici')}>
-                    Torna indietro
-                </span>
-            </div>
 
         </div>
     )

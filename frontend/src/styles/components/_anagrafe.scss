@@ -5,7 +5,12 @@
 
 // ── Contenitore principale ────────────────────────────────────────────────────
 .anagrafe {
-    padding: $space-2 0;
+    padding: $space-3;
+}
+
+// ── Link indietro in cima ─────────────────────────────────────────────────────
+.anagrafe-back {
+    margin-bottom: $space-5;
 }
 
 // ── Barra statistiche ─────────────────────────────────────────────────────────
@@ -31,7 +36,7 @@
 
     .stat-label {
         font-size: $text-sm;
-        color: $palette-text-secondary;
+        color: $palette-text;
         margin-top: 2px;
     }
 }
@@ -41,6 +46,7 @@
     display: flex;
     gap: $space-2;
     margin-bottom: $space-4;
+    align-items: center;
 }
 
 .anagrafe-search-input {
@@ -48,9 +54,9 @@
     background: $palette-surface-input;
     border: 1px solid $palette-surface-hover;
     border-radius: $radius-xl;
-    padding: $space-2 $space-4;
+    padding: $space-3 $space-5;
     color: $palette-text;
-    font-size: $text-md;
+    font-size: $text-lg;
     font-family: $font-base;
     transition: border-color $transition-fast, box-shadow $transition-fast;
 
@@ -67,17 +73,21 @@
     background: $palette-surface-raised;
     border: 1px solid $palette-surface-hover;
     border-radius: $radius-xl;
-    padding: $space-2 $space-4;
-    color: $palette-text-secondary;
+    padding: $space-3 $space-5;
+    color: $palette-text;
     cursor: pointer;
-    font-size: $text-md;
+    font-size: $text-lg;
     font-family: $font-base;
     white-space: nowrap;
-    transition: color $transition-fast, border-color $transition-fast;
+    transition: color $transition-fast, border-color $transition-fast, opacity $transition-fast;
 
-    &:hover {
-        color: $palette-text;
-        border-color: $palette-text-secondary;
+    &:hover { border-color: $palette-action; color: $palette-action; }
+
+    // Visibile ma attenuato quando la ricerca è vuota
+    &.inactive {
+        opacity: 0.35;
+        cursor: default;
+        pointer-events: none;
     }
 }
 
@@ -91,10 +101,10 @@
 
 .anagrafe-letter-btn {
     padding: $space-2 $space-3;
-    border-radius: $radius-full;
+    border-radius: $radius-md;          // quadrato, non pill
     border: 1px solid $palette-surface-hover;
     background: transparent;
-    color: $palette-text-secondary;
+    color: $palette-text;               // colore acceso
     cursor: pointer;
     font-size: $text-md;
     font-family: $font-base;
@@ -123,8 +133,9 @@
 
 // ── Risultati ─────────────────────────────────────────────────────────────────
 .anagrafe-section-header {
-    font-size: $text-sm;
-    color: $palette-text-secondary;
+    font-size: $text-md;
+    color: $palette-text-title;         // oro caldo, più acceso del secondary
+    font-weight: $font-weight-bold;
     padding: $space-3 0 $space-2;
     border-bottom: 1px solid $palette-surface-hover;
     margin-top: $space-4;
@@ -186,9 +197,10 @@
 }
 
 .anagrafe-row-badge {
-    font-size: $text-xs;
-    padding: 3px $space-2;
-    border-radius: $radius-full;
+    font-size: $text-sm;
+    font-weight: $font-weight-bold;
+    padding: $space-1 $space-3;
+    border-radius: $radius-md;          // quadrato, coerente con l'alfabeto
     border: 1px solid;
     white-space: nowrap;
     flex-shrink: 0;
