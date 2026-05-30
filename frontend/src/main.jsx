@@ -27,6 +27,7 @@
  */
 
 import { createRoot } from 'react-dom/client'
+import { initIdleDetector } from './utils/idleDetector'
 
 // Importazione di tutti i componenti registrati
 import OnlineUsers     from './components/OnlineUsers'
@@ -163,6 +164,7 @@ window.CT.navigate = (url) => { window.top.location.href = url }
 // evitando race condition tra il caricamento del modulo e il parsing del DOM.
 // --------------------------------------------------------------------------------------------
 document.dispatchEvent(new CustomEvent('ct:ready'))
+initIdleDetector()
 
 // ---------------------------------------------------------------------------
 // PHASE 3.2 / 4b — Intercettore click globale per navigazione React

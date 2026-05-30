@@ -75,7 +75,7 @@ function UserRow({ user }) {
     const openSms = () => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(user.nome)}`)
 
     return (
-        <tr className="presente">
+        <tr className={`presente${user.assente ? ' presente-assente' : ''}`}>
 
             {/* Avatar del personaggio */}
             <td width="10%" style={{ textAlign: 'center' }}>

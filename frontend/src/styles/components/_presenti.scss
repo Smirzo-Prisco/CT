@@ -42,6 +42,13 @@ div.presente {
     text-transform: none;
 }
 
+// Utente assente (altra scheda o inattivo da 60s)
+div.presente-assente,
+tr.presente-assente {
+    opacity: 0.4;
+    transition: opacity $transition-fast;
+}
+
 div.presente a {
     line-height: 0;
     text-transform: none;   // specificità (0,1,2) batte a:link (0,1,1)

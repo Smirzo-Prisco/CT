@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import shared from './shared.module.css'
 
 const HEARTBEAT_MS = 120_000
@@ -15,17 +15,31 @@ export default function OnlineUsers() {
       .catch(console.error)
   }, [])
 
+  const heartbeatRef = useRef(null)
+
   useEffect(() => {
     fetchPresenti()
-
-    const heartbeat = setInterval(() => fetchPresenti(), HEARTBEAT_MS)
+    heartbeatRef.current = setInterval(fetchPresenti, HEARTBEAT_MS)
 
     const sock = window.ctSocket
-    if (sock) sock.on('users:update', () => fetchPresenti())
+    if (sock) sock.on('users:update', fetchPresenti)
+
+    // Pausa heartbeat quando l'utente è assente; ripresa quando torna attivo
+    const onIdle   = () => { clearInterval(heartbeatRef.current); heartbeatRef.current = null }
+    const onActive = () => {
+      if (!heartbeatRef.current) {
+        fetchPresenti()
+        heartbeatRef.current = setInterval(fetchPresenti, HEARTBEAT_MS)
+      }
+    }
+    window.addEventListener('ct:idle',   onIdle)
+    window.addEventListener('ct:active', onActive)
 
     return () => {
-      clearInterval(heartbeat)
-      if (sock) sock.off('users:update')
+      clearInterval(heartbeatRef.current)
+      if (sock) sock.off('users:update', fetchPresenti)
+      window.removeEventListener('ct:idle',   onIdle)
+      window.removeEventListener('ct:active', onActive)
     }
   }, [fetchPresenti])
 
@@ -40,7 +54,7 @@ export default function OnlineUsers() {
           </div>
         ) : (
           users.map(user => (
-            <div key={user.nome} className="presente">
+            <div key={user.nome} className={`presente${user.assente ? ' presente-assente' : ''}`}>
               <a href="#" onClick={e => { e.preventDefault(); openMsg(user.nome) }}>
                 <img src="/themes/crystal/imgs/race_presenti/Sms.png" alt="Messaggio" />
               </a>
