@@ -57,9 +57,10 @@ switch ($op) {
 
         $araldo = gdrcd_query("SELECT id_araldo FROM araldo WHERE tipo = 6 AND proprietari = $mestiere");
         if ($araldo && !empty($araldo['id_araldo'])) {
-            $id = (int)$araldo['id_araldo'];
-            gdrcd_query("INSERT INTO messaggioaraldo (id_messaggio_padre, id_araldo, titolo, messaggio, autore, data_messaggio, data_ultimo_messaggio, anonimo, giornalista)
-                         VALUES ('-1', $id, '$titolo', '$msg', '$login', NOW(), NOW(), 'no', 'no')");
+            $id  = (int)$araldo['id_araldo'];
+            $sql = "INSERT INTO messaggioaraldo (id_messaggio_padre, id_araldo, titolo, messaggio, autore, data_messaggio, data_ultimo_messaggio, anonimo, giornalista)"
+                 . " VALUES ('-1', $id, '$titolo', '$msg', '$login', NOW(), NOW(), 'no', 'no')";
+            gdrcd_query($sql);
         }
 
         echo json_encode(['success' => true, 'message' => 'Ruolo nel mestiere confermato. Esci e rientra per vedere le modifiche.']);
