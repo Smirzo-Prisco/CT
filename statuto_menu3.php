@@ -33,7 +33,7 @@ $id2 = $_GET['id2'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -48,7 +48,7 @@ $id2 = $_GET['id2'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -62,7 +62,7 @@ $id2 = $_GET['id2'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -76,7 +76,7 @@ $id2 = $_GET['id2'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -93,7 +93,7 @@ if ($id == 9) { ?>
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -109,7 +109,7 @@ if ($id == 9) { ?>
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -123,7 +123,7 @@ if ($id == 9) { ?>
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -137,7 +137,7 @@ if ($id == 9) { ?>
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -157,7 +157,7 @@ if ($id2 > 0) { ?>
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -172,7 +172,7 @@ if ($id2 > 0) { ?>
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -186,7 +186,7 @@ if ($id2 > 0) { ?>
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
@@ -200,7 +200,7 @@ if ($id2 > 0) { ?>
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   
