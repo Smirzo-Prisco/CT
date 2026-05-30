@@ -56,6 +56,7 @@ import ScegliMestiere       from './components/ScegliMestiere'
 import MercatoAbilita       from './components/MercatoAbilita'
 import IncrementoParametri  from './components/IncrementoParametri'
 import PrenotazioniProva    from './components/PrenotazioniProva'
+import ServiziGilde         from './components/ServiziGilde'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -193,6 +194,10 @@ const ROUTES = {
     servizi_prenotazioni_prova: {
         component: PrenotazioniProva,
         css: ['/themes/crystal/albergo.css'],
+    },
+    servizi_gilde: {
+        component: ServiziGilde,
+        css: ['/themes/crystal/famiglie.css'],
     },
 }
 
