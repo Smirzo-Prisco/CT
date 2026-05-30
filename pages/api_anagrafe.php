@@ -22,6 +22,7 @@ if (empty($_SESSION['login'])) {
     echo json_encode(['success' => false, 'message' => 'Non autenticato']);
     exit;
 }
+session_write_close();
 
 $op = $_GET['op'] ?? '';
 
@@ -67,7 +68,9 @@ switch ($op) {
         }
         gdrcd_query($res, 'free');
 
-        echo json_encode(['success' => true, 'personaggi' => $list]);
+        $out = json_encode(['success' => true, 'personaggi' => $list], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+        if ($out === false) $out = json_encode(['success' => false, 'message' => 'Errore codifica: ' . json_last_error_msg()]);
+        echo $out;
         break;
 
     default:

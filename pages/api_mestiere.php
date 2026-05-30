@@ -42,7 +42,7 @@ session_write_close();
  * Scarica il buffer, controlla che json_encode sia riuscito, poi invia.
  * Se json_encode fallisce (dati non-UTF8) restituisce un errore leggibile.
  */
-function jsonOut(array $data): void {
+function jsonOut(array $data) {
     ob_end_clean();
     $json = json_encode($data, JSON_UNESCAPED_UNICODE);
     if ($json === false) {

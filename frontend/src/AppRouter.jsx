@@ -172,7 +172,7 @@ const ROUTES = {
     },
     anagrafe: {
         component: Anagrafe,
-        css: ['/themes/crystal/anagrafe.css'],
+        css: ['/themes/crystal/famiglie.css'],
     },
     user_cambio_pass: {
         component: CambioPass,
