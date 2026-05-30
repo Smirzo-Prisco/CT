@@ -1,14 +1,4 @@
 <?php
-// DEBUG: scrive l'ultimo errore su file (funziona anche se Apache fa override della risposta 500)
-register_shutdown_function(function () {
-    $e = error_get_last();
-    $log = __DIR__ . '/mestiere_debug.log';
-    file_put_contents($log, date('H:i:s') . ' ' . json_encode($e) . "\n", FILE_APPEND | LOCK_EX);
-});
-ini_set('error_log',  __DIR__ . '/mestiere_debug.log');
-ini_set('log_errors', '1');
-error_reporting(E_ALL);
-
 session_start();
 header('Content-Type: application/json');
 require_once(__DIR__ . '/../includes/required.php');
@@ -61,7 +51,7 @@ switch ($op) {
         $data     = json_decode(file_get_contents('php://input'), true);
         $mestiere = (int)($data['mestiere'] ?? 0);
         $titolo   = gdrcd_filter('in', "Conferma nel mestiere - $login");
-        $msg      = gdrcd_filter('in', "Il personaggio [b]$login[/b] ha appena confermato il ruolo nel mestiere");
+        $msg      = gdrcd_filter('in', "Il personaggio [b]{$login}[/b] ha appena confermato il ruolo nel mestiere");
 
         gdrcd_query("UPDATE clgpersonaggiomestiere SET conferma_mestiere = 1 WHERE personaggio = '$login'");
 
