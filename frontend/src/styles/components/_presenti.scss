@@ -53,7 +53,7 @@ div.link_presenti {
 .online-user-link {
     font-size: $text-md;
     letter-spacing: 0;
-    text-transform: capitalize;
+    text-transform: none;   // override global a:link { text-transform: uppercase }
 }
 
 div.contenitore_presenti {
@@ -134,9 +134,11 @@ div.pagina_presenti {
 
     // Link interni alla colonna
     a,
+    a:link,
     a:visited {
         border: none;
         color: $color-action;
+        text-transform: none;   // override global a:link { text-transform: uppercase }
     }
 
     a:hover {
