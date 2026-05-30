@@ -54,7 +54,7 @@ export default function OnlineUsers() {
           </div>
         ) : (
           users.map(user => (
-            <div key={user.nome} className={`presente${user.assente ? ' presente-assente' : ''}`}>
+            <div key={user.nome} className={`presente${!user.disponibile ? ' presente-assente' : ''}`}>
               <a href="#" onClick={e => { e.preventDefault(); openMsg(user.nome) }}>
                 <img src="/themes/crystal/imgs/race_presenti/Sms.png" alt="Messaggio" />
               </a>

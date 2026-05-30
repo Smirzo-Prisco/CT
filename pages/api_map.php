@@ -269,7 +269,9 @@ switch ($op) {
     case 'setIdle':
         $login = gdrcd_filter('in', $_SESSION['login']);
         $idle  = !empty($data['idle']) ? 1 : 0;
-        gdrcd_query("UPDATE personaggio SET assente = $idle, ultimo_refresh = NOW() WHERE nome = '$login'");
+        // disponibile=0 → assente, disponibile=1 → presente
+        $disp = $idle ? 0 : 1;
+        gdrcd_query("UPDATE personaggio SET disponibile = $disp, ultimo_refresh = NOW() WHERE nome = '$login'");
         echo json_encode(['success' => true]);
         break;
 
@@ -280,7 +282,7 @@ switch ($op) {
         $login   = gdrcd_filter('in', $_SESSION['login']);
         $is_staff = ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1 || $_SESSION['master'] == 1);
 
-        $q = "UPDATE personaggio SET ultimo_refresh = NOW(), assente = 0";
+        $q = "UPDATE personaggio SET ultimo_refresh = NOW(), disponibile = 1";
         if (isset($_GET['disponibile'])) {
             $disp = gdrcd_filter('num', $_GET['disponibile']);
             $q   .= ", disponibile = $disp";
@@ -296,7 +298,7 @@ switch ($op) {
 
         $result = gdrcd_query(
             "SELECT p.nome, p.cognome, p.permessi, p.sesso, p.id_razza,
-                    p.disponibile, p.is_invisible, p.assente,
+                    p.disponibile, p.is_invisible,
                     m.stanza_apparente, m.nome AS luogo_nome,
                     ru_fam.immagine AS fam_img
              FROM personaggio p
@@ -321,7 +323,6 @@ switch ($op) {
                     'id_razza'         => (int)$row['id_razza'],
                     'disponibile'      => (int)$row['disponibile'],
                     'is_invisible'     => (int)$row['is_invisible'],
-                    'assente'          => (bool)$row['assente'],
                     'luogo_nome'       => $row['stanza_apparente'] ?: ($row['luogo_nome'] ?? ''),
                     'gruppo_img'       => $row['fam_img'] ? 'imgs/guilds/' . $row['fam_img'] : '',
                 ];
@@ -374,7 +375,7 @@ switch ($op) {
         $result = gdrcd_query("
             SELECT
                 p.nome, p.cognome, p.sesso,
-                p.is_invisible, p.assente, p.ultima_mappa, p.ultimo_luogo,
+                p.is_invisible, p.disponibile, p.ultima_mappa, p.ultimo_luogo,
                 p.url_img_chat, p.id_gilda, p.id_ruolo_gilda,
                 r.sing_m, r.sing_f, r.immagine             AS razza_img,
                 m.stanza_apparente,    m.nome              AS stanza_nome,
@@ -410,7 +411,7 @@ switch ($op) {
                 'cognome'       => $row['cognome']       ?? '',
                 'sesso'         => $row['sesso'],
                 'is_invisible'  => (bool)$row['is_invisible'],
-                'assente'       => (bool)$row['assente'],
+                'disponibile'   => (int)$row['disponibile'],
                 'ultima_mappa'  => (int)$row['ultima_mappa'],
                 'ultimo_luogo'  => (int)$row['ultimo_luogo'],
                 'url_img_chat'  => $row['url_img_chat']  ?? '',
