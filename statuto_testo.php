@@ -1,9 +1,6 @@
 <?php
 session_start();
-include('includes/constant_values.inc.php');
-include('config.inc.php');
-include('vocabulary/' . $PARAMETERS['languages']['set'] . '.vocabulary.php');
-include('includes/functions.inc.php');
+require_once('includes/required.php');
 $handleDBConnection = gdrcd_connect();
 $articolo = $_GET['articolo'];
 
