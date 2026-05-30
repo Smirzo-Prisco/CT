@@ -1,27 +1,60 @@
 /**
- * Anagrafe.jsx — Lista personaggi filtrata per lettera iniziale.
+ * Anagrafe.jsx — Lista personaggi con statistiche per razza, ricerca e filtro alfabetico.
  *
- * Recupera i personaggi da api_anagrafe.php?op=getByLetter&letter=X.
- * L'alfabeto è mostrato come barra di navigazione; selezionando una lettera
- * si carica la lista corrispondente. I nomi aprono la scheda personaggio.
- * Le icone gilda/mestiere/razza vengono mostrate come immagini.
+ * Struttura:
+ *   1. Barra statistiche: totale personaggi + conteggio per razza (ruolo/famiglia)
+ *   2. Campo di ricerca istantaneo (filtra per nome e cognome)
+ *   3. Alfabeto: Tutti + A–Z (lettere senza personaggi appaiono disabilitate)
+ *   4. Lista risultati raggruppata per lettera con avatar, nome, sottotitolo e badge razza
  *
- * Stili: /themes/crystal/anagrafe.css (iniettato da AppRouter).
+ * Tutto il filtraggio è client-side: i personaggi vengono caricati una volta sola
+ * da op=getAll e poi filtrati in memoria.
+ *
+ * API: api_anagrafe.php (op=getStats, op=getAll)
+ * Stili: _anagrafe.scss (iniettato via main.scss nel bundle)
  *
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
-/** Naviga via CT.navigate (SPA) se disponibile, altrimenti reload. */
-function navigate(url) {
-    if (window.CT?.navigate) window.CT.navigate(url)
-    else window.top.location.href = url
+// Colori fissi per avatar e badge (derivati dai design token del progetto)
+const AVATAR_COLORS = [
+    '#9a6353', '#3a4f86', '#27ae60', '#e74c3c', '#f39c12',
+    '#17a2b8', '#8e44ad', '#2c3e50', '#16a085', '#d35400',
+]
+
+const BADGE_PALETTES = [
+    { bg: 'rgba(174,231,255,0.12)', border: '#AEE7FF', color: '#AEE7FF' },
+    { bg: 'rgba(39,174,96,0.12)',   border: '#27ae60', color: '#27ae60' },
+    { bg: 'rgba(231,76,60,0.12)',   border: '#e74c3c', color: '#e74c3c' },
+    { bg: 'rgba(243,156,18,0.12)',  border: '#f39c12', color: '#f39c12' },
+    { bg: 'rgba(154,99,83,0.12)',   border: '#9a6353', color: '#9a6353' },
+    { bg: 'rgba(142,68,173,0.12)', border: '#8e44ad', color: '#8e44ad' },
+    { bg: 'rgba(23,162,184,0.12)', border: '#17a2b8', color: '#17a2b8' },
+]
+
+// ── Utilità ───────────────────────────────────────────────────────────────────
+
+function hashStr(str) {
+    let h = 0
+    for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h)
+    return Math.abs(h)
 }
 
-/** Formatta una data nel formato locale italiano. */
+const avatarColor = (nome) => AVATAR_COLORS[hashStr(nome || '') % AVATAR_COLORS.length]
+const badgeStyle  = (nome) => {
+    const p = BADGE_PALETTES[hashStr(nome || '') % BADGE_PALETTES.length]
+    return { background: p.bg, borderColor: p.border, color: p.color }
+}
+const statColor   = (i)    => AVATAR_COLORS[i % AVATAR_COLORS.length]
+
+function initials(nome, cognome) {
+    return ((nome?.[0] ?? '') + (cognome?.[0] ?? '')).toUpperCase()
+}
+
 function formatDate(dateStr) {
     if (!dateStr) return '—'
     const d = new Date(dateStr)
@@ -29,127 +62,184 @@ function formatDate(dateStr) {
     return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
+function navigate(url) {
+    if (window.CT?.navigate) window.CT.navigate(url)
+    else window.top.location.href = url
+}
+
 // ── Componente principale ─────────────────────────────────────────────────────
 
 export default function Anagrafe() {
-    const [letter, setLetter]         = useState(null)
-    const [personaggi, setPersonaggi] = useState([])
-    const [loading, setLoading]       = useState(false)
-    const [error, setError]           = useState(null)
+    const [stats, setStats]       = useState(null)
+    const [allChars, setAllChars] = useState([])
+    const [letter, setLetter]     = useState(null)   // null = Tutti
+    const [search, setSearch]     = useState('')
+    const [loading, setLoading]   = useState(true)
+    const [error, setError]       = useState(null)
 
-    const fetchByLetter = useCallback((l) => {
-        setLetter(l)
-        setLoading(true)
-        setError(null)
-        fetch(`pages/api_anagrafe.php?op=getByLetter&letter=${encodeURIComponent(l)}`)
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) setPersonaggi(d.personaggi)
-                else setError(d.message ?? 'Errore')
+    // Carica statistiche e personaggi in parallelo al mount
+    useEffect(() => {
+        Promise.all([
+            fetch('pages/api_anagrafe.php?op=getStats').then(r => r.json()),
+            fetch('pages/api_anagrafe.php?op=getAll').then(r => r.json()),
+        ])
+            .then(([sData, aData]) => {
+                if (sData.success) setStats(sData)
+                if (aData.success) setAllChars(aData.personaggi)
+                if (!sData.success || !aData.success)
+                    setError(sData.message ?? aData.message ?? 'Errore caricamento dati')
                 setLoading(false)
             })
             .catch(err => { setError(err.message); setLoading(false) })
     }, [])
 
+    // Lettere che contengono almeno un personaggio (per disabilitare le altre)
+    const activeLetters = useMemo(() => {
+        const s = new Set()
+        allChars.forEach(pg => { if (pg.nome?.[0]) s.add(pg.nome[0].toUpperCase()) })
+        return s
+    }, [allChars])
+
+    // Filtro per lettera + ricerca (entrambi client-side)
+    const filtered = useMemo(() => {
+        let list = allChars
+        if (letter)
+            list = list.filter(pg => pg.nome?.[0]?.toUpperCase() === letter)
+        if (search.trim()) {
+            const q = search.trim().toLowerCase()
+            list = list.filter(pg =>
+                pg.nome?.toLowerCase().includes(q) ||
+                pg.cognome?.toLowerCase().includes(q)
+            )
+        }
+        return list
+    }, [allChars, letter, search])
+
+    // Raggruppamento alfabetico dei risultati filtrati
+    const grouped = useMemo(() => {
+        const map = {}
+        filtered.forEach(pg => {
+            const k = pg.nome?.[0]?.toUpperCase() ?? '?'
+            ;(map[k] ??= []).push(pg)
+        })
+        return Object.entries(map).sort(([a], [b]) => a.localeCompare(b))
+    }, [filtered])
+
+    if (loading) return <p><i className="fas fa-spinner fa-spin" /> Caricamento…</p>
+    if (error)   return <p className="error">Errore: {error}</p>
+
     return (
-        <div className="pagina_servizi_prenotazioni">
-            <div className="page_body">
+        <div className="anagrafe">
 
-                <table className="customTable">
-                    <tbody>
-                        <tr className="second_header" style={{ filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.57))' }}>
-                            <td><div>ANAGRAFE</div></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <br /><br />
-
-                {/* Barra alfabetica */}
-                <div className="anagrafe-alphabet">
-                    {ALPHABET.map(l => (
-                        <span
-                            key={l}
-                            className={`anagrafe-letter${letter === l ? ' active' : ''}`}
-                            onClick={() => fetchByLetter(l)}
-                        >
-                            [{l}]
-                        </span>
+            {/* ── Barra statistiche ─────────────────────────────────────────── */}
+            {stats && (
+                <div className="anagrafe-stats">
+                    <div className="anagrafe-stat-card">
+                        <div className="stat-count">{stats.total}</div>
+                        <div className="stat-label">personaggi</div>
+                    </div>
+                    {stats.razze.map((r, i) => (
+                        <div key={r.nome || i} className="anagrafe-stat-card">
+                            <div className="stat-count" style={{ color: statColor(i) }}>{r.count}</div>
+                            <div className="stat-label">{r.nome || '—'}</div>
+                        </div>
                     ))}
                 </div>
+            )}
 
-                {/* Lista risultati */}
-                {loading && (
-                    <p><i className="fas fa-spinner fa-spin"></i> Caricamento…</p>
+            {/* ── Ricerca ───────────────────────────────────────────────────── */}
+            <div className="anagrafe-search-wrap">
+                <input
+                    className="anagrafe-search-input"
+                    type="text"
+                    placeholder="Cerca per nome, cognome…"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                />
+                {search && (
+                    <button className="anagrafe-search-clear" onClick={() => setSearch('')}>
+                        × Azzera
+                    </button>
                 )}
-
-                {error && <p className="error">{error}</p>}
-
-                {!loading && !error && letter && personaggi.length === 0 && (
-                    <p>Nessun personaggio trovato per la lettera "{letter}".</p>
-                )}
-
-                {!loading && !error && personaggi.length > 0 && (
-                    <>
-                        <br /><br />
-                        <table className="customTable">
-                            <thead>
-                                <tr><th colSpan="5">LISTA UTENTI</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr className="second_header">
-                                    <td>NOME E COGNOME</td>
-                                    <td>FAMIGLIA</td>
-                                    <td>LAVORO</td>
-                                    <td>RAZZA</td>
-                                    <td>ULTIMO ACCESSO</td>
-                                </tr>
-                                {personaggi.map(pg => (
-                                    <tr key={pg.nome} className="presente">
-                                        <td>
-                                            <span
-                                                style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                                onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(pg.nome)}`)}
-                                            >
-                                                {pg.nome} {pg.cognome}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            {pg.gilda.img
-                                                ? <img width="25" height="25" src={`imgs/guilds/${pg.gilda.img}`} alt={pg.gilda.nome} title={pg.gilda.nome} />
-                                                : '—'
-                                            }
-                                        </td>
-                                        <td>
-                                            {pg.mestiere.img
-                                                ? <img width="25" height="25" src={`imgs/mestieri/${pg.mestiere.img}`} alt={pg.mestiere.nome} title={pg.mestiere.nome} />
-                                                : '—'
-                                            }
-                                        </td>
-                                        <td>
-                                            {pg.razza.img
-                                                ? <img width="25" height="25" src={`imgs/races/${pg.razza.img}`} alt={pg.razza.nome} title={pg.razza.nome} />
-                                                : '—'
-                                            }
-                                        </td>
-                                        <td>{formatDate(pg.ultimoRefresh)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </>
-                )}
-
-                <div className="panels_link">
-                    <br /><br />
-                    <span
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => navigate('main.php?page=uffici')}
-                    >
-                        Torna indietro
-                    </span>
-                </div>
-
             </div>
+
+            {/* ── Alfabeto ──────────────────────────────────────────────────── */}
+            <div className="anagrafe-alphabet">
+                <button
+                    className={`anagrafe-letter-btn${letter === null ? ' active' : ''}`}
+                    onClick={() => setLetter(null)}
+                >
+                    Tutti
+                </button>
+                {ALPHABET.map(l => (
+                    <button
+                        key={l}
+                        className={[
+                            'anagrafe-letter-btn',
+                            letter === l ? 'active' : '',
+                            !activeLetters.has(l) ? 'disabled' : '',
+                        ].join(' ').trim()}
+                        onClick={() => activeLetters.has(l) && setLetter(l === letter ? null : l)}
+                    >
+                        {l}
+                    </button>
+                ))}
+            </div>
+
+            {/* ── Risultati ─────────────────────────────────────────────────── */}
+            {filtered.length === 0 && (
+                <p className="anagrafe-empty">Nessun personaggio trovato.</p>
+            )}
+
+            {grouped.map(([groupLetter, chars]) => (
+                <div key={groupLetter}>
+                    <div className="anagrafe-section-header">{groupLetter}</div>
+                    {chars.map(pg => {
+                        const parts = [
+                            pg.mestiere?.nome || null,
+                            `livello ${pg.livello}`,
+                            formatDate(pg.ultimoRefresh),
+                        ].filter(Boolean)
+
+                        return (
+                            <div
+                                key={pg.nome}
+                                className="anagrafe-row"
+                                onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(pg.nome)}`)}
+                            >
+                                <div
+                                    className="anagrafe-avatar"
+                                    style={{ background: avatarColor(pg.nome) }}
+                                >
+                                    {initials(pg.nome, pg.cognome)}
+                                </div>
+
+                                <div className="anagrafe-row-info">
+                                    <div className="anagrafe-row-name">{pg.nome} {pg.cognome}</div>
+                                    <div className="anagrafe-row-sub">{parts.join(' — ')}</div>
+                                </div>
+
+                                {pg.razza?.nome && (
+                                    <span
+                                        className="anagrafe-row-badge"
+                                        style={badgeStyle(pg.razza.nome)}
+                                    >
+                                        {pg.razza.nome}
+                                    </span>
+                                )}
+                            </div>
+                        )
+                    })}
+                </div>
+            ))}
+
+            {/* ── Link indietro ─────────────────────────────────────────────── */}
+            <div className="panels_link" style={{ marginTop: '20px' }}>
+                <span style={{ cursor: 'pointer' }} onClick={() => navigate('main.php?page=uffici')}>
+                    Torna indietro
+                </span>
+            </div>
+
         </div>
     )
 }
