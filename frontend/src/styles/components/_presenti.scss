@@ -215,8 +215,9 @@ tr.mappa {
 }
 
 tr.presente a:link,
-a:visited {
+tr.presente a:visited {
     font-size: $text-sm;
-    color: $palette-text-title;
+    color: $color-action;
     font-family: $font-serif;
+    text-transform: none;   // override global a:link { text-transform: uppercase }
 }
