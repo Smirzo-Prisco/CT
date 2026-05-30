@@ -1,76 +1,133 @@
-﻿<?php
+<?php
+/**
+ * statuto_main.php — Pagina statuto gilda o mestiere
+ *
+ * Standalone: niente header.inc.php, niente iframe.
+ * Menu accordion renderizzato inline via PHP.
+ * Testo articolo caricato via fetch → statuto_testo.php?articolo=N
+ * che restituisce solo il frammento HTML del contenuto.
+ */
+
 session_start();
 require_once('includes/required.php');
 $handleDBConnection = gdrcd_connect();
-$id = $_GET['id'];
-$id2 = $_GET['id2'];
 
-//carico l'elenco delle abilità
-if ($id == 1) {
-$background = 'paladini.png';
-} else if ($id == 2) {
-$background = 'demoni.png';
-} else if ($id == 3) {
-$background = 'setta.png';
-} else if ($id == 4) {
-$background = 'custodi.png';
-} else if ($id == 5) {
-$background = 'guardiani.png';
-} else if ($id == 6) {
-$background = 'fiori.png';
-} else if ($id == 7) {
-$background = 'lancaster.png';
-} else if ($id == 8) {
-$background = 'muryu.png';
-} else if ($id == 9) {
-$background = 'manuale_cittadini.png';
-} else if ($id2 == 1) {
-$background = 'icc.png';
-} else if ($id2 == 2) {
-$background = 'tae.png';
-} else if ($id2 == 3) {
-$background = 'magic.png';
-} else if ($id2 == 4) {
-$background = 'pandora.png';
-} else if ($id2 == 6) {
-$background = 'corte.png';
-} elseif ($id2 == 10) {
-$background = 'corte.png';
+$id  = (int)($_GET['id']  ?? 0);
+$id2 = (int)($_GET['id2'] ?? 0);
+
+// Mappa id gilda → immagine di sfondo
+$bgGilde   = [1=>'paladini.png',2=>'demoni.png',3=>'setta.png',4=>'custodi.png',
+               5=>'guardiani.png',6=>'fiori.png',7=>'lancaster.png',8=>'muryu.png',9=>'manuale_cittadini.png'];
+$bgMestieri = [1=>'icc.png',2=>'tae.png',3=>'magic.png',4=>'pandora.png',6=>'corte.png',10=>'corte.png'];
+
+$background = $bgGilde[$id] ?? ($bgMestieri[$id2] ?? null);
+if (!$background) exit;
+
+/**
+ * Renderizza una sezione accordion del menu.
+ * Restituisce HTML stringa o '' se non ci sono articoli.
+ */
+function menuSection($tipo, $campo, $valore, $classe) {
+    $valore = (int)$valore;
+    $res    = gdrcd_query("SELECT articolo, titolo FROM statuti_new WHERE tipo='$tipo' AND $campo='$valore' ORDER BY articolo", 'result');
+    $links  = '';
+    while ($row = gdrcd_query($res, 'fetch')) {
+        $art   = (int)$row['articolo'];
+        $tit   = gdrcd_filter('out', $row['titolo']);
+        $links .= "<a href=\"#\" onclick=\"loadArticolo($art);return false;\">$tit</a><br>\n";
+    }
+    gdrcd_query($res, 'free');
+    if (!$links) return '';
+    return "
+<li>
+  <div class=\"dropdownlink $classe\"><i class=\"fa fa-chevron-down\"></i></div>
+  <ul class=\"submenuItems\"><li><p><center>$links</center></p></li></ul>
+</li>\n";
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css?family=Amatic+SC" rel="stylesheet">
-<link href="themes/crystal/statuti.css" rel="stylesheet" type="text/css">
+<title>CT - Documentazione</title>
+<link rel="stylesheet" href="themes/crystal/statuti.css">
+<link rel="stylesheet" href="themes/crystal/statuto_menu.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-<title>CT - Documentazione</title>  
 </head>
-
-<?php if ($id > 0 || $id2 > 0) { ?>
 <body>
 
 <div id="main-container">
-<div class="chapter"> 
-<img src="themes/crystal/imgs/statuti/<?php echo $background; ?>">
-</div>
-<div class="openmenu">
-<?php if ($id > 0) { ?>
-<iframe name="openmenuframe" src ="statuto_menu3.php?id=<?= $id ?>" class="iframemenu" allowtransparency="true" frameborder="0"></iframe>
-<?php } else if ($id2 > 0) { ?>
-<iframe name="openmenuframe" src ="statuto_menu3.php?id2=<?= $id2 ?>" class="iframemenu" allowtransparency="true" frameborder="0"></iframe>
-<?php } ?>
-</div>
-<div class="content">  
-  <div class="opendoc">
-      <iframe name="opendocframe" src ="statuto_testo.php" class="iframedoc" allowtransparency="true" frameborder="0"></iframe>
+
+  <!-- Immagine di sfondo -->
+  <div class="chapter">
+    <img src="themes/crystal/imgs/statuti/<?= $background ?>">
   </div>
+
+  <!-- Menu accordion (ex iframe openmenuframe) -->
+  <div class="openmenu">
+    <div class="pos-menu">
+      <ul class="accordion-menu">
+        <?php if ($id > 0 && $id < 9):
+            echo menuSection('storia',    'id_gilda', $id, 'ambientazione');
+            echo menuSection('statuto',   'id_gilda', $id, 'regolamento');
+            echo menuSection('skill',     'id_gilda', $id, 'primi_passi');
+            echo menuSection('requisiti', 'id_gilda', $id, 'manuale');
+        endif; ?>
+        <?php if ($id == 9):
+            echo menuSection('cittadini', 'id_gilda', $id, 'cittadini');
+            echo menuSection('sit',       'id_gilda', $id, 'sit');
+            echo menuSection('wiccan',    'id_gilda', $id, 'wikkan');
+            echo menuSection('scorpion',  'id_gilda', $id, 'scorpion');
+        endif; ?>
+        <?php if ($id2 > 0):
+            echo menuSection('storia',    'id_mestiere', $id2, 'statutom');
+            echo menuSection('statuto',   'id_mestiere', $id2, 'descrizione');
+            echo menuSection('skill',     'id_mestiere', $id2, 'cariche');
+            echo menuSection('requisiti', 'id_mestiere', $id2, 'specifiche');
+        endif; ?>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Area contenuto (ex iframe opendocframe) -->
+  <div class="content">
+    <div class="opendoc" id="doc-content"></div>
+  </div>
+
 </div>
-</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+/** Carica il testo di un articolo nel div #doc-content via fetch */
+function loadArticolo(id) {
+    fetch('statuto_testo.php?articolo=' + id)
+        .then(function(r) { return r.text(); })
+        .then(function(html) { document.getElementById('doc-content').innerHTML = html; });
+}
+
+/** Accordion menu */
+$(function () {
+    var Accordion = function (el, multiple) {
+        this.el       = el || {};
+        this.multiple = multiple || false;
+        this.el.find('.dropdownlink').on('click', { el: this.el, multiple: this.multiple }, this.dropdown);
+    };
+
+    Accordion.prototype.dropdown = function (e) {
+        var $el   = e.data.el,
+            $this = $(this),
+            $next = $this.next();
+
+        $next.slideToggle();
+        $this.parent().toggleClass('open');
+
+        if (!e.data.multiple) {
+            $el.find('.submenuItems').not($next).slideUp().parent().removeClass('open');
+        }
+    };
+
+    new Accordion($('.accordion-menu'), false);
+});
+</script>
 </body>
 </html>
-<?php } ?>

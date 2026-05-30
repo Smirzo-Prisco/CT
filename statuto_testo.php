@@ -1,42 +1,39 @@
 <?php
+/**
+ * statuto_testo.php — Restituisce solo il frammento HTML del testo di un articolo.
+ * Chiamato via fetch da statuto_main.php, non più in iframe.
+ */
+
 session_start();
 require_once('includes/required.php');
 $handleDBConnection = gdrcd_connect();
-$articolo = $_GET['articolo'];
 
-$result = gdrcd_query("SELECT * FROM statuti_new WHERE articolo='".$articolo."'");
-$titolo = $result['titolo'];
-$testo = $result['testo'];
+$articolo = (int)($_GET['articolo'] ?? 0);
+if (!$articolo) exit;
 
-$convtesto = ($result['testo']);
-                $convtesto = (str_replace("\n", "<br>", $convtesto));
-                $convtesto = (str_replace("[BR]", "<br>", $convtesto));
-                $convtesto = (str_replace("[B]", "<b>", $convtesto));
-                $convtesto = (str_replace("[/B]", "</b>", $convtesto));
-                $convtesto = (str_replace("[I]", "<i>", $convtesto));
-                $convtesto = (str_replace("[/I]", "</i>", $convtesto));
-                $convtesto = (str_replace("[U]", "<u>", $convtesto));
-                $convtesto = (str_replace("[/U]", "</u>", $convtesto));
-                $convtesto = (str_replace("[C]", "<div align='center'>", $convtesto));
-                $convtesto = (str_replace("[/C]", "</div>", $convtesto));
-                $convtesto = (str_replace("[quote]", "<table border=1 bordercolor=#a9cded align=center width=80%><tr><td>", $convtesto));
-                $convtesto = (str_replace("[/quote]", "</td></tr></table>", $convtesto));
-                $convtesto = (str_replace("[D]", "<div align='right'>", $convtesto));
-                $convtesto = (str_replace("[/D]", "</div>", $convtesto));
+$result = gdrcd_query("SELECT titolo, testo FROM statuti_new WHERE articolo='$articolo'");
+if (!$result) exit;
 
-                $testo = $convtesto;
-?>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="utf-8">
-  <link href="themes/crystal/statuti.css" rel="stylesheet" type="text/css">
-  <title></title>
-</head>
-<body style="background: transparent;">
-<div class="testo">
-<div class="titoli" style="padding-top:20px; padding-bottom:5px;"><?php echo $titolo; ?></div><br>
-<?php echo $testo; ?>
-</div>
-</body>
-</html>
+$titolo = gdrcd_filter('out', $result['titolo'] ?? '');
+$testo  = $result['testo'] ?? '';
+
+$testo = str_replace("\n",       "<br>",                                                   $testo);
+$testo = str_replace("[BR]",     "<br>",                                                   $testo);
+$testo = str_replace("[B]",      "<b>",                                                    $testo);
+$testo = str_replace("[/B]",     "</b>",                                                   $testo);
+$testo = str_replace("[I]",      "<i>",                                                    $testo);
+$testo = str_replace("[/I]",     "</i>",                                                   $testo);
+$testo = str_replace("[U]",      "<u>",                                                    $testo);
+$testo = str_replace("[/U]",     "</u>",                                                   $testo);
+$testo = str_replace("[C]",      "<div align='center'>",                                   $testo);
+$testo = str_replace("[/C]",     "</div>",                                                 $testo);
+$testo = str_replace("[quote]",  "<table border=1 bordercolor=#a9cded align=center width=80%><tr><td>", $testo);
+$testo = str_replace("[/quote]", "</td></tr></table>",                                     $testo);
+$testo = str_replace("[D]",      "<div align='right'>",                                    $testo);
+$testo = str_replace("[/D]",     "</div>",                                                 $testo);
+
+header('Content-Type: text/html; charset=UTF-8');
+echo '<div class="testo">';
+echo '<div class="titoli" style="padding-top:20px;padding-bottom:5px;">' . $titolo . '</div><br>';
+echo $testo;
+echo '</div>';
