@@ -13,24 +13,30 @@ export default function OnlineUsers() {
 
   const fetchPresenti = useCallback(() => {
     fetch('/pages/api_map.php?op=presenti')
-      .then(r => r.json())
+      .then(r  => r.json())
       .then(data => { if (data.success) setUsers(data.users) })
       .catch(console.error)
   }, [])
 
   const heartbeatRef = useRef(null)
+  const isIdleRef    = useRef(false)
 
   useEffect(() => {
     fetchPresenti()
-    // Heartbeat: solo ping silenzioso, gli aggiornamenti UI arrivano via socket
     heartbeatRef.current = setInterval(sendPing, HEARTBEAT_MS)
 
     const sock = window.ctSocket
-    if (sock) sock.on('users:update', fetchPresenti)
+    // Non chiamare fetchPresenti se l'utente è idle: op=presenti resetta
+    // disponibile=1 nel DB, annullando lo stato assente.
+    if (sock) sock.on('users:update', () => { if (!isIdleRef.current) fetchPresenti() })
 
-    // Pausa heartbeat quando l'utente è assente; ripresa quando torna attivo
-    const onIdle   = () => { clearInterval(heartbeatRef.current); heartbeatRef.current = null }
+    const onIdle   = () => {
+      isIdleRef.current = true
+      clearInterval(heartbeatRef.current)
+      heartbeatRef.current = null
+    }
     const onActive = () => {
+      isIdleRef.current = false
       if (!heartbeatRef.current) {
         heartbeatRef.current = setInterval(sendPing, HEARTBEAT_MS)
       }
@@ -40,7 +46,7 @@ export default function OnlineUsers() {
 
     return () => {
       clearInterval(heartbeatRef.current)
-      if (sock) sock.off('users:update', fetchPresenti)
+      if (sock) sock.off('users:update')
       window.removeEventListener('ct:idle',   onIdle)
       window.removeEventListener('ct:active', onActive)
     }

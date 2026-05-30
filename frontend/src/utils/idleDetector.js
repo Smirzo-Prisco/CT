@@ -59,8 +59,11 @@ function setIdleState(idle) {
     window.dispatchEvent(new CustomEvent(idle ? 'ct:idle' : 'ct:active'))
 
     if (idle) {
-        // Ping lento per tenere ultimo_refresh vivo ogni 3 minuti
-        idlePing = setInterval(() => notifyServer(true), IDLE_PING_MS)
+        // Ping lento: solo ultimo_refresh, nessun socket notify (evita rumore)
+        idlePing = setInterval(
+            () => fetch('/pages/api_map.php?op=ping').catch(() => {}),
+            IDLE_PING_MS
+        )
     } else {
         clearInterval(idlePing)
         idlePing = null

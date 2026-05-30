@@ -268,6 +268,7 @@ switch ($op) {
     // -------------------------------------------------------------------------
     case 'ping':
         $login = gdrcd_filter('in', $_SESSION['login']);
+        session_write_close();
         gdrcd_query("UPDATE personaggio SET ultimo_refresh = NOW() WHERE nome = '$login'");
         echo json_encode(['success' => true]);
         break;
@@ -282,6 +283,7 @@ switch ($op) {
         // disponibile=0 → assente, disponibile=1 → presente
         $disp  = $idle ? 0 : 1;
         $luogo = (int)$_SESSION['luogo'];
+        session_write_close();
         gdrcd_query("UPDATE personaggio SET disponibile = $disp, ultimo_refresh = NOW() WHERE nome = '$login'");
         notifySocketServer('users:update',   'loc:' . $luogo);
         notifySocketServer('presenti:update', 'global');
