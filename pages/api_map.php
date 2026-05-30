@@ -270,8 +270,11 @@ switch ($op) {
         $login = gdrcd_filter('in', $_SESSION['login']);
         $idle  = !empty($data['idle']) ? 1 : 0;
         // disponibile=0 → assente, disponibile=1 → presente
-        $disp = $idle ? 0 : 1;
+        $disp  = $idle ? 0 : 1;
+        $luogo = (int)$_SESSION['luogo'];
         gdrcd_query("UPDATE personaggio SET disponibile = $disp, ultimo_refresh = NOW() WHERE nome = '$login'");
+        notifySocketServer('users:update',   'loc:' . $luogo);
+        notifySocketServer('presenti:update', 'global');
         echo json_encode(['success' => true]);
         break;
 
