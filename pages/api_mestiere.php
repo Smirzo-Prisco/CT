@@ -14,4 +14,13 @@ $login = gdrcd_filter('in', $_SESSION['login']);
 $op    = $_GET['op'] ?? '';
 session_write_close();
 
-echo json_encode(['op_received' => $op, 'login' => $login]);
+switch ($op) {
+    case 'getState':
+        $pg          = gdrcd_query("SELECT esperienza, esperienza_mestiere FROM personaggio WHERE nome = '$login'");
+        $exp         = (int)($pg['esperienza'] ?? 0);
+        $expMestiere = (int)($pg['esperienza_mestiere'] ?? 0);
+        echo json_encode(['switch' => 'getState reached', 'exp' => $exp]);
+        break;
+    default:
+        echo json_encode(['switch' => 'default', 'op' => $op]);
+}
