@@ -57,6 +57,7 @@ import MercatoAbilita       from './components/MercatoAbilita'
 import IncrementoParametri  from './components/IncrementoParametri'
 import PrenotazioniProva    from './components/PrenotazioniProva'
 import ServiziGilde         from './components/ServiziGilde'
+import Statuto              from './components/Statuto'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -198,6 +199,13 @@ const ROUTES = {
     servizi_gilde: {
         component: ServiziGilde,
         css: ['/themes/crystal/famiglie.css'],
+    },
+    statuto_main: {
+        component: Statuto,
+        css: [
+            '/themes/crystal/statuto_menu.css',
+            '/themes/crystal/statuto.css',
+        ],
     },
 }
 

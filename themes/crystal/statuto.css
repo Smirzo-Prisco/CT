@@ -1,0 +1,61 @@
+/* statuto.css — Layout statuto gilda/mestiere nella SPA */
+
+#statuto-wrap {
+    position: relative;
+    width: 985px;
+    min-height: 640px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+#statuto-wrap .statuto-bg {
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+#statuto-wrap .statuto-bg img { display: block; }
+
+/* Override z-index:-1 da statuto_menu.css */
+#statuto-wrap .pos-menu {
+    position: absolute;
+    top: 148px;
+    left: 24px;
+    z-index: 1;
+}
+
+#statuto-content {
+    position: absolute;
+    top: 15px;
+    left: 337px;
+    width: 527px;
+    min-height: 400px;
+    max-height: 580px;
+    overflow-y: auto;
+    z-index: 1;
+    padding: 8px;
+}
+
+/* Stili testo articolo (da statuto_testo.php) */
+#statuto-content .titoli {
+    font-family: 'DejaVu Serif', serif;
+    font-size: 16px;
+    color: #ce846f;
+    text-transform: uppercase;
+    font-weight: normal;
+    background-image: url(/imgs/documentazione/barra_titolo.png);
+    background-repeat: no-repeat;
+    text-align: center;
+    padding: 10px;
+    text-shadow: 3px 2px 3px #000;
+}
+
+#statuto-content .testo {
+    font-family: 'DejaVu Serif', serif;
+    font-size: 15px;
+    color: #8f8f8f;
+    line-height: 18px;
+    text-align: justify;
+    padding: 20px;
+}
