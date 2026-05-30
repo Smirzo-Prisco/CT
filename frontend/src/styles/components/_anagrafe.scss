@@ -53,6 +53,8 @@ $search-height: 44px;
 
 .anagrafe-search-input {
     flex: 1;
+    width: 100%;        // override main.css: input { width: 80% }
+    margin-bottom: 0;   // override main.css: input { margin-bottom: 10px }
     height: $search-height;
     box-sizing: border-box;
     background: $palette-surface-input;
