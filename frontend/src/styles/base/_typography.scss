@@ -7,7 +7,7 @@
 
 a,
 a:visited {
-    color: $color-text-light;
+    color: $color-action;
     text-decoration: none;
 }
 
@@ -17,10 +17,8 @@ a:visited {
 a:link {
     font-size: $text-sm;
     letter-spacing: 2px;
-    color: $palette-text-title;
-    font-family: $font-serif;
+    color: $color-action;
     text-align: center;
-    text-transform: uppercase;
 }
 
 a:hover {
@@ -29,7 +27,12 @@ a:hover {
 
 // ── Titoli sezioni engine ─────────────────────────────────────
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     margin-top: 0;
     font-weight: $font-weight-bold;
 }
@@ -83,10 +86,21 @@ div.error {
     color: $color-text-light;
     z-index: 10000;
 
-    &.success { background: $color-success; }
-    &.warning { background: $color-warning; }
-    &.error   { background: $color-danger; }
-    &.info    { background: $color-info; }
+    &.success {
+        background: $color-success;
+    }
+
+    &.warning {
+        background: $color-warning;
+    }
+
+    &.error {
+        background: $color-danger;
+    }
+
+    &.info {
+        background: $color-info;
+    }
 }
 
 .save-loader {
@@ -101,5 +115,7 @@ div.error {
 }
 
 @keyframes ct-spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
