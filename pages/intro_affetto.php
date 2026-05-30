@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 session_start();
 
@@ -108,7 +108,7 @@ $handleDBConnection = gdrcd_connect();
                                 <td class="casella_controlli"><!-- Iconcine dei controlli -->
                                             <!-- Modifica -->
                                             <div style="display:inline-block; float:center; height: 26px; text-align: center;">
-                                                <form action="form_affetto.php?id=<? echo $row['id'] ?>" method="post">
+                                                <form action="form_affetto.php?id=<?php echo $row['id'] ?>" method="post">
                                                     <input type="hidden" name="id"
                                                            value="<?php echo $row['id'] ?>" />
                                                     <input type="hidden" name="op" value="edit" />

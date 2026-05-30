@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 $Login = $_SESSION['login'];
 $pg = $_SESSION['login'];
@@ -40,17 +40,17 @@ if (isset($_POST['submit']) && $_POST['submit']=="Invia")
     <option>Giocata personale</option>
     <option>Giocata di gilda</option>
     <option>Giocata di mestiere</option>
-    <? if ($_SESSION['Master'] > 0) { ?>
+    <?php if ($_SESSION['Master'] > 0) { ?>
     <option>Quest</option>
     <option>Evento</option>
-    <? } ?>
+    <?php } ?>
     </select>
     <br><br>
 
-<? if ($_SESSION['Master'] > 0) { ?> Titolo: 
-<input type=text size=20 name="testo" value="Inserisci titolo" class=ares> (<i>Solo per quest</i>)<br><br><? }?>
+<?php if ($_SESSION['Master'] > 0) { ?> Titolo: 
+<input type=text size=20 name="testo" value="Inserisci titolo" class=ares> (<i>Solo per quest</i>)<br><br><?php }?>
 
-Con <? if ($_SESSION['Master'] > 0) { ?>(<b>Se <u>QUEST</u> o <u>EVENTO</u>: lasciare vuoto questo campo)</b><? }?>: 
+Con <?php if ($_SESSION['Master'] > 0) { ?>(<b>Se <u>QUEST</u> o <u>EVENTO</u>: lasciare vuoto questo campo)</b><?php }?>: 
 <select name="destinatario" class="ares">
 <?
 $result = gdrcd_query("SELECT * FROM personaggio", "result");
@@ -65,10 +65,10 @@ $rs->close;
 <br><br>
 Tuo personaggio: <select name="autore" class="ares">
 <option><?= $pg ?></option>
-    <? if ($_SESSION['Master'] > 0) { ?>
+    <?php if ($_SESSION['Master'] > 0) { ?>
     <option>Master</option>
-    <? } ?>
-</select> <? if ($_SESSION['Master'] > 0) { ?> (<i>Se Quest o Evento, impostare su <B>master</B></i>) <? }?><br><br>
+    <?php } ?>
+</select> <?php if ($_SESSION['Master'] > 0) { ?> (<i>Se Quest o Evento, impostare su <B>master</B></i>) <?php }?><br><br>
 
 
 Luogo:
@@ -103,7 +103,7 @@ Ora:<br>
 	<td width=15% align=center>Data/Ora</td>
     <td width=50% align=center>Informazione</td>
 </tr> 
-<? if ($pg) {
+<?php if ($pg) {
       $sql = "SELECT * FROM appuntamenti WHERE autore = '$pg' ORDER BY str_data ASC, orario ASC";
       $result = gdrcd_query($sql, "result");
       if(gdrcd_query($result, "num_rows") > 0)
@@ -124,7 +124,7 @@ Ora:<br>
 	<td valign=top><font color=white><?= $data ?> alle <?= $orario ?></font></td>
     <td valign=top><font color=white><center><?= $titolo ?> con <?= $destinatario ?></center></font></td>
     <td align=center width="5%">[<a href="main.php?page=agenda_center&op=remove_role&id=<?= $id ?>">X</a>]</td></tr>
-    <? 	}
+    <?php 	}
     }
 }
  ?>
@@ -162,7 +162,7 @@ Ora:<br>
 	<td valign=top><font color=white><?= $data ?> alle <?= $orario ?></font></td>
     <td valign=top><font color=white><center><?= $titolo ?> <b>"<?= $testo ?>"</b> presso <b><?= $luogo ?></b></center></font></td>
     <td align=center width="5%">[<a href="main.php?page=agenda_center&op=remove_role&id=<?= $id ?>">X</a>]</td></tr>
-    <? 	}
+    <?php 	}
     }
 }
  ?>

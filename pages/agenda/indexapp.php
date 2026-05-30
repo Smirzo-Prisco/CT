@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include ("../inc/parametri.inc.php");
 include ("../inc/controllo.php");
@@ -33,7 +33,7 @@ if ($pg == '') {
     <tr>
 	<td valign=top><font color=white><?= $Nome ?></font></td>
     </tr>
-    <? 	}
+    <?php 	}
     }
  ?>
 </table>

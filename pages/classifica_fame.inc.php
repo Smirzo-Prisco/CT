@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../themes/crystal/volti.css">
+﻿<link rel="stylesheet" href="../themes/crystal/volti.css">
 
 <div class="page_body">  
 
@@ -41,7 +41,7 @@
 </td>
 
 </tr>
-<? 
+<?php 
 }
 ?>
 </table><br><br>

@@ -156,7 +156,7 @@ if ($_POST['load_item'] != "") {
                                     // Calcolo dei punti skill restituiti
                                     $puntiRestituiti = calcolaSpesaAcquisto($tipo, $grado);
                                     ?>
-                                    <input type="hidden" name="totale" value="<? echo $puntiRestituiti ?>" />
+                                    <input type="hidden" name="totale" value="<?php echo $puntiRestituiti ?>" />
                                     
                                 </div>
                             </td>
@@ -178,7 +178,7 @@ if ($_POST['load_item'] != "") {
                                             <input type="hidden" name="pg" value="<?php echo $personaggio_selezionato; ?>" />
                                             <input type="hidden" name="op" value="cancella" />
                                             <input type="submit" value="X" />
-                                            <input type="hidden" name="totale" value="<? echo $puntiRestituiti ?>" />
+                                            <input type="hidden" name="totale" value="<?php echo $puntiRestituiti ?>" />
                                         </form>
                                     </div>
                                 </div>

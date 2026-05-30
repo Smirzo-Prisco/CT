@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include ("../inc/parametri.inc.php");
 include ("../inc/controllo.php");
@@ -44,29 +44,29 @@ if (isset($_POST['submit']) && $_POST['submit']=="invia")
     <option>Giocata personale</option>
     <option>Giocata di gilda</option>
     <option>Giocata di mestiere</option>
-    <? if ($_SESSION['Master'] > 0) { ?>
+    <?php if ($_SESSION['Master'] > 0) { ?>
     <option>Quest</option>
     <option>Evento</option>
-    <? } ?>
+    <?php } ?>
     </select>
     <br><br>
 
-<? if ($_SESSION['Master'] > 0) { ?> Titolo: 
-<input type=text size=20 name="testo" value="Inserisci titolo" class=ares> (<i>Solo per quest</i>)<br><br><? }?>
+<?php if ($_SESSION['Master'] > 0) { ?> Titolo: 
+<input type=text size=20 name="testo" value="Inserisci titolo" class=ares> (<i>Solo per quest</i>)<br><br><?php }?>
 
-Con: <input type=text size=20 name="destinatario" value="Inserisci nome" class=ares> <? if ($_SESSION['Master'] > 0) { ?> (<i>Se Quest o Evento, lasciare vuoto questo campo</i>) <? }?><br><br>
+Con: <input type=text size=20 name="destinatario" value="Inserisci nome" class=ares> <?php if ($_SESSION['Master'] > 0) { ?> (<i>Se Quest o Evento, lasciare vuoto questo campo</i>) <?php }?><br><br>
 
 Tuo personaggio: <select name="autore" class="ares">
 <option><?= $pg ?></option>
-    <? if ($_SESSION['Master'] > 0) { ?>
+    <?php if ($_SESSION['Master'] > 0) { ?>
     <option>Master</option>
-    <? } ?>
-</select> <? if ($_SESSION['Master'] > 0) { ?> (<i>Se Quest o Evento, impostare su <B>master</B></i>) <? }?><br><br>
+    <?php } ?>
+</select> <?php if ($_SESSION['Master'] > 0) { ?> (<i>Se Quest o Evento, impostare su <B>master</B></i>) <?php }?><br><br>
 
-<? if ($_SESSION['Master'] > 0) { ?>
+<?php if ($_SESSION['Master'] > 0) { ?>
 Luogo:
 <input name="luogo" type="text" value="Inserisci luogo" class="ares"> (<i>Solo per quest</i>)<br><br>
-<? } ?>
+<?php } ?>
 
 Data:<br>
 <input name="data" type="text" value="<?= date("d-m-Y"); ?>" class="ares"><br><br>
@@ -87,7 +87,7 @@ Data:<br>
 	<td width=15% align=center>Data/Ora</td>
     <td width=50% align=center>Informazione</td>
 </tr> 
-<? if ($pg) {
+<?php if ($pg) {
       include 'config.php';
       $sql = "SELECT * FROM appuntamenti WHERE autore = '$pg'";
       $result = mysql_query($sql) or die (mysql_error());
@@ -108,7 +108,7 @@ Data:<br>
 	<td valign=top><font color=white><?= $data ?></font></td>
     <td valign=top><font color=white><center><?= $titolo ?> con <?= $destinatario ?></center></font></td>
     <td align=center width="5%">[<a href="cancella.php?id=<?= $id ?>">X</a>]</td></tr>
-    <? 	}
+    <?php 	}
     }
 }
  ?>
@@ -146,7 +146,7 @@ Data:<br>
 	<td valign=top><font color=white><?= $data ?></font></td>
     <td valign=top><font color=white><center><?= $titolo ?> <b>"<?= $testo ?>"</b> presso <b><?= $luogo ?></b></center></font></td>
     <td align=center width="5%">[<a href="cancella.php?id=<?= $id ?>">X</a>]</td></tr>
-    <? 	}
+    <?php 	}
     }
 }
  ?>

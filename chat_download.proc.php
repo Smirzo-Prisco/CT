@@ -46,7 +46,7 @@ function SaveToDisk(fileURL, fileName) {
         var save = document.createElement('a');
         save.href = 'chat_download.proc.php';
         save.target = '_blank';
-        save.download = fileName || 'Role del <? echo date('d-m-Y')?>.html';
+        save.download = fileName || 'Role del <?php echo date('d-m-Y')?>.html';
 
         var event = new MouseEvent('click');
         // event.initEvent('click', true, true);

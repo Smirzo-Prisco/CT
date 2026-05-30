@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include ("../inc/parametri.inc.php");
 include ("../inc/controllo.php");
@@ -62,20 +62,20 @@ if (isset($_POST['submit']) && $_POST['submit']=="invia")
     <option>Giocata personale</option>
     <option>Giocata di gilda</option>
     <option>Giocata di mestiere</option>
-    <? if ($_SESSION['Master'] > 0) { ?>
+    <?php if ($_SESSION['Master'] > 0) { ?>
     <option>Quest</option>
     <option>Evento</option>
-    <? } ?>
+    <?php } ?>
     </select>
     <br><br>
 
-<? if ($_SESSION['Master'] > 0) { ?> Titolo: 
-<input type=text size=20 name="testo" value="Inserisci titolo" class=ares> (<i>Solo per quest</i>)<br><br><? }?>
+<?php if ($_SESSION['Master'] > 0) { ?> Titolo: 
+<input type=text size=20 name="testo" value="Inserisci titolo" class=ares> (<i>Solo per quest</i>)<br><br><?php }?>
 
-Con <? if ($_SESSION['Master'] > 0) { ?>(<b>Se <u>QUEST</u> o <u>EVENTO</u>: lasciare vuoto questo campo)</b><? }?>: 
+Con <?php if ($_SESSION['Master'] > 0) { ?>(<b>Se <u>QUEST</u> o <u>EVENTO</u>: lasciare vuoto questo campo)</b><?php }?>: 
 <select name="destinatario" class="ares">
 <option></option>
-<? $MySql = "SELECT * FROM Personaggio WHERE NOT(Nome = 'Luc' OR Nome = 'Luther' OR Nome = 'Luis' OR Nome = 'Jemei' OR Nome = 'Nathan' OR Nome = 'Bjorn' OR Nome = 'James' OR Nome = 'Alisea' OR Nome = 'Reiko' OR Nome = 'Clarisse' OR Nome = 'Darius' OR Nome = 'Darleen' OR Nome = 'Aleksey' OR Nome = 'Klaus')  order by Nome";
+<?php $MySql = "SELECT * FROM Personaggio WHERE NOT(Nome = 'Luc' OR Nome = 'Luther' OR Nome = 'Luis' OR Nome = 'Jemei' OR Nome = 'Nathan' OR Nome = 'Bjorn' OR Nome = 'James' OR Nome = 'Alisea' OR Nome = 'Reiko' OR Nome = 'Clarisse' OR Nome = 'Darius' OR Nome = 'Darleen' OR Nome = 'Aleksey' OR Nome = 'Klaus')  order by Nome";
 $Result = mysql_query($MySql);
 
 while ($rs = mysql_fetch_array($Result)) {
@@ -83,7 +83,7 @@ while ($rs = mysql_fetch_array($Result)) {
 }
 $rs->close;
 ?>
-<? $MySql = "SELECT NomeCorporazione FROM Gilda WHERE NOT(IDGilda = '0')  order by NomeCorporazione";
+<?php $MySql = "SELECT NomeCorporazione FROM Gilda WHERE NOT(IDGilda = '0')  order by NomeCorporazione";
 $Result = mysql_query($MySql);
 
 while ($rs = mysql_fetch_array($Result)) {
@@ -95,16 +95,16 @@ $rs->close;
 <br><br>
 Tuo personaggio: <select name="autore" class="ares">
 <option><?= $pg ?></option>
-    <? if ($_SESSION['Master'] > 0) { ?>
+    <?php if ($_SESSION['Master'] > 0) { ?>
     <option>Master</option>
-    <? } ?>
-</select> <? if ($_SESSION['Master'] > 0) { ?> (<i>Se Quest o Evento, impostare su <B>master</B></i>) <? }?><br><br>
+    <?php } ?>
+</select> <?php if ($_SESSION['Master'] > 0) { ?> (<i>Se Quest o Evento, impostare su <B>master</B></i>) <?php }?><br><br>
 
 
 Luogo:
 <select name="luogo" class="ares">
 <option></option>
-<? $MySql = 'SELECT * FROM Mappa WHERE NOT (ID = 406 OR ID = 407 OR ID = 414) ORDER BY Breve';
+<?php $MySql = 'SELECT * FROM Mappa WHERE NOT (ID = 406 OR ID = 407 OR ID = 414) ORDER BY Breve';
 $Result = mysql_query($MySql);
 
 while ($rs = mysql_fetch_array($Result)) {
@@ -133,7 +133,7 @@ Data:<br>
 	<td width=15% align=center>Data/Ora</td>
     <td width=50% align=center>Informazione</td>
 </tr> 
-<? if ($pg) {
+<?php if ($pg) {
       include 'config.php';
       $sql = "SELECT * FROM appuntamenti WHERE autore = '$pg'";
       $result = mysql_query($sql) or die (mysql_error());
@@ -154,7 +154,7 @@ Data:<br>
 	<td valign=top><font color=white><?= $data ?></font></td>
     <td valign=top><font color=white><center><?= $titolo ?> con <?= $destinatario ?></center></font></td>
     <td align=center width="5%">[<a href="cancella.php?id=<?= $id ?>">X</a>]</td></tr>
-    <? 	}
+    <?php 	}
     }
 }
  ?>
@@ -192,7 +192,7 @@ Data:<br>
 	<td valign=top><font color=white><?= $data ?></font></td>
     <td valign=top><font color=white><center><?= $titolo ?> <b>"<?= $testo ?>"</b> presso <b><?= $luogo ?></b></center></font></td>
     <td align=center width="5%">[<a href="cancella.php?id=<?= $id ?>">X</a>]</td></tr>
-    <? 	}
+    <?php 	}
     }
 }
  ?>

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="themes/crystal/famiglie.css">
+﻿<link rel="stylesheet" href="themes/crystal/famiglie.css">
 <div class="pagina_servizi_adm_gilde">
 
 <!-- Titolo della pagina -->
@@ -191,7 +191,7 @@
     <tr>
     <td>
     <input name="nome" type=hidden value="<?php echo $row['personaggio']; ?>">
-    <img src="imgs/mestieri/<? echo $row['immagine']; ?>" border=0 title="<? echo $row['nome_ruolo']; ?>">
+    <img src="imgs/mestieri/<?php echo $row['immagine']; ?>" border=0 title="<?php echo $row['nome_ruolo']; ?>">
     <b><a href="main.php?page=scheda&pg=<?php echo $row['personaggio']; ?>" target=_top><?php echo  $row['personaggio']; ?></a></b>
     </td>
     

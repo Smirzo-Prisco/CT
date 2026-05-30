@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 /* Includo i file necessari */
@@ -76,10 +76,10 @@ O QUEST <?php } ?>
     <option  <?php if($skill['titolo'] == 'Giocata personale') {echo 'selected';} ?>>Giocata personale</option>
     <option <?php if($skill['titolo'] == 'Giocata di gilda') {echo 'selected';} ?>>Giocata di gilda</option>
     <option <?php if($skill['titolo'] == 'Giocata di mestiere') {echo 'selected';} ?>>Giocata di mestiere</option>
-    <? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+    <?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
     <option <?php if($skill['titolo'] == 'Quest') {echo 'selected';} ?>>Quest</option>
     <option <?php if($skill['titolo'] == 'Evento') {echo 'selected';} ?>>Evento</option>
-    <? } ?>
+    <?php } ?>
     </select>
 </td>
 </tr>
@@ -89,18 +89,18 @@ O QUEST <?php } ?>
 <tr class="second_header">
 <td>
 <b>Tuo personaggio</b>
-<? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+<?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
 <b> o Master</b>
-<? } ?>
+<?php } ?>
 </td>
 </tr>
 <tr>
 <td>
 <select name="autore" class="ares" style="background-color: #0f111d;">
 <option><?= $pg ?></option>
-    <? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+    <?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
     <option>Master</option>
-    <? } ?>
+    <?php } ?>
 </select>
 </td>
 </tr>  
@@ -110,9 +110,9 @@ O QUEST <?php } ?>
 <tr class="second_header">
 <td>
 <b>Giocare con:</b>
-<? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+<?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
 <br><small><u>Se <u>QUEST</u> o <u>EVENTO</u>: lasciare vuoto questo campo</u></small>
-<? } ?>
+<?php } ?>
 </td>
 </tr>
 <tr>
@@ -157,12 +157,12 @@ $rs->close;
 <td>
 <input name="data" type="datetime-local" value="<?=date("Y-m-d");?>T<?=date("H:i");?>" min="<?=date("Y-m-d");?>T<?=date("H:i");?>" class="ares" style="background-color: #0f111d;">
 <!--
-<input name="data" type="text" value="<? if($skill['str_data'] != '--') { echo date('d-m-Y', $skill['str_data']); } else { echo date("d-m-Y"); } ?>" class="ares" style="background-color: #0f111d;">
+<input name="data" type="text" value="<?php if($skill['str_data'] != '--') { echo date('d-m-Y', $skill['str_data']); } else { echo date("d-m-Y"); } ?>" class="ares" style="background-color: #0f111d;">
 <input type=text size=20 name="orario" value="<?php echo $skill['orario']; ?>" class=ares style="background-color: #0f111d;">
 -->
 </td>
 </tr> 
-<? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+<?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
 <tr class="second_header">
 <td>
 <b>Titolo quest:</b>

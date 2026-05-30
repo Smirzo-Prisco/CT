@@ -1,4 +1,4 @@
-<?php include('../ref_header.inc.php'); /*Header comune*/ ?>
+﻿<?php include('../ref_header.inc.php'); /*Header comune*/ ?>
     <!-- Box presenti-->
     <div class="pagina_presenti">
         <div class="page_title">
@@ -253,7 +253,7 @@
 </iframe>
     </div>
         <div id="calendario_role">
-    <a href="../main.php?page=agenda_center&op=add_role" target="_top"">Prenota role <?php if ($_SESSION['Master'] > 0) {?>o Evento<? }?></a>
+    <a href="../main.php?page=agenda_center&op=add_role" target="_top"">Prenota role <?php if ($_SESSION['Master'] > 0) {?>o Evento<?php }?></a>
     </div>
 	
     <!-- Chiudura finestra del gioco -->

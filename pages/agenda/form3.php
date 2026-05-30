@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 /* Includo i file necessari */
@@ -60,10 +60,10 @@ O QUEST <?php } ?>
     <option>Giocata personale</option>
     <option>Giocata di gilda</option>
     <option>Giocata di mestiere</option>
-    <? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+    <?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
     <option>Quest</option>
     <option>Evento</option>
-    <? } ?>
+    <?php } ?>
     </select>
 </td>
 </tr>
@@ -73,18 +73,18 @@ O QUEST <?php } ?>
 <tr class="second_header">
 <td>
 <b>Tuo personaggio</b>
-<? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+<?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
 <b> o Master</b>
-<? } ?>
+<?php } ?>
 </td>
 </tr>
 <tr>
 <td>
 <select name="autore" class="ares">
 <option><?= $pg ?></option>
-    <? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+    <?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
     <option>Master</option>
-    <? } ?>
+    <?php } ?>
 </select>
 </td>
 </tr>  
@@ -94,15 +94,15 @@ O QUEST <?php } ?>
 <tr class="second_header">
 <td>
 <b>Giocare con:</b>
-<? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+<?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
 <br><small><u>Se <u>QUEST</u> o <u>EVENTO</u>: lasciare vuoto questo campo</u></small>
-<? } ?>
+<?php } ?>
 </td>
 </tr>
 <tr>
 <td>
 <select name="destinatario" class="ares">
-<? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+<?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
 <option></option>
 <?
 }
@@ -152,7 +152,7 @@ $rs->close;
 <input type=text size=20 name="orario" value="00:00" class=ares>
 </td>
 </tr> 
-<? if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
+<?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
 <tr class="second_header">
 <td>
 <b>Titolo quest:</b>
@@ -220,7 +220,7 @@ AGENDA DI <font style="text-transform: uppercase;"><?php echo "$pg"; ?></font>
     <td>[<a href="main.php?page=agenda_center&op=remove_role&id=<?= $id ?>">X</a>]
     </td>
     </tr>
-    <? 	}
+    <?php 	}
     }
 }
  ?>
@@ -267,7 +267,7 @@ REGISTRO QUEST
 	<td><?= $data ?> alle <?= $orario ?></td>
     <td><?= $titolo ?> <b>"<?= $testo ?>"</b> presso <b><?= $luogo ?></b></td>
     <td>[<a href="main.php?page=agenda_center&op=remove_role&id=<?= $id ?>">X</a>]</td></tr>
-    <? 	}
+    <?php 	}
     }
 }
  ?>

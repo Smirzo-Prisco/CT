@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 session_start();
 
@@ -71,7 +71,7 @@ $handleDBConnection = gdrcd_connect();
     <body style='background: #070a1b none;'>
     
     <span class="testo_contenuto">
-    <? echo $rs['contenuto']; ?>
+    <?php echo $rs['contenuto']; ?>
     </span>
 
 </body>

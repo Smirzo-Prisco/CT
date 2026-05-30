@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /* Includo i file necessari */
 include('includes/constant_values.inc.php');
 include('config.inc.php');
@@ -49,7 +49,7 @@ if(gdrcd_filter('get', $_REQUEST['op']) == 'search') {
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="documentazione_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?>
+  <?php }//while ?>
   
   <?php } else { ?>
 <div class="titoli" style="background-image: url(../themes/crystal/imgs/documentazione/barra_titolo.png);"><?php echo $titolo; ?></div><br>

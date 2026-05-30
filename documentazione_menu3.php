@@ -35,7 +35,7 @@ $tipo = $_GET['tipo'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="documentazione_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?>
+  <?php }//while ?>
   </p></li>
     </ul>
   </li>
@@ -49,7 +49,7 @@ $tipo = $_GET['tipo'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="documentazione_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   <li>
@@ -62,7 +62,7 @@ $tipo = $_GET['tipo'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="documentazione_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   <li>
@@ -75,7 +75,7 @@ $tipo = $_GET['tipo'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="documentazione_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
   <li>
@@ -88,7 +88,7 @@ $tipo = $_GET['tipo'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="documentazione_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
     <li>
@@ -101,7 +101,7 @@ $tipo = $_GET['tipo'];
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="documentazione_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <? }//while ?></p></li>
+  <?php }//while ?></p></li>
     </ul>
   </li>
 </ul>
