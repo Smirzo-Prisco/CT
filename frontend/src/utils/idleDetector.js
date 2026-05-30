@@ -86,7 +86,7 @@ export function initIdleDetector() {
         document.addEventListener(e, onActivity, { passive: true })
     )
 
-    // Scheda nascosta → assente immediatamente
+    // Scheda nascosta (cambio tab nello stesso browser o minimizzazione) → assente
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             clearTimeout(idleTimer)
@@ -95,6 +95,10 @@ export function initIdleDetector() {
             onActivity()
         }
     })
+
+    // Perdita focus finestra (cambio browser/app, anche senza minimizzare) → assente
+    window.addEventListener('blur',  () => { clearTimeout(idleTimer); setIdleState(true) })
+    window.addEventListener('focus', () => onActivity())
 
     // Avvia il timer dal momento del caricamento
     onActivity()
