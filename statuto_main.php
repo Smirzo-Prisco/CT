@@ -1,14 +1,9 @@
 ﻿<?php
 session_start();
-
-/* Includo i file necessari */
 include('includes/constant_values.inc.php');
 include('config.inc.php');
 include('vocabulary/' . $PARAMETERS['languages']['set'] . '.vocabulary.php');
 include('includes/functions.inc.php');
-require'header.inc.php'; /*Header comune*/
-
-/* Eseguo la connessione al database */
 $handleDBConnection = gdrcd_connect();
 $id = $_GET['id'];
 $id2 = $_GET['id2'];
@@ -47,7 +42,10 @@ $background = 'corte.png';
 }
 
 ?>
+<!DOCTYPE html>
+<html lang="it">
 <head>
+<meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css?family=Amatic+SC" rel="stylesheet">
 <link href="themes/crystal/statuti.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -77,4 +75,5 @@ $background = 'corte.png';
 </div>
 </div>
 </body>
+</html>
 <?php } ?>

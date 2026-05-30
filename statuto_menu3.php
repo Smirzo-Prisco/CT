@@ -1,19 +1,18 @@
 ﻿<?php
-/* Includo i file necessari */
+session_start();
 include('includes/constant_values.inc.php');
 include('config.inc.php');
 include('vocabulary/' . $PARAMETERS['languages']['set'] . '.vocabulary.php');
 include('includes/functions.inc.php');
-require('header.inc.php'); /*Header comune*/
-
-/* Eseguo la connessione al database */
 $handleDBConnection = gdrcd_connect();
 $tipo = $_GET['tipo'];
 $id = $_GET['id'];
 $id2 = $_GET['id2'];
 ?>
-
+<!DOCTYPE html>
+<html lang="it">
 <head>
+<meta charset="utf-8">
     <link href="themes/crystal/statuti.css" rel="stylesheet" type="text/css">
     <link href="themes/crystal/statuto_menu.css" rel="stylesheet" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -246,5 +245,6 @@ $(function () {
 });
 
     </script>
- 
+
 </body>
+</html>
