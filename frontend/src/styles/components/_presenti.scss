@@ -44,6 +44,7 @@ div.presente {
 
 div.presente a {
     line-height: 0;
+    text-transform: none;   // specificità (0,1,2) batte a:link (0,1,1)
 }
 
 div.link_presenti {
