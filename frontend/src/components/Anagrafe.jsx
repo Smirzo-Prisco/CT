@@ -20,20 +20,21 @@ import { useState, useEffect, useMemo } from 'react'
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
-// Colori fissi per avatar e badge (derivati dai design token del progetto)
+// Colori tenui per avatar/stat (leggermente desaturati rispetto ai token)
 const AVATAR_COLORS = [
-    '#9a6353', '#3a4f86', '#27ae60', '#e74c3c', '#f39c12',
-    '#17a2b8', '#8e44ad', '#2c3e50', '#16a085', '#d35400',
+    '#7a5043', '#3a4f86', '#218a4a', '#a83428', '#b07a0a',
+    '#137a8a', '#6a3286', '#1d3040', '#107060', '#9a3800',
 ]
 
+// Badge senza bordo: sfondo leggero + testo più tenue
 const BADGE_PALETTES = [
-    { bg: 'rgba(174,231,255,0.12)', border: '#AEE7FF', color: '#AEE7FF' },
-    { bg: 'rgba(39,174,96,0.12)',   border: '#27ae60', color: '#27ae60' },
-    { bg: 'rgba(231,76,60,0.12)',   border: '#e74c3c', color: '#e74c3c' },
-    { bg: 'rgba(243,156,18,0.12)',  border: '#f39c12', color: '#f39c12' },
-    { bg: 'rgba(154,99,83,0.12)',   border: '#9a6353', color: '#9a6353' },
-    { bg: 'rgba(142,68,173,0.12)', border: '#8e44ad', color: '#8e44ad' },
-    { bg: 'rgba(23,162,184,0.12)', border: '#17a2b8', color: '#17a2b8' },
+    { bg: 'rgba(174,231,255,0.10)', color: '#7aaabb' },
+    { bg: 'rgba(39,174,96,0.10)',   color: '#3d8a52' },
+    { bg: 'rgba(231,76,60,0.10)',   color: '#a04040' },
+    { bg: 'rgba(243,156,18,0.10)',  color: '#9a7820' },
+    { bg: 'rgba(154,99,83,0.10)',   color: '#7a5548' },
+    { bg: 'rgba(142,68,173,0.10)',  color: '#7a4080' },
+    { bg: 'rgba(23,162,184,0.10)',  color: '#2d8090' },
 ]
 
 // ── Utilità ───────────────────────────────────────────────────────────────────
@@ -47,7 +48,7 @@ function hashStr(str) {
 const avatarColor = (nome) => AVATAR_COLORS[hashStr(nome || '') % AVATAR_COLORS.length]
 const badgeStyle  = (nome) => {
     const p = BADGE_PALETTES[hashStr(nome || '') % BADGE_PALETTES.length]
-    return { background: p.bg, borderColor: p.border, color: p.color }
+    return { background: p.bg, color: p.color }
 }
 const statColor   = (i)    => AVATAR_COLORS[i % AVATAR_COLORS.length]
 
