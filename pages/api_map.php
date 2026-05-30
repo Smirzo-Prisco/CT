@@ -263,6 +263,16 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // PING — aggiorna solo ultimo_refresh per tenere il pg nella lista presenti.
+    // Non restituisce dati: gli aggiornamenti UI arrivano via socket (users:update).
+    // -------------------------------------------------------------------------
+    case 'ping':
+        $login = gdrcd_filter('in', $_SESSION['login']);
+        gdrcd_query("UPDATE personaggio SET ultimo_refresh = NOW() WHERE nome = '$login'");
+        echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
     // SET_IDLE — segna il personaggio come assente/presente senza render
     // Aggiorna ultimo_refresh per mantenere il pg visibile nella lista.
     // -------------------------------------------------------------------------

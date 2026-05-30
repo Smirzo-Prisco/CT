@@ -3,15 +3,18 @@ import shared from './shared.module.css'
 
 const HEARTBEAT_MS = 120_000
 
+/** Ping silenzioso: aggiorna solo ultimo_refresh, nessun re-render */
+function sendPing() {
+  fetch('/pages/api_map.php?op=ping').catch(() => {})
+}
+
 export default function OnlineUsers() {
   const [users, setUsers] = useState([])
 
-  const fetchPresenti = useCallback((qs = '') => {
-    fetch('/pages/api_map.php?op=presenti' + qs)
+  const fetchPresenti = useCallback(() => {
+    fetch('/pages/api_map.php?op=presenti')
       .then(r => r.json())
-      .then(data => {
-        if (data.success) setUsers(data.users)
-      })
+      .then(data => { if (data.success) setUsers(data.users) })
       .catch(console.error)
   }, [])
 
@@ -19,7 +22,8 @@ export default function OnlineUsers() {
 
   useEffect(() => {
     fetchPresenti()
-    heartbeatRef.current = setInterval(fetchPresenti, HEARTBEAT_MS)
+    // Heartbeat: solo ping silenzioso, gli aggiornamenti UI arrivano via socket
+    heartbeatRef.current = setInterval(sendPing, HEARTBEAT_MS)
 
     const sock = window.ctSocket
     if (sock) sock.on('users:update', fetchPresenti)
@@ -28,8 +32,7 @@ export default function OnlineUsers() {
     const onIdle   = () => { clearInterval(heartbeatRef.current); heartbeatRef.current = null }
     const onActive = () => {
       if (!heartbeatRef.current) {
-        fetchPresenti()
-        heartbeatRef.current = setInterval(fetchPresenti, HEARTBEAT_MS)
+        heartbeatRef.current = setInterval(sendPing, HEARTBEAT_MS)
       }
     }
     window.addEventListener('ct:idle',   onIdle)
