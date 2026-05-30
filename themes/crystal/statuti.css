@@ -48,7 +48,6 @@ iframe.iframemenu{
 .content{
     position: absolute;
     height: 100%;
-    z-index: -9999;
 }
 
 .opendoc{
