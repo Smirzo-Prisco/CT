@@ -41,6 +41,30 @@ switch ($op) {
         echo json_encode(['success' => true, 'message' => 'Mestiere aggiornato']);
         break;
 
+    case 'pick':
+        $pg = gdrcd_query("SELECT esperienza FROM personaggio WHERE nome = '$login'");
+        if ((int)($pg['esperienza'] ?? 0) < 10) {
+            echo json_encode(['success' => false, 'message' => 'Servono almeno 10 punti esperienza per confermare il mestiere']);
+            exit;
+        }
+
+        $data     = json_decode(file_get_contents('php://input'), true);
+        $mestiere = (int)($data['mestiere'] ?? 0);
+        $titolo   = gdrcd_filter('in', "Conferma nel mestiere - $login");
+        $msg      = gdrcd_filter('in', "Il personaggio [b]$login[/b] ha appena confermato il ruolo nel mestiere");
+
+        gdrcd_query("UPDATE clgpersonaggiomestiere SET conferma_mestiere = 1 WHERE personaggio = '$login'");
+
+        $araldo = gdrcd_query("SELECT id_araldo FROM araldo WHERE tipo = 6 AND proprietari = $mestiere");
+        if ($araldo && !empty($araldo['id_araldo'])) {
+            $id = (int)$araldo['id_araldo'];
+            gdrcd_query("INSERT INTO messaggioaraldo (id_messaggio_padre, id_araldo, titolo, messaggio, autore, data_messaggio, data_ultimo_messaggio, anonimo, giornalista)
+                         VALUES ('-1', $id, '$titolo', '$msg', '$login', NOW(), NOW(), 'no', 'no')");
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Ruolo nel mestiere confermato. Esci e rientra per vedere le modifiche.']);
+        break;
+
     default:
         echo json_encode(['op' => $op]);
 }
