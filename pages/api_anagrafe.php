@@ -41,7 +41,7 @@ switch ($op) {
 
         $res = gdrcd_query(
             "SELECT personaggio.nome, personaggio.cognome, personaggio.ultimo_refresh,
-                    ruolo.nome AS nome_gilda, ruolo.immagine AS img_gilda,
+                    ruolo.nome_ruolo AS nome_gilda, ruolo.immagine AS img_gilda,
                     ruolo_mestiere.nome_ruolo AS nome_mestiere, ruolo_mestiere.immagine AS img_mestiere,
                     razza.sing_m, razza.sing_f, razza.immagine AS img_razza
              FROM personaggio
