@@ -45,9 +45,17 @@ import SchedaAffetti  from './components/SchedaAffetti'
 import SchedaPunti    from './components/SchedaPunti'
 import SchedaEquip    from './components/SchedaEquip'
 import SchedaOggetti  from './components/SchedaOggetti'
-import Gestione       from './components/Gestione'
-import Uffici         from './components/Uffici'
-import RoleRecap      from './components/RoleRecap'
+import Gestione             from './components/Gestione'
+import Uffici               from './components/Uffici'
+import RoleRecap            from './components/RoleRecap'
+import ElencoStaff          from './components/ElencoStaff'
+import ElencoVolti          from './components/ElencoVolti'
+import Anagrafe             from './components/Anagrafe'
+import CambioPass           from './components/CambioPass'
+import ScegliMestiere       from './components/ScegliMestiere'
+import MercatoAbilita       from './components/MercatoAbilita'
+import IncrementoParametri  from './components/IncrementoParametri'
+import PrenotazioniProva    from './components/PrenotazioniProva'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -153,6 +161,38 @@ const ROUTES = {
     role_recap: {
         component: RoleRecap,
         css: [],
+    },
+    elenco_staff: {
+        component: ElencoStaff,
+        css: ['/themes/crystal/famiglie.css'],
+    },
+    elenco_volti: {
+        component: ElencoVolti,
+        css: ['/themes/crystal/volti.css'],
+    },
+    anagrafe: {
+        component: Anagrafe,
+        css: ['/themes/crystal/anagrafe.css'],
+    },
+    user_cambio_pass: {
+        component: CambioPass,
+        css: [],
+    },
+    scegli_mestiere: {
+        component: ScegliMestiere,
+        css: ['/themes/crystal/famiglie.css'],
+    },
+    mercato_abilita_atarashi: {
+        component: MercatoAbilita,
+        css: [],
+    },
+    incremento_parametri: {
+        component: IncrementoParametri,
+        css: ['/themes/crystal/incremento_parametri.css'],
+    },
+    servizi_prenotazioni_prova: {
+        component: PrenotazioniProva,
+        css: ['/themes/crystal/albergo.css'],
     },
 }
 
