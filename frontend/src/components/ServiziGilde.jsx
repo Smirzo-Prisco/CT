@@ -305,7 +305,7 @@ export default function ServiziGilde() {
                                     <a
                                         className="table-title"
                                         href="#"
-                                        onClick={e => { e.preventDefault(); navigate('/documentazione_main.php') }}
+                                        onClick={e => { e.preventDefault(); navigate('main.php?page=documentazione_main') }}
                                     >
                                         AMBIENTAZIONE &amp; REGOLAMENTO
                                     </a>

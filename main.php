@@ -30,7 +30,7 @@ const MIGRATED_PAGES = [
     'role_recap', 'elenco_staff', 'elenco_volti', 'anagrafe',
     'user_cambio_pass', 'scegli_mestiere', 'mercato_abilita_atarashi',
     'incremento_parametri', 'servizi_prenotazioni_prova',
-    'servizi_gilde', 'statuto_main',
+    'servizi_gilde', 'statuto_main', 'documentazione_main',
 ];
 
 // ── DB update per cambio mappa (navigazione PHP diretta) ──────────────────────

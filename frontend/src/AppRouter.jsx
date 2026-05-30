@@ -58,6 +58,7 @@ import IncrementoParametri  from './components/IncrementoParametri'
 import PrenotazioniProva    from './components/PrenotazioniProva'
 import ServiziGilde         from './components/ServiziGilde'
 import Statuto              from './components/Statuto'
+import Documentazione       from './components/Documentazione'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -205,6 +206,13 @@ const ROUTES = {
         css: [
             '/themes/crystal/statuto_menu.css',
             '/themes/crystal/statuto.css',
+        ],
+    },
+    documentazione_main: {
+        component: Documentazione,
+        css: [
+            '/themes/crystal/documentazione_menu.css',
+            '/themes/crystal/documentazione_spa.css',
         ],
     },
 }

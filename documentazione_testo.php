@@ -1,59 +1,61 @@
-﻿<?php
-/* Includo i file necessari */
-include('includes/constant_values.inc.php');
-include('config.inc.php');
-include('vocabulary/' . $PARAMETERS['languages']['set'] . '.vocabulary.php');
-include('includes/functions.inc.php');
-require('header.inc.php'); /*Header comune*/
+<?php
+/**
+ * documentazione_testo.php — Frammento HTML testo articolo o risultati ricerca.
+ * Chiamato via fetch da documentazione_main.php e Documentazione.jsx.
+ */
 
-/* Eseguo la connessione al database */
+session_start();
+require_once('includes/required.php');
 $handleDBConnection = gdrcd_connect();
-$articolo = $_GET['articolo'];
 
-$result = gdrcd_query("SELECT * FROM regolamento WHERE articolo='".$articolo."'");
-$titolo = $result['titolo'];
-$testo = $result['testo'];
+$op      = $_REQUEST['op'] ?? '';
+$ricerca = trim($_POST['ricerca'] ?? '');
 
-$convtesto = ($result['testo']);
-                $convtesto = (str_replace("\n", "<br>", $convtesto));
-                $convtesto = (str_replace("[BR]", "<br>", $convtesto));
-                $convtesto = (str_replace("[B]", "<b>", $convtesto));
-                $convtesto = (str_replace("[/B]", "</b>", $convtesto));
-                $convtesto = (str_replace("[I]", "<i>", $convtesto));
-                $convtesto = (str_replace("[/I]", "</i>", $convtesto));
-                $convtesto = (str_replace("[U]", "<u>", $convtesto));
-                $convtesto = (str_replace("[/U]", "</u>", $convtesto));
-                $convtesto = (str_replace("[C]", "<div align='center'>", $convtesto));
-                $convtesto = (str_replace("[/C]", "</div>", $convtesto));
-                $convtesto = (str_replace("[quote]", "<table border=1 bordercolor=#a9cded align=center width=80%><tr><td>", $convtesto));
-                $convtesto = (str_replace("[/quote]", "</td></tr></table>", $convtesto));
-                $convtesto = (str_replace("[D]", "<div align='right'>", $convtesto));
-                $convtesto = (str_replace("[/D]", "</div>", $convtesto));
+header('Content-Type: text/html; charset=UTF-8');
 
-                $testo = $convtesto;
-?>
-<head>
-  <meta charset="utf-8">
-  <link href="themes/crystal/documentazione.css" rel="stylesheet" type="text/css">
-  <title></title>
-</head>
-<body style="background: transparent;">
-<div class="testo">
+if ($op === 'search' && $ricerca !== '') {
+    $safe = gdrcd_filter('in', $ricerca);
+    echo '<div class="testo">';
+    echo '<div class="titoli">PAROLA CERCATA: ' . gdrcd_filter('out', $ricerca) . '</div><br>';
+    $res = gdrcd_query(
+        "SELECT articolo, titolo FROM regolamento WHERE (titolo LIKE '%$safe%' OR testo LIKE '%$safe%') ORDER BY articolo",
+        'result'
+    );
+    while ($row = gdrcd_query($res, 'fetch')) {
+        $art = (int)$row['articolo'];
+        $tit = gdrcd_filter('out', $row['titolo']);
+        echo "<center><a href=\"#\" class=\"doc-link\" data-articolo=\"$art\">$tit</a><br></center>\n";
+    }
+    gdrcd_query($res, 'free');
+    echo '</div>';
+    exit;
+}
 
-<?php 
-$ricerca = $_POST['ricerca'];
-if(gdrcd_filter('get', $_REQUEST['op']) == 'search') {
-?>
-<div class="titoli" style="background-image: url(../themes/crystal/imgs/documentazione/barra_titolo.png);"><b>PAROLA CERCATA</b>: <?php echo $ricerca; ?></div><br>
-  <?php $query = "SELECT * FROM regolamento WHERE (titolo LIKE '%$ricerca%' OR testo LIKE '%$ricerca%')  ORDER BY articolo";
-  $result = gdrcd_query($query, 'result');
-  while ($row = gdrcd_query($result, 'fetch')) { ?>
-  <center><a href="documentazione_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" target="opendocframe"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
-  <?php }//while ?>
-  
-  <?php } else { ?>
-<div class="titoli" style="background-image: url(../themes/crystal/imgs/documentazione/barra_titolo.png);"><?php echo $titolo; ?></div><br>
-<?php echo $testo; ?>
-</div>
-<?php } ?>
-</body>
+$articolo = (int)($_GET['articolo'] ?? 0);
+if (!$articolo) exit;
+
+$result = gdrcd_query("SELECT titolo, testo FROM regolamento WHERE articolo='$articolo'");
+if (!$result) exit;
+
+$titolo = gdrcd_filter('out', $result['titolo'] ?? '');
+$testo  = $result['testo'] ?? '';
+
+$testo = str_replace("\n",       "<br>",                                                                   $testo);
+$testo = str_replace("[BR]",     "<br>",                                                                   $testo);
+$testo = str_replace("[B]",      "<b>",                                                                    $testo);
+$testo = str_replace("[/B]",     "</b>",                                                                   $testo);
+$testo = str_replace("[I]",      "<i>",                                                                    $testo);
+$testo = str_replace("[/I]",     "</i>",                                                                   $testo);
+$testo = str_replace("[U]",      "<u>",                                                                    $testo);
+$testo = str_replace("[/U]",     "</u>",                                                                   $testo);
+$testo = str_replace("[C]",      "<div align='center'>",                                                   $testo);
+$testo = str_replace("[/C]",     "</div>",                                                                 $testo);
+$testo = str_replace("[quote]",  "<table border=1 bordercolor=#a9cded align=center width=80%><tr><td>",   $testo);
+$testo = str_replace("[/quote]", "</td></tr></table>",                                                     $testo);
+$testo = str_replace("[D]",      "<div align='right'>",                                                    $testo);
+$testo = str_replace("[/D]",     "</div>",                                                                 $testo);
+
+echo '<div class="testo">';
+echo '<div class="titoli" style="padding-top:20px;padding-bottom:5px;">' . $titolo . '</div><br>';
+echo $testo;
+echo '</div>';
