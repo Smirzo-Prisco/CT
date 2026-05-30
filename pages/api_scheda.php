@@ -27,6 +27,7 @@ if (empty($_SESSION['login'])) {
     echo json_encode(['success' => false, 'message' => 'Non autenticato']);
     exit;
 }
+session_write_close();
 
 $op = $_GET['op'] ?? '';
 $pg = gdrcd_filter('in', $_GET['pg'] ?? '');

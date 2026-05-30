@@ -27,6 +27,9 @@ const MIGRATED_PAGES = [
     'scheda_equip', 'scheda_oggetti',
     'scheda_px', 'scheda_px_shin', 'scheda_px_mestiere',
     'gestione', 'uffici',
+    'role_recap', 'elenco_staff', 'elenco_volti', 'anagrafe',
+    'user_cambio_pass', 'scegli_mestiere', 'mercato_abilita_atarashi',
+    'incremento_parametri', 'servizi_prenotazioni_prova',
 ];
 
 // ── DB update per cambio mappa (navigazione PHP diretta) ──────────────────────

@@ -21,6 +21,7 @@ if (empty($_SESSION['login'])) {
     echo json_encode(['success' => false, 'message' => 'Non autenticato']);
     exit;
 }
+session_write_close();
 
 $op  = $_GET['op'] ?? '';
 $LOG = __DIR__ . '/../log.html';

@@ -14,6 +14,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         echo json_encode(['error' => 'Non autenticato']);
         exit;
     }
+    session_write_close();
 
     $json_data = file_get_contents('php://input');
     $data = json_decode($json_data, true);

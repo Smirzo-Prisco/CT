@@ -33,6 +33,10 @@ if (empty($_SESSION['login'])) {
 
 $login = gdrcd_filter('in', $_SESSION['login']);
 $op    = $_GET['op'] ?? '';
+// Rilascia il lock della sessione — la leggiamo solo, non la scriviamo.
+// Senza questo, le richieste concorrenti (sidebar) si accodano e possono
+// causare timeout silenzioso ("Unexpected end of JSON input").
+session_write_close();
 
 /**
  * Scarica il buffer, controlla che json_encode sia riuscito, poi invia.
