@@ -56,11 +56,12 @@ function buildPersonaggiList(string $where, array $soglie): array {
     $res = gdrcd_query(
         "SELECT personaggio.nome, personaggio.cognome, personaggio.ultimo_refresh,
                 (COALESCE(personaggio.car2,0)+COALESCE(personaggio.car4,0)+COALESCE(personaggio.car6,0)+COALESCE(personaggio.car8,0)) AS tot_stats,
-                ruolo.nome_ruolo AS nome_gilda, ruolo.immagine AS img_gilda,
+                gilda.nome AS nome_gilda, ruolo.immagine AS img_gilda,
                 ruolo_mestiere.nome_ruolo AS nome_mestiere, ruolo_mestiere.immagine AS img_mestiere,
                 razza.sing_m, razza.immagine AS img_razza
          FROM personaggio
          LEFT JOIN ruolo          ON personaggio.id_ruolo_gilda    = ruolo.id_ruolo
+         LEFT JOIN gilda           ON ruolo.gilda                   = gilda.id_gilda
          LEFT JOIN ruolo_mestiere ON personaggio.id_ruolo_mestiere = ruolo_mestiere.id_ruolo
          LEFT JOIN razza           ON personaggio.id_razza          = razza.id_razza
          WHERE $where
@@ -98,18 +99,19 @@ switch ($op) {
         )['c'] ?? 0);
 
         $rRes  = gdrcd_query(
-            "SELECT ruolo.nome_ruolo, ruolo.immagine, COUNT(*) AS cnt
+            "SELECT gilda.nome AS nome_gilda, ruolo.immagine, COUNT(*) AS cnt
              FROM personaggio
-             LEFT JOIN ruolo ON personaggio.id_ruolo_gilda = ruolo.id_ruolo
+             LEFT JOIN ruolo  ON personaggio.id_ruolo_gilda = ruolo.id_ruolo
+             LEFT JOIN gilda  ON ruolo.gilda                = gilda.id_gilda
              WHERE (personaggio.esilio < NOW() OR personaggio.esilio IS NULL)
-             GROUP BY ruolo.id_ruolo
+             GROUP BY gilda.id_gilda
              ORDER BY cnt DESC",
             'result'
         );
         $razze = [];
         while ($r = gdrcd_query($rRes, 'fetch')) {
             $razze[] = [
-                'nome'  => gdrcd_filter('out', $r['nome_ruolo'] ?? ''),
+                'nome'  => gdrcd_filter('out', $r['nome_gilda'] ?? ''),
                 'img'   => $r['immagine'] ?? '',
                 'count' => (int)$r['cnt'],
             ];
