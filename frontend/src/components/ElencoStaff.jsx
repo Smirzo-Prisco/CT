@@ -5,6 +5,8 @@
  * Coordinatori, Master, Moderatori, Guide. Ogni nome è cliccabile e apre
  * la scheda del personaggio via SPA.
  *
+ * Stili: /themes/crystal/famiglie.css (customTable, second_header).
+ *
  * @author Crystal Tokyo Dev
  */
 
@@ -14,29 +16,6 @@ import { useState, useEffect } from 'react'
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
     else window.top.location.href = url
-}
-
-// ── Sotto-componenti ──────────────────────────────────────────────────────────
-
-function StaffSection({ title, members }) {
-    return (
-        <div className="staff-section">
-            <div className="staff-section-title">{title}</div>
-            {members.length === 0
-                ? <div className="staff-empty">—</div>
-                : members.map(nome => (
-                    <div
-                        key={nome}
-                        className="staff-member"
-                        onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(nome)}`)}
-                    >
-                        <i className="fas fa-user"></i>
-                        <span>{nome}</span>
-                    </div>
-                ))
-            }
-        </div>
-    )
 }
 
 // ── Componente principale ─────────────────────────────────────────────────────
@@ -57,49 +36,56 @@ export default function ElencoStaff() {
             .catch(err => { setError(err.message); setLoading(false) })
     }, [])
 
+    if (loading) return <p><i className="fas fa-spinner fa-spin"></i> Caricamento…</p>
+    if (error)   return <p className="error">{error}</p>
+
+    const sections = [
+        { key: 'coordinatori', label: 'COORDINATORI' },
+        { key: 'master',       label: 'MASTER' },
+        { key: 'moderatori',   label: 'MODERATORI' },
+        { key: 'guide',        label: 'GUIDE' },
+    ]
+
     return (
-        <div id="staff-app">
-            <div className="container">
-
-                <header>
-                    <h1><i className="fas fa-shield-alt"></i> Staff</h1>
-                    <p className="subtitle">Personaggi con ruoli speciali di gestione</p>
-                </header>
-
-                {loading && (
-                    <div className="no-results">
-                        <i className="fas fa-spinner fa-spin"></i>
-                        <h3>Caricamento…</h3>
-                    </div>
-                )}
-
-                {error && (
-                    <div className="no-results">
-                        <i className="fas fa-exclamation-triangle"></i>
-                        <h3>Errore nel caricamento</h3>
-                        <p>{error}</p>
-                    </div>
-                )}
-
-                {staff && (
-                    <div className="staff-grid">
-                        <StaffSection title="Coordinatori" members={staff.coordinatori} />
-                        <StaffSection title="Master"       members={staff.master} />
-                        <StaffSection title="Moderatori"   members={staff.moderatori} />
-                        <StaffSection title="Guide"        members={staff.guide} />
-                    </div>
-                )}
-
-                <div className="panels_link" style={{ marginTop: '24px' }}>
-                    <span
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => navigate('main.php?page=uffici')}
-                    >
-                        Torna indietro
-                    </span>
-                </div>
-
+        <>
+            <table className="customTable">
+                <tbody>
+                    {sections.map(({ key, label }) => (
+                        <>
+                            <tr className="second_header" key={`hdr-${key}`}>
+                                <td>{label}</td>
+                            </tr>
+                            <tr key={`row-${key}`}>
+                                <td>
+                                    {staff[key].length === 0
+                                        ? <span>—</span>
+                                        : staff[key].map((nome, i) => (
+                                            <span key={nome}>
+                                                <span
+                                                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                                    onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(nome)}`)}
+                                                >
+                                                    {nome}
+                                                </span>
+                                                <br />
+                                            </span>
+                                        ))
+                                    }
+                                </td>
+                            </tr>
+                        </>
+                    ))}
+                </tbody>
+            </table>
+            <br /><br />
+            <div className="panels_link">
+                <span
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate('main.php?page=uffici')}
+                >
+                    Torna indietro
+                </span>
             </div>
-        </div>
+        </>
     )
 }

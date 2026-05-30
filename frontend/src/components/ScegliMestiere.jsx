@@ -25,17 +25,23 @@ function navigate(url) {
 // ── Componente principale ─────────────────────────────────────────────────────
 
 export default function ScegliMestiere() {
-    const [state, setState]     = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [msg, setMsg]         = useState(null)   // { type: 'ok'|'err', text }
+    const [state, setState]       = useState(null)
+    const [loading, setLoading]   = useState(true)
+    const [fetchError, setFetchError] = useState(null)
+    const [msg, setMsg]           = useState(null)   // { type: 'ok'|'err', text }
 
     const fetchState = useCallback(() => {
         setLoading(true)
         setMsg(null)
+        setFetchError(null)
         fetch('pages/api_mestiere.php?op=getState')
             .then(r => r.json())
-            .then(d => { if (d.success) setState(d); setLoading(false) })
-            .catch(() => setLoading(false))
+            .then(d => {
+                if (d.success) setState(d)
+                else setFetchError(d.message ?? 'Errore sconosciuto')
+                setLoading(false)
+            })
+            .catch(err => { setFetchError(err.message); setLoading(false) })
     }, [])
 
     useEffect(() => { fetchState() }, [fetchState])
@@ -54,7 +60,7 @@ export default function ScegliMestiere() {
     }
 
     if (loading) return <p><i className="fas fa-spinner fa-spin"></i> Caricamento…</p>
-    if (!state)  return <p className="error">Impossibile caricare i dati.</p>
+    if (fetchError) return <p className="error">Errore: {fetchError}</p>
 
     const { step, esperienza, expMestiere, mestieri, hasConferma } = state
 
