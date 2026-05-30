@@ -9,28 +9,45 @@
  *   POST ?op=pick       — Conferma il mestiere corrente e lo blocca.
  *   POST ?op=levelUp    — Avanza a un livello inferiore del mestiere corrente.
  *
- * Tutte le query usano throwOnError=true: in caso di errore SQL viene lanciata
- * una Exception invece di chiamare die(), così il try-catch restituisce JSON
- * invece di HTML corrotto.
+ * Protezioni errori:
+ *  - ob_start() cattura qualsiasi output spurio (warning, die) prima del JSON
+ *  - catch (\Throwable) cattura sia Exception che Error (PHP 7+)
+ *  - jsonOut() verifica che json_encode non restituisca false (dati non-UTF8)
  *
  * @author Crystal Tokyo Dev
  */
 
+ob_start();
 session_start();
 header('Content-Type: application/json');
 
 require_once(__DIR__ . '/../includes/required.php');
 require_once(__DIR__ . '/../includes/custom_functions.inc.php');
-$handleDBConnection = gdrcd_connect();
+gdrcd_connect();
 
 if (empty($_SESSION['login'])) {
-    http_response_code(401);
+    ob_end_clean();
     echo json_encode(['success' => false, 'message' => 'Non autenticato']);
     exit;
 }
 
 $login = gdrcd_filter('in', $_SESSION['login']);
 $op    = $_GET['op'] ?? '';
+
+/**
+ * Scarica il buffer, controlla che json_encode sia riuscito, poi invia.
+ * Se json_encode fallisce (dati non-UTF8) restituisce un errore leggibile.
+ */
+function jsonOut(array $data): void {
+    ob_end_clean();
+    $json = json_encode($data, JSON_UNESCAPED_UNICODE);
+    if ($json === false) {
+        echo json_encode(['success' => false, 'message' => 'Errore codifica JSON: ' . json_last_error_msg()]);
+    } else {
+        echo $json;
+    }
+    exit;
+}
 
 try {
 
@@ -41,32 +58,29 @@ switch ($op) {
     // -------------------------------------------------------------------------
     case 'getState':
         $pg          = gdrcd_query("SELECT esperienza, esperienza_mestiere, id_mestiere, id_ruolo_mestiere FROM personaggio WHERE nome = '$login'", 'query', true);
-        $exp         = (int)($pg['esperienza'] ?? 0);
+        $exp         = (int)($pg['esperienza']         ?? 0);
         $expMestiere = (int)($pg['esperienza_mestiere'] ?? 0);
 
         $conferma       = gdrcd_query("SELECT conferma_mestiere, id_ruolo FROM clgpersonaggiomestiere WHERE personaggio = '$login'", 'query', true);
         $hasConferma    = $conferma && (int)$conferma['conferma_mestiere'] >= 1;
         $currentIdRuolo = $conferma ? (int)$conferma['id_ruolo'] : 0;
 
-        // step 2 → scelta libera / step 3 → avanzamento
         $step = $hasConferma ? 3 : 2;
 
         if ($step === 2) {
-            // Tutti i mestieri di livello 3 (grado base)
             $res      = gdrcd_query("SELECT id_ruolo, nome_ruolo, immagine, mestiere FROM ruolo_mestiere WHERE livello_mestiere = 3 ORDER BY nome_ruolo", 'result', true);
             $mestieri = [];
             while ($row = gdrcd_query($res, 'fetch')) {
                 $mestieri[] = [
                     'id'       => (int)$row['id_ruolo'],
-                    'nome'     => gdrcd_filter('out', $row['nome_ruolo']),
-                    'immagine' => $row['immagine'],
+                    'nome'     => gdrcd_filter('out', (string)$row['nome_ruolo']),
+                    'immagine' => (string)$row['immagine'],
                     'mestiere' => (int)$row['mestiere'],
                     'selected' => ((int)$row['id_ruolo'] === $currentIdRuolo),
                 ];
             }
             gdrcd_query($res, 'free');
         } else {
-            // step 3 → livelli inferiori del mestiere corrente (sotto il livello attuale)
             $res      = gdrcd_query(
                 "SELECT rm.id_ruolo, rm.nome_ruolo, rm.immagine, rm.mestiere, rm.livello_mestiere
                  FROM personaggio p
@@ -85,16 +99,14 @@ switch ($op) {
             );
             $mestieri = [];
             while ($row = gdrcd_query($res, 'fetch')) {
-                // Controlla se è sbloccabile in base all'esperienza mestiere
                 $livello  = (int)$row['livello_mestiere'];
-                $unlocked = false;
-                if ($expMestiere >= 55 && $livello > 1) $unlocked = true;
-                elseif ($expMestiere >= 10 && $expMestiere < 55 && $livello > 2) $unlocked = true;
+                $unlocked = ($expMestiere >= 55 && $livello > 1)
+                          || ($expMestiere >= 10 && $expMestiere < 55 && $livello > 2);
 
                 $mestieri[] = [
                     'id'       => (int)$row['id_ruolo'],
-                    'nome'     => gdrcd_filter('out', $row['nome_ruolo']),
-                    'immagine' => $row['immagine'],
+                    'nome'     => gdrcd_filter('out', (string)$row['nome_ruolo']),
+                    'immagine' => (string)$row['immagine'],
                     'mestiere' => (int)$row['mestiere'],
                     'livello'  => $livello,
                     'unlocked' => $unlocked,
@@ -103,7 +115,7 @@ switch ($op) {
             gdrcd_query($res, 'free');
         }
 
-        echo json_encode([
+        jsonOut([
             'success'        => true,
             'step'           => $step,
             'esperienza'     => $exp,
@@ -112,7 +124,6 @@ switch ($op) {
             'currentIdRuolo' => $currentIdRuolo,
             'mestieri'       => $mestieri,
         ]);
-        break;
 
     // -------------------------------------------------------------------------
     // change — imposta/cambia il mestiere di livello 3
@@ -120,10 +131,10 @@ switch ($op) {
     case 'change':
         $data     = json_decode(file_get_contents('php://input'), true);
         $idRuolo  = (int)($data['id_record'] ?? 0);
-        $mestiere = (int)($data['mestiere'] ?? 0);
+        $mestiere = (int)($data['mestiere']  ?? 0);
 
         if (!$idRuolo || !$mestiere) {
-            echo json_encode(['success' => false, 'message' => 'Dati mancanti']); break;
+            jsonOut(['success' => false, 'message' => 'Dati mancanti']);
         }
 
         $existing = gdrcd_query("SELECT id_ruolo FROM clgpersonaggiomestiere WHERE personaggio = '$login'", 'result', true);
@@ -135,8 +146,7 @@ switch ($op) {
         gdrcd_query($existing, 'free');
         gdrcd_query("UPDATE personaggio SET id_mestiere = $mestiere, id_ruolo_mestiere = $idRuolo WHERE nome = '$login'", 'query', true);
 
-        echo json_encode(['success' => true, 'message' => 'Mestiere aggiornato']);
-        break;
+        jsonOut(['success' => true, 'message' => 'Mestiere aggiornato']);
 
     // -------------------------------------------------------------------------
     // pick — conferma il mestiere e lo blocca; pubblica messaggio in bacheca
@@ -144,25 +154,24 @@ switch ($op) {
     case 'pick':
         $pg = gdrcd_query("SELECT esperienza FROM personaggio WHERE nome = '$login'", 'query', true);
         if ((int)($pg['esperienza'] ?? 0) < 10) {
-            echo json_encode(['success' => false, 'message' => 'Servono almeno 10 punti esperienza per confermare il mestiere']); break;
+            jsonOut(['success' => false, 'message' => 'Servono almeno 10 punti esperienza per confermare il mestiere']);
         }
 
         $data     = json_decode(file_get_contents('php://input'), true);
         $mestiere = (int)($data['mestiere'] ?? 0);
-        $titolo   = "Conferma nel mestiere - $login";
-        $msg      = "Il personaggio [b]$login[/b] ha appena confermato il ruolo nel mestiere";
+        $titolo   = gdrcd_filter('in', "Conferma nel mestiere - $login");
+        $msg      = gdrcd_filter('in', "Il personaggio [b]$login[/b] ha appena confermato il ruolo nel mestiere");
 
         gdrcd_query("UPDATE clgpersonaggiomestiere SET conferma_mestiere = 1 WHERE personaggio = '$login'", 'query', true);
 
         $araldo = gdrcd_query("SELECT id_araldo FROM araldo WHERE tipo = 6 AND proprietari = $mestiere", 'query', true);
-        if ($araldo && $araldo['id_araldo']) {
+        if ($araldo && !empty($araldo['id_araldo'])) {
             $id = (int)$araldo['id_araldo'];
             gdrcd_query("INSERT INTO messaggioaraldo (id_messaggio_padre, id_araldo, titolo, messaggio, autore, data_messaggio, data_ultimo_messaggio, anonimo, giornalista)
                          VALUES ('-1', $id, '$titolo', '$msg', '$login', NOW(), NOW(), 'no', 'no')", 'query', true);
         }
 
-        echo json_encode(['success' => true, 'message' => 'Ruolo nel mestiere confermato. Ricarica la pagina per vedere le modifiche.']);
-        break;
+        jsonOut(['success' => true, 'message' => 'Ruolo nel mestiere confermato. Esci e rientra per vedere le modifiche.']);
 
     // -------------------------------------------------------------------------
     // levelUp — avanza al livello inferiore del mestiere corrente
@@ -170,24 +179,22 @@ switch ($op) {
     case 'levelUp':
         $data     = json_decode(file_get_contents('php://input'), true);
         $idRuolo  = (int)($data['id_record'] ?? 0);
-        $mestiere = (int)($data['mestiere'] ?? 0);
+        $mestiere = (int)($data['mestiere']  ?? 0);
 
         if (!$idRuolo || !$mestiere) {
-            echo json_encode(['success' => false, 'message' => 'Dati mancanti']); break;
+            jsonOut(['success' => false, 'message' => 'Dati mancanti']);
         }
 
         gdrcd_query("UPDATE clgpersonaggiomestiere SET id_ruolo = $idRuolo WHERE personaggio = '$login'", 'query', true);
         gdrcd_query("UPDATE personaggio SET id_mestiere = $mestiere, id_ruolo_mestiere = $idRuolo WHERE nome = '$login'", 'query', true);
 
-        echo json_encode(['success' => true, 'message' => 'Livello mestiere aggiornato']);
-        break;
+        jsonOut(['success' => true, 'message' => 'Livello mestiere aggiornato']);
 
     default:
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Operazione non valida']);
+        jsonOut(['success' => false, 'message' => 'Operazione non valida']);
 }
 
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+} catch (\Throwable $e) {
+    // Cattura sia Exception che Error (PHP 7+)
+    jsonOut(['success' => false, 'message' => $e->getMessage()]);
 }
