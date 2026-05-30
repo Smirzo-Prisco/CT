@@ -20,21 +20,21 @@ import { useState, useEffect, useMemo } from 'react'
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
-// Colori tenui per avatar/stat (leggermente desaturati rispetto ai token)
+// Colori originali leggermente schiariti per leggibilità su sfondo scuro
 const AVATAR_COLORS = [
-    '#7a5043', '#3a4f86', '#218a4a', '#a83428', '#b07a0a',
-    '#137a8a', '#6a3286', '#1d3040', '#107060', '#9a3800',
+    '#c07a68', '#5572b0', '#35cc72', '#f07060', '#f5b030',
+    '#25bcd4', '#b058d0', '#5080a0', '#22c4a8', '#f07020',
 ]
 
-// Badge senza bordo: sfondo leggero + testo più tenue
+// Badge senza bordo: sfondo leggero + testo acceso ma non violento
 const BADGE_PALETTES = [
-    { bg: 'rgba(174,231,255,0.10)', color: '#7aaabb' },
-    { bg: 'rgba(39,174,96,0.10)',   color: '#3d8a52' },
-    { bg: 'rgba(231,76,60,0.10)',   color: '#a04040' },
-    { bg: 'rgba(243,156,18,0.10)',  color: '#9a7820' },
-    { bg: 'rgba(154,99,83,0.10)',   color: '#7a5548' },
-    { bg: 'rgba(142,68,173,0.10)',  color: '#7a4080' },
-    { bg: 'rgba(23,162,184,0.10)',  color: '#2d8090' },
+    { bg: 'rgba(174,231,255,0.12)', color: '#AEE7FF' },
+    { bg: 'rgba(53,204,114,0.12)',  color: '#35cc72' },
+    { bg: 'rgba(240,112,96,0.12)',  color: '#f07060' },
+    { bg: 'rgba(245,176,48,0.12)',  color: '#f5b030' },
+    { bg: 'rgba(192,122,104,0.12)', color: '#c07a68' },
+    { bg: 'rgba(176,88,208,0.12)',  color: '#b058d0' },
+    { bg: 'rgba(37,188,212,0.12)',  color: '#25bcd4' },
 ]
 
 // ── Utilità ───────────────────────────────────────────────────────────────────

@@ -42,19 +42,23 @@
 }
 
 // ── Ricerca ───────────────────────────────────────────────────────────────────
+$search-height: 44px;
+
 .anagrafe-search-wrap {
     display: flex;
     gap: $space-2;
     margin-bottom: $space-4;
-    align-items: stretch;   // input e button stessa altezza
+    align-items: center;
 }
 
 .anagrafe-search-input {
     flex: 1;
+    height: $search-height;
+    box-sizing: border-box;
     background: $palette-surface-input;
     border: 1px solid $palette-surface-hover;
     border-radius: $radius-xl;
-    padding: $space-3 $space-5;
+    padding: 0 $space-5;
     color: $palette-text;
     font-size: $text-lg;
     font-family: $font-base;
@@ -70,10 +74,12 @@
 }
 
 .anagrafe-search-clear {
+    height: $search-height;
+    box-sizing: border-box;
     background: $palette-surface-raised;
     border: 1px solid $palette-surface-hover;
     border-radius: $radius-xl;
-    padding: 0 $space-5;                // verticale gestito da align-items: stretch
+    padding: 0 $space-5;
     color: $palette-text;
     cursor: pointer;
     font-size: $text-lg;
