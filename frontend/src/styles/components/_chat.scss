@@ -727,7 +727,7 @@ div.form_row {
 .chat-action-controls {
     display: flex;
     align-items: center;
-    width: 100%;
+    flex: 1;
     gap: $space-1;
     flex-wrap: nowrap;
     justify-content: space-between;
