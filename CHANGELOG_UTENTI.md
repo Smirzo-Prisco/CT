@@ -1,5 +1,23 @@
 # Novità — Crystal Tokyo
 
+## Cosa c'è di nuovo
+
+- 🔔 **Forum** — l'icona segnala i thread non letti in tempo reale, senza dover entrare
+- ⚔️ **Icona giocate** — si illumina automaticamente quando è in corso una role nella tua stanza
+- ❤️ **Cura** — recuperi +10 PS salute al giorno gratis, senza bisogno di una giocata
+- 🧬 **Combattimento** — nuovo sistema con avvisi di attacco, pulsanti di difesa istantanei (dado / scudo / subisci), esiti provvisori visibili in chat e riepilogo a fine turno con card dettagliate
+- 🌀 **Attacchi mentali** — introdotti effetti di durata e regole per i comandi mentali; l'integrità è ora unificata a 100 punti per tutti
+- 🛡️ **Devia attacco** — puoi tentare di annullare un attacco fisico o con arma con un tiro di Destrezza
+- 🎨 **Interfaccia rinnovata** — palette colori aggiornata, layout colonne riorganizzato, icone di navigazione con etichette
+- 💬 **Chattina OFF** — integrata nella colonna sinistra, sempre visibile, con indicatore di chi sta scrivendo
+- ✉️ **Messaggi privati** — ridisegnati con separazione netta ON/OFF, thread e notifiche in tempo reale
+- 📋 **Anagrafe** — sezione rinnovata con un layout più chiaro
+- 👤 **Utenti inattivi** — i personaggi inattivi sono ora riconoscibili a colpo d'occhio
+- 📜 **Regolamento e statuti** — si aprono direttamente nel gioco, senza uscire dalla schermata principale
+- 📍 **Nome del luogo cliccabile** — raggiunge la stanza direttamente, senza passare dalla mappa
+- 🏠 **Chat vuota** — mostra la descrizione del luogo con immagine e testo quando non c'è nessuna role in corso
+- 🚪 **Iscrizione** — modulo riprogettato, più chiaro e accessibile anche da mobile
+
 ---
 
 ## Notifiche forum
@@ -107,6 +125,30 @@ La barra comandi della chat è stata riorganizzata: il campo TAG si trova ora so
 ## Collegamento rapido al luogo
 
 Il nome del luogo corrente nella colonna sinistra è ora cliccabile: permette di raggiungere direttamente la stanza senza passare dalla mappa.
+
+---
+
+## Sistema di cura
+
+È possibile recuperare **+10 PS salute al giorno** gratuitamente, senza bisogno di una giocata.
+
+---
+
+## Restyling sezione anagrafe
+
+La sezione anagrafe è stata ridisegnata con un layout aggiornato.
+
+---
+
+## Visualizzazione utente inattivo
+
+I personaggi inattivi sono ora riconoscibili a colpo d'occhio grazie a un indicatore dedicato.
+
+---
+
+## Regolamento e statuti nella pagina
+
+Regolamento, ambientazione e statuti delle famiglie/mestieri si aprono direttamente all'interno del gioco, senza uscire dalla schermata principale.
 
 ---
 
