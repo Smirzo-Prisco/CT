@@ -119,7 +119,7 @@ function ModificaPG() {
 
 function GestionePng() {
     // Stato creazione
-    const [newPng, setNewPng] = useState({ nome: '', salute: 100, destrezza: 7, potere: 7, mente: 7, tempra: 7 })
+    const [newPng, setNewPng] = useState({ pngName: '', salute: 100, destrezza: 7, potere: 7, mente: 7, tempra: 7 })
     const [creating, setCreating]   = useState(false)
     const [createMsg, setCreateMsg] = useState('')
 
@@ -160,7 +160,7 @@ function GestionePng() {
     }
 
     function createPng() {
-        if (!newPng.nome.trim()) return
+        if (!newPng.pngName.trim()) return
         setCreating(true)
         setCreateMsg('')
         fetch('pages/api_chat.php?op=newMasterPng', {
@@ -173,7 +173,7 @@ function GestionePng() {
                 setCreateMsg(d.message ?? '')
                 setCreating(false)
                 if (d.success) {
-                    setNewPng({ nome: '', salute: 100, destrezza: 7, potere: 7, mente: 7, tempra: 7 })
+                    setNewPng({ pngName: '', salute: 100, destrezza: 7, potere: 7, mente: 7, tempra: 7 })
                     loadPngList()
                 }
             })
@@ -210,8 +210,8 @@ function GestionePng() {
             {/* ── Crea PNG ── */}
             <div className="gdr-form-group">
                 <label className="gdr-label">Nome PNG</label>
-                <input className="gdr-input" value={newPng.nome} placeholder="Nome PNG"
-                    onChange={e => setNewPng(f => ({ ...f, nome: e.target.value }))} />
+                <input className="gdr-input" value={newPng.pngName} placeholder="Nome PNG"
+                    onChange={e => setNewPng(f => ({ ...f, pngName: e.target.value }))} />
             </div>
             <div className="gdr-form-group">
                 <label className="gdr-label">Salute</label>
