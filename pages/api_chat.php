@@ -1161,13 +1161,21 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         case 'newMasterPng':
             if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
             $location = $_SESSION['luogo'];
-            $id_role = locationActiveRole($location);
-            $pngName = gdrcd_filter('post', $data['pngName']);
+            $id_role  = locationActiveRole($location);
+            $pngName  = gdrcd_filter('post', $data['pngName']);
+            if (!$pngName) { echo json_encode(['success' => false, 'message' => 'Nome PNG mancante']); exit; }
+
             $pngSalute    = max(1, min(200, (int)($data['salute']    ?? 100)));
             $pngDestrezza = max(1, min(20,  (int)($data['destrezza'] ?? 7)));
             $pngPotere    = max(1, min(20,  (int)($data['potere']    ?? 7)));
             $pngMente     = max(1, min(20,  (int)($data['mente']     ?? 7)));
             $pngTempra    = max(1, min(20,  (int)($data['tempra']    ?? 7)));
+
+            // Se non c'è una role attiva nella stanza, ne apre una nuova
+            if (!$id_role) {
+                gdrcd_query("INSERT INTO role_sessions (`location`, `start`) VALUES ($location, NOW())");
+                $id_role = (int)gdrcd_query("SELECT LAST_INSERT_ID() AS id")['id'];
+            }
 
             // Inserisce o aggiorna il png nella tabella personaggi
             $existingPng = gdrcd_query("SELECT nome FROM personaggio WHERE nome = '$pngName'", 'result');
@@ -1180,6 +1188,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             }
 
             addPgToRole($id_role, $pngName, $location, 1);
+            notifySocketServer('role:update', 'loc:' . $location);
 
             echo json_encode(['success' => true, 'message' => 'PNG aggiunto con successo!']);
             break;
