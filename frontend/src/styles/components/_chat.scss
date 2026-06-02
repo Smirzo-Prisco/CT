@@ -728,9 +728,34 @@ div.form_row {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: $space-2;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    gap: $space-1;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+
+    // Il contatore testo occupa lo spazio disponibile e può stringersi
+    .gdr-char-counter {
+        flex: 1 1 auto;
+        min-width: 0;
+        white-space: nowrap;
+        margin-top: 0;
+        text-align: right;
+    }
+
+    // Il pannello sessione si espande ma non prende tutta la larghezza
+    .gdr-session-status {
+        flex: 0 1 auto;
+        min-width: 0;
+        margin: 0 4px;
+        padding: $space-1 10px;
+    }
+
+    // Le icone hanno larghezza fissa ridotta
+    > a {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .chat-avvia-btn {
@@ -1426,6 +1451,14 @@ button.chat_button {
         order: 3;
         width: 100%;
         justify-content: center;
+    }
+
+    // Dentro chat-action-controls il session-status NON va a capo su riga propria
+    .chat-action-controls .gdr-session-status {
+        order: 0;
+        width: auto;
+        margin: 0 4px;
+        justify-content: flex-start;
     }
 
     div.casella_chat {
