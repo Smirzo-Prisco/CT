@@ -486,11 +486,10 @@ export default function ChatShell() {
                                             </a>
                                         )}
                                         {pulsanti.is_staff && (
-                                            <a href="#" onClick={e => { e.preventDefault(); setMasterPanelOpen(true) }}>
-                                                <img title="Pannello Master" src="themes/crystal/imgs/chat/master_panel.png" className="chat_icon"
-                                                    onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='inline' }}
-                                                />
-                                                <span style={{ display:'none', fontSize:'18px', cursor:'pointer' }} title="Pannello Master">⚙</span>
+                                            <a href="#" onClick={e => { e.preventDefault(); setMasterPanelOpen(true) }}
+                                               title="Pannello Master"
+                                               style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:'24px', height:'24px', background:'linear-gradient(135deg,#7b2d8b,#4a1060)', borderRadius:'50%', color:'#e8c9f5', fontWeight:'bold', fontSize:'13px', fontFamily:'serif', textDecoration:'none', boxShadow:'0 0 5px rgba(180,80,220,0.5)', cursor:'pointer' }}>
+                                                M
                                             </a>
                                         )}
                                         {/* Cura pg: sopra la textarea, fuori dal pannello per renderlo accessibile a tutti */}

@@ -160,7 +160,7 @@ function GestionePng() {
     }
 
     function createPng() {
-        if (!newPng.pngName.trim()) return
+        if (!newPng.pngName.trim()) { setCreateMsg('Inserire il nome del PNG.'); return }
         setCreating(true)
         setCreateMsg('')
         fetch('pages/api_chat.php?op=newMasterPng', {
@@ -415,14 +415,10 @@ export default function MasterPanel({ isOpen, onClose }) {
 
                     <br /><br />
 
-                    {/* Modifica PG + Gestione PNG */}
+                    {/* Modifica PG + Gestione PNG + Attacchi PNG in sospeso */}
                     <div className="gdr-grid">
                         <ModificaPG />
                         <GestionePng />
-                    </div>
-
-                    {/* Attacchi PNG in sospeso */}
-                    <div style={{ marginTop: '20px' }}>
                         <AttacchiPngSospeso />
                     </div>
 
