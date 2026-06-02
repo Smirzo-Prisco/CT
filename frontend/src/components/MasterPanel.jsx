@@ -118,7 +118,7 @@ function ModificaPG() {
 // ── Crea PNG ──────────────────────────────────────────────────────────────────
 
 function CreaPng() {
-    const [newPng, setNewPng] = useState({ pngName: '', salute: 100, destrezza: 7, potere: 7, mente: 7, tempra: 7 })
+    const [newPng, setNewPng] = useState({ pngName: '', salute: 100, destrezza: '', potere: '', mente: '', tempra: '' })
     const [creating, setCreating]   = useState(false)
     const [createMsg, setCreateMsg] = useState('')
 
@@ -136,7 +136,7 @@ function CreaPng() {
                 setCreateMsg(d.message ?? '')
                 setCreating(false)
                 if (d.success) {
-                    setNewPng({ pngName: '', salute: 100, destrezza: 7, potere: 7, mente: 7, tempra: 7 })
+                    setNewPng({ pngName: '', salute: 100, destrezza: '', potere: '', mente: '', tempra: '' })
                     window.dispatchEvent(new CustomEvent('png-created'))
                 }
             })
