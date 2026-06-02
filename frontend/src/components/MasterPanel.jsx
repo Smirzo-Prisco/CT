@@ -115,49 +115,12 @@ function ModificaPG() {
     )
 }
 
-// ── Gestione PNG ──────────────────────────────────────────────────────────────
+// ── Crea PNG ──────────────────────────────────────────────────────────────────
 
-function GestionePng() {
-    // Stato creazione
+function CreaPng() {
     const [newPng, setNewPng] = useState({ pngName: '', salute: 100, destrezza: 7, potere: 7, mente: 7, tempra: 7 })
     const [creating, setCreating]   = useState(false)
     const [createMsg, setCreateMsg] = useState('')
-
-    // Stato attacco
-    const [pngList, setPngList]             = useState([])
-    const [selectedPng, setSelectedPng]     = useState('')
-    const [pgList, setPgList]               = useState([])
-    const [message, setMessage]             = useState('')
-    const [car, setCar]                     = useState('destrezza')
-    const [selectedTargets, setTargets]     = useState([])
-    const [damagePercent, setDamagePercent] = useState(100)
-    const [sending, setSending]             = useState(false)
-    const [sendMsg, setSendMsg]             = useState('')
-
-    // Carica la lista PNG attivi
-    const loadPngList = useCallback(() => {
-        fetch('pages/api_roleSession.php?op=getPngRolePlaying')
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    const list = d.png ?? []
-                    setPngList(list)
-                    setSelectedPng(prev => (list.includes(prev) ? prev : (list[0] ?? '')))
-                }
-            })
-    }, [])
-
-    // Carica i PG attivi (bersagli) al mount
-    useEffect(() => {
-        loadPngList()
-        fetch('pages/api_roleSession.php?op=getRolePgs', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => { if (d.success) setPgList(d.users ?? []) })
-    }, [loadPngList])
-
-    function toggleTarget(name) {
-        setTargets(prev => prev.includes(name) ? prev.filter(t => t !== name) : [...prev, name])
-    }
 
     function createPng() {
         if (!newPng.pngName.trim()) { setCreateMsg('Inserire il nome del PNG.'); return }
@@ -174,40 +137,14 @@ function GestionePng() {
                 setCreating(false)
                 if (d.success) {
                     setNewPng({ pngName: '', salute: 100, destrezza: 7, potere: 7, mente: 7, tempra: 7 })
-                    loadPngList()
+                    window.dispatchEvent(new CustomEvent('png-created'))
                 }
-            })
-    }
-
-    function sendAttack() {
-        if (!selectedPng) { setSendMsg('Seleziona un PNG.'); return }
-        if (selectedTargets.length === 0) { setSendMsg('Seleziona almeno un bersaglio.'); return }
-        setSending(true)
-        setSendMsg('')
-        fetch('pages/api_chat.php?op=newMasterPngAttack', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({
-                pngName:       selectedPng,
-                pngMessage:    message,
-                pngCar:        car,
-                targets:       selectedTargets,
-                damagePercent,
-            }),
-        })
-            .then(r => r.json())
-            .then(d => {
-                setSendMsg(d.message ?? '')
-                setSending(false)
-                if (d.success) { setMessage(''); setTargets([]) }
             })
     }
 
     return (
         <div className="gdr-card">
-            <div className="gdr-card-title">Gestione PNG</div>
-
-            {/* ── Crea PNG ── */}
+            <div className="gdr-card-title">Crea PNG</div>
             <div className="gdr-form-group">
                 <label className="gdr-label">Nome PNG</label>
                 <input className="gdr-input" value={newPng.pngName} placeholder="Nome PNG"
@@ -242,11 +179,79 @@ function GestionePng() {
                 {creating ? 'Aggiunta…' : 'Aggiungi PNG'}
             </button>
             {createMsg && <p style={{ color: '#8cba8c', marginTop: '6px', fontSize: '12px' }}>{createMsg}</p>}
+        </div>
+    )
+}
 
-            <hr style={{ margin: '14px 0', borderColor: '#2a2f4a' }} />
+// ── Gestione PNG ──────────────────────────────────────────────────────────────
 
-            {/* ── Attacca con PNG ── */}
-            <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '10px', color: '#ccc' }}>Attacco PNG</div>
+function GestionePng() {
+    const [pngList, setPngList]             = useState([])
+    const [selectedPng, setSelectedPng]     = useState('')
+    const [pgList, setPgList]               = useState([])
+    const [message, setMessage]             = useState('')
+    const [car, setCar]                     = useState('destrezza')
+    const [selectedTargets, setTargets]     = useState([])
+    const [damagePercent, setDamagePercent] = useState(100)
+    const [sending, setSending]             = useState(false)
+    const [sendMsg, setSendMsg]             = useState('')
+
+    const loadPngList = useCallback(() => {
+        fetch('pages/api_roleSession.php?op=getPngRolePlaying')
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    const list = d.png ?? []
+                    setPngList(list)
+                    setSelectedPng(prev => (list.includes(prev) ? prev : (list[0] ?? '')))
+                }
+            })
+    }, [])
+
+    useEffect(() => {
+        loadPngList()
+        fetch('pages/api_roleSession.php?op=getRolePgs', { method: 'POST' })
+            .then(r => r.json())
+            .then(d => { if (d.success) setPgList(d.users ?? []) })
+    }, [loadPngList])
+
+    // Aggiorna la lista quando CreaPng crea un nuovo PNG
+    useEffect(() => {
+        window.addEventListener('png-created', loadPngList)
+        return () => window.removeEventListener('png-created', loadPngList)
+    }, [loadPngList])
+
+    function toggleTarget(name) {
+        setTargets(prev => prev.includes(name) ? prev.filter(t => t !== name) : [...prev, name])
+    }
+
+    function sendAttack() {
+        if (!selectedPng) { setSendMsg('Seleziona un PNG.'); return }
+        if (selectedTargets.length === 0) { setSendMsg('Seleziona almeno un bersaglio.'); return }
+        setSending(true)
+        setSendMsg('')
+        fetch('pages/api_chat.php?op=newMasterPngAttack', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+                pngName:       selectedPng,
+                pngMessage:    message,
+                pngCar:        car,
+                targets:       selectedTargets,
+                damagePercent,
+            }),
+        })
+            .then(r => r.json())
+            .then(d => {
+                setSendMsg(d.message ?? '')
+                setSending(false)
+                if (d.success) { setMessage(''); setTargets([]) }
+            })
+    }
+
+    return (
+        <div className="gdr-card">
+            <div className="gdr-card-title">Gestione PNG</div>
             {pngList.length === 0 ? (
                 <p style={{ fontSize: '12px', color: '#8f8f8f' }}>Nessun PNG attivo.</p>
             ) : (
@@ -415,9 +420,10 @@ export default function MasterPanel({ isOpen, onClose }) {
 
                     <br /><br />
 
-                    {/* Modifica PG + Gestione PNG + Attacchi PNG in sospeso */}
+                    {/* Modifica PG + Crea PNG + Gestione PNG + Attacchi PNG in sospeso */}
                     <div className="gdr-grid">
                         <ModificaPG />
+                        <CreaPng />
                         <GestionePng />
                         <AttacchiPngSospeso />
                     </div>
