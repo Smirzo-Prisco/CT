@@ -1159,19 +1159,231 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             break;
         case 'newMasterPng':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
             $location = $_SESSION['luogo'];
-            $id_role = locationActiveRole($location); // Recupera l'eventuale role attiva nella chat
+            $id_role = locationActiveRole($location);
             $pngName = gdrcd_filter('post', $data['pngName']);
+            $pngSalute    = max(1, min(200, (int)($data['salute']    ?? 100)));
+            $pngDestrezza = max(1, min(20,  (int)($data['destrezza'] ?? 7)));
+            $pngPotere    = max(1, min(20,  (int)($data['potere']    ?? 7)));
+            $pngMente     = max(1, min(20,  (int)($data['mente']     ?? 7)));
+            $pngTempra    = max(1, min(20,  (int)($data['tempra']    ?? 7)));
 
-            // Inserisco il png nella tabella dei personaggi se non esiste già
+            // Inserisce o aggiorna il png nella tabella personaggi
             $existingPng = gdrcd_query("SELECT nome FROM personaggio WHERE nome = '$pngName'", 'result');
-            if (gdrcd_query($existingPng, 'num_rows') == 0)  gdrcd_query("INSERT INTO personaggio (nome, salute, integrita, car2) VALUES ('$pngName', 100, 100, 7)");
+            if (gdrcd_query($existingPng, 'num_rows') == 0) {
+                gdrcd_query("INSERT INTO personaggio (nome, salute, integrita, car2, car4, car6, car8)
+                    VALUES ('$pngName', $pngSalute, 100, $pngDestrezza, $pngMente, $pngTempra, $pngPotere)");
+            } else {
+                gdrcd_query("UPDATE personaggio SET salute=$pngSalute, car2=$pngDestrezza, car4=$pngMente, car6=$pngTempra, car8=$pngPotere
+                    WHERE nome='$pngName'");
+            }
 
-            // Inserisco il png nella role
             addPgToRole($id_role, $pngName, $location, 1);
 
-            echo json_encode(array('success' => true, 'message' => 'PNG aggiunto con successo!'));
+            echo json_encode(['success' => true, 'message' => 'PNG aggiunto con successo!']);
+            break;
 
+        /**
+         * getPgList — lista DISTINCT dei pg partecipanti alla role corrente (esclusi PNG).
+         * Include anche i pg usciti (end IS NOT NULL) per consentire al master
+         * di intervenire su personaggi che hanno lasciato il turno.
+         */
+        case 'getPgList':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => true, 'pgs' => []]); exit; }
+            $res = gdrcd_query(
+                "SELECT DISTINCT pg_name FROM role_session_players WHERE id_role = $id_role AND png = 0",
+                'result'
+            );
+            $pgs = [];
+            while ($row = gdrcd_query($res, 'fetch')) $pgs[] = $row['pg_name'];
+            echo json_encode(['success' => true, 'pgs' => $pgs]);
+            break;
+
+        /**
+         * getPgData — carica i campi modificabili di un personaggio (uso master).
+         */
+        case 'getPgData':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            $pgName = gdrcd_filter('get', $_GET['pg'] ?? '');
+            if (!$pgName) { echo json_encode(['success' => false, 'message' => 'Nome mancante']); exit; }
+            $pg = gdrcd_query("SELECT note_fato, particolari, salute, integrita, notorieta FROM personaggio WHERE nome = '$pgName' LIMIT 1");
+            if (!$pg) { echo json_encode(['success' => false, 'message' => 'PG non trovato']); exit; }
+            echo json_encode(['success' => true, 'data' => $pg]);
+            break;
+
+        /**
+         * savePgData — salva i campi modificabili di un personaggio (uso master).
+         * Campi: note_fato, particolari, salute, integrita, notorieta.
+         */
+        case 'savePgData':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            $pgName     = gdrcd_filter('post', $data['pg'] ?? '');
+            $noteFato   = gdrcd_filter('in', $data['note_fato']   ?? '');
+            $particolari= gdrcd_filter('in', $data['particolari'] ?? '');
+            $salute     = max(0, (int)($data['salute']    ?? 0));
+            $integrita  = max(0, min(100, (int)($data['integrita']  ?? 0)));
+            $notorieta  = max(0, min(100, (int)($data['notorieta']  ?? 0)));
+            if (!$pgName) { echo json_encode(['success' => false, 'message' => 'Nome mancante']); exit; }
+            gdrcd_query("UPDATE personaggio SET
+                note_fato='$noteFato', particolari='$particolari',
+                salute=$salute, integrita=$integrita, notorieta=$notorieta
+                WHERE nome='$pgName'");
+            echo json_encode(['success' => true, 'message' => 'Personaggio aggiornato.']);
+            break;
+
+        /**
+         * newMasterPngAttack — il master attacca uno o più bersagli con un PNG,
+         * usando il sistema di combattimento completo (fight + notifyAttackIncoming).
+         * Sostituisce il vecchio newMasterPngAction per gli attacchi con dado.
+         */
+        case 'newMasterPngAttack':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            $luogo   = (int)$_SESSION['luogo'];
+            $login   = $_SESSION['login'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+
+            $pngName       = gdrcd_filter('post', $data['pngName']      ?? '');
+            $pngMessage    = gdrcd_filter('in',   gdrcd_filter('post', $data['pngMessage'] ?? ''));
+            $pngCar        = $data['pngCar']       ?? 'destrezza';
+            $targets       = is_array($data['targets'] ?? null) ? $data['targets'] : [];
+            $damagePercent = max(1, min(100, (int)($data['damagePercent'] ?? 100)));
+            $turn          = getTurn($id_role);
+
+            if (!$pngName) { echo json_encode(['success' => false, 'message' => 'Nome PNG mancante']); exit; }
+
+            // Mappa nome caratteristica → colonna DB
+            $carColMap = ['destrezza'=>'car2','mente'=>'car4','tempra'=>'car6','potere'=>'car8'];
+            $carCol    = $carColMap[$pngCar] ?? 'car2';
+
+            // Recupera il valore della caratteristica dal PNG
+            $pngRow = gdrcd_query("SELECT $carCol FROM personaggio WHERE nome = '$pngName' LIMIT 1");
+            if (!$pngRow) { echo json_encode(['success' => false, 'message' => 'PNG non trovato']); exit; }
+            $carVal = (int)$pngRow[$carCol];
+
+            // Calcola il tiro: bonus dalla caratteristica (formula uguale a lanciaStat)
+            $bonus  = (int)(($carVal / 10) - 1);
+            $raw    = mt_rand(1, 20);
+            $dice   = max(1, $raw + $bonus);
+
+            // Messaggio azione in chat
+            if ($pngMessage) {
+                checkTurnEnd($luogo, $pngName, $id_role);
+                chatInsertMessage($luogo, $login, $pngName, $pngMessage, 'N', null);
+            }
+
+            if (!empty($targets)) {
+                $targetsStr = implode(',', array_map(fn($t) => gdrcd_filter('post', $t), $targets));
+                $id_fight   = fight($id_role, $pngName, $targetsStr, 0, 0, $pngCar, $dice, 'attacco PNG master', $damagePercent);
+                notifyAttackIncoming($id_role, $luogo, $pngName, $targets, $pngCar, $dice, $id_fight, $turn);
+            }
+
+            echo json_encode(['success' => true, 'message' => 'Attacco PNG inviato.', 'dice' => $dice]);
+            break;
+
+        /**
+         * pending_attacks_png — attacchi del turno corrente verso PNG senza risposta.
+         * Usato dal pannello master per mostrare i pulsanti dado/scudo/subisce per i PNG.
+         */
+        case 'pending_attacks_png':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => true, 'attacks' => []]); exit; }
+            $turn = getTurn($id_role);
+
+            // Trova i PNG attivi nella role corrente
+            $pngRes = gdrcd_query(
+                "SELECT DISTINCT pg_name FROM role_session_players WHERE id_role = $id_role AND png = 1",
+                'result'
+            );
+            $pngNames = [];
+            while ($row = gdrcd_query($pngRes, 'fetch')) $pngNames[] = "'" . gdrcd_filter('in', $row['pg_name']) . "'";
+
+            if (empty($pngNames)) { echo json_encode(['success' => true, 'attacks' => []]); exit; }
+            $pngList = implode(',', $pngNames);
+
+            $res = gdrcd_query("
+                SELECT rf.id, rf.striker, rf.car, rf.dice, rf.target
+                FROM role_fights rf
+                WHERE rf.id_role = $id_role
+                  AND rf.turn    = $turn
+                  AND rf.car     IN ('destrezza','mente','potere')
+                  AND NOT EXISTS (
+                    SELECT 1 FROM role_fights r2
+                    WHERE r2.id_role = rf.id_role
+                      AND r2.turn    = rf.turn
+                      AND (r2.car IN ('dado_risposta','subisce','difesa'))
+                      AND r2.target  = rf.striker
+                  )
+            ", 'result');
+
+            $attacks = [];
+            while ($row = gdrcd_query($res, 'fetch')) {
+                $rowTargets = array_map('trim', explode(',', $row['target']));
+                foreach ($rowTargets as $t) {
+                    if (!in_array("'$t'", $pngNames)) continue;
+                    $attacks[] = [
+                        'id_fight' => (int)$row['id'],
+                        'attacker' => $row['striker'],
+                        'car'      => $row['car'],
+                        'dice'     => (int)$row['dice'],
+                        'png'      => $t,
+                        'choices'  => ['dado', 'subisce'],
+                    ];
+                }
+            }
+            echo json_encode(['success' => true, 'attacks' => $attacks]);
+            break;
+
+        /**
+         * risposta_immediata_png — il master risponde a un attacco per conto di un PNG.
+         * Logica identica a risposta_immediata ma usa $pngName invece di $login.
+         */
+        case 'risposta_immediata_png':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            $luogo    = (int)$_SESSION['luogo'];
+            $id_role  = locationActiveRole($luogo);
+            $pngName  = gdrcd_filter('post', $data['pngName']  ?? '');
+            $scelta   = $data['scelta']   ?? '';
+            $id_fight = (int)($data['id_fight'] ?? 0);
+            $turn     = getTurn($id_role);
+
+            if (!$pngName || !$id_role) { echo json_encode(['success' => false, 'message' => 'Dati mancanti']); exit; }
+
+            $fightRow = gdrcd_query("SELECT * FROM role_fights WHERE id = $id_fight AND id_role = $id_role AND turn = $turn");
+            if (!$fightRow) { echo json_encode(['success' => false, 'message' => 'Attacco non trovato']); exit; }
+            $fightTargets = array_map('trim', explode(',', $fightRow['target']));
+            if (!in_array($pngName, $fightTargets)) { echo json_encode(['success' => false, 'message' => 'Il PNG non è tra i bersagli']); exit; }
+
+            $attacker  = $fightRow['striker'];
+            $messaggio = '';
+            $dice      = 0;
+
+            switch ($scelta) {
+                case 'dado':
+                    $carDifesa  = getDefenceCar($fightRow['car'], $pngName);
+                    $diceResult = lanciaStat($id_role, $attacker, $pngName, true, $carDifesa['nome'], $carDifesa['nome'], $carDifesa['car'], $carDifesa['punti'], 0, 0);
+                    $dice       = $diceResult['risultato'];
+                    fight($id_role, $pngName, $attacker, 0, 0, 'dado_risposta', $dice, 'risposta PNG dado');
+                    $messaggio = "<i>Risultato provvisorio:</i> $pngName tira il dado di difesa e ottiene <b>$dice</b> contro l'attacco di $attacker";
+                    break;
+                case 'subisce':
+                    fight($id_role, $pngName, $attacker, 0, 0, 'subisce', 0, 'risposta PNG subisce');
+                    $messaggio = "<i>Risultato provvisorio:</i> $pngName subisce l'attacco di $attacker";
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'message' => 'Scelta non valida']); exit;
+            }
+
+            $messaggio = gdrcd_filter('in', $messaggio);
+            chatInsertMessage($luogo, $pngName, null, $messaggio, 'C', null, '', null);
+            checkTurnCanClose($id_role, $luogo);
+            echo json_encode(['success' => true, 'scelta' => $scelta, 'dice' => $dice]);
             break;
         case 'newMasterPngAction':
             $login = $_SESSION['login'];

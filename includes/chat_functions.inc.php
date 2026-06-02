@@ -1382,6 +1382,10 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
         if($can_send === 1) {
             if(!isset($difensori[$target])) { // Se non ha usato lo scudo in questo turno, significa che deve difendersi con un dado
 
+                // Se damage_percent > 0 (attacchi PNG master), ogni bersaglio riceve quella
+                // percentuale del danno calcolato invece della divisione per count($targets).
+                $damagePercent = isset($r['damage_percent']) ? (int)$r['damage_percent'] : 0;
+
                 if ($subisce) {
                     // Il bersaglio ha scelto esplicitamente di subire: danno fisso, nessun dado di difesa
                     $damage = $defaultDamage;
@@ -1391,7 +1395,10 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                     if($dice > $dadoDifesa) {
                         $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level']);
                         $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
-                        $damage = (($dice - $dadoDifesa) * $moltiplicatore / count($targets));
+                        $baseDmg = ($dice - $dadoDifesa) * $moltiplicatore;
+                        $damage = $damagePercent > 0
+                            ? round($baseDmg * ($damagePercent / 100))
+                            : round($baseDmg / count($targets));
                         $durataResult = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
                         $durata = $durataResult['turni'];
                         $durataMsg = $durataResult['msg'];
@@ -1402,7 +1409,10 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                     if($dice > $dadoDifesa) {
                         $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level']);
                         $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
-                        $damage = (($dice - $dadoDifesa) * $moltiplicatore / count($targets));
+                        $baseDmg = ($dice - $dadoDifesa) * $moltiplicatore;
+                        $damage = $damagePercent > 0
+                            ? round($baseDmg * ($damagePercent / 100))
+                            : round($baseDmg / count($targets));
                         $durataResult = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
                         $durata = $durataResult['turni'];
                         $durataMsg = $durataResult['msg'];
@@ -1648,11 +1658,12 @@ function getRolePgs($id_role, $active = false) {
     return $users;
 }
 
-// Registra un'azione di combattimento nella role e restituisce l'ID inserito
-function fight($id_role, $striker, $target, $id_skill, $level, $car, $dice, $recap='') {
+// Registra un'azione di combattimento nella role e restituisce l'ID inserito.
+// $damage_percent > 0: ogni bersaglio subisce X% del danno calcolato (attacchi PNG master).
+function fight($id_role, $striker, $target, $id_skill, $level, $car, $dice, $recap='', $damage_percent=0) {
     $turn = getTurn($id_role);
-    $query = "INSERT INTO role_fights (id_role, turn, striker, `target`, car, id_skill, level, dice, result)
-            VALUES ($id_role, $turn, '$striker', '$target', '$car', $id_skill, $level, $dice, '$recap')";
+    $query = "INSERT INTO role_fights (id_role, turn, striker, `target`, car, id_skill, level, dice, result, damage_percent)
+            VALUES ($id_role, $turn, '$striker', '$target', '$car', $id_skill, $level, $dice, '$recap', $damage_percent)";
     gdrcd_query($query);
     return (int)gdrcd_query("SELECT LAST_INSERT_ID() as id")['id'];
 }

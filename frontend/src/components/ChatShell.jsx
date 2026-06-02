@@ -23,6 +23,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import ChatViewer from './ChatViewer'
 import TargetSelector from './TargetSelector'
+import MasterPanel from './MasterPanel'
 
 // ---------------------------------------------------------------------------
 // UTILITÀ
@@ -100,11 +101,14 @@ export default function ChatShell() {
      */
     const [roleActive, setRoleActive] = useState(false)
 
-    /** Tab attiva nel pannello GDR: 'dice' | 'skills' | 'master' | 'writing' */
+    /** Tab attiva nel pannello GDR: 'dice' | 'skills' | 'writing' */
     const [activeTab, setActiveTab] = useState('dice')
 
     /** Visibilità del pannello GDR — gestita via state per garantire il re-render */
     const [panelOpen, setPanelOpen] = useState(false)
+
+    /** Visibilità del pannello master (solo staff) */
+    const [masterPanelOpen, setMasterPanelOpen] = useState(false)
 
     /** Nasconde il pulsante cura dopo che è stato usato con successo */
     const [curaDone, setCuraDone] = useState(false)
@@ -481,6 +485,14 @@ export default function ChatShell() {
                                                 <img title="Pannello GDR" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" />
                                             </a>
                                         )}
+                                        {pulsanti.is_staff && (
+                                            <a href="#" onClick={e => { e.preventDefault(); setMasterPanelOpen(true) }}>
+                                                <img title="Pannello Master" src="themes/crystal/imgs/chat/master_panel.png" className="chat_icon"
+                                                    onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='inline' }}
+                                                />
+                                                <span style={{ display:'none', fontSize:'18px', cursor:'pointer' }} title="Pannello Master">⚙</span>
+                                            </a>
+                                        )}
                                         {/* Cura pg: sopra la textarea, fuori dal pannello per renderlo accessibile a tutti */}
                                         {pulsanti.show_cura && !curaDone && (
                                             <a href="#" onClick={e => {
@@ -652,10 +664,6 @@ export default function ChatShell() {
                                     onClick={() => setActiveTab('dice')}>Dadi e Tiri</div>
                                 <div className={`gdr-tab${activeTab === 'skills' ? ' active' : ''}`}
                                     onClick={() => setActiveTab('skills')}>Abilità e Armi</div>
-                                {pulsanti.is_staff && (
-                                    <div className={`gdr-tab${activeTab === 'master' ? ' active' : ''}`}
-                                        onClick={() => { setActiveTab('master'); window.getPngRolePlaying?.() }}>Gestione Master</div>
-                                )}
                                 <div className={`gdr-tab${activeTab === 'writing' ? ' active' : ''}`}
                                     onClick={() => setActiveTab('writing')}>Scrittura</div>
                             </div>
@@ -781,96 +789,6 @@ export default function ChatShell() {
                                 </div>
                             </div>
 
-                            {/* ── TAB: GESTIONE MASTER (solo staff) ────────────────── */}
-                            {pulsanti.is_staff && (
-                                <div className={`gdr-tab-content${activeTab === 'master' ? ' active' : ''}`} id="master-tab">
-                                    <div className="gdr-master-panel">
-                                        <div className="gdr-master-panel-title">Area Master</div>
-                                        <p>Questa area è riservata ai Master per la gestione dei personaggi e PNG.</p>
-                                    </div>
-                                    <button className="btn" id="endTurn" onClick={() => window.closeTurn?.()}>Chiudi turno</button>
-                                    <br /><br />
-                                    <div className="gdr-grid">
-                                        {/* Modifica Personaggio */}
-                                        <div className="gdr-card">
-                                            <div className="gdr-card-title">Modifica Personaggio</div>
-                                            <div className="gdr-form-group">
-                                                <label className="gdr-label" htmlFor="nome_personaggio">Personaggio</label>
-                                                <select className="gdr-select" name="nome_personaggio" id="nome_personaggio">
-                                                    <option value="pg1">Personaggio 1</option>
-                                                    <option value="pg2">Personaggio 2</option>
-                                                    <option value="pg3">Personaggio 3</option>
-                                                </select>
-                                            </div>
-                                            <div id="modificaParametri">
-                                                <div className="gdr-form-group">
-                                                    <label className="gdr-label" htmlFor="note_fato">Note del Fato</label>
-                                                    <textarea className="gdr-textarea" name="note_fato" id="note_fato" rows={3}></textarea>
-                                                </div>
-                                                <div className="gdr-form-group">
-                                                    <label className="gdr-label" htmlFor="particolari">Particolari</label>
-                                                    <textarea className="gdr-textarea" name="particolari" id="particolari" rows={3}></textarea>
-                                                </div>
-                                                <div className="gdr-form-group">
-                                                    <label className="gdr-label" htmlFor="salute">Salute</label>
-                                                    <input className="gdr-input" type="number" name="salute" id="salute" />
-                                                </div>
-                                                <div className="gdr-form-group">
-                                                    <label className="gdr-label" htmlFor="integrita">Integrità (0-10)</label>
-                                                    <input className="gdr-input" type="number" name="integrita" min={0} max={10} id="integrita" />
-                                                </div>
-                                                <div className="gdr-form-group">
-                                                    <label className="gdr-label" htmlFor="notorieta">Notorietà (0-100)</label>
-                                                    <input className="gdr-input" type="number" name="notorieta" min={0} max={100} id="notorieta" />
-                                                </div>
-                                                <div className="gdr-form-group">
-                                                    <label className="gdr-label" htmlFor="soldi">Soldi</label>
-                                                    <input className="gdr-input" type="number" name="soldi" min={0} id="soldi" />
-                                                </div>
-                                                <button className="gdr-button gdr-btn-success" onClick={() => window.gdrEditMasterPgChat?.()}>Modifica Personaggio</button>
-                                            </div>
-                                        </div>
-
-                                        {/* Gestione PNG */}
-                                        <div className="gdr-card">
-                                            <div className="gdr-card-title">Gestione PNG</div>
-                                            <div className="gdr-form-group" style={{ flex: 1 }}>
-                                                <label className="gdr-label" htmlFor="pngNew" style={{ flex: 1 }}>Nome PNG</label>
-                                                <input className="gdr-input" id="pngNew" placeholder="Nome PNG" style={{ flex: 2 }} />
-                                            </div>
-                                            <div className="gdr-form-group" style={{ flex: 1 }}>
-                                                <label className="gdr-label">Destrezza PNG</label>
-                                                <input className="gdr-input" id="pngNewDestrezza" placeholder="Destrezza" />
-                                            </div>
-                                            <button className="gdr-button gdr-btn-success" onClick={() => window.newMasterPng?.()}>Aggiungi</button>
-                                            <div className="gdr-card-title"></div>
-                                            <div className="gdr-form-group">
-                                                <label className="gdr-label" htmlFor="pngName">PNG attivi</label>
-                                                <select className="gdr-select" id="pngName"></select>
-                                            </div>
-                                            <div className="gdr-form-group">
-                                                <label className="gdr-label" htmlFor="pngMessage">Azione PNG</label>
-                                                <textarea className="gdr-textarea" id="pngMessage" placeholder="Azione PNG" rows={3}></textarea>
-                                            </div>
-                                            <div className="gdr-form-group">
-                                                <label className="gdr-label" htmlFor="pngCar">Caratteristica PNG</label>
-                                                <select className="gdr-select" id="pngCar">
-                                                    <option value="destrezza">Usa destrezza</option>
-                                                    <option value="potere">Usa potere</option>
-                                                    <option value="mente">Usa mente</option>
-                                                    <option value="tempra">Usa tempra</option>
-                                                </select>
-                                            </div>
-                                            <div className="gdr-form-group">
-                                                <label className="gdr-label" htmlFor="pngBonus">Bonus caratteristica PNG</label>
-                                                <input className="gdr-input" id="pngBonus" placeholder="Bonus sul dado" />
-                                            </div>
-                                            <button className="gdr-button gdr-btn-success" onClick={() => window.newMasterPngAction?.()}>Invia</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
                             {/* ── TAB: SCRITTURA ───────────────────────────────────── */}
                             <div className={`gdr-tab-content${activeTab === 'writing' ? ' active' : ''}`} id="writing-tab">
                                 <div className="gdr-grid">
@@ -895,6 +813,16 @@ export default function ChatShell() {
                     </div>
 
                 </>, document.body)}
+
+                {/* ================================================================ */}
+                {/* PANNELLO MASTER — overlay separato, solo staff                  */}
+                {/* ================================================================ */}
+                {pulsanti.is_staff && (
+                    <MasterPanel
+                        isOpen={masterPanelOpen}
+                        onClose={() => setMasterPanelOpen(false)}
+                    />
+                )}
 
                 {/* ================================================================ */}
                 {/* MODALE — Modifica azione                                        */}
