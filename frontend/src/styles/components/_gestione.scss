@@ -3,9 +3,9 @@
 // ============================================================
 @use '../tokens' as *;
 
-$gestione-action: $palette-blue-alt;   // #4da6ff
-$gestione-surface: $palette-surface-raised;  // #1c1f2e
-$gestione-hover:   $palette-surface-hover;  // #2e3350
+$gestione-action: $palette-blue-alt; // #4da6ff
+$gestione-surface: $palette-surface-raised; // #1c1f2e
+$gestione-hover: $palette-surface-hover; // #2e3350
 
 // ── Link azione post-operazione (oggetti, gestione) ──────────
 
@@ -18,7 +18,10 @@ $gestione-hover:   $palette-surface-hover;  // #2e3350
     margin: $space-1 + 1;
     display: inline-block;
 
-    &:hover, &:visited { color: #ce846f; }
+    &:hover,
+    &:visited {
+        color: #ce846f;
+    }
 }
 
 .action-links {
@@ -60,13 +63,26 @@ $gestione-hover:   $palette-surface-hover;  // #2e3350
         transition: background $transition-normal;
         font-size: $text-lg;
 
-        &.back        { background: $gestione-hover; }
-        &.back:hover  { background: $gestione-action; }
-        &.add         { background: $gestione-action; }
-        &.add:hover   { background: $gestione-hover; }
+        &.back {
+            background: $gestione-hover;
+        }
+
+        &.back:hover {
+            background: $gestione-action;
+        }
+
+        &.add {
+            background: $gestione-action;
+        }
+
+        &.add:hover {
+            background: $gestione-hover;
+        }
     }
 
-    .btn-action.right { margin-left: auto; }
+    .btn-action.right {
+        margin-left: auto;
+    }
 }
 
 // ── Dashboard ─────────────────────────────────────────────────
@@ -105,7 +121,9 @@ header {
         color: $gestione-action;
     }
 
-    h3 { font-size: $text-xl; }
+    h3 {
+        font-size: $text-xl;
+    }
 }
 
 .sub-menu {
@@ -113,14 +131,18 @@ header {
     padding: $space-2 + 2 0 0;
     margin: 0;
 
-    li { margin: $space-1 + 1 0; }
+    li {
+        margin: $space-1 + 1 0;
+    }
 
     a {
         color: $color-text-muted;
         font-size: $text-lg;
         text-decoration: none;
 
-        &:hover { color: $gestione-action; }
+        &:hover {
+            color: $gestione-action;
+        }
     }
 }
 
@@ -137,13 +159,16 @@ header {
         letter-spacing: 2px;
     }
 
-    th, td {
+    th,
+    td {
         border: 1px solid #333 !important;
         padding: $space-2 !important;
         text-align: left;
     }
 
-    th { background: $gestione-hover !important; }
+    th {
+        background: $gestione-hover !important;
+    }
 
     td.azioni {
         display: flex;
@@ -165,8 +190,13 @@ header {
     padding: $space-1;
     transition: color $transition-normal;
 
-    &:hover { color: $color-text-light; }
-    i { pointer-events: none; }
+    &:hover {
+        color: $color-text-light;
+    }
+
+    i {
+        pointer-events: none;
+    }
 }
 
 // ── Filtri ────────────────────────────────────────────────────
@@ -198,7 +228,9 @@ header {
     flex-wrap: wrap;
     gap: $space-2;
 
-    input[type="checkbox"] { display: none; }
+    input[type="checkbox"] {
+        display: none;
+    }
 
     label {
         cursor: pointer;
@@ -208,10 +240,15 @@ header {
         border-radius: $radius-md;
         transition: $transition-normal;
 
-        img { width: 15px; height: 15px; object-fit: cover; border-radius: $radius-md; }
+        img {
+            width: 15px;
+            height: 15px;
+            object-fit: cover;
+            border-radius: $radius-md;
+        }
     }
 
-    input[type="checkbox"]:checked + label {
+    input[type="checkbox"]:checked+label {
         border-color: $gestione-action;
         box-shadow: 0 0 8px rgb(77 166 255 / 60%);
     }
@@ -240,7 +277,9 @@ header {
         color: $gestione-action;
     }
 
-    &.tooltip, &.tooltip-buy, &.tooltip-sell {
+    &.tooltip,
+    &.tooltip-buy,
+    &.tooltip-sell {
         visibility: hidden;
         opacity: 0;
         position: absolute;
@@ -254,9 +293,20 @@ header {
         transition: opacity $transition-normal;
     }
 
-    &.tooltip     { top: 100%; left: 100%; }
-    &.tooltip-buy { bottom: 130%; right: 170%; }
-    &.tooltip-sell{ top: 200%; right: 200%; }
+    &.tooltip {
+        top: 100%;
+        left: 100%;
+    }
+
+    &.tooltip-buy {
+        bottom: 130%;
+        right: 170%;
+    }
+
+    &.tooltip-sell {
+        top: 200%;
+        right: 200%;
+    }
 }
 
 .help-icon {
@@ -267,48 +317,9 @@ header {
 
     &:hover .tooltip,
     &:hover .tooltip-buy,
-    &:hover .tooltip-sell { visibility: visible; opacity: 1; }
-}
-
-// ── Tabella responsive ────────────────────────────────────────
-
-.ct-table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    font-size: $text-sm;
-    color: $palette-text-title;
-    font-family: $font-serif;
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 800px;
-    }
-
-    th, td {
-        padding: $space-3 $space-2;
-        text-align: left;
-        border-bottom: 1px solid $color-border;
-    }
-
-    th { font-weight: $font-weight-bold; }
-    .azioni { white-space: nowrap; }
-
-    .action-buttons {
-        display: flex;
-        gap: $space-1 + 1;
-        flex-wrap: nowrap;
-    }
-
-    .btn-action {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: $space-1 + 1;
-        color: $gestione-action;
-        transition: color $transition-normal;
-
-        &:hover { color: $color-text-light; }
+    &:hover .tooltip-sell {
+        visibility: visible;
+        opacity: 1;
     }
 }
 
@@ -337,7 +348,11 @@ header {
         padding: 0 30px;
     }
 
-    h1 { text-align: center; margin-bottom: $space-6; color: $color-text-muted; }
+    h1 {
+        text-align: center;
+        margin-bottom: $space-6;
+        color: $color-text-muted;
+    }
 
     label {
         display: block;
@@ -346,7 +361,10 @@ header {
         color: $color-text-muted;
     }
 
-    textarea { min-height: 100px; resize: vertical; }
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
 
     .form-section {
         margin-bottom: 30px;
@@ -355,17 +373,27 @@ header {
         border-left: 4px solid #007bff;
     }
 
-    .actions { text-align: center; margin-top: $space-6; }
+    .actions {
+        text-align: center;
+        margin-top: $space-6;
+    }
 
     .input-with-button {
         display: flex;
         gap: $space-2;
 
-        input  { flex: 1; }
-        button { white-space: nowrap; }
+        input {
+            flex: 1;
+        }
+
+        button {
+            white-space: nowrap;
+        }
     }
 
-    .form-container { width: 100%; }
+    .form-container {
+        width: 100%;
+    }
 
     .form-row {
         display: flex;
@@ -382,9 +410,17 @@ header {
     .form-group {
         margin-bottom: 0;
 
-        label { display: block; margin-bottom: $space-1 + 1; font-weight: $font-weight-bold; }
+        label {
+            display: block;
+            margin-bottom: $space-1 + 1;
+            font-weight: $font-weight-bold;
+        }
 
-        input, select { width: 100%; box-sizing: border-box; }
+        input,
+        select {
+            width: 100%;
+            box-sizing: border-box;
+        }
     }
 
     .checkbox-group,
@@ -399,52 +435,99 @@ header {
         display: flex;
         gap: $space-2 + 2;
 
-        input  { flex: 1; }
-        button { white-space: nowrap; }
+        input {
+            flex: 1;
+        }
+
+        button {
+            white-space: nowrap;
+        }
     }
 
-    @media (width <= 768px) {
+    @media (width <=768px) {
         padding: $space-2 + 2;
         align-items: flex-start;
 
-        .modal-content { max-height: 95vh; padding: 15px; margin-top: $space-5; }
+        .modal-content {
+            max-height: 95vh;
+            padding: 15px;
+            margin-top: $space-5;
+        }
 
-        input, select, textarea { width: 100%; box-sizing: border-box; }
+        input,
+        select,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-        .form-row { flex-direction: column; gap: 15px; }
-        .inline-group .input-with-button { flex-direction: column; button { width: 100%; } }
+        .form-row {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .inline-group .input-with-button {
+            flex-direction: column;
+
+            button {
+                width: 100%;
+            }
+        }
     }
 
-    @media (width <= 480px) {
-        .modal-content { padding: $space-3; border-radius: $radius-lg; }
-        h1 { font-size: 1.5rem; margin-bottom: 15px; }
+    @media (width <=480px) {
+        .modal-content {
+            padding: $space-3;
+            border-radius: $radius-lg;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
     }
 }
 
 // ── Responsive gestione ───────────────────────────────────────
 
-@media (width <= 768px) {
-    .card { padding: 15px; i { font-size: 32px; } h3 { font-size: $text-xl; } }
-    .ct-table-responsive { border: 1px solid $color-border; border-radius: $radius-sm; }
-    .ct-table-responsive table { min-width: 100%; }
+@media (width <=768px) {
+    .card {
+        padding: 15px;
 
-    @media (width <= 480px) {
-        .dashboard { grid-template-columns: 1fr; }
-        .card i { font-size: 28px; margin-right: $space-2 + 2; }
-        .card h3 { display: inline-block; vertical-align: middle; }
+        i {
+            font-size: 32px;
+        }
+
+        h3 {
+            font-size: $text-xl;
+        }
+    }
+
+    @media (width <=480px) {
+        .dashboard {
+            grid-template-columns: 1fr;
+        }
+
+        .card i {
+            font-size: 28px;
+            margin-right: $space-2 + 2;
+        }
+
+        .card h3 {
+            display: inline-block;
+            vertical-align: middle;
+        }
     }
 }
 
-@media (width <= 1024px) and (width >= 769px) {
-    .ct-table-responsive {
-        table { font-size: $text-lg; }
-        th, td { padding: $space-2 $space-1 + 2; }
-        .action-buttons { flex-direction: column; gap: 3px; }
-        .btn-action { padding: 3px; }
+@media only screen and (width <=768px) {
+    .topbar {
+        flex-wrap: wrap;
     }
-}
 
-@media only screen and (width <= 768px) {
-    .topbar { flex-wrap: wrap; }
-    .filter-form { order: 3; width: 100%; margin-top: $space-2 + 2; }
+    .filter-form {
+        order: 3;
+        width: 100%;
+        margin-top: $space-2 + 2;
+    }
 }
