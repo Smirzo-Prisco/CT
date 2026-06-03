@@ -225,7 +225,7 @@ export default function ChatShell() {
             .then(d => {
                 if (d.success && d.pending) setCloseTurnPrompt({ id_role: d.id_role })
             })
-            .catch(() => {})
+            .catch(() => { })
     }, [shell])
 
     /**
@@ -487,8 +487,8 @@ export default function ChatShell() {
                                         )}
                                         {pulsanti.is_staff && (
                                             <a href="#" onClick={e => { e.preventDefault(); setMasterPanelOpen(true) }}
-                                               title="Pannello Master"
-                                               style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:'24px', height:'24px', background:'linear-gradient(135deg,#7b2d8b,#4a1060)', borderRadius:'50%', color:'#e8c9f5', fontWeight:'bold', fontSize:'13px', fontFamily:'serif', textDecoration:'none', boxShadow:'0 0 5px rgba(180,80,220,0.5)', cursor:'pointer' }}>
+                                                title="Pannello Master"
+                                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', background: 'linear-gradient(135deg,#7b2d8b,#4a1060)', borderRadius: '50%', color: '#e8c9f5', fontWeight: 'bold', fontSize: '13px', fontFamily: 'serif', textDecoration: 'none', boxShadow: '0 0 5px rgba(180,80,220,0.5)', cursor: 'pointer' }}>
                                                 M
                                             </a>
                                         )}
@@ -653,6 +653,11 @@ export default function ChatShell() {
                                             <img src="themes/crystal/imgs/chess/scacchiera.png" alt="Scacchiera" />
                                         </a>
                                     )}
+
+                                    {/* Scrittura libera */}
+                                    <a href="#" id="gdrOpenTextareaButton" className="gdr-control-btn" title="Scrittura Libera">
+                                        <img src="themes/crystal/imgs/chat/writer.png" alt="Scrittura Libera" />
+                                    </a>
                                 </div>
                                 <button className="gdr-close-btn" id="gdrCloseBtn" onClick={() => setPanelOpen(false)}>&times;</button>
                             </div>
@@ -660,7 +665,7 @@ export default function ChatShell() {
                             {/* Tab bar */}
                             <div className="gdr-tabs">
                                 <div className={`gdr-tab${activeTab === 'dice' ? ' active' : ''}`} id="defaultOpen"
-                                    onClick={() => setActiveTab('dice')}>Dadi e Tiri</div>
+                                    onClick={() => setActiveTab('dice')}>D20 e Oggetti</div>
                                 <div className={`gdr-tab${activeTab === 'skills' ? ' active' : ''}`}
                                     onClick={() => setActiveTab('skills')}>Abilità e Armi</div>
                                 <div className={`gdr-tab${activeTab === 'writing' ? ' active' : ''}`}
@@ -798,12 +803,6 @@ export default function ChatShell() {
                                             <input className="gdr-input" name="caratteri" id="caratteri" placeholder="Limite caratteri" />
                                         </div>
                                         <button className="gdr-button gdr-btn-success" onClick={() => window.setCharLimit?.()}>Imposta Limite</button>
-                                    </div>
-                                    <div className="gdr-card">
-                                        <div className="gdr-card-title">Scrittura Libera</div>
-                                        <button className="gdr-button gdr-btn-warning" id="gdrOpenTextareaButton">
-                                            Apri Scrittura Libera in Popup
-                                        </button>
                                     </div>
                                 </div>
                             </div>
