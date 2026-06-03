@@ -54,11 +54,6 @@ export default function AnteprimaScheda() {
     return (
         <div className="pagina_info_location">
 
-            {/* Nome personaggio */}
-            <div className="page_title">
-                <h2>{nome}</h2>
-            </div>
-
             <div className="page_body">
 
                 {/* Avatar con classe giorno/notte */}
