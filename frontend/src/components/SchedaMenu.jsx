@@ -30,7 +30,7 @@ export default function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
                         <li className="subMenuItem"><a href={`main.php?page=scheda_dice&pg=${enc}`}>Dice di sé</a></li>
                         <li className="subMenuItem"><a href={`main.php?page=scheda_affetti&pg=${enc}`}>Affetti</a></li>
                         <li className="subMenuItem"><a href={`main.php?page=scheda_off&pg=${enc}`}>Off</a></li>
-                        <li className="subMenuItem"><a href={`main.php?page=scheda_trans&pg=${enc}`}>Transizioni</a></li>
+                        {/* <li className="subMenuItem"><a href={`main.php?page=scheda_trans&pg=${enc}`}>Transizioni</a></li> */}
                     </ul>
                 </li>
 
