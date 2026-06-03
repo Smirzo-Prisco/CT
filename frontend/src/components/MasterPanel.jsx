@@ -428,10 +428,10 @@ export default function MasterPanel({ isOpen, onClose, showPulisci }) {
 
                     {/* Modifica PG + Crea PNG + Gestione PNG + Attacchi PNG in sospeso */}
                     <div className="gdr-grid">
-                        <ModificaPG />
                         <CreaPng />
                         <GestionePng />
                         <AttacchiPngSospeso />
+                        <ModificaPG />
                     </div>
 
                 </div>
