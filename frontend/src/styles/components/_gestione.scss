@@ -346,43 +346,7 @@ header {
         color: $color-text-muted;
     }
 
-    input[type="text"],
-    input[type="url"],
-    input[type="number"],
-    input[type="email"],
-    select,
-    textarea {
-        width: 95%;
-        padding: $space-3;
-        border: 1px solid $color-text-muted;
-        border-radius: $radius-lg;
-        font-size: 15px;
-        transition: border-color $transition-fast;
-    }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-        border-color: #4f7cff;
-        outline: none;
-    }
-
     textarea { min-height: 100px; resize: vertical; }
-
-    button {
-        background: #4f7cff;
-        color: $color-text-light;
-        border: none;
-        padding: $space-3 $space-5;
-        font-size: $text-xl;
-        border-radius: $radius-lg;
-        cursor: pointer;
-        transition: background $transition-fast;
-        height: 45px;
-        margin-top: $space-1 + 1;
-
-        &:hover { background: #3a63d1; }
-    }
 
     .form-section {
         margin-bottom: 30px;
@@ -420,13 +384,7 @@ header {
 
         label { display: block; margin-bottom: $space-1 + 1; font-weight: $font-weight-bold; }
 
-        input, select {
-            width: 100%;
-            padding: $space-2 $space-3;
-            border: 1px solid $color-border;
-            border-radius: $radius-sm;
-            box-sizing: border-box;
-        }
+        input, select { width: 100%; box-sizing: border-box; }
     }
 
     .checkbox-group,
@@ -442,17 +400,7 @@ header {
         gap: $space-2 + 2;
 
         input  { flex: 1; }
-        button {
-            padding: $space-2 $space-4;
-            background-color: #007bff;
-            color: $color-text-light;
-            border: none;
-            border-radius: $radius-sm;
-            cursor: pointer;
-            white-space: nowrap;
-
-            &:hover { background-color: #0056b3; }
-        }
+        button { white-space: nowrap; }
     }
 
     @media (width <= 768px) {
@@ -461,12 +409,7 @@ header {
 
         .modal-content { max-height: 95vh; padding: 15px; margin-top: $space-5; }
 
-        input[type="text"],
-        input[type="url"],
-        input[type="number"],
-        input[type="email"],
-        select,
-        textarea { width: 100%; box-sizing: border-box; }
+        input, select, textarea { width: 100%; box-sizing: border-box; }
 
         .form-row { flex-direction: column; gap: 15px; }
         .inline-group .input-with-button { flex-direction: column; button { width: 100%; } }
