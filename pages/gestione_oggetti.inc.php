@@ -36,7 +36,6 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                         ORDER BY nome ASC", 'result');
 ?>
 
-<link rel="stylesheet" href="../themes/crystal/uffici_nuovi.css">
 
 <!-- Top bar -->
 <div class="topbar">
@@ -135,11 +134,11 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             <!-- Campi Base -->
             <div class="form-group">
                 <label for="nome">Nome Oggetto *</label>
-                <input type="text" name="nome" id="nome" required class="ares">
+                <input type="text" name="nome" id="nome" required>
             </div>
             <div class="form-group">
                 <label for="descrizione">Descrizione *</label>
-                <textarea name="descrizione" id="descrizione" rows="5" required class="ares"></textarea>
+                <textarea name="descrizione" id="descrizione" rows="5" required></textarea>
             </div>
             <!-- Immagine con preview -->
 			<div class="form-row">
@@ -155,7 +154,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
 			</div>
             <div class="form-group">
                 <label for="ubicabile">Posizionabile in</label>
-                <select name="ubicabile" id="ubicabile" class="ares">
+                <select name="ubicabile" id="ubicabile">
                     <?php
                     $posizioni = [
                         0 => 'Non trasportabile', 1 => 'Equipaggia', 2 => 'Mano Dx', 3 => 'Mano Sx',
@@ -173,7 +172,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             <!-- Categoria (modificabile solo in creazione) -->
             <div class="form-group">
                 <label for="categoria">Categoria *</label>
-                <select name="categoria" id="categoriaObj" class="ares" required>
+                <select name="categoria" id="categoriaObj" required>
                     <option value="">Seleziona categoria</option>
                     <option value="standard">Standard</option>
                     <option value="arma">Arma</option>
@@ -186,7 +185,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             <!-- Tipo Oggetto (dinamico) -->
             <div class="form-group">
                 <label for="tipo">Tipo Oggetto *</label>
-                <select name="tipo" id="tipo" class="ares" required>
+                <select name="tipo" id="tipo" required>
                     <option value="">Seleziona tipo</option>
                 </select>
             </div>
@@ -197,7 +196,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             <div id="sezione_arma" class="sezione-dinamica-obj" style="display: none;">
                 <div class="form-group">
                     <label for="tipo_arma">Tipo di arma</label>
-                    <select name="tipo_arma" class="ares">
+                    <select name="tipo_arma">
                         <option value="1">Arma bianca</option>
                         <option value="2">Arma da lancio</option>
                         <option value="3">Arma da fuoco</option>
@@ -205,7 +204,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                 </div>
                 <div class="form-group">
                     <label for="bonus_arma">Bonus arma</label>
-                    <select name="bonus_arma" class="ares">
+                    <select name="bonus_arma">
                         <?php for ($i = 1; $i <= 3; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -213,7 +212,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                 </div>
                 <div class="form-group">
                     <label for="ricarica_massima">Ricarica massima</label>
-                    <select name="ricarica_massima" class="ares">
+                    <select name="ricarica_massima">
                         <?php for ($i = 1; $i <= 10; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -224,7 +223,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             <div id="sezione_curativo" class="sezione-dinamica-obj" style="display: none;">
                 <div class="form-group">
                     <label for="salute_integra">Salute integra</label>
-                    <select name="salute_integra" class="ares">
+                    <select name="salute_integra">
                         <?php for ($i = 0; $i <= 20; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -232,7 +231,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                 </div>
                 <div class="form-group">
                     <label for="integrita_integra">Integrità integra</label>
-                    <select name="integrita_integra" class="ares">
+                    <select name="integrita_integra">
                         <?php for ($i = 0; $i <= 20; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -240,7 +239,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                 </div>
                 <div class="form-group">
                     <label for="cariche_curativo">Cariche iniziali</label>
-                    <select name="cariche_curativo" class="ares">
+                    <select name="cariche_curativo">
                         <?php for ($i = 1; $i <= 10; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -251,7 +250,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             <div id="sezione_statistica" class="sezione-dinamica-obj" style="display: none;">
                 <div class="form-group">
                     <label for="temp_giorni">Durata (giorni)</label>
-                    <select name="temp_giorni" class="ares">
+                    <select name="temp_giorni">
                         <?php for ($i = 1; $i <= 30; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -269,7 +268,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                 foreach ($bonus_extra as $campo => $nome): ?>
                 <div class="form-group">
                     <label for="<?= $campo ?>">Bonus <?= $nome ?></label>
-                    <select name="<?= $campo ?>" class="ares">
+                    <select name="<?= $campo ?>">
                         <?php for ($i = -10; $i <= 10; $i++): ?>
                             <option value="<?= $i ?>"><?= $i > 0 ? '+' : '' ?><?= $i ?></option>
                         <?php endfor; ?>
@@ -279,7 +278,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
 
                 <div class="form-group">
                     <label for="cariche_statistica">Cariche iniziali</label>
-                    <select name="cariche_statistica" class="ares">
+                    <select name="cariche_statistica">
                         <?php for ($i = 1; $i <= 10; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -287,7 +286,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                 </div>
                 <div class="form-group">
                     <label for="ricarica_massima_statistica">Ricarica massima</label>
-                    <select name="ricarica_massima_statistica" class="ares">
+                    <select name="ricarica_massima_statistica">
                         <?php for ($i = 0; $i <= 10; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -298,7 +297,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             <div id="sezione_magico" class="sezione-dinamica-obj" style="display: none;">
                 <div class="form-group">
                     <label for="cariche_magico">Cariche iniziali</label>
-                    <select name="cariche_magico" class="ares">
+                    <select name="cariche_magico">
                         <?php for ($i = 1; $i <= 10; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -306,7 +305,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                 </div>
                 <div class="form-group">
                     <label for="ricarica_massima_magico">Ricarica massima</label>
-                    <select name="ricarica_massima_magico" class="ares">
+                    <select name="ricarica_massima_magico">
                         <?php for ($i = 1; $i <= 10; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -317,7 +316,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             <div id="sezione_standard" class="sezione-dinamica-obj" style="display: none;">
                 <div class="form-group">
                     <label for="cariche_standard">Utilizzo</label>
-                    <select name="cariche_standard" class="ares">
+                    <select name="cariche_standard">
                         <option value="illimitato">Illimitato</option>
                         <?php for ($i = 1; $i <= 10; $i++): ?>
                             <option value="<?= $i ?>"><?= $i ?></option>
