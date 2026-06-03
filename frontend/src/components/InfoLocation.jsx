@@ -72,11 +72,6 @@ export default function InfoLocation() {
     return (
         <div className="pagina_info_location">
 
-            {/* Titolo: nome luogo */}
-            <div className="page_title">
-                <h2>{data.nome}</h2>
-            </div>
-
             <div className="page_body">
 
                 {/* Anno + nome luogo */}
