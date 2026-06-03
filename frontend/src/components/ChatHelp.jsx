@@ -8,7 +8,7 @@
 
 import { useState, useEffect } from 'react'
 
-export default function ChatHelp() {
+export default function ChatHelp({ onBack }) {
     const [soglie, setSoglie] = useState([])
 
     useEffect(() => {
@@ -21,7 +21,7 @@ export default function ChatHelp() {
     return (
         <div className="chat-help-page">
 
-            <button className="chat-help-back" onClick={() => window.history.back()}>
+            <button className="chat-help-back" onClick={() => onBack ? onBack() : window.history.back()}>
                 <i className="fa-solid fa-arrow-left"></i> Torna alla chat
             </button>
 

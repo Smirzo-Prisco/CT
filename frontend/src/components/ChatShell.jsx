@@ -24,6 +24,7 @@ import { createPortal } from 'react-dom'
 import ChatViewer from './ChatViewer'
 import TargetSelector from './TargetSelector'
 import MasterPanel from './MasterPanel'
+import ChatHelp from './ChatHelp'
 
 // ---------------------------------------------------------------------------
 // UTILITÀ
@@ -112,6 +113,9 @@ export default function ChatShell() {
 
     /** Nasconde il pulsante cura dopo che è stato usato con successo */
     const [curaDone, setCuraDone] = useState(false)
+
+    /** Mostra la guida chat come overlay (preserva il testo nel form) */
+    const [showHelp, setShowHelp] = useState(false)
 
     /** Ref allo <style> iniettato per le preferenze tipografiche */
     const styleRef = useRef(null)
@@ -400,6 +404,11 @@ export default function ChatShell() {
     return (
         <>
             <div className="pagina_frame_chat">
+                {showHelp && (
+                    <div className="chat-help-overlay">
+                        <ChatHelp onBack={() => setShowHelp(false)} />
+                    </div>
+                )}
                 <div className="page_body">
 
                     {/* Accesso negato a stanza privata */}
@@ -507,7 +516,7 @@ export default function ChatShell() {
                                                 <img src="themes/crystal/imgs/chat/cura.png" alt="Cura PG" className="chat_icon" />
                                             </a>
                                         )}
-                                        <a href="#" onClick={(e) => { e.preventDefault(); window.CT?.navigate('main.php?page=chat_help') }}>
+                                        <a href="#" onClick={(e) => { e.preventDefault(); setShowHelp(true) }}>
                                             <img src="themes/crystal/imgs/chat/help.png" alt="Info" className="chat_icon" />
                                         </a>
                                         <div className="gdr-session-status inactive" id="gdrSessionStatus">

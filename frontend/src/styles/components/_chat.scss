@@ -762,6 +762,14 @@ div.form_row {
     overflow-y: auto;
 }
 
+.chat-help-overlay {
+    position: absolute;
+    inset: 0;
+    background: $color-bg;
+    z-index: 20;
+    overflow-y: auto;
+}
+
 .pg-role-row {
     display: grid;
     grid-template-columns: 1fr 60px 60px 60px 80px;
