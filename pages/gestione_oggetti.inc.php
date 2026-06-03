@@ -92,7 +92,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
       </tr>
       <?php foreach ($oggetti as $obj): ?>
       <tr>
-        <td width="5%" data-label="Immagine"><img width="25" height="25" src="imgs/items/<?=$obj['urlimg']?>" alt="Immagine"/></td>
+        <td width="5%" data-label="Immagine" style="text-align:center"><img width="50" height="50" src="imgs/items/<?=$obj['urlimg']?>" alt="Immagine"/></td>
         <td><?= htmlspecialchars($obj['nome']) ?></td>
         <td><?= mb_substr(htmlspecialchars($obj['descrizione']), 0, 120, "UTF-8").'...' ?></td>
         <td><?= htmlspecialchars($obj['desc_tipo']) ?></td>
