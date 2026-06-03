@@ -1273,30 +1273,6 @@ header {
 }
 
 
-/* Tabella gestione personaggio */
-.item-list table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #1c1f2e;
-    color: #a7a7a8;
-    font-family: "DejaVu Serif";
-    font-size: 11px;
-    letter-spacing: 2px;
-}
-
-.item-list th, .item-list td {
-    border: 1px solid #333 !important;
-    padding: 8px !important;
-    text-align: left;
-}
-.item-list th { background:#2e3350 !important; }
-
-.item-list td.azioni {
-    display: flex;
-    gap: 6px; /* spazio tra icone */
-    justify-content: center; /* o left/right */
-    align-items: center;
-}
 
 .btn-action {
     background: none;
