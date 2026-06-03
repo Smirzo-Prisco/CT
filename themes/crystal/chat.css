@@ -588,14 +588,14 @@ div.chat_row_Y {
 div.chat_row_S {
     margin-top: 3px;
     font-size: 13px;
-    font-family: "DejaVu Serif", serif;
+    font-family: Inter, sans-serif;
     color: #ffd28a;
 }
 
 div.chat_row_Q {
     margin-top: 3px;
     font-size: 13px;
-    font-family: "DejaVu Serif", serif;
+    font-family: Inter, sans-serif;
     color: #ffd28a;
 }
 
@@ -614,21 +614,21 @@ div.chat_row_C {
 
 span.chat_sussurro {
     font-size: 13px;
-    font-family: "DejaVu Serif", serif;
+    font-family: Inter, sans-serif;
     color: #ffd28a;    
 }
 
 span.chat_time {
     font-size: 13px;
     color: #a7a7a8;
-    font-family: "DejaVu Serif", serif;
+    font-family: Inter, sans-serif;
     margin-right: 3px;
 }
 
 span.chat_name {
     font-size: 13px;
     color: #a7a7a8;
-    font-family: "DejaVu Serif", serif;
+    font-family: Inter, sans-serif;
     text-align: justify;
     
 }
@@ -636,7 +636,7 @@ span.chat_name {
 span.chat_msg {
     color: #a7a7a8;
     font-size: 15px; 
-    font-family: "DejaVu Serif", serif;
+    font-family: Inter, sans-serif;
     text-align: justify;    
 }
 
@@ -661,7 +661,7 @@ span.chat_skill {
 span.intestazione_moderazione {
 font-size: 14px;
 color: #d7b500;
-font-family: "DejaVu Serif", serif;
+font-family: Inter, sans-serif;
 text-align: center;
 filter: drop-shadow(-0.866px 0.5px 6.5px rgb(0 0 0 / 57%));
 text-transform: uppercase;
@@ -670,7 +670,7 @@ text-transform: uppercase;
 span.intestazione_master {
 font-size: 15px;
 color: #05a4c1;
-font-family: "DejaVu Serif", serif;
+font-family: Inter, sans-serif;
 text-align: center;
 filter: drop-shadow(-0.866px 0.5px 6.5px rgb(0 0 0 / 57%));
 text-transform: uppercase;
@@ -679,7 +679,7 @@ text-transform: uppercase;
 span.chat_master {
     font-size: 16px;
     color: #a7a7a8;
-    font-family: "DejaVu Serif", serif;
+    font-family: Inter, sans-serif;
     text-align: justify;   
 }
 
@@ -1015,7 +1015,7 @@ button.chat_button:hover {
     border-radius: 5px;
     font-size: 10px;
     color: #8f8f8f;
-    font-family: "DejaVu Serif", serif;
+    font-family: Inter, sans-serif;
     padding: 4px;
     text-transform: uppercase;
     cursor: pointer;
