@@ -41,10 +41,28 @@ $gestione-hover: $palette-surface-hover; // #2e3350
 
 // ── Topbar ────────────────────────────────────────────────────
 
-.topbar a {
-    padding: 6px 12px;
-    border-radius: 5px;
-    transition: background .3s ease;
+.topbar {
+    max-height: 40px;
+    gap: 15px;
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: $gestione-surface;
+    padding: $space-3 $space-5;
+    box-shadow: $shadow-sm;
+    z-index: 10;
+
+    a {
+        padding: 6px 12px;
+        border-radius: 5px;
+        transition: background .3s ease;
+    }
+
+    .btn-action.right {
+        margin-left: auto;
+    }
 }
 
 // ── Dashboard ─────────────────────────────────────────────────
@@ -458,6 +476,10 @@ header {
 }
 
 @media only screen and (width <=768px) {
+    .topbar {
+        flex-wrap: wrap;
+    }
+
     .filter-form {
         order: 3;
         width: 100%;
