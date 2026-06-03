@@ -37,7 +37,7 @@ div.pagina_forum {
 div.forum_date_big {
     font-size: $text-xs;
     color: $palette-text-title;
-    font-family: $font-serif;
+    font-family: $font-base;
     text-align: left;
     margin-top: 2px;
     padding-left: 15px;
@@ -47,7 +47,7 @@ div.forum_date_big {
 div.forum_date_big_right {
     font-size: $text-md - 1;
     color: #8f8f8f;
-    font-family: $font-serif;
+    font-family: $font-base;
     text-align: center;
     margin-top: 2px;
     padding-top: $space-1 + 1;
@@ -63,13 +63,13 @@ div.forum_column {
     padding-left: 15px;
     font-size: $text-md - 1;
     color: $palette-text-title;
-    font-family: $font-serif;
+    font-family: $font-base;
 }
 
 div.forum_date_small {
     font-size: $text-xs;
     color: $palette-text-title;
-    font-family: $font-serif;
+    font-family: $font-base;
     text-align: left;
     margin-top: 2px;
     padding-left: 15px;
@@ -79,7 +79,7 @@ div.forum_date_small {
 div.forum_post_title {
     font-size: $text-md - 1;
     color: $palette-text-title;
-    font-family: $font-serif;
+    font-family: $font-base;
     text-transform: uppercase;
 }
 
@@ -110,7 +110,7 @@ div.forum_post_modify {
     font-size: $text-sm;
     letter-spacing: 2px;
     color: $palette-text-title;
-    font-family: $font-serif;
+    font-family: $font-base;
     text-align: center;
     margin: 40px 0 $space-5 0;
     text-transform: uppercase;
@@ -125,7 +125,7 @@ div.header_thread {
     font-size: 15px;
     text-align: center;
     color: $forum-accent;
-    font-family: $font-serif;
+    font-family: $font-base;
     text-transform: uppercase;
 }
 

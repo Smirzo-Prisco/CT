@@ -51,7 +51,7 @@ tr.presente-assente {
 
 div.presente a {
     line-height: 0;
-    text-transform: none;   // specificità (0,1,2) batte a:link (0,1,1)
+    text-transform: none; // specificità (0,1,2) batte a:link (0,1,1)
 }
 
 div.link_presenti {
@@ -61,7 +61,7 @@ div.link_presenti {
 .online-user-link {
     font-size: $text-md;
     letter-spacing: 0;
-    text-transform: none;   // override global a:link { text-transform: uppercase }
+    text-transform: none; // override global a:link { text-transform: uppercase }
 }
 
 div.contenitore_presenti {
@@ -146,7 +146,7 @@ div.pagina_presenti {
     a:visited {
         border: none;
         color: $color-action;
-        text-transform: none;   // override global a:link { text-transform: uppercase }
+        text-transform: none; // override global a:link { text-transform: uppercase }
     }
 
     a:hover {
@@ -201,7 +201,7 @@ tr.second_header {
     background: url('imgs/presenti/barra.png');
     font-size: $text-xs;
     color: $palette-text-title;
-    font-family: $font-serif;
+    font-family: $font-base;
 }
 
 tr.third_header {
@@ -211,7 +211,7 @@ tr.third_header {
     a:visited {
         font-size: $text-md - 1;
         color: $color-action;
-        font-family: $font-serif;
+        font-family: $font-base;
         filter: drop-shadow(-1.732px 1px 2px #000);
     }
 }
@@ -219,13 +219,13 @@ tr.third_header {
 tr.mappa {
     font-size: $text-md - 1;
     color: #8f8f8f;
-    font-family: $font-serif;
+    font-family: $font-base;
 }
 
 tr.presente a:link,
 tr.presente a:visited {
     font-size: $text-sm;
     color: $color-action;
-    font-family: $font-serif;
-    text-transform: none;   // override global a:link { text-transform: uppercase }
+    font-family: $font-base;
+    text-transform: none; // override global a:link { text-transform: uppercase }
 }

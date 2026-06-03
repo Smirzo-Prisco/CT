@@ -31,20 +31,20 @@ import shared from './shared.module.css'
 
 /** Fusione tipi DB → label categoria (come nell'originale PHP) */
 const TYPE_MERGE = {
-    'Default':            'Default/Difensiva',
-    'Difensiva':          'Default/Difensiva',
-    'Generica base':      'Generica',
-    'Generica avanzata':  'Generica',
-    'Attacco base':       'Attacco',
-    'Attacco medio':      'Attacco',
-    'Attacco avanzato':   'Attacco',
-    'Mentale base':       'Mentale',
-    'Mentale media':      'Mentale',
-    'Mentale avanzata':   'Mentale',
+    'Default': 'Default/Difensiva',
+    'Difensiva': 'Default/Difensiva',
+    'Generica base': 'Generica',
+    'Generica avanzata': 'Generica',
+    'Attacco base': 'Attacco',
+    'Attacco medio': 'Attacco',
+    'Attacco avanzato': 'Attacco',
+    'Mentale base': 'Mentale',
+    'Mentale media': 'Mentale',
+    'Mentale avanzata': 'Mentale',
     'Mentale di attacco': 'Mentale',
-    'Potere speciale':    'Potere speciale',
-    'Talento':            'Talento',
-    'Skill temporanea':   'Skill temporanee',
+    'Potere speciale': 'Potere speciale',
+    'Talento': 'Talento',
+    'Skill temporanea': 'Skill temporanee',
 }
 
 /** Ordine canonico delle categorie display */
@@ -130,10 +130,10 @@ function SkillGroup({ categoria, lista }) {
                 <tr className="second_header">
                     <td colSpan="1" style={{
                         textTransform: 'uppercase',
-                        fontSize:      'var(--text-md)',
-                        color:         'var(--palette-rust)',
-                        fontFamily:    'var(--font-serif)',
-                        filter:        'drop-shadow(0 0 5px rgba(0,0,0,0.57))',
+                        fontSize: 'var(--text-md)',
+                        color: 'var(--palette-rust)',
+                        fontFamily: 'var(--font-base)',
+                        filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.57))',
                     }}>
                         {categoria}
                     </td>
@@ -154,8 +154,8 @@ export default function SchedaSkills() {
     const pg = new URLSearchParams(window.location.search).get('pg') ?? ''
 
     const [profile, setProfile] = useState(null)
-    const [skills,  setSkills]  = useState(null)
-    const [error,   setError]   = useState(null)
+    const [skills, setSkills] = useState(null)
+    const [error, setError] = useState(null)
 
     useEffect(() => {
         if (!pg) { setError('Personaggio non specificato'); return }
@@ -168,13 +168,13 @@ export default function SchedaSkills() {
             }),
         ]).then(([prof, sk]) => {
             if (prof.success) setProfile(prof)
-            else              setError(prof.message ?? 'Errore profilo')
-            if (sk.success)   setSkills(sk.skills)
-            else              setError(sk.message  ?? 'Errore abilità')
+            else setError(prof.message ?? 'Errore profilo')
+            if (sk.success) setSkills(sk.skills)
+            else setError(sk.message ?? 'Errore abilità')
         }).catch(e => setError(e.message ?? 'Errore di rete'))
     }, [pg])
 
-    if (error)               return <div className="pagina_scheda"><div className="error">{error}</div></div>
+    if (error) return <div className="pagina_scheda"><div className="error">{error}</div></div>
     if (!profile || !skills) return <div className="pagina_scheda"><div>Caricamento…</div></div>
 
     const { nome, cognome, is_own, is_admin, is_staff, is_master } = profile

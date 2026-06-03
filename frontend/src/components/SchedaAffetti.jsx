@@ -26,16 +26,16 @@ import SchedaMenu from './SchedaMenu'
 // ---------------------------------------------------------------------------
 
 const TIPO_LABELS = {
-    legami:     'Legami',
-    nemici:     'Nemici',
-    famiglia:   'Famiglia',
+    legami: 'Legami',
+    nemici: 'Nemici',
+    famiglia: 'Famiglia',
     conoscenze: 'Conoscenze',
-    memories:   'Memories',
+    memories: 'Memories',
 }
 
 const AVATAR_DEFAULT = '/themes/crystal/imgs/scheda/empy_affetti.png'
-const DETAIL_BASE    = '/pages/dettaglio_affetto.php'
-const INTRO_BASE     = '/pages/intro_affetto.php'
+const DETAIL_BASE = '/pages/dettaglio_affetto.php'
+const INTRO_BASE = '/pages/intro_affetto.php'
 
 // ---------------------------------------------------------------------------
 // SOTTO-COMPONENTI
@@ -62,10 +62,12 @@ function AffettoTile({ entry, pg, onClick, selected }) {
                     <span>{displayName}</span>
                     {entry.titolo && (
                         <><br />
-                        <span style={{ color: '#616161', fontFamily: 'Dejavu Sans', fontSize: 11,
-                                       textTransform: 'none', letterSpacing: 'normal' }}>
-                            {entry.titolo}
-                        </span></>
+                            <span style={{
+                                color: '#616161', fontFamily: 'Dejavu Sans', fontSize: 11,
+                                textTransform: 'none', letterSpacing: 'normal'
+                            }}>
+                                {entry.titolo}
+                            </span></>
                     )}
                 </div>
             </a>
@@ -80,12 +82,12 @@ function AffettoTile({ entry, pg, onClick, selected }) {
 export default function SchedaAffetti() {
     const pg = new URLSearchParams(window.location.search).get('pg') ?? ''
 
-    const [profile,  setProfile]  = useState(null)
-    const [affetti,  setAffetti]  = useState(null)
-    const [canAdd,   setCanAdd]   = useState(false)
+    const [profile, setProfile] = useState(null)
+    const [affetti, setAffetti] = useState(null)
+    const [canAdd, setCanAdd] = useState(false)
     const [iframeSrc, setIframeSrc] = useState('')
     const [selected, setSelected] = useState(null)
-    const [error,    setError]    = useState(null)
+    const [error, setError] = useState(null)
     const iframeRef = useRef(null)
 
     useEffect(() => {
@@ -98,7 +100,7 @@ export default function SchedaAffetti() {
                 .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
         ]).then(([prof, aff]) => {
             if (prof.success) setProfile(prof)
-            else              setError(prof.message ?? 'Errore profilo')
+            else setError(prof.message ?? 'Errore profilo')
             if (aff.success) {
                 setAffetti(aff.affetti)
                 setCanAdd(aff.can_add)
@@ -116,7 +118,7 @@ export default function SchedaAffetti() {
         setSelected(id)
     }
 
-    if (error)            return <div className="pagina_scheda"><div className="error">{error}</div></div>
+    if (error) return <div className="pagina_scheda"><div className="error">{error}</div></div>
     if (!profile || !affetti) return <div className="pagina_scheda"><div>Caricamento…</div></div>
 
     const { nome, cognome, is_own, is_admin, is_staff, is_master } = profile
@@ -140,12 +142,12 @@ export default function SchedaAffetti() {
                         {/* Intestazione colonne */}
                         <tr style={{ background: "url('/themes/crystal/imgs/presenti/barra.png')", border: '1px solid #090a11' }}>
                             <td style={{ border: 'none' }}>
-                                <div className="faces" style={{ fontFamily: 'var(--font-serif)', color: '#ce846f', fontSize: 12 }}>
+                                <div className="faces" style={{ fontFamily: 'var(--font-base)', color: '#ce846f', fontSize: 12 }}>
                                     <div className="faces_info">PERSONAGGI</div>
                                 </div>
                             </td>
                             <td style={{ border: 'none' }}>
-                                <div className="faces" style={{ fontFamily: 'var(--font-serif)', color: '#ce846f', fontSize: 12 }}>
+                                <div className="faces" style={{ fontFamily: 'var(--font-base)', color: '#ce846f', fontSize: 12 }}>
                                     <div className="faces_info">DETTAGLIO</div>
                                 </div>
                             </td>
@@ -192,9 +194,11 @@ export default function SchedaAffetti() {
                                                     openDetail(`/pages/form_affetto.php?username=${enc}`, null)
                                                 }}>
                                                 <div className="tile-text" style={{ textAlign: 'center' }}>
-                                                    <span style={{ color: '#353535', fontSize: 11,
-                                                                   fontFamily: 'Dejavu Sans',
-                                                                   textTransform: 'uppercase' }}>
+                                                    <span style={{
+                                                        color: '#353535', fontSize: 11,
+                                                        fontFamily: 'Dejavu Sans',
+                                                        textTransform: 'uppercase'
+                                                    }}>
                                                         Aggiungi affetto
                                                     </span>
                                                 </div>
@@ -218,7 +222,7 @@ export default function SchedaAffetti() {
                                         try {
                                             const h = iframeRef.current?.contentWindow?.document?.body?.scrollHeight
                                             if (h) iframeRef.current.style.height = h + 'px'
-                                        } catch {}
+                                        } catch { }
                                     }}
                                 />
                             </td>

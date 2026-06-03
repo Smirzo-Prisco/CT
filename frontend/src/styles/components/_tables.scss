@@ -4,7 +4,7 @@
 // Gestisce la classe .ct-table-responsive usata nelle
 // pagine di gestione (lista utenti, personaggi, ecc.).
 //
-// @use: tokens → $font-serif, $text-sm, $text-lg, $palette-text-title,
+// @use: tokens → $text-sm, $text-lg, $palette-text-title,
 //               $color-border, $color-action, $space-2, $space-3,
 //               $radius-sm, $transition-normal
 // ============================================================
@@ -54,8 +54,8 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: $space-1 $space-1;  // 5px (usa $space-1 = 4px, vicino)
-    color: $color-action;        // #4da6ff
+    padding: $space-1 $space-1; // 5px (usa $space-1 = 4px, vicino)
+    color: $color-action; // #4da6ff
     transition: color $transition-normal; // 0.3s ease
 }
 
@@ -64,7 +64,7 @@
 }
 
 // ── Responsive: mobile (≤ 768px) ────────────────────────────────────
-@media (width <= 768px) {
+@media (width <=768px) {
     .ct-table-responsive table {
         min-width: 100%;
     }
@@ -75,7 +75,8 @@
     }
 
     // ── Responsive: mobile stretto (≤ 480px) — layout a card ────────
-    @media (width <= 480px) {
+    @media (width <=480px) {
+
         .ct-table-responsive table,
         .ct-table-responsive thead,
         .ct-table-responsive tbody,
@@ -144,7 +145,7 @@
 }
 
 // ── Responsive: tablet (769px – 1024px) ─────────────────────────────
-@media (width <= 1024px) and (width >= 769px) {
+@media (width <=1024px) and (width >=769px) {
     .ct-table-responsive table {
         font-size: $text-lg; // 14px
     }
