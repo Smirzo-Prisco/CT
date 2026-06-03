@@ -60,14 +60,14 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             // Per tipo
             $tipi = gdrcd_query("SELECT * FROM codtipooggetto ORDER BY descrizione ASC", 'result');
 
-            echo '<select name="tipo" id="selectTipoObj" class="form-select"><option value="">Tutti</option>';
+            echo '<select name="tipo" id="selectTipoObj"><option value="">Tutti</option>';
             while ($row = gdrcd_query($tipi, 'fetch')) { echo '<option value="' . $row['cod_tipo'] . '" '.($_POST[$filtro]==$row['cod_tipo']?'selected':'').'>' . htmlspecialchars($row['descrizione']) . '</option>'; }
             echo '</select>';
 
             // Per categoria
             $tipi = gdrcd_query("SELECT DISTINCT categoria FROM oggetto ORDER BY categoria ASC", 'result');
 
-            echo '<select name="categoria" id="selectCategoriaObj" class="form-select"><option value="">Tutti</option>';
+            echo '<select name="categoria" id="selectCategoriaObj"><option value="">Tutti</option>';
             while ($row = gdrcd_query($tipi, 'fetch')) { echo '<option '.($_POST[$filtro]==htmlspecialchars($row['categoria'])?'selected':'').'>' . htmlspecialchars($row['categoria']) . '</option>'; }
             echo '</select>';
         ?>

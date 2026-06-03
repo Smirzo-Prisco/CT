@@ -1371,25 +1371,6 @@ display: none; /* nasconde la checkbox nativa */
     box-shadow: 0 0 8px rgb(77 166 255 / 60%);
 }
 
-.form-select, 
-.searchField {
-    max-height: 30px; /* Altezza consistente */
-    margin: 0;
-    padding: 6px 12px;
-    border: 1px solid #2e3350;
-    border-radius: 5px;
-    background: #2a2d3c;
-    color: #fff;
-    font-size: 14px;
-}
-
-.form-select {
-    min-width: 120px;
-}
-
-.searchField {
-    width: 200px;
-}
 
 /************** Lista prodotti mercato ***********************/
 .prodotto {
