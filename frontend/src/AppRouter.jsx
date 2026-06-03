@@ -367,7 +367,6 @@ export default function AppRouter({ isStaff = false }) {
     // così il nuovo mount chiama op=shell con la sessione aggiornata dal move.
     if (isChat) {
         injectCSS('/themes/crystal/mestieri.css')
-        injectCSS('/themes/crystal/chat.css')
         return <ChatShell key={params.dir} />
     }
 

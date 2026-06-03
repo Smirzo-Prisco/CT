@@ -870,7 +870,7 @@ function closeTurn($id_role, $location) {
 
 /**
  * Genera il riepilogo del turno come HTML card-based.
- * Stile gestito da .ct-turn__* in chat.css.
+ * Stile gestito da .ct-turn__* in _chat.scss (compilato in ct-main.css).
  * Solo background:hsl() sugli avatar e width:% sulla barra HP restano inline
  * perché calcolati dinamicamente.
  *

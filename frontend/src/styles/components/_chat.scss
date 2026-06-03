@@ -429,6 +429,15 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
             background-color: #e74c3c;
             animation: none;
         }
+
+        .gdr-status-text {
+            text-shadow: none;
+            color: $color-text;
+        }
+
+        .gdr-animated-border {
+            display: none;
+        }
     }
 }
 
@@ -1731,4 +1740,239 @@ button.chat_button {
         background: #6b2121;
         color: #fff;
     }
+}
+
+// ── Avatar inline nella riga chat ────────────────────────────
+
+img.chat_avatar_inline {
+    width: 22px;
+    height: 22px;
+    border-radius: $radius-full;
+    object-fit: cover;
+    vertical-align: middle;
+    margin: 0 4px;
+    display: inline-block;
+}
+
+// ── Status text e bordo animato sessione ──────────────────────
+
+.gdr-status-text {
+    color: $color-text-light;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-shadow: 0 0 10px rgb(39 174 96 / 50%);
+}
+
+.gdr-animated-border {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgb(39 174 96 / 40%), transparent);
+    animation: gdr-shine 3s infinite;
+}
+
+// ── CT-TURN: riepilogo turno di combattimento ─────────────────
+// Solo background:hsl() sugli avatar e width:% sulla barra HP
+// restano inline, calcolati dinamicamente da PHP.
+
+.ct-turn {
+    font-family: $font-chat;
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.ct-turn__header {
+    background: #12141f;
+    border: 1px solid #3a3f5c;
+    border-radius: $radius-lg;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-weight: $font-weight-bold;
+    font-size: $text-lg;
+    color: #7986cb;
+}
+
+.ct-turn__cards {
+    margin-bottom: 12px;
+}
+
+.ct-turn__card {
+    background: #181b28;
+    border: 1px solid #2d3348;
+    border-radius: $radius-lg;
+    padding: 12px;
+    margin-bottom: $space-2;
+}
+
+.ct-turn__card--generic {
+    border-left: 3px solid #7986cb;
+    padding: 10px 12px;
+}
+
+.ct-turn__card--kill {
+    background: #4a0000;
+    border-color: #8b0000;
+    padding: 8px 12px;
+    font-size: $text-md;
+    color: #ef9a9a;
+}
+
+.ct-turn__row {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-wrap: wrap;
+}
+
+.ct-turn__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-full;
+    font-weight: $font-weight-bold;
+    font-size: $text-md;
+    color: #fff;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.ct-turn__name {
+    font-weight: $font-weight-bold;
+    color: #cfd8dc;
+    font-size: $text-md;
+}
+
+.ct-turn__connector {
+    color: #666;
+    font-size: $text-xl;
+    margin: 0 2px;
+}
+
+.ct-turn__badge {
+    border-radius: $radius-sm;
+    padding: 2px 8px;
+    font-size: $text-sm;
+    white-space: nowrap;
+    margin-left: auto;
+
+    &--hit    { background: #4a1010; color: #ef9a9a; }
+    &--miss   { background: #3a2c10; color: #ffcc80; }
+    &--shield { background: #1a3a5c; color: #90caf9; }
+    &--ok     { background: #1b5e20; color: #a5d6a7; }
+    &--fail   { background: #4a1010; color: #ef9a9a; }
+    &--noatk  { background: #2a2a10; color: #ffcc80; }
+}
+
+.ct-turn__formula {
+    font-size: $text-sm;
+    color: #9e9e9e;
+    margin-top: 6px;
+
+    b { color: #ef9a9a; }
+}
+
+.ct-turn__hpbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.ct-turn__hpbar__label {
+    font-size: $text-2xs;
+    color: #888;
+    min-width: 22px;
+}
+
+.ct-turn__hpbar__track {
+    flex: 1;
+    background: #252836;
+    border-radius: 3px;
+    height: 6px;
+    overflow: hidden;
+}
+
+.ct-turn__hpbar__fill {
+    height: 100%;
+    border-radius: 3px;
+
+    &--high { background: #4caf50; }
+    &--mid  { background: #ff9800; }
+    &--low  { background: #f44336; }
+}
+
+.ct-turn__hpbar__value {
+    font-size: $text-sm;
+    color: #aaa;
+    min-width: 52px;
+    text-align: right;
+}
+
+.ct-turn__note {
+    font-size: $text-sm;
+    color: #ff9800;
+    margin-top: 4px;
+
+    &--duration { color: #ffb74d; }
+}
+
+.ct-turn__generic-text {
+    font-size: $text-md;
+    color: #cfd8dc;
+}
+
+.ct-turn__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: $space-2;
+}
+
+.ct-turn__pg-card {
+    background: #181b28;
+    border: 1px solid #2d3348;
+    border-radius: $radius-lg;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+.ct-turn__pg-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-full;
+    font-weight: $font-weight-bold;
+    font-size: $text-md;
+    color: #fff;
+}
+
+.ct-turn__pg-name {
+    font-weight: $font-weight-bold;
+    color: #cfd8dc;
+    margin: 6px 0 2px;
+    font-size: $text-md;
+    overflow-wrap: anywhere;
+}
+
+.ct-turn__pg-dmg--ps {
+    font-size: $text-md;
+    color: #ef9a9a;
+    margin-top: 2px;
+}
+
+.ct-turn__pg-dmg--int {
+    font-size: $text-md;
+    color: #ce93d8;
+    margin-top: 2px;
+}
+
+.ct-turn__pg-ok {
+    font-size: $text-md;
+    color: #66bb6a;
+    margin-top: 2px;
 }
