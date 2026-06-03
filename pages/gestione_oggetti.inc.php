@@ -99,6 +99,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
         <td><?= htmlspecialchars($obj['categoria']) ?></td>
         <!-- Colonna Azioni -->
         <td class="azioni">
+          <div class="action-buttons">
           <?php if (hasPermesso($_SESSION, $azioni_permessi['modifica']) || $mestiere == $obj['tipo']): ?>
             <button type="button" class="btn-action" title="Modifica" onclick="apriModaleModificaObj(<?= $obj['id_oggetto'] ?>)"><i class="fa-solid fa-pen-to-square"></i></button>
           <?php endif; ?>
@@ -117,6 +118,7 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
               <button type="submit" class="btn-action" title="Approva"><i class="fa-solid fa-check-circle"></i></button>
             </form>
           <?php endif; ?>
+          </div>
         </td>
       </tr>
       <?php endforeach; ?>

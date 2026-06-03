@@ -146,9 +146,6 @@ header {
         }
     }
 
-    td.azioni {
-        display: flex;
-    }
 }
 
 // ── Filtri ────────────────────────────────────────────────────
@@ -161,7 +158,9 @@ header {
     padding: $space-2 + 2;
 
     label {
+        display: inline-flex;
         align-items: center;
+        gap: $space-1;
         color: $color-text-muted;
         font-size: $text-lg;
         cursor: pointer;
