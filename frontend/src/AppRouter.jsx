@@ -59,6 +59,7 @@ import PrenotazioniProva    from './components/PrenotazioniProva'
 import ServiziGilde         from './components/ServiziGilde'
 import Statuto              from './components/Statuto'
 import Documentazione       from './components/Documentazione'
+import ChatHelp             from './components/ChatHelp'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -214,6 +215,10 @@ const ROUTES = {
             '/themes/crystal/documentazione_menu.css',
             '/themes/crystal/documentazione_spa.css',
         ],
+    },
+    chat_help: {
+        component: ChatHelp,
+        css: ['/themes/crystal/chat_help.css'],
     },
 }
 

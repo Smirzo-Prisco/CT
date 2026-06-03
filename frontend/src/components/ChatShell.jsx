@@ -507,7 +507,7 @@ export default function ChatShell() {
                                                 <img src="themes/crystal/imgs/chat/cura.png" alt="Cura PG" className="chat_icon" />
                                             </a>
                                         )}
-                                        <a href="#" onClick={(e) => { e.preventDefault(); window.open('chat_help.proc.php', 'Help', 'toolbar=no,width=500,height=500') }}>
+                                        <a href="#" onClick={(e) => { e.preventDefault(); window.CT?.navigate('main.php?page=chat_help') }}>
                                             <img src="themes/crystal/imgs/chat/help.png" alt="Info" className="chat_icon" />
                                         </a>
                                         <div className="gdr-session-status inactive" id="gdrSessionStatus">

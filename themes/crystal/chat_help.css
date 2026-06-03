@@ -1,23 +1,39 @@
-/* chat_help.proc.php — Pagina standalone aiuto chat */
+/* chat_help.css — Guida chat integrata nella SPA */
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-    background: linear-gradient(135deg, #0f111d 0%, #1a1a2e 100%);
-    font-family: "DejaVu Serif", Georgia, serif;
+/* Wrapper principale: fornisce contesto colore/font senza toccare il global */
+.chat-help-page {
     color: #e0e0e0;
     line-height: 1.6;
     padding: 15px;
-    min-height: 100vh;
 }
 
-.intestazione {
+.chat-help-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgb(206 132 111 / 15%);
+    color: #ce846f;
+    border: 1px solid rgb(206 132 111 / 40%);
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.chat-help-back:hover {
+    background: rgb(206 132 111 / 28%);
+    border-color: rgb(206 132 111 / 70%);
+}
+
+.chat-help-page .intestazione {
     display: block;
     font-size: 1.8rem;
     text-transform: uppercase;
     color: #ce846f;
     font-weight: bold;
-    text-shadow: -2px 2px 3px rgba(0,0,0,0.7);
+    text-shadow: -2px 2px 3px rgb(0 0 0 / 70%);
     padding-bottom: 10px;
     border-bottom: 2px dashed #ce846f;
     text-align: center;
@@ -26,7 +42,7 @@ body {
     letter-spacing: 1px;
 }
 
-.section-title {
+.chat-help-page .section-title {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -34,15 +50,19 @@ body {
     color: #ce846f;
     text-transform: uppercase;
     font-weight: bold;
-    text-shadow: -2px 2px 3px rgba(0,0,0,0.7);
+    text-shadow: -2px 2px 3px rgb(0 0 0 / 70%);
     padding: 8px 0;
-    border-bottom: 1px dashed rgba(206,132,111,0.4);
+    border-bottom: 1px dashed rgb(206 132 111 / 40%);
     margin-bottom: 15px;
 }
 
-.section-title::before { content: "›"; font-size: 1.4rem; color: #b56d57; }
+.chat-help-page .section-title::before {
+    content: "›";
+    font-size: 1.4rem;
+    color: #b56d57;
+}
 
-.text-content {
+.chat-help-page .text-content {
     color: #a8a8a8;
     font-size: 0.95rem;
     line-height: 1.7;
@@ -50,80 +70,69 @@ body {
     padding: 0 5px;
 }
 
-.text-content b { color: #ce846f; font-weight: bold; }
+.chat-help-page .text-content b {
+    color: #ce846f;
+    font-weight: bold;
+}
 
-.help-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+.chat-help-page .help-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-.commands-grid {
+.chat-help-page .commands-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
     gap: 25px;
     margin-bottom: 40px;
 }
 
-@media (max-width: 768px) { .commands-grid { grid-template-columns: 1fr; } }
+@media (width <= 768px) {
+    .chat-help-page .commands-grid {
+        grid-template-columns: 1fr;
+    }
+}
 
-.command-card {
-    background: rgba(20,21,35,0.85);
+.chat-help-page .command-card {
+    background: rgb(20 21 35 / 85%);
     border-radius: 10px;
     padding: 25px;
-    border: 1px solid rgba(206,132,111,0.2);
+    border: 1px solid rgb(206 132 111 / 20%);
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 20%);
     height: 100%;
 }
 
-.command-card:hover {
+.chat-help-page .command-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(206,132,111,0.4);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    border-color: rgb(206 132 111 / 40%);
+    box-shadow: 0 8px 25px rgb(0 0 0 / 30%);
 }
 
-.examples-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.example-img {
+/* Tabella moltiplicatori danno */
+.help-soglie-table {
     width: 100%;
-    height: auto;
-    border-radius: 6px;
-    border: 2px solid rgba(206,132,111,0.3);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
-    transition: transform 0.3s ease;
-}
-
-.example-img:hover { transform: scale(1.02); border-color: rgba(206,132,111,0.5); }
-
-.divider {
+    margin-top: 10px;
+    border-collapse: collapse;
     text-align: center;
-    color: #8f8f8f;
-    margin: 30px 0;
-    position: relative;
+    font-size: 0.9rem;
 }
 
-.divider::before, .divider::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    width: 40%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #8f8f8f, transparent);
+.help-soglie-table th {
+    background: #1a2240;
+    color: #ce846f;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border: 1px solid #333;
 }
 
-.divider::before { left: 0; }
-.divider::after  { right: 0; }
+.help-soglie-table td {
+    color: #a8a8a8;
+    padding: 5px 10px;
+    border: 1px solid #333;
+}
 
-.mb-10 { margin-bottom: 10px; }
-.mb-15 { margin-bottom: 15px; }
-.mb-20 { margin-bottom: 20px; }
-.mb-30 { margin-bottom: 30px; }
-.text-center  { text-align: center; }
-.text-italic  { font-style: italic; }
-
-::-webkit-scrollbar       { width: 10px; }
-::-webkit-scrollbar-track { background: rgba(20,21,35,0.8); }
-::-webkit-scrollbar-thumb { background: rgba(206,132,111,0.5); border-radius: 5px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(206,132,111,0.7); }
+.help-soglie-table tr:nth-child(even) td {
+    background: rgb(30 40 60 / 40%);
+}
