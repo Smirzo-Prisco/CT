@@ -2,7 +2,8 @@
 /**
  * api_chatHelp.php — Soglie danno per la pagina help chat
  */
-require 'header.inc.php';
+session_start();
+require_once(__DIR__ . '/../config.inc.php');
 header('Content-Type: application/json');
 
 $soglie = [];
