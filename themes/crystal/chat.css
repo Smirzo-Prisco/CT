@@ -471,6 +471,16 @@ img.chat_avatar {
     position: relative;
 }
 
+img.chat_avatar_inline {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+    vertical-align: middle;
+    margin: 0 4px;
+    display: inline-block;
+}
+
 /***** testo della chat *****/
 
 /* Tipi messaggio: (A azione, P parlato, N PNG, M Master, X Moderazione, I Immagine, S sussurro, D dado, C skill check, O uso oggetto) */

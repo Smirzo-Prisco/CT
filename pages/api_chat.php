@@ -714,6 +714,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                             $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar" style="width:'.$PARAMETERS['settings']['chat_avatar']['width'].'px; height:'.$PARAMETERS['settings']['chat_avatar']['height'].'px;" />';
                         }
                         $add_chat .= '<span class="chat_time">'.gdrcd_format_time($row['ora']).'</span>';
+                        if (!empty($row['url_img_chat'])) $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar_inline" />';
                         if ($PARAMETERS['mode']['chaticons']=='ON') $add_chat .= $add_icon;
                         $add_chat .= '<span class="chat_name"><a href="main.php?page=scheda&pg='.$row['mittente'].'">'.$row['mittente'].'</a>';
                         if (!empty($row['destinatario'])) $add_chat .= '<span class="chat_tag"> [<font color=#d89d8c>'.gdrcd_filter('out',$row['destinatario']).'</font>]</span>';
@@ -727,6 +728,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                             $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar" style="width:'.$PARAMETERS['settings']['chat_avatar']['width'].'px; height:'.$PARAMETERS['settings']['chat_avatar']['height'].'px;" />';
                         }
                         $add_chat .= '<span class="chat_time">'.gdrcd_format_time($row['ora']).'</span>';
+                        if (!empty($row['url_img_chat'])) $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar_inline" />';
                         if ($PARAMETERS['mode']['chaticons']=='ON') $add_chat .= $add_icon;
                         $add_chat .= '<span class="chat_name"><a href="#" onclick="document.getElementById(\'tag\').value=\''.$row['mittente'].'\'; document.getElementById(\'type\')[2].selected = \'1\'; document.getElementById(\'message\').focus();">'.$row['mittente'].'</a>';
                         if(!empty($row['destinatario'])) $add_chat .= '<span class="chat_tag"> ['.gdrcd_filter('out',$row['destinatario']).']</span>';
