@@ -383,10 +383,11 @@ function AttacchiPngSospeso() {
 // ── Componente principale ─────────────────────────────────────────────────────
 
 /**
- * @param {boolean} props.isOpen  - Il pannello master è visibile
- * @param {Function} props.onClose - Callback per chiudere il pannello
+ * @param {boolean}  props.isOpen      - Il pannello master è visibile
+ * @param {Function} props.onClose     - Callback per chiudere il pannello
+ * @param {boolean}  props.showPulisci - Mostra l'icona pulisci chat (solo staff abilitato)
  */
-export default function MasterPanel({ isOpen, onClose }) {
+export default function MasterPanel({ isOpen, onClose, showPulisci }) {
     if (!isOpen) return null
 
     return createPortal(
@@ -407,18 +408,23 @@ export default function MasterPanel({ isOpen, onClose }) {
                 {/* Header */}
                 <div className="gdr-header">
                     <div className="gdr-logo">Pannello Master</div>
+                    <div className="gdr-main-controls">
+                        <a href="#" id="endTurnMaster" className="gdr-control-btn" title="Chiudi turno"
+                            onClick={e => { e.preventDefault(); window.closeTurn?.() }}>
+                            <i className="fa-solid fa-flag-checkered" style={{ fontSize: '20px', color: '#e8e6e3' }}></i>
+                        </a>
+                        {showPulisci && (
+                            <a href="#" className="gdr-control-btn" title="Pulisci chat"
+                                onClick={e => { e.preventDefault(); window.pulisciChat?.() }}>
+                                <img src="themes/crystal/imgs/chat/pulisci_chat.png" alt="Pulisci chat" />
+                            </a>
+                        )}
+                    </div>
                     <button className="gdr-close-btn" onClick={onClose}>&times;</button>
                 </div>
 
                 {/* Corpo scrollabile */}
                 <div style={{ overflowY: 'auto', padding: '16px', flex: 1 }}>
-
-                    {/* Chiudi turno */}
-                    <button className="btn" id="endTurnMaster" onClick={() => window.closeTurn?.()}>
-                        Chiudi turno
-                    </button>
-
-                    <br /><br />
 
                     {/* Modifica PG + Crea PNG + Gestione PNG + Attacchi PNG in sospeso */}
                     <div className="gdr-grid">

@@ -640,13 +640,6 @@ export default function ChatShell() {
                                     )}
 
 
-                                    {/* Pulisci chat: solo staff */}
-                                    {pulsanti.show_pulisci && (
-                                        <a href="#" onClick={(e) => { e.preventDefault(); window.pulisciChat?.() }} className="gdr-control-btn">
-                                            <img src="themes/crystal/imgs/chat/pulisci_chat.png" alt="Pulisci chat" />
-                                        </a>
-                                    )}
-
                                     {/* Scacchiera: solo admin/master, non in ospedale */}
                                     {pulsanti.show_scacchiera && (
                                         <a href="#" onClick={(e) => { e.preventDefault(); window.open(`pages/chess.inc.php?id=${luogo}`, 'Log', 'fullscreen,toolbar=no') }} className="gdr-control-btn">
@@ -819,6 +812,7 @@ export default function ChatShell() {
                     <MasterPanel
                         isOpen={masterPanelOpen}
                         onClose={() => setMasterPanelOpen(false)}
+                        showPulisci={pulsanti.show_pulisci}
                     />
                 )}
 
