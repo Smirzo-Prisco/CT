@@ -42,8 +42,6 @@
 
 /* Stili testo articolo (da statuto_testo.php) */
 #statuto-content .titoli {
-    font-family: 'DejaVu Serif', serif;
-    font-size: 16px;
     color: #ce846f;
     text-transform: uppercase;
     font-weight: normal;
@@ -55,8 +53,6 @@
 }
 
 #statuto-content .testo {
-    font-family: 'DejaVu Serif', serif;
-    font-size: 15px;
     color: #8f8f8f;
     line-height: 18px;
     text-align: justify;

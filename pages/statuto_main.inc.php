@@ -86,8 +86,6 @@ function statutoSection($tipo, $campo, $valore, $classe) {
 }
 /* Stili testo articolo (da statuti.css, scoped) */
 #statuto-content .titoli {
-    font-family: 'DejaVu Serif', serif;
-    font-size: 16px;
     color: #ce846f;
     text-transform: uppercase;
     font-weight: normal;
@@ -98,8 +96,6 @@ function statutoSection($tipo, $campo, $valore, $classe) {
     text-shadow: 3px 2px 3px #000;
 }
 #statuto-content .testo {
-    font-family: 'DejaVu Serif', serif;
-    font-size: 15px;
     color: #8f8f8f;
     line-height: 18px;
     text-align: justify;
