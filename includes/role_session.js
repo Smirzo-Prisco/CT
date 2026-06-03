@@ -51,7 +51,7 @@ function getPgRolePlaying() {
 
             users.forEach(user => {
                 const row = document.createElement('div');
-                row.style.cssText = 'display: grid; grid-template-columns: 1fr 60px 60px 60px 80px; gap: 8px; align-items: center; padding: 6px 8px; background-color: rgba(30, 40, 60, 0.3); border-radius: 4px; margin-bottom: 3px; font-size: 0.9rem;';
+                row.className = 'pg-role-row';
 
                 // Nome
                 const nameCol = document.createElement('div');
@@ -153,7 +153,7 @@ function closePgTurn(id_role, suss_id, pgName) {
         body: JSON.stringify({ id_role, suss_id, pgName })
     })
         .then(res => res.json())
-        .then(data => { if (window.refreshChat) window.refreshChat(); })
+        .then(() => { if (window.refreshChat) window.refreshChat(); })
         .catch(err => console.error('Errore caricamento chat:', err));
 }
 

@@ -762,6 +762,18 @@ div.form_row {
     overflow-y: auto;
 }
 
+.pg-role-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 60px 60px 80px;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 8px;
+    background-color: rgba(30, 40, 60, 0.3);
+    border-radius: 4px;
+    margin-bottom: 3px;
+    font-size: 0.9rem;
+}
+
 input#tag {
     width: 90px;
 }
@@ -1607,6 +1619,39 @@ button.chat_button {
     .user-search-popup__autocomplete-list {
         left: $space-5;
         right: $space-5;
+    }
+
+    // ── Riga comandi chat: icone in prima riga, TAG+submit in seconda ──
+    .chat-submit-row {
+        flex-wrap: wrap;
+        max-height: none;
+    }
+
+    .chat-action-controls {
+        order: 1;
+        justify-content: space-around;
+    }
+
+    .action-tag {
+        order: 2;
+        flex: 1;
+    }
+
+    .chat-submit-row > input[type="submit"] {
+        order: 2;
+    }
+
+    // ── Modale personaggi giocanti ─────────────────────────────────
+    #pgRolePlayingPanel {
+        left: 0 !important;
+        right: 0 !important;
+    }
+
+    .pg-role-header,
+    .pg-role-row {
+        grid-template-columns: 1fr 35px 35px 35px 60px;
+        gap: 4px;
+        font-size: 0.75rem;
     }
 }
 
