@@ -44,8 +44,8 @@ export default function ChatHelp({ onBack }) {
                         <h2 className="section-title">Role</h2>
                         <p className="text-content">
                             Clicca sul pulsante <i className="fa-solid fa-play chat-avvia-btn"></i> per avviare oppure unirti alla giocata.
-                            L'icona del pannello chat <img title="Pannello chat" src="themes/crystal/imgs/chat/chat_panel.png" class="chat_icon"> compare soltanto se sei coinvolto nella giocata attiva.
-                                L'icona <i class="fa-solid fa-users" style="cursor: pointer; display: block; font-size: 16px;"></i> permette di visualizzare tutti i personaggi giocanti.
+                            L'icona del pannello chat <img title="Pannello chat" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" /> compare soltanto se sei coinvolto nella giocata attiva.
+                                L'icona <i className="fa-solid fa-users" style={{ cursor: 'pointer', display: 'inline-block', fontSize: '16px' }}></i> permette di visualizzare tutti i personaggi giocanti.
                                 Alla fine di ogni giocata, ricordarsi di effettuare l'uscita dalla role attraverso l'apposita icona.
                                 Per ogni lancio occorre sempre specificare almeno un bersaglio.
                                 La quantità di bersagli attaccabili aumenta con il livello dell'abilità utilizzata.
