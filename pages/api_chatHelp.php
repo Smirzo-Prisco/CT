@@ -4,6 +4,8 @@
  */
 session_start();
 require_once(__DIR__ . '/../config.inc.php');
+require_once(__DIR__ . '/../includes/required.php');
+require_once(__DIR__ . '/../includes/functions.inc.php');
 header('Content-Type: application/json');
 
 $soglie = [];
