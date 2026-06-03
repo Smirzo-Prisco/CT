@@ -46,7 +46,7 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
                     <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">Chiudi</span>
                 </div>
                 <div class="container2">
-                    <iframe id="myframe" src="/default.php"></iframe>
+                    <iframe id="myframe" src="about:blank"></iframe>
                 </div>
             </form>
         </div>

@@ -145,7 +145,7 @@ if (isset($_GET['css']))
                 </div>
 
                 <div class="container2">
-                  <iframe id="myframe" src="/default.php"></iframe>
+                  <iframe id="myframe" src="about:blank"></iframe>
                 </div>
               </form>
             </div>

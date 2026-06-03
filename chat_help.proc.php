@@ -21,7 +21,7 @@ require 'header.inc.php'; /*Header comune*/
                 <div class="command-card">
                     <h2 class="section-title">Role</h2>
                     <p class="text-content">
-                        Clicca su "Avvia role" oppure su "Join" per avviare la giocata o aggiungerti ad una giocata in corso.
+                        Clicca sul pulsante <i className="fa-solid fa-play chat-avvia-btn"></i> oppure su "Join" per avviare la giocata o aggiungerti ad una giocata in corso.
                         L'icona del pannello chat compare soltanto se sei coinvolto nella giocata attiva.
                         L'cona degli utenti permette di visualizzare tutti i personaggi giocanti.
                         Alla fine di ogni giocata, ricordarsi di effettuare l'uscita dalla role attraverso l'apposita icona.
