@@ -4,6 +4,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
     require_once(__DIR__ . '/../config.inc.php');
     require_once(__DIR__ . '/../includes/required.php');
     require_once(__DIR__ . '/../includes/functions.inc.php');
+    require_once(__DIR__ . '/../includes/custom_functions.inc.php');
     
     // IMPORTANTE: Solo per le richieste AJAX
     header('Content-Type: application/json');
