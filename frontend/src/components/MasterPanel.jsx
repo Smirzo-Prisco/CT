@@ -411,7 +411,7 @@ export default function MasterPanel({ isOpen, onClose, showPulisci }) {
                     <div className="gdr-main-controls">
                         <a href="#" id="endTurnMaster" className="gdr-control-btn" title="Chiudi turno"
                             onClick={e => { e.preventDefault(); window.closeTurn?.() }}>
-                            <i className="fa-solid fa-circle-stop" style={{ fontSize: '20px', color: '#e8e6e3' }}></i>
+                            <i className="fa-solid fa-lock" style={{ fontSize: '20px', color: '#e8e6e3' }}></i>
                         </a>
                         {showPulisci && (
                             <a href="#" className="gdr-control-btn" title="Pulisci chat"
