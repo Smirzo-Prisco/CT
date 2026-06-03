@@ -154,7 +154,11 @@
 // ── Alias legacy (classi già in uso nel progetto) ────────────
 // Mappate sulle nuove varianti per compatibilità retroattiva.
 
-.btn-action   { @extend .btn--icon; }
+.btn-action {
+    @extend .btn--icon;
+    margin: 0 $space-1;
+    i { pointer-events: none; }
+}
 .btn-dettagli { @extend .btn; @extend .btn--action; }
 .btn-compra-ok { @extend .btn; @extend .btn--success; }
 .btn-mercato-ko {

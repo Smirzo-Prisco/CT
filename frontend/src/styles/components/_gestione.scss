@@ -150,24 +150,20 @@ header {
 
 .item-list {
     table {
-        width: 100%;
-        border-collapse: collapse;
         background: $gestione-surface;
-        color: $palette-text-title;
-        font-family: $font-serif;
-        font-size: $text-sm;
         letter-spacing: 2px;
-    }
 
-    th,
-    td {
-        border: 1px solid #333 !important;
-        padding: $space-2 !important;
-        text-align: left;
-    }
+        // Specificità 0,1,0,2 → prevale su .ct-table-responsive th/td (0,1,0,1) senza !important
+        th,
+        td {
+            border: 1px solid #333;
+            padding: $space-2;
+            text-align: left;
+        }
 
-    th {
-        background: $gestione-hover !important;
+        th {
+            background: $gestione-hover;
+        }
     }
 
     td.azioni {
@@ -175,27 +171,6 @@ header {
         gap: $space-1 + 2;
         justify-content: center;
         align-items: center;
-    }
-}
-
-// ── Pulsante azione icona ─────────────────────────────────────
-
-.btn-action {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: $gestione-action;
-    font-size: $text-lg;
-    margin: 0 $space-1;
-    padding: $space-1;
-    transition: color $transition-normal;
-
-    &:hover {
-        color: $color-text-light;
-    }
-
-    i {
-        pointer-events: none;
     }
 }
 
