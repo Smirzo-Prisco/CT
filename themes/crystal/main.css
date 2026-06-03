@@ -1054,10 +1054,6 @@ div.right{
 }
 
 @media only screen and (width <= 768px) {
-    .topbar {
-        flex-wrap: wrap;
-    }
-
     .filter-form {
         order: 3;
         width: 100%;
@@ -1276,38 +1272,6 @@ header {
     transition: opacity 0.3s ease;
 }
 
-/* Barra superiore */
-.topbar {
-    max-height: 40px;
-    gap: 15px;
-    position: sticky; /* resta in cima anche scrollando */
-    top: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #1c1f2e;
-    padding: 12px 20px;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 40%);
-    z-index: 10;
-}
-
-.topbar a {
-    text-decoration: none;
-    color: #fff;
-    padding: 6px 12px;
-    margin: 0 !important;
-    border-radius: 5px;
-    transition: background 0.3s;
-    font-size: 14px;
-}
-.topbar a.back {background: #2e3350;}
-.topbar a.back:hover {background: #4da6ff;}
-.topbar a.add {background: #4da6ff;}
-.topbar a.add:hover {background: #2e3350;}
-
-.topbar .btn-action.right {
-    margin-left: auto;
-}
 
 /* Tabella gestione personaggio */
 .item-list table {
