@@ -36,7 +36,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: $space-2 + 2; // 10px di spazio uniforme tra ogni componente
-    padding-bottom: $space-2 + 2;
+    padding-top: $space-2 + 2;
 
     // Tutti i figli diretti: stessa larghezza, nessun margine individuale
     >* {
