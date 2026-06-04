@@ -13,7 +13,7 @@
     --secondary-light: #{lighten($palette-rust, 15%)};
     --accent-color: #{$color-warning};
     --text-light: #{$color-text-light};
-    --text-medium: #{$color-text};
+    --text-medium: $color-text; // #{$color-text-secondary};
     --text-dark: #{$color-text-muted};
     --card-bg: #{$palette-surface-raised};
     --card-border: $color-border; // #{$palette-surface-hover};
