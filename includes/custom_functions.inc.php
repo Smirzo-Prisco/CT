@@ -164,29 +164,42 @@ function hasPermesso(array $permessi_utente, array $permessi_richiesti) {
 
 // Manda sms interni alla land
 function send_sms($from, $to, $title, $text) {
-    // Devo verificare se esiste già una conversazione in corso tra mittente e destinatario
-    $exists = gdrcd_query("SELECT id_conversazione FROM sms WHERE mittente_nome = '".gdrcd_filter('in', $from)."' AND destinatario_nome = '".gdrcd_filter('in', $to)."' LIMIT 1", 'result');
+    $from_safe = gdrcd_filter('in', $from);
+    $to_safe   = gdrcd_filter('in', $to);
+
+    // Cerca la conversazione in entrambe le direzioni (A→B e B→A sono la stessa conv)
+    $exists = gdrcd_query(
+        "SELECT id_conversazione FROM sms
+         WHERE (mittente_nome = '$from_safe' AND destinatario_nome = '$to_safe')
+            OR (mittente_nome = '$to_safe'   AND destinatario_nome = '$from_safe')
+         LIMIT 1",
+        'result'
+    );
 
     if (gdrcd_query($exists, 'num_rows') > 0) {
-        // Esiste già una conversazione, inserisco un nuovo sms nella conversazione
         $id_conversazione = gdrcd_query($exists, 'fetch')['id_conversazione'];
 
         gdrcd_query("INSERT INTO sms (mittente_nome, destinatario_nome, testo, id_conversazione, tipo_messaggio, ongame, ora_spedizione)
-                    VALUES ('".gdrcd_filter('in', $from)."', '".gdrcd_filter('in', $to)."', '$text', $id_conversazione, 'individuale', '0', NOW())");
+                    VALUES ('$from_safe', '$to_safe', '$text', $id_conversazione, 'individuale', '0', NOW())");
 
-        // Segno l'sms come da leggere
-        gdrcd_query("UPDATE conversazioni_individuali SET lettura = 0 WHERE id_conversazione = $id_conversazione");
+        // Garantisce che entrambi abbiano la riga (può mancare in conversazioni pre-fix)
+        $chkFrom = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali WHERE id_conversazione = $id_conversazione AND utente_nome = '$from_safe'");
+        if ($chkFrom['n'] == 0) gdrcd_query("INSERT INTO conversazioni_individuali (id_conversazione, utente_nome, lettura) VALUES ($id_conversazione, '$from_safe', 1)");
+
+        $chkTo = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali WHERE id_conversazione = $id_conversazione AND utente_nome = '$to_safe'");
+        if ($chkTo['n'] == 0) gdrcd_query("INSERT INTO conversazioni_individuali (id_conversazione, utente_nome, lettura) VALUES ($id_conversazione, '$to_safe', 0)");
+
+        // Solo il destinatario vede il nuovo messaggio come non letto
+        gdrcd_query("UPDATE conversazioni_individuali SET lettura = 0 WHERE id_conversazione = $id_conversazione AND utente_nome = '$to_safe'");
     } else {
-        // Non esiste una conversazione, ne creo una nuova generando un nuovo id
         $new_id = (gdrcd_query(gdrcd_query("SELECT MAX(id_conversazione) as max_id FROM sms", 'result'), 'fetch')['max_id'] + 1);
 
-        // Inserisco prima l'sms
         gdrcd_query("INSERT INTO sms (mittente_nome, destinatario_nome, testo, id_conversazione, tipo_messaggio, ongame, ora_spedizione)
-                    VALUES ('".gdrcd_filter('in', $from)."', '".gdrcd_filter('in', $to)."', '$text', $new_id, 'individuale', '0', NOW())");
+                    VALUES ('$from_safe', '$to_safe', '$text', $new_id, 'individuale', '0', NOW())");
 
-        // Poi inserisco la nuova conversazione
-        gdrcd_query("INSERT INTO conversazioni_individuali (id_conversazione, utente_nome, lettura)
-                    VALUES ($new_id, '" . gdrcd_filter('in', $to) . "', 0)");
+        // Riga per entrambi: destinatario non letto, mittente già letto
+        gdrcd_query("INSERT INTO conversazioni_individuali (id_conversazione, utente_nome, lettura) VALUES ($new_id, '$to_safe',   0)");
+        gdrcd_query("INSERT INTO conversazioni_individuali (id_conversazione, utente_nome, lettura) VALUES ($new_id, '$from_safe', 1)");
     }
 
     notifySocketServer('dm:update', 'dm:' . $to);
