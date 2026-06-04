@@ -470,7 +470,7 @@ if($_SESSION['admin'] != 1) {
 
                 <!-- Pulsanti -->
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeSkillModal('statuto')">Annulla</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeGuildModal('skill')">Annulla</button>
                     <button type="submit" class="btn btn-primary" onclick="saveSkill()">Salva</button>
                 </div>
             </form>
