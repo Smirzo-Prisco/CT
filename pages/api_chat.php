@@ -313,9 +313,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     "SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login'"
                 )['can_send'] ?? 1);
 
-                $choices = [];
+                $choices = ['dado'];
+
                 if ($canSend === 1) {
-                    $choices[] = 'dado';
                     $hasShield = (int)gdrcd_query(
                         "SELECT COUNT(*) as n FROM clgpersonaggioabilita cpa
                          JOIN abilita a ON cpa.id_abilita = a.id_abilita

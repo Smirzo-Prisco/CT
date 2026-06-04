@@ -1695,10 +1695,9 @@ function notifyAttackIncoming($id_role, $luogo, $striker, array $targets, $car, 
             "SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$t'"
         )['can_send'] ?? 1);
 
-        $choices = [];
-        if ($canSend === 1) {
-            $choices[] = 'dado';
+        $choices = ['dado'];
 
+        if ($canSend === 1) {
             $hasShield = (int)gdrcd_query(
                 "SELECT COUNT(*) as n FROM clgpersonaggioabilita cpa
                  JOIN abilita a ON cpa.id_abilita = a.id_abilita
