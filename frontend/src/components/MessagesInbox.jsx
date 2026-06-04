@@ -156,11 +156,23 @@ function ConvItem({ conv, isSelected, onClick }) {
 function ThreadView({ messages, conv, loading, replyText, setReplyText, sending, onSend, onBack }) {
     /** Ref per lo scroll automatico all'ultimo messaggio */
     const bottomRef = useRef(null)
+    /** Ref alla textarea di risposta: usato per recuperare il focus dopo l'invio */
+    const textareaRef = useRef(null)
+    /** Traccia il valore precedente di sending per intercettare la transizione true→false */
+    const prevSendingRef = useRef(false)
 
     // Scrolla in fondo ogni volta che arrivano nuovi messaggi
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [messages])
+
+    // Rimette il focus sulla textarea non appena l'invio si conclude
+    useEffect(() => {
+        if (prevSendingRef.current && !sending) {
+            textareaRef.current?.focus()
+        }
+        prevSendingRef.current = sending
+    }, [sending])
 
     if (loading) return <div className={styles.loading}>Caricamento messaggi...</div>
 
@@ -224,6 +236,7 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
             {conv.tipo !== 'globale' && (
                 <div className="thread-reply">
                     <textarea
+                        ref={textareaRef}
                         value={replyText}
                         onChange={e => setReplyText(e.target.value)}
                         placeholder="Scrivi una risposta..."

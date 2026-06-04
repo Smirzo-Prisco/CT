@@ -5,6 +5,7 @@
 // conflitti con altri componenti SPA (es. .container, .header).
 // Il nodo radice del componente deve avere id="messages-center-app".
 // ============================================================
+@use '../tokens' as *;
 
 #messages-center-app {
 
@@ -665,5 +666,44 @@
         font-size: 14px;
         color: #ffdd57;
         margin-bottom: 5px;
+    }
+
+    // ── Thread DM (ThreadView) ────────────────────────────────
+
+    // Colonna flex a tutta altezza: header fisso + messaggi scorrevoli + reply bar
+    .thread-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    // Header sticky: torna indietro + nome interlocutore
+    .thread-header {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+        padding: $space-4 $space-5;
+        background-color: $palette-surface-dark;
+        border-bottom: 1px solid $palette-surface-hover;
+        min-height: 56px;
+    }
+
+    // Area messaggi: riempie lo spazio disponibile e scrolla internamente
+    .thread-messages {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+        padding: $space-4;
+    }
+
+    // Barra di risposta: affianca textarea e pulsante Invia
+    .thread-reply {
+        flex-shrink: 0;
+        border-top: 1px solid $palette-surface-hover;
+        padding: $space-3 $space-4;
+        display: flex;
+        align-items: flex-end;
+        gap: $space-3;
     }
 }
