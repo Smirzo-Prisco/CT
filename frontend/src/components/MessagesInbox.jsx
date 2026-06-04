@@ -453,16 +453,15 @@ export default function MessagesInbox({ toPg = null }) {
 
         const sock = window.ctSocket
         if (sock) {
-            sock.on('dm:update', () => {
-                // Aggiorna sempre la lista (icone non letti, ordine conversazioni)
+            // Handler salvato in variabile: sock.off() senza riferimento specifico
+            // rimuoverebbe TUTTI i listener dm:update (incluso quello di FrameMessaggi)
+            const dmHandler = () => {
                 fetchList()
-                // Se c'è un thread aperto: aggiorna silenziosamente i messaggi
-                // (silent=1 → no mark-as-read → no dm:update emesso → nessun loop)
                 fetchThreadSilent()
-            })
+            }
+            sock.on('dm:update', dmHandler)
+            return () => { sock.off('dm:update', dmHandler) }
         }
-
-        return () => { if (sock) sock.off('dm:update') }
     }, [fetchList, fetchThreadSilent])
 
     // ---------------------------------------------------------------------------
