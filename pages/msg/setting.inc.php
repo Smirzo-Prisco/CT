@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="new_sms.css" TYPE="text/css">
+<link rel="stylesheet" href="/themes/crystal/msg_legacy.css" TYPE="text/css">
 <link rel="stylesheet" href="../../themes/crystal/messaggi.css" TYPE="text/css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>

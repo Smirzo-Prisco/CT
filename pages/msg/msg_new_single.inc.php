@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="../../themes/crystal/messaggi.css" type="text/css">
 <link rel="stylesheet" href="../../themes/crystal/messages.css" type="text/css">
-<link rel="stylesheet" href="new_sms.css" type="text/css">
+<link rel="stylesheet" href="/themes/crystal/msg_legacy.css" type="text/css">
 <body style="background-color:transparent;">
 
 <?php

@@ -83,7 +83,7 @@ const ROUTES = {
     messages_center: {
         component: MessagesInbox,
         css: [
-            '/pages/mex_privati/new_sms.css',
+            '/themes/crystal/messages_center.css',
         ],
     },
     presenti_estesi: {

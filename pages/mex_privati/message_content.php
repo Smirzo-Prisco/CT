@@ -427,7 +427,7 @@ elseif ($conversazione_id > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messaging Content</title>
-    <link rel="stylesheet" href="new_sms.css">
+    <link rel="stylesheet" href="/themes/crystal/messages_center.css">
 </head>
 <body>
 

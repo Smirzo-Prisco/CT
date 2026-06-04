@@ -1,45 +1,47 @@
+/* Stili legacy per la pagina messaggi (pages/msg/) */
+
 table.principale_sms {
-margin: auto;
-width: 90%;
-background-color: #161d36;
-border-collapse: collapse;
-border-width: 1px;
-border-color: #070A1B;
-border-style: solid;
+    margin: auto;
+    width: 90%;
+    background-color: #161d36;
+    border-collapse: collapse;
+    border-width: 1px;
+    border-color: #070A1B;
+    border-style: solid;
 }
 
 table.principale_sms td {
-border-width: 1px;
-border-color: #070A1B;
-border-style: solid;
-padding: 5px;
+    border-width: 1px;
+    border-color: #070A1B;
+    border-style: solid;
+    padding: 5px;
 }
 
-th.second_header{
-background: url('../themes/crystal/imgs/sms/sfondo_stellato.png');
+th.second_header {
+    background: url('/themes/crystal/imgs/sms/sfondo_stellato.png');
 }
 
 div.lista_mittenti {
-border-width: 0px;
-border-color: red;
-border-style: solid;
-width: 100%; 
-height: 440px;
-overflow: auto;
-font-family: Lato;
-color: #b4b6bf;
-font-size: 11px;
-background-color: #0f111d;
+    border-width: 0px;
+    border-color: red;
+    border-style: solid;
+    width: 100%;
+    height: 440px;
+    overflow: auto;
+    font-family: Lato;
+    color: #b4b6bf;
+    font-size: 11px;
+    background-color: #0f111d;
 }
 
 div.lista_comandi {
-border-width: 0px;
-border-color: red;
-border-style: solid;
-border-collapse: collapse;
-width: 100%; 
-height: 70px;
-background-color: #0f111d;
+    border-width: 0px;
+    border-color: red;
+    border-style: solid;
+    border-collapse: collapse;
+    width: 100%;
+    height: 70px;
+    background-color: #0f111d;
 }
 
 .single_mittente {
@@ -50,8 +52,6 @@ background-color: #0f111d;
     color: white;
     position: relative;
 }
-
-/*IMMAGINE*/
 
 .single_mittente .mittenti_box.image_box {
     width: 45px;
@@ -82,20 +82,18 @@ background-color: #0f111d;
     height: 45px;
 }
 
-/*INFO*/
 .erase {
     width: calc(100% - 150px);
     text-align: left;
     padding-left: 10px;
     box-sizing: border-box;
     cursor: pointer;
-    
     border-width: 0px;
     border-color: red;
     border-style: solid;
-    position:absolute; 
-    top:-13px;
-    left:-13px; 
+    position: absolute;
+    top: -13px;
+    left: -13px;
 }
 
 .single_mittente .mittenti_box.data_box {
@@ -104,13 +102,12 @@ background-color: #0f111d;
     padding-left: 10px;
     box-sizing: border-box;
     cursor: pointer;
-    
     border-width: 0px;
     border-color: red;
     border-style: solid;
-    position:relative; 
-    top:-40px;
-    right:-50px; 
+    position: relative;
+    top: -40px;
+    right: -50px;
 }
 
 .single_mittente .mittenti_box.data_box:hover .name {
@@ -124,35 +121,34 @@ background-color: #0f111d;
     margin-top: 6px;
 }
 
-/*DX TESTO*/
-
-
 div.box_centrale {
-border-width: 0px;
-border-color: red;
-border-style: solid;
-width: 100%; 
-height: 440px;
-overflow: auto;
-font-family: Lato;
-color: #b4b6bf;
-font-size: 11px;
-background-color: transparent;
+    border-width: 0px;
+    border-color: red;
+    border-style: solid;
+    width: 100%;
+    height: 440px;
+    overflow: auto;
+    font-family: Lato;
+    color: #b4b6bf;
+    font-size: 11px;
+    background-color: transparent;
 }
 
 .opendoc_sms::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.opendoc_sms::-webkit-scrollbar-thumb {
-  background: #1A2240;
-  border-radius: 10px;
-}
-.opendoc_sms::-webkit-scrollbar-track {
-  background: transparent;
+    width: 10px;
+    height: 10px;
 }
 
-.testo_box{
+.opendoc_sms::-webkit-scrollbar-thumb {
+    background: #1A2240;
+    border-radius: 10px;
+}
+
+.opendoc_sms::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.testo_box {
     margin-left: 20px;
     margin-top: 10px;
     padding: 10px 10px 3px 10px;
@@ -160,22 +156,19 @@ background-color: transparent;
     border-radius: 15px;
     position: relative;
     border-width: 1px;
-border-color: red;
-border-style: solid;
-
+    border-color: red;
+    border-style: solid;
 }
 
-.box_centrale .testo_box .image{
-    
+.box_centrale .testo_box .image {
     overflow: hidden;
-    margin: 7px 5px; 
+    margin: 7px 5px;
     border-width: 0px;
     border-color: red;
     border-style: solid;
 }
 
-.box_centrale .testo_box .image_mitt{
-    
+.box_centrale .testo_box .image_mitt {
     overflow: hidden;
     margin: 7px 5px;
     border-width: 0px;
@@ -190,7 +183,6 @@ border-style: solid;
     float: right;
     clear: both;
     padding: 10px 10px 3px 10px;
-    border-radius: 0px;
     font-family: Lato;
     color: #b4b6bf;
     font-size: 16px;
@@ -198,7 +190,6 @@ border-style: solid;
     border-color: #070A1B;
     border-style: solid;
     border-radius: 5px 0px 5px 5px;
-
 }
 
 .ricevuto {
@@ -208,7 +199,6 @@ border-style: solid;
     float: left;
     clear: both;
     padding: 10px 10px 3px 10px;
-    border-radius: 0px;
     font-family: Lato;
     color: #b4b6bf;
     font-size: 16px;
@@ -216,10 +206,9 @@ border-style: solid;
     border-color: #070A1B;
     border-style: solid;
     border-radius: 0px 5px 5px 5px;
-    
 }
 
-.data{
+.data {
     font-size: 10px;
     margin-top: 5px;
     text-align: right;
@@ -227,30 +216,27 @@ border-style: solid;
     color: #b4b6bf;
 }
 
-/*DX BOX*/
-
 div.box_scritto {
-border-width: 1px;
-border-color: red;
-border-style: solid;
-border-collapse: collapse;
-width: 100%; 
-height: 65px;
-position: relative; 
-overflow: auto;
+    border-width: 1px;
+    border-color: red;
+    border-style: solid;
+    border-collapse: collapse;
+    width: 100%;
+    height: 65px;
+    position: relative;
+    overflow: auto;
 }
 
-/* CONTENITORE PAGINE, frame */
-
-.content{
+.content {
     width: 100%;
     height: 510px;
-    background-color: yellow;
-    background: url('../../themes/crystal/imgs/icone/logo_chat.png') no-repeat;
-    background-position: center; margin: auto; display: block;
-    
+    background: url('/themes/crystal/imgs/icone/logo_chat.png') no-repeat;
+    background-position: center;
+    margin: auto;
+    display: block;
 }
-.opendoc{
+
+.opendoc {
     position: relative;
     right: 0px;
     top: -40px;
@@ -258,26 +244,25 @@ overflow: auto;
     background-repeat: repeat;
     width: 100%;
     height: 115%;
-    
     border-width: 0px;
     border-color: yellow;
     border-style: solid;
 }
 
-iframe.iframedoc{    
-    margin-top: 0px;    
+iframe.iframedoc {
+    margin-top: 0px;
     width: 100%;
     height: 100%;
-    overflow:auto;
-    }
+    overflow: auto;
+}
 
-.content_sms{
+.content_sms {
     width: 100%;
     height: 480px;
     background-color: transparent;
 }
 
-.opendoc_sms{
+.opendoc_sms {
     position: relative;
     top: 49px;
     right: 0px;
@@ -292,13 +277,13 @@ iframe.iframedoc{
     border-style: solid;
 }
 
-.content_testo{
+.content_testo {
     width: 100%;
     height: 20px;
     background-color: transparent;
 }
 
-.opendoc_testo{
+.opendoc_testo {
     position: relative;
     top: 5px;
     right: 0px;
@@ -307,18 +292,17 @@ iframe.iframedoc{
     background-repeat: repeat;
     width: 100%;
     height: 85px;
-
     overflow-y: hidden;
     overflow-x: auto;
 }
 
-.content_header{
+.content_header {
     width: 100%;
     height: 20px;
     background-color: transparent;
 }
 
-.opendoc_header{
+.opendoc_header {
     position: relative;
     top: -507px;
     right: 0px;
@@ -331,7 +315,6 @@ iframe.iframedoc{
     border-width: 0px;
     border-color: yellow;
     border-style: solid;
-    
     font-size: 15px;
     margin-top: 5px;
     text-align: center;
@@ -339,53 +322,23 @@ iframe.iframedoc{
     color: #b4b6bf;
 }
 
-.opendoc_heavder:hover {
-    position: relative;
-    top: -507px;
-    right: 0px;
-    bottom: 0px;
-    background-color: transparent;
-    background-repeat: repeat;
-    width: 100%;
-    height: 552.8px;
-    overflow: hidden;
-    border-width: 1px;
-    border-color: yellow;
-    border-style: solid;
-    
-    font-size: 15px;
-    margin-top: 5px;
-    text-align: center;
-    font-family: Lato;
-    color: #b4b6bf;
-}
-
-
-
-
-
-
-
-.image_invio{
-    position:absolute; 
-    top:20px;
-    left:420px; 
+.image_invio {
+    position: absolute;
+    top: 20px;
+    left: 420px;
     border-width: 0px;
     border-color: red;
     border-style: solid;
 }
 
-.image_modifica{
-    position:absolute; 
-    top:20px;
-    left:470px; 
+.image_modifica {
+    position: absolute;
+    top: 20px;
+    left: 470px;
     border-width: 0px;
     border-color: red;
     border-style: solid;
 }
-
-
-/*GENERAL*/
 
 div.warning, div.error {
     background-color: #1A2240;
@@ -414,7 +367,8 @@ div.warning, div.error {
 
 div.form_field table {
     margin: 5px auto;
-    }
+}
+
 div.form_messaggi {
     background: #111423;
     font-family: Lato;
@@ -429,5 +383,5 @@ div.form_messaggi {
 input[type="image"] {
     background-color: transparent;
     border-width: 0px;
-    border-color:#070a1b;
+    border-color: #070a1b;
 }

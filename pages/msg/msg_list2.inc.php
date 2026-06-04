@@ -10,7 +10,7 @@ $flGESTCUSTOM = isset($_GET['sender']) === true && gdrcd_filter('in', $_GET['sen
 $RECORDPERPAGE = gdrcd_filter('num', $PARAMETERS['settings']['records_per_page']);
 ?>
 
-<link rel="stylesheet" href="pages/msg/new_sms.css" TYPE="text/css">
+<link rel="stylesheet" href="/themes/crystal/msg_legacy.css" TYPE="text/css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
