@@ -16,7 +16,7 @@
     --text-medium: #{$color-text};
     --text-dark: #{$color-text-muted};
     --card-bg: #{$palette-surface-raised};
-    --card-border: #{$color-border}; // $palette-surface-hover
+    --card-border: $color-border; // #{$palette-surface-hover};
     --input-bg: #{$palette-surface-input};
     --input-border: #{$palette-surface-select};
     --success-color: #{$color-success};
