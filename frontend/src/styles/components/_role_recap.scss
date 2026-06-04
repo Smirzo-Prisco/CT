@@ -1,48 +1,41 @@
 // ============================================================
 // _role_recap.scss — Storico giocate (role_recap.inc.php)
-// Componente standalone con CSS variables proprie.
+// Componente standalone scopato sotto #giocate-app.
 // ============================================================
 @use '../tokens' as *;
 
 #giocate-app {
-    // Variabili locali — mappate sui token globali del progetto
-    --primary-dark: #{$palette-surface-raised};
-    --primary-darker: #{$palette-surface-dark};
-    --primary-darkest: #{$palette-surface-deep};
-    --secondary-color: #{$palette-rust};
-    --secondary-light: #{lighten($palette-rust, 15%)};
-    --accent-color: #{$color-warning};
-    --text-light: $color-text-light; // #{$color-text-light};
-    --text-medium: $color-text; // #{$color-text-secondary};
-    --text-dark: #{$color-text-muted};
-    --card-bg: #{$palette-surface-raised};
-    --card-border: $color-border; // #{$palette-surface-hover};
-    --input-bg: #{$palette-surface-input};
-    --input-border: #{$palette-surface-select};
-    --success-color: #{$color-success};
-    --warning-color: #{$color-warning};
-    --shadow: #{$shadow-md};
-    --shadow-hover: #{$shadow-lg};
-    --radius: #{$radius-lg};
-    --transition: all #{$transition-normal};
+    // ── Variabili locali → token globali ─────────────────────
+    --bg:            #{$palette-surface-dark};      // sfondo pagina
+    --bg-deep:       #{$palette-surface-deep};      // sfondo più scuro (es. testo su bottone colorato)
+    --surface:       #{$palette-surface-raised};    // card / pannelli
+    --border:        #{$palette-surface-hover};     // bordi card
+    --input:         #{$palette-surface-input};     // sfondo input / select
+    --border-input:  #{$palette-surface-select};    // bordi input / select
+    --brand:         #{$palette-rust};              // colore brand Crystal Tokyo
+    --brand-light:   #{lighten($palette-rust, 15%)};
+    --accent:        #{$palette-action};            // accento ice-blue del progetto
+    --text:          #{$color-text};                // testo corpo
+    --text-title:    #{$color-text-title};          // titoli / valori in evidenza
+    --text-secondary:#{$color-text-secondary};      // testo secondario / note
+    --text-muted:    #{$color-text-muted};          // placeholder / terziario
+    --success:       #{$color-success};
+    --warning:       #{$color-warning};
+    --shadow:        #{$shadow-md};
+    --shadow-hover:  #{$shadow-lg};
+    --radius:        #{$radius-lg};
+    --transition:    all #{$transition-normal};
 
     font-family: $font-base;
-    background-color: var(--primary-darker);
-    color: var(--text-light);
+    background-color: var(--bg);
+    color: var(--text);
     line-height: 1.6;
     padding: $space-5;
     min-height: 100vh;
 
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
+    .container { max-width: 1200px; margin: 0 auto; }
 
     // ── Header ───────────────────────────────────────────────
 
@@ -50,11 +43,11 @@
         text-align: center;
         margin-bottom: 30px;
         padding-bottom: $space-5;
-        border-bottom: 2px solid var(--secondary-color);
+        border-bottom: 2px solid var(--brand);
     }
 
     h1 {
-        color: var(--text-light);
+        color: var(--text-title);
         margin-bottom: $space-2 + 2;
         font-size: 2.2rem;
         display: flex;
@@ -62,20 +55,15 @@
         justify-content: center;
         gap: $space-3;
 
-        i {
-            color: var(--secondary-color);
-        }
+        i { color: var(--brand); }
     }
 
-    .subtitle {
-        color: var(--text-medium);
-        font-size: 1.1rem;
-    }
+    .subtitle { color: var(--text-secondary); font-size: 1.1rem; }
 
     // ── Filtri ────────────────────────────────────────────────
 
     .filters {
-        background-color: var(--card-bg);
+        background-color: var(--surface);
         padding: $space-5;
         border-radius: var(--radius);
         box-shadow: var(--shadow);
@@ -84,7 +72,7 @@
         flex-wrap: wrap;
         gap: $space-5;
         align-items: flex-end;
-        border: 1px solid var(--card-border);
+        border: 1px solid var(--border);
     }
 
     .filter-group {
@@ -97,36 +85,33 @@
     .filter-label {
         font-weight: 600;
         margin-bottom: $space-2;
-        color: var(--text-light);
+        color: var(--text);
         font-size: 0.95rem;
     }
 
     select {
         padding: $space-3 15px;
-        border: 1px solid var(--input-border);
+        border: 1px solid var(--border-input);
         border-radius: var(--radius);
         font-size: 1rem;
-        background-color: var(--input-bg);
-        color: var(--text-light);
+        background-color: var(--input);
+        color: var(--text);
         transition: var(--transition);
         cursor: pointer;
 
-        &:hover {
-            border-color: var(--secondary-color);
-        }
-
-        &:focus {
+        &:hover { border-color: var(--brand); }
+        &:focus  {
             outline: none;
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba($palette-rust, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba($palette-action, 0.2);
         }
     }
 
     .reset-btn {
         padding: $space-3 $space-5;
-        background-color: var(--primary-dark);
-        color: var(--text-light);
-        border: 1px solid var(--input-border);
+        background-color: var(--surface);
+        color: var(--text);
+        border: 1px solid var(--border-input);
         border-radius: var(--radius);
         font-weight: 600;
         cursor: pointer;
@@ -136,9 +121,9 @@
         gap: $space-2;
 
         &:hover {
-            background-color: var(--secondary-color);
-            color: var(--primary-darkest);
-            border-color: var(--secondary-color);
+            background-color: var(--brand);
+            color: var(--bg-deep);
+            border-color: var(--brand);
         }
     }
 
@@ -152,7 +137,7 @@
     }
 
     .stat-card {
-        background-color: var(--card-bg);
+        background-color: var(--surface);
         border-radius: var(--radius);
         padding: $space-5;
         box-shadow: var(--shadow);
@@ -160,12 +145,12 @@
         align-items: center;
         gap: 15px;
         transition: var(--transition);
-        border: 1px solid var(--card-border);
+        border: 1px solid var(--border);
 
         &:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-hover);
-            border-color: var(--secondary-color);
+            border-color: var(--brand);
         }
     }
 
@@ -177,24 +162,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--secondary-color);
+        color: var(--brand);
         font-size: 1.5rem;
     }
 
-    .stat-content {
-        flex: 1;
-    }
-
-    .stat-value {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--text-light);
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-        color: var(--text-medium);
-    }
+    .stat-content   { flex: 1; }
+    .stat-value     { font-size: 1.8rem; font-weight: 700; color: var(--text-title); }
+    .stat-label     { font-size: 0.9rem; color: var(--text-secondary); }
 
     // ── Badge stato ───────────────────────────────────────────
 
@@ -210,13 +184,13 @@
 
     .status-in-corso {
         background-color: rgba($palette-success, 0.2);
-        color: var(--success-color);
+        color: var(--success);
         border: 1px solid rgba($palette-success, 0.3);
     }
 
     .status-conclusa {
         background-color: rgba($palette-text-secondary, 0.2);
-        color: var(--text-medium);
+        color: var(--text-secondary);
         border: 1px solid rgba($palette-text-secondary, 0.3);
     }
 
@@ -229,14 +203,15 @@
     }
 
     .game-card {
-        background-color: var(--card-bg);
+        background-color: var(--surface);
         border-radius: var(--radius);
         overflow: hidden;
         box-shadow: var(--shadow);
         transition: var(--transition);
-        border: 1px solid var(--card-border);
+        border: 1px solid var(--border);
         position: relative;
 
+        // Striscia decorativa brand → accent (rust → ice blue)
         &::before {
             content: '';
             position: absolute;
@@ -244,19 +219,19 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            background: linear-gradient(90deg, var(--brand), var(--accent));
         }
 
         &:hover {
             transform: translateY(-8px);
             box-shadow: var(--shadow-hover);
-            border-color: var(--secondary-color);
+            border-color: var(--brand);
         }
     }
 
     .game-header {
         background-color: rgba($palette-surface-raised, 0.7);
-        color: var(--text-light);
+        color: var(--text);
         padding: $space-5;
         display: flex;
         justify-content: space-between;
@@ -266,26 +241,22 @@
     .game-place {
         font-size: 1.3rem;
         font-weight: 700;
+        color: var(--text-title);
         flex: 1;
 
-        i {
-            color: var(--secondary-color);
-            margin-right: $space-2;
-        }
+        i { color: var(--brand); margin-right: $space-2; }
     }
 
     .game-date {
         font-size: 1rem;
-        color: var(--text-medium);
+        color: var(--text-secondary);
         margin-top: $space-1 + 1;
         display: flex;
         align-items: center;
         gap: $space-1 + 1;
     }
 
-    .game-body {
-        padding: $space-5;
-    }
+    .game-body { padding: $space-5; }
 
     .game-info {
         display: grid;
@@ -294,56 +265,41 @@
         margin-bottom: $space-5;
     }
 
-    .info-item {
-        display: flex;
-        flex-direction: column;
-    }
+    .info-item { display: flex; flex-direction: column; }
 
     .info-label {
         font-size: 0.85rem;
-        color: var(--text-medium);
+        color: var(--text-secondary);
         margin-bottom: $space-1 + 1;
         display: flex;
         align-items: center;
         gap: $space-1 + 1;
 
-        i {
-            color: var(--secondary-color);
-        }
+        i { color: var(--brand); }
     }
 
-    .info-value {
-        font-weight: 600;
-        font-size: 1.1rem;
-        color: var(--text-light);
-    }
+    .info-value { font-weight: 600; font-size: 1.1rem; color: var(--text-title); }
 
     // ── Partecipanti ──────────────────────────────────────────
 
     .participants {
         margin-top: $space-5;
         padding-top: $space-5;
-        border-top: 1px solid var(--card-border);
+        border-top: 1px solid var(--border);
     }
 
     .participants-title {
         font-weight: 600;
         margin-bottom: $space-3;
-        color: var(--text-light);
+        color: var(--text-title);
         display: flex;
         align-items: center;
         gap: $space-2;
 
-        i {
-            color: var(--secondary-color);
-        }
+        i { color: var(--brand); }
     }
 
-    .participants-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: $space-2 + 2;
-    }
+    .participants-list { display: flex; flex-wrap: wrap; gap: $space-2 + 2; }
 
     .participant {
         background-color: rgba($palette-rust, 0.15);
@@ -361,9 +317,7 @@
             border-color: rgba($palette-rust, 0.4);
         }
 
-        i {
-            color: var(--secondary-light);
-        }
+        i { color: var(--brand-light); }
     }
 
     // ── Nessun risultato ──────────────────────────────────────
@@ -371,101 +325,47 @@
     .no-results {
         text-align: center;
         padding: 50px $space-5;
-        background-color: var(--card-bg);
+        background-color: var(--surface);
         border-radius: var(--radius);
         box-shadow: var(--shadow);
         grid-column: 1 / -1;
-        border: 1px solid var(--card-border);
+        border: 1px solid var(--border);
 
-        i {
-            font-size: 3.5rem;
-            color: var(--primary-dark);
-            margin-bottom: 15px;
-        }
-
-        h3 {
-            color: var(--text-light);
-            margin-bottom: $space-2 + 2;
-        }
-
-        p {
-            color: var(--text-medium);
-        }
+        i  { font-size: 3.5rem; color: var(--border); margin-bottom: 15px; }
+        h3 { color: var(--text-title); margin-bottom: $space-2 + 2; }
+        p  { color: var(--text-secondary); }
     }
 
     // ── Scrollbar ─────────────────────────────────────────────
 
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: var(--primary-dark);
-    }
-
+    ::-webkit-scrollbar       { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb {
-        background: var(--secondary-color);
+        background: var(--brand);
         border-radius: $radius-sm;
-
-        &:hover {
-            background: var(--secondary-light);
-        }
+        &:hover { background: var(--brand-light); }
     }
 
     // ── Responsive ────────────────────────────────────────────
 
     @media (max-width: 992px) {
-        .games-list {
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        }
+        .games-list { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
     }
 
     @media (max-width: 768px) {
         padding: 15px;
-
-        .games-list {
-            grid-template-columns: 1fr;
-        }
-
-        .game-info {
-            grid-template-columns: 1fr;
-        }
-
-        .filters {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .filter-group {
-            min-width: 100%;
-        }
-
-        .reset-btn {
-            justify-content: center;
-        }
-
-        .stats {
-            grid-template-columns: repeat(2, 1fr);
-        }
+        .games-list    { grid-template-columns: 1fr; }
+        .game-info     { grid-template-columns: 1fr; }
+        .filters       { flex-direction: column; align-items: stretch; }
+        .filter-group  { min-width: 100%; }
+        .reset-btn     { justify-content: center; }
+        .stats         { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 480px) {
-        h1 {
-            font-size: 1.8rem;
-        }
-
-        .game-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: $space-2 + 2;
-        }
-
-        .stats {
-            grid-template-columns: 1fr;
-        }
-
-        .game-info {
-            grid-template-columns: 1fr;
-        }
+        h1           { font-size: 1.8rem; }
+        .game-header { flex-direction: column; align-items: flex-start; gap: $space-2 + 2; }
+        .stats       { grid-template-columns: 1fr; }
+        .game-info   { grid-template-columns: 1fr; }
     }
 }
