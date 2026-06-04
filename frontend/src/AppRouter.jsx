@@ -82,9 +82,7 @@ const ROUTES = {
     },
     messages_center: {
         component: MessagesInbox,
-        css: [
-            '/themes/crystal/messages_center.css',
-        ],
+        css: [],
     },
     presenti_estesi: {
         component: PresentiEstesi,

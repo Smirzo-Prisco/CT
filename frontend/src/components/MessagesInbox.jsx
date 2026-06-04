@@ -587,7 +587,7 @@ export default function MessagesInbox({ toPg = null }) {
     // --- VISTA LISTA ---
     if (view === 'list') {
         return (
-            <div className="container">
+            <div id="messages-center-app" className="container">
                 <div className="sidebar" style={{ width: '100%' }}>
 
                     {/* Intestazione */}
@@ -663,7 +663,7 @@ export default function MessagesInbox({ toPg = null }) {
     // --- VISTA THREAD ---
     if (view === 'thread' && selectedConv) {
         return (
-            <div className="container">
+            <div id="messages-center-app" className="container">
                 <div className="main-content" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
                     <ThreadView
                         messages={messages}
@@ -682,7 +682,7 @@ export default function MessagesInbox({ toPg = null }) {
 
     // --- VISTA COMPOSIZIONE ---
     return (
-        <div className="container">
+        <div id="messages-center-app" className="container">
             <div className="main-content" style={{ width: '100%' }}>
                 <ComposeView
                     onSend={sendNew}
