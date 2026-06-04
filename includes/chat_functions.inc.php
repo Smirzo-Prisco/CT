@@ -1066,12 +1066,15 @@ function elaboratePrint($riepilogo, $turn = null) {
         scaloPunti($pg, $ps, 'salute');
         scaloPunti($pg, $pi, 'integrita');
 
-        // Logica originale preservata: $ps <= 0 = nessun danno salute questo turno
-        if ($ps <= 0) {
+        // Elimina il PNG solo se ha ricevuto danni PS questo turno E i PS residui sono <= 0
+        if ($ps > 0) {
             $isPng = gdrcd_query("SELECT png FROM role_session_players WHERE pg_name = '$pg'")['png'] ?? 0;
             if ($isPng == 1) {
-                $killHtml .= "<div class=\"ct-turn__card ct-turn__card--kill\">&#x2620; <b>{$pg}</b> viene eliminato dallo scontro.</div>";
-                killPng($pg);
+                $psResidui = (int)(gdrcd_query("SELECT salute FROM personaggio WHERE nome = '$pg'")['salute'] ?? 1);
+                if ($psResidui <= 0) {
+                    $killHtml .= "<div class=\"ct-turn__card ct-turn__card--kill\">&#x2620; <b>{$pg}</b> viene eliminato dallo scontro.</div>";
+                    killPng($pg);
+                }
             }
         }
 
