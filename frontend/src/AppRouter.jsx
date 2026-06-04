@@ -229,15 +229,17 @@ export const MIGRATED_PAGES = new Set(Object.keys(ROUTES))
 
 /**
  * Inietta un CSS nel <head> se non è già presente.
- * Evita di caricare lo stesso file più volte durante la sessione.
+ * Tutti i link iniettati sono marcati con data-spa-css per poterli
+ * rimuovere selettivamente al cambio route (vedi useEffect in AppRouter).
  *
  * @param {string} href - Path assoluto del file CSS
  */
 function injectCSS(href) {
-    if (!document.querySelector(`link[href="${href}"]`)) {
+    if (!document.querySelector(`link[data-spa-css][href="${href}"]`)) {
         const link = document.createElement('link')
         link.rel  = 'stylesheet'
         link.href = href
+        link.setAttribute('data-spa-css', '1')
         document.head.appendChild(link)
     }
 }
@@ -348,6 +350,19 @@ export default function AppRouter({ isStaff = false }) {
     useEffect(() => {
         if (window.CT) window.CT.navigate = navigate
     }, [navigate])
+
+    // Rimuove i CSS iniettati dalla route precedente che non servono più.
+    // L'iniezione avviene nel render (sincrona, nessun flash di contenuto);
+    // la rimozione qui è asincrona rispetto al render ma non causa flash
+    // perché agisce solo sui link in uscita, non su quelli appena aggiunti.
+    useEffect(() => {
+        const needed = new Set(
+            isChat ? ['/themes/crystal/mestieri.css'] : (route?.css ?? [])
+        )
+        document.querySelectorAll('link[data-spa-css]').forEach(link => {
+            if (!needed.has(link.getAttribute('href'))) link.remove()
+        })
+    }, [params.page, params.dir])
 
     // -----------------------------------------------------------------------
     // RENDERING
