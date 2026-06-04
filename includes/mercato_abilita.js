@@ -229,13 +229,9 @@ document.addEventListener("click", function (e) {
     document.getElementById("skill-modal").classList.add("open");
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById("close-modal").addEventListener("click", () => {
-        document.getElementById("skill-modal").classList.remove("open");
-    });
-
-    document.getElementById("close-modal").onclick = () =>
-        document.getElementById("skill-modal").classList.remove("open");
-
-    loadSkills(); // chiamata all'avvio
-});
+// Lo script è caricato dinamicamente dopo il mount React: il DOM è già pronto,
+// DOMContentLoaded non scatterà mai → chiamo direttamente senza attendere l'evento.
+document.getElementById("close-modal")?.addEventListener("click", () =>
+    document.getElementById("skill-modal").classList.remove("open")
+);
+loadSkills();
