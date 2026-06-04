@@ -5,28 +5,28 @@
 @use '../tokens' as *;
 
 #giocate-app {
-    // Variabili locali del componente
-    --primary-dark:     #181c31;
-    --primary-darker:   #121626;
-    --primary-darkest:  #0d101f;
-    --secondary-color:  #ce846f;
-    --secondary-light:  #e09e8d;
-    --accent-color:     #f0b27a;
+    // Variabili locali — mappate sui token globali del progetto
+    --primary-dark:     #{$palette-surface-raised};
+    --primary-darker:   #{$palette-surface-dark};
+    --primary-darkest:  #{$palette-surface-deep};
+    --secondary-color:  #{$palette-rust};
+    --secondary-light:  #{lighten($palette-rust, 15%)};
+    --accent-color:     #{$color-warning};
     --text-light:       #{$color-text-light};
-    --text-medium:      #b0b0b0;
-    --text-dark:        #8a8a8a;
-    --card-bg:          #1e2238;
-    --card-border:      #2a2f4a;
-    --input-bg:         #252a40;
-    --input-border:     #343a52;
+    --text-medium:      #{$color-text-secondary};
+    --text-dark:        #{$color-text-muted};
+    --card-bg:          #{$palette-surface-raised};
+    --card-border:      #{$palette-surface-hover};
+    --input-bg:         #{$palette-surface-input};
+    --input-border:     #{$palette-surface-select};
     --success-color:    #{$color-success};
     --warning-color:    #{$color-warning};
-    --shadow:           0 4px 12px rgba(0, 0, 0, 0.25);
-    --shadow-hover:     0 8px 24px rgba(0, 0, 0, 0.35);
-    --radius:           #{$radius-xl - 2};
+    --shadow:           #{$shadow-md};
+    --shadow-hover:     #{$shadow-lg};
+    --radius:           #{$radius-lg};
     --transition:       all #{$transition-normal};
 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: $font-base;
     background-color: var(--primary-darker);
     color: var(--text-light);
     line-height: 1.6;
@@ -103,7 +103,7 @@
         &:focus  {
             outline: none;
             border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgb(206 132 111 / 20%);
+            box-shadow: 0 0 0 3px rgba($palette-rust, 0.2);
         }
     }
 
@@ -157,7 +157,7 @@
     .stat-icon {
         width: 50px;
         height: 50px;
-        background-color: rgb(206 132 111 / 15%);
+        background-color: rgba($palette-rust, 0.15);
         border-radius: $radius-full;
         display: flex;
         align-items: center;
@@ -183,15 +183,15 @@
     }
 
     .status-in-corso  {
-        background-color: rgb(76 175 80 / 20%);
+        background-color: rgba($palette-success, 0.2);
         color: var(--success-color);
-        border: 1px solid rgb(76 175 80 / 30%);
+        border: 1px solid rgba($palette-success, 0.3);
     }
 
     .status-conclusa {
-        background-color: rgb(140 140 140 / 20%);
+        background-color: rgba($palette-text-secondary, 0.2);
         color: var(--text-medium);
-        border: 1px solid rgb(140 140 140 / 30%);
+        border: 1px solid rgba($palette-text-secondary, 0.3);
     }
 
     // ── Lista giocate ─────────────────────────────────────────
@@ -229,7 +229,7 @@
     }
 
     .game-header {
-        background-color: rgb(24 28 49 / 70%);
+        background-color: rgba($palette-surface-raised, 0.7);
         color: var(--text-light);
         padding: $space-5;
         display: flex;
@@ -300,7 +300,7 @@
     .participants-list { display: flex; flex-wrap: wrap; gap: $space-2 + 2; }
 
     .participant {
-        background-color: rgb(206 132 111 / 15%);
+        background-color: rgba($palette-rust, 0.15);
         padding: $space-2 15px;
         border-radius: 20px;
         font-size: 0.9rem;
@@ -308,11 +308,11 @@
         align-items: center;
         gap: $space-2;
         transition: var(--transition);
-        border: 1px solid rgb(206 132 111 / 20%);
+        border: 1px solid rgba($palette-rust, 0.2);
 
         &:hover {
-            background-color: rgb(206 132 111 / 25%);
-            border-color: rgb(206 132 111 / 40%);
+            background-color: rgba($palette-rust, 0.25);
+            border-color: rgba($palette-rust, 0.4);
         }
 
         i { color: var(--secondary-light); }
