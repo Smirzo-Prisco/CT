@@ -1583,6 +1583,17 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
                     } else $msg .= "<br>$striker tenta di convertire i danni di $target in salute, ma fallisce. ";
                 break;
 
+                case 'converti_meta_danni_bersaglio_in_salute_castatore':
+                    if ($dice >= 10) {
+                        if ($hasSubisce) {
+                            $tot  = sumDanni($riepilogo[$target]['subisce']);
+                            $meta = (int) floor($tot['salute'] / 2);
+                            gdrcd_query("UPDATE personaggio SET salute = salute + $meta WHERE nome = '$striker'");
+                            $msg .= "<br>$striker lancia a $target una skill generica che converte metà dei danni subiti da $target ({$meta} ps) in punti salute per se stesso. ";
+                        } else $msg .= "<br>$striker tenta di convertire metà dei danni di $target in salute, ma $target non subisce danni fisici in questo turno. ";
+                    } else $msg .= "<br>$striker tenta di convertire metà dei danni di $target in salute, ma fallisce. ";
+                break;
+
                 case 'meno_50_danni_tutti_con_durata':
                     // TODO
                 break;

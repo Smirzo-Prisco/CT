@@ -446,6 +446,12 @@ if($_SESSION['admin'] != 1) {
                         </label>
                     </div>
                     <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="converti_meta_danni_bersaglio_in_salute_castatore" id="converti_meta_danni_bersaglio_in_salute_castatore">
+                        <label for="converti_meta_danni_bersaglio_in_salute_castatore">
+                            Trasforma la metà del danno subito dal bersaglio in punti salute per se stesso.
+                        </label>
+                    </div>
+                    <div class="radio-group">
                         <input type="radio" name="sottotipo" value="più_15_punti_salute" id="più_15_punti_salute">
                         <label for="più_15_punti_salute">
                             Toglie 15 ps al castatore e li assegna al bersaglio.
