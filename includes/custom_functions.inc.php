@@ -3,107 +3,54 @@
 // ini_set('display_errors', 1);
 
 /**
- * Invia un'email HTML via SMTP diretto (Register.it SSL:465).
- * Non usa mail() nativa né librerie esterne — solo stream PHP.
- * Credenziali in $PARAMETERS['smtp'] (config.inc.php, fuori da git).
+ * Invia un'email HTML via Brevo API HTTP (porta 443).
+ * Usato al posto di SMTP perché Hetzner blocca le porte 25/465/587 in uscita.
+ * Richiede $PARAMETERS['smtp']['api_key'] in config.inc.php (fuori da git).
  *
  * @param string $to      Indirizzo destinatario
- * @param string $subject Oggetto (verrà codificato UTF-8 Base64)
+ * @param string $subject Oggetto
  * @param string $message Corpo HTML
- * @return bool           true se il server ha accettato il messaggio
- */
-/**
- * Invia un'email HTML via SMTP con STARTTLS (Brevo, porta 587).
- * Non usa mail() nativa né librerie esterne — solo stream PHP.
- * Credenziali in $PARAMETERS['smtp'] (config.inc.php, fuori da git).
- *
- * @param string $to      Indirizzo destinatario
- * @param string $subject Oggetto (verrà codificato UTF-8 Base64)
- * @param string $message Corpo HTML
- * @return bool           true se il server ha accettato il messaggio
+ * @return bool           true se Brevo ha accettato il messaggio (HTTP 201)
  */
 function send_mail(string $to, string $subject, string $message) : bool {
-    $cfg      = $GLOBALS['PARAMETERS']['smtp'] ?? null;
-    if (!$cfg) { error_log('[send_mail] SMTP non configurato in config.inc.php'); return false; }
-
-    $from     = $cfg['user'];
-    $fromname = $cfg['fromname'] ?? 'Crystal Tokyo';
-
-    // ── Connessione plain (STARTTLS su porta 587) ────────────────
-    $sock = stream_socket_client(
-        $cfg['host'] . ':' . $cfg['port'],
-        $errno, $errstr, 30
-    );
-    if (!$sock) { error_log("[send_mail] Connessione fallita: $errstr ($errno)"); return false; }
-
-    stream_set_timeout($sock, 30);
-
-    // Helper: legge la risposta (gestisce risposte multi-riga 250-)
-    $read = function() use ($sock) : string {
-        $out = '';
-        while (($line = fgets($sock, 512)) !== false) {
-            $out .= $line;
-            if (isset($line[3]) && $line[3] === ' ') break;
-        }
-        return $out;
-    };
-    $cmd = function(string $line) use ($sock, $read) : string {
-        fputs($sock, $line . "\r\n");
-        return $read();
-    };
-    $ok = function(string $r, int $code) { return strncmp($r, (string)$code, 3) === 0; };
-
-    // ── Handshake iniziale ───────────────────────────────────────
-    $read(); // greeting "220 ..."
-    $r = $cmd('EHLO crystaltokyo.it');
-    if (!$ok($r, 250)) { error_log("[send_mail] EHLO fallito: $r"); fclose($sock); return false; }
-
-    // ── STARTTLS: upgrade a connessione cifrata ──────────────────
-    $r = $cmd('STARTTLS');
-    if (!$ok($r, 220)) { error_log("[send_mail] STARTTLS fallito: $r"); fclose($sock); return false; }
-    if (!stream_socket_enable_crypto($sock, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT)) {
-        error_log('[send_mail] Handshake TLS fallito');
-        fclose($sock);
+    $cfg = $GLOBALS['PARAMETERS']['smtp'] ?? null;
+    if (!$cfg || empty($cfg['api_key'])) {
+        error_log('[send_mail] api_key Brevo non configurata in config.inc.php');
         return false;
     }
 
-    // ── Secondo EHLO (obbligatorio dopo STARTTLS) ────────────────
-    $r = $cmd('EHLO crystaltokyo.it');
-    if (!$ok($r, 250)) { error_log("[send_mail] EHLO post-TLS fallito: $r"); fclose($sock); return false; }
+    $from     = isset($cfg['from']) ? $cfg['from'] : $cfg['user'];
+    $fromname = isset($cfg['fromname']) ? $cfg['fromname'] : 'Crystal Tokyo';
 
-    // ── Autenticazione AUTH LOGIN ────────────────────────────────
-    $r = $cmd('AUTH LOGIN');
-    if (!$ok($r, 334)) { error_log("[send_mail] AUTH LOGIN fallito: $r"); fclose($sock); return false; }
-    $cmd(base64_encode($from));
-    $r = $cmd(base64_encode($cfg['pass']));
-    if (!$ok($r, 235)) { error_log("[send_mail] Autenticazione fallita: $r"); fclose($sock); return false; }
+    $payload = json_encode([
+        'sender'      => ['name' => $fromname, 'email' => $from],
+        'to'          => [['email' => $to]],
+        'subject'     => $subject,
+        'htmlContent' => $message,
+    ]);
 
-    // ── Busta ────────────────────────────────────────────────────
-    $mailFrom = isset($cfg['from']) ? $cfg['from'] : $from;
-    $r = $cmd("MAIL FROM:<{$mailFrom}>");
-    if (!$ok($r, 250)) { error_log("[send_mail] MAIL FROM fallito: $r"); fclose($sock); return false; }
-    $r = $cmd("RCPT TO:<{$to}>");
-    if (!$ok($r, 250)) { error_log("[send_mail] RCPT TO fallito: $r"); fclose($sock); return false; }
-    $r = $cmd('DATA');
-    if (!$ok($r, 354)) { error_log("[send_mail] DATA fallito: $r"); fclose($sock); return false; }
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_HTTPHEADER     => [
+            'accept: application/json',
+            'api-key: ' . $cfg['api_key'],
+            'content-type: application/json',
+        ],
+        CURLOPT_TIMEOUT        => 15,
+    ]);
 
-    // ── Intestazioni + corpo ─────────────────────────────────────
-    $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-    $headers = "From: {$fromname} <{$mailFrom}>\r\n"
-             . "To: {$to}\r\n"
-             . "Subject: {$encodedSubject}\r\n"
-             . "MIME-Version: 1.0\r\n"
-             . "Content-Type: text/html; charset=UTF-8\r\n"
-             . "Content-Transfer-Encoding: base64\r\n";
+    $response = curl_exec($ch);
+    $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr  = curl_error($ch);
+    curl_close($ch);
 
-    $body = $headers . "\r\n" . chunk_split(base64_encode($message)) . "\r\n.\r\n";
-    $r = $cmd($body);
-    if (!$ok($r, 250)) { error_log("[send_mail] Invio corpo fallito: $r"); }
+    if ($curlErr) { error_log("[send_mail] curl error: $curlErr"); return false; }
+    if ($httpCode !== 201) { error_log("[send_mail] Brevo API HTTP $httpCode: $response"); return false; }
 
-    $cmd('QUIT');
-    fclose($sock);
-
-    return $ok($r, 250);
+    return true;
 }
 
 function generateLinks($current_page, $total_pages, $url = "?") {
