@@ -32,11 +32,11 @@ table.customTable {
       text-transform: uppercase; 
   }
   
-  td.up a:link, a:visited {
+  td.up a:link, td.up a:visited {
       font-size: 12px;
       color: #a7a7a8;
       font-family: "DejaVu Serif";
-      text-transform: uppercase; 
+      text-transform: uppercase;
   }
   
   td.up {
@@ -193,8 +193,8 @@ table.customTable {
           width: 90%; 
       }
       
-      td.up, td.up a:link, a:visited {
-          font-size: 11px; 
+      td.up, td.up a:link, td.up a:visited {
+          font-size: 11px;
       }
   
       tr.second_header td.up_logo {
@@ -226,7 +226,7 @@ table.customTable {
           width: 95%; 
       }
       
-      td.up, td.up a:link, a:visited {
+      td.up, td.up a:link, td.up a:visited {
           font-size: 10px;
       }
   
@@ -265,7 +265,7 @@ table.customTable {
           width: 100%; 
       }
   
-      td.up, td.up a:link, a:visited {
+      td.up, td.up a:link, td.up a:visited {
           font-size: 9px;
       }
   
