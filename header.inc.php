@@ -184,10 +184,16 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
 
             if (document.getElementById('meteo-container'))
                 CT.mount('Meteo', 'meteo-container', {});
+
+            if (document.getElementById('chatbot-widget-container'))
+                CT.mount('ChatbotWidget', 'chatbot-widget-container', {});
         });
         </script>
     </head>
     <body class="main_body">
+<?php if (!empty($_SESSION['login'])): ?>
+<div id="chatbot-widget-container"></div>
+<?php endif; ?>
 <?php
     /** * CONTROLLO PER AGGIORNAMENTO DB
      * Il controllo viene lanciato solo in index e nelle pagine di installer/upgrade.

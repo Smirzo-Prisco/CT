@@ -45,6 +45,7 @@ import AnteprimaScheda from './components/AnteprimaScheda'
 import LinkMenu        from './components/LinkMenu'
 import ChattingOff     from './components/ChattingOff'
 import Meteo           from './components/Meteo'
+import ChatbotWidget   from './components/ChatbotWidget'
 
 /**
  * Registry privato dei componenti.
@@ -139,6 +140,9 @@ window.CT.register('ChattingOff', ChattingOff)
 
 /** Box meteo nella colonna destra — toggle oggi/ieri */
 window.CT.register('Meteo', Meteo)
+
+/** Chatbot AI floating widget — bottom-right, 5 domande/giorno, max 500 char */
+window.CT.register('ChatbotWidget', ChatbotWidget)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.

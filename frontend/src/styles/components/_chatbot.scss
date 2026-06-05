@@ -1,0 +1,295 @@
+// ============================================================
+// _chatbot.scss — Widget chatbot AI Crystal Tokyo
+// Floating button + pannello chat (bottom-right).
+// ============================================================
+
+// ── Contenitore widget ────────────────────────────────────
+
+.chatbot-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+// ── FAB (Floating Action Button) ─────────────────────────
+
+.chatbot-fab {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: $palette-rust;
+    color: $palette-text;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    transition: background 0.2s, transform 0.15s;
+    flex-shrink: 0;
+
+    &:hover {
+        background: $palette-rust-dark;
+        transform: scale(1.08);
+    }
+
+    &--open {
+        background: $palette-surface-hover;
+    }
+}
+
+// ── Pannello ─────────────────────────────────────────────
+
+.chatbot-panel {
+    width: 340px;
+    background: $palette-surface-dark;
+    border: 1px solid $palette-surface-hover;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+
+    @media (max-width: 400px) {
+        width: calc(100vw - 48px);
+    }
+}
+
+// ── Header ───────────────────────────────────────────────
+
+.chatbot-header {
+    background: $palette-surface-raised;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid $palette-surface-hover;
+    flex-shrink: 0;
+}
+
+.chatbot-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: $palette-text-title;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.chatbot-remaining {
+    font-size: 11px;
+    color: $palette-text-secondary;
+    white-space: nowrap;
+
+    &--empty {
+        color: $palette-danger;
+    }
+}
+
+.chatbot-close {
+    background: none;
+    border: none;
+    color: $palette-text-secondary;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+
+    &:hover {
+        color: $palette-text;
+        background: $palette-surface-hover;
+    }
+}
+
+// ── Lista messaggi ───────────────────────────────────────
+
+.chatbot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 180px;
+    max-height: 280px;
+}
+
+.chatbot-empty {
+    color: $palette-text-secondary;
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.6;
+    padding: 20px 8px;
+}
+
+// ── Singolo messaggio ────────────────────────────────────
+
+.chatbot-msg {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+
+    &--user {
+        flex-direction: row-reverse;
+
+        .chatbot-msg-text {
+            background: $palette-blue-mid;
+            color: $palette-text;
+            border-radius: 12px 2px 12px 12px;
+        }
+    }
+
+    &--ai {
+        .chatbot-msg-text {
+            background: $palette-surface;
+            color: $palette-text;
+            border-radius: 2px 12px 12px 12px;
+        }
+    }
+
+    &--error {
+        .chatbot-msg-icon { color: $palette-danger; }
+
+        .chatbot-msg-text {
+            background: rgba($palette-danger, 0.12);
+            color: $palette-danger;
+            border-radius: 8px;
+        }
+    }
+}
+
+.chatbot-msg-icon {
+    font-size: 13px;
+    color: $palette-text-secondary;
+    margin-top: 5px;
+    flex-shrink: 0;
+    width: 14px;
+    text-align: center;
+}
+
+.chatbot-msg-text {
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 8px 12px;
+    max-width: 85%;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+// ── Typing indicator (tre pallini animati) ───────────────
+
+.chatbot-typing {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 10px 14px;
+    background: $palette-surface;
+    border-radius: 2px 12px 12px 12px;
+
+    span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: $palette-text-secondary;
+        animation: chatbot-bounce 1s infinite ease-in-out;
+
+        &:nth-child(2) { animation-delay: 0.15s; }
+        &:nth-child(3) { animation-delay: 0.30s; }
+    }
+}
+
+@keyframes chatbot-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+    30%            { transform: translateY(-6px); opacity: 1; }
+}
+
+// ── Area input ───────────────────────────────────────────
+
+.chatbot-input-area {
+    padding: 10px 12px;
+    border-top: 1px solid $palette-surface-hover;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.chatbot-input-wrap {
+    flex: 1;
+    position: relative;
+}
+
+.chatbot-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: $palette-surface-input;
+    border: 1px solid $palette-surface-hover;
+    border-radius: 8px;
+    color: $palette-text;
+    font-size: 13px;
+    padding: 8px 10px 20px;
+    resize: none;
+    outline: none;
+    line-height: 1.4;
+    font-family: inherit;
+
+    &::placeholder {
+        color: $palette-text-muted;
+    }
+
+    &:focus {
+        border-color: $palette-rust;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.chatbot-chars {
+    position: absolute;
+    bottom: 5px;
+    right: 8px;
+    font-size: 10px;
+    color: $palette-text-secondary;
+    pointer-events: none;
+
+    &--warn {
+        color: $palette-warning;
+        font-weight: 600;
+    }
+}
+
+.chatbot-send {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: $palette-rust;
+    color: $palette-text;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+        background: $palette-rust-dark;
+    }
+
+    &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+}
