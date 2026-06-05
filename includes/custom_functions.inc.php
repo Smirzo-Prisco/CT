@@ -12,6 +12,16 @@
  * @param string $message Corpo HTML
  * @return bool           true se il server ha accettato il messaggio
  */
+/**
+ * Invia un'email HTML via SMTP con STARTTLS (Brevo, porta 587).
+ * Non usa mail() nativa né librerie esterne — solo stream PHP.
+ * Credenziali in $PARAMETERS['smtp'] (config.inc.php, fuori da git).
+ *
+ * @param string $to      Indirizzo destinatario
+ * @param string $subject Oggetto (verrà codificato UTF-8 Base64)
+ * @param string $message Corpo HTML
+ * @return bool           true se il server ha accettato il messaggio
+ */
 function send_mail(string $to, string $subject, string $message) : bool {
     $cfg      = $GLOBALS['PARAMETERS']['smtp'] ?? null;
     if (!$cfg) { error_log('[send_mail] SMTP non configurato in config.inc.php'); return false; }
@@ -19,18 +29,14 @@ function send_mail(string $to, string $subject, string $message) : bool {
     $from     = $cfg['user'];
     $fromname = $cfg['fromname'] ?? 'Crystal Tokyo';
 
-    // ── Connessione SSL ──────────────────────────────────────────
-    $ctx = stream_context_create(['ssl' => [
-        'verify_peer'       => true,
-        'verify_peer_name'  => true,
-        'allow_self_signed' => false,
-    ]]);
+    // ── Connessione plain (STARTTLS su porta 587) ────────────────
     $sock = stream_socket_client(
         $cfg['host'] . ':' . $cfg['port'],
-        $errno, $errstr, 30,
-        STREAM_CLIENT_CONNECT, $ctx
+        $errno, $errstr, 30
     );
     if (!$sock) { error_log("[send_mail] Connessione fallita: $errstr ($errno)"); return false; }
+
+    stream_set_timeout($sock, 30);
 
     // Helper: legge la risposta (gestisce risposte multi-riga 250-)
     $read = function() use ($sock) : string {
@@ -47,10 +53,23 @@ function send_mail(string $to, string $subject, string $message) : bool {
     };
     $ok = function(string $r, int $code) { return strncmp($r, (string)$code, 3) === 0; };
 
-    // ── Handshake SMTP ───────────────────────────────────────────
+    // ── Handshake iniziale ───────────────────────────────────────
     $read(); // greeting "220 ..."
     $r = $cmd('EHLO crystaltokyo.it');
     if (!$ok($r, 250)) { error_log("[send_mail] EHLO fallito: $r"); fclose($sock); return false; }
+
+    // ── STARTTLS: upgrade a connessione cifrata ──────────────────
+    $r = $cmd('STARTTLS');
+    if (!$ok($r, 220)) { error_log("[send_mail] STARTTLS fallito: $r"); fclose($sock); return false; }
+    if (!stream_socket_enable_crypto($sock, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT)) {
+        error_log('[send_mail] Handshake TLS fallito');
+        fclose($sock);
+        return false;
+    }
+
+    // ── Secondo EHLO (obbligatorio dopo STARTTLS) ────────────────
+    $r = $cmd('EHLO crystaltokyo.it');
+    if (!$ok($r, 250)) { error_log("[send_mail] EHLO post-TLS fallito: $r"); fclose($sock); return false; }
 
     // ── Autenticazione AUTH LOGIN ────────────────────────────────
     $r = $cmd('AUTH LOGIN');
@@ -60,7 +79,7 @@ function send_mail(string $to, string $subject, string $message) : bool {
     if (!$ok($r, 235)) { error_log("[send_mail] Autenticazione fallita: $r"); fclose($sock); return false; }
 
     // ── Busta ────────────────────────────────────────────────────
-    $r = $cmd("MAIL FROM:<{$from}>");
+    $r = $cmd("MAIL FROM:<{$cfg['from'] ?? $from}>");
     if (!$ok($r, 250)) { error_log("[send_mail] MAIL FROM fallito: $r"); fclose($sock); return false; }
     $r = $cmd("RCPT TO:<{$to}>");
     if (!$ok($r, 250)) { error_log("[send_mail] RCPT TO fallito: $r"); fclose($sock); return false; }
@@ -69,7 +88,8 @@ function send_mail(string $to, string $subject, string $message) : bool {
 
     // ── Intestazioni + corpo ─────────────────────────────────────
     $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-    $headers = "From: {$fromname} <{$from}>\r\n"
+    $mailFrom = $cfg['from'] ?? $from;
+    $headers = "From: {$fromname} <{$mailFrom}>\r\n"
              . "To: {$to}\r\n"
              . "Subject: {$encodedSubject}\r\n"
              . "MIME-Version: 1.0\r\n"

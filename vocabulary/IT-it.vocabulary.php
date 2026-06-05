@@ -63,21 +63,66 @@ $MESSAGE['register']['fields']['stats'] = 'Caratteristiche';
 $MESSAGE['register']['fields']['stats_info'] = 'La somma dei punteggi deve essere';
 $MESSAGE['register']['summary'] = 'Riepilogo';
 /* Condizioni */
-$MESSAGE['register']['disclaimer'] = "Le presenti condizioni sono vincolanti tra la gestione del sito e l'utente che si registra alla piattaforma.
-Il servizio
-Crystal Tokyo GDR è una piattaforma di gioco di ruolo online (play-by-chat) completamente gratuita, senza scopo di lucro e priva di qualsiasi elemento di gioco d'azzardo o pagamento in valuta corrente.
-Età minima e contenuti
-La piattaforma è vietata ai minori di 16 anni. Il gioco può trattare tematiche mature quali religione, droghe, sesso, violenza e crimine. Gli utenti minorenni saranno immediatamente allontanati.
-Comportamento
-È richiesto il rispetto assoluto verso tutti i giocatori. Comportamenti di cyberbullismo saranno segnalati alle autorità competenti. I personaggi creati al solo scopo di disturbare il gioco saranno bannati immediatamente.
-Registrazione e account
-L'iscrizione è necessaria per accedere al gioco. Al termine della registrazione verrà inviata una password via email. Si raccomanda di scegliere una password non riconducibile alla propria identità reale e di non divulgarla a terzi. La piattaforma non si assume responsabilità per la divulgazione volontaria di dati personali da parte degli utenti.
-Privacy e messaggistica
-La messaggistica interna non è da considerarsi privata: può essere monitorata in qualsiasi momento dalla gestione o dai moderatori. Prima dell'iscrizione si invita a prendere visione dell'informativa privacy, conforme al GDPR (Regolamento UE 2016/679).
-Proprietà intellettuale
-Il codice, la grafica, la base dati e tutti i contenuti della piattaforma sono di proprietà della gestione. In caso di abbandono, l'utente non vanta alcun diritto su grafica, personaggi, storie o contenuti creati durante la partecipazione al gioco.
-Salute
-Si sconsiglia l'uso prolungato della piattaforma. Si consiglia di effettuare pause regolari e di interrompere il gioco in caso di stati ansiosi o di stress.";
+$MESSAGE['register']['disclaimer'] = "TERMINI E CONDIZIONI D'USO — CRYSTAL TOKYO GDR
+In vigore dal 5 giugno 2026
+
+1. Descrizione del servizio
+Crystal Tokyo GDR è una piattaforma di gioco di ruolo online (play-by-chat) amatoriale, gratuita e senza scopo di lucro. L'ambientazione è un'invenzione originale della gestione e dei suoi collaboratori, ispirata al fumetto giapponese e alla tradizione narrativa occidentale. Qualsiasi riferimento a fatti o persone reali è puramente casuale.
+
+2. Accettazione dei termini
+La registrazione alla piattaforma implica la piena accettazione delle presenti condizioni. Chi non intende accettarle è invitato a non registrarsi.
+
+3. Età minima
+L'accesso è vietato ai minori di 16 anni. La piattaforma tratta tematiche mature quali violenza narrativa, riferimenti a sostanze nell'ambito della finzione di gioco e contenuti per adulti. La gestione si riserva di allontanare immediatamente qualsiasi utente risultasse minorenne.
+
+4. Comportamento degli utenti
+Gli utenti sono tenuti a mantenere un comportamento rispettoso nei confronti degli altri partecipanti. Sono espressamente vietati:
+
+Insulti, molestie e comportamenti di cyberbullismo
+Utilizzo di più account contemporaneamente
+Divulgazione di dati personali propri o altrui
+Qualsiasi comportamento finalizzato a disturbare il regolare svolgimento del gioco
+
+Le violazioni potranno comportare la sospensione o il ban permanente dell'account. I casi di cyberbullismo saranno segnalati alle autorità competenti ai sensi di legge.
+
+5. Account e credenziali
+Al termine della registrazione verrà inviata una password via email. L'utente è responsabile della custodia delle proprie credenziali e non dovrà divulgarle a terzi. La gestione non si assume alcuna responsabilità per accessi non autorizzati derivanti dalla divulgazione volontaria delle credenziali da parte dell'utente.
+
+6. Messaggistica interna
+La messaggistica interna alla piattaforma non è da considerarsi privata. Può essere monitorata in qualsiasi momento dalla gestione o dai moderatori incaricati, senza necessità di preavviso, ai fini della sicurezza e del corretto svolgimento del gioco.
+
+7. Proprietà intellettuale
+Il codice, la grafica, la base dati e tutti i contenuti della piattaforma sono di proprietà della gestione. In caso di abbandono della piattaforma, l'utente non vanta alcun diritto su:
+
+Grafica e materiali visivi
+Personaggi creati e relativi sviluppi narrativi
+Storie, eventi e circostanze verificatisi in gioco
+Qualsiasi contributo fornito alla documentazione di gioco
+
+Tali elementi restano a tutti gli effetti parte integrante della piattaforma.
+
+8. Immagini e contenuti caricati dagli utenti
+La gestione non si assume responsabilità per le immagini scelte dagli utenti come avatar o per altri contenuti caricati dagli stessi. Qualora un contenuto dovesse violare la normativa vigente in materia di copyright o privacy (GDPR — Regolamento UE 2016/679), la gestione provvederà alla sua immediata rimozione.
+
+9. Limitazione di responsabilità
+La piattaforma è offerta gratuitamente e senza garanzie di continuità del servizio. La gestione non è responsabile per:
+
+Interruzioni del servizio
+Perdita di dati
+Danni derivanti dall'uso della piattaforma
+Iniziative personali degli utenti
+
+
+10. Salute e uso consapevole
+Si sconsiglia l'uso prolungato della piattaforma. Si raccomanda di effettuare pause regolari, di non giocare per molte ore consecutive e di interrompere il gioco in caso di stati ansiosi o di stress.
+
+11. Modifiche ai termini
+La gestione si riserva il diritto di modificare i presenti termini in qualsiasi momento. Le modifiche saranno comunicate agli utenti tramite avviso sulla piattaforma e/o via email. L'utilizzo continuato del servizio dopo la notifica implica l'accettazione delle modifiche.
+
+12. Legge applicabile
+I presenti termini sono regolati dalla legge italiana. Per qualsiasi controversia è competente il Foro di residenza del titolare.
+
+Crystal Tokyo GDR — gestione@crystaltokyo.it";
 /* Informazioni */
 $MESSAGE['register']['rules_read'] = "Crystaltokyo gdr nasce da una rielaborazione di molti elementi classici del fumetto giapponese e di alcuni elementi di culto della tradizione occidentale che confluiscono in una realtà metropolitana postmoderna.<br>
 L'ambientazione può considerarsi a tutti gli effetti una invenzione del gestore e dei più stretti collaboratori.<br>

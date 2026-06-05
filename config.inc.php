@@ -32,6 +32,13 @@ $PARAMETERS['info']['site_name'] = 'Crystal Tokyo'; //nome del gioco
 $PARAMETERS['info']['site_url'] = 'http://crystaltokyo.it'; //indirizzo URL del gioco
 $PARAMETERS['info']['webmaster_name'] = 'Gestione'; //nome e cognome del responsabile del sito
 $PARAMETERS['info']['webmaster_email'] = 'gestione@crystaltokyo.it'; //email ufficiale del webmaster (è visibile in homepage)
+
+/* SMTP — usato da send_mail() per il recupero password e le notifiche */
+$PARAMETERS['smtp']['host']     = 'ssl://smtp.register.it';
+$PARAMETERS['smtp']['port']     = 465;
+$PARAMETERS['smtp']['user']     = 'gestione@crystaltokyo.it';
+$PARAMETERS['smtp']['pass']     = 'Cry5t4lt0ky0';            // <-- inserisci la password della casella
+$PARAMETERS['smtp']['fromname'] = 'Crystal Tokyo';
 $PARAMETERS['info']['homepage_name'] = 'Homepage'; //nome con il quale si indica la prima pagina visualizzata
 $PARAMETERS['info']['dbadmin_name'] = 'Admin DB';
 $PARAMETERS['info']['GDRCD'] = 'CT'; //nome del gioco
