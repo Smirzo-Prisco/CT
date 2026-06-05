@@ -80,7 +80,7 @@ export default function ChatbotWidget() {
                     {/* Header */}
                     <div className="chatbot-header">
                         <span className="chatbot-title">
-                            <i className="fas fa-robot" /> Crystal Tokyo AI
+                            <i className="fas fa-robot" /> Crystal Bot
                         </span>
                         {remaining !== null && (
                             <span className={`chatbot-remaining ${isExhausted ? 'chatbot-remaining--empty' : ''}`}>
@@ -100,7 +100,7 @@ export default function ChatbotWidget() {
                     <div className="chatbot-messages">
                         {messages.length === 0 && (
                             <div className="chatbot-empty">
-                                Ciao! Sono l&apos;assistente di Crystal Tokyo.<br />
+                                Ciao! Sono Crystal Bot, l&apos;assistente di Crystal Tokyo.<br />
                                 Puoi chiedermi informazioni sul regolamento e sull&apos;ambientazione.
                             </div>
                         )}
