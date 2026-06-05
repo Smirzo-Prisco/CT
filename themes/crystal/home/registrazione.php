@@ -16,9 +16,7 @@ $fase = isset($_POST['fase']) ? $_POST['fase'] : 1;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Iubenda Cookie Solution -->
-    <script type="text/javascript" src="https://embeds.iubenda.com/widgets/856838b7-0259-42a6-b7ac-3d21589f080f.js"></script>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrazione - Crystal Tokyo GDR</title>
     <!-- Collegamento ai fogli di stile CSS -->
