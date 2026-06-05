@@ -89,7 +89,7 @@ function SaveToDisk(fileURL, fileName) {
     <br><br>
    <input type="submit" href="javascript: void(0)"  onclick="SaveToDisk('fileURL, fileName')" value="Salva" style="font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 10px;font-weight: normal;color: #b4b6bf;background-color: #0a121b;border: 1px solid; border-color:#888888; -moz-border-radius:.4em; border-radius:.4em;vertical-align: bottom;-moz-border-radius: 10px;">
 
-    <?
+    <?php
     echo "</center><hr>";
     
     
