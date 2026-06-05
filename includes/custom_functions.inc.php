@@ -79,7 +79,8 @@ function send_mail(string $to, string $subject, string $message) : bool {
     if (!$ok($r, 235)) { error_log("[send_mail] Autenticazione fallita: $r"); fclose($sock); return false; }
 
     // ── Busta ────────────────────────────────────────────────────
-    $r = $cmd("MAIL FROM:<{$cfg['from'] ?? $from}>");
+    $mailFrom = isset($cfg['from']) ? $cfg['from'] : $from;
+    $r = $cmd("MAIL FROM:<{$mailFrom}>");
     if (!$ok($r, 250)) { error_log("[send_mail] MAIL FROM fallito: $r"); fclose($sock); return false; }
     $r = $cmd("RCPT TO:<{$to}>");
     if (!$ok($r, 250)) { error_log("[send_mail] RCPT TO fallito: $r"); fclose($sock); return false; }
@@ -88,7 +89,6 @@ function send_mail(string $to, string $subject, string $message) : bool {
 
     // ── Intestazioni + corpo ─────────────────────────────────────
     $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-    $mailFrom = $cfg['from'] ?? $from;
     $headers = "From: {$fromname} <{$mailFrom}>\r\n"
              . "To: {$to}\r\n"
              . "Subject: {$encodedSubject}\r\n"
