@@ -64,6 +64,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="it" lang="it">
     <head>
         <meta charset="UTF-8">
+        <!-- Iubenda Cookie Solution — deve stare il prima possibile nell'<head> -->
+        <script type="text/javascript" src="https://embeds.iubenda.com/widgets/856838b7-0259-42a6-b7ac-3d21589f080f.js"></script>
         <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
         <meta http-equiv="Content-Type" content="text/html;">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">

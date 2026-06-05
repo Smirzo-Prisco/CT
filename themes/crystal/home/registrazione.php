@@ -129,7 +129,8 @@ $fase = isset($_POST['fase']) ? $_POST['fase'] : 1;
 
 <div class="input-group registration-input-group">
     <input type="checkbox" id="consensoTrattamentoDati" name="consensoTrattamentoDati" required>
-    <label for="consensoTrattamentoDati">ESPRIMO IL CONSENSO al trattamento dei miei dati personali secondo quanto espresso dalla Privacy Policy e Cookie Policy</label>
+    <label for="consensoTrattamentoDati">ESPRIMO IL CONSENSO al trattamento dei miei dati personali secondo quanto espresso dalla <a href="https://www.iubenda.com/privacy-policy/18155810" class="iubenda-black iubenda-noiframe iubenda-embed" title="Privacy Policy">Privacy Policy</a> e <a href="https://www.iubenda.com/privacy-policy/18155810/cookie-policy" class="iubenda-black iubenda-noiframe iubenda-embed" title="Cookie Policy">Cookie Policy</a></label>
+    <script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>
 </div>
 
 
