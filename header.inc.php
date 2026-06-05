@@ -85,7 +85,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <!-- homepage.css, chat.css, presenti.css, scheda.css, messaggi.css, forum.css, lettura_bacheca.css rimossi: tutte le regole sono ora in ct-styles.css -->
         <link rel="stylesheet" href="<?=$css_v('ct-styles.css')?>" type="text/css">
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css">
         <?php
         /** * Il controllo individua se l'header non è impiegato per il main */
         if(!isset($check_for_update)): ?>
