@@ -44,8 +44,8 @@ function send_mail(string $to, string $subject, string $message) : bool {
         fputs($sock, $line . "\r\n");
         return $read();
     };
-    // Helper: verifica il codice di risposta
-    $ok = fn(string $r, int $code) => str_starts_with($r, (string)$code);
+    // Helper: verifica il codice di risposta (compatibile PHP 7.2+)
+    $ok = function(string $r, int $code) { return strncmp($r, (string)$code, 3) === 0; };
 
     // ── Handshake SMTP ───────────────────────────────────────────
     $read(); // greeting "220 ..."
