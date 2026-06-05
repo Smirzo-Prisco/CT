@@ -22,8 +22,12 @@ jobs:
           script: |
             set -e
             cd ${{ secrets.SSH_PATH }}
+            # Preserva config.inc.php prima del reset (non è in git)
+            cp config.inc.php /tmp/ct_config_backup.php 2>/dev/null || true
             git fetch origin main
             git reset --hard origin/main
+            # Ripristina config.inc.php dopo il reset
+            cp /tmp/ct_config_backup.php config.inc.php 2>/dev/null || true
             cd ${{ secrets.SSH_PATH }}/nodeserver
             npm install --production
             pm2 restart ct-socket || pm2 start server.js --name ct-socket
