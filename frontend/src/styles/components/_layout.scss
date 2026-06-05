@@ -86,17 +86,11 @@ body {
     }
 }
 
-// ── Footer Iubenda ────────────────────────────────────────────
+// ── Link Iubenda (colonna destra, sotto meteo) ────────────────
 
-footer {
-    position: fixed;
-    bottom: 0;
-    left: 260px;
-    right: 260px;
-    z-index: 999;
+#iubenda-container {
     text-align: center;
     padding: $space-1 $space-2;
-    background: $palette-surface-raised;
     font-size: $text-xs;
 
     a {

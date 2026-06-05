@@ -31,6 +31,12 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
     <div id="anteprima-scheda-container"></div>
     <div id="frame-messaggi-container"></div>
     <div id="meteo-container"></div>
+    <div id="iubenda-container">
+        <a href="https://www.iubenda.com/privacy-policy/18155810" class="iubenda-black iubenda-noiframe iubenda-embed" title="Privacy Policy">Privacy Policy</a>
+        &nbsp;·&nbsp;
+        <a href="https://www.iubenda.com/privacy-policy/18155810/cookie-policy" class="iubenda-black iubenda-noiframe iubenda-embed" title="Cookie Policy">Cookie Policy</a>
+        <script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>
+    </div>
 </div>
 
 <!-- ====================================================================== -->
