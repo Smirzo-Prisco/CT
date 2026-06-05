@@ -119,9 +119,11 @@ function UserRow({ user }) {
 
             {/* Icone cariche staff */}
             <td style={{ textAlign: 'center' }}>
-                {STAFF_ICONS.filter(ic => user.staff[ic.key]).map(ic => (
-                    <img key={ic.key} src={ic.src} width="20" height="20" title={ic.title} alt={ic.title} />
-                ))}
+                <span style={{ display: 'flex', justifyContent: 'center', gap: '2px' }}>
+                    {STAFF_ICONS.filter(ic => user.staff[ic.key]).map(ic => (
+                        <img key={ic.key} src={ic.src} width="20" height="20" title={ic.title} alt={ic.title} />
+                    ))}
+                </span>
             </td>
         </tr>
     )
