@@ -1182,8 +1182,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Inserisce o aggiorna il png nella tabella personaggi
             $existingPng = gdrcd_query("SELECT nome FROM personaggio WHERE nome = '$pngName'", 'result');
             if (gdrcd_query($existingPng, 'num_rows') == 0) {
-                gdrcd_query("INSERT INTO personaggio (nome, salute, integrita, car2, car4, car6, car8)
-                    VALUES ('$pngName', $pngSalute, 100, $pngDestrezza, $pngMente, $pngTempra, $pngPotere)");
+                gdrcd_query("INSERT INTO personaggio (nome, salute, salute_max, integrita, car2, car4, car6, car8)
+                    VALUES ('$pngName', $pngSalute, $pngSalute, 100, $pngDestrezza, $pngMente, $pngTempra, $pngPotere)");
             } else {
                 gdrcd_query("UPDATE personaggio SET salute=$pngSalute, car2=$pngDestrezza, car4=$pngMente, car6=$pngTempra, car8=$pngPotere
                     WHERE nome='$pngName'");

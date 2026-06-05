@@ -899,15 +899,15 @@ function elaboratePrint($riepilogo, $turn = null) {
     };
 
     // Solo width:% inline — tutto il resto dalle classi .ct-turn__hpbar__*
-    $mkHpBar = function(int $after, string $label = 'PS') : string {
-        $pct   = max(0, min(100, $after));
+    $mkHpBar = function(int $after, string $label = 'PS', int $max = 100) : string {
+        $pct   = $max > 0 ? max(0, min(100, (int)round($after / $max * 100))) : 0;
         $level = $pct > 50 ? 'high' : ($pct > 25 ? 'mid' : 'low');
         return "<div class=\"ct-turn__hpbar\">"
              . "<span class=\"ct-turn__hpbar__label\">{$label}</span>"
              . "<div class=\"ct-turn__hpbar__track\">"
              . "<div class=\"ct-turn__hpbar__fill ct-turn__hpbar__fill--{$level}\" style=\"width:{$pct}%\"></div>"
              . "</div>"
-             . "<span class=\"ct-turn__hpbar__value\">{$after}/100</span>"
+             . "<span class=\"ct-turn__hpbar__value\">{$after}/{$max}</span>"
              . "</div>";
     };
 
@@ -1023,7 +1023,7 @@ function elaboratePrint($riepilogo, $turn = null) {
                 if (!$shielded && $sub && !isset($sub['msg'])) {
                     $punti  = max(0, (int)($sub['punti'] ?? 100));
                     $after  = max(0, $punti - $danno);
-                    $hpHtml = $mkHpBar($after, $ptLabel);
+                    $hpHtml = $mkHpBar($after, $ptLabel, max(1, (int)($sub['punti_max'] ?? 100)));
                     if (!empty($sub['durata_msg'])) {
                         $hpHtml .= "<div class=\"ct-turn__note ct-turn__note--duration\">{$sub['durata_msg']}</div>";
                     }
@@ -1430,6 +1430,7 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
             'pg' => $striker,
             'danno' => $damage,
             'punti' => $carDifesa['punti'], // Punti di salute o integrità prima dell'attacco
+            'punti_max' => $carDifesa['punti_max'] ?? 100, // Massimo per la barra HP
             'punti_type' => $carDifesa['type'], // Salute o integrità
             'intoccabile' => isset($intoccabili[$target]), // Se è scudato o meno
             'can_send' => $can_send, // Se può lanciare un dado di difesa o meno
@@ -1627,9 +1628,9 @@ function getDefenceCar($attack_car, $target) {
         prelevo i punti del bersaglio su destrezza e i suoi punti salute */
         case 'forza':
         case 'destrezza':
-        case 'potere': return array('nome' => 'destrezza', 'car' => $pg['car2'], 'punti' => $pg['salute'], 'type' => 'salute');
+        case 'potere': return array('nome' => 'destrezza', 'car' => $pg['car2'], 'punti' => $pg['salute'], 'punti_max' => $pg['salute_max'] ?? 100, 'type' => 'salute');
         // Se l'attacco è con Mente, ritorno Tempra, i punti su Tempra e i punti integrità del bersaglio
-        case 'mente': return array('nome' => 'tempra', 'car' => $pg['car6'], 'punti' => $pg['integrita'], 'type' => 'integrità');
+        case 'mente': return array('nome' => 'tempra', 'car' => $pg['car6'], 'punti' => $pg['integrita'], 'punti_max' => $pg['integrita_max'] ?? 100, 'type' => 'integrità');
         default: return null;
     }
 }
