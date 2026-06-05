@@ -13,7 +13,9 @@
  * @return bool           true se il server ha accettato il messaggio
  */
 function send_mail(string $to, string $subject, string $message) : bool {
-    $cfg      = $GLOBALS['PARAMETERS']['smtp'];
+    $cfg      = $GLOBALS['PARAMETERS']['smtp'] ?? null;
+    if (!$cfg) { error_log('[send_mail] SMTP non configurato in config.inc.php'); return false; }
+
     $from     = $cfg['user'];
     $fromname = $cfg['fromname'] ?? 'Crystal Tokyo';
 
@@ -28,40 +30,42 @@ function send_mail(string $to, string $subject, string $message) : bool {
         $errno, $errstr, 30,
         STREAM_CLIENT_CONNECT, $ctx
     );
-    if (!$sock) return false;
+    if (!$sock) { error_log("[send_mail] Connessione fallita: $errstr ($errno)"); return false; }
 
     // Helper: legge la risposta (gestisce risposte multi-riga 250-)
     $read = function() use ($sock) : string {
         $out = '';
         while (($line = fgets($sock, 512)) !== false) {
             $out .= $line;
-            if (isset($line[3]) && $line[3] === ' ') break; // "250 " → fine
+            if (isset($line[3]) && $line[3] === ' ') break;
         }
         return $out;
     };
-    // Helper: invia una riga e legge la risposta
     $cmd = function(string $line) use ($sock, $read) : string {
         fputs($sock, $line . "\r\n");
         return $read();
     };
-    // Helper: verifica il codice di risposta (compatibile PHP 7.2+)
     $ok = function(string $r, int $code) { return strncmp($r, (string)$code, 3) === 0; };
 
     // ── Handshake SMTP ───────────────────────────────────────────
     $read(); // greeting "220 ..."
-    if (!$ok($cmd('EHLO crystaltokyo.it'), 250)) { fclose($sock); return false; }
+    $r = $cmd('EHLO crystaltokyo.it');
+    if (!$ok($r, 250)) { error_log("[send_mail] EHLO fallito: $r"); fclose($sock); return false; }
 
     // ── Autenticazione AUTH LOGIN ────────────────────────────────
     $r = $cmd('AUTH LOGIN');
-    if (!$ok($r, 334)) { fclose($sock); return false; }
-    $cmd(base64_encode($from));          // username
-    $r = $cmd(base64_encode($cfg['pass'])); // password
-    if (!$ok($r, 235)) { fclose($sock); return false; }
+    if (!$ok($r, 334)) { error_log("[send_mail] AUTH LOGIN fallito: $r"); fclose($sock); return false; }
+    $cmd(base64_encode($from));
+    $r = $cmd(base64_encode($cfg['pass']));
+    if (!$ok($r, 235)) { error_log("[send_mail] Autenticazione fallita: $r"); fclose($sock); return false; }
 
     // ── Busta ────────────────────────────────────────────────────
-    if (!$ok($cmd("MAIL FROM:<{$from}>"), 250)) { fclose($sock); return false; }
-    if (!$ok($cmd("RCPT TO:<{$to}>"),     250)) { fclose($sock); return false; }
-    if (!$ok($cmd('DATA'),                354)) { fclose($sock); return false; }
+    $r = $cmd("MAIL FROM:<{$from}>");
+    if (!$ok($r, 250)) { error_log("[send_mail] MAIL FROM fallito: $r"); fclose($sock); return false; }
+    $r = $cmd("RCPT TO:<{$to}>");
+    if (!$ok($r, 250)) { error_log("[send_mail] RCPT TO fallito: $r"); fclose($sock); return false; }
+    $r = $cmd('DATA');
+    if (!$ok($r, 354)) { error_log("[send_mail] DATA fallito: $r"); fclose($sock); return false; }
 
     // ── Intestazioni + corpo ─────────────────────────────────────
     $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
@@ -74,6 +78,7 @@ function send_mail(string $to, string $subject, string $message) : bool {
 
     $body = $headers . "\r\n" . chunk_split(base64_encode($message)) . "\r\n.\r\n";
     $r = $cmd($body);
+    if (!$ok($r, 250)) { error_log("[send_mail] Invio corpo fallito: $r"); }
 
     $cmd('QUIT');
     fclose($sock);
