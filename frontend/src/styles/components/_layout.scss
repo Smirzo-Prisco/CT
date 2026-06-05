@@ -150,6 +150,11 @@ body {
 }
 
 @media screen and (max-width: 768px) {
+    :root {
+        // Su mobile le sidebar sono nascoste: le modali occupano l'intera larghezza
+        --sidebar-modal-offset: 0px;
+    }
+
     body {
         overflow-x: hidden !important;
         width: 100% !important;

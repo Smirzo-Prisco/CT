@@ -397,8 +397,8 @@ export default function MasterPanel({ isOpen, onClose, showPulisci }) {
                 display:  'flex',
                 position: 'fixed',
                 top:      0,
-                left:     '260px',
-                right:    '260px',
+                left:     'var(--sidebar-modal-offset, 260px)',
+                right:    'var(--sidebar-modal-offset, 260px)',
                 bottom:   0,
                 zIndex:   1001,
             }}
