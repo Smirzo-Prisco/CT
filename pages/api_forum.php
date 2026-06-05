@@ -213,11 +213,14 @@ switch ($op) {
             $edit_note = $pos !== false ? trim(substr($msg_text, $pos)) : null;
             if ($pos !== false) $msg_text = trim(substr($msg_text, 0, $pos));
 
+            // Processa bbcode server-side (come pages/forum/read.inc.php)
+            $msg_html = gdrcd_bbcoder(gdrcd_filter('out', $msg_text));
+
             $messages[] = [
                 'id'         => (int)$post['id_messaggio'],
                 'padre'      => (int)$post['id_messaggio_padre'],
                 'titolo'     => $post['titolo'],
-                'messaggio'  => $msg_text,
+                'messaggio'  => $msg_html,
                 'edit_note'  => $edit_note,
                 'autore'     => $post['anonimo'] == 1 ? 'Anonimo' : $post['autore'],
                 'avatar'     => $post['url_img_chat'],
