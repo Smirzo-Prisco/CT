@@ -49,7 +49,7 @@ if(!empty($_POST['email'])) {
             $subject = gdrcd_filter('out',$MESSAGE['register']['forms']['mail']['sub'] . ' ' . $PARAMETERS['info']['site_name']);
             $text = gdrcd_filter('out', $MESSAGE['register']['forms']['mail']['text'] . ': ' . $pass);
 
-            mail($_POST['email'], $subject, $text, 'From: ' . $PARAMETERS['info']['webmaster_email']);
+            send_mail($_POST['email'], $subject, $text);
 
             $RP_response = gdrcd_filter('out', $MESSAGE['warning']['modified']);
 

@@ -507,8 +507,7 @@ MESTIERE (<a style="font-size: 18px; color: #8f8f8f; font-family: DejaVu Serif; 
                 $subject = $PARAMETERS['info']['site_name'] . ' - Registrazione di ' . gdrcd_filter('get',
                         $_POST['nome']) . ' ' . gdrcd_filter('get', $_POST['cognome']);
 
-                mail(gdrcd_filter('get', $_POST['email']), $subject, $text,
-                    'From: ' . gdrcd_filter('out', $PARAMETERS['info']['webmaster_email']));
+                send_mail(gdrcd_filter('get', $_POST['email']), $subject, $text);
 
             } else {
 
