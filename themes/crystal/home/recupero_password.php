@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($dati !== null) {
         $email = gdrcd_filter('in', $dati['email'] ?? '');
-        $exists = count(gdrcd_query("SELECT id FROM personaggio WHERE email = '$email'"));
+        $exists = count(gdrcd_query("SELECT nome FROM personaggio WHERE email = '$email'"));
 
         if($exists > 0) {
             $newPass = gdrcd_genera_pass();
