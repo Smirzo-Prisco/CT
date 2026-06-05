@@ -896,11 +896,13 @@ export default function Forum({ isStaff = false }) {
                     <button onClick={() => setSearchQuery(searchQuery)}>cerca</button>
                 </div>
 
+                <div className={styles.backBar}>
+                    <button onClick={backToSections}>← Torna indietro</button>
+                </div>
                 <div className={styles.buttonsBar}>
                     <button onClick={() => setView(isStaff && currentSection?.tipo === 1 ? 'compose_quest' : 'compose')}>
                         {isStaff && currentSection?.tipo === 1 ? 'Nuova Quest' : 'Nuovo Messaggio'}
                     </button>
-                    <button onClick={backToSections}>Torna indietro</button>
                 </div>
 
                 {loadingThreads ? (
@@ -953,6 +955,10 @@ export default function Forum({ isStaff = false }) {
                                 ))}
                             </div>
                         )}
+
+                        <div className={styles.backBar}>
+                            <button onClick={backToSections}>← Torna indietro</button>
+                        </div>
                     </>
                 )}
             </div>
