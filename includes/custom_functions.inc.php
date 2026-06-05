@@ -2,14 +2,83 @@
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 
-function send_mail($to, $subject, $message) {
-    $from = $GLOBALS['PARAMETERS']['info']['webmaster_email'];
-    $headers = 'From: ' . $from . "\r\n" .
-        'Reply-To: ' . $from . "\r\n" .
-        'X-Mailer: PHP/' . phpversion() . "\r\n" .
-        'Content-type: text/html; charset=UTF-8' . "\r\n";
+/**
+ * Invia un'email HTML via SMTP diretto (Register.it SSL:465).
+ * Non usa mail() nativa né librerie esterne — solo stream PHP.
+ * Credenziali in $PARAMETERS['smtp'] (config.inc.php, fuori da git).
+ *
+ * @param string $to      Indirizzo destinatario
+ * @param string $subject Oggetto (verrà codificato UTF-8 Base64)
+ * @param string $message Corpo HTML
+ * @return bool           true se il server ha accettato il messaggio
+ */
+function send_mail(string $to, string $subject, string $message) : bool {
+    $cfg      = $GLOBALS['PARAMETERS']['smtp'];
+    $from     = $cfg['user'];
+    $fromname = $cfg['fromname'] ?? 'Crystal Tokyo';
 
-    return (bool) mail($to, $subject, $message, $headers);
+    // ── Connessione SSL ──────────────────────────────────────────
+    $ctx = stream_context_create(['ssl' => [
+        'verify_peer'       => true,
+        'verify_peer_name'  => true,
+        'allow_self_signed' => false,
+    ]]);
+    $sock = stream_socket_client(
+        $cfg['host'] . ':' . $cfg['port'],
+        $errno, $errstr, 30,
+        STREAM_CLIENT_CONNECT, $ctx
+    );
+    if (!$sock) return false;
+
+    // Helper: legge la risposta (gestisce risposte multi-riga 250-)
+    $read = function() use ($sock) : string {
+        $out = '';
+        while (($line = fgets($sock, 512)) !== false) {
+            $out .= $line;
+            if (isset($line[3]) && $line[3] === ' ') break; // "250 " → fine
+        }
+        return $out;
+    };
+    // Helper: invia una riga e legge la risposta
+    $cmd = function(string $line) use ($sock, $read) : string {
+        fputs($sock, $line . "\r\n");
+        return $read();
+    };
+    // Helper: verifica il codice di risposta
+    $ok = fn(string $r, int $code) => str_starts_with($r, (string)$code);
+
+    // ── Handshake SMTP ───────────────────────────────────────────
+    $read(); // greeting "220 ..."
+    if (!$ok($cmd('EHLO crystaltokyo.it'), 250)) { fclose($sock); return false; }
+
+    // ── Autenticazione AUTH LOGIN ────────────────────────────────
+    $r = $cmd('AUTH LOGIN');
+    if (!$ok($r, 334)) { fclose($sock); return false; }
+    $cmd(base64_encode($from));          // username
+    $r = $cmd(base64_encode($cfg['pass'])); // password
+    if (!$ok($r, 235)) { fclose($sock); return false; }
+
+    // ── Busta ────────────────────────────────────────────────────
+    if (!$ok($cmd("MAIL FROM:<{$from}>"), 250)) { fclose($sock); return false; }
+    if (!$ok($cmd("RCPT TO:<{$to}>"),     250)) { fclose($sock); return false; }
+    if (!$ok($cmd('DATA'),                354)) { fclose($sock); return false; }
+
+    // ── Intestazioni + corpo ─────────────────────────────────────
+    $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+    $headers = "From: {$fromname} <{$from}>\r\n"
+             . "To: {$to}\r\n"
+             . "Subject: {$encodedSubject}\r\n"
+             . "MIME-Version: 1.0\r\n"
+             . "Content-Type: text/html; charset=UTF-8\r\n"
+             . "Content-Transfer-Encoding: base64\r\n";
+
+    $body = $headers . "\r\n" . chunk_split(base64_encode($message)) . "\r\n.\r\n";
+    $r = $cmd($body);
+
+    $cmd('QUIT');
+    fclose($sock);
+
+    return $ok($r, 250);
 }
 
 function generateLinks($current_page, $total_pages, $url = "?") {

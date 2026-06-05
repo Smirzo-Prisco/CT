@@ -14,13 +14,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $dati = json_decode($json_data, true); // Decodifica il JSON in un array associativo
 
     if ($dati !== null) {
-        $email = (!isset($dati['email']) ? '' : htmlspecialchars($dati['email']));
-        $exists = count(gdrcd_query("SELECT * FROM personaggio where email = '$email'"));
+        $email = gdrcd_filter('in', $dati['email'] ?? '');
+        $exists = count(gdrcd_query("SELECT id FROM personaggio WHERE email = '$email'"));
 
         if($exists > 0) {
             $newPass = gdrcd_genera_pass();
 
-            gdrcd_query("UPDATE personaggio SET pass = '" . gdrcd_encript($newPass) . "' where email = '$email'");
+            gdrcd_query("UPDATE personaggio SET pass = '" . gdrcd_encript($newPass) . "' WHERE email = '$email'");
 
             $subject = 'Crystal Tokyo - Recupero password';
             $message = "Ciao,<br>di seguito la nuova password che ti è stata assegnata:<br><br><b>".$newPass."</b>";
