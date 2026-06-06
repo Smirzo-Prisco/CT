@@ -67,13 +67,35 @@ if ($op === 'ask') {
         exit;
     }
 
-    // Carica articoli pubblici dal DB (escluso tipo "staff")
-    $result  = gdrcd_query("SELECT titolo, testo, tipo FROM regolamento WHERE tipo != 'staff' ORDER BY tipo, articolo", 'result');
+    // RAG semplificato: FULLTEXT search per articoli rilevanti, fallback su tutti
+    $domanda_ft = gdrcd_filter('in', $domanda);
+    $result = gdrcd_query(
+        "SELECT titolo, testo, tipo,
+                MATCH(titolo, testo) AGAINST('$domanda_ft' IN NATURAL LANGUAGE MODE) AS score
+         FROM regolamento
+         WHERE tipo != 'staff'
+           AND MATCH(titolo, testo) AGAINST('$domanda_ft' IN NATURAL LANGUAGE MODE) > 0
+         ORDER BY score DESC
+         LIMIT 5",
+        'result'
+    );
+
     $context = '';
+    $trovati = 0;
     while ($art = gdrcd_query($result, 'fetch')) {
         $context .= "## [{$art['tipo']}] {$art['titolo']}\n{$art['testo']}\n\n";
+        $trovati++;
     }
     gdrcd_query($result, 'free');
+
+    // Fallback: se FULLTEXT non trova nulla, carica tutti gli articoli pubblici
+    if ($trovati === 0) {
+        $result = gdrcd_query("SELECT titolo, testo, tipo FROM regolamento WHERE tipo != 'staff' ORDER BY tipo, articolo", 'result');
+        while ($art = gdrcd_query($result, 'fetch')) {
+            $context .= "## [{$art['tipo']}] {$art['titolo']}\n{$art['testo']}\n\n";
+        }
+        gdrcd_query($result, 'free');
+    }
 
     // Chiave API Anthropic
     $api_key = $PARAMETERS['anthropic']['api_key'] ?? '';
