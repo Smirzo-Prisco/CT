@@ -3,10 +3,10 @@
  * api_chatbot.php — API endpoint per il chatbot Crystal Tokyo AI
  *
  * Operazioni (GET ?op=):
- *   status  → domande rimaste oggi per l'utente corrente
+ *   status  → C-token usati/rimasti oggi per l'utente corrente
  *   ask     → POST JSON { "domanda": "..." } → risposta Claude AI
  *
- * Rate limit: 5 domande/giorno per utente autenticato.
+ * Rate limit: TOKEN_LIMIT C-token/giorno per utente autenticato.
  * Modello: claude-haiku-4-5-20251001 (Anthropic).
  *
  * @author Crystal Tokyo Dev
@@ -24,21 +24,21 @@ if (empty($_SESSION['login'])) {
     exit;
 }
 
-$op         = $_GET['op'] ?? '';
-$nome       = gdrcd_filter('in', $_SESSION['login']);
-$DAILY_LIMIT = 5;
+$op          = $_GET['op'] ?? '';
+$nome        = gdrcd_filter('in', $_SESSION['login']);
+$TOKEN_LIMIT = (int)($PARAMETERS['anthropic']['daily_token_limit'] ?? 5000);
 $MAX_CHARS   = 500;
 
 // ── op=status ──────────────────────────────────────────────────────────────
 
 if ($op === 'status') {
-    $row  = gdrcd_query("SELECT COUNT(*) AS n FROM chatbot_log WHERE nome_personaggio = '$nome' AND DATE(created_at) = CURDATE()");
-    $used = (int)($row['n'] ?? 0);
+    $row  = gdrcd_query("SELECT COALESCE(SUM(tokens_usati), 0) AS used FROM chatbot_log WHERE nome_personaggio = '$nome' AND DATE(created_at) = CURDATE()");
+    $used = (int)($row['used'] ?? 0);
     echo json_encode([
-        'success'   => true,
-        'used'      => $used,
-        'limit'     => $DAILY_LIMIT,
-        'remaining' => max(0, $DAILY_LIMIT - $used),
+        'success'          => true,
+        'tokens_used'      => $used,
+        'tokens_limit'     => $TOKEN_LIMIT,
+        'tokens_remaining' => max(0, $TOKEN_LIMIT - $used),
     ]);
     exit;
 }
@@ -59,11 +59,11 @@ if ($op === 'ask') {
         exit;
     }
 
-    // Controllo limite giornaliero
-    $row  = gdrcd_query("SELECT COUNT(*) AS n FROM chatbot_log WHERE nome_personaggio = '$nome' AND DATE(created_at) = CURDATE()");
-    $used = (int)($row['n'] ?? 0);
-    if ($used >= $DAILY_LIMIT) {
-        echo json_encode(['success' => false, 'message' => 'Hai esaurito le 5 domande di oggi. Torna domani!']);
+    // Controllo C-token giornalieri
+    $row  = gdrcd_query("SELECT COALESCE(SUM(tokens_usati), 0) AS used FROM chatbot_log WHERE nome_personaggio = '$nome' AND DATE(created_at) = CURDATE()");
+    $used = (int)($row['used'] ?? 0);
+    if ($used >= $TOKEN_LIMIT) {
+        echo json_encode(['success' => false, 'message' => 'Hai esaurito i C-token di oggi. Torna domani!']);
         exit;
     }
 
@@ -157,15 +157,18 @@ if ($op === 'ask') {
     $tokens_output = (int)($result_data['usage']['output_tokens'] ?? 0);
     $tokens_tot    = $tokens_input + $tokens_output;
 
-    // Salva nel log per monitoraggio spesa token
+    // Salva nel log per monitoraggio spesa
     $d_safe = gdrcd_filter('in', $domanda);
     $r_safe = gdrcd_filter('in', $risposta);
     gdrcd_query("INSERT INTO chatbot_log (nome_personaggio, domanda, risposta, tokens_usati) VALUES ('$nome', '$d_safe', '$r_safe', $tokens_tot)");
 
+    $used_after = $used + $tokens_tot;
     echo json_encode([
-        'success'   => true,
-        'risposta'  => $risposta,
-        'remaining' => $DAILY_LIMIT - $used - 1,
+        'success'          => true,
+        'risposta'         => $risposta,
+        'tokens_used'      => $used_after,
+        'tokens_limit'     => $TOKEN_LIMIT,
+        'tokens_remaining' => max(0, $TOKEN_LIMIT - $used_after),
     ]);
     exit;
 }

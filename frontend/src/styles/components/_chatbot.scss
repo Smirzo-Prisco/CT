@@ -111,6 +111,44 @@
     }
 }
 
+// ── Barra C-token ────────────────────────────────────────
+
+.chatbot-token-bar-wrap {
+    padding: 6px 14px 4px;
+    background: $palette-surface-raised;
+    border-bottom: 1px solid $palette-surface-hover;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.chatbot-token-bar {
+    height: 5px;
+    border-radius: 3px;
+    background: $palette-surface-hover;
+    overflow: hidden;
+
+    &__fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.4s ease;
+    }
+
+    &--ok    .chatbot-token-bar__fill { background: $palette-success; }
+    &--warning .chatbot-token-bar__fill { background: $palette-warning; }
+    &--danger  .chatbot-token-bar__fill { background: $palette-danger; }
+}
+
+.chatbot-token-label {
+    font-size: 10px;
+    text-align: right;
+
+    &--ok      { color: $palette-success; }
+    &--warning { color: $palette-warning; }
+    &--danger  { color: $palette-danger; }
+}
+
 // ── Lista messaggi ───────────────────────────────────────
 
 .chatbot-messages {

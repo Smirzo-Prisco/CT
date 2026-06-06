@@ -1,9 +1,10 @@
 /**
  * ChatbotWidget.jsx — Widget chatbot AI Crystal Tokyo
  *
- * Floating action button in basso a destra che apre un pannello chat.
- * Rate limit: 5 domande/giorno per utente (applicato lato server).
+ * Floating action button in basso che apre un pannello chat.
+ * Rate limit: C-token giornalieri per utente (applicato lato server).
  * Max 500 caratteri per domanda.
+ * Barra C-token: verde → giallo → rosso al consumo.
  *
  * @author Crystal Tokyo Dev
  */
@@ -14,18 +15,22 @@ const MAX_CHARS = 500
 const API_BASE  = '/pages/api_chatbot.php'
 
 export default function ChatbotWidget() {
-    const [open, setOpen]           = useState(false)
-    const [messages, setMessages]   = useState([])
-    const [input, setInput]         = useState('')
-    const [loading, setLoading]     = useState(false)
-    const [remaining, setRemaining] = useState(null)
-    const messagesEndRef             = useRef(null)
+    const [open, setOpen]         = useState(false)
+    const [messages, setMessages] = useState([])
+    const [input, setInput]       = useState('')
+    const [loading, setLoading]   = useState(false)
+    const [tokenData, setTokenData] = useState({ used: 0, limit: 5000 })
+    const messagesEndRef           = useRef(null)
 
-    // Carica quante domande rimangono oggi all'avvio
+    // Carica stato C-token all'avvio
     useEffect(() => {
         fetch(`${API_BASE}?op=status`)
             .then(r => r.json())
-            .then(data => { if (data.success) setRemaining(data.remaining) })
+            .then(data => {
+                if (data.success) {
+                    setTokenData({ used: data.tokens_used, limit: data.tokens_limit })
+                }
+            })
             .catch(() => {})
     }, [])
 
@@ -34,9 +39,14 @@ export default function ChatbotWidget() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [messages, loading])
 
+    const isExhausted = tokenData.used >= tokenData.limit
+    const pct         = Math.min(100, Math.round((tokenData.used / tokenData.limit) * 100))
+
+    const tokenBarClass = pct >= 80 ? 'danger' : pct >= 50 ? 'warning' : 'ok'
+
     const sendMessage = useCallback(async () => {
         const q = input.trim()
-        if (!q || loading || remaining === 0) return
+        if (!q || loading || isExhausted) return
 
         setMessages(prev => [...prev, { role: 'user', text: q }])
         setInput('')
@@ -51,7 +61,7 @@ export default function ChatbotWidget() {
             const data = await resp.json()
             if (data.success) {
                 setMessages(prev => [...prev, { role: 'ai', text: data.risposta }])
-                setRemaining(data.remaining)
+                setTokenData({ used: data.tokens_used, limit: data.tokens_limit })
             } else {
                 setMessages(prev => [...prev, { role: 'error', text: data.message }])
             }
@@ -60,7 +70,7 @@ export default function ChatbotWidget() {
         } finally {
             setLoading(false)
         }
-    }, [input, loading, remaining])
+    }, [input, loading, isExhausted])
 
     const handleKey = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -69,9 +79,8 @@ export default function ChatbotWidget() {
         }
     }
 
-    const charsLeft    = MAX_CHARS - input.length
-    const isExhausted  = remaining === 0
-    const canSend      = !loading && input.trim().length > 0 && !isExhausted
+    const charsLeft = MAX_CHARS - input.length
+    const canSend   = !loading && input.trim().length > 0 && !isExhausted
 
     return (
         <div className="chatbot-widget">
@@ -82,11 +91,6 @@ export default function ChatbotWidget() {
                         <span className="chatbot-title">
                             <i className="fas fa-robot" /> Crystal Bot
                         </span>
-                        {remaining !== null && (
-                            <span className={`chatbot-remaining ${isExhausted ? 'chatbot-remaining--empty' : ''}`}>
-                                {isExhausted ? 'Domande esaurite' : `${remaining}/5 rimaste`}
-                            </span>
-                        )}
                         <button
                             className="chatbot-close"
                             onClick={() => setOpen(false)}
@@ -94,6 +98,22 @@ export default function ChatbotWidget() {
                         >
                             <i className="fas fa-times" />
                         </button>
+                    </div>
+
+                    {/* Barra C-token */}
+                    <div className="chatbot-token-bar-wrap">
+                        <div className={`chatbot-token-bar chatbot-token-bar--${tokenBarClass}`}>
+                            <div
+                                className="chatbot-token-bar__fill"
+                                style={{ width: `${pct}%` }}
+                            />
+                        </div>
+                        <span className={`chatbot-token-label chatbot-token-label--${tokenBarClass}`}>
+                            {isExhausted
+                                ? 'C-token esauriti'
+                                : `${tokenData.used.toLocaleString()} / ${tokenData.limit.toLocaleString()} C-token`
+                            }
+                        </span>
                     </div>
 
                     {/* Messaggi */}
@@ -135,7 +155,7 @@ export default function ChatbotWidget() {
                                 value={input}
                                 onChange={e => setInput(e.target.value.slice(0, MAX_CHARS))}
                                 onKeyDown={handleKey}
-                                placeholder={isExhausted ? 'Domande esaurite per oggi.' : 'Scrivi una domanda… (Invio per inviare)'}
+                                placeholder={isExhausted ? 'C-token esauriti per oggi.' : 'Scrivi una domanda… (Invio per inviare)'}
                                 disabled={loading || isExhausted}
                                 rows={2}
                             />
@@ -162,8 +182,8 @@ export default function ChatbotWidget() {
             <button
                 className={`chatbot-fab ${open ? 'chatbot-fab--open' : ''}`}
                 onClick={() => setOpen(prev => !prev)}
-                aria-label={open ? 'Chiudi chatbot' : 'Apri assistente Crystal Tokyo'}
-                title="Assistente Crystal Tokyo"
+                aria-label={open ? 'Chiudi chatbot' : 'Apri Crystal Bot'}
+                title="Crystal Bot"
             >
                 <i className={`fas ${open ? 'fa-times' : 'fa-robot'}`} />
             </button>
