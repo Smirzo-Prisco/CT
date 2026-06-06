@@ -460,7 +460,7 @@ export default function ChatShell() {
                     {closeTurnPrompt && (
                         <div className="attack-prompt">
                             <span className="attack-prompt-text">
-                                Tutti i personaggi hanno dichiarato le loro azioni.
+                                Prima di concludere il tuo turno, accertati di non dover effettuare lanci.
                             </span>
                             <div className="attack-prompt-buttons">
                                 <button type="button" className="attack-prompt-btn btn-dado"
@@ -830,7 +830,7 @@ export default function ChatShell() {
                 {/* ================================================================ */}
                 <div className="pg-edit-container" id="editAction-modal" role="dialog" aria-modal="true">
                     <div className="modal-content">
-                        <span className="close" id="closePgModal">&times;</span>
+                        <span className="close" id="closePgModal" onClick={() => document.getElementById('editAction-modal').style.display = 'none'}>&times;</span>
                         <h2>Modifica Azione</h2>
                         <textarea id="edit_action_textarea" rows={10}></textarea>
                     </div>
