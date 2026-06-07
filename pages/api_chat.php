@@ -85,6 +85,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             
             $messaggio = '';
             $sussurro = null;
+            $dado_raw = 0;
             /**************************** COSTRUZIONE MESSAGGIO   ************************************************/
             switch ($skill_info['tipo']) {
                 //  FISICA
@@ -94,6 +95,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $messaggio .= "$login usa la skill fisica ".$skill_info['nome']." di livello $livello";
                     $diceLounch = lanciaStat($id_role, $login, implode(',', $bersaglio), true, $car, $car, $pg['car'.$skill_info['car']], $salute, 0, 0);
                     $dice = $diceLounch['risultato'];
+                    $dado_raw = $diceLounch['dado_raw'];
                     $tiro = " con un tiro totale di $car di " . $diceLounch['risultato'];
                     $sussurro = $diceLounch['sussurro'];
                     break;
@@ -105,6 +107,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $messaggio .= "$login usa la skill mentale ".$skill_info['nome']." di livello $livello";
                     $diceLounch = lanciaStat($id_role, $login, implode(',', $bersaglio), true, $car, $car, $pg['car'.$skill_info['car']], $salute, 0, 0);
                     $dice = $diceLounch['risultato'];
+                    $dado_raw = $diceLounch['dado_raw'];
                     $tiro = " con un tiro totale di $car di $dice";
                     $sussurro = $diceLounch['sussurro'];
                     break;
@@ -163,7 +166,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $sussurro = isset($messaggio_talento['testo']) ? gdrcd_filter('in', $messaggio_talento['testo']) : $sussurro;
 
             /**************************** AZIONI   ************************************************/
-            $id_fight = fight($id_role, $login, implode(',', $bersaglio), $skill, $livello, $car, $dice, 'usa una skill '.$skill_info['tipo']);
+            $id_fight = fight($id_role, $login, implode(',', $bersaglio), $skill, $livello, $car, $dice, 'usa una skill '.$skill_info['tipo'], 0, $dado_raw);
             chatInsertMessage($luogo, $login, null, $messaggio.$tiro, 'C', $sussurro, '', null); // Messaggio in chat
 
             // Notifica i bersagli in tempo reale per la risposta immediata
@@ -536,7 +539,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $dice_bonus = $dice_malus = 0; // Le creature non hanno bonus o malus
 
                     $diceLounch = lanciaStat($id_role, $creatura['nome'], $bersaglio, $bonus_stats, '', $nome_tiro, $caratteristica, $creatura['salute'], $dice_bonus, $dice_malus);
-                    fight($id_role, $login, $bersaglio, 0, 1, $nome_tiro, $diceLounch['risultato'], 'creatura'); // Funzione di gestione combattimenti
+                    fight($id_role, $login, $bersaglio, 0, 1, $nome_tiro, $diceLounch['risultato'], 'creatura', 0, $diceLounch['dado_raw']); // Funzione di gestione combattimenti
                 } else {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione! Non hai evocato nessuna creatura.'));
                     exit;
@@ -568,7 +571,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             }
 
             // Registro l'attacco
-            $id_fight = fight($id_role, $login, $bersaglio, 0, 1, $car_fight, $totale, $descrizione_attacco);
+            $id_fight = fight($id_role, $login, $bersaglio, 0, 1, $car_fight, $totale, $descrizione_attacco, 0, $d20);
 
             // Notifica bersaglio in tempo reale (solo per attacchi fisici/arma, non per devia)
             if (!$is_devia) {

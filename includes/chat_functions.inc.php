@@ -624,6 +624,7 @@ function lanciaStat($id_role, $login, $bersaglio, $bonus_stats, $dice_type, $nom
             if ($malus_salute > 0) $sussurro .= " - $malus_salute di malus per la salute";
             
             $sussurro .= " = $numtot_finale";
+            if ($num === 20) $sussurro = "⚡ CRITICO! " . $sussurro;
         }
     }
 
@@ -640,7 +641,8 @@ function lanciaStat($id_role, $login, $bersaglio, $bonus_stats, $dice_type, $nom
     return array(
         'messaggio' => $messaggio,
         'sussurro' => $sussurro,
-        'risultato' => $numtot_finale
+        'risultato' => $numtot_finale,
+        'dado_raw' => $num
     );
 }
 /************* FINE LANCIO STATS DELLA CHAT ******************************/
@@ -994,10 +996,14 @@ function elaboratePrint($riepilogo, $turn = null) {
                 $sub      = $subIdx["{$target}|{$pg}"] ?? null;
                 $shielded = $sub && !empty($sub['intoccabile']);
 
+                $isCritico = isset($att['formula']['critico']) && $att['formula']['critico'];
+
                 if ($shielded) {
                     $badge = $mkBadge('Scudato', 'shield');
                 } elseif ($danno <= 0) {
                     $badge = $mkBadge('Mancato', 'miss');
+                } elseif ($isCritico) {
+                    $badge = $mkBadge('Colpito', 'hit') . "<span class=\"ct-turn__badge ct-turn__badge--critico\">&#9889; Critico!</span>";
                 } else {
                     $badge = $mkBadge('Colpito', 'hit');
                 }
@@ -1010,11 +1016,12 @@ function elaboratePrint($riepilogo, $turn = null) {
                     $cA     = htmlspecialchars(ucfirst((string)($f['car_attacco'] ?? '')));
                     $cD     = htmlspecialchars(ucfirst((string)($f['car_difesa']  ?? '')));
                     $mul    = (int)($f['moltiplicatore'] ?? 1);
+                    $critHtml = $isCritico ? " &times; <b style=\"color:#ffd700;\">2 (critico)</b>" : '';
                     $res    = $danno > 0
                             ? " = <b>{$danno}&nbsp;{$ptLabel}</b>"
                             : " = <b style=\"color:#888;\">0</b>";
                     $formulaHtml = "<div class=\"ct-turn__formula\">"
-                                 . "({$dA}&nbsp;{$cA} &#8722; {$dD}&nbsp;{$cD}) &times; {$mul}{$res}</div>";
+                                 . "({$dA}&nbsp;{$cA} &#8722; {$dD}&nbsp;{$cD}) &times; {$mul}{$critHtml}{$res}</div>";
                 } elseif ($sub && isset($sub['msg'])) {
                     $formulaHtml = "<div class=\"ct-turn__formula\">{$sub['msg']}</div>";
                 }
@@ -1360,6 +1367,7 @@ function elaborateAttack($id_role, $turn, $intoccabili, $difensori, &$riepilogo)
 function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, $defaultDamage, &$riepilogo, $turn) {
     $striker = $r['striker']; // Attaccante
     $dice = $r['dice']; // Dado di attacco
+    $critico = ((int)($r['dado_raw'] ?? 0) === 20); // Colpo critico: d20 naturale = 20
     if (!isset($riepilogo[$striker])) $riepilogo[$striker] = array(); // Inizializzo l'array del pg
 
     // Per ogni bersaglio di questo attaccato
@@ -1391,7 +1399,7 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
 
                 if ($subisce) {
                     // Il bersaglio ha scelto esplicitamente di subire: danno fisso, nessun dado di difesa
-                    $damage = $defaultDamage;
+                    $damage = $critico ? ($defaultDamage * 2) : $defaultDamage;
                 } elseif ($dadoRisposta) {
                     // Il bersaglio ha già tirato il dado in risposta immediata: usa quel risultato
                     $dadoDifesa = (int)$dadoRisposta['dice'];
@@ -1402,6 +1410,7 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                         $damage = $damagePercent > 0
                             ? round($baseDmg * ($damagePercent / 100))
                             : round($baseDmg / count($targets));
+                        if ($critico && $damage > 0) $damage *= 2;
                         $durataResult = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
                         $durata = $durataResult['turni'];
                         $durataMsg = $durataResult['msg'];
@@ -1416,6 +1425,7 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                         $damage = $damagePercent > 0
                             ? round($baseDmg * ($damagePercent / 100))
                             : round($baseDmg / count($targets));
+                        if ($critico && $damage > 0) $damage *= 2;
                         $durataResult = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
                         $durata = $durataResult['turni'];
                         $durataMsg = $durataResult['msg'];
@@ -1442,12 +1452,13 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                 'dadoDifesa' => $dadoDifesa,
                 'car_attacco' => $r['car'],
                 'car_difesa' => $carDifesa['nome'],
-                'moltiplicatore' => $moltiplicatore
+                'moltiplicatore' => $moltiplicatore,
+                'critico' => $critico
             ]
         );
 
         // Salvo l'attacco effettuato
-        $riepilogo[$striker]['attacca'][] = array( 
+        $riepilogo[$striker]['attacca'][] = array(
             'danno' => $damage,
             'pg' => $target,
             'punti' => $carDifesa['punti'], // Punti di salute o integrità prima dell'attacco
@@ -1457,7 +1468,8 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                 'dadoDifesa' => $dadoDifesa,
                 'car_attacco' => $r['car'],
                 'car_difesa' => $carDifesa['nome'],
-                'moltiplicatore' => $moltiplicatore
+                'moltiplicatore' => $moltiplicatore,
+                'critico' => $critico
             ]
         );
     }
@@ -1675,10 +1687,10 @@ function getRolePgs($id_role, $active = false) {
 
 // Registra un'azione di combattimento nella role e restituisce l'ID inserito.
 // $damage_percent > 0: ogni bersaglio subisce X% del danno calcolato (attacchi PNG master).
-function fight($id_role, $striker, $target, $id_skill, $level, $car, $dice, $recap='', $damage_percent=0) {
+function fight($id_role, $striker, $target, $id_skill, $level, $car, $dice, $recap='', $damage_percent=0, $dado_raw=0) {
     $turn = getTurn($id_role);
-    $query = "INSERT INTO role_fights (id_role, turn, striker, `target`, car, id_skill, level, dice, result, damage_percent)
-            VALUES ($id_role, $turn, '$striker', '$target', '$car', $id_skill, $level, $dice, '$recap', $damage_percent)";
+    $query = "INSERT INTO role_fights (id_role, turn, striker, `target`, car, id_skill, level, dice, result, damage_percent, dado_raw)
+            VALUES ($id_role, $turn, '$striker', '$target', '$car', $id_skill, $level, $dice, '$recap', $damage_percent, $dado_raw)";
     gdrcd_query($query);
     return (int)gdrcd_query("SELECT LAST_INSERT_ID() as id")['id'];
 }
