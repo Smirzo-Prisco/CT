@@ -277,9 +277,16 @@ export default function ChatHelp({ onBack }) {
                             Cessa automaticamente se l'integrità scende <b>sotto 20</b>.
                         </p>
                         <p className="text-content">
-                            Lanciare abilità mentali di tipo "comando" per due turni consecutivi è
-                            sconsigliato: il sistema lo rileva automaticamente e applica una perdita
-                            di integrità all'attaccante stesso come conseguenza.
+                            Per le abilità mentali di tipo "comando" vigono due regole distinte sui turni consecutivi:
+                        </p>
+                        <p className="text-content">
+                            — Lanciare la stessa abilità di comando <b>sullo stesso bersaglio</b> per due turni
+                            di fila è <b>vietato</b>: il sistema blocca il lancio e restituisce un errore.
+                        </p>
+                        <p className="text-content">
+                            — Lanciare un'abilità di comando <b>su un bersaglio diverso</b> nel turno successivo
+                            è invece consentito, ma il sistema applica automaticamente una <b>perdita di integrità
+                            all'attaccante</b>, proporzionale al suo livello.
                         </p>
                     </div>
 
@@ -289,7 +296,7 @@ export default function ChatHelp({ onBack }) {
                         <p className="text-content">
                             Il sistema assegna automaticamente <b>punti esperienza</b> durante la role.
                             Dopo aver inviato 4 azioni all'interno della stessa giocata in una
-                            location pubblica, il personaggio riceve +1 esperienza e +2 shin.
+                            location pubblica, il personaggio riceve +1 esperienza.
                         </p>
                         <p className="text-content">
                             Chi lancia almeno <b>3 abilità</b> in un giorno riceve +1 shin bonus.
