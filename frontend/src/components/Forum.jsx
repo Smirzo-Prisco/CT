@@ -36,7 +36,8 @@ import styles from './Forum.module.css'
  */
 function formatDate(iso) {
     if (!iso) return ''
-    const d = new Date(iso)
+    // Safari/iOS non accetta "YYYY-MM-DD HH:MM:SS" — serve la T come separatore ISO 8601
+    const d = new Date(iso.replace(' ', 'T'))
     return d.toLocaleDateString('it-IT') + ' ' + d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
 }
 
@@ -79,7 +80,10 @@ function ThreadRow({ thread, onClick, isStaff, onAction }) {
 
             {/* TOPIC: titolo + data creazione */}
             <td className={styles.topicCell}>
-                <div className="forum_post_title">{thread.titolo}</div>
+                <div className={`forum_post_title ${!thread.letto ? styles.unreadTitle : ''}`}>
+                    {!thread.letto && <span className={styles.unreadDot} title="Non letto" />}
+                    {thread.titolo}
+                </div>
                 <div className="forum_date_small">{formatDate(thread.data)}</div>
             </td>
 
@@ -1024,6 +1028,10 @@ export default function Forum({ isStaff = false }) {
                             sending={sending}
                             onSubmit={sendReply}
                         />
+
+                        <div className={styles.backBar}>
+                            <button onClick={backToThreads}>← {currentSection?.nome}</button>
+                        </div>
                     </>
                 )}
             </div>

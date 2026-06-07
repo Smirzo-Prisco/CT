@@ -47,6 +47,22 @@
 .unreadBadge     { margin-left: 6px; background: #e74c3c; color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; font-weight: bold; vertical-align: middle; }
 .sectionDescCell { padding: 8px 20px; font-size: 11px; color: #a7a7a8; text-transform: uppercase; letter-spacing: 1px; }
 
+/* ── Thread non letti ─────────────────────────────────────── */
+.unreadDot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e74c3c;
+    margin-right: 8px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.unreadTitle {
+    font-weight: bold;
+}
+
 /* ── Vista thread list ─────────────────────────────────────── */
 .searchBar       { text-align: center; margin-bottom: 10px; }
 .searchInput     { width: 200px; margin-right: 6px; }
