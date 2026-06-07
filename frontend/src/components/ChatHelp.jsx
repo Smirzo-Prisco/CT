@@ -281,13 +281,25 @@ export default function ChatHelp({ onBack }) {
                         </p>
                         <p className="text-content">
                             — Lanciare la stessa abilità di comando <b>sullo stesso bersaglio</b> per due turni
-                            di fila è <b>vietato</b>: il sistema blocca il lancio e restituisce un errore.
+                            di fila è <b>vietato</b>: il lancio viene bloccato dal sistema.
                         </p>
                         <p className="text-content">
-                            — Lanciare un'abilità di comando <b>su un bersaglio diverso</b> nel turno successivo
+                            — Lanciare un'abilità di comando <b>su un bersaglio diverso</b> per due turni di fila
                             è invece consentito, ma il sistema applica automaticamente una <b>perdita di integrità
-                            all'attaccante</b>, proporzionale al suo livello.
+                            all'attaccante</b>, determinata dal suo livello (vedi tabella).
                         </p>
+                        {soglie.length > 0 && (
+                            <table className="help-soglie-table">
+                                <thead>
+                                    <tr><th>Livello</th><th>Integrità persa</th></tr>
+                                </thead>
+                                <tbody>
+                                    {soglie.map(s => (
+                                        <tr key={s.livello}><td>{s.livello}</td><td>{s.integrita}</td></tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
                     </div>
 
                     {/* ── ESPERIENZA ───────────────────────────────── */}

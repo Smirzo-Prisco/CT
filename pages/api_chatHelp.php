@@ -9,9 +9,9 @@ require_once(__DIR__ . '/../includes/functions.inc.php');
 header('Content-Type: application/json');
 
 $soglie = [];
-$res = gdrcd_query("SELECT livello, danno FROM gilda_soglie ORDER BY livello", 'result');
+$res = gdrcd_query("SELECT livello, danno, integrita FROM gilda_soglie ORDER BY livello", 'result');
 while ($row = gdrcd_query($res, 'fetch')) {
-    $soglie[] = ['livello' => (int)$row['livello'], 'danno' => $row['danno']];
+    $soglie[] = ['livello' => (int)$row['livello'], 'danno' => $row['danno'], 'integrita' => (int)$row['integrita']];
 }
 gdrcd_query($res, 'free');
 
