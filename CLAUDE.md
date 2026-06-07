@@ -66,6 +66,9 @@ Chatbot basato su Claude Haiku (`claude-haiku-4-5-20251001`) integrato come widg
 - Nei componenti React, i listener DOM (click, ecc.) vanno messi come `onClick` React, non tramite `addEventListener` in `corefunctions.js` (la SPA non garantisce DOMContentLoaded sul DOM React)
 - `config.inc.php` non va mai committato — è in `.gitignore` ma era storicalmente tracciato; ora rimosso con `git rm --cached`
 
+## Comportamento atteso da Claude
+- **Commit e push sempre in autonomia**, senza chiedere conferma all'utente — ogni modifica completata va committata e pushata immediatamente. Il push su `main` innesca automaticamente le GitHub Actions (build frontend + deploy sul server).
+
 ## Cosa non fare
 - Non aggiungere `<?` short tag nei file PHP
 - Non usare `mail()` nativa — usare sempre `send_mail()` da `custom_functions.inc.php`
