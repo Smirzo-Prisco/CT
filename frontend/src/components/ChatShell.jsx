@@ -516,9 +516,9 @@ export default function ChatShell() {
                                                 <img src="themes/crystal/imgs/chat/cura.png" alt="Cura PG" className="chat_icon" />
                                             </a>
                                         )}
-                                        <a href="#" onClick={(e) => { e.preventDefault(); setShowHelp(true) }}>
+                                        {/* <a href="#" onClick={(e) => { e.preventDefault(); setShowHelp(true) }}>
                                             <img src="themes/crystal/imgs/chat/help.png" alt="Info" className="chat_icon" />
-                                        </a>
+                                        </a> */}
                                         <div className="gdr-session-status inactive" id="gdrSessionStatus">
                                             <div className="gdr-pulse-dot"></div>
                                             <i id="quitRole"
