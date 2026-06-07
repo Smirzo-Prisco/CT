@@ -210,7 +210,7 @@ function awardExperience($session) {
     $nome_luogo = gdrcd_query("SELECT nome FROM mappa WHERE id=" . $session['luogo'] . "");
     $resoconto = "Giocata libera - " . $nome_luogo['nome'] . "";
     
-    gdrcd_query("UPDATE personaggio SET esperienza = esperienza + 1, esperienza_r = esperienza_r + 1, shin = shin + 2, last_date_exp = NOW() WHERE nome = '" . $session['login'] . "' LIMIT 1");
+    gdrcd_query("UPDATE personaggio SET esperienza = esperienza + 1, esperienza_r = esperienza_r + 1, last_date_exp = NOW() WHERE nome = '" . $session['login'] . "' LIMIT 1");
     gdrcd_query("INSERT INTO Punti (nome, esperienza, data_evento, commento) VALUES ('" . $session['login'] . "', '1', NOW(), '" . gdrcd_filter('in', $resoconto) . "')");
     
     chatInsertMessage($session['luogo'], 'System', $session['login'], 'Punto esperienza assegnato', 'Q');
