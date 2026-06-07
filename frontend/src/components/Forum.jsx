@@ -23,7 +23,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import styles from './Forum.module.css'
+import styles from './Forum.module.scss'
 
 // ---------------------------------------------------------------------------
 // UTILITÀ

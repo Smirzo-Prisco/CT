@@ -1,6 +1,7 @@
-/* Forum.module.css — stili scoped per Forum.jsx */
+// Forum.module.scss — stili scoped per Forum.jsx
+@use '../styles/tokens' as *;
 
-/* ── ThreadRow ─────────────────────────────────────────────── */
+// ── ThreadRow ─────────────────────────────────────────────────
 
 .clickable {
     cursor: pointer;
@@ -49,14 +50,14 @@
     width: 20px;
 }
 
-/* ── Thread non letti ─────────────────────────────────────── */
+// ── Thread non letti ──────────────────────────────────────────
 
 .unreadDot {
     display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #e74c3c;
+    background: $palette-danger;
     margin-right: 8px;
     vertical-align: middle;
     flex-shrink: 0;
@@ -66,7 +67,7 @@
     font-weight: bold;
 }
 
-/* ── PostCard ──────────────────────────────────────────────── */
+// ── PostCard ───────────────────────────────────────────────────
 
 .postCard {
     margin-bottom: 10px;
@@ -107,23 +108,23 @@
 .editNote {
     margin-top: 10px;
     font-size: 11px;
-    color: #aaa;
+    color: $palette-text-secondary;
 }
 
-/* ── BBCodeToolbar ─────────────────────────────────────────── */
+// ── BBCodeToolbar ──────────────────────────────────────────────
 
 .toolbar {
     padding: 6px 0;
     text-align: center;
-    border-bottom: 1px solid #2a2f4a;
+    border-bottom: 1px solid $palette-surface-hover;
     margin-bottom: 6px;
-    color: #a7a7a8;
+    color: $palette-text-secondary;
     font-size: 11px;
 }
 
 .toolbarLabel {
     margin-right: 6px;
-    color: #888;
+    color: $palette-text-muted;
 }
 
 .toolbarBtn {
@@ -138,16 +139,16 @@
 .toolbarBtnU {
     cursor: pointer;
     margin: 0 4px;
-    color: #a7a7a8;
+    color: $palette-text-secondary;
     text-decoration: underline;
     font-size: 12px;
     user-select: none;
 }
 
-/* ── PostForm ──────────────────────────────────────────────── */
+// ── PostForm ───────────────────────────────────────────────────
 
 .closedNote {
-    color: #aaa;
+    color: $palette-text-secondary;
     font-style: italic;
     text-align: center;
     margin: 20px 0;
@@ -156,7 +157,7 @@
 .formContainer {
     margin-top: 20px;
     padding: 10px;
-    background: #111423;
+    background: $palette-surface-dark;
     border-radius: 6px;
 }
 
@@ -190,7 +191,7 @@
 
 .anonLabel {
     font-size: 12px;
-    color: #aaa;
+    color: $palette-text-secondary;
     cursor: pointer;
 }
 
@@ -198,11 +199,11 @@
     margin-right: 4px;
 }
 
-/* ── Vista sezioni ─────────────────────────────────────────── */
+// ── Vista sezioni ──────────────────────────────────────────────
 
 .loadingText {
     padding: 20px;
-    color: #aaa;
+    color: $palette-text-secondary;
 }
 
 .sectionsTable {
@@ -214,7 +215,7 @@
     text-align: center;
     padding: 8px 20px;
     text-transform: uppercase;
-    color: #ce846f;
+    color: $color-text-title;
     font-family: 'DejaVu Serif', serif;
     filter: drop-shadow(-1.732px 1px 2px #000);
 }
@@ -233,8 +234,8 @@
 
 .unreadBadge {
     margin-left: 6px;
-    background: #e74c3c;
-    color: #fff;
+    background: $palette-danger;
+    color: $palette-text;
     border-radius: 10px;
     padding: 1px 7px;
     font-size: 10px;
@@ -245,12 +246,12 @@
 .sectionDescCell {
     padding: 8px 20px;
     font-size: 11px;
-    color: #a7a7a8;
+    color: $palette-text-secondary;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-/* ── Vista thread list ─────────────────────────────────────── */
+// ── Vista thread list ──────────────────────────────────────────
 
 .searchBar {
     text-align: center;
@@ -272,18 +273,18 @@
 }
 
 .theadColor {
-    color: #ce846f;
+    color: $color-text-title;
 }
 
 .theadCenter {
     text-align: center;
     width: 40px;
-    color: #ce846f;
+    color: $color-text-title;
 }
 
 .emptyState {
     padding: 20px;
-    color: #aaa;
+    color: $palette-text-secondary;
     text-align: center;
 }
 
@@ -305,16 +306,16 @@
 .sectionHeading {
     font-family: 'DejaVu Serif', serif;
     font-size: 14px;
-    color: #ce846f;
+    color: $color-text-title;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .loadingSmall {
-    color: #aaa;
+    color: $palette-text-secondary;
 }
 
-/* ── ComposeQuest ──────────────────────────────────────────── */
+// ── ComposeQuest ───────────────────────────────────────────────
 
 .questHeader {
     text-align: center;
@@ -328,7 +329,7 @@
     margin-top: 10px;
 }
 
-/* ── PuntiTable (tabella valutazioni quest) ────────────────── */
+// ── PuntiTable (tabella valutazioni quest) ─────────────────────
 
 .puntiTable {
     width: 100%;
