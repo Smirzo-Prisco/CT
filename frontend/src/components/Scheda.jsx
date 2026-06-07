@@ -105,7 +105,7 @@ function SchedaAvatar({ urlImg, nome }) {
  */
 function SchedaProfilo({ profile }) {
     const { nome, cognome, eta, natoa, lavoro, razza, nome_ruolo, nome_ruolo_mestiere,
-            salute, salute_max, integrita, integrita_max, notorieta,
+            salute, salute_max, integrita, integrita_max, /* notorieta, */
             esperienza, shin, statistiche, privilegi, config } = profile
     const sn = config?.stat_names ?? {}
 
@@ -226,9 +226,9 @@ function SchedaProfilo({ profile }) {
                 )}
 
                 <br />
-                <span className={styles.labelLeft}>{sn.notorieta ?? 'Notorietà'}:</span>
+                {/* <span className={styles.labelLeft}>{sn.notorieta ?? 'Notorietà'}:</span>
                 <span className={styles.valueRight}>{Math.floor(notorieta)}</span>
-                <br /><br />
+                <br /><br /> */}
 
                 {/* ── CARICHE STAFF ─────────────────────────────────────── */}
                 <span className={styles.labelLeft}>Cariche</span>
