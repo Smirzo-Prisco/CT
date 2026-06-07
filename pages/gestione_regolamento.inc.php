@@ -183,9 +183,9 @@
                 $totaleresults = $record_globale['COUNT(*)'];
                 //Lettura record
                 if ($_SESSION['admin'] == 1) {
-                $result = gdrcd_query("SELECT articolo, titolo, testo FROM regolamento ORDER BY articolo LIMIT ".$pagebegin.", ".$pageend."", 'result');
+                $result = gdrcd_query("SELECT articolo, titolo, tipo, testo FROM regolamento ORDER BY articolo LIMIT ".$pagebegin.", ".$pageend."", 'result');
                 } else if ($_SESSION['guida'] == 1) {
-                $result = gdrcd_query("SELECT articolo, titolo, testo FROM regolamento WHERE tipo != 'ambientazione' ORDER BY articolo LIMIT ".$pagebegin.", ".$pageend."", 'result');
+                $result = gdrcd_query("SELECT articolo, titolo, tipo, testo FROM regolamento WHERE tipo != 'ambientazione' ORDER BY articolo LIMIT ".$pagebegin.", ".$pageend."", 'result');
                 }
                 $numresults = gdrcd_query($result, 'num_rows');
 
@@ -196,14 +196,17 @@
                         <table>
                             <!-- Intestazione tabella -->
                             <tr>
-                                
+
                                 <td class="casella_titolo">
                                     <div class="titoli_elenco"><?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['rules']['titolo']); ?></div>
                                 </td>
                                 <td class="casella_titolo">
+                                    <div class="titoli_elenco">Tipo</div>
+                                </td>
+                                <td class="casella_titolo">
                                     <div class="titoli_elenco"><?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['ops_col']); ?></div>
                                 </td>
-                                
+
                             </tr>
                             <!-- Record -->
                             <?php while($row = gdrcd_query($result, 'fetch')) { ?>
@@ -216,6 +219,11 @@
                                     <td class="casella_elemento">
                                         <div class="elementi_elenco">
                                             <?php echo gdrcd_filter('out', $row['titolo']); ?>
+                                        </div>
+                                    </td>
+                                    <td class="casella_elemento">
+                                        <div class="elementi_elenco">
+                                            <?php echo gdrcd_filter('out', $row['tipo']); ?>
                                         </div>
                                     </td>
                                     <td class="casella_controlli"><!-- Iconcine dei controlli -->
