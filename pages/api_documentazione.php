@@ -46,7 +46,7 @@ foreach ($SECTIONS as $sec) {
     while ($row = gdrcd_query($res, 'fetch')) {
         $items[] = [
             'articolo' => (int)$row['articolo'],
-            'titolo'   => gdrcd_filter('out', $row['titolo']),
+            'titolo'   => $row['titolo'],
         ];
     }
     gdrcd_query($res, 'free');
