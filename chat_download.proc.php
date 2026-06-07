@@ -86,7 +86,7 @@ function SaveToDisk(fileURL, fileName) {
         	echo "<center><h3><font color='white'><b>Log ". $row_luogo['nome'] ."</b></font></h3>";
     ?>
     <br>
-    <?
+    <?php
     echo "</center><hr>";
     
     
