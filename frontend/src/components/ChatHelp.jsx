@@ -59,9 +59,58 @@ export default function ChatHelp({ onBack }) {
                             Premi <b>Invio</b> o clicca il pulsante <b>Invia</b> per pubblicare l'azione.
                         </p>
                         <p className="text-content">
-                            Nella barra superiore del form sono presenti altri comandi:
-                            l'icona <i className="fa-solid fa-dice"></i> apre il <b>Pannello GDR</b> (skill, dadi, oggetti),
-                            l'icona <i className="fa-solid fa-circle-question"></i> apre questa guida.
+                            Nella barra superiore del form sono presenti le icone di accesso rapido alle funzioni della chat.
+                            La sezione <b>Icone della Chat</b> qui sotto riporta la descrizione completa di ciascuna.
+                        </p>
+                    </div>
+
+                    {/* ── ICONE DELLA CHAT ─────────────────────────── */}
+                    <div className="command-card">
+                        <h2 className="section-title">Icone della Chat</h2>
+                        <p className="text-content">
+                            Le icone nella barra in alto al form di azione e nel Pannello GDR:
+                        </p>
+                        <p className="text-content">
+                            <img src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" title="Pannello GDR" /> <b>Pannello GDR</b> —
+                            Apre il pannello per lanciare dadi, usare abilità, armi e oggetti. Compare solo durante una role attiva (o sempre per Master e Admin).
+                        </p>
+                        <p className="text-content">
+                            <img src="themes/crystal/imgs/chat/cura.png" className="chat_icon" alt="Cura PG" /> <b>Cura PG</b> —
+                            Permette di ripristinare i punti vita del personaggio. Compare solo quando il personaggio è in grado di curarsi.
+                        </p>
+                        <p className="text-content">
+                            <img src="themes/crystal/imgs/chat/help.png" className="chat_icon" alt="Guida" /> <b>Guida</b> —
+                            Apre questa guida alla chat.
+                        </p>
+                        <p className="text-content">
+                            <i className="fa-solid fa-play chat-avvia-btn"></i> <b>Avvia / Entra in Role</b> —
+                            Avvia una nuova giocata oppure ti aggiunge a quella già in corso nella stanza.
+                            Compare quando non sei ancora dentro una role.
+                        </p>
+                        <p className="text-content">
+                            <i className="fa-solid fa-users" style={{ fontSize: '16px' }}></i> <b>Personaggi in Role</b> —
+                            Mostra la lista di tutti i personaggi attivi nella giocata corrente con il loro stato
+                            (in role, azione inviata, turno chiuso). Compare solo durante la role.
+                        </p>
+                        <p className="text-content">
+                            <i className="fa-solid fa-power-off" style={{ fontSize: '16px' }}></i> <b>Esci dalla Role</b> —
+                            Chiude la tua partecipazione alla giocata in corso. Ricordarsi sempre di cliccarla al termine della sessione. Compare solo quando sei dentro una role.
+                        </p>
+                        <p className="text-content">
+                            All'interno del <b>Pannello GDR</b> (in alto a destra) sono presenti ulteriori icone:
+                        </p>
+                        <p className="text-content">
+                            <img src="themes/crystal/imgs/chat/blocca_salva.png" className="chat_icon" alt="Salva" /> <b>Salva Giocata</b> —
+                            Apre in una nuova scheda la pagina di salvataggio della giocata corrente.
+                        </p>
+                        <p className="text-content">
+                            <img src="themes/crystal/imgs/chat/BackchatOFF.png" className="chat_icon" alt="Backchat" /> <b>Backchat</b> —
+                            Attiva o disattiva il backchat (registro storico delle azioni della stanza).
+                            Visibile solo ai personaggi con un livello di esperienza sufficiente.
+                        </p>
+                        <p className="text-content">
+                            <img src="themes/crystal/imgs/chat/writer.png" className="chat_icon" alt="Scrittura Libera" /> <b>Scrittura Libera</b> —
+                            Apre un editor per comporre testi lunghi senza il limite caratteri della textarea principale.
                         </p>
                     </div>
 
@@ -78,17 +127,9 @@ export default function ChatHelp({ onBack }) {
                             partecipanti dalla lista dei presenti.
                         </p>
                         <p className="text-content">
-                            L'icona del pannello chat <img title="Pannello chat" src="themes/crystal/imgs/chat/chat_panel.png" className="chat_icon" /> compare
-                            soltanto se sei coinvolto nella giocata attiva.
-                            L'icona <i className="fa-solid fa-users" style={{ cursor: 'pointer', display: 'inline-block', fontSize: '16px' }}></i> mostra
-                            la lista di tutti i personaggi attualmente nella giocata, con il loro stato
-                            (in role, azione inviata, turno chiuso).
-                        </p>
-                        <p className="text-content">
-                            Alla fine della giocata ricordarsi di uscire dalla role tramite
-                            l'icona <i className="fa-solid fa-power-off" style={{ cursor: 'pointer', display: 'inline-block', fontSize: '16px' }}></i>.
                             Per ogni lancio occorre sempre specificare almeno un bersaglio.
                             La quantità di bersagli attaccabili aumenta con il livello dell'abilità utilizzata.
+                            Le icone relative alla role (pannello GDR, personaggi, uscita) sono descritte nella sezione <b>Icone della Chat</b>.
                         </p>
                     </div>
 
