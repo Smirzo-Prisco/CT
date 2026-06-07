@@ -102,10 +102,6 @@ export default function ChatHelp({ onBack }) {
                             in quel preciso momento.
                         </p>
                         <p className="text-content">
-                            Per inviare un'azione narrativa, fai precedere il testo dal simbolo <b>+</b>.
-                            Esempio: <i>+Si avvicina lentamente al tavolo, senza alzare lo sguardo.</i>
-                        </p>
-                        <p className="text-content">
                             È vietato descrivere in un solo blocco più azioni contemporanee o impossibili
                             da compiere nello stesso istante.
                         </p>
@@ -120,7 +116,7 @@ export default function ChatHelp({ onBack }) {
                             oppure tra i simboli <b>&lt; &gt;</b>.
                         </p>
                         <p className="text-content">
-                            Esempio: <i>+Entra nella stanza e si guarda intorno. [Non vedo nessuno...]</i>
+                            Esempio: <i>Entra nella stanza e si guarda intorno. [Non vedo nessuno...]</i>
                         </p>
                         <p className="text-content">
                             Un'azione tipica è composta da: <b>TAG</b> (campo apposito) + <b>narrato</b> + <b>parlato</b>.
@@ -139,25 +135,7 @@ export default function ChatHelp({ onBack }) {
                             Esempio: <i>@NomePersonaggio Vieni con me, ho qualcosa da dirti.</i>
                         </p>
                         <p className="text-content">
-                            Il sussurro non è visibile agli altri presenti nella chat, nemmeno al Master
-                            (a meno che il Master non abbia abilitato la visualizzazione dei sussurri).
-                        </p>
-                    </div>
-
-                    {/* ── DADI PURI ────────────────────────────────── */}
-                    <div className="command-card">
-                        <h2 className="section-title">Dadi Puri</h2>
-                        <p className="text-content">
-                            Quando il Master lo richiede, o per determinate situazioni, è possibile
-                            lanciare un dado con qualsiasi numero di facce (fino a 1000).
-                        </p>
-                        <p className="text-content">
-                            Scrivi <b>#d</b> seguito dal numero di facce desiderate direttamente
-                            nel campo testo. Esempio: <i>#d20</i> lancia un dado a 20 facce.
-                        </p>
-                        <p className="text-content">
-                            In alternativa, dal <b>Pannello GDR</b> è disponibile un dado generico
-                            configurabile che pubblica automaticamente il risultato in chat.
+                            Il sussurro non è visibile agli altri presenti nella chat.
                         </p>
                     </div>
 
@@ -179,14 +157,13 @@ export default function ChatHelp({ onBack }) {
                     <div className="command-card">
                         <h2 className="section-title">Pannello GDR</h2>
                         <p className="text-content">
-                            Il Pannello GDR si apre cliccando l'icona in alto a sinistra nel form.
+                            Il Pannello GDR si apre cliccando l'icona dedicata.
                             È disponibile durante una role attiva (o sempre per Master e Admin).
                             Contiene tre sezioni principali.
                         </p>
                         <p className="text-content">
                             <b>D20 e Oggetti</b> — permette di lanciare un dado generico con un numero
-                            di facce a scelta, oppure di usare un oggetto dall'inventario (medicine,
-                            potenziamenti, oggetti magici). L'effetto viene pubblicato automaticamente in chat.
+                            di facce a scelta, oppure di usare un oggetto dall'inventario. L'effetto viene pubblicato automaticamente in chat.
                         </p>
                         <p className="text-content">
                             <b>Abilità e Armi</b> — la sezione principale per il combattimento. Permette
@@ -204,16 +181,15 @@ export default function ChatHelp({ onBack }) {
                     <div className="command-card">
                         <h2 className="section-title">Abilità e Lanci</h2>
                         <p className="text-content">
-                            Le abilità si dividono in più categorie: <b>attacco</b> (fisico o mentale),
-                            <b> difensiva</b> (scudo), <b>generica</b> e <b>talento</b>.
-                            Ogni abilità ha un livello che ne determina la potenza e il numero
+                            Le abilità (o skills) si dividono in più categorie: <b>attacco</b> (fisico o mentale),
+                            <b> difensiva</b> (scudo) e <b>generica</b>.
+                            Ogni abilità ha un livello che ne determina sia la potenza che il numero
                             massimo di bersagli selezionabili.
                         </p>
                         <p className="text-content">
                             Quando lanci un'abilità, il sistema esegue un tiro D20 e aggiunge
                             il bonus della caratteristica associata (destrezza per il fisico,
-                            mente per il mentale). Il risultato viene inviato come sussurro
-                            privato visibile solo al Master.
+                            mente per il mentale).
                         </p>
                         <p className="text-content">
                             Le <b>skill temporanee</b> hanno un numero limitato di utilizzi,
@@ -224,6 +200,7 @@ export default function ChatHelp({ onBack }) {
                             Usare uno <b>scudo (difensiva)</b> conta come chiusura automatica
                             del proprio turno: non sarà più possibile attaccare nello stesso turno.
                             Non è consentito lanciare più di un'abilità di attacco per turno.
+                            E' consentito utilizzare un'abilità difensiva dopo un lancio qualunque nello stesso turno, ma questo preclude la possibilità di effettuare qualunque lancio nel turno successivo, ad eccezione del dado di difesa.
                         </p>
                     </div>
 
@@ -242,7 +219,7 @@ export default function ChatHelp({ onBack }) {
                         </p>
                         <p className="text-content">
                             Durante una role vengono mostrati solo i personaggi che fanno parte
-                            della giocata attiva. I Master vedono sempre tutti i presenti nella stanza.
+                            della giocata attiva.
                         </p>
                     </div>
 
