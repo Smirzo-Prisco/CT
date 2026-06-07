@@ -228,8 +228,7 @@ export default function ChatHelp({ onBack }) {
                         <h2 className="section-title">Turni</h2>
                         <p className="text-content">
                             Nel turno è consentito lanciare solamente ciò che è disponibile dal pannello.
-                            Quando tutti i partecipanti hanno inviato la loro azione e l'eventuale lancio, il sistema invia
-                            un sussurro con un pulsante che consente la chiusura del turno.
+                            Dopo un'azione il sistema invia un messaggio proponendo la chiudura del turno.
                             Il turno viene chiuso solamente quando tutti i partecipanti hanno cliccato sul pulsante di chiusura
                             del turno, per dare la possibilità a tutti di lanciare un'eventuale scudo o attacco.
                             Quando il turno viene chiuso, il sistema invia automaticamente un riepilogo in chat.
@@ -237,36 +236,8 @@ export default function ChatHelp({ onBack }) {
                         <p className="text-content">
                             Quando si riceve un attacco, il sistema propone tre opzioni di risposta immediata:
                             <b> Dado</b> (tira il dado di difesa senza chiudere il turno),
-                            <b> Scudo</b> (usa una skill difensiva, chiude automaticamente il tuo turno),
+                            <b> Scudo</b> (usa una skill difensiva se in possesso, chiude automaticamente il tuo turno),
                             oppure <b> Subisci</b> (accetti il danno senza risposta).
-                        </p>
-                        <p className="text-content">
-                            <b>Esempio 1</b><br />
-                            - A attacca B<br />
-                            - B descrive una difesa e attacca A<br />
-                            - Il sistema manda ai partecipanti la richiesta di chiusura turno<br />
-                            - A clicca sul pulsante di chiusura turno<br />
-                            - B clicca sul pulsante di chiusura turno<br />
-                            - Il sistema manda il riepilogo del turno in chat
-                        </p>
-                        <p className="text-content">
-                            <b>Esempio 2</b><br />
-                            - A attacca B<br />
-                            - B descrive una difesa e attacca C<br />
-                            - C descrive una difesa e attacca A<br />
-                            - D lancia uno scudo per difendere A<br />
-                            - Il sistema manda ai 4 partecipanti la richiesta di chiusura turno<br />
-                            - Prima di chiudere il turno, A lancia uno scudo per difendere se stesso<br />
-                            - Tutti cliccano sul pulsante di chiusura turno<br />
-                            - Il sistema manda il riepilogo del turno in chat<br /><br />
-                            Turno successivo...<br /><br />
-                            - Il sistema impedisce ad A di lanciare un attacco, poiché ha già utilizzato un attacco e uno
-                            scudo nel turno precedente. Ma può continuare a lanciare uno scudo rinunciando nuovamente
-                            all'attacco nel turno successivo<br />
-                            - B può continuare ad attaccare<br />
-                            - C può continuare ad attaccare<br />
-                            - D può continuare ad attaccare perché nel turno precedente ha utilizzato il suo lancio per
-                            lanciare uno scudo, quindi ha a disposizione un nuovo lancio per il turno corrente
                         </p>
                     </div>
 
@@ -275,9 +246,7 @@ export default function ChatHelp({ onBack }) {
                         <h2 className="section-title">Danni</h2>
                         <p className="text-content">
                             Calcolo del danno: attacco meno difesa per il moltiplicatore del livello d'attacco (vedi tabella).
-                            Durante uno scontro è consentito lanciare soltanto abilità di attacco e di difesa.
-                            Non c'è bisogno di lanciare dadi relativi alle caratteristiche, poiché il sistema calcola ogni
-                            danno a fine turno sulla base delle abilità lanciate.
+                            Ogni danno viene calcolato a fine turno e applicato ad ogni personaggio colpito.
                             In caso di attacco su bersaglio multiplo, l'eventuale danno viene diviso per tutti i bersagli.
                         </p>
                         {soglie.length > 0 && (
@@ -298,8 +267,7 @@ export default function ChatHelp({ onBack }) {
                     <div className="command-card">
                         <h2 className="section-title">Effetti Mentali</h2>
                         <p className="text-content">
-                            Le abilità mentali agiscono sull'<b>integrità</b> del bersaglio (valore
-                            massimo 100 per tutti i personaggi).
+                            Le abilità mentali agiscono sull'<b>integrità</b> del bersaglio.
                             Alcune skill mentali hanno un <b>effetto di durata</b>: una volta attivato,
                             il bersaglio perde 5 punti integrità per ogni turno successivo,
                             per un numero di turni determinato dall'entità del danno iniziale.
@@ -309,9 +277,9 @@ export default function ChatHelp({ onBack }) {
                             Cessa automaticamente se l'integrità scende <b>sotto 20</b>.
                         </p>
                         <p className="text-content">
-                            Non è consentito lanciare due abilità mentali di tipo "comando" consecutive
-                            sullo stesso bersaglio: il secondo lancio comporta una perdita di integrità
-                            per l'attaccante stesso.
+                            Lanciare abilità mentali di tipo "comando" per due turni consecutivi è
+                            sconsigliato: il sistema lo rileva automaticamente e applica una perdita
+                            di integrità all'attaccante stesso come conseguenza.
                         </p>
                     </div>
 
