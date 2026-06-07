@@ -15,6 +15,14 @@ $op   = $_GET['op'] ?? '';
 $data = json_decode(file_get_contents('php://input'), true) ?? [];
 $login = $_SESSION['login'];
 
+// Fire-and-forget: notifica il server Socket.io di un nuovo post nel forum.
+// Tutti i client connessi ricevono 'forum:update' e aggiornano la vista corrente.
+function notifyForumUpdate(int $araldo_id, int $thread_id): void {
+    $payload = json_encode(['event' => 'forum:update', 'room' => 'global', 'data' => ['araldo_id' => $araldo_id, 'thread_id' => $thread_id]]);
+    $ctx = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-Type: application/json', 'content' => $payload, 'timeout' => 1, 'ignore_errors' => true]]);
+    @file_get_contents('http://127.0.0.1:3000/notify', false, $ctx);
+}
+
 // -------------------------------------------------------------------------
 // Helper: verifica se l'utente corrente può accedere a una sezione araldo
 // -------------------------------------------------------------------------
@@ -213,8 +221,10 @@ switch ($op) {
             $edit_note = $pos !== false ? trim(substr($msg_text, $pos)) : null;
             if ($pos !== false) $msg_text = trim(substr($msg_text, 0, $pos));
 
-            // Processa bbcode server-side (come pages/forum/read.inc.php)
-            $msg_html = gdrcd_bbcoder(gdrcd_filter('out', $msg_text));
+            // gdrcd_bbcoder lavora sul testo grezzo (come pages/forum/read.inc.php):
+            // non applicare gdrcd_filter('out') qui perché i post possono contenere HTML
+            // diretto (<b>, <span>, ecc.) che verrebbe escapato in entità letterali.
+            $msg_html = gdrcd_bbcoder($msg_text);
 
             $messages[] = [
                 'id'         => (int)$post['id_messaggio'],
@@ -313,10 +323,13 @@ switch ($op) {
             gdrcd_query("UPDATE personaggio SET esperienza_mestiere = esperienza_mestiere + 0.5, last_date_mestiere = NOW() WHERE nome = '" . gdrcd_filter('in', $login) . "'");
         }
 
+        $resp_thread_id = $padre == -1 ? $new_id : $padre;
+        notifyForumUpdate($araldo_id, $resp_thread_id);
+
         echo json_encode([
             'success'    => true,
             'id'         => $new_id,
-            'thread_id'  => $padre == -1 ? $new_id : $padre,
+            'thread_id'  => $resp_thread_id,
         ]);
         break;
 
@@ -571,6 +584,8 @@ switch ($op) {
                     WHERE nome = '$pg_f'");
             }
         }
+
+        notifyForumUpdate($araldo_id, $thread_id);
 
         echo json_encode(['success' => true, 'thread_id' => $thread_id]);
         break;

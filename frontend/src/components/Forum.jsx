@@ -660,6 +660,26 @@ export default function Forum({ isStaff = false }) {
     // Caricamento iniziale delle sezioni al mount del componente
     useEffect(() => { fetchSections() }, [fetchSections])
 
+    // Aggiornamento real-time via socket: 'forum:update' arriva quando
+    // qualcuno pubblica un post. Aggiorna la vista corrente di conseguenza.
+    useEffect(() => {
+        const sock = window.ctSocket
+        if (!sock) return
+
+        const handle = ({ araldo_id, thread_id }) => {
+            if (view === 'sections') {
+                fetchSections()
+            } else if (view === 'threads' && currentSection?.id === araldo_id) {
+                fetchThreads(currentSection.id, page)
+            } else if (view === 'read' && currentThread?.id === thread_id) {
+                fetchThread(currentThread.id)
+            }
+        }
+
+        sock.on('forum:update', handle)
+        return () => sock.off('forum:update', handle)
+    }, [view, currentSection, currentThread, page, fetchSections, fetchThreads, fetchThread])
+
     // ---------------------------------------------------------------------------
     // NAVIGAZIONE
     // ---------------------------------------------------------------------------
@@ -902,6 +922,7 @@ export default function Forum({ isStaff = false }) {
 
                 <div className={styles.backBar}>
                     <button onClick={backToSections}>← Torna indietro</button>
+                    <span className={styles.sectionHeading}>{currentSection?.nome}</span>
                 </div>
                 <div className={styles.buttonsBar}>
                     <button onClick={() => setView(isStaff && currentSection?.tipo === 1 ? 'compose_quest' : 'compose')}>

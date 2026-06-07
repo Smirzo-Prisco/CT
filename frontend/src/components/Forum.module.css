@@ -1,53 +1,56 @@
 /* Forum.module.css — stili scoped per Forum.jsx */
 
 /* ── ThreadRow ─────────────────────────────────────────────── */
-.clickable       { cursor: pointer; }
-.statusCell      { text-align: center; width: 40px; padding: 8px; }
-.statusIcon      { width: 18px; height: 18px; }
-.topicCell       { padding: 8px 10px; }
-.authorCell      { padding: 8px 10px; text-align: center; white-space: nowrap; }
-.repliesCell     { padding: 8px 10px; text-align: center; white-space: nowrap; }
-.dateNoIndent    { padding-left: 0; }
-.actionsCell     { padding: 8px; text-align: center; white-space: nowrap; }
-.actionIcon      { cursor: pointer; margin: 0 2px; width: 20px; }
 
-/* ── PostCard ──────────────────────────────────────────────── */
-.postCard        { margin-bottom: 10px; width: 100%; }
-.authorColumn    { vertical-align: top; padding: 10px; min-width: 80px; }
-.avatarImg       { display: block; margin-bottom: 6px; }
-.authorName      { font-size: 12px; color: #ce846f; text-align: center; }
-.authorDate      { padding-left: 0; text-align: center; }
-.messageColumn   { vertical-align: top; padding: 10px; }
-.threadTitle     { margin-bottom: 10px; }
-.editNote        { margin-top: 10px; font-size: 11px; color: #aaa; }
+.clickable {
+    cursor: pointer;
+}
 
-/* ── BBCodeToolbar ─────────────────────────────────────────── */
-.toolbar         { padding: 6px 0; text-align: center; border-bottom: 1px solid #2a2f4a; margin-bottom: 6px; color: #a7a7a8; font-size: 11px; }
-.toolbarLabel    { margin-right: 6px; color: #888; }
-.toolbarBtn      { cursor: pointer; margin: 0 4px; font-family: 'DejaVu Serif'; font-size: 12px; letter-spacing: 1px; user-select: none; }
-.toolbarBtnU     { cursor: pointer; margin: 0 4px; color: #a7a7a8; text-decoration: underline; font-size: 12px; user-select: none; }
+.statusCell {
+    text-align: center;
+    width: 40px;
+    padding: 8px;
+}
 
-/* ── PostForm ──────────────────────────────────────────────── */
-.closedNote      { color: #aaa; font-style: italic; text-align: center; margin: 20px 0; }
-.formContainer   { margin-top: 20px; padding: 10px; background: #111423; border-radius: 6px; }
-.formTitle       { color: #ce846f; margin-bottom: 10px; }
-.titleField      { margin-bottom: 8px; }
-.fullWidth       { width: 100%; box-sizing: border-box; }
-.fullWidthResize { width: 100%; box-sizing: border-box; resize: vertical; }
-.formOptions     { display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
-.anonLabel       { font-size: 12px; color: #aaa; cursor: pointer; }
-.anonCheckbox    { margin-right: 4px; }
+.statusIcon {
+    width: 18px;
+    height: 18px;
+}
 
-/* ── Vista sezioni ─────────────────────────────────────────── */
-.loadingText     { padding: 20px; color: #aaa; }
-.sectionsTable   { width: 100%; margin: 0 auto; }
-.groupHeaderCell { text-align: center; padding: 8px 20px; text-transform: uppercase; color: #ce846f; font-family: 'DejaVu Serif'; filter: drop-shadow(-1.732px 1px 2px #000); }
-.sectionNameCell { padding: 8px 20px; text-transform: uppercase; white-space: nowrap; }
-.unreadMoon      { margin-right: 6px; font-size: 14px; vertical-align: middle; }
-.unreadBadge     { margin-left: 6px; background: #e74c3c; color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; font-weight: bold; vertical-align: middle; }
-.sectionDescCell { padding: 8px 20px; font-size: 11px; color: #a7a7a8; text-transform: uppercase; letter-spacing: 1px; }
+.topicCell {
+    padding: 8px 10px;
+}
+
+.authorCell {
+    padding: 8px 10px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.repliesCell {
+    padding: 8px 10px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.dateNoIndent {
+    padding-left: 0;
+}
+
+.actionsCell {
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.actionIcon {
+    cursor: pointer;
+    margin: 0 2px;
+    width: 20px;
+}
 
 /* ── Thread non letti ─────────────────────────────────────── */
+
 .unreadDot {
     display: inline-block;
     width: 8px;
@@ -63,21 +66,277 @@
     font-weight: bold;
 }
 
+/* ── PostCard ──────────────────────────────────────────────── */
+
+.postCard {
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.authorColumn {
+    vertical-align: top;
+    padding: 10px;
+    min-width: 80px;
+}
+
+.avatarImg {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.authorName {
+    font-size: 12px;
+    color: #ce846f;
+    text-align: center;
+}
+
+.authorDate {
+    padding-left: 0;
+    text-align: center;
+}
+
+.messageColumn {
+    vertical-align: top;
+    padding: 10px;
+}
+
+.threadTitle {
+    margin-bottom: 10px;
+}
+
+.editNote {
+    margin-top: 10px;
+    font-size: 11px;
+    color: #aaa;
+}
+
+/* ── BBCodeToolbar ─────────────────────────────────────────── */
+
+.toolbar {
+    padding: 6px 0;
+    text-align: center;
+    border-bottom: 1px solid #2a2f4a;
+    margin-bottom: 6px;
+    color: #a7a7a8;
+    font-size: 11px;
+}
+
+.toolbarLabel {
+    margin-right: 6px;
+    color: #888;
+}
+
+.toolbarBtn {
+    cursor: pointer;
+    margin: 0 4px;
+    font-family: 'DejaVu Serif', serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    user-select: none;
+}
+
+.toolbarBtnU {
+    cursor: pointer;
+    margin: 0 4px;
+    color: #a7a7a8;
+    text-decoration: underline;
+    font-size: 12px;
+    user-select: none;
+}
+
+/* ── PostForm ──────────────────────────────────────────────── */
+
+.closedNote {
+    color: #aaa;
+    font-style: italic;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.formContainer {
+    margin-top: 20px;
+    padding: 10px;
+    background: #111423;
+    border-radius: 6px;
+}
+
+.formTitle {
+    color: #ce846f;
+    margin-bottom: 10px;
+}
+
+.titleField {
+    margin-bottom: 8px;
+}
+
+.fullWidth {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.fullWidthResize {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.formOptions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.anonLabel {
+    font-size: 12px;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.anonCheckbox {
+    margin-right: 4px;
+}
+
+/* ── Vista sezioni ─────────────────────────────────────────── */
+
+.loadingText {
+    padding: 20px;
+    color: #aaa;
+}
+
+.sectionsTable {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.groupHeaderCell {
+    text-align: center;
+    padding: 8px 20px;
+    text-transform: uppercase;
+    color: #ce846f;
+    font-family: 'DejaVu Serif', serif;
+    filter: drop-shadow(-1.732px 1px 2px #000);
+}
+
+.sectionNameCell {
+    padding: 8px 20px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.unreadMoon {
+    margin-right: 6px;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.unreadBadge {
+    margin-left: 6px;
+    background: #e74c3c;
+    color: #fff;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.sectionDescCell {
+    padding: 8px 20px;
+    font-size: 11px;
+    color: #a7a7a8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 /* ── Vista thread list ─────────────────────────────────────── */
-.searchBar       { text-align: center; margin-bottom: 10px; }
-.searchInput     { width: 200px; margin-right: 6px; }
-.buttonsBar      { text-align: center; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-.theadColor      { color: #ce846f; }
-.theadCenter     { text-align: center; width: 40px; color: #ce846f; }
-.emptyState      { padding: 20px; color: #aaa; text-align: center; }
-.pagination      { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 10px; justify-content: center; }
-.backBar         { margin-bottom: 10px; }
-.loadingSmall    { color: #aaa; }
+
+.searchBar {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.searchInput {
+    width: 200px;
+    margin-right: 6px;
+}
+
+.buttonsBar {
+    text-align: center;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.theadColor {
+    color: #ce846f;
+}
+
+.theadCenter {
+    text-align: center;
+    width: 40px;
+    color: #ce846f;
+}
+
+.emptyState {
+    padding: 20px;
+    color: #aaa;
+    text-align: center;
+}
+
+.pagination {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    justify-content: center;
+}
+
+.backBar {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.sectionHeading {
+    font-family: 'DejaVu Serif', serif;
+    font-size: 14px;
+    color: #ce846f;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.loadingSmall {
+    color: #aaa;
+}
 
 /* ── ComposeQuest ──────────────────────────────────────────── */
-.questHeader     { text-align: center; color: #ce846f; padding: 8px; font-family: 'DejaVu Serif'; }
-.pgPuntiTable    { width: 100%; margin-top: 10px; }
+
+.questHeader {
+    text-align: center;
+    color: #ce846f;
+    padding: 8px;
+    font-family: 'DejaVu Serif', serif;
+}
+
+.pgPuntiTable {
+    width: 100%;
+    margin-top: 10px;
+}
 
 /* ── PuntiTable (tabella valutazioni quest) ────────────────── */
-.puntiTable      { width: 100%; margin-bottom: 10px; font-size: 12px; }
-.puntiName       { color: #ce846f; text-decoration: none; }
+
+.puntiTable {
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+.puntiName {
+    color: #ce846f;
+    text-decoration: none;
+}
