@@ -3,6 +3,42 @@ const ns_global = {
     param: 'op'
 };
 
+// ── Indicatore disconnessione socket ─────────────────────────────────────────
+// Mostra un banner in cima alla pagina se la connessione real-time cade,
+// lo nasconde non appena socket.io si riconnette.
+(function initSocketStatus() {
+    if (!window.ctSocket) return;
+
+    const bar = document.createElement('div');
+    bar.id = 'socket-status-bar';
+    bar.style.cssText = [
+        'display:none',
+        'position:fixed',
+        'top:0',
+        'left:50%',
+        'transform:translateX(-50%)',
+        'background:#c0392b',
+        'color:#fff',
+        'padding:5px 20px',
+        'border-radius:0 0 8px 8px',
+        'font-size:12px',
+        'font-family:inherit',
+        'z-index:9999',
+        'pointer-events:none',
+        'white-space:nowrap',
+    ].join(';');
+    document.body.appendChild(bar);
+
+    window.ctSocket.on('disconnect', () => {
+        bar.textContent = '⚠ Connessione persa — riconnessione in corso…';
+        bar.style.display = 'block';
+    });
+
+    window.ctSocket.on('connect', () => {
+        bar.style.display = 'none';
+    });
+}());
+
 function gdrcd_selector(id) {
     return document.getElementById(id);
 }

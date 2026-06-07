@@ -10,7 +10,6 @@ function addPgToRole() {
             .then(data => {
                 if (data.success) {
                     window.updateRoleActive?.(true)
-                    if (window.refreshChat) window.refreshChat();
                 } else showNotification(data.message, 'error');
             })
             .catch(err => console.error('Errore caricamento chat:', err));

@@ -761,7 +761,7 @@ function getWeaponAttack ($id_arma, $pg_name, $bonus_talento) {
 function addPgToRole($id_role, $pg_name, $location, $png = 0) {
     // can_send = 1 garantisce che il pg possa vedere dado/scudo sin dal primo turno
     gdrcd_query("INSERT INTO role_session_players (id_role, pg_name, png, can_send) VALUES ($id_role, '$pg_name', $png, 1)");
-    chatInsertMessage($location, 'System', $pg_name, " si è ha aggiunto alla role", 'N');
+    chatInsertMessage($location, 'System', $pg_name, " si è aggiunto alla role", 'N');
 }
 
 // Controlla se il personaggio ha role attive non congelate
