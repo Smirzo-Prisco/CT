@@ -131,7 +131,10 @@ export default function ChatbotWidget() {
                                     {msg.role === 'user'  && <i className="fas fa-user" />}
                                     {msg.role === 'error' && <i className="fas fa-exclamation-triangle" />}
                                 </div>
-                                <div className="chatbot-msg-text">{msg.text}</div>
+                                {msg.role === 'ai'
+                                    ? <div className="chatbot-msg-text" dangerouslySetInnerHTML={{ __html: msg.text }} />
+                                    : <div className="chatbot-msg-text">{msg.text}</div>
+                                }
                             </div>
                         ))}
                         {loading && (

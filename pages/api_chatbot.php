@@ -13,6 +13,7 @@
  */
 
 session_start();
+ob_start(); // buffer output: evita che warning/notice PHP corrompano il JSON
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../includes/required.php';
@@ -141,12 +142,14 @@ if ($op === 'ask') {
 
     if ($curlErr) {
         error_log("[chatbot] curl error: $curlErr");
+        ob_end_clean();
         echo json_encode(['success' => false, 'message' => 'Errore di rete. Riprova.']);
         exit;
     }
 
     if ($httpCode !== 200) {
         error_log("[chatbot] Anthropic API HTTP $httpCode: $response");
+        ob_end_clean();
         echo json_encode(['success' => false, 'message' => 'Errore del servizio AI. Riprova più tardi.']);
         exit;
     }
@@ -157,19 +160,24 @@ if ($op === 'ask') {
     $tokens_output = (int)($result_data['usage']['output_tokens'] ?? 0);
     $tokens_tot    = $tokens_input + $tokens_output;
 
-    // Salva nel log per monitoraggio spesa
-    $d_safe = gdrcd_filter('in', $domanda);
-    $r_safe = gdrcd_filter('in', $risposta);
-    gdrcd_query("INSERT INTO chatbot_log (nome_personaggio, domanda, risposta, tokens_usati) VALUES ('$nome', '$d_safe', '$r_safe', $tokens_tot)");
+    // Salva nel log per monitoraggio spesa (tronca a 10000 char per sicurezza colonna)
+    $d_safe = gdrcd_filter('in', mb_substr($domanda, 0, 500));
+    $r_safe = gdrcd_filter('in', mb_substr($risposta, 0, 10000));
+    try {
+        gdrcd_query("INSERT INTO chatbot_log (nome_personaggio, domanda, risposta, tokens_usati) VALUES ('$nome', '$d_safe', '$r_safe', $tokens_tot)");
+    } catch (Throwable $e) {
+        error_log('[chatbot] log insert failed: ' . $e->getMessage());
+    }
 
     $used_after = $used + $tokens_tot;
+    ob_end_clean();
     echo json_encode([
         'success'          => true,
         'risposta'         => $risposta,
         'tokens_used'      => $used_after,
         'tokens_limit'     => $TOKEN_LIMIT,
         'tokens_remaining' => max(0, $TOKEN_LIMIT - $used_after),
-    ]);
+    ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }
 
