@@ -831,8 +831,9 @@ function checkTurnEnd($location, $user, $id_role) {
                 // Ha già uno scudo (car='difesa') nel turno: chiusura automatica senza chiedere
                 gdrcd_query("UPDATE role_session_players SET close_turn = 1 WHERE id_role = $id_role AND pg_name = '$pgName' AND `end` IS NULL");
             } else {
-                // Nessun scudo: notifica real-time tramite socket, il prompt appare in chat
-                notifySocketServer('combat:close_turn', 'chat:' . (int)$location, [
+                // Nessun scudo: notifica diretta alla room personale dm:$pgName (evita
+                // broadcast + filtro client-side che può fallire su mismatch nome)
+                notifySocketServer('combat:close_turn', 'dm:' . $pgName, [
                     'id_role' => (int)$id_role,
                     'pg_name' => $pgName,
                 ]);

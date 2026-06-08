@@ -262,23 +262,44 @@ export default function ChatShell() {
     }, [shell])
 
     /**
-     * Ascolta 'combat:close_turn': mostra il prompt di chiusura turno se
-     * il messaggio è indirizzato al pg corrente.
+     * Ascolta 'combat:close_turn': il server invia l'evento direttamente alla
+     * room personale dm:login, quindi non serve filtrare per pg_name.
      */
     useEffect(() => {
         if (!shell) return
         const sock = window.ctSocket
         if (!sock) return
-        const myLogin = shell.login
 
         const onCloseTurn = (data) => {
-            if (data?.pg_name !== myLogin) return
             setCloseTurnPrompt({ id_role: data.id_role })
         }
 
         sock.on('combat:close_turn', onCloseTurn)
         return () => sock.off('combat:close_turn', onCloseTurn)
     }, [shell])
+
+    /**
+     * Fallback: quando arriva chat:update durante una role attiva, ri-controlla
+     * se c'è un prompt di chiusura turno pendente non ancora mostrato.
+     * Recupera i casi in cui il socket event è stato perso (rete instabile, tab
+     * in background, ecc.).
+     */
+    useEffect(() => {
+        if (!shell || !roleActive) return
+        const sock = window.ctSocket
+        if (!sock) return
+
+        const onChatUpdate = () => {
+            if (closeTurnPrompt) return // prompt già visibile, niente da fare
+            fetch('/pages/api_chat.php?op=pending_close_turn', { method: 'POST' })
+                .then(r => r.json())
+                .then(d => { if (d.success && d.pending) setCloseTurnPrompt({ id_role: d.id_role }) })
+                .catch(() => { })
+        }
+
+        sock.on('chat:update', onChatUpdate)
+        return () => sock.off('chat:update', onChatUpdate)
+    }, [shell, roleActive, closeTurnPrompt])
 
     /** Conferma la chiusura del turno e rimuove il prompt. */
     const handleCloseTurn = useCallback((id_role) => {
