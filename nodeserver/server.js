@@ -78,6 +78,9 @@ io.on('connection', socket => {
         }
         socket.join(`chat:${nl}`);
         socket.join(`loc:${nl}`);
+        // Notifica la nuova stanza (presenti aggiornati) e il pannello globale
+        io.to(`loc:${nl}`).emit('users:update');
+        io.to('global').emit('presenti:update');
     });
 
     // Typing indicator chattina off: broadcast a tutti tranne il mittente

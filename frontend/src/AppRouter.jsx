@@ -330,6 +330,8 @@ export default function AppRouter({ isStaff = false }) {
                     // Aggiorna le room socket: la connessione esistente era
                     // iscritta a chat:${old} — deve passare a chat:${dir}
                     window.ctSocket?.emit('room:change', { newLuogo: dir })
+                    // Notifica InfoLocation (e altri componenti) del cambio stanza
+                    window.dispatchEvent(new CustomEvent('ct:location-changed'))
                     window.history.pushState({}, '', url)
                     setParams(readParams())
                 } else {

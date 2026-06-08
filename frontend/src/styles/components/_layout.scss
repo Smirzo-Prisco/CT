@@ -522,12 +522,21 @@ div.pagina_info_location {
     display: flex;
     align-items: center;
     gap: $space-2;
+    padding: 0 5px;
+}
+
+.info-location-pin-link {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    text-decoration: none;
 }
 
 .info-location-pin {
     color: $color-primary;
     font-size: $text-md;
-    flex-shrink: 0;
+
+    &:hover { opacity: 0.75; }
 }
 
 .info-location-name {
@@ -541,7 +550,7 @@ div.pagina_info_location {
 .info-location-desc-btn {
     background: none;
     border: none;
-    color: $palette-text-secondary;
+    color: $palette-text-title;
     cursor: pointer;
     padding: 0;
     font-size: $text-md;

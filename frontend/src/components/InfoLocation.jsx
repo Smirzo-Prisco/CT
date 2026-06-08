@@ -48,12 +48,17 @@ export default function InfoLocation() {
     useEffect(() => {
         fetchLocation()
 
-        // Si aggiorna ad ogni spostamento (il server emette users:update
-        // quando il personaggio entra/esce da una stanza o cambia mappa)
         const sock = window.ctSocket
         if (sock) sock.on('users:update', fetchLocation)
 
-        return () => { if (sock) sock.off('users:update', fetchLocation) }
+        // Aggiornamento diretto quando la SPA sposta il pg in una nuova stanza
+        // (AppRouter dispatcha questo evento dopo op=move, senza attendere il socket)
+        window.addEventListener('ct:location-changed', fetchLocation)
+
+        return () => {
+            if (sock) sock.off('users:update', fetchLocation)
+            window.removeEventListener('ct:location-changed', fetchLocation)
+        }
     }, [fetchLocation])
 
     // ---------------------------------------------------------------------------
@@ -83,8 +88,10 @@ export default function InfoLocation() {
                     <span className="info-location-anno">{`Anno ${data.anno}`}</span>
                     <div className="info-location-name-row">
 
-                        {/* Pin sinistra */}
-                        <i className="fa-solid fa-location-dot info-location-pin" />
+                        {/* Pin sinistra — cliccabile, porta al luogo corrente */}
+                        <a href={`main.php?dir=${data.luogo}`} onClick={goToRoom} className="info-location-pin-link" title="Vai al luogo">
+                            <i className="fa-solid fa-location-dot info-location-pin" />
+                        </a>
 
                         {/* Nome — cliccabile sia in stanza che in mappa */}
                         <a href={`main.php?dir=${data.luogo}`} onClick={goToRoom} className="info-location-name">
