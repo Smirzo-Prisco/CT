@@ -204,16 +204,18 @@ function hasPermesso(array $permessi_utente, array $permessi_richiesti) {
 }
 
 // Manda sms interni alla land
+// On e off game usano conversazioni separate tra la stessa coppia di utenti.
 function send_sms($from, $to, $title, $text, $ongame = 0) {
     $from_safe  = gdrcd_filter('in', $from);
     $to_safe    = gdrcd_filter('in', $to);
     $ongame_int = $ongame ? 1 : 0;
 
-    // Cerca la conversazione in entrambe le direzioni (A→B e B→A sono la stessa conv)
+    // Cerca la conversazione on/off specifica tra questa coppia (A→B e B→A sono la stessa)
     $exists = gdrcd_query(
         "SELECT id_conversazione FROM sms
-         WHERE (mittente_nome = '$from_safe' AND destinatario_nome = '$to_safe')
-            OR (mittente_nome = '$to_safe'   AND destinatario_nome = '$from_safe')
+         WHERE ((mittente_nome = '$from_safe' AND destinatario_nome = '$to_safe')
+             OR (mittente_nome = '$to_safe'   AND destinatario_nome = '$from_safe'))
+           AND ongame = $ongame_int
          LIMIT 1",
         'result'
     );
@@ -237,7 +239,7 @@ function send_sms($from, $to, $title, $text, $ongame = 0) {
         $new_id = (gdrcd_query(gdrcd_query("SELECT MAX(id_conversazione) as max_id FROM sms", 'result'), 'fetch')['max_id'] + 1);
 
         gdrcd_query("INSERT INTO sms (mittente_nome, destinatario_nome, testo, id_conversazione, tipo_messaggio, ongame, ora_spedizione)
-                    VALUES ('$from_safe', '$to_safe', '$text', $new_id, 'individuale', '0', NOW())");
+                    VALUES ('$from_safe', '$to_safe', '$text', $new_id, 'individuale', $ongame_int, NOW())");
 
         // Riga per entrambi: destinatario non letto, mittente già letto
         gdrcd_query("INSERT INTO conversazioni_individuali (id_conversazione, utente_nome, lettura) VALUES ($new_id, '$to_safe',   0)");
