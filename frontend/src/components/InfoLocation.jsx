@@ -6,8 +6,8 @@
  *
  * Contenuto:
  *   - Immagine del luogo (variante giorno/notte)
- *   - Nome luogo + anno di gioco (cliccabile → apre descrizione)
- *   - Stato e descrizione in marquee
+ *   - Nome luogo + anno di gioco (cliccabile → torna al luogo corrente)
+ *   - Icona pin a sinistra del nome, icona info a destra → modale descrizione
  *
  * Aggiornamento real-time:
  *   - Ascolta 'users:update' via socket: si aggiorna ogni volta che il
@@ -30,6 +30,9 @@ export default function InfoLocation() {
 
     /** Dati del luogo corrente restituiti da op=current */
     const [data, setData] = useState(null)
+
+    /** Visibilità della modale descrizione luogo */
+    const [showDesc, setShowDesc] = useState(false)
 
     /**
      * Recupera le informazioni sul luogo corrente dall'API.
@@ -61,7 +64,8 @@ export default function InfoLocation() {
         return <div className="pagina_info_location"><div className={shared.muted}>...</div></div>
     }
 
-    /** Naviga alla stanza corrente via CT.navigate (SPA) o href diretto */
+    /** Naviga al luogo corrente via CT.navigate (SPA) o href diretto.
+     *  Funziona sia per stanze che per mappe. */
     const goToRoom = (e) => {
         e.preventDefault()
         const url = `main.php?dir=${data.luogo}`
@@ -77,17 +81,50 @@ export default function InfoLocation() {
                 {/* Anno + nome luogo */}
                 <div className="info-location-year">
                     <span className="info-location-anno">{`Anno ${data.anno}`}</span>
-                    <div>
-                        {data.tipo === 'stanza' ? (
-                            <a href={`main.php?dir=${data.luogo}`} onClick={goToRoom}>
-                                {data.nome}
-                            </a>
-                        ) : (
-                            <span>{data.nome}</span>
+                    <div className="info-location-name-row">
+
+                        {/* Pin sinistra */}
+                        <i className="fa-solid fa-location-dot info-location-pin" />
+
+                        {/* Nome — cliccabile sia in stanza che in mappa */}
+                        <a href={`main.php?dir=${data.luogo}`} onClick={goToRoom} className="info-location-name">
+                            {data.nome}
+                        </a>
+
+                        {/* Info destra — apre modale descrizione */}
+                        {data.descrizione && (
+                            <button
+                                className="info-location-desc-btn"
+                                onClick={() => setShowDesc(true)}
+                                title="Descrizione del luogo"
+                            >
+                                <i className="fa-solid fa-circle-info" />
+                            </button>
                         )}
+
                     </div>
                 </div>
             </div>
+
+            {/* Modale descrizione luogo */}
+            {showDesc && (
+                <div className="info-location-overlay" onClick={() => setShowDesc(false)}>
+                    <div className="info-location-modal" onClick={e => e.stopPropagation()}>
+                        <div className="info-location-modal-header">
+                            <span>
+                                <i className="fa-solid fa-location-dot" style={{ marginRight: 8 }} />
+                                {data.nome}
+                            </span>
+                            <button onClick={() => setShowDesc(false)} aria-label="Chiudi">×</button>
+                        </div>
+                        <div
+                            className="info-location-modal-body"
+                            dangerouslySetInnerHTML={{ __html: data.descrizione }}
+                        />
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }

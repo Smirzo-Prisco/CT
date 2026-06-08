@@ -518,6 +518,97 @@ div.pagina_info_location {
     }
 }
 
+.info-location-name-row {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+}
+
+.info-location-pin {
+    color: $color-primary;
+    font-size: $text-md;
+    flex-shrink: 0;
+}
+
+.info-location-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.info-location-desc-btn {
+    background: none;
+    border: none;
+    color: $palette-text-secondary;
+    cursor: pointer;
+    padding: 0;
+    font-size: $text-md;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: color $transition-fast;
+
+    &:hover { color: $color-primary; }
+}
+
+// ── Modale descrizione luogo ──────────────────────────────────
+
+.info-location-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-location-modal {
+    background: $palette-surface;
+    border: 1px solid $palette-surface-hover;
+    border-radius: $radius-xl;
+    width: 420px;
+    max-width: 90vw;
+    max-height: 70vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: $shadow-lg;
+}
+
+.info-location-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-3 $space-4;
+    border-bottom: 1px solid $palette-surface-hover;
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
+    color: $color-text-title;
+    flex-shrink: 0;
+
+    button {
+        background: none;
+        border: none;
+        color: $palette-text-secondary;
+        cursor: pointer;
+        font-size: $text-2xl;
+        line-height: 1;
+        padding: 0 $space-1;
+
+        &:hover { color: $color-text; }
+    }
+}
+
+.info-location-modal-body {
+    padding: $space-4;
+    overflow-y: auto;
+    color: $color-text;
+    font-size: $text-md;
+    line-height: 1.7;
+}
+
 // ── Mappa cliccabile ──────────────────────────────────────────
 
 div.mappaclick_map {
