@@ -124,10 +124,16 @@ export default function InfoLocation() {
                             </span>
                             <button onClick={() => setShowDesc(false)} aria-label="Chiudi">×</button>
                         </div>
-                        <div
-                            className="info-location-modal-body"
-                            dangerouslySetInnerHTML={{ __html: data.descrizione }}
-                        />
+                        <div className="info-location-modal-body">
+                            {data.descrizione_immagine && (
+                                <img
+                                    src={`/themes/crystal/imgs/descrizioni/${data.descrizione_immagine}`}
+                                    alt={data.nome}
+                                    className="info-location-modal-img"
+                                />
+                            )}
+                            <div dangerouslySetInnerHTML={{ __html: data.descrizione }} />
+                        </div>
                     </div>
                 </div>
             )}

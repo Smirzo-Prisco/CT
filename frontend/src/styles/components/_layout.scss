@@ -530,6 +530,7 @@ div.pagina_info_location {
     align-items: center;
     flex-shrink: 0;
     text-decoration: none;
+    margin-left: 25px;
 }
 
 .info-location-pin {
@@ -553,6 +554,7 @@ div.pagina_info_location {
     color: $palette-text-title;
     cursor: pointer;
     padding: 0;
+    margin-right: 5px;
     font-size: $text-md;
     flex-shrink: 0;
     line-height: 1;
@@ -616,6 +618,15 @@ div.pagina_info_location {
     color: $color-text;
     font-size: $text-md;
     line-height: 1.7;
+}
+
+.info-location-modal-img {
+    display: block;
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: $radius-md;
+    margin-bottom: $space-4;
 }
 
 // ── Mappa cliccabile ──────────────────────────────────────────
