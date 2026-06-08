@@ -521,7 +521,7 @@ div.pagina_info_location {
 .info-location-name-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0;
     padding: 0 5px;
 }
 
@@ -530,6 +530,7 @@ div.pagina_info_location {
     align-items: center;
     flex-shrink: 0;
     text-decoration: none;
+    margin-right: 10px;
 }
 
 .info-location-pin {
