@@ -210,12 +210,19 @@ function send_sms($from, $to, $title, $text, $ongame = 0) {
     $to_safe    = gdrcd_filter('in', $to);
     $ongame_int = $ongame ? 1 : 0;
 
-    // Cerca la conversazione on/off specifica tra questa coppia (A→B e B→A sono la stessa)
+    // Cerca una conversazione PURA con questo tipo ongame tra questa coppia.
+    // NOT EXISTS esclude le conversazioni miste (legacy) che contengono anche
+    // messaggi dell'altro tipo — quelle non vanno riutilizzate.
     $exists = gdrcd_query(
-        "SELECT id_conversazione FROM sms
-         WHERE ((mittente_nome = '$from_safe' AND destinatario_nome = '$to_safe')
-             OR (mittente_nome = '$to_safe'   AND destinatario_nome = '$from_safe'))
-           AND ongame = $ongame_int
+        "SELECT DISTINCT s.id_conversazione FROM sms s
+         WHERE ((s.mittente_nome = '$from_safe' AND s.destinatario_nome = '$to_safe')
+             OR (s.mittente_nome = '$to_safe'   AND s.destinatario_nome = '$from_safe'))
+           AND s.ongame = $ongame_int
+           AND NOT EXISTS (
+             SELECT 1 FROM sms s2
+             WHERE s2.id_conversazione = s.id_conversazione
+               AND s2.ongame != $ongame_int
+           )
          LIMIT 1",
         'result'
     );

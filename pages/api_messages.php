@@ -135,6 +135,14 @@ switch ($op) {
         $conv_id  = (int)($_GET['conversazione_id'] ?? 0);
         $gruppo_id = (int)($_GET['gruppo_id'] ?? 0);
 
+        // Filtro ongame per conversazioni individuali: il frontend passa il tipo della
+        // conversazione aperta per evitare di mostrare messaggi dell'altro tipo in
+        // conversazioni miste create prima del fix.
+        $ongame_filter = '';
+        if ($conv_id > 0 && isset($_GET['ongame'])) {
+            $ongame_filter = ' AND s.ongame = ' . (int)$_GET['ongame'];
+        }
+
         if ($conv_id > 0) {
             // Verifica accesso (l'utente deve partecipare alla conversazione)
             $access = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali
@@ -150,7 +158,7 @@ switch ($op) {
                     p.url_img_chat
                 FROM sms s
                 LEFT JOIN personaggio p ON s.mittente_nome = p.nome
-                WHERE s.id_conversazione = $conv_id
+                WHERE s.id_conversazione = $conv_id{$ongame_filter}
                 ORDER BY s.ora_spedizione ASC", 'result');
 
             // Segna come letto (solo se non è una chiamata "silent" fatta per aggiornare

@@ -406,9 +406,11 @@ export default function MessagesInbox({ toPg = null }) {
         setMessages([])
         setReplyText('')
 
-        // op=read: segna come letto + restituisce messaggi + emette dm:update al self
+        // op=read: segna come letto + restituisce messaggi + emette dm:update al self.
+        // Per le conversazioni individuali passa ongame in modo che il server filtri
+        // solo i messaggi del tipo corretto (gestisce anche le conversazioni miste legacy).
         const qs = conv.tipo === 'individuale'
-            ? `conversazione_id=${conv.conversazione_id}`
+            ? `conversazione_id=${conv.conversazione_id}&ongame=${conv.ongame ? 1 : 0}`
             : `gruppo_id=${conv.gruppo_id}`
 
         fetch(`/pages/api_messages.php?op=read&${qs}`)
@@ -435,7 +437,7 @@ export default function MessagesInbox({ toPg = null }) {
         const conv = selectedConvRef.current
         if (!conv) return
         const qs = conv.tipo === 'individuale'
-            ? `conversazione_id=${conv.conversazione_id}&silent=1`
+            ? `conversazione_id=${conv.conversazione_id}&ongame=${conv.ongame ? 1 : 0}&silent=1`
             : `gruppo_id=${conv.gruppo_id}&silent=1`
         fetch(`/pages/api_messages.php?op=read&${qs}`)
             .then(r => r.json())
