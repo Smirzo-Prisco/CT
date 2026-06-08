@@ -255,7 +255,7 @@ switch ($op) {
 
         } elseif (!empty($destinatario)) {
             // Messaggio individuale — usa send_sms() di custom_functions
-            send_sms($_SESSION['login'], $destinatario, '', $messaggio);
+            send_sms($_SESSION['login'], $destinatario, '', $messaggio, $ongame);
             // send_sms() già chiama notifySocketServer internamente
 
             // Recupera id conversazione appena creata/aggiornata

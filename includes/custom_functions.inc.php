@@ -204,9 +204,10 @@ function hasPermesso(array $permessi_utente, array $permessi_richiesti) {
 }
 
 // Manda sms interni alla land
-function send_sms($from, $to, $title, $text) {
-    $from_safe = gdrcd_filter('in', $from);
-    $to_safe   = gdrcd_filter('in', $to);
+function send_sms($from, $to, $title, $text, $ongame = 0) {
+    $from_safe  = gdrcd_filter('in', $from);
+    $to_safe    = gdrcd_filter('in', $to);
+    $ongame_int = $ongame ? 1 : 0;
 
     // Cerca la conversazione in entrambe le direzioni (A→B e B→A sono la stessa conv)
     $exists = gdrcd_query(
@@ -221,7 +222,7 @@ function send_sms($from, $to, $title, $text) {
         $id_conversazione = gdrcd_query($exists, 'fetch')['id_conversazione'];
 
         gdrcd_query("INSERT INTO sms (mittente_nome, destinatario_nome, testo, id_conversazione, tipo_messaggio, ongame, ora_spedizione)
-                    VALUES ('$from_safe', '$to_safe', '$text', $id_conversazione, 'individuale', '0', NOW())");
+                    VALUES ('$from_safe', '$to_safe', '$text', $id_conversazione, 'individuale', $ongame_int, NOW())");
 
         // Garantisce che entrambi abbiano la riga (può mancare in conversazioni pre-fix)
         $chkFrom = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali WHERE id_conversazione = $id_conversazione AND utente_nome = '$from_safe'");
