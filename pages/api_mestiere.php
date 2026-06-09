@@ -73,7 +73,7 @@ switch ($op) {
             while ($row = gdrcd_query($res, 'fetch')) {
                 $livello  = (int)$row['livello_mestiere'];
                 // Livello 1 (avanzato) non è accessibile in autonomia: assegnato solo da admin/capomestiere
-                $unlocked = ($livello === 2 && $expMestiere >= 55);
+                $unlocked = ($livello === 2 && $expMestiere >= 10);
                 $mestieri[] = [
                     'id'       => (int)$row['id_ruolo'],
                     'nome'     => gdrcd_filter('out', (string)$row['nome_ruolo']),
@@ -178,8 +178,8 @@ switch ($op) {
 
         $pg          = gdrcd_query("SELECT esperienza_mestiere FROM personaggio WHERE nome = '$login'");
         $expMestiere = (int)($pg['esperienza_mestiere'] ?? 0);
-        if ($livelloRichiesto === 2 && $expMestiere < 55) {
-            echo json_encode(['success' => false, 'message' => 'Servono almeno 55 punti mestiere per avanzare a questo livello']);
+        if ($livelloRichiesto === 2 && $expMestiere < 10) {
+            echo json_encode(['success' => false, 'message' => 'Servono almeno 10 punti mestiere per avanzare a questo livello']);
             exit;
         }
 
