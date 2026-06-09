@@ -72,8 +72,9 @@ switch ($op) {
             $mestieri = [];
             while ($row = gdrcd_query($res, 'fetch')) {
                 $livello  = (int)$row['livello_mestiere'];
-                // Livello 1 (avanzato) non è accessibile in autonomia: assegnato solo da admin/capomestiere
-                $unlocked = ($livello === 2 && $expMestiere >= 10);
+                // Livello 0 (capomestiere) non è accessibile in autonomia: assegnato solo da admin/capomestiere
+                $unlocked = ($livello === 2 && $expMestiere >= 10)
+                          || ($livello === 1 && $expMestiere >= 55);
                 $mestieri[] = [
                     'id'       => (int)$row['id_ruolo'],
                     'nome'     => gdrcd_filter('out', (string)$row['nome_ruolo']),
@@ -170,8 +171,8 @@ switch ($op) {
         }
         $livelloRichiesto = (int)$ruolo['livello_mestiere'];
 
-        // Livello 1 (avanzato) non è accessibile in autonomia: solo admin/capomestiere
-        if ($livelloRichiesto === 1) {
+        // Livello 0 (capomestiere) non è accessibile in autonomia: solo admin/capomestiere
+        if ($livelloRichiesto === 0) {
             echo json_encode(['success' => false, 'message' => 'Questo livello viene assegnato dal capomestiere']);
             exit;
         }
@@ -180,6 +181,10 @@ switch ($op) {
         $expMestiere = (int)($pg['esperienza_mestiere'] ?? 0);
         if ($livelloRichiesto === 2 && $expMestiere < 10) {
             echo json_encode(['success' => false, 'message' => 'Servono almeno 10 punti mestiere per avanzare a questo livello']);
+            exit;
+        }
+        if ($livelloRichiesto === 1 && $expMestiere < 55) {
+            echo json_encode(['success' => false, 'message' => 'Servono almeno 55 punti mestiere per avanzare a questo livello']);
             exit;
         }
 
