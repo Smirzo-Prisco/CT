@@ -38,7 +38,7 @@ if(gdrcd_query($result, 'num_rows') > 0) {
 $login1 = ucwords(strtolower(trim($login1)));
 
 /*Carico dal database il profilo dell'account (personaggio)*/
-$record = gdrcd_query("SELECT personaggio.id_gilda, personaggio.ctnews_letto, personaggio.pass, personaggio.nome, personaggio.cognome, personaggio.permessi, personaggio.sesso, personaggio.ultima_mappa, personaggio.ultimo_luogo, personaggio.id_razza, personaggio.id_mestiere, personaggio.id_ruolo_mestiere, personaggio.ultimo_messaggio, personaggio.blocca_media, personaggio.suono_dm, personaggio.suono_chat, personaggio.suono_scheda, personaggio.ora_entrata, personaggio.ora_uscita, personaggio.ultimo_refresh, razza.sing_m, razza.sing_f, razza.icon AS url_img_razza, privilegi.admin as admin, privilegi.moderatore as moderatore, privilegi.master as master, privilegi.guida as guida, privilegi.capomestiere as capomestiere, privilegi.capogilda as capogilda, privilegi.grafico as grafico FROM personaggio LEFT JOIN razza ON personaggio.id_razza = razza.id_razza LEFT JOIN privilegi ON personaggio.nome = privilegi.nome WHERE personaggio.nome = '".gdrcd_filter('in', $login1)."' LIMIT 1");
+$record = gdrcd_query("SELECT personaggio.id_gilda, personaggio.ctnews_letto, personaggio.pass, personaggio.nome, personaggio.cognome, personaggio.permessi, personaggio.sesso, personaggio.ultima_mappa, personaggio.ultimo_luogo, personaggio.id_razza, personaggio.id_mestiere, personaggio.id_ruolo_mestiere, personaggio.ultimo_messaggio, personaggio.blocca_media, personaggio.ora_entrata, personaggio.ora_uscita, personaggio.ultimo_refresh, razza.sing_m, razza.sing_f, razza.icon AS url_img_razza, privilegi.admin as admin, privilegi.moderatore as moderatore, privilegi.master as master, privilegi.guida as guida, privilegi.capomestiere as capomestiere, privilegi.capogilda as capogilda, privilegi.grafico as grafico FROM personaggio LEFT JOIN razza ON personaggio.id_razza = razza.id_razza LEFT JOIN privilegi ON personaggio.nome = privilegi.nome WHERE personaggio.nome = '".gdrcd_filter('in', $login1)."' LIMIT 1");
 
 /*Se esiste un personaggio corrispondente al nome ed alla password specificati*/
 /** * Aggiunti i controlli sugli orari di connessione e disconnessione per impedire i doppi login con gli stessi account
@@ -68,9 +68,17 @@ if( !empty($record) && gdrcd_password_check($pass1, $record['pass']) && ($record
      * @author Blancks
      */
     $_SESSION['blocca_media']    = $record['blocca_media'];
-    $_SESSION['suono_dm']        = (int)($record['suono_dm']     ?? 1);
-    $_SESSION['suono_chat']      = (int)($record['suono_chat']   ?? 1);
-    $_SESSION['suono_scheda']    = (int)($record['suono_scheda'] ?? 1);
+    // Query separata: le colonne suono_* potrebbero non esistere ancora se upgrade.php non è stato eseguito
+    try {
+        $snd = gdrcd_query("SELECT suono_dm, suono_chat, suono_scheda FROM personaggio WHERE nome = '" . gdrcd_filter('in', $record['nome']) . "' LIMIT 1");
+        $_SESSION['suono_dm']     = (int)($snd['suono_dm']     ?? 1);
+        $_SESSION['suono_chat']   = (int)($snd['suono_chat']   ?? 1);
+        $_SESSION['suono_scheda'] = (int)($snd['suono_scheda'] ?? 1);
+    } catch (\mysqli_sql_exception $e) {
+        $_SESSION['suono_dm']     = 1;
+        $_SESSION['suono_chat']   = 1;
+        $_SESSION['suono_scheda'] = 1;
+    }
 
     /** * Archiviazione dato utile per capire quanti nuovi topic in bacheca ci sono rispetto all'ultima visita
      * @author Blancks
