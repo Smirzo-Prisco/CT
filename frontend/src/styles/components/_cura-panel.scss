@@ -91,4 +91,36 @@
         font-size: 0.82rem;
         color: $palette-action;
     }
+
+    // ── Card staff Ospedale ─────────────────────────────────────────────────
+
+    &__staff {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid $palette-surface-hover;
+    }
+
+    &__staff-title {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: $palette-text-muted;
+        margin-bottom: 8px;
+    }
+
+    &__target {
+        flex: 1;
+        min-width: 0;
+        padding: 4px 8px;
+        border: 1px solid $palette-surface-hover;
+        border-radius: 4px;
+        background: $palette-surface;
+        color: $palette-text;
+        font-size: 0.85rem;
+
+        &:focus {
+            outline: none;
+            border-color: $palette-action;
+        }
+    }
 }

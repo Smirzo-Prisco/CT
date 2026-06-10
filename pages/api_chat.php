@@ -1490,6 +1490,17 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
             $can_master_msg  = $is_admin || $is_master;
 
+            // Membro del mestiere Ospedale (id_mestiere = 10): può curare altri pg
+            $is_ospedale_row = gdrcd_query(
+                "SELECT 1 FROM clgpersonaggiomestiere
+                 JOIN ruolo_mestiere ON clgpersonaggiomestiere.id_ruolo = ruolo_mestiere.id_ruolo
+                 WHERE ruolo_mestiere.mestiere = 10
+                   AND clgpersonaggiomestiere.personaggio = '$login_f'
+                   AND clgpersonaggiomestiere.conferma_mestiere = 1
+                 LIMIT 1"
+            );
+            $is_ospedale = !empty($is_ospedale_row);
+
             // Helper: recupera oggetti per categoria come array JSON
             $fetch_oggetti = function(string $categoria, string $extra = '') use ($login_f): array {
                 $res  = gdrcd_query("SELECT c.id_oggetto, o.nome, c.cariche
@@ -1621,6 +1632,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'show_scacchiera' => $show_scacchiera,
                     'is_staff'        => $is_staff,
                     'can_master_msg'  => $can_master_msg,
+                    'is_ospedale'     => $is_ospedale,
                 ],
                 'oggetti'      => [
                     'curativi'      => $curativi,
@@ -1634,6 +1646,59 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 'has_active_role' => $has_active_role,
                 'submit_label'    => gdrcd_filter('out', $MESSAGE['interface']['forms']['submit'] ?? 'Invia'),
             ]);
+            break;
+
+        case 'curaAltroPg':
+            $login    = $_SESSION['login'];
+            $login_f  = gdrcd_filter('in', $login);
+            $luogo    = (int)$_SESSION['luogo'];
+
+            if ($luogo !== 25) {
+                echo json_encode(['success' => false, 'message' => 'Puoi usare questo comando solo in ospedale.']);
+                exit;
+            }
+
+            // Verifica che l'operatore appartenga al mestiere Ospedale
+            $check_op = gdrcd_query(
+                "SELECT 1 FROM clgpersonaggiomestiere
+                 JOIN ruolo_mestiere ON clgpersonaggiomestiere.id_ruolo = ruolo_mestiere.id_ruolo
+                 WHERE ruolo_mestiere.mestiere = 10
+                   AND clgpersonaggiomestiere.personaggio = '$login_f'
+                   AND clgpersonaggiomestiere.conferma_mestiere = 1
+                 LIMIT 1"
+            );
+            if (empty($check_op)) {
+                echo json_encode(['success' => false, 'message' => 'Non sei autorizzato ad eseguire questa operazione.']);
+                exit;
+            }
+
+            $input_cura2 = json_decode(file_get_contents('php://input'), true);
+            $target      = gdrcd_filter('in', trim($input_cura2['target'] ?? ''));
+
+            if ($target === '') {
+                echo json_encode(['success' => false, 'message' => 'Specifica il nome del personaggio da curare.']);
+                exit;
+            }
+
+            $pg_target = gdrcd_query("SELECT salute FROM personaggio WHERE nome = '$target'");
+            if (!$pg_target) {
+                echo json_encode(['success' => false, 'message' => 'Personaggio non trovato.']);
+                exit;
+            }
+
+            $salute_target = (int)$pg_target['salute'];
+            if ($salute_target >= 100) {
+                echo json_encode(['success' => false, 'message' => 'Il personaggio ha già la salute al massimo (100 PS).']);
+                exit;
+            }
+
+            $ps_cura    = min(25, 100 - $salute_target);
+            $nuova_sal  = $salute_target + $ps_cura;
+
+            gdrcd_query("UPDATE personaggio SET salute = $nuova_sal WHERE nome = '$target'");
+            chatInsertMessage($luogo, 'System', $login, "cura $target di $ps_cura PS. Salute attuale: $nuova_sal/100.", 'N');
+
+            echo json_encode(['success' => true, 'punti_effettivi' => $ps_cura, 'nuova_salute' => $nuova_sal]);
             break;
 
         default: echo json_encode(['error' => 'Operazione non valida']); break;

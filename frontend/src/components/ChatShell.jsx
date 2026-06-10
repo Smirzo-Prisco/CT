@@ -86,10 +86,14 @@ function AbilitaOptions({ abilita }) {
 // PANNELLO CURA DI EMERGENZA
 // ---------------------------------------------------------------------------
 
-function CuraPanel({ onClose }) {
-    const [punti, setPunti]       = useState(10)
-    const [loading, setLoading]   = useState(false)
-    const [feedback, setFeedback] = useState(null)
+function CuraPanel({ onClose, isOspedale }) {
+    const [punti, setPunti]           = useState(10)
+    const [loading, setLoading]       = useState(false)
+    const [feedback, setFeedback]     = useState(null)
+
+    const [target, setTarget]               = useState('')
+    const [loadingStaff, setLoadingStaff]   = useState(false)
+    const [feedbackStaff, setFeedbackStaff] = useState(null)
 
     const handleApplica = useCallback(() => {
         const p = Math.max(1, Math.min(90, punti))
@@ -110,6 +114,28 @@ function CuraPanel({ onClose }) {
             .catch(() => setFeedback('Errore di rete.'))
             .finally(() => setLoading(false))
     }, [punti])
+
+    const handleCuraAltro = useCallback(() => {
+        if (!target.trim()) return
+        setLoadingStaff(true)
+        setFeedbackStaff(null)
+        fetch('/pages/api_chat.php?op=curaAltroPg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target: target.trim() }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setFeedbackStaff(`${target}: +${data.punti_effettivi} PS. Salute: ${data.nuova_salute}/100.`)
+                    setTarget('')
+                } else {
+                    setFeedbackStaff(data.message)
+                }
+            })
+            .catch(() => setFeedbackStaff('Errore di rete.'))
+            .finally(() => setLoadingStaff(false))
+    }, [target])
 
     return (
         <div className="cura-panel">
@@ -143,6 +169,30 @@ function CuraPanel({ onClose }) {
                 </button>
             </div>
             {feedback && <div className="cura-panel__feedback">{feedback}</div>}
+
+            {isOspedale && (
+                <div className="cura-panel__staff">
+                    <div className="cura-panel__staff-title">Cura paziente</div>
+                    <div className="cura-panel__controls">
+                        <input
+                            type="text"
+                            className="cura-panel__target"
+                            placeholder="Nome personaggio"
+                            value={target}
+                            onChange={e => setTarget(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') handleCuraAltro() }}
+                        />
+                        <button
+                            className="cura-panel__btn"
+                            onClick={handleCuraAltro}
+                            disabled={loadingStaff || !target.trim()}
+                        >
+                            {loadingStaff ? '...' : 'Assegna 25 PS'}
+                        </button>
+                    </div>
+                    {feedbackStaff && <div className="cura-panel__feedback">{feedbackStaff}</div>}
+                </div>
+            )}
         </div>
     )
 }
@@ -562,7 +612,10 @@ export default function ChatShell() {
                     {/* ============================================================ */}
                     <div className="panels_box">
                         {showCuraPanel && (
-                            <CuraPanel onClose={() => setShowCuraPanel(false)} />
+                            <CuraPanel
+                                onClose={() => setShowCuraPanel(false)}
+                                isOspedale={!!pulsanti.is_ospedale}
+                            />
                         )}
                         <div className="form_chat">
                             <form method="post" id="chat_form_messages">
