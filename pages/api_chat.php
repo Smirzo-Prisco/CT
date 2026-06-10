@@ -974,6 +974,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 exit;
             }
 
+            if (pgIsInRole($login)) {
+                echo json_encode(['success' => false, 'message' => 'Non puoi usare la cura di emergenza mentre sei in una giocata.']);
+                exit;
+            }
+
             $input_cura      = json_decode(file_get_contents('php://input'), true);
             $punti_richiesti = isset($input_cura['punti']) ? (int)$input_cura['punti'] : 0;
 
