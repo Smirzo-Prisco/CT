@@ -87,15 +87,15 @@ function AbilitaOptions({ abilita }) {
 // ---------------------------------------------------------------------------
 
 function CuraPanel({ onClose, isOspedale }) {
-    const [loadingGiorn, setLoadingGiorn]     = useState(false)
-    const [feedbackGiorn, setFeedbackGiorn]   = useState(null)
+    const [loadingGiorn, setLoadingGiorn] = useState(false)
+    const [feedbackGiorn, setFeedbackGiorn] = useState(null)
 
-    const [punti, setPunti]           = useState(10)
-    const [loading, setLoading]       = useState(false)
-    const [feedback, setFeedback]     = useState(null)
+    const [punti, setPunti] = useState(10)
+    const [loading, setLoading] = useState(false)
+    const [feedback, setFeedback] = useState(null)
 
-    const [target, setTarget]               = useState('')
-    const [loadingStaff, setLoadingStaff]   = useState(false)
+    const [target, setTarget] = useState('')
+    const [loadingStaff, setLoadingStaff] = useState(false)
     const [feedbackStaff, setFeedbackStaff] = useState(null)
 
     const handleCuraGiornaliera = useCallback(() => {
@@ -179,56 +179,58 @@ function CuraPanel({ onClose, isOspedale }) {
 
             {/* ── Cura di emergenza ── */}
             <div className="cura-panel__section">
-            <div className="cura-panel__info">
-                La cura di emergenza consente il recupero momentaneo dei punti salute specificati.
-                A partire da domani, all&rsquo;ingresso in una nuova giocata, al personaggio verranno
-                tolti gli stessi punti salute più il 30% di essi.
-            </div>
-            <div className="cura-panel__controls">
-                <input
-                    type="number"
-                    className="cura-panel__input"
-                    min={1}
-                    max={90}
-                    value={punti}
-                    onChange={e => {
-                        const v = parseInt(e.target.value, 10)
-                        setPunti(isNaN(v) ? 1 : Math.max(1, Math.min(90, v)))
-                    }}
-                />
-                <button
-                    className="cura-panel__btn"
-                    onClick={handleApplica}
-                    disabled={loading}
-                >
-                    {loading ? '...' : 'Applica cura'}
-                </button>
-            </div>
-            {feedback && <div className="cura-panel__feedback">{feedback}</div>}
-
-            {isOspedale && (
-                <div className="cura-panel__staff">
-                    <div className="cura-panel__staff-title">Cura paziente</div>
-                    <div className="cura-panel__controls">
-                        <input
-                            type="text"
-                            className="cura-panel__target"
-                            placeholder="Nome personaggio"
-                            value={target}
-                            onChange={e => setTarget(e.target.value)}
-                            onKeyDown={e => { if (e.key === 'Enter') handleCuraAltro() }}
-                        />
-                        <button
-                            className="cura-panel__btn"
-                            onClick={handleCuraAltro}
-                            disabled={loadingStaff || !target.trim()}
-                        >
-                            {loadingStaff ? '...' : 'Assegna 25 PS'}
-                        </button>
-                    </div>
-                    {feedbackStaff && <div className="cura-panel__feedback">{feedbackStaff}</div>}
+                <div className="cura-panel__info">
+                    Sei ridott* male e ti serve un piccolo aiuto che ti dia un boost? Prendi la dose che vuoi,
+                    ne pagherai le conseguenze domani.
+                    La cura di emergenza consente il recupero momentaneo dei punti salute specificati.
+                    Da domani, all&rsquo;ingresso in una nuova giocata, perderai il 130% dei punti richiesti.
+                    Inutilizzabile durante una giocata.
                 </div>
-            )}
+                <div className="cura-panel__controls">
+                    <input
+                        type="number"
+                        className="cura-panel__input"
+                        min={1}
+                        max={90}
+                        value={punti}
+                        onChange={e => {
+                            const v = parseInt(e.target.value, 10)
+                            setPunti(isNaN(v) ? 1 : Math.max(1, Math.min(90, v)))
+                        }}
+                    />
+                    <button
+                        className="cura-panel__btn"
+                        onClick={handleApplica}
+                        disabled={loading}
+                    >
+                        {loading ? '...' : 'Applica cura'}
+                    </button>
+                </div>
+                {feedback && <div className="cura-panel__feedback">{feedback}</div>}
+
+                {isOspedale && (
+                    <div className="cura-panel__staff">
+                        <div className="cura-panel__staff-title">Cura paziente</div>
+                        <div className="cura-panel__controls">
+                            <input
+                                type="text"
+                                className="cura-panel__target"
+                                placeholder="Nome personaggio"
+                                value={target}
+                                onChange={e => setTarget(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter') handleCuraAltro() }}
+                            />
+                            <button
+                                className="cura-panel__btn"
+                                onClick={handleCuraAltro}
+                                disabled={loadingStaff || !target.trim()}
+                            >
+                                {loadingStaff ? '...' : 'Assegna 25 PS'}
+                            </button>
+                        </div>
+                        {feedbackStaff && <div className="cura-panel__feedback">{feedbackStaff}</div>}
+                    </div>
+                )}
             </div>{/* end cura-panel__section */}
         </div>
     )
@@ -682,7 +684,7 @@ export default function ChatShell() {
                                         )}
                                         {pulsanti.show_cura && (
                                             <a href="#" onClick={e => { e.preventDefault(); setShowCuraPanel(v => !v) }}
-                                               title="Cura di Emergenza">
+                                                title="Cura di Emergenza">
                                                 <img src="themes/crystal/imgs/chat/cura.png" alt="Cura di Emergenza" className="chat_icon" />
                                             </a>
                                         )}

@@ -146,15 +146,18 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         case 'resetPg':  // Tolgo al pg tutti i punti shin, le skill e i talenti acquistati
             // Se non viene specificato alcun personaggio, agisco su tutti i personaggi del sistema
             $pgs = isset($data['pgs']) && is_array($data['pgs']) && count($data['pgs']) > 0 ? $data['pgs'] : gdrcd_query("SELECT * FROM personaggio ORDER BY nome ASC", 'result');
-            
+
+            $errors = [];
+
             // Ciclo tutti i nomi dei pg
             foreach ($pgs as $pg) {
-                $nome = $pg["nome"];
-                
+                $nome   = $pg["nome"];
+                $nome_f = gdrcd_filter('in', $nome);
+
                 // Recupero tutti i punti del pg
-                $punti = getPuntiPg($nome); // Tutti i punti
+                $punti        = getPuntiPg($nome_f); // Tutti i punti
                 $esperienza_r = getExp_rPg($punti['esperienza']); // Punti esperienza
-                $tot_shin = ($punti['shin_to_spend'] + $punti['tot_shin'] + $punti['punto_skill']); // Punti shin
+                $tot_shin     = ($punti['shin_to_spend'] + $punti['tot_shin'] + $punti['punto_skill']); // Punti shin
                 /*
                 - UPDATE
                     - Esperienza residua calcolata in base agli scaglioni di guadagno dell'esperienza
@@ -169,14 +172,16 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                                 car1 = 0, car3 = 0, car5 = 0, car7 = 0, car9 = 0,
                                 shin = $tot_shin,
                                 punto_skill = 0.0, esperienza_s = 0
-                            WHERE nome = '$nome'");
+                            WHERE nome = '$nome_f'");
                 // Elimino le skill e i talenti assegnati al pg e i log che tengono traccia dell'assegnazione degli shin
-                $query_deleteSkillTalentiPg = gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE nome = '$nome' AND id_abilita NOT IN (SELECT id_abilita FROM abilita WHERE tipo IN ('Talento', 'Skill temporanea'))");
-                $query_deleteLogPg = gdrcd_query("DELETE from log_spesa WHERE nome = '$nome'");
+                $query_deleteSkillTalentiPg = gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE nome = '$nome_f' AND id_abilita NOT IN (SELECT id_abilita FROM abilita WHERE tipo IN ('Talento', 'Skill temporanea'))");
+                $query_deleteLogPg = gdrcd_query("DELETE from log_spesa WHERE nome = '$nome_f'");
 
-                if ($query_updatePg && $query_deleteSkillTalentiPg && $query_deleteLogPg) echo json_encode(['success' => true, 'message' => 'Personaggi azzerati con successo']);
-                else echo json_encode(['success' => false, 'message' => 'Errore nell\'azzeramento del personaggio']);
+                if (!$query_updatePg || !$query_deleteSkillTalentiPg || !$query_deleteLogPg) $errors[] = $nome;
             }
+
+            if (empty($errors)) echo json_encode(['success' => true,  'message' => 'Personaggi azzerati con successo']);
+            else                 echo json_encode(['success' => false, 'message' => 'Errore nell\'azzeramento di: ' . implode(', ', $errors)]);
 
             break;
         case 'getPuntiPg': // Recupero le statistiche del pg
