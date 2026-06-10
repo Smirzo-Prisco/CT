@@ -274,6 +274,12 @@
         background-color: #000;
         margin: 0;
         padding: 0;
+
+        @media screen and (max-width: 768px) {
+            // I pulsanti hamburger fissi (bottom: 10px, ~37px alti) coprono il fondo
+            // dell'iframe — riduciamo l'altezza di 60px così il send button è visibile
+            height: calc(100vh - 27px - 60px);
+        }
     }
 
     .message-container {
