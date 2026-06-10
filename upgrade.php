@@ -11,6 +11,9 @@ if ( ! isset($updating_queryes[0]) || empty($updating_queryes[0])) {
     /** * Aggiornamento delle tabelle
     * @author Blancks
     */
+    // Disabilita strict mode per questa sessione: le tabelle legacy GDRCD possono avere
+    // DEFAULT '0000-00-00' su colonne DATE che MySQL strict mode rifiuta durante l'ALTER TABLE.
+    gdrcd_query("SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION'");
     foreach ($updating_queryes as $query) {
         gdrcd_query($query);
     }
