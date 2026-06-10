@@ -681,6 +681,12 @@
         display: flex;
         flex-direction: column;
         height: 100vh;
+
+        @media screen and (max-width: 768px) {
+            // I pulsanti hamburger (fixed, bottom 10px, ~44px alti) coprono il fondo.
+            // Il padding spinge la reply bar sopra di loro.
+            padding-bottom: 60px;
+        }
     }
 
     // Header sticky: torna indietro + nome interlocutore
