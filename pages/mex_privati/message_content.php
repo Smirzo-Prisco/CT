@@ -428,6 +428,13 @@ elseif ($conversazione_id > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messaging Content</title>
     <link rel="stylesheet" href="/themes/crystal/messages_center.css">
+    <style>
+        @media screen and (max-width: 768px) {
+            .message-input-container {
+                bottom: 70px !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
