@@ -944,17 +944,18 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 exit;
             }
             if ($result['delta_salute'] === 0) {
-                echo json_encode(['success' => false, 'message' => 'La tua salute è già al massimo (100 PS).']);
+                echo json_encode(['success' => false, 'message' => "La tua salute è già al massimo ({$result['salute_max']} PS)."]);
                 exit;
             }
 
             $punti_effettivi = $result['delta_salute'];
             $nuova_salute    = $result['salute'];
+            $sal_max         = $result['salute_max'];
             $login_f         = gdrcd_filter('in', $login);
 
             // Accumula il debito giornaliero: un record per coppia (nome, data)
             gdrcd_query("INSERT INTO cure_emergenza (nome, punti, data_cura) VALUES ('$login_f', $punti_effettivi, CURDATE()) ON DUPLICATE KEY UPDATE punti = punti + $punti_effettivi");
-            chatInsertMessage($luogo, 'System', $login, "ha ricevuto una cura di emergenza di $punti_effettivi PS. Salute attuale: $nuova_salute/100.", 'N');
+            chatInsertMessage($luogo, 'System', $login, "ha ricevuto una cura di emergenza di $punti_effettivi PS. Salute attuale: $nuova_salute/$sal_max.", 'N');
 
             echo json_encode(['success' => true, 'punti_effettivi' => $punti_effettivi, 'nuova_salute' => $nuova_salute]);
             break;
@@ -1051,9 +1052,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             // Recupera i dettagli dell'oggetto dal database
             $oggetto = gdrcd_query("SELECT * FROM oggetto WHERE id_oggetto = $id_oggetto");
-            $parametri = gdrcd_query("SELECT salute, integrita FROM personaggio WHERE nome = '$login'");
-            $salute_attuale = $parametri['salute'];
-            $integrita_attuale = $parametri['integrita'];
+            $parametri = gdrcd_query("SELECT salute, salute_max, integrita, integrita_max FROM personaggio WHERE nome = '$login'");
+            $salute_attuale    = (int)$parametri['salute'];
+            $integrita_attuale = (int)$parametri['integrita'];
+            $cap_sal_ogg       = max(1, (int)($parametri['salute_max']    ?? 100));
+            $cap_int_ogg       = max(1, (int)($parametri['integrita_max'] ?? 10));
             $nome_oggetto = $oggetto['nome'];
             $messaggio = "$login ha usato l\'oggetto " . gdrcd_filter('in', $nome_oggetto) . ".";
 
@@ -1061,10 +1064,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             // Logica per curare SALUTE
             if ($oggetto['heal'] > 0) {
-                if ($salute_attuale >= 100) chatInsertMessage($_SESSION['luogo'], 'System', $login, "La tua salute è già al massimo!", 'Q');
+                if ($salute_attuale >= $cap_sal_ogg) chatInsertMessage($_SESSION['luogo'], 'System', $login, "La tua salute è già al massimo!", 'Q');
                 elseif ($salute_attuale < 50) chatInsertMessage($_SESSION['luogo'], 'System', $login, "Gli oggetti non possono curare ferite così gravi!", 'Q');
                 else {
-                    $new_salute = min($salute_attuale + $oggetto['heal'], 100);
+                    $new_salute = min($salute_attuale + (int)$oggetto['heal'], $cap_sal_ogg);
                     gdrcd_query("UPDATE personaggio SET salute = $new_salute WHERE nome = '$login'");
                     $oggetto_usato = true;
                 }
@@ -1072,10 +1075,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             // Logica per curare INTEGRITÀ
             if ($oggetto['integrita'] > 0) {
-                if ($integrita_attuale >= 10) chatInsertMessage($_SESSION['luogo'], 'System', $login, "La tua integrità è già al massimo!", 'Q');
+                if ($integrita_attuale >= $cap_int_ogg) chatInsertMessage($_SESSION['luogo'], 'System', $login, "La tua integrità è già al massimo!", 'Q');
                 elseif ($integrita_attuale < 3) chatInsertMessage($_SESSION['luogo'], 'System', $login, "Gli oggetti non possono curare ferite mentali così gravi!", 'Q');
                 else {
-                    $new_integrita = min($integrita_attuale + $oggetto['integrita'], 10);
+                    $new_integrita = min($integrita_attuale + (int)$oggetto['integrita'], $cap_int_ogg);
                     gdrcd_query("UPDATE personaggio SET integrita = $new_integrita WHERE nome = '$login'");
                     $oggetto_usato = true;
                 }
@@ -1129,23 +1132,25 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $soldi = (int)gdrcd_filter('post', $data['soldi']);
 
             //recupero valori attuali
-            $actual = gdrcd_query("SELECT salute, integrita, notorieta, soldi FROM personaggio WHERE nome = '$nome_personaggio'");
+            $actual = gdrcd_query("SELECT salute, salute_max, integrita, integrita_max, notorieta, soldi FROM personaggio WHERE nome = '$nome_personaggio'");
 
             // Aggiorna i dati del personaggio nel database
-            $query = "UPDATE personaggio SET 
-                        note_fato = '$note_fato', 
-                        particolari = '$particolari', 
-                        salute = $salute, 
-                        integrita = $integrita, 
-                        notorieta = $notorieta, 
-                        soldi = $soldi 
+            $query = "UPDATE personaggio SET
+                        note_fato = '$note_fato',
+                        particolari = '$particolari',
+                        salute = $salute,
+                        integrita = $integrita,
+                        notorieta = $notorieta,
+                        soldi = $soldi
                     WHERE nome = '$nome_personaggio'";
             gdrcd_query($query);
-            
+
             // Invia i messaggi in chat a seconda dei cambiamenti effettuati
+            $sal_max_m = (int)($actual['salute_max']    ?? 100);
+            $int_max_m = (int)($actual['integrita_max'] ?? 10);
             $msg = '';
-            if ($salute != $actual['salute']) $msg .= "La tua salute è stata modificata in $salute/100.";
-            if ($integrita != $actual['integrita']) $msg .= " La tua integrità è stata modificata in $integrita/10.";
+            if ($salute != $actual['salute']) $msg .= "La tua salute è stata modificata in $salute/$sal_max_m.";
+            if ($integrita != $actual['integrita']) $msg .= " La tua integrità è stata modificata in $integrita/$int_max_m.";
             if ($soldi != $actual['soldi']) $msg .= " Il tuo conto adesso ha $soldi monete.";
             if ($notorieta != $actual['notorieta']) $msg .= " La tua notorietà pubblica adesso è di $notorieta.";
             
@@ -1229,10 +1234,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $pgName     = gdrcd_filter('post', $data['pg'] ?? '');
             $noteFato   = gdrcd_filter('in', $data['note_fato']   ?? '');
             $particolari= gdrcd_filter('in', $data['particolari'] ?? '');
-            $salute     = max(0, (int)($data['salute']    ?? 0));
-            $integrita  = max(0, min(100, (int)($data['integrita']  ?? 0)));
-            $notorieta  = max(0, min(100, (int)($data['notorieta']  ?? 0)));
             if (!$pgName) { echo json_encode(['success' => false, 'message' => 'Nome mancante']); exit; }
+            $pgMax      = gdrcd_query("SELECT salute_max, integrita_max FROM personaggio WHERE nome = '$pgName'");
+            $cap_sal_sp = max(1, (int)($pgMax['salute_max']    ?? 100));
+            $cap_int_sp = max(1, (int)($pgMax['integrita_max'] ?? 10));
+            $salute     = max(0, min($cap_sal_sp, (int)($data['salute']    ?? 0)));
+            $integrita  = max(0, min($cap_int_sp, (int)($data['integrita'] ?? 0)));
+            $notorieta  = max(0, min(100,          (int)($data['notorieta'] ?? 0)));
             gdrcd_query("UPDATE personaggio SET
                 note_fato='$noteFato', particolari='$particolari',
                 salute=$salute, integrita=$integrita, notorieta=$notorieta
@@ -1447,8 +1455,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     FROM mappa WHERE id = $luogo LIMIT 1");
 
             // Dati personaggio (solo i campi utili alla shell)
-            $pg = gdrcd_query("SELECT salute, integrita, esperienza, back_chat,
-                        preferenze_chat
+            $pg = gdrcd_query("SELECT salute, salute_max, integrita, integrita_max,
+                        esperienza, back_chat, preferenze_chat
                     FROM personaggio WHERE nome = '$login_f' LIMIT 1");
 
             // Preferenze tipografiche (font, colori, grandezza, interlinea)
@@ -1484,7 +1492,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Visibilità pulsanti
             $show_backchat   = (float)$pg['esperienza'] > 19;
             $backchat_on     = (int)$pg['back_chat'] === 1;
-            $show_cura       = ($luogo === 25 && (int)$pg['salute'] > 0 && (int)$pg['salute'] < 100);
+            $show_cura       = ($luogo === 25 && (int)$pg['salute'] > 0 && (int)$pg['salute'] < (int)$pg['salute_max']);
             $show_pulisci    = $is_staff;
             $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
             $can_master_msg  = $is_admin || $is_master;
@@ -1521,9 +1529,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             };
 
             // Oggetti curativi: visibili solo se la salute non è piena o l'integrità bassa
-            $salute    = (int)$pg['salute'];
-            $integrita = (int)$pg['integrita'];
-            $curativi  = (($salute < 100 && $salute > 49) || $integrita < 10)
+            $salute         = (int)$pg['salute'];
+            $integrita      = (int)$pg['integrita'];
+            $salute_max_pg  = (int)$pg['salute_max'];
+            $integrita_max_pg = (int)$pg['integrita_max'];
+            $curativi  = (($salute < $salute_max_pg && $salute > 49) || $integrita < $integrita_max_pg)
                          ? $fetch_oggetti('curativo') : [];
 
             // Potenziamenti: visibili solo se non ce n'è già uno attivo
@@ -1685,13 +1695,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 exit;
             }
             if ($result_target['delta_salute'] === 0) {
-                echo json_encode(['success' => false, 'message' => 'Il personaggio ha già la salute al massimo (100 PS).']);
+                echo json_encode(['success' => false, 'message' => "Il personaggio ha già la salute al massimo ({$result_target['salute_max']} PS)."]);
                 exit;
             }
 
-            $ps_cura   = $result_target['delta_salute'];
-            $nuova_sal = $result_target['salute'];
-            chatInsertMessage($luogo, 'System', $login, "cura $target_raw di $ps_cura PS. Salute attuale: $nuova_sal/100.", 'N');
+            $ps_cura      = $result_target['delta_salute'];
+            $nuova_sal    = $result_target['salute'];
+            $sal_max_t    = $result_target['salute_max'];
+            chatInsertMessage($luogo, 'System', $login, "cura $target_raw di $ps_cura PS. Salute attuale: $nuova_sal/$sal_max_t.", 'N');
 
             echo json_encode(['success' => true, 'punti_effettivi' => $ps_cura, 'nuova_salute' => $nuova_sal]);
             break;

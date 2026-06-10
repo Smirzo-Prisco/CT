@@ -482,14 +482,16 @@ function insertOggetto($dati) {
  */
 function adjustPgStats(string $nome, int $delta_salute = 0, int $delta_integrita = 0): array|false {
     $nome_f = gdrcd_filter('in', $nome);
-    $pg = gdrcd_query("SELECT salute, integrita FROM personaggio WHERE nome = '$nome_f'");
+    $pg = gdrcd_query("SELECT salute, integrita, salute_max, integrita_max FROM personaggio WHERE nome = '$nome_f'");
     if (!$pg) return false;
 
     $prev_salute    = (int)$pg['salute'];
     $prev_integrita = (int)$pg['integrita'];
+    $cap_salute     = max(1, (int)($pg['salute_max']    ?? 100));
+    $cap_integrita  = max(1, (int)($pg['integrita_max'] ?? 10));
 
-    $new_salute    = max(0, min(100, $prev_salute    + $delta_salute));
-    $new_integrita = max(0, min(10,  $prev_integrita + $delta_integrita));
+    $new_salute    = max(0, min($cap_salute,    $prev_salute    + $delta_salute));
+    $new_integrita = max(0, min($cap_integrita, $prev_integrita + $delta_integrita));
 
     $updates = [];
     if ($new_salute    !== $prev_salute)    $updates[] = "salute = $new_salute";
@@ -501,6 +503,8 @@ function adjustPgStats(string $nome, int $delta_salute = 0, int $delta_integrita
     return [
         'salute'          => $new_salute,
         'integrita'       => $new_integrita,
+        'salute_max'      => $cap_salute,
+        'integrita_max'   => $cap_integrita,
         'delta_salute'    => $new_salute    - $prev_salute,
         'delta_integrita' => $new_integrita - $prev_integrita,
     ];
