@@ -119,7 +119,7 @@
                     <tr><td><div style="text-align: justify;"><?=gdrcd_bbcoder(gdrcd_filter('out', $statuto['statuto']))?></div></td></tr>
                 </table>
             <?php } ?>
-            <div class="link_back"><a href="main.php?page=servizi_mestieri"><?=gdrcd_filter('out', $MESSAGE['interface']['guilds']['back'])?></a></div>
+            <div class="link_back"><a href="main.php?page=servizi_gilde"><?=gdrcd_filter('out', $MESSAGE['interface']['guilds']['back'])?></a></div>
         <?php } ?>
     </div>
     <!-- Box principale -->

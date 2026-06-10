@@ -46,7 +46,7 @@ switch ($op) {
         while ($row = gdrcd_query($resG, 'fetch')) {
             $gilde[] = [
                 'id'    => (int)$row['id_gilda'],
-                'nome'  => gdrcd_filter('out', $row['nome']),
+                'nome'  => $row['nome'],
                 'count' => (int)$row['cnt'],
             ];
         }
@@ -71,9 +71,9 @@ switch ($op) {
         while ($row = gdrcd_query($resM, 'fetch')) {
             $mestieri[] = [
                 'id'        => (int)$row['id_mestiere'],
-                'nome'      => gdrcd_filter('out', $row['nome']),
+                'nome'      => $row['nome'],
                 'tipo'      => (int)$row['tipo'],
-                'tipo_desc' => gdrcd_filter('out', $row['tipo_desc']),
+                'tipo_desc' => $row['tipo_desc'],
                 'url_sito'  => $row['url_sito'] ?? '',
                 'count'     => (int)$row['cnt'],
             ];
@@ -116,8 +116,8 @@ switch ($op) {
         $ruoli = [];
         while ($row = gdrcd_query($resR, 'fetch')) {
             $ruoli[] = [
-                'immagine'   => gdrcd_filter('out', $row['immagine']),
-                'nome_ruolo' => gdrcd_filter('out', $row['nome_ruolo']),
+                'immagine'   => $row['immagine'],
+                'nome_ruolo' => $row['nome_ruolo'],
             ];
         }
         gdrcd_query($resR, 'free');
@@ -137,11 +137,11 @@ switch ($op) {
         $affiliati = [];
         while ($row = gdrcd_query($resA, 'fetch')) {
             $affiliati[] = [
-                'nome'       => gdrcd_filter('out', $row['personaggio']),
-                'cognome'    => gdrcd_filter('out', $row['cognome'] ?? ''),
-                'nickname'   => $row['nickname'] ? gdrcd_filter('out', $row['nickname']) : null,
-                'immagine'   => gdrcd_filter('out', $row['immagine']),
-                'nome_ruolo' => gdrcd_filter('out', $row['nome_ruolo']),
+                'nome'       => $row['personaggio'],
+                'cognome'    => $row['cognome'] ?? '',
+                'nickname'   => $row['nickname'] ?: null,
+                'immagine'   => $row['immagine'],
+                'nome_ruolo' => $row['nome_ruolo'],
                 'special'    => (bool)$row['special'],
             ];
         }
