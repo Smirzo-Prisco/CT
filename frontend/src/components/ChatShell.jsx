@@ -83,6 +83,71 @@ function AbilitaOptions({ abilita }) {
 }
 
 // ---------------------------------------------------------------------------
+// PANNELLO CURA DI EMERGENZA
+// ---------------------------------------------------------------------------
+
+function CuraPanel({ onClose }) {
+    const [punti, setPunti]       = useState(10)
+    const [loading, setLoading]   = useState(false)
+    const [feedback, setFeedback] = useState(null)
+
+    const handleApplica = useCallback(() => {
+        const p = Math.max(1, Math.min(90, punti))
+        setLoading(true)
+        setFeedback(null)
+        fetch('/pages/api_chat.php?op=curaPg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ punti: p }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success)
+                    setFeedback(`+${data.punti_effettivi} PS. Salute attuale: ${data.nuova_salute}/100.`)
+                else
+                    setFeedback(data.message)
+            })
+            .catch(() => setFeedback('Errore di rete.'))
+            .finally(() => setLoading(false))
+    }, [punti])
+
+    return (
+        <div className="cura-panel">
+            <div className="cura-panel__header">
+                <span>Cura di Emergenza</span>
+                <button className="cura-panel__close" onClick={onClose} aria-label="Chiudi">✕</button>
+            </div>
+            <div className="cura-panel__info">
+                La cura di emergenza consente il recupero momentaneo dei punti salute specificati.
+                A partire da domani, all&rsquo;ingresso in una nuova giocata, al personaggio verranno
+                tolti gli stessi punti salute più il 30% di essi.
+            </div>
+            <div className="cura-panel__controls">
+                <input
+                    type="number"
+                    className="cura-panel__input"
+                    min={1}
+                    max={90}
+                    value={punti}
+                    onChange={e => {
+                        const v = parseInt(e.target.value, 10)
+                        setPunti(isNaN(v) ? 1 : Math.max(1, Math.min(90, v)))
+                    }}
+                />
+                <button
+                    className="cura-panel__btn"
+                    onClick={handleApplica}
+                    disabled={loading}
+                >
+                    {loading ? '...' : 'Applica cura'}
+                </button>
+            </div>
+            {feedback && <div className="cura-panel__feedback">{feedback}</div>}
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
@@ -111,8 +176,8 @@ export default function ChatShell() {
     /** Visibilità del pannello master (solo staff) */
     const [masterPanelOpen, setMasterPanelOpen] = useState(false)
 
-    /** Nasconde il pulsante cura dopo che è stato usato con successo */
-    const [curaDone, setCuraDone] = useState(false)
+    /** Visibilità del pannello cura di emergenza */
+    const [showCuraPanel, setShowCuraPanel] = useState(false)
 
     /** Mostra la guida chat come overlay (preserva il testo nel form) */
     const [showHelp, setShowHelp] = useState(false)
@@ -496,6 +561,9 @@ export default function ChatShell() {
                     {/* FORM INSERIMENTO AZIONE                                      */}
                     {/* ============================================================ */}
                     <div className="panels_box">
+                        {showCuraPanel && (
+                            <CuraPanel onClose={() => setShowCuraPanel(false)} />
+                        )}
                         <div className="form_chat">
                             <form method="post" id="chat_form_messages">
 
@@ -522,19 +590,10 @@ export default function ChatShell() {
                                                 M
                                             </a>
                                         )}
-                                        {/* Cura pg: sopra la textarea, fuori dal pannello per renderlo accessibile a tutti */}
-                                        {pulsanti.show_cura && !curaDone && (
-                                            <a href="#" onClick={e => {
-                                                e.preventDefault()
-                                                fetch('pages/api_chat.php?op=curaPg')
-                                                    .then(r => r.json())
-                                                    .then(data => {
-                                                        if (data.success) setCuraDone(true)
-                                                        else alert(data.message)
-                                                    })
-                                                    .catch(err => console.error('Errore cura pg:', err))
-                                            }}>
-                                                <img src="themes/crystal/imgs/chat/cura.png" alt="Cura PG" className="chat_icon" />
+                                        {pulsanti.show_cura && (
+                                            <a href="#" onClick={e => { e.preventDefault(); setShowCuraPanel(v => !v) }}
+                                               title="Cura di Emergenza">
+                                                <img src="themes/crystal/imgs/chat/cura.png" alt="Cura di Emergenza" className="chat_icon" />
                                             </a>
                                         )}
                                         {/* <a href="#" onClick={(e) => { e.preventDefault(); setShowHelp(true) }}>

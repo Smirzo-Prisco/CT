@@ -1,0 +1,94 @@
+@use '../tokens' as *;
+
+.cura-panel {
+    background: $palette-surface-raised;
+    border: 1px solid $palette-surface-hover;
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: $palette-text;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: $palette-text-muted;
+        margin-bottom: 8px;
+    }
+
+    &__close {
+        background: none;
+        border: none;
+        color: $palette-text-muted;
+        cursor: pointer;
+        font-size: 0.9rem;
+        line-height: 1;
+        padding: 0 2px;
+
+        &:hover { color: $palette-text; }
+    }
+
+    &__info {
+        background: rgba($palette-surface-hover, 0.4);
+        border-left: 3px solid $palette-action;
+        border-radius: 3px;
+        padding: 8px 10px;
+        font-size: 0.82rem;
+        line-height: 1.5;
+        color: $palette-text-muted;
+        margin-bottom: 10px;
+    }
+
+    &__controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    &__input {
+        width: 70px;
+        padding: 4px 8px;
+        border: 1px solid $palette-surface-hover;
+        border-radius: 4px;
+        background: $palette-surface;
+        color: $palette-text;
+        font-size: 0.85rem;
+        text-align: center;
+
+        &:focus {
+            outline: none;
+            border-color: $palette-action;
+        }
+    }
+
+    &__btn {
+        padding: 4px 14px;
+        border: 1px solid $palette-action;
+        border-radius: 4px;
+        background: $palette-action;
+        color: $palette-surface;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+
+        &:hover:not(:disabled) {
+            background: $palette-action-hover;
+            border-color: $palette-action-hover;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+    }
+
+    &__feedback {
+        margin-top: 8px;
+        font-size: 0.82rem;
+        color: $palette-action;
+    }
+}

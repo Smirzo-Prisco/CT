@@ -42,6 +42,18 @@ if ($table > 0) {
             }
         }
     }
+    // Crea la tabella cure_emergenza se non esiste ancora
+    if (!in_array('cure_emergenza', $tables_list)) {
+        $updating_queryes[] = "CREATE TABLE IF NOT EXISTS `cure_emergenza` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `nome` varchar(100) NOT NULL,
+            `punti` int(11) NOT NULL DEFAULT '0',
+            `data_cura` date NOT NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `uq_nome_data` (`nome`, `data_cura`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+    }
+
     /** * Controllo se da configurazione è abilitato l'encript delle password e se le password non sono criptate nel db
      * @author Blancks
      */

@@ -25,12 +25,23 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         case 'addPgToRole':
             $login = $_SESSION['login'];
             $location = $_SESSION['luogo'];
-        
+
             try {
                 // Controlla se l'utente ha già una giocata in corso
                 if(pgIsInRole($login)) {
                     echo json_encode(['success' => false,  'message' => "L'utente $userName ha già una giocata in corso."]);
                     exit;
+                }
+
+                // Controlla se esiste un debito di cura di emergenza da giorni precedenti
+                $login_safe = gdrcd_filter('in', $login);
+                $debt = gdrcd_query("SELECT SUM(punti) AS totale FROM cure_emergenza WHERE nome = '$login_safe' AND data_cura < CURDATE()");
+                $debito_ps = (int)($debt['totale'] ?? 0);
+                if ($debito_ps > 0) {
+                    $malus = (int)ceil($debito_ps * 1.30);
+                    gdrcd_query("UPDATE personaggio SET salute = GREATEST(0, salute - $malus) WHERE nome = '$login_safe'");
+                    gdrcd_query("DELETE FROM cure_emergenza WHERE nome = '$login_safe' AND data_cura < CURDATE()");
+                    chatInsertMessage($location, 'System', $login, "sconta il debito della cura di emergenza: -$malus PS ($debito_ps + 30%).", 'N');
                 }
 
                 $id_role = locationActiveRole($location); // Recupera l'eventuale role attiva nella chat
@@ -40,7 +51,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     gdrcd_query("INSERT INTO role_sessions (`location`, `start`) VALUES ($location, NOW())");
                     $id_role = gdrcd_query("SELECT LAST_INSERT_ID() AS id")['id'];
                 }
-                
+
                 // In ogni caso aggiungo il pg alla role
                 addPgToRole($id_role, $login, $location);
 
