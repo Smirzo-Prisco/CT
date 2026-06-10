@@ -24,6 +24,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import shared from './shared.module.css'
 
 export default function InfoLocation() {
@@ -113,8 +114,10 @@ export default function InfoLocation() {
                 </div>
             </div>
 
-            {/* Modale descrizione luogo */}
-            {showDesc && (
+            {/* Modale descrizione luogo — portal su document.body per sfuggire
+                al transform del parent (#framecontentLeft) che su mobile
+                intrappola position:fixed dentro la colonna */}
+            {showDesc && createPortal(
                 <div className="info-location-overlay" onClick={() => setShowDesc(false)}>
                     <div className="info-location-modal" onClick={e => e.stopPropagation()}>
                         <div className="info-location-modal-header">
@@ -135,7 +138,8 @@ export default function InfoLocation() {
                             <div dangerouslySetInnerHTML={{ __html: data.descrizione }} />
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
         </div>
