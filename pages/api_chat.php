@@ -921,6 +921,50 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             else echo json_encode(array('success' => false, 'message' => "Errore nella cancellazione della chat della stanza."));
 
             break;
+        case 'curaPgGiornaliera':
+            $login   = $_SESSION['login'];
+            $login_f = gdrcd_filter('in', $login);
+            $luogo   = (int)$_SESSION['luogo'];
+
+            if ($luogo !== 25) {
+                echo json_encode(['success' => false, 'message' => 'Puoi usare questo comando solo in ospedale.']);
+                exit;
+            }
+
+            // Reset giornaliero alle 7:00 — stesso comportamento del sistema originale
+            $now   = new DateTime('now');
+            $reset = new DateTime('today 7:00');
+            if ($now < $reset) $reset->modify('-1day');
+
+            $last_cure = gdrcd_query("SELECT data_cura FROM cure WHERE nome = '$login_f'");
+            if ($last_cure && new DateTime($last_cure['data_cura']) >= $reset) {
+                echo json_encode(['success' => false, 'message' => 'Hai già usato la cura giornaliera. Torna dopo le 7:00!']);
+                exit;
+            }
+
+            $result_g = adjustPgStats($login, 10);
+            if (!$result_g) {
+                echo json_encode(['success' => false, 'message' => 'Personaggio non trovato.']);
+                exit;
+            }
+            if ($result_g['delta_salute'] === 0) {
+                echo json_encode(['success' => false, 'message' => "La tua salute è già al massimo ({$result_g['salute_max']} PS)."]);
+                exit;
+            }
+
+            if ($last_cure)
+                gdrcd_query("UPDATE cure SET data_cura = NOW() WHERE nome = '$login_f'");
+            else
+                gdrcd_query("INSERT INTO cure (nome, data_cura) VALUES ('$login_f', NOW())");
+
+            $ps_g   = $result_g['delta_salute'];
+            $sal_g  = $result_g['salute'];
+            $max_g  = $result_g['salute_max'];
+            chatInsertMessage($luogo, 'System', $login, "ha ricevuto la cura giornaliera di $ps_g PS. Salute: $sal_g/$max_g.", 'N');
+
+            echo json_encode(['success' => true, 'punti_effettivi' => $ps_g, 'nuova_salute' => $sal_g]);
+            break;
+
         case 'curaPg':
             $login = $_SESSION['login'];
             $luogo = (int)$_SESSION['luogo'];

@@ -87,6 +87,9 @@ function AbilitaOptions({ abilita }) {
 // ---------------------------------------------------------------------------
 
 function CuraPanel({ onClose, isOspedale }) {
+    const [loadingGiorn, setLoadingGiorn]     = useState(false)
+    const [feedbackGiorn, setFeedbackGiorn]   = useState(null)
+
     const [punti, setPunti]           = useState(10)
     const [loading, setLoading]       = useState(false)
     const [feedback, setFeedback]     = useState(null)
@@ -94,6 +97,21 @@ function CuraPanel({ onClose, isOspedale }) {
     const [target, setTarget]               = useState('')
     const [loadingStaff, setLoadingStaff]   = useState(false)
     const [feedbackStaff, setFeedbackStaff] = useState(null)
+
+    const handleCuraGiornaliera = useCallback(() => {
+        setLoadingGiorn(true)
+        setFeedbackGiorn(null)
+        fetch('/pages/api_chat.php?op=curaPgGiornaliera', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success)
+                    setFeedbackGiorn(`+${data.punti_effettivi} PS. Salute: ${data.nuova_salute}.`)
+                else
+                    setFeedbackGiorn(data.message)
+            })
+            .catch(() => setFeedbackGiorn('Errore di rete.'))
+            .finally(() => setLoadingGiorn(false))
+    }, [])
 
     const handleApplica = useCallback(() => {
         const p = Math.max(1, Math.min(90, punti))
@@ -140,9 +158,27 @@ function CuraPanel({ onClose, isOspedale }) {
     return (
         <div className="cura-panel">
             <div className="cura-panel__header">
-                <span>Cura di Emergenza</span>
+                <span>Ospedale</span>
                 <button className="cura-panel__close" onClick={onClose} aria-label="Chiudi">✕</button>
             </div>
+
+            {/* ── Cura giornaliera ── */}
+            <div className="cura-panel__daily">
+                <div className="cura-panel__daily-label">Cura giornaliera</div>
+                <div className="cura-panel__controls">
+                    <button
+                        className="cura-panel__btn"
+                        onClick={handleCuraGiornaliera}
+                        disabled={loadingGiorn}
+                    >
+                        {loadingGiorn ? '...' : 'Ricevi +10 PS'}
+                    </button>
+                </div>
+                {feedbackGiorn && <div className="cura-panel__feedback">{feedbackGiorn}</div>}
+            </div>
+
+            {/* ── Cura di emergenza ── */}
+            <div className="cura-panel__section">
             <div className="cura-panel__info">
                 La cura di emergenza consente il recupero momentaneo dei punti salute specificati.
                 A partire da domani, all&rsquo;ingresso in una nuova giocata, al personaggio verranno
@@ -193,6 +229,7 @@ function CuraPanel({ onClose, isOspedale }) {
                     {feedbackStaff && <div className="cura-panel__feedback">{feedbackStaff}</div>}
                 </div>
             )}
+            </div>{/* end cura-panel__section */}
         </div>
     )
 }

@@ -92,6 +92,28 @@
         color: $palette-action;
     }
 
+    // ── Sezione cura giornaliera ────────────────────────────────────────────
+
+    &__daily {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid $palette-surface-hover;
+    }
+
+    &__daily-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: $palette-text-muted;
+        margin-bottom: 6px;
+    }
+
+    // ── Separatore sezione cura di emergenza ────────────────────────────────
+
+    &__section {
+        padding-top: 4px;
+    }
+
     // ── Card staff Ospedale ─────────────────────────────────────────────────
 
     &__staff {
