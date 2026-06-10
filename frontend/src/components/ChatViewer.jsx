@@ -43,7 +43,7 @@ export default function ChatViewer() {
           }
         }
 
-        if (data.play) new Audio('../sounds/beep.wav').play().catch(() => {})
+        if (data.play && (window.CT_USER?.soundPrefs?.chat ?? 1)) new Audio('../sounds/beep.wav').play().catch(() => {})
       })
       .catch(console.error)
   }, [])

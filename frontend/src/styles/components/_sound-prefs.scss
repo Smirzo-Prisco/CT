@@ -1,0 +1,66 @@
+@use '../tokens' as *;
+
+// ── Bottone toggle speaker nel grid ─────────────────────────────────────────
+
+.sound-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $palette-action;
+    font-size: 1.3rem;
+    padding: 4px;
+    transition: color 0.2s;
+
+    &:hover { color: $palette-action-hover; }
+
+    &--muted { color: $palette-text-muted; }
+}
+
+// ── Pannello preferenze ──────────────────────────────────────────────────────
+
+.sound-panel {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    right: 0;
+    z-index: 200;
+    background: $palette-surface-raised;
+    border: 1px solid $palette-surface-hover;
+    border-radius: 6px;
+    padding: 10px 12px;
+    min-width: 190px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+    &__title {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: $palette-text-muted;
+        margin-bottom: 8px;
+    }
+
+    &__row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: $palette-text;
+
+        & + & { border-top: 1px solid $palette-surface-hover; }
+
+        input[type='checkbox'] {
+            accent-color: $palette-action;
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+    }
+}

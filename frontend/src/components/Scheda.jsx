@@ -20,7 +20,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import SchedaMenu from './SchedaMenu'
 import styles from './Scheda.module.css'
 
@@ -260,7 +260,15 @@ export default function Scheda() {
     const [profile, setProfile] = useState(null)
     const [error, setError]     = useState(null)
     const [noteFatoOpen, setNoteFatoOpen] = useState(false)
+    const [soundScheda, setSoundScheda] = useState(() => window.CT_USER?.soundPrefs?.scheda ?? 1)
     const scopedStyleEl = useRef(null)
+
+    // Reagisce in real-time al cambio preferenza musica schede
+    useEffect(() => {
+        function onSoundUpdate(e) { setSoundScheda(e.detail?.scheda ?? 1) }
+        document.addEventListener('ct:soundprefs:update', onSoundUpdate)
+        return () => document.removeEventListener('ct:soundprefs:update', onSoundUpdate)
+    }, [])
 
     useEffect(() => {
         if (!pg) { setError('Personaggio non specificato'); return }
@@ -384,8 +392,8 @@ export default function Scheda() {
 
             </div>{/* fine scheda_page_body */}
 
-            {/* ── Audio (se il pg ha musica in scheda) ─────────────────── */}
-            {url_media && (
+            {/* ── Audio (se il pg ha musica in scheda e l'utente ha i suoni scheda attivi) ── */}
+            {url_media && !!soundScheda && (
                 <audio autoPlay>
                     <source src={url_media} type="audio/mpeg" />
                 </audio>

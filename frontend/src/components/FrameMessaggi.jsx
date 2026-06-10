@@ -7,20 +7,22 @@
  *   - Griglia 3×N di icone di navigazione (mappa, aggiorna, messaggi, forum, ecc.)
  *   - Notifica messaggi privati: icona animata se ci sono messaggi non letti
  *   - Audio: suono sms.wav al primo arrivo di un nuovo messaggio (throttle 10 min)
+ *   - Pannello preferenze suoni: toggle DM / chat / musica schede, persistito su DB
  *
  * Aggiornamento real-time:
  *   - 'dm:update' via socket → aggiorna lo stato icona messaggi privati
  *
  * API:
- *   GET pages/api_global.php?op=getMessages → stato messaggi non letti
- *   GET pages/api_global.php?op=events_today → se ci sono eventi oggi
+ *   GET  pages/api_global.php?op=getMessages       → stato messaggi non letti
+ *   GET  pages/api_global.php?op=events_today      → se ci sono eventi oggi
+ *   POST pages/api_global.php?op=saveSoundPrefs    → salva preferenze suoni
  *
  * Montaggio: via ct:ready su #frame-messaggi-container in left-right_frames.php
  *
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 // ---------------------------------------------------------------------------
 // GRIGLIA ICONE
@@ -48,6 +50,33 @@ function buildIcons(hasEvents, hasOpenRoles) {
 const ICO = '../themes/crystal/imgs/icone/'
 
 // ---------------------------------------------------------------------------
+// PANNELLO PREFERENZE SUONI
+// ---------------------------------------------------------------------------
+
+function SoundPanel({ prefs, onToggle }) {
+    return (
+        <div className="sound-panel">
+            <div className="sound-panel__title">Preferenze suoni</div>
+            <label className="sound-panel__row">
+                <span>Messaggi privati</span>
+                <input type="checkbox" checked={!!prefs.dm}
+                    onChange={() => onToggle('dm')} />
+            </label>
+            <label className="sound-panel__row">
+                <span>Chat di gioco</span>
+                <input type="checkbox" checked={!!prefs.chat}
+                    onChange={() => onToggle('chat')} />
+            </label>
+            <label className="sound-panel__row">
+                <span>Musica schede</span>
+                <input type="checkbox" checked={!!prefs.scheda}
+                    onChange={() => onToggle('scheda')} />
+            </label>
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
@@ -56,6 +85,43 @@ export default function FrameMessaggi() {
     const [hasNewMessages, setHasNewMessages] = useState(false)
     const [hasEvents, setHasEvents]           = useState(false)
     const [hasOpenRoles, setHasOpenRoles]     = useState(false)
+    const [showSoundPanel, setShowSoundPanel] = useState(false)
+    const [soundPrefs, setSoundPrefs] = useState(() => ({
+        dm:     window.CT_USER?.soundPrefs?.dm     ?? 1,
+        chat:   window.CT_USER?.soundPrefs?.chat   ?? 1,
+        scheda: window.CT_USER?.soundPrefs?.scheda ?? 1,
+    }))
+
+    const panelRef = useRef(null)
+
+    // Chiude il pannello cliccando fuori
+    useEffect(() => {
+        if (!showSoundPanel) return
+        function handleOutside(e) {
+            if (panelRef.current && !panelRef.current.contains(e.target)) {
+                setShowSoundPanel(false)
+            }
+        }
+        document.addEventListener('mousedown', handleOutside)
+        return () => document.removeEventListener('mousedown', handleOutside)
+    }, [showSoundPanel])
+
+    const handleToggle = useCallback((key) => {
+        setSoundPrefs(prev => {
+            const next = { ...prev, [key]: prev[key] ? 0 : 1 }
+            // Aggiorna CT_USER in-place così gli altri componenti leggono il valore aggiornato
+            if (window.CT_USER) window.CT_USER.soundPrefs = next
+            // Notifica gli altri componenti React (es. Scheda) tramite evento DOM
+            document.dispatchEvent(new CustomEvent('ct:soundprefs:update', { detail: next }))
+            // Persiste su DB (fire-and-forget)
+            fetch('/pages/api_global.php?op=saveSoundPrefs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(next),
+            }).catch(() => {})
+            return next
+        })
+    }, [])
 
     useEffect(() => {
         fetch('/pages/api_global.php?op=events_today')
@@ -85,7 +151,7 @@ export default function FrameMessaggi() {
                 if (!d.success) return
                 setHasNewMessages(d.hasNew)
 
-                if (d.hasNew && d.allowAudio) {
+                if (d.hasNew && d.allowAudio && (window.CT_USER?.soundPrefs?.dm ?? 1)) {
                     const now = Date.now()
                     const last = parseInt(localStorage.getItem('last_audio_play') || '0', 10)
                     if (now - last > 600_000) {
@@ -110,6 +176,10 @@ export default function FrameMessaggi() {
 
     const ICONS = buildIcons(hasEvents, hasOpenRoles)
 
+    // Icona speaker: pieno se almeno un suono è attivo, barrato se tutti muti
+    const anySoundOn = soundPrefs.dm || soundPrefs.chat || soundPrefs.scheda
+    const speakerIcon = anySoundOn ? 'fa-volume-high' : 'fa-volume-xmark'
+
     return (
         <div id="gridPanel">
             <div className="grid">
@@ -128,6 +198,21 @@ export default function FrameMessaggi() {
                         <span className="icon-label">{icon.alt}</span>
                     </div>
                 ))}
+
+                {/* Icona toggle suoni */}
+                <div key="suoni" className="grid-item" ref={panelRef}>
+                    <button
+                        className={`icon-link sound-toggle-btn${!anySoundOn ? ' sound-toggle-btn--muted' : ''}`}
+                        title="Preferenze suoni"
+                        onClick={() => setShowSoundPanel(v => !v)}
+                    >
+                        <i className={`fa-solid ${speakerIcon}`}></i>
+                    </button>
+                    <span className="icon-label">Suoni</span>
+                    {showSoundPanel && (
+                        <SoundPanel prefs={soundPrefs} onToggle={handleToggle} />
+                    )}
+                </div>
             </div>
         </div>
     )

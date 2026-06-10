@@ -52,6 +52,7 @@ switch ($op) {
             personaggio.sesso, personaggio.ultima_mappa, personaggio.ultimo_luogo,
             personaggio.id_razza, personaggio.id_mestiere, personaggio.id_ruolo_mestiere,
             personaggio.ultimo_messaggio, personaggio.blocca_media,
+            personaggio.suono_dm, personaggio.suono_chat, personaggio.suono_scheda,
             personaggio.ora_entrata, personaggio.ora_uscita, personaggio.ultimo_refresh,
             razza.sing_m, razza.sing_f, razza.icon AS url_img_razza,
             privilegi.admin, privilegi.moderatore, privilegi.master,
@@ -82,6 +83,9 @@ switch ($op) {
         $_SESSION['grafico']            = $record['grafico'];
         $_SESSION['user']               = 1;
         $_SESSION['blocca_media']       = $record['blocca_media'];
+        $_SESSION['suono_dm']           = (int)($record['suono_dm']     ?? 1);
+        $_SESSION['suono_chat']         = (int)($record['suono_chat']   ?? 1);
+        $_SESSION['suono_scheda']       = (int)($record['suono_scheda'] ?? 1);
         $_SESSION['ultima_uscita']      = $record['ora_uscita'];
         $_SESSION['razza']              = ($record['sesso'] == 'f') ? $record['sing_f'] : $record['sing_m'];
         $_SESSION['mestiere']           = $record['id_mestiere'];

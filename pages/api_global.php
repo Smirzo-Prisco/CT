@@ -1124,6 +1124,19 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
             break;
+        case 'saveSoundPrefs': // Salvo le preferenze suoni dell'utente
+            session_start();
+            $dm     = isset($data['dm'])     ? ($data['dm']     ? 1 : 0) : 1;
+            $chat   = isset($data['chat'])   ? ($data['chat']   ? 1 : 0) : 1;
+            $scheda = isset($data['scheda']) ? ($data['scheda'] ? 1 : 0) : 1;
+            $login  = gdrcd_filter('in', $_SESSION['login']);
+            gdrcd_query("UPDATE personaggio SET suono_dm=$dm, suono_chat=$chat, suono_scheda=$scheda WHERE nome='$login'");
+            $_SESSION['suono_dm']     = $dm;
+            $_SESSION['suono_chat']   = $chat;
+            $_SESSION['suono_scheda'] = $scheda;
+            echo json_encode(['success' => true]);
+            break;
+
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
     /*********************  FINE    Recupero i dati dell'utente che voglio modificare   */

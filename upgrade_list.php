@@ -18,6 +18,9 @@ $tables['messaggioaraldo']['chiuso'] = "binary(1) NOT NULL DEFAULT '0'";
 
 $tables['personaggio']['url_img_chat'] = "varchar(255) NOT NULL DEFAULT ' '";
 $tables['personaggio']['blocca_media'] = "binary(1) NOT NULL DEFAULT '0'";
+$tables['personaggio']['suono_dm']     = "tinyint(1) NOT NULL DEFAULT '1'";
+$tables['personaggio']['suono_chat']   = "tinyint(1) NOT NULL DEFAULT '1'";
+$tables['personaggio']['suono_scheda'] = "tinyint(1) NOT NULL DEFAULT '1'";
 $tables['personaggio']['online_status'] = "varchar(100) DEFAULT NULL";
 $tables['personaggio']['ultimo_messaggio'] = "bigint(20) NOT NULL DEFAULT '0'";
 $tables['personaggio']['ultimo_cambiopass'] = "DATETIME NULL DEFAULT NULL";

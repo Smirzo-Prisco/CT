@@ -105,7 +105,12 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             login:        <?=json_encode($_SESSION['login'])?>,
             luogo:        <?=(int)($_SESSION['luogo'] ?? 0)?>,
             mappa:        <?=(int)($_SESSION['mappa'] ?? 0)?>,
-            url_img_chat: <?=json_encode($pg_avatar)?>
+            url_img_chat: <?=json_encode($pg_avatar)?>,
+            soundPrefs: {
+                dm:     <?=(int)($_SESSION['suono_dm']     ?? 1)?>,
+                chat:   <?=(int)($_SESSION['suono_chat']   ?? 1)?>,
+                scheda: <?=(int)($_SESSION['suono_scheda'] ?? 1)?>
+            }
         };
         window.ctSocket = null;
         </script>
