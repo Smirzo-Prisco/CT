@@ -348,6 +348,7 @@ div.info_pg_night {
     width: 100%;
     height: 220px;
     margin: -1px auto;
+    position: relative;
 }
 
 div.info_pg {
@@ -403,7 +404,6 @@ img.immagine_pg {
     flex-direction: column;
     align-items: center;
     margin-bottom: -25px;
-    position: relative;
 }
 
 .icon-link {
