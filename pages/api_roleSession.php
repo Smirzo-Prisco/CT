@@ -38,10 +38,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $debt = gdrcd_query("SELECT SUM(punti) AS totale FROM cure_emergenza WHERE nome = '$login_safe' AND data_cura < CURDATE()");
                 $debito_ps = (int)($debt['totale'] ?? 0);
                 if ($debito_ps > 0) {
-                    $malus = (int)ceil($debito_ps * 1.30);
-                    gdrcd_query("UPDATE personaggio SET salute = GREATEST(0, salute - $malus) WHERE nome = '$login_safe'");
+                    $malus        = (int)ceil($debito_ps * 1.30);
+                    $result_debito = adjustPgStats($login, -$malus);
                     gdrcd_query("DELETE FROM cure_emergenza WHERE nome = '$login_safe' AND data_cura < CURDATE()");
-                    chatInsertMessage($location, 'System', $login, "sconta il debito della cura di emergenza: -$malus PS ($debito_ps + 30%).", 'N');
+                    $sal_dopo = $result_debito ? $result_debito['salute'] : '?';
+                    chatInsertMessage($location, 'System', $login, "sconta il debito della cura di emergenza: -$malus PS ($debito_ps + 30%). Salute: $sal_dopo/100.", 'N');
                 }
 
                 $id_role = locationActiveRole($location); // Recupera l'eventuale role attiva nella chat

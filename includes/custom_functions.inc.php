@@ -467,6 +467,45 @@ function insertOggetto($dati) {
 
 
 /************* PERSONAGGI ******************************/
+
+/**
+ * Modifica salute e/o integrità di un personaggio rispettando i cap di gioco.
+ *
+ * Cap: salute 0–100, integrità 0–10.
+ * Usare sempre questa funzione anziché UPDATE diretti su questi due campi.
+ *
+ * @param string $nome             Nome del personaggio (viene filtrato internamente)
+ * @param int    $delta_salute     Variazione PS (+/-)
+ * @param int    $delta_integrita  Variazione integrità (+/-)
+ * @return array|false  ['salute', 'integrita', 'delta_salute', 'delta_integrita']
+ *                      oppure false se il personaggio non esiste
+ */
+function adjustPgStats(string $nome, int $delta_salute = 0, int $delta_integrita = 0): array|false {
+    $nome_f = gdrcd_filter('in', $nome);
+    $pg = gdrcd_query("SELECT salute, integrita FROM personaggio WHERE nome = '$nome_f'");
+    if (!$pg) return false;
+
+    $prev_salute    = (int)$pg['salute'];
+    $prev_integrita = (int)$pg['integrita'];
+
+    $new_salute    = max(0, min(100, $prev_salute    + $delta_salute));
+    $new_integrita = max(0, min(10,  $prev_integrita + $delta_integrita));
+
+    $updates = [];
+    if ($new_salute    !== $prev_salute)    $updates[] = "salute = $new_salute";
+    if ($new_integrita !== $prev_integrita) $updates[] = "integrita = $new_integrita";
+
+    if (!empty($updates))
+        gdrcd_query("UPDATE personaggio SET " . implode(', ', $updates) . " WHERE nome = '$nome_f'");
+
+    return [
+        'salute'          => $new_salute,
+        'integrita'       => $new_integrita,
+        'delta_salute'    => $new_salute    - $prev_salute,
+        'delta_integrita' => $new_integrita - $prev_integrita,
+    ];
+}
+
 function getPuntiPg($pg = '') {
     $where = $pg != '' ? " WHERE nome = '$pg'" : '';
 
