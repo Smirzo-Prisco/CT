@@ -5,7 +5,7 @@
 .sound-toggle-wrapper {
     position: absolute;
     bottom: 10px;
-    right: 10px;
+    left: 10px;
 }
 
 // ── Bottone toggle speaker ───────────────────────────────────────────────────
@@ -38,7 +38,7 @@
 .sound-panel {
     position: absolute;
     bottom: calc(100% + 6px);
-    right: 0;
+    left: 0;
     z-index: 200;
     background: $palette-surface-raised;
     border: 1px solid $palette-surface-hover;
