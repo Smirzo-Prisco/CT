@@ -121,10 +121,18 @@ switch ($op) {
         $unread_grp = gdrcd_query("SELECT COUNT(*) AS n FROM partecipazione_gruppo
             WHERE utente_nome = '$login' AND lettura = 0");
 
+        $perms = [
+            'admin'        => ($_SESSION['admin']        ?? 0) == 1,
+            'master'       => ($_SESSION['master']       ?? 0) == 1,
+            'capogilda'    => ($_SESSION['capogilda']    ?? 0) == 1,
+            'capomestiere' => ($_SESSION['capomestiere'] ?? 0) == 1,
+        ];
+
         echo json_encode([
             'success'       => true,
             'conversations' => $conversations,
             'non_letti'     => (int)$unread_ind['n'] + (int)$unread_grp['n'],
+            'perms'         => $perms,
         ]);
         break;
 
@@ -321,6 +329,110 @@ switch ($op) {
 
         notifySocketServer('dm:update', 'dm:' . $_SESSION['login']);
         echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // SENDMASS — invia a un gruppo di destinatari in base al tipo
+    // -------------------------------------------------------------------------
+    case 'sendMass':
+        $tipo      = $data['tipo']     ?? '';
+        $messaggio = gdrcd_filter('in', $data['messaggio'] ?? '');
+        $ongame    = (int)($data['ongame'] ?? 0);
+
+        $is_admin        = ($_SESSION['admin']        ?? 0) == 1;
+        $is_master       = ($_SESSION['master']       ?? 0) == 1;
+        $is_capogilda    = ($_SESSION['capogilda']    ?? 0) == 1;
+        $is_capomestiere = ($_SESSION['capomestiere'] ?? 0) == 1;
+
+        if (empty($messaggio)) {
+            echo json_encode(['success' => false, 'message' => 'Messaggio vuoto']);
+            exit;
+        }
+
+        $destinatari = [];
+
+        switch ($tipo) {
+            case 'presenti':
+                if (!$is_admin && !$is_master) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
+                $res = gdrcd_query("SELECT nome FROM personaggio WHERE ora_entrata > ora_uscita AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW()", 'result');
+                while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['nome'];
+                gdrcd_query($res, 'free');
+                break;
+
+            case 'broadcast':
+                if (!$is_admin) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
+                $res = gdrcd_query("SELECT nome FROM personaggio", 'result');
+                while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['nome'];
+                gdrcd_query($res, 'free');
+                break;
+
+            case 'capogilda':
+                if (!$is_admin && !$is_master && !$is_capogilda) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
+                $res = gdrcd_query("SELECT nome FROM privilegi WHERE capogilda = 1", 'result');
+                while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['nome'];
+                gdrcd_query($res, 'free');
+                break;
+
+            case 'capomestiere':
+                if (!$is_admin && !$is_master && !$is_capomestiere) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
+                $res = gdrcd_query("SELECT nome FROM privilegi WHERE capomestiere = 1", 'result');
+                while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['nome'];
+                gdrcd_query($res, 'free');
+                break;
+
+            case 'gilda':
+                if (!$is_admin && !$is_capogilda) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
+                $res = gdrcd_query("SELECT clgpersonaggioruolo.personaggio FROM clgpersonaggioruolo
+                    JOIN ruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo
+                    WHERE ruolo.gilda IN (
+                        SELECT ruolo.gilda FROM clgpersonaggioruolo
+                        JOIN ruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo
+                        WHERE clgpersonaggioruolo.personaggio = '$login' AND ruolo.gilda > -1
+                    )", 'result');
+                while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['personaggio'];
+                gdrcd_query($res, 'free');
+                break;
+
+            case 'tutto_mestiere':
+                if (!$is_admin && !$is_capomestiere) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
+                $res = gdrcd_query("SELECT clgpersonaggiomestiere.personaggio FROM clgpersonaggiomestiere
+                    JOIN ruolo_mestiere ON clgpersonaggiomestiere.id_ruolo = ruolo_mestiere.id_ruolo
+                    WHERE ruolo_mestiere.mestiere IN (
+                        SELECT ruolo_mestiere.mestiere FROM clgpersonaggiomestiere
+                        JOIN ruolo_mestiere ON clgpersonaggiomestiere.id_ruolo = ruolo_mestiere.id_ruolo
+                        WHERE clgpersonaggiomestiere.personaggio = '$login' AND ruolo_mestiere.mestiere > -1
+                    )", 'result');
+                while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['personaggio'];
+                gdrcd_query($res, 'free');
+                break;
+
+            case 'tutto_inclinati':
+                if (!$is_admin && !$is_master) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
+                $res = gdrcd_query("SELECT personaggio FROM clgpersonaggioinclinazione", 'result');
+                while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['personaggio'];
+                gdrcd_query($res, 'free');
+                break;
+
+            case 'multiplo':
+                if (!$is_admin && !$is_master && !$is_capogilda && !$is_capomestiere) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
+                foreach (array_map('trim', explode(',', $data['destinatari'] ?? '')) as $nome_raw) {
+                    $nome_safe = gdrcd_filter('in', $nome_raw);
+                    if ($nome_safe && gdrcd_query("SELECT nome FROM personaggio WHERE nome = '$nome_safe'")) $destinatari[] = $nome_raw;
+                }
+                break;
+
+            default:
+                echo json_encode(['success' => false, 'message' => 'Tipo non valido']);
+                exit;
+        }
+
+        $inviati = 0;
+        foreach ($destinatari as $dest_nome) {
+            send_sms($_SESSION['login'], $dest_nome, '', $messaggio, $ongame);
+            $inviati++;
+        }
+
+        echo json_encode(['success' => true, 'message' => "Messaggio inviato a $inviati destinatari."]);
         break;
 
     default:

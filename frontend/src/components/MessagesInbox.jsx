@@ -264,35 +264,85 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
 
 /**
  * Form per scrivere un nuovo messaggio a un destinatario qualsiasi.
+ * Se l'utente ha permessi elevati mostra un dropdown per l'invio massivo.
  *
- * @param {Function} props.onSend   - Callback con { destinatario, testo, ongame }
- * @param {Function} props.onCancel - Callback per annullare
- * @param {boolean}  props.sending  - true durante l'invio
+ * @param {Function} props.onSend     - Callback con { destinatario, testo, ongame }
+ * @param {Function} props.onSendMass - Callback con { tipo, messaggio, ongame, destinatari? }
+ * @param {Function} props.onCancel   - Callback per annullare
+ * @param {boolean}  props.sending    - true durante l'invio
+ * @param {Object}   props.perms      - Permessi utente { admin, master, capogilda, capomestiere }
  */
-function ComposeView({ onSend, onCancel, sending, defaultDest = '' }) {
-    const [dest,   setDest]   = useState(defaultDest)
-    const [testo,  setTesto]  = useState('')
-    const [ongame, setOngame] = useState(0)
+function ComposeView({ onSend, onSendMass, onCancel, sending, defaultDest = '', perms = {} }) {
+    const [dest,     setDest]     = useState(defaultDest)
+    const [testo,    setTesto]    = useState('')
+    const [ongame,   setOngame]   = useState(0)
+    const [massType, setMassType] = useState('---')
+
+    const hasMassPerms = perms.admin || perms.master || perms.capogilda || perms.capomestiere
+    const isMassMode   = massType !== '---'
+    const isMultiplo   = massType === 'multiplo'
+
+    const massOptions = []
+    if (perms.admin || perms.master || perms.capogilda || perms.capomestiere)
+        massOptions.push({ value: 'multiplo',        label: 'Multiplo (nomi separati da virgola)' })
+    if (perms.admin || perms.master)
+        massOptions.push({ value: 'presenti',        label: 'Tutti i presenti' })
+    if (perms.admin)
+        massOptions.push({ value: 'broadcast',       label: 'Tutti i personaggi' })
+    if (perms.admin || perms.master || perms.capogilda)
+        massOptions.push({ value: 'capogilda',       label: 'Tutti i capogilda' })
+    if (perms.admin || perms.master || perms.capomestiere)
+        massOptions.push({ value: 'capomestiere',    label: 'Tutti i capomestiere' })
+    if (perms.admin || perms.capogilda)
+        massOptions.push({ value: 'gilda',           label: 'Tutta la famiglia' })
+    if (perms.admin || perms.capomestiere)
+        massOptions.push({ value: 'tutto_mestiere',  label: 'Tutto il mestiere' })
+    if (perms.admin || perms.master)
+        massOptions.push({ value: 'tutto_inclinati', label: 'Tutti gli inclinati' })
+
+    const canSend = !!testo.trim() && (isMassMode ? (!isMultiplo || !!dest.trim()) : !!dest.trim())
 
     const handleSend = () => {
-        if (!dest.trim() || !testo.trim()) return
-        onSend({ destinatario: dest.trim(), testo, ongame })
+        if (!canSend || sending) return
+        if (isMassMode) {
+            const payload = { tipo: massType, messaggio: testo, ongame }
+            if (isMultiplo) payload.destinatari = dest
+            onSendMass(payload)
+        } else {
+            onSend({ destinatario: dest.trim(), testo, ongame })
+        }
     }
 
     return (
         <div className={styles.composeWrap}>
             <h3>Nuovo Messaggio</h3>
 
-            <div className={styles.formField}>
-                <label className={styles.formLabel}>Destinatario</label>
-                <input
-                    type="text"
-                    value={dest}
-                    onChange={e => setDest(e.target.value)}
-                    placeholder="Nome personaggio"
-                    className={styles.fullWidth}
-                />
-            </div>
+            {hasMassPerms && (
+                <div className={styles.formField}>
+                    <label className={styles.formLabel}>Destinatari</label>
+                    <select value={massType} onChange={e => setMassType(e.target.value)}>
+                        <option value="---">— Singolo —</option>
+                        {massOptions.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
+            {(!isMassMode || isMultiplo) && (
+                <div className={styles.formField}>
+                    <label className={styles.formLabel}>
+                        {isMultiplo ? 'Nomi (separati da virgola)' : 'Destinatario'}
+                    </label>
+                    <input
+                        type="text"
+                        value={dest}
+                        onChange={e => setDest(e.target.value)}
+                        placeholder={isMultiplo ? 'Nome1, Nome2, Nome3...' : 'Nome personaggio'}
+                        className={styles.fullWidth}
+                    />
+                </div>
+            )}
 
             <div className={styles.formField}>
                 <label className={styles.formLabel}>Tipo</label>
@@ -313,7 +363,7 @@ function ComposeView({ onSend, onCancel, sending, defaultDest = '' }) {
             </div>
 
             <div className={styles.formActions}>
-                <button onClick={handleSend} disabled={sending || !dest.trim() || !testo.trim()}>
+                <button onClick={handleSend} disabled={sending || !canSend}>
                     {sending ? 'Invio...' : 'Invia'}
                 </button>
                 <button onClick={onCancel}>Annulla</button>
@@ -343,6 +393,9 @@ export default function MessagesInbox({ toPg = null }) {
     const [messages, setMessages] = useState([])
     /** true mentre il thread sta caricando */
     const [loadingThread, setLoadingThread] = useState(false)
+
+    // --- permessi utente (restituiti da op=list) ---
+    const [perms, setPerms] = useState({})
 
     // --- stato risposta / composizione ---
     /** Testo nel campo risposta rapida */
@@ -380,7 +433,10 @@ export default function MessagesInbox({ toPg = null }) {
         fetch('/pages/api_messages.php?op=list')
             .then(r => r.json())
             .then(data => {
-                if (data.success) setConversations(data.conversations)
+                if (data.success) {
+                    setConversations(data.conversations)
+                    setPerms(data.perms ?? {})
+                }
                 setLoadingList(false)
             })
             .catch(err => {
@@ -568,6 +624,38 @@ export default function MessagesInbox({ toPg = null }) {
     }
 
     // ---------------------------------------------------------------------------
+    // INVIO MASSIVO
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Invia un messaggio a un gruppo di destinatari tramite op=sendMass.
+     *
+     * @param {Object} params - { tipo, messaggio, ongame, destinatari? }
+     */
+    const sendMass = ({ tipo, messaggio, ongame, destinatari }) => {
+        if (sending) return
+        setSending(true)
+
+        fetch('/pages/api_messages.php?op=sendMass', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ tipo, messaggio, ongame, destinatari }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setView('list')
+                    fetchList()
+                    alert(data.message)
+                } else {
+                    alert(data.message || 'Errore nell\'invio')
+                }
+            })
+            .catch(err => console.error('[MessagesInbox] Errore invio massivo:', err))
+            .finally(() => setSending(false))
+    }
+
+    // ---------------------------------------------------------------------------
     // DATI DERIVATI
     // ---------------------------------------------------------------------------
 
@@ -700,9 +788,11 @@ export default function MessagesInbox({ toPg = null }) {
             <div className="main-content" style={{ width: '100%' }}>
                 <ComposeView
                     onSend={sendNew}
+                    onSendMass={sendMass}
                     onCancel={() => setView('list')}
                     sending={sending}
                     defaultDest={composeDest}
+                    perms={perms}
                 />
             </div>
         </div>
