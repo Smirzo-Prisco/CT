@@ -1430,7 +1430,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 case 'dado':
                     $carDifesa  = getDefenceCar($fightRow['car'], $pngName);
                     $rawDado    = mt_rand(1, 20);
-                    $bonusCar   = (int)(($carDifesa['car'] / 10) - 1);
+                    $bonusCar   = $carDifesa['car'] - 1;
                     $dice       = max(1, $rawDado + $bonusCar);
                     $breakdown  = $bonusCar > 0
                         ? "$rawDado/20 + $bonusCar = $dice"
