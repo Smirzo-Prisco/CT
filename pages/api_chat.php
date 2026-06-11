@@ -1380,7 +1380,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     WHERE r2.id_role = rf.id_role
                       AND r2.turn    = rf.turn
                       AND (r2.car IN ('dado_risposta','subisce','difesa'))
-                      AND r2.target  = rf.striker
+                      AND r2.striker = rf.striker
+                      AND FIND_IN_SET(r2.target, rf.target) > 0
                   )
             ", 'result');
 
@@ -1435,11 +1436,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $breakdown  = $bonusCar > 0
                         ? "$rawDado/20 + $bonusCar = $dice"
                         : ($bonusCar < 0 ? "$rawDado/20 - " . abs($bonusCar) . " = $dice" : "$rawDado/20 = $dice");
-                    fight($id_role, $pngName, $attacker, 0, 0, 'dado_risposta', $dice, 'risposta PNG dado');
+                    fight($id_role, $attacker, $pngName, 0, 0, 'dado_risposta', $dice, 'risposta PNG dado');
                     $messaggio = "<i>Risultato provvisorio:</i> $pngName tira il dado di difesa ({$carDifesa['nome']}) e ottiene <b>$dice</b> ($breakdown) contro l'attacco di $attacker";
                     break;
                 case 'subisce':
-                    fight($id_role, $pngName, $attacker, 0, 0, 'subisce', 0, 'risposta PNG subisce');
+                    fight($id_role, $attacker, $pngName, 0, 0, 'subisce', 0, 'risposta PNG subisce');
                     $messaggio = "<i>Risultato provvisorio:</i> $pngName subisce l'attacco di $attacker";
                     break;
                 default:

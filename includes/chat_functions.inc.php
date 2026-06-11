@@ -1387,8 +1387,8 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
         $can_send = $canRow ? (int)$canRow['can_send'] : 1;
 
         // Risposta immediata: il bersaglio ha scelto esplicitamente come reagire prima della fine turno
-        $dadoRisposta = gdrcd_query("SELECT dice FROM role_fights WHERE id_role=$id_role AND turn=$turn AND striker='$target' AND target='$striker' AND car='dado_risposta' LIMIT 1");
-        $subisce      = gdrcd_query("SELECT id   FROM role_fights WHERE id_role=$id_role AND turn=$turn AND striker='$target' AND target='$striker' AND car='subisce'       LIMIT 1");
+        $dadoRisposta = gdrcd_query("SELECT dice FROM role_fights WHERE id_role=$id_role AND turn=$turn AND ((striker='$target' AND target='$striker') OR (striker='$striker' AND target='$target')) AND car='dado_risposta' LIMIT 1");
+        $subisce      = gdrcd_query("SELECT id   FROM role_fights WHERE id_role=$id_role AND turn=$turn AND ((striker='$target' AND target='$striker') OR (striker='$striker' AND target='$target')) AND car='subisce'       LIMIT 1");
 
         // Se il bersaglio può lanciare un dado automatico di difesa perché non ha lanciato uno scudo in questo turno e neanche nel precedente
         if($can_send === 1) {
