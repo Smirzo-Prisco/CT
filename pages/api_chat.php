@@ -1429,10 +1429,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             switch ($scelta) {
                 case 'dado':
                     $carDifesa  = getDefenceCar($fightRow['car'], $pngName);
-                    $diceResult = lanciaStat($id_role, $attacker, $pngName, true, $carDifesa['nome'], $carDifesa['nome'], $carDifesa['car'], $carDifesa['punti'], 0, 0);
-                    $dice       = $diceResult['risultato'];
+                    $rawDado    = mt_rand(1, 20);
+                    $bonusCar   = (int)(($carDifesa['car'] / 10) - 1);
+                    $dice       = max(1, $rawDado + $bonusCar);
+                    $breakdown  = $bonusCar > 0
+                        ? "$rawDado/20 + $bonusCar = $dice"
+                        : ($bonusCar < 0 ? "$rawDado/20 - " . abs($bonusCar) . " = $dice" : "$rawDado/20 = $dice");
                     fight($id_role, $pngName, $attacker, 0, 0, 'dado_risposta', $dice, 'risposta PNG dado');
-                    $messaggio = "<i>Risultato provvisorio:</i> $pngName tira il dado di difesa e ottiene <b>$dice</b> contro l'attacco di $attacker";
+                    $messaggio = "<i>Risultato provvisorio:</i> $pngName tira il dado di difesa ({$carDifesa['nome']}) e ottiene <b>$dice</b> ($breakdown) contro l'attacco di $attacker";
                     break;
                 case 'subisce':
                     fight($id_role, $pngName, $attacker, 0, 0, 'subisce', 0, 'risposta PNG subisce');
