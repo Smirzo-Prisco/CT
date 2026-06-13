@@ -20,6 +20,27 @@
 .replyTextarea { flex: 1; resize: vertical; }
 .sendBtn       { align-self: flex-end; }
 
+.threadHeaderRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.deleteConvBtn {
+    font-size: 0.8em;
+    color: #e74c3c;
+    background: none;
+    border: 1px solid #e74c3c;
+    border-radius: 3px;
+    padding: 2px 8px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.deleteConvBtn:hover {
+    background: rgb(231 76 60 / 12%);
+}
+
 /* ── ComposeView ───────────────────────────────────────────── */
 .composeWrap   { padding: 20px; }
 .formField     { margin-bottom: 10px; }

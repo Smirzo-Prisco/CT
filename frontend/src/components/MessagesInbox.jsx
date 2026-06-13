@@ -152,8 +152,9 @@ function ConvItem({ conv, isSelected, onClick }) {
  * @param {boolean}  props.sending      - true durante l'invio
  * @param {Function} props.onSend       - Callback per inviare la risposta
  * @param {Function} props.onBack       - Callback per tornare alla lista (mobile)
+ * @param {Function} props.onDelete     - Callback per eliminare la conversazione
  */
-function ThreadView({ messages, conv, loading, replyText, setReplyText, sending, onSend, onBack }) {
+function ThreadView({ messages, conv, loading, replyText, setReplyText, sending, onSend, onBack, onDelete }) {
     /** Ref per lo scroll automatico all'ultimo messaggio */
     const bottomRef = useRef(null)
     /** Ref alla textarea di risposta: usato per recuperare il focus dopo l'invio */
@@ -179,15 +180,28 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
     return (
         <div className={`thread-container ${styles.threadWrap}`}>
 
-            {/* Header del thread con nome contatto e pulsante torna indietro */}
+            {/* Header del thread con nome contatto, pulsante back e pulsante elimina */}
             <div className="thread-header">
-                <button onClick={onBack} className={styles.backBtn}>←</button>
-                <strong>{conv.display_name}</strong>
-                <span className={styles.onlineBadge}>
-                    {conv.ongame ? '[ON]' : '[OFF]'}
-                    {conv.tipo === 'gruppo' ? ' · Gruppo' : ''}
-                    {conv.tipo === 'globale' ? ' · Globale' : ''}
-                </span>
+                <div className={styles.threadHeaderRow}>
+                    <div>
+                        <button onClick={onBack} className={styles.backBtn}>←</button>
+                        <strong>{conv.display_name}</strong>
+                        <span className={styles.onlineBadge}>
+                            {conv.ongame ? '[ON]' : '[OFF]'}
+                            {conv.tipo === 'gruppo' ? ' · Gruppo' : ''}
+                            {conv.tipo === 'globale' ? ' · Globale' : ''}
+                        </span>
+                    </div>
+                    {conv.tipo !== 'globale' && (
+                        <button
+                            onClick={() => { if (confirm('Eliminare questa conversazione?')) onDelete() }}
+                            className={styles.deleteConvBtn}
+                            title="Elimina conversazione"
+                        >
+                            Elimina
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/*
@@ -656,6 +670,40 @@ export default function MessagesInbox({ toPg = null }) {
     }
 
     // ---------------------------------------------------------------------------
+    // ELIMINAZIONE CONVERSAZIONE
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Elimina la conversazione aperta dal punto di vista dell'utente corrente.
+     * Per le conversazioni individuali, se anche l'altro utente l'ha eliminata
+     * i messaggi sms vengono rimossi dal server.
+     */
+    const handleDeleteConv = useCallback(() => {
+        if (!selectedConv) return
+        const body = selectedConv.tipo === 'individuale'
+            ? { conversazione_id: selectedConv.conversazione_id }
+            : { gruppo_id: selectedConv.gruppo_id }
+
+        fetch('/pages/api_messages.php?op=delete_conv', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setView('list')
+                    setSelectedConv(null)
+                    setMessages([])
+                    fetchList()
+                } else {
+                    alert(data.message || 'Errore durante l\'eliminazione')
+                }
+            })
+            .catch(console.error)
+    }, [selectedConv, fetchList])
+
+    // ---------------------------------------------------------------------------
     // DATI DERIVATI
     // ---------------------------------------------------------------------------
 
@@ -776,6 +824,7 @@ export default function MessagesInbox({ toPg = null }) {
                         sending={sending}
                         onSend={sendReply}
                         onBack={() => { setView('list'); setSelectedConv(null) }}
+                        onDelete={handleDeleteConv}
                     />
                 </div>
             </div>

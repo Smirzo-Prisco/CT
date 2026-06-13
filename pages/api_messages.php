@@ -435,6 +435,56 @@ switch ($op) {
         echo json_encode(['success' => true, 'message' => "Messaggio inviato a $inviati destinatari."]);
         break;
 
+    // -------------------------------------------------------------------------
+    // DELETE_CONV — elimina la conversazione dal punto di vista dell'utente
+    //   individuale: rimuove la riga in conversazioni_individuali; se entrambi
+    //                i partecipanti hanno eliminato, pulisce anche i record sms.
+    //   gruppo:      rimuove l'utente da partecipazione_gruppo (abbandona).
+    // -------------------------------------------------------------------------
+    case 'delete_conv':
+        $conv_id   = (int)($data['conversazione_id'] ?? 0);
+        $gruppo_id = (int)($data['gruppo_id']        ?? 0);
+
+        if ($conv_id > 0) {
+            $access = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali
+                WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
+            if ($access['n'] == 0) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Accesso negato']);
+                exit;
+            }
+
+            gdrcd_query("DELETE FROM conversazioni_individuali
+                WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
+
+            // Se non rimane nessun partecipante, elimina anche i messaggi
+            $remaining = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali
+                WHERE id_conversazione = $conv_id");
+            if ((int)$remaining['n'] === 0) {
+                gdrcd_query("DELETE FROM sms WHERE id_conversazione = $conv_id");
+            }
+
+            echo json_encode(['success' => true]);
+
+        } elseif ($gruppo_id > 0) {
+            $access = gdrcd_query("SELECT COUNT(*) AS n FROM partecipazione_gruppo
+                WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'");
+            if ($access['n'] == 0) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Accesso negato']);
+                exit;
+            }
+
+            gdrcd_query("DELETE FROM partecipazione_gruppo
+                WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'");
+
+            echo json_encode(['success' => true]);
+
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Specifica conversazione_id o gruppo_id']);
+        }
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Operazione non valida']);
