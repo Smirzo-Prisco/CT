@@ -436,6 +436,61 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // DELETE_MSGS — elimina messaggi specifici da una conversazione.
+    // Identificatore per riga: (mittente_nome, ora_spedizione) dentro la
+    // conversazione — coppia sufficiente a unicità pratica (stessa precisione
+    // al secondo, stesso mittente nella stessa conv).
+    // -------------------------------------------------------------------------
+    case 'delete_msgs':
+        $conv_id   = (int)($data['conversazione_id'] ?? 0);
+        $gruppo_id = (int)($data['gruppo_id']        ?? 0);
+        $messaggi  = is_array($data['messaggi'] ?? null) ? $data['messaggi'] : [];
+
+        if (empty($messaggi)) {
+            echo json_encode(['success' => false, 'message' => 'Nessun messaggio selezionato']);
+            exit;
+        }
+
+        if ($conv_id > 0) {
+            $access = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali
+                WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
+            if ($access['n'] == 0) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Accesso negato']);
+                exit;
+            }
+            foreach ($messaggi as $msg) {
+                $mitt = gdrcd_filter('in', $msg['mittente'] ?? '');
+                $ora  = gdrcd_filter('in', $msg['ora']      ?? '');
+                if ($mitt && $ora) {
+                    gdrcd_query("DELETE FROM sms WHERE id_conversazione = $conv_id AND mittente_nome = '$mitt' AND ora_spedizione = '$ora' LIMIT 1");
+                }
+            }
+            echo json_encode(['success' => true]);
+
+        } elseif ($gruppo_id > 0) {
+            $access = gdrcd_query("SELECT COUNT(*) AS n FROM partecipazione_gruppo
+                WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'");
+            if ($access['n'] == 0) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Accesso negato']);
+                exit;
+            }
+            foreach ($messaggi as $msg) {
+                $mitt = gdrcd_filter('in', $msg['mittente'] ?? '');
+                $ora  = gdrcd_filter('in', $msg['ora']      ?? '');
+                if ($mitt && $ora) {
+                    gdrcd_query("DELETE FROM sms WHERE gruppo_id = $gruppo_id AND mittente_nome = '$mitt' AND ora_spedizione = '$ora' LIMIT 1");
+                }
+            }
+            echo json_encode(['success' => true]);
+
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Specifica conversazione_id o gruppo_id']);
+        }
+        break;
+
+    // -------------------------------------------------------------------------
     // DELETE_CONV — elimina la conversazione dal punto di vista dell'utente
     //   individuale: rimuove la riga in conversazioni_individuali; se entrambi
     //                i partecipanti hanno eliminato, pulisce anche i record sms.

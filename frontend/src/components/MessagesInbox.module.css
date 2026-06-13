@@ -26,6 +26,58 @@
     justify-content: space-between;
 }
 
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.selectModeBtn {
+    font-size: 0.8em;
+    color: #aaa;
+    background: none;
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+.selectModeBtn:hover {
+    border-color: #aaa;
+    color: #ccc;
+}
+
+.cancelSelectBtn {
+    font-size: 0.8em;
+    background: none;
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+.selectableMsgRow {
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.1s;
+}
+
+.selectableMsgRow:hover {
+    background: rgb(255 255 255 / 5%);
+}
+
+.selectedMsgRow {
+    background: rgb(100 100 200 / 15%);
+    border-left: 3px solid #6060cc;
+}
+
+.msgCheckbox {
+    flex-shrink: 0;
+    align-self: center;
+    margin-right: 4px;
+    cursor: pointer;
+}
+
 .deleteConvBtn {
     font-size: 0.8em;
     color: #e74c3c;

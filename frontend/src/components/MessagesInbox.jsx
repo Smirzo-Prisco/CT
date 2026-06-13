@@ -153,14 +153,17 @@ function ConvItem({ conv, isSelected, onClick }) {
  * @param {Function} props.onSend       - Callback per inviare la risposta
  * @param {Function} props.onBack       - Callback per tornare alla lista (mobile)
  * @param {Function} props.onDelete     - Callback per eliminare la conversazione
+ * @param {Function} props.onDeleteMsgs - Callback ([{mittente,ora}]) per eliminare messaggi selezionati
  */
-function ThreadView({ messages, conv, loading, replyText, setReplyText, sending, onSend, onBack, onDelete }) {
+function ThreadView({ messages, conv, loading, replyText, setReplyText, sending, onSend, onBack, onDelete, onDeleteMsgs }) {
     /** Ref per lo scroll automatico all'ultimo messaggio */
     const bottomRef = useRef(null)
     /** Ref alla textarea di risposta: usato per recuperare il focus dopo l'invio */
     const textareaRef = useRef(null)
     /** Traccia il valore precedente di sending per intercettare la transizione true→false */
     const prevSendingRef = useRef(false)
+    const [selectMode, setSelectMode] = useState(false)
+    const [selected,   setSelected]   = useState(new Set())
 
     // Scrolla in fondo ogni volta che arrivano nuovi messaggi
     useEffect(() => {
@@ -175,32 +178,89 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
         prevSendingRef.current = sending
     }, [sending])
 
+    // Reset selezione al cambio di conversazione
+    useEffect(() => {
+        setSelectMode(false)
+        setSelected(new Set())
+    }, [conv])
+
+    const msgKey = (msg) => `${msg.mittente}|${msg.ora}`
+
+    const toggleSelect = (msg) => {
+        const k = msgKey(msg)
+        setSelected(prev => {
+            const next = new Set(prev)
+            if (next.has(k)) next.delete(k)
+            else next.add(k)
+            return next
+        })
+    }
+
+    const exitSelectMode = () => {
+        setSelectMode(false)
+        setSelected(new Set())
+    }
+
+    const handleDeleteSelected = () => {
+        if (selected.size === 0) return
+        const messaggi = [...selected].map(k => {
+            const sep = k.indexOf('|')
+            return { mittente: k.slice(0, sep), ora: k.slice(sep + 1) }
+        })
+        onDeleteMsgs(messaggi)
+        exitSelectMode()
+    }
+
     if (loading) return <div className={styles.loading}>Caricamento messaggi...</div>
 
     return (
         <div className={`thread-container ${styles.threadWrap}`}>
 
-            {/* Header del thread con nome contatto, pulsante back e pulsante elimina */}
+            {/* Header: normale → [← nome badge] [Seleziona][Elimina conv]; selezione → [←] [Elimina N][Annulla] */}
             <div className="thread-header">
                 <div className={styles.threadHeaderRow}>
                     <div>
                         <button onClick={onBack} className={styles.backBtn}>←</button>
-                        <strong>{conv.display_name}</strong>
-                        <span className={styles.onlineBadge}>
-                            {conv.ongame ? '[ON]' : '[OFF]'}
-                            {conv.tipo === 'gruppo' ? ' · Gruppo' : ''}
-                            {conv.tipo === 'globale' ? ' · Globale' : ''}
-                        </span>
+                        {!selectMode && (
+                            <>
+                                <strong>{conv.display_name}</strong>
+                                <span className={styles.onlineBadge}>
+                                    {conv.ongame ? '[ON]' : '[OFF]'}
+                                    {conv.tipo === 'gruppo' ? ' · Gruppo' : ''}
+                                    {conv.tipo === 'globale' ? ' · Globale' : ''}
+                                </span>
+                            </>
+                        )}
                     </div>
-                    {conv.tipo !== 'globale' && (
-                        <button
-                            onClick={() => { if (confirm('Eliminare questa conversazione?')) onDelete() }}
-                            className={styles.deleteConvBtn}
-                            title="Elimina conversazione"
-                        >
-                            Elimina
-                        </button>
-                    )}
+                    <div className={styles.headerActions}>
+                        {selectMode ? (
+                            <>
+                                <button
+                                    onClick={handleDeleteSelected}
+                                    disabled={selected.size === 0}
+                                    className={styles.deleteConvBtn}
+                                >
+                                    {selected.size > 0 ? `Elimina (${selected.size})` : 'Elimina'}
+                                </button>
+                                <button onClick={exitSelectMode} className={styles.cancelSelectBtn}>
+                                    Annulla
+                                </button>
+                            </>
+                        ) : conv.tipo !== 'globale' && (
+                            <>
+                                <button onClick={() => setSelectMode(true)} className={styles.selectModeBtn}>
+                                    Seleziona
+                                </button>
+                                <button
+                                    onClick={() => { if (confirm('Eliminare questa conversazione?')) onDelete() }}
+                                    className={styles.deleteConvBtn}
+                                    title="Elimina conversazione"
+                                >
+                                    Elimina
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -213,41 +273,60 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                 {messages.length === 0 && (
                     <p className={styles.emptyMsg}>Nessun messaggio.</p>
                 )}
-                {messages.map((msg, i) => (
-                    <div
-                        key={i}
-                        className={`thread-message ${styles.msgRow}`}
-                    >
-                        {/* Avatar mittente */}
-                        {msg.avatar && (
-                            <img
-                                src={msg.avatar}
-                                alt={msg.mittente}
-                                className={styles.msgAvatar}
-                            />
-                        )}
+                {messages.map((msg, i) => {
+                    const k = msgKey(msg)
+                    const isSel = selected.has(k)
+                    return (
+                        <div
+                            key={i}
+                            className={[
+                                'thread-message',
+                                styles.msgRow,
+                                selectMode ? styles.selectableMsgRow : '',
+                                isSel      ? styles.selectedMsgRow   : '',
+                            ].filter(Boolean).join(' ')}
+                            onClick={selectMode ? () => toggleSelect(msg) : undefined}
+                        >
+                            {/* Checkbox visibile in modalità selezione */}
+                            {selectMode && (
+                                <input
+                                    type="checkbox"
+                                    checked={isSel}
+                                    onChange={() => toggleSelect(msg)}
+                                    className={styles.msgCheckbox}
+                                    onClick={e => e.stopPropagation()}
+                                />
+                            )}
 
-                        {/* Corpo del messaggio */}
-                        <div className={styles.msgBody}>
-                            <div className={styles.msgMeta}>
-                                <strong>{msg.mittente}</strong>
-                                {' · '}
-                                {formatDate(msg.ora, msg.ongame)}
+                            {/* Avatar mittente */}
+                            {msg.avatar && (
+                                <img
+                                    src={msg.avatar}
+                                    alt={msg.mittente}
+                                    className={styles.msgAvatar}
+                                />
+                            )}
+
+                            {/* Corpo del messaggio */}
+                            <div className={styles.msgBody}>
+                                <div className={styles.msgMeta}>
+                                    <strong>{msg.mittente}</strong>
+                                    {' · '}
+                                    {formatDate(msg.ora, msg.ongame)}
+                                </div>
+                                <div
+                                    className="thread-message-text"
+                                    dangerouslySetInnerHTML={{ __html: msg.testo }}
+                                />
                             </div>
-                            {/* Il testo può contenere HTML dal sistema (formattazione) */}
-                            <div
-                                className="thread-message-text"
-                                dangerouslySetInnerHTML={{ __html: msg.testo }}
-                            />
                         </div>
-                    </div>
-                ))}
-                {/* Anchor per lo scroll automatico */}
+                    )
+                })}
                 <div ref={bottomRef} />
             </div>
 
-            {/* Form di risposta (nascosto per messaggi globali) */}
-            {conv.tipo !== 'globale' && (
+            {/* Form di risposta — nascosto per globali e durante la selezione */}
+            {conv.tipo !== 'globale' && !selectMode && (
                 <div className="thread-reply">
                     <textarea
                         ref={textareaRef}
@@ -670,6 +749,29 @@ export default function MessagesInbox({ toPg = null }) {
     }
 
     // ---------------------------------------------------------------------------
+    // ELIMINAZIONE MESSAGGI SELEZIONATI
+    // ---------------------------------------------------------------------------
+
+    const handleDeleteMsgs = useCallback((messaggi) => {
+        if (!selectedConv) return
+        const body = selectedConv.tipo === 'individuale'
+            ? { conversazione_id: selectedConv.conversazione_id, messaggi }
+            : { gruppo_id: selectedConv.gruppo_id, messaggi }
+
+        fetch('/pages/api_messages.php?op=delete_msgs', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) fetchThreadSilent()
+                else alert(data.message || 'Errore durante l\'eliminazione')
+            })
+            .catch(console.error)
+    }, [selectedConv, fetchThreadSilent])
+
+    // ---------------------------------------------------------------------------
     // ELIMINAZIONE CONVERSAZIONE
     // ---------------------------------------------------------------------------
 
@@ -825,6 +927,7 @@ export default function MessagesInbox({ toPg = null }) {
                         onSend={sendReply}
                         onBack={() => { setView('list'); setSelectedConv(null) }}
                         onDelete={handleDeleteConv}
+                        onDeleteMsgs={handleDeleteMsgs}
                     />
                 </div>
             </div>
