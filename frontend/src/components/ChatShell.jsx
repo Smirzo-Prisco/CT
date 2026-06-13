@@ -556,6 +556,32 @@ export default function ChatShell() {
     }, [shell])
 
     // -----------------------------------------------------------------------
+    // HANDLER: BACKCHAT TOGGLE
+    // -----------------------------------------------------------------------
+
+    /**
+     * Toggling backchat via React state: aggiorna shell.pulsanti.backchat_on
+     * dopo la risposta API, così i re-render successivi (socket, ecc.) non
+     * ripristinano l'immagine al valore precedente.
+     */
+    async function handleToggleBackChat() {
+        try {
+            const res = await fetch('/pages/api_chat.php?op=setBackChat')
+            const data = await res.json()
+            if (data.success) {
+                setShell(prev => ({
+                    ...prev,
+                    pulsanti: { ...prev.pulsanti, backchat_on: !prev.pulsanti.backchat_on }
+                }))
+            } else {
+                window.showNotification?.(data.message, 'error')
+            }
+        } catch (err) {
+            console.error('Errore toggleBackChat:', err)
+        }
+    }
+
+    // -----------------------------------------------------------------------
     // GUARD: CARICAMENTO / ERRORE
     // -----------------------------------------------------------------------
 
@@ -813,7 +839,7 @@ export default function ChatShell() {
 
                                     {/* Backchat: visibile solo se esperienza > 19 — no FOUC */}
                                     {pulsanti.show_backchat && (
-                                        <a href="#" onClick={(e) => { e.preventDefault(); window.toggleBackChat?.(e.currentTarget) }} className="gdr-control-btn">
+                                        <a href="#" onClick={(e) => { e.preventDefault(); handleToggleBackChat() }} className="gdr-control-btn">
                                             <img id="backChatToggle"
                                                 title={pulsanti.backchat_on ? 'Disattiva Backchat' : 'Attiva Backchat'}
                                                 src={`themes/crystal/imgs/chat/Backchat${pulsanti.backchat_on ? 'ON' : 'OFF'}.png`} />
