@@ -112,7 +112,7 @@ const ZONES = [
         cx: 161, cy: 320,
         desc: 'Roppongi (六本木) è nota per l\'ingente numero di locali notturni e, per questo, meta di numerosi turisti ed espatriati occidentali.',
         rooms: [
-            { page: 'servizi_mercato', img: 'centro_commerciale.png' },
+            // { page: 'servizi_mercato', img: 'centro_commerciale.png' },
             { dir: 13, img: 'gatto_nero.png' },
             { page: 'servizi_prenotazioni_prova', img: 'hotel_inn.png' },
             { dir: 47, img: 'terrazza_panoramica.png' },
