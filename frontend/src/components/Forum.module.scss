@@ -341,3 +341,29 @@
     color: #ce846f;
     text-decoration: none;
 }
+
+// ── PostCard edit inline ──────────────────────────────────────
+
+.editForm {
+    margin-top: 6px;
+}
+
+.editActions {
+    margin-top: 8px;
+    text-align: right;
+}
+
+.editBtn {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: none;
+    border: 1px solid $palette-text-muted;
+    color: $palette-text-muted;
+    cursor: pointer;
+    border-radius: 3px;
+
+    &:hover {
+        color: $palette-text;
+        border-color: $palette-text;
+    }
+}

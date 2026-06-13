@@ -148,11 +148,30 @@ function ThreadRow({ thread, onClick, isStaff, onAction }) {
 /**
  * Post di un thread (sia il messaggio originale che le risposte).
  * Mostra avatar, autore, data e testo del messaggio.
+ * Se msg.can_edit è true mostra il pulsante "Modifica" con editor inline.
  *
- * @param {Object} props.msg    - Dati del messaggio
- * @param {boolean} props.isFirst - true se è il messaggio padre del thread
+ * @param {Object}   props.msg     - Dati del messaggio
+ * @param {boolean}  props.isFirst - true se è il messaggio padre del thread
+ * @param {Function} props.onEdit  - Callback ({ id, messaggio, titolo }) al salvataggio
  */
-function PostCard({ msg, isFirst }) {
+function PostCard({ msg, isFirst, onEdit }) {
+    const [isEditing,  setIsEditing]  = useState(false)
+    const [editText,   setEditText]   = useState('')
+    const [editTitolo, setEditTitolo] = useState('')
+    const textareaRef = useRef(null)
+
+    const startEdit = () => {
+        setEditText(msg.messaggio_raw ?? '')
+        setEditTitolo(msg.titolo ?? '')
+        setIsEditing(true)
+    }
+
+    const saveEdit = () => {
+        if (!editText.trim()) return
+        onEdit({ id: msg.id, messaggio: editText, titolo: editTitolo })
+        setIsEditing(false)
+    }
+
     return (
         <table className={`customTable ${styles.postCard}`}>
             <tbody>
@@ -172,12 +191,47 @@ function PostCard({ msg, isFirst }) {
 
                     {/* Colonna messaggio */}
                     <td className={`forum_main_post_message ${styles.messageColumn}`}>
-                        {isFirst && msg.titolo && (
-                            <div className={`header_thread ${styles.threadTitle}`}>{msg.titolo}</div>
-                        )}
-                        <div className="forum_post_message" dangerouslySetInnerHTML={{ __html: msg.messaggio }} />
-                        {msg.edit_note && (
-                            <div className={`forum_post_modify ${styles.editNote}`}>{msg.edit_note}</div>
+                        {isEditing ? (
+                            <div className={styles.editForm}>
+                                {isFirst && (
+                                    <div className={styles.titleField}>
+                                        <input
+                                            type="text"
+                                            value={editTitolo}
+                                            onChange={e => setEditTitolo(e.target.value)}
+                                            placeholder="Titolo"
+                                            className={styles.fullWidth}
+                                        />
+                                    </div>
+                                )}
+                                <BBCodeToolbar textareaRef={textareaRef} onChange={setEditText} />
+                                <textarea
+                                    ref={textareaRef}
+                                    value={editText}
+                                    onChange={e => setEditText(e.target.value)}
+                                    rows="8"
+                                    className={styles.fullWidthResize}
+                                />
+                                <div className={styles.formOptions}>
+                                    <button onClick={saveEdit} disabled={!editText.trim()}>Salva</button>
+                                    <button onClick={() => setIsEditing(false)}>Annulla</button>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                {isFirst && msg.titolo && (
+                                    <div className={`header_thread ${styles.threadTitle}`}>{msg.titolo}</div>
+                                )}
+                                <div className="forum_post_message" dangerouslySetInnerHTML={{ __html: msg.messaggio }} />
+                                {msg.edit_note && (
+                                    <div className={`forum_post_modify ${styles.editNote}`}>{msg.edit_note}</div>
+                                )}
+                                {msg.can_edit && (
+                                    <div className={styles.editActions}>
+                                        <button onClick={startEdit} className={styles.editBtn}>Modifica</button>
+                                    </div>
+                                )}
+                            </>
                         )}
                     </td>
                 </tr>
@@ -815,6 +869,24 @@ export default function Forum({ isStaff = false }) {
     }
 
     /**
+     * Salva la modifica di un post esistente.
+     * @param {Object} params - { id, messaggio, titolo }
+     */
+    const handleEditPost = useCallback(({ id, messaggio, titolo }) => {
+        fetch('/pages/api_forum.php?op=edit_post', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ id_messaggio: id, messaggio, titolo }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) fetchThread(currentThread.id)
+                else alert(data.message || 'Errore nella modifica')
+            })
+            .catch(console.error)
+    }, [currentThread, fetchThread])
+
+    /**
      * Invia un resoconto quest nella sezione corrente.
      * @param {Object} formData - Tutti i campi del form ComposeQuest
      */
@@ -1036,7 +1108,7 @@ export default function Forum({ isStaff = false }) {
                         {/* Tutti i messaggi del thread */}
                         {messages.map((msg, i) => (
                             <div key={msg.id}>
-                                <PostCard msg={msg} isFirst={i === 0} />
+                                <PostCard msg={msg} isFirst={i === 0} onEdit={handleEditPost} />
                                 {/* Tabella punti partecipanti — visibile solo a master/admin, solo sul post radice */}
                                 {i === 0 && <PuntiTable puntiList={puntiList} />}
                             </div>

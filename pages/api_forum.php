@@ -218,6 +218,7 @@ switch ($op) {
             $msg_text = $post['messaggio'];
             // Rimuove la firma di modifica dal corpo del messaggio
             $pos = strrpos($msg_text, 'Modificato da');
+            if ($pos === false) $pos = strrpos($msg_text, 'Modificato:');
             $edit_note = $pos !== false ? trim(substr($msg_text, $pos)) : null;
             if ($pos !== false) $msg_text = trim(substr($msg_text, 0, $pos));
 
@@ -227,16 +228,18 @@ switch ($op) {
             $msg_html = gdrcd_bbcoder($msg_text);
 
             $messages[] = [
-                'id'         => (int)$post['id_messaggio'],
-                'padre'      => (int)$post['id_messaggio_padre'],
-                'titolo'     => $post['titolo'],
-                'messaggio'  => $msg_html,
-                'edit_note'  => $edit_note,
-                'autore'     => $post['anonimo'] == 1 ? 'Anonimo' : $post['autore'],
-                'avatar'     => $post['url_img_chat'],
-                'data'       => $post['data_messaggio'],
-                'chiuso'     => (bool)$post['chiuso'],
-                'giornalista' => (bool)$post['giornalista'],
+                'id'            => (int)$post['id_messaggio'],
+                'padre'         => (int)$post['id_messaggio_padre'],
+                'titolo'        => $post['titolo'],
+                'messaggio'     => $msg_html,
+                'messaggio_raw' => $msg_text,
+                'edit_note'     => $edit_note,
+                'autore'        => $post['anonimo'] == 1 ? 'Anonimo' : $post['autore'],
+                'avatar'        => $post['url_img_chat'],
+                'data'          => $post['data_messaggio'],
+                'chiuso'        => (bool)$post['chiuso'],
+                'giornalista'   => (bool)$post['giornalista'],
+                'can_edit'      => ($post['autore'] == $login || $_SESSION['admin'] == 1),
             ];
         } while ($post = gdrcd_query($result, 'fetch'));
         gdrcd_query($result, 'free');
@@ -588,6 +591,41 @@ switch ($op) {
         notifyForumUpdate($araldo_id, $thread_id);
 
         echo json_encode(['success' => true, 'thread_id' => $thread_id]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // EDIT_POST — modifica testo e titolo di un messaggio (autore o admin)
+    // -------------------------------------------------------------------------
+    case 'edit_post':
+        $id_msg    = (int)($data['id_messaggio'] ?? 0);
+        $titolo    = gdrcd_filter('in', trim($data['titolo']    ?? ''));
+        $messaggio = gdrcd_filter('in', trim($data['messaggio'] ?? ''));
+
+        if (empty($messaggio)) {
+            echo json_encode(['success' => false, 'message' => 'Messaggio vuoto']);
+            exit;
+        }
+
+        $row = gdrcd_query("SELECT autore, anonimo FROM messaggioaraldo WHERE id_messaggio = $id_msg LIMIT 1");
+        if (!$row) {
+            echo json_encode(['success' => false, 'message' => 'Messaggio non trovato']);
+            exit;
+        }
+        if ($row['autore'] != $login && $_SESSION['admin'] != 1) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Accesso negato']);
+            exit;
+        }
+
+        $time = date('d/m/Y H:i');
+        $login_f   = gdrcd_filter('in', $login);
+        $text_edit = ($row['anonimo'] == 1)
+            ? 'Modificato: ' . $time
+            : 'Modificato da ' . $login_f . ': ' . $time;
+
+        gdrcd_query("UPDATE messaggioaraldo SET messaggio = '$messaggio\n\n\n\n $text_edit', titolo = '$titolo' WHERE id_messaggio = $id_msg LIMIT 1");
+
+        echo json_encode(['success' => true]);
         break;
 
     default:
