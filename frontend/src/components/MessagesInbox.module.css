@@ -30,6 +30,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-left: 20px;
 }
 
 .selectModeBtn {
@@ -87,7 +88,6 @@
     padding: 2px 8px;
     cursor: pointer;
     white-space: nowrap;
-    margin-left: 20px;
 }
 
 .deleteConvBtn:hover {
