@@ -491,6 +491,36 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // DELETE_CONVS — elimina più conversazioni in un'unica chiamata
+    // -------------------------------------------------------------------------
+    case 'delete_convs':
+        $conversazioni = is_array($data['conversazioni'] ?? null) ? $data['conversazioni'] : [];
+        if (empty($conversazioni)) {
+            echo json_encode(['success' => false, 'message' => 'Nessuna conversazione selezionata']);
+            exit;
+        }
+        foreach ($conversazioni as $c) {
+            $tipo      = $c['tipo']             ?? '';
+            $conv_id   = (int)($c['conversazione_id'] ?? 0);
+            $gruppo_id = (int)($c['gruppo_id']        ?? 0);
+
+            if ($tipo === 'individuale' && $conv_id > 0) {
+                $ok = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
+                if ($ok['n'] == 0) continue;
+                gdrcd_query("DELETE FROM conversazioni_individuali WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
+                $rem = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali WHERE id_conversazione = $conv_id");
+                if ((int)$rem['n'] === 0) gdrcd_query("DELETE FROM sms WHERE id_conversazione = $conv_id");
+
+            } elseif ($tipo === 'gruppo' && $gruppo_id > 0) {
+                $ok = gdrcd_query("SELECT COUNT(*) AS n FROM partecipazione_gruppo WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'");
+                if ($ok['n'] == 0) continue;
+                gdrcd_query("DELETE FROM partecipazione_gruppo WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'");
+            }
+        }
+        echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
     // DELETE_CONV — elimina la conversazione dal punto di vista dell'utente
     //   individuale: rimuove la riga in conversazioni_individuali; se entrambi
     //                i partecipanti hanno eliminato, pulisce anche i record sms.

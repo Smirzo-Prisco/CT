@@ -79,6 +79,20 @@
     cursor: pointer;
 }
 
+/* ── Selezione multipla nella lista conversazioni ────────────── */
+
+.convChecked {
+    background: rgb(100 100 200 / 15%);
+    border-left: 3px solid #6060cc;
+}
+
+.convCheckbox {
+    flex-shrink: 0;
+    align-self: center;
+    margin-right: 6px;
+    cursor: pointer;
+}
+
 .deleteConvBtn {
     font-size: 0.8em;
     color: #e74c3c;

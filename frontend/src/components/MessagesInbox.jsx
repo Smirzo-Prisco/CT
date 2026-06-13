@@ -103,17 +103,30 @@ function getAvatarUrl(conv) {
  * @param {boolean}  props.isSelected - true se questa è la conversazione aperta
  * @param {Function} props.onClick    - Callback al click
  */
-function ConvItem({ conv, isSelected, onClick }) {
+function ConvItem({ conv, isSelected, onClick, selectMode = false, checked = false, onToggle }) {
     /** Anteprima testo: max 30 caratteri senza HTML */
     const preview = (conv.ultimo_testo || '').replace(/<[^>]*>/g, '').slice(0, 30) + (conv.ultimo_testo?.length > 30 ? '...' : '')
 
+    const handleClick = (e) => {
+        e.preventDefault()
+        if (selectMode && conv.tipo !== 'globale') onToggle?.(conv)
+        else onClick(conv)
+    }
+
     return (
-        <a
-            href="#"
-            onClick={e => { e.preventDefault(); onClick(conv) }}
-            className={styles.noDecoration}
-        >
-            <div className={`message-item ${isSelected ? 'selected' : ''}`}>
+        <a href="#" onClick={handleClick} className={styles.noDecoration}>
+            <div className={`message-item ${isSelected ? 'selected' : ''} ${checked ? styles.convChecked : ''}`}>
+
+                {/* Checkbox visibile in modalità selezione (non per globali) */}
+                {selectMode && conv.tipo !== 'globale' && (
+                    <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => onToggle?.(conv)}
+                        className={styles.convCheckbox}
+                        onClick={e => e.stopPropagation()}
+                    />
+                )}
 
                 {/* Avatar del contatto/gruppo */}
                 <img
@@ -126,7 +139,6 @@ function ConvItem({ conv, isSelected, onClick }) {
                 <div className="message-details">
                     <p className="sender">
                         {conv.display_name}
-                        {/* Punto indicatore nuovo messaggio */}
                         {conv.non_letto && <span className={styles.unreadDot}>●</span>}
                     </p>
                     <p className="date">{formatDate(conv.ora, conv.ongame)}</p>
@@ -505,6 +517,10 @@ export default function MessagesInbox({ toPg = null }) {
     /** Destinatario pre-compilato nella vista compose (da ?to= URL param) */
     const [composeDest, setComposeDest] = useState('')
 
+    // --- selezione multipla nella lista conversazioni ---
+    const [listSelectMode, setListSelectMode] = useState(false)
+    const [listSelected,   setListSelected]   = useState(new Set())
+
     // Ref alla conversazione aperta: usato dal listener socket per aggiornare
     // il thread senza passarlo come dipendenza all'useEffect (evita ri-registrazioni)
     const selectedConvRef = useRef(null)
@@ -749,6 +765,51 @@ export default function MessagesInbox({ toPg = null }) {
     }
 
     // ---------------------------------------------------------------------------
+    // SELEZIONE E CANCELLAZIONE MULTIPLA CONVERSAZIONI
+    // ---------------------------------------------------------------------------
+
+    const convKey = (conv) => conv.tipo === 'individuale'
+        ? `individuale-${conv.conversazione_id}`
+        : `gruppo-${conv.gruppo_id}`
+
+    const toggleListSelect = (conv) => {
+        const k = convKey(conv)
+        setListSelected(prev => {
+            const next = new Set(prev)
+            if (next.has(k)) next.delete(k)
+            else next.add(k)
+            return next
+        })
+    }
+
+    const handleDeleteSelectedConvs = () => {
+        const conversazioni = [...listSelected].map(k => {
+            const sep  = k.indexOf('-')
+            const tipo = k.slice(0, sep)
+            const id   = parseInt(k.slice(sep + 1))
+            return tipo === 'individuale'
+                ? { tipo, conversazione_id: id }
+                : { tipo, gruppo_id: id }
+        })
+        fetch('/pages/api_messages.php?op=delete_convs', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ conversazioni }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setListSelectMode(false)
+                    setListSelected(new Set())
+                    fetchList()
+                } else {
+                    alert(data.message || 'Errore durante l\'eliminazione')
+                }
+            })
+            .catch(console.error)
+    }
+
+    // ---------------------------------------------------------------------------
     // ELIMINAZIONE MESSAGGI SELEZIONATI
     // ---------------------------------------------------------------------------
 
@@ -880,7 +941,15 @@ export default function MessagesInbox({ toPg = null }) {
                                 <p style={{ padding: '10px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>Nessun messaggio OFF.</p>
                             ) : (
                                 convOff.map(conv => (
-                                    <ConvItem key={`${conv.tipo}-${conv.conversazione_id}`} conv={conv} isSelected={false} onClick={openConversation} />
+                                    <ConvItem
+                                        key={`${conv.tipo}-${conv.conversazione_id}`}
+                                        conv={conv}
+                                        isSelected={false}
+                                        onClick={openConversation}
+                                        selectMode={listSelectMode}
+                                        checked={listSelected.has(convKey(conv))}
+                                        onToggle={toggleListSelect}
+                                    />
                                 ))
                             )}
                         </div>
@@ -895,7 +964,15 @@ export default function MessagesInbox({ toPg = null }) {
                                 <p style={{ padding: '10px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>Nessun messaggio ON.</p>
                             ) : (
                                 convOn.map(conv => (
-                                    <ConvItem key={`${conv.tipo}-${conv.conversazione_id}`} conv={conv} isSelected={false} onClick={openConversation} />
+                                    <ConvItem
+                                        key={`${conv.tipo}-${conv.conversazione_id}`}
+                                        conv={conv}
+                                        isSelected={false}
+                                        onClick={openConversation}
+                                        selectMode={listSelectMode}
+                                        checked={listSelected.has(convKey(conv))}
+                                        onToggle={toggleListSelect}
+                                    />
                                 ))
                             )}
                         </div>
@@ -903,9 +980,29 @@ export default function MessagesInbox({ toPg = null }) {
 
                     {/* Azioni in fondo */}
                     <div className="bottom-bar">
-                        <button id="new-message-button" onClick={() => setView('compose')}>
-                            Nuovo Messaggio
-                        </button>
+                        {listSelectMode ? (
+                            <>
+                                <button
+                                    onClick={handleDeleteSelectedConvs}
+                                    disabled={listSelected.size === 0}
+                                    className={styles.deleteConvBtn}
+                                >
+                                    {listSelected.size > 0 ? `Elimina (${listSelected.size})` : 'Elimina'}
+                                </button>
+                                <button onClick={() => { setListSelectMode(false); setListSelected(new Set()) }}>
+                                    Annulla
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button id="new-message-button" onClick={() => setView('compose')}>
+                                    Nuovo Messaggio
+                                </button>
+                                <button onClick={() => setListSelectMode(true)} className={styles.selectModeBtn}>
+                                    Seleziona
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
