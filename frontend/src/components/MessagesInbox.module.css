@@ -35,6 +35,7 @@
     padding: 2px 8px;
     cursor: pointer;
     white-space: nowrap;
+    margin-left: 20px;
 }
 
 .deleteConvBtn:hover {
