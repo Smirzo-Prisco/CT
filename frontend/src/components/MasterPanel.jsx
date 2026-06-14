@@ -507,14 +507,12 @@ function QuestPanel({ questState, luogo }) {
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                         className={`gdr-button${questState.turnMode === 'liberi' ? ' gdr-tab--active' : ''}`}
-                        onClick={() => setMode('liberi')}
-                        style={questState.turnMode === 'liberi' ? { background: '#3a4a6a', borderColor: '#ce846f', color: '#ce846f' } : {}}>
+                        onClick={() => setMode('liberi')}>
                         Turni liberi
                     </button>
                     <button
                         className={`gdr-button${questState.turnMode === 'fissi' ? ' gdr-tab--active' : ''}`}
-                        onClick={() => setMode('fissi')}
-                        style={questState.turnMode === 'fissi' ? { background: '#3a4a6a', borderColor: '#ce846f', color: '#ce846f' } : {}}>
+                        onClick={() => setMode('fissi')}>
                         Turni fissi
                     </button>
                 </div>
