@@ -191,11 +191,20 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode($response);
             break;
             exit;
+        case 'getRoleParticipants':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false]); break; }
+            $res_pgs = gdrcd_query("SELECT DISTINCT pg_name FROM role_session_players ORDER BY pg_name ASC", 'result');
+            $pg_names = [];
+            while ($r = gdrcd_query($res_pgs, 'fetch')) $pg_names[] = $r['pg_name'];
+            echo json_encode(['success' => true, 'pgs' => $pg_names]);
+            break;
+
         case 'getPgAllRoles':
             $is_staff   = isAdminMasterMod($_SESSION);
             $login_f    = gdrcd_filter('in', $_SESSION['login']);
-            $show_all   = $is_staff && ($_GET['pg'] ?? '') === 'all';
-            $pg_filter  = $show_all ? null : $login_f;
+            $pg_param   = isset($_GET['pg']) ? gdrcd_filter('in', trim($_GET['pg'])) : '';
+            $show_all   = $is_staff && $pg_param === 'all';
+            $pg_filter  = $show_all ? null : ($is_staff && $pg_param !== '' ? $pg_param : $login_f);
 
             $where = $pg_filter !== null
                 ? "WHERE role_session_players.pg_name = '$pg_filter'"

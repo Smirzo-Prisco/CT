@@ -133,34 +133,45 @@ function GameCard({ game }) {
 // ── Componente principale ─────────────────────────────────────────────────────
 
 export default function RoleRecap() {
-    const [roles, setRoles]         = useState([])
-    const [loading, setLoading]     = useState(true)
-    const [error, setError]         = useState(null)
-    const [isStaff, setIsStaff]     = useState(false)
-    const [showAll, setShowAll]     = useState(false)
+    const [roles, setRoles]           = useState([])
+    const [loading, setLoading]       = useState(true)
+    const [error, setError]           = useState(null)
+    const [isStaff, setIsStaff]       = useState(false)
+    const [currentUser, setCurrentUser] = useState('')
+    const [pgList, setPgList]         = useState([])
+    const [selectedPg, setSelectedPg] = useState('')
 
-    const fetchRoles = useCallback((all = false) => {
+    const fetchRoles = useCallback((pg) => {
         setLoading(true)
         setError(null)
-        const url = 'pages/api_roleSession.php?op=getPgAllRoles' + (all ? '&pg=all' : '')
-        fetch(url)
+        const qs = pg ? `&pg=${encodeURIComponent(pg)}` : ''
+        fetch(`pages/api_roleSession.php?op=getPgAllRoles${qs}`)
             .then(r => r.json())
             .then(d => {
                 setRoles(d.roles ?? [])
-                setIsStaff(d.is_staff ?? false)
+                if (d.is_staff !== undefined) setIsStaff(d.is_staff)
+                if (d.current_user) {
+                    setCurrentUser(d.current_user)
+                    setSelectedPg(prev => prev || d.current_user)
+                }
                 setLoading(false)
             })
-            .catch(err => {
-                setError(err.message)
-                setLoading(false)
-            })
+            .catch(err => { setError(err.message); setLoading(false) })
     }, [])
 
-    useEffect(() => { fetchRoles(false) }, [fetchRoles])
+    useEffect(() => { fetchRoles('') }, [fetchRoles])
 
-    function toggleFilter(all) {
-        setShowAll(all)
-        fetchRoles(all)
+    useEffect(() => {
+        if (!isStaff) return
+        fetch('pages/api_roleSession.php?op=getRoleParticipants')
+            .then(r => r.json())
+            .then(d => { if (d.success) setPgList(d.pgs ?? []) })
+            .catch(() => {})
+    }, [isStaff])
+
+    function applyFilter(pg) {
+        setSelectedPg(pg)
+        fetchRoles(pg)
     }
 
     // ── Statistiche aggregate ────────────────────────────────────────────────
@@ -186,23 +197,25 @@ export default function RoleRecap() {
 
                 <header>
                     <h1><i className="fas fa-dice"></i> Elenco Giocate</h1>
-                    <p className="subtitle">
-                        {isStaff && !showAll ? 'Le tue giocate' : 'Tutte le giocate'}
-                    </p>
+                    <p className="subtitle">Storico giocate per partecipante</p>
                     {isStaff && (
                         <div className="filter-bar">
-                            <button
-                                className={`filter-btn${!showAll ? ' filter-btn--active' : ''}`}
-                                onClick={() => toggleFilter(false)}
+                            <label className="filter-label" htmlFor="pg-select">
+                                <i className="fas fa-user"></i> Giocatore
+                            </label>
+                            <select
+                                id="pg-select"
+                                className="filter-select"
+                                value={selectedPg}
+                                onChange={e => applyFilter(e.target.value)}
                             >
-                                <i className="fas fa-user"></i> Le mie
-                            </button>
-                            <button
-                                className={`filter-btn${showAll ? ' filter-btn--active' : ''}`}
-                                onClick={() => toggleFilter(true)}
-                            >
-                                <i className="fas fa-users"></i> Tutte
-                            </button>
+                                <option value={currentUser}>Le mie ({currentUser})</option>
+                                <option value="all">Tutte le giocate</option>
+                                {pgList
+                                    .filter(p => p !== currentUser)
+                                    .map(p => <option key={p} value={p}>{p}</option>)
+                                }
+                            </select>
                         </div>
                     )}
                 </header>
@@ -226,7 +239,7 @@ export default function RoleRecap() {
                         <i className="fas fa-exclamation-triangle"></i>
                         <h3>Errore nel caricamento</h3>
                         <p>{error}</p>
-                        <button onClick={() => fetchRoles(showAll)} style={{ marginTop: '16px', padding: '8px 20px', cursor: 'pointer' }}>
+                        <button onClick={() => fetchRoles(selectedPg)} style={{ marginTop: '16px', padding: '8px 20px', cursor: 'pointer' }}>
                             <i className="fas fa-redo"></i> Riprova
                         </button>
                     </div>
