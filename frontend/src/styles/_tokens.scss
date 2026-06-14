@@ -32,7 +32,7 @@ $palette-rust-dark: #AEE7FF; // #7a4f43; // variante scura del brand
 // Testi
 $palette-text: #E8E6E3; // testo principale
 $palette-text-secondary: #A8A6B3; // testo secondario / note
-$palette-text-title: #D6C6A5; // titoli, sezioni, dettagli (non su blocchi lunghi)
+$palette-text-title: #d9d0bf; // titoli, sezioni, dettagli (non su blocchi lunghi)
 $palette-text-muted: #ccc; // placeholder, terziario
 $palette-text-disabled: rgb(192, 164, 158); // stato disabilitato
 
@@ -75,7 +75,7 @@ $color-action-hover: $palette-action-hover;
 $color-text: $palette-text;
 $color-text-secondary: $palette-text-secondary;
 $color-text-title: $palette-text-title;
-$color-text-light: $palette-text-title; // headings in contesti speciali
+$color-text-light: $palette-text; // headings in contesti speciali
 $color-text-muted: $palette-text-muted;
 
 // Feedback
