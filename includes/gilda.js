@@ -96,7 +96,7 @@ function removeGuildPg(nome) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome })
         })
-            .then(response => { });//if (response.ok) location.reload(); });
+            .then(response => { if (response.ok) location.reload(); });
     }
 }
 function addGuildPg(id_gilda) {
@@ -184,9 +184,7 @@ function saveSoglia(id_soglia) {
         .then(data => {
             if (data.success) {
                 showNotification(data.message, 'success');
-                // window.location.reload();
-                // Chiudo modale
-                document.getElementById('modalSoglia').style.display = 'none';
+                location.reload();
             } else showNotification(data.message, 'error');
         })
         .catch(error => {
@@ -295,9 +293,7 @@ function saveSkill() {
                 .then(data => {
                     if (data.success) {
                         showNotification(data.message, 'success');
-                        // window.location.reload();
-                        // Chiudo modale
-                        document.getElementById('modalSkill').style.display = 'none';
+                        location.reload();
                     } else showNotification('Errore nel salvataggio: ' + data.message, 'error');
                 })
                 .catch(error => {
