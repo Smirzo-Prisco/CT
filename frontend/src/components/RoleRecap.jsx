@@ -176,13 +176,6 @@ export default function RoleRecap() {
         fetchRoles(pg)
     }
 
-    // ── Statistiche aggregate ────────────────────────────────────────────────
-
-    const totalGames   = roles.length
-    const activeGames  = roles.filter(r => r.inCorso).length
-    const totalPlayers = roles.reduce((acc, r) => acc + r.partecipanti.length, 0)
-    const avgTurns     = totalGames > 0 ? Math.round(roles.reduce((acc, r) => acc + r.totTurni, 0) / totalGames) : 0
-
     // ── Valori unici per filtro luogo ────────────────────────────────────────
 
     const uniqueLocations = [...new Set(roles.map(r => r.luogo).filter(Boolean))].sort()
@@ -209,6 +202,13 @@ export default function RoleRecap() {
         }
         return true
     })
+
+    // ── Statistiche aggregate (sui risultati filtrati) ───────────────────────
+
+    const totalGames   = filtered.length
+    const activeGames  = filtered.filter(r => r.inCorso).length
+    const totalPlayers = filtered.reduce((acc, r) => acc + r.partecipanti.length, 0)
+    const avgTurns     = totalGames > 0 ? Math.round(filtered.reduce((acc, r) => acc + r.totTurni, 0) / totalGames) : 0
 
     // ── Render ───────────────────────────────────────────────────────────────
 
