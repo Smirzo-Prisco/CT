@@ -81,9 +81,9 @@
     }
 
     .rl-badge-active {
-        background-color: rgba(#{$palette-success}, 0.2);
+        background-color: rgba($palette-success, 0.2);
         color: #{$color-success};
-        border: 1px solid rgba(#{$palette-success}, 0.3);
+        border: 1px solid rgba($palette-success, 0.3);
         padding: 2px 10px;
         border-radius: 12px;
         font-weight: 600;
@@ -211,8 +211,8 @@
     // ── Sussurro (S) ──────────────────────────────────────────
 
     .rl-msg--whisper {
-        background-color: rgba(#{$palette-action}, 0.05);
-        border-left: 2px solid rgba(#{$palette-action}, 0.4);
+        background-color: rgba($palette-action, 0.05);
+        border-left: 2px solid rgba($palette-action, 0.4);
         color: #{$color-text-secondary};
         font-style: italic;
         font-size: 0.9rem;
