@@ -133,17 +133,21 @@ function GameCard({ game }) {
 // ── Componente principale ─────────────────────────────────────────────────────
 
 export default function RoleRecap() {
-    const [roles, setRoles]     = useState([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError]     = useState(null)
+    const [roles, setRoles]         = useState([])
+    const [loading, setLoading]     = useState(true)
+    const [error, setError]         = useState(null)
+    const [isStaff, setIsStaff]     = useState(false)
+    const [showAll, setShowAll]     = useState(false)
 
-    const fetchRoles = useCallback(() => {
+    const fetchRoles = useCallback((all = false) => {
         setLoading(true)
         setError(null)
-        fetch('pages/api_roleSession.php?op=getPgAllRoles')
+        const url = 'pages/api_roleSession.php?op=getPgAllRoles' + (all ? '&pg=all' : '')
+        fetch(url)
             .then(r => r.json())
             .then(d => {
                 setRoles(d.roles ?? [])
+                setIsStaff(d.is_staff ?? false)
                 setLoading(false)
             })
             .catch(err => {
@@ -152,7 +156,12 @@ export default function RoleRecap() {
             })
     }, [])
 
-    useEffect(() => { fetchRoles() }, [fetchRoles])
+    useEffect(() => { fetchRoles(false) }, [fetchRoles])
+
+    function toggleFilter(all) {
+        setShowAll(all)
+        fetchRoles(all)
+    }
 
     // ── Statistiche aggregate ────────────────────────────────────────────────
 
@@ -177,7 +186,25 @@ export default function RoleRecap() {
 
                 <header>
                     <h1><i className="fas fa-dice"></i> Elenco Giocate</h1>
-                    <p className="subtitle">Visualizza tutte le giocate con dettagli, partecipanti e stato</p>
+                    <p className="subtitle">
+                        {isStaff && !showAll ? 'Le tue giocate' : 'Tutte le giocate'}
+                    </p>
+                    {isStaff && (
+                        <div className="filter-bar">
+                            <button
+                                className={`filter-btn${!showAll ? ' filter-btn--active' : ''}`}
+                                onClick={() => toggleFilter(false)}
+                            >
+                                <i className="fas fa-user"></i> Le mie
+                            </button>
+                            <button
+                                className={`filter-btn${showAll ? ' filter-btn--active' : ''}`}
+                                onClick={() => toggleFilter(true)}
+                            >
+                                <i className="fas fa-users"></i> Tutte
+                            </button>
+                        </div>
+                    )}
                 </header>
 
                 <div className="stats">
@@ -199,7 +226,7 @@ export default function RoleRecap() {
                         <i className="fas fa-exclamation-triangle"></i>
                         <h3>Errore nel caricamento</h3>
                         <p>{error}</p>
-                        <button onClick={fetchRoles} style={{ marginTop: '16px', padding: '8px 20px', cursor: 'pointer' }}>
+                        <button onClick={() => fetchRoles(showAll)} style={{ marginTop: '16px', padding: '8px 20px', cursor: 'pointer' }}>
                             <i className="fas fa-redo"></i> Riprova
                         </button>
                     </div>

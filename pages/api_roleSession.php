@@ -191,36 +191,48 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode($response);
             break;
             exit;
-        case 'getPgAllRoles': // Prende tutte le role del pg - ATTENZIONARE! Verificare la presenza
-            $where = isAdminMasterMod($_SESSION) ? "" : "WHERE role_session_players.pg_name = '".$_SESSION['login']."'";
-            
-            $query = "SELECT role_sessions.*, mappa.nome, mappa.id as luogo_id FROM role_sessions 
-                        LEFT JOIN mappa ON role_sessions.location = mappa.id 
-                        INNER JOIN role_session_players ON role_sessions.id_role = role_session_players.id_role 
-                        $where";
+        case 'getPgAllRoles':
+            $is_staff   = isAdminMasterMod($_SESSION);
+            $login_f    = gdrcd_filter('in', $_SESSION['login']);
+            $show_all   = $is_staff && ($_GET['pg'] ?? '') === 'all';
+            $pg_filter  = $show_all ? null : $login_f;
+
+            $where = $pg_filter !== null
+                ? "WHERE role_session_players.pg_name = '$pg_filter'"
+                : '';
+
+            $query = "SELECT role_sessions.id_role, role_sessions.location, role_sessions.start,
+                             role_sessions.end, role_sessions.turn, mappa.nome, mappa.id as luogo_id
+                      FROM role_sessions
+                      LEFT JOIN mappa ON role_sessions.location = mappa.id
+                      INNER JOIN role_session_players ON role_sessions.id_role = role_session_players.id_role
+                      $where
+                      GROUP BY role_sessions.id_role
+                      ORDER BY role_sessions.start DESC";
             $result = gdrcd_query($query, 'result');
             $roles = [];
-            
-            while($row = gdrcd_query($result, 'fetch')) {
-                $role = [];
 
-                $role['id'] = (int)$row['id_role'];
-                $role['luogo_id'] = $row['luogo_id'];
-                $role['luogo'] = $row['nome'];
-                $role['data'] = date("l j F Y", strtotime($row['start']));
-                $role['oraInizio'] = date("H:i", strtotime($row['start']));
-                $role['oraFine'] = $row['end'] !== null ? date("H:i", strtotime($row['end'])) : '';
-                $role['totTurni'] = (int)$row['turn'];
-                $role['partecipanti'] = getRolePgs($row['id_role'], false);
-                $role['inCorso'] = $row['end'] === null ? true : false;
-                $role['icona'] = 'fas fa-globe';
-
-                array_push($roles, $role);
+            while ($row = gdrcd_query($result, 'fetch')) {
+                $roles[] = [
+                    'id'           => (int)$row['id_role'],
+                    'luogo_id'     => $row['luogo_id'],
+                    'luogo'        => $row['nome'],
+                    'data'         => date('Y-m-d', strtotime($row['start'])),
+                    'oraInizio'    => date('H:i', strtotime($row['start'])),
+                    'oraFine'      => $row['end'] !== null ? date('H:i', strtotime($row['end'])) : '',
+                    'totTurni'     => (int)$row['turn'],
+                    'partecipanti' => getRolePgs($row['id_role'], false),
+                    'inCorso'      => $row['end'] === null,
+                    'icona'        => 'fas fa-globe',
+                ];
             }
-            
-            if(!empty($roles)) echo json_encode(array('success' => true, 'message' => "Giocate del pg", 'roles' => $roles));
-            else echo json_encode(array('success' => false, 'message' => "Errore! Nessuna giocata trovata per il pg.", 'query' => $query));
 
+            echo json_encode([
+                'success'      => true,
+                'roles'        => $roles,
+                'is_staff'     => $is_staff,
+                'current_user' => $_SESSION['login'],
+            ]);
             break;
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
