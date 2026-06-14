@@ -140,6 +140,8 @@ export default function RoleRecap() {
     const [currentUser, setCurrentUser] = useState('')
     const [pgList, setPgList]         = useState([])
     const [selectedPg, setSelectedPg] = useState('')
+    const [filterLuogo, setFilterLuogo] = useState('')
+    const [filterData, setFilterData]   = useState('')
 
     const fetchRoles = useCallback((pg) => {
         setLoading(true)
@@ -181,12 +183,31 @@ export default function RoleRecap() {
     const totalPlayers = roles.reduce((acc, r) => acc + r.partecipanti.length, 0)
     const avgTurns     = totalGames > 0 ? Math.round(roles.reduce((acc, r) => acc + r.totTurni, 0) / totalGames) : 0
 
+    // ── Valori unici per filtro luogo ────────────────────────────────────────
+
+    const uniqueLocations = [...new Set(roles.map(r => r.luogo).filter(Boolean))].sort()
+
     // ── Ordinamento: in corso prima, poi per data decrescente ────────────────
 
     const sorted = [...roles].sort((a, b) => {
         if (a.inCorso && !b.inCorso) return -1
         if (!a.inCorso && b.inCorso) return 1
         return new Date(b.data) - new Date(a.data)
+    })
+
+    // ── Filtri client-side ───────────────────────────────────────────────────
+
+    const now = new Date()
+    const filtered = sorted.filter(r => {
+        if (filterLuogo && r.luogo !== filterLuogo) return false
+        if (filterData) {
+            const d = new Date(r.data)
+            const days = filterData === 'week' ? 7 : 30
+            const cutoff = new Date(now)
+            cutoff.setDate(cutoff.getDate() - days)
+            if (d < cutoff) return false
+        }
+        return true
     })
 
     // ── Render ───────────────────────────────────────────────────────────────
@@ -227,6 +248,44 @@ export default function RoleRecap() {
                     <StatCard icon="fas fa-hourglass-half" value={avgTurns}     label="Turni medi" />
                 </div>
 
+                <div className="filters">
+                    <div className="filter-group">
+                        <label className="filter-label" htmlFor="luogo-select">
+                            <i className="fas fa-map-marker-alt"></i> Luogo
+                        </label>
+                        <select
+                            id="luogo-select"
+                            value={filterLuogo}
+                            onChange={e => setFilterLuogo(e.target.value)}
+                        >
+                            <option value="">Tutti i luoghi</option>
+                            {uniqueLocations.map(l => <option key={l} value={l}>{l}</option>)}
+                        </select>
+                    </div>
+
+                    <div className="filter-group">
+                        <label className="filter-label" htmlFor="data-select">
+                            <i className="fas fa-calendar-alt"></i> Periodo
+                        </label>
+                        <select
+                            id="data-select"
+                            value={filterData}
+                            onChange={e => setFilterData(e.target.value)}
+                        >
+                            <option value="">Tutto il periodo</option>
+                            <option value="week">Ultima settimana</option>
+                            <option value="month">Ultimo mese</option>
+                        </select>
+                    </div>
+
+                    <button
+                        className="reset-btn"
+                        onClick={() => { setFilterLuogo(''); setFilterData('') }}
+                    >
+                        <i className="fas fa-times"></i> Reset filtri
+                    </button>
+                </div>
+
                 {loading && (
                     <div className="no-results">
                         <i className="fas fa-spinner fa-spin"></i>
@@ -245,17 +304,17 @@ export default function RoleRecap() {
                     </div>
                 )}
 
-                {!loading && !error && sorted.length === 0 && (
+                {!loading && !error && filtered.length === 0 && (
                     <div className="no-results">
                         <i className="fas fa-search"></i>
                         <h3>Nessuna giocata trovata</h3>
-                        <p>Non ci sono giocate disponibili al momento</p>
+                        <p>Prova a modificare i filtri</p>
                     </div>
                 )}
 
-                {!loading && !error && sorted.length > 0 && (
+                {!loading && !error && filtered.length > 0 && (
                     <div className="games-list">
-                        {sorted.map(game => <GameCard key={game.id} game={game} />)}
+                        {filtered.map(game => <GameCard key={game.id} game={game} />)}
                     </div>
                 )}
 
