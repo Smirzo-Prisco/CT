@@ -760,6 +760,49 @@ function getWeaponAttack ($id_arma, $pg_name, $bonus_talento) {
 /************* FINE CHAT di gioco ******************************/
 
 /************* Gestione ROLEPLAYS ******************************/
+
+function ensureQuestSchema() {
+    static $done = false;
+    if ($done) return;
+    $done = true;
+    $cols = gdrcd_query("SHOW COLUMNS FROM role_sessions", 'result');
+    $existing = [];
+    while ($r = gdrcd_query($cols, 'fetch')) $existing[] = $r['Field'];
+    if (!in_array('timer_end', $existing))
+        gdrcd_query("ALTER TABLE role_sessions ADD COLUMN timer_end BIGINT NULL DEFAULT NULL");
+    if (!in_array('turn_mode', $existing))
+        gdrcd_query("ALTER TABLE role_sessions ADD COLUMN turn_mode ENUM('liberi','fissi') NOT NULL DEFAULT 'liberi'");
+    if (!in_array('turn_order_idx', $existing))
+        gdrcd_query("ALTER TABLE role_sessions ADD COLUMN turn_order_idx INT NOT NULL DEFAULT 0");
+    gdrcd_query("CREATE TABLE IF NOT EXISTS quest_turn_order (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        id_role INT NOT NULL,
+        pg_name VARCHAR(50) NOT NULL,
+        position INT NOT NULL DEFAULT 0,
+        UNIQUE KEY uk_role_pg (id_role, pg_name)
+    )");
+}
+
+function questCheckTimerAndOrder($id_role, $login, $is_roll = false) {
+    if (!$id_role) return null;
+    $role = gdrcd_query("SELECT timer_end, turn_mode, turn_order_idx FROM role_sessions WHERE id_role = $id_role");
+    if (!$role) return null;
+    if ($role['timer_end'] !== null) {
+        $now_ms = (int)(microtime(true) * 1000);
+        if ($now_ms >= (int)$role['timer_end'])
+            return 'Tempo scaduto! Attendi che il Master avvii il prossimo turno.';
+    }
+    if (!$is_roll && $role['turn_mode'] === 'fissi') {
+        $idx = (int)$role['turn_order_idx'];
+        $res = gdrcd_query("SELECT pg_name FROM quest_turn_order WHERE id_role = $id_role ORDER BY position ASC", 'result');
+        $players = [];
+        while ($r = gdrcd_query($res, 'fetch')) $players[] = $r['pg_name'];
+        if (!empty($players) && (!isset($players[$idx]) || $players[$idx] !== $login))
+            return 'Turni fissi: è il turno di <b>' . ($players[$idx] ?? '—') . '</b>. Attendi il tuo.';
+    }
+    return null;
+}
+
 function addPgToRole($id_role, $pg_name, $location, $png = 0) {
     // can_send = 1 garantisce che il pg possa vedere dado/scudo sin dal primo turno
     gdrcd_query("INSERT INTO role_session_players (id_role, pg_name, png, can_send) VALUES ($id_role, '$pg_name', $png, 1)");
@@ -824,11 +867,19 @@ function checkTurnEnd($location, $user, $id_role) {
 
         $turn = getTurn($id_role);
 
+        // Se il timer è attivo, auto-conferma tutti senza inviare il prompt
+        $timerActive = false;
+        $roleRow = gdrcd_query("SELECT timer_end FROM role_sessions WHERE id_role = $id_role");
+        if ($roleRow && $roleRow['timer_end'] !== null) {
+            $now_ms = (int)(microtime(true) * 1000);
+            if ($now_ms < (int)$roleRow['timer_end']) $timerActive = true;
+        }
+
         while ($pg = gdrcd_query($pgs, 'fetch')) {
             $pgName = $pg['pg_name'];
 
-            if (hasShieldLaunch($id_role, $pgName, $turn)) {
-                // Ha già uno scudo (car='difesa') nel turno: chiusura automatica senza chiedere
+            if ($timerActive || hasShieldLaunch($id_role, $pgName, $turn)) {
+                // Timer attivo o scudo già lanciato: chiusura automatica senza chiedere
                 gdrcd_query("UPDATE role_session_players SET close_turn = 1 WHERE id_role = $id_role AND pg_name = '$pgName' AND `end` IS NULL");
             } else {
                 // Nessun scudo: notifica diretta alla room personale dm:$pgName (evita
@@ -863,7 +914,7 @@ function closeTurn($id_role, $location) {
     // Rispettare l'ordine dell'esecuzione dei metodi
     setCanSend($id_role); // Impedisco o consento al pg di lanciare nel prossimo turno
     $msgElaboration = elaborateTurn($id_role); // Elaboro il turno per calcolare eventuali danni
-    gdrcd_query("UPDATE role_sessions SET turn = (turn + 1) WHERE id_role = $id_role"); // Passo al turno successivo
+    gdrcd_query("UPDATE role_sessions SET turn = (turn + 1), timer_end = NULL, turn_order_idx = 0 WHERE id_role = $id_role"); // Passo al turno successivo e resetto lo stato quest
     gdrcd_query("UPDATE role_session_players SET `sent` = 0, close_turn = 0 WHERE id_role = $id_role"); // Riporto tutti i pg a sent = 0 e riapro il turno per tutti
     if ($msgElaboration !== '') chatInsertMessage($location, 'System', NULL, $msgElaboration, 'N');
     chatInsertMessage($location, 'System', NULL, 'Turno chiuso! Iniziate il turno successivo...', 'N');

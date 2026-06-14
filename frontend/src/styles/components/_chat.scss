@@ -1977,3 +1977,62 @@ img.chat_avatar_inline {
     color: #66bb6a;
     margin-top: 2px;
 }
+
+// ── MasterPanel tab bar ───────────────────────────────────────────────────────
+
+.gdr-tab-bar {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex: 1;
+    padding: 0 12px;
+}
+
+.gdr-tab-bar .gdr-tab {
+    padding: 6px 14px;
+    font-size: $text-sm;
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    color: #b4b6bf;
+    background: transparent;
+    transition: var(--transition);
+
+    &:hover:not(.gdr-tab--active) {
+        background: rgb(255 255 255 / 6%);
+        color: #d0d2d8;
+    }
+
+    &.gdr-tab--active {
+        border-color: #ce846f;
+        color: #ce846f;
+        background: rgb(206 132 111 / 10%);
+        font-weight: $font-weight-bold;
+    }
+}
+
+// ── Quest timer bar ───────────────────────────────────────────────────────────
+
+.quest-timer-bar {
+    text-align: center;
+    padding: 6px 0;
+    background: rgb(0 0 0 / 20%);
+    border-top: 1px solid #2a2f45;
+    border-bottom: 1px solid #2a2f45;
+    margin-bottom: 4px;
+
+    &__countdown {
+        font-size: 20px;
+        font-weight: bold;
+        color: #b4b6bf;
+        letter-spacing: 3px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__expired {
+        font-size: 14px;
+        font-weight: bold;
+        color: #ef5350;
+        letter-spacing: 1px;
+    }
+}

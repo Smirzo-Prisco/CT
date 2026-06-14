@@ -237,6 +237,40 @@ function CuraPanel({ onClose, isOspedale }) {
 }
 
 // ---------------------------------------------------------------------------
+// COUNTDOWN TIMER QUEST
+// ---------------------------------------------------------------------------
+
+function QuestTimerDisplay({ timerEnd, timerExpiredCalledRef }) {
+    const [timeLeft, setTimeLeft] = useState(null)
+
+    useEffect(() => {
+        const tick = () => {
+            const left = Math.max(0, Math.floor((timerEnd - Date.now()) / 1000))
+            setTimeLeft(left)
+            if (left === 0 && !timerExpiredCalledRef.current) {
+                timerExpiredCalledRef.current = true
+                fetch('/pages/api_chat.php?op=timerExpired', { method: 'POST' }).catch(() => { })
+            }
+        }
+        tick()
+        const iv = setInterval(tick, 500)
+        return () => clearInterval(iv)
+    }, [timerEnd, timerExpiredCalledRef])
+
+    const mm = timeLeft !== null ? String(Math.floor(timeLeft / 60)).padStart(2, '0') : '--'
+    const ss = timeLeft !== null ? String(timeLeft % 60).padStart(2, '0') : '--'
+
+    return (
+        <div className="quest-timer-bar">
+            {timeLeft === 0
+                ? <span className="quest-timer-bar__expired">Tempo scaduto</span>
+                : <span className="quest-timer-bar__countdown">{mm}:{ss}</span>
+            }
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
@@ -288,6 +322,12 @@ export default function ChatShell() {
      * Null se non c'è nulla da confermare, { id_role } altrimenti.
      */
     const [closeTurnPrompt, setCloseTurnPrompt] = useState(null)
+
+    /** Stato quest: timer, modalità turno, ordine turni */
+    const [questState, setQuestState] = useState({ timerEnd: null, turnMode: 'liberi', turnOrder: [], currentIdx: 0 })
+
+    /** Ref per evitare chiamate multiple a timerExpired */
+    const timerExpiredCalledRef = useRef(false)
 
     // -----------------------------------------------------------------------
     // FETCH DATI SHELL
@@ -384,6 +424,52 @@ export default function ChatShell() {
                 if (d.success && d.pending) setCloseTurnPrompt({ id_role: d.id_role })
             })
             .catch(() => { })
+    }, [shell])
+
+    /** Carica lo stato quest iniziale una volta che la shell è pronta. */
+    useEffect(() => {
+        if (!shell) return
+        fetch('/pages/api_chat.php?op=getQuestState')
+            .then(r => r.json())
+            .then(d => {
+                if (d.success && d.active) {
+                    setQuestState({
+                        timerEnd:   d.timer_end ?? null,
+                        turnMode:   d.turn_mode ?? 'liberi',
+                        turnOrder:  d.turn_order ?? [],
+                        currentIdx: d.turn_order_idx ?? 0,
+                    })
+                    timerExpiredCalledRef.current = false
+                }
+            })
+            .catch(() => { })
+    }, [shell])
+
+    /** Ascolta gli eventi socket quest:* per aggiornare lo stato in tempo reale. */
+    useEffect(() => {
+        if (!shell) return
+        const sock = window.ctSocket
+        if (!sock) return
+
+        const onTimerSet  = (data) => { setQuestState(q => ({ ...q, timerEnd: data.timer_end })); timerExpiredCalledRef.current = false }
+        const onTimerStop = ()     => setQuestState(q => ({ ...q, timerEnd: null }))
+        const onTurnMode  = (data) => setQuestState(q => ({ ...q, turnMode: data.mode }))
+        const onTurnOrder = (data) => setQuestState(q => ({ ...q, turnOrder: data.order, currentIdx: data.current_idx ?? 0 }))
+        const onTurnAdv   = (data) => setQuestState(q => ({ ...q, currentIdx: data.current_idx, turnOrder: data.order ?? q.turnOrder }))
+
+        sock.on('quest:timer_set',   onTimerSet)
+        sock.on('quest:timer_stop',  onTimerStop)
+        sock.on('quest:turn_mode',   onTurnMode)
+        sock.on('quest:turn_order',  onTurnOrder)
+        sock.on('quest:turn_advance',onTurnAdv)
+
+        return () => {
+            sock.off('quest:timer_set',   onTimerSet)
+            sock.off('quest:timer_stop',  onTimerStop)
+            sock.off('quest:turn_mode',   onTurnMode)
+            sock.off('quest:turn_order',  onTurnOrder)
+            sock.off('quest:turn_advance',onTurnAdv)
+        }
     }, [shell])
 
     /**
@@ -657,8 +743,9 @@ export default function ChatShell() {
 
                     {/* ============================================================ */}
                     {/* PROMPT CHIUSURA TURNO — compare quando tutti hanno agito     */}
+                    {/* Soppresso se il timer è attivo (auto-conferma lato server)   */}
                     {/* ============================================================ */}
-                    {closeTurnPrompt && (
+                    {closeTurnPrompt && !questState.timerEnd && (
                         <div className="attack-prompt">
                             <span className="attack-prompt-text">
                                 Prima di concludere il tuo turno, accertati di non dover effettuare lanci.
@@ -670,6 +757,13 @@ export default function ChatShell() {
                                 </button>
                             </div>
                         </div>
+                    )}
+
+                    {/* ============================================================ */}
+                    {/* COUNTDOWN TIMER QUEST — visibile a tutti quando timer attivo */}
+                    {/* ============================================================ */}
+                    {questState.timerEnd && (
+                        <QuestTimerDisplay timerEnd={questState.timerEnd} timerExpiredCalledRef={timerExpiredCalledRef} />
                     )}
 
                     {/* ============================================================ */}
@@ -1020,6 +1114,8 @@ export default function ChatShell() {
                         isOpen={masterPanelOpen}
                         onClose={() => setMasterPanelOpen(false)}
                         showPulisci={pulsanti.show_pulisci}
+                        questState={questState}
+                        luogo={luogo}
                     />
                 )}
 

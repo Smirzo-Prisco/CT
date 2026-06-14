@@ -41,6 +41,15 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $turn = getTurn($id_role);
 
             /**************************** CONTROLLI   ************************************************/
+                // Verifica timer quest (is_roll=true, quindi ordine turni ignorato per i lanci)
+                if ($id_role) {
+                    $questErrSkill = questCheckTimerAndOrder($id_role, $login, true);
+                    if ($questErrSkill !== null) {
+                        echo json_encode(['success' => false, 'message' => $questErrSkill]);
+                        exit;
+                    }
+                }
+
                 // Se il pg ha già lanciato un attacco e uno scudo nel turno precedente, non può attaccare
                 if ($skill_info['tipo'] != 'Difensiva' && $can_send === 0) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione, non puoi agire: nel turno precedente hai già usato lo scudo difensivo.'));
@@ -377,12 +386,21 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $turn = getTurn($id_role);
 
             /****************************  CONTROLLI   ************************************************/
+            // Verifica timer quest
+            if ($id_role) {
+                $questErrDado = questCheckTimerAndOrder($id_role, $login, true);
+                if ($questErrDado !== null) {
+                    echo json_encode(['success' => false, 'message' => $questErrDado]);
+                    exit;
+                }
+            }
+
             // Se il pg non è nella role della chat
             if (!pgIsInRole($login, $luogo) && !isAdminMasterMod($_SESSION)) {
                 echo json_encode(array('success' => false, 'message' => 'Attenzione, nessuna role attiva per il tuo pg!'));
                 exit;
             }
-            
+
             // Per gli attacchi con dado il bersaglio deve essere uno solo
             if(empty($bersaglio)) {
                 echo json_encode(array('success' => false, 'message' => 'Attenzione, selezione errata del bersaglio!'));
@@ -483,6 +501,15 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             /****************************  FINE Definizione variabili   ************************************************/
 
             /****************************  CONTROLLI   ************************************************/
+                // Verifica timer quest
+                if ($id_role) {
+                    $questErrAtk = questCheckTimerAndOrder($id_role, $login, true);
+                    if ($questErrAtk !== null) {
+                        echo json_encode(['success' => false, 'message' => $questErrAtk]);
+                        exit;
+                    }
+                }
+
                 // Se il pg non è nella role della chat
                 if (!pgIsInRole($login, $luogo) && !isAdminMasterMod($_SESSION)) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione, nessuna role attiva per il tuo pg!'));
@@ -592,12 +619,22 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $back_chat = $pg['back_chat'] == 1 ? true : false;
             $dado_selezionato = isset($data['dado']) ? (int)$data['dado'] : 0;
 
+            // Verifica timer quest
+            $id_role_dado_gen = locationActiveRole($luogo);
+            if ($id_role_dado_gen) {
+                $questErrDadoGen = questCheckTimerAndOrder($id_role_dado_gen, $login, true);
+                if ($questErrDadoGen !== null) {
+                    echo json_encode(['success' => false, 'message' => $questErrDadoGen]);
+                    exit;
+                }
+            }
+
             // Se il pg non è nella role della chat
             if (!pgIsInRole($login, $luogo) && !isAdminMasterMod($_SESSION)) {
                 echo json_encode(array('success' => false, 'message' => 'Attenzione, nessuna role attiva per il tuo pg!'));
                 exit;
             }
-            
+
             if ($dado_selezionato > 0) {
                 $num = mt_rand(1, $dado_selezionato);
                 $messaggio = "$login esegue un tiro totale di $num/$dado_selezionato";
@@ -873,12 +910,34 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             // Se il personaggio che invia è soggetto a una skill di durata, scalo i punti (integrità) — solo per le azioni P (una per turno)
             if ($m_type === 'P') checkSkillEffect($login, $location);
+
+            // Verifica timer e ordine turni per le azioni P
+            if ($m_type === 'P' && $id_role) {
+                $questErr = questCheckTimerAndOrder($id_role, $login, false);
+                if ($questErr !== null) {
+                    echo json_encode(['success' => false, 'message' => $questErr]);
+                    exit;
+                }
+            }
             /**************************** FINE  CONTROLLI   ************************************************/
 
             // Determina se è un sussurro, un messaggio normale o comando stanza privata
             if ($m_type === 'S') handleWhisperMessage($type, $chat_message, $tag_n_beyond, $m_type, $_SESSION);
             elseif ($type < "5" || $type > "7") handleNormalMessage($chat_message, $action_tag, $login, $m_type, $_SESSION, $PARAMETERS, $id_role);
             else handleRoomCommand($m_type, $tag_n_beyond, $_SESSION, $data);
+
+            // In modalità fissi, avanza l'indice dopo un'azione P
+            if ($m_type === 'P' && $id_role) {
+                $roleMode = gdrcd_query("SELECT turn_mode, turn_order_idx FROM role_sessions WHERE id_role = $id_role");
+                if ($roleMode && $roleMode['turn_mode'] === 'fissi') {
+                    $res_ord = gdrcd_query("SELECT pg_name FROM quest_turn_order WHERE id_role = $id_role ORDER BY position ASC", 'result');
+                    $ord_players = [];
+                    while ($r = gdrcd_query($res_ord, 'fetch')) $ord_players[] = $r['pg_name'];
+                    $new_idx = count($ord_players) > 0 ? ((int)$roleMode['turn_order_idx'] + 1) % count($ord_players) : 0;
+                    gdrcd_query("UPDATE role_sessions SET turn_order_idx = $new_idx WHERE id_role = $id_role");
+                    notifySocketServer('quest:turn_advance', 'loc:' . $location, ['current_idx' => $new_idx, 'order' => $ord_players]);
+                }
+            }
             
             // Aggiorna tag nella sessione
             $_SESSION['tag'] = gdrcd_filter('in', $data['tag']);
@@ -1759,6 +1818,97 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             chatInsertMessage($luogo, 'System', $login, "cura $target_raw di $ps_cura PS. Salute attuale: $nuova_sal/$sal_max_t.", 'N');
 
             echo json_encode(['success' => true, 'punti_effettivi' => $ps_cura, 'nuova_salute' => $nuova_sal]);
+            break;
+
+        case 'getQuestState':
+            ensureQuestSchema();
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) {
+                echo json_encode(['success' => true, 'active' => false]);
+                exit;
+            }
+            $role = gdrcd_query("SELECT timer_end, turn_mode, turn_order_idx FROM role_sessions WHERE id_role = $id_role");
+            $res_order = gdrcd_query("SELECT pg_name FROM quest_turn_order WHERE id_role = $id_role ORDER BY position ASC", 'result');
+            $turn_order = [];
+            while ($r = gdrcd_query($res_order, 'fetch')) $turn_order[] = $r['pg_name'];
+            echo json_encode([
+                'success'       => true,
+                'active'        => true,
+                'id_role'       => (int)$id_role,
+                'timer_end'     => $role['timer_end'] !== null ? (int)$role['timer_end'] : null,
+                'turn_mode'     => $role['turn_mode'] ?? 'liberi',
+                'turn_order'    => $turn_order,
+                'turn_order_idx'=> (int)($role['turn_order_idx'] ?? 0),
+            ]);
+            break;
+
+        case 'setQuestTimer':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            ensureQuestSchema();
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+            $seconds   = max(1, (int)($data['seconds'] ?? 60));
+            $timer_end = (int)(microtime(true) * 1000) + ($seconds * 1000);
+            gdrcd_query("UPDATE role_sessions SET timer_end = $timer_end WHERE id_role = $id_role");
+            notifySocketServer('quest:timer_set', 'loc:' . $luogo, ['timer_end' => $timer_end]);
+            echo json_encode(['success' => true, 'timer_end' => $timer_end]);
+            break;
+
+        case 'stopQuestTimer':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            ensureQuestSchema();
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+            gdrcd_query("UPDATE role_sessions SET timer_end = NULL WHERE id_role = $id_role");
+            notifySocketServer('quest:timer_stop', 'loc:' . $luogo, []);
+            echo json_encode(['success' => true]);
+            break;
+
+        case 'setTurnMode':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            ensureQuestSchema();
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+            $mode = ($data['mode'] ?? '') === 'fissi' ? 'fissi' : 'liberi';
+            gdrcd_query("UPDATE role_sessions SET turn_mode = '$mode', turn_order_idx = 0 WHERE id_role = $id_role");
+            notifySocketServer('quest:turn_mode', 'loc:' . $luogo, ['mode' => $mode]);
+            echo json_encode(['success' => true, 'mode' => $mode]);
+            break;
+
+        case 'setTurnOrder':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            ensureQuestSchema();
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+            $order = is_array($data['order'] ?? null) ? $data['order'] : [];
+            gdrcd_query("DELETE FROM quest_turn_order WHERE id_role = $id_role");
+            foreach ($order as $pos => $pg_name) {
+                $pg_name_f = gdrcd_filter('in', $pg_name);
+                gdrcd_query("INSERT INTO quest_turn_order (id_role, pg_name, position) VALUES ($id_role, '$pg_name_f', $pos)");
+            }
+            gdrcd_query("UPDATE role_sessions SET turn_order_idx = 0 WHERE id_role = $id_role");
+            notifySocketServer('quest:turn_order', 'loc:' . $luogo, ['order' => $order, 'current_idx' => 0]);
+            echo json_encode(['success' => true]);
+            break;
+
+        case 'timerExpired':
+            ensureQuestSchema();
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+            $role_te = gdrcd_query("SELECT timer_end FROM role_sessions WHERE id_role = $id_role");
+            if (!$role_te || $role_te['timer_end'] === null) { echo json_encode(['success' => false, 'message' => 'Timer non attivo']); exit; }
+            $now_ms = (int)(microtime(true) * 1000);
+            if ($now_ms < (int)$role_te['timer_end']) { echo json_encode(['success' => false, 'message' => 'Timer non ancora scaduto']); exit; }
+            gdrcd_query("UPDATE role_sessions SET timer_end = NULL WHERE id_role = $id_role");
+            notifySocketServer('quest:timer_stop', 'loc:' . $luogo, []);
+            closeTurn($id_role, $luogo);
+            echo json_encode(['success' => true]);
             break;
 
         default: echo json_encode(['error' => 'Operazione non valida']); break;

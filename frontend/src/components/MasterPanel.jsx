@@ -21,7 +21,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 
 // ── Modifica Personaggio ──────────────────────────────────────────────────────
@@ -380,14 +380,195 @@ function AttacchiPngSospeso() {
     )
 }
 
+// ── QuestPanel ────────────────────────────────────────────────────────────────
+
+function QuestPanel({ questState, luogo }) {
+    const [mins, setMins]       = useState(0)
+    const [secs, setSecs]       = useState(30)
+    const [timeLeft, setTimeLeft] = useState(null)
+    const [pgListLocal, setPgListLocal] = useState([])
+    const [localOrder, setLocalOrder]   = useState([])
+    const [orderMsg, setOrderMsg]       = useState('')
+
+    // Countdown locale
+    useEffect(() => {
+        if (!questState.timerEnd) { setTimeLeft(null); return }
+        const tick = () => {
+            const left = Math.max(0, Math.floor((questState.timerEnd - Date.now()) / 1000))
+            setTimeLeft(left)
+        }
+        tick()
+        const iv = setInterval(tick, 500)
+        return () => clearInterval(iv)
+    }, [questState.timerEnd])
+
+    function avviaTimer() {
+        const seconds = mins * 60 + secs
+        if (seconds < 1) return
+        fetch('/pages/api_chat.php?op=setQuestTimer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ seconds }),
+        })
+    }
+
+    function fermaTimer() {
+        fetch('/pages/api_chat.php?op=stopQuestTimer', { method: 'POST' })
+    }
+
+    function setMode(mode) {
+        fetch('/pages/api_chat.php?op=setTurnMode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode }),
+        })
+    }
+
+    function caricaGiocatori() {
+        fetch('/pages/api_roleSession.php?op=getRolePgs', { method: 'POST' })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    const users = d.users ?? []
+                    setPgListLocal(users)
+                    setLocalOrder(questState.turnOrder.length > 0
+                        ? questState.turnOrder.filter(p => users.includes(p))
+                        : [...users])
+                }
+            })
+    }
+
+    function moveUp(idx) {
+        if (idx === 0) return
+        setLocalOrder(prev => {
+            const a = [...prev]
+            ;[a[idx - 1], a[idx]] = [a[idx], a[idx - 1]]
+            return a
+        })
+    }
+
+    function moveDown(idx) {
+        setLocalOrder(prev => {
+            if (idx >= prev.length - 1) return prev
+            const a = [...prev]
+            ;[a[idx], a[idx + 1]] = [a[idx + 1], a[idx]]
+            return a
+        })
+    }
+
+    function salvaOrdine() {
+        fetch('/pages/api_chat.php?op=setTurnOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order: localOrder }),
+        })
+            .then(r => r.json())
+            .then(d => setOrderMsg(d.success ? 'Ordine salvato.' : (d.message ?? 'Errore')))
+    }
+
+    const fmtTime = (s) => {
+        if (s === null) return '--:--'
+        const m = Math.floor(s / 60)
+        const r = s % 60
+        return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`
+    }
+
+    return (
+        <div className="gdr-grid">
+            {/* Timer */}
+            <div className="gdr-card">
+                <div className="gdr-card-title">Timer Turno</div>
+                <div className="gdr-form-group" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input className="gdr-input" type="number" min={0} max={59} value={mins}
+                        onChange={e => setMins(Math.max(0, Math.min(59, +e.target.value)))}
+                        style={{ width: '60px' }} />
+                    <span style={{ color: '#b4b6bf' }}>min</span>
+                    <input className="gdr-input" type="number" min={0} max={59} value={secs}
+                        onChange={e => setSecs(Math.max(0, Math.min(59, +e.target.value)))}
+                        style={{ width: '60px' }} />
+                    <span style={{ color: '#b4b6bf' }}>sec</span>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                    <button className="gdr-button gdr-btn-success" onClick={avviaTimer}>Avvia</button>
+                    {questState.timerEnd && (
+                        <button className="gdr-button" onClick={fermaTimer}>Ferma</button>
+                    )}
+                </div>
+                {timeLeft !== null && (
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: timeLeft === 0 ? '#ef5350' : '#b4b6bf', textAlign: 'center', letterSpacing: '2px' }}>
+                        {timeLeft === 0 ? 'Scaduto' : fmtTime(timeLeft)}
+                    </div>
+                )}
+            </div>
+
+            {/* Modalità */}
+            <div className="gdr-card">
+                <div className="gdr-card-title">Modalità Turno</div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                        className={`gdr-button${questState.turnMode === 'liberi' ? ' gdr-tab--active' : ''}`}
+                        onClick={() => setMode('liberi')}
+                        style={questState.turnMode === 'liberi' ? { background: '#3a4a6a', borderColor: '#ce846f', color: '#ce846f' } : {}}>
+                        Turni liberi
+                    </button>
+                    <button
+                        className={`gdr-button${questState.turnMode === 'fissi' ? ' gdr-tab--active' : ''}`}
+                        onClick={() => setMode('fissi')}
+                        style={questState.turnMode === 'fissi' ? { background: '#3a4a6a', borderColor: '#ce846f', color: '#ce846f' } : {}}>
+                        Turni fissi
+                    </button>
+                </div>
+            </div>
+
+            {/* Ordine turni */}
+            <div className="gdr-card">
+                <div className="gdr-card-title">Ordine Turni</div>
+                <button className="gdr-button" style={{ marginBottom: '10px', fontSize: '11px' }} onClick={caricaGiocatori}>
+                    Carica giocatori
+                </button>
+                {localOrder.length === 0 && (
+                    <p style={{ fontSize: '12px', color: '#8f8f8f' }}>Nessun giocatore caricato.</p>
+                )}
+                {localOrder.map((name, idx) => (
+                    <div key={name} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                        <span style={{
+                            fontSize: '12px', flex: 1, color: '#b4b6bf',
+                            fontWeight: questState.turnMode === 'fissi' && idx === questState.currentIdx ? 'bold' : 'normal',
+                            color: questState.turnMode === 'fissi' && idx === questState.currentIdx ? '#ce846f' : '#b4b6bf',
+                        }}>
+                            {questState.turnMode === 'fissi' && idx === questState.currentIdx ? '▶ ' : ''}{name}
+                        </span>
+                        <button type="button" onClick={() => moveUp(idx)}
+                            style={{ background: 'none', border: '1px solid #3a3f5a', color: '#b4b6bf', cursor: 'pointer', borderRadius: '3px', padding: '2px 6px' }}>↑</button>
+                        <button type="button" onClick={() => moveDown(idx)}
+                            style={{ background: 'none', border: '1px solid #3a3f5a', color: '#b4b6bf', cursor: 'pointer', borderRadius: '3px', padding: '2px 6px' }}>↓</button>
+                    </div>
+                ))}
+                {localOrder.length > 0 && (
+                    <>
+                        <button className="gdr-button gdr-btn-success" onClick={salvaOrdine} style={{ marginTop: '8px' }}>
+                            Salva Ordine
+                        </button>
+                        {orderMsg && <p style={{ color: '#8cba8c', fontSize: '12px', marginTop: '6px' }}>{orderMsg}</p>}
+                    </>
+                )}
+            </div>
+        </div>
+    )
+}
+
 // ── Componente principale ─────────────────────────────────────────────────────
 
 /**
  * @param {boolean}  props.isOpen      - Il pannello master è visibile
  * @param {Function} props.onClose     - Callback per chiudere il pannello
  * @param {boolean}  props.showPulisci - Mostra l'icona pulisci chat (solo staff abilitato)
+ * @param {object}   props.questState  - Stato quest: timerEnd, turnMode, turnOrder, currentIdx
+ * @param {number}   props.luogo       - ID stanza corrente
  */
-export default function MasterPanel({ isOpen, onClose, showPulisci }) {
+export default function MasterPanel({ isOpen, onClose, showPulisci, questState, luogo }) {
+    const [activeTab, setActiveTab] = useState('pg-png')
+
     if (!isOpen) return null
 
     return createPortal(
@@ -408,6 +589,18 @@ export default function MasterPanel({ isOpen, onClose, showPulisci }) {
                 {/* Header */}
                 <div className="gdr-header">
                     <div className="gdr-logo">Pannello Master</div>
+                    <div className="gdr-tab-bar">
+                        <button
+                            className={`gdr-tab${activeTab === 'pg-png' ? ' gdr-tab--active' : ''}`}
+                            onClick={() => setActiveTab('pg-png')}>
+                            PG &amp; PNG
+                        </button>
+                        <button
+                            className={`gdr-tab${activeTab === 'quest' ? ' gdr-tab--active' : ''}`}
+                            onClick={() => setActiveTab('quest')}>
+                            Quest
+                        </button>
+                    </div>
                     <div className="gdr-main-controls">
                         <a href="#" id="endTurnMaster" className="gdr-control-btn" title="Chiudi turno"
                             onClick={e => { e.preventDefault(); window.closeTurn?.() }}>
@@ -428,13 +621,18 @@ export default function MasterPanel({ isOpen, onClose, showPulisci }) {
                 {/* Corpo scrollabile */}
                 <div style={{ overflowY: 'auto', padding: '16px', flex: 1 }}>
 
-                    {/* Modifica PG + Crea PNG + Gestione PNG + Attacchi PNG in sospeso */}
-                    <div className="gdr-grid">
-                        <CreaPng />
-                        <GestionePng />
-                        <AttacchiPngSospeso />
-                        <ModificaPG />
-                    </div>
+                    {activeTab === 'pg-png' && (
+                        <div className="gdr-grid">
+                            <CreaPng />
+                            <GestionePng />
+                            <AttacchiPngSospeso />
+                            <ModificaPG />
+                        </div>
+                    )}
+
+                    {activeTab === 'quest' && (
+                        <QuestPanel questState={questState} luogo={luogo} />
+                    )}
 
                 </div>
             </div>
