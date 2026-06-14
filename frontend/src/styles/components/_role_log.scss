@@ -266,6 +266,30 @@
 
     .rl-error i { color: #{$color-warning}; }
 
+    // ── Torna in cima ─────────────────────────────────────────
+
+    .rl-back-to-top {
+        position: fixed;
+        bottom: $space-6;
+        right: $space-6;
+        width: 44px;
+        height: 44px;
+        border-radius: $radius-full;
+        background: #{$palette-action};
+        color: #{$palette-surface-deep};
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        box-shadow: #{$shadow-lg};
+        transition: all #{$transition-normal};
+        z-index: 100;
+
+        &:hover { background: #{$palette-action-hover}; transform: translateY(-3px); }
+    }
+
     // ── Responsive ────────────────────────────────────────────
 
     @media (max-width: 768px) {

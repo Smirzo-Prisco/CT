@@ -18,7 +18,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
@@ -138,6 +138,13 @@ export default function RoleLog() {
     }, [id])
 
     const endRef = useRef(null)
+    const [showTop, setShowTop] = useState(false)
+
+    useEffect(() => {
+        const onScroll = () => setShowTop(window.scrollY > 300)
+        window.addEventListener('scroll', onScroll)
+        return () => window.removeEventListener('scroll', onScroll)
+    }, [])
 
     if (loading) return (
         <div id="role-log-app">
@@ -193,6 +200,18 @@ export default function RoleLog() {
                 </div>
 
             </div>
+
         </div>
+
+        {showTop && (
+            <button
+                className="rl-back-to-top"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                title="Torna in cima"
+            >
+                <i className="fas fa-chevron-up"></i>
+            </button>
+        )}
+    </div>
     )
 }
