@@ -201,17 +201,16 @@ export default function RoleLog() {
 
             </div>
 
-        </div>
+            {showTop && (
+                <button
+                    className="rl-back-to-top"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    title="Torna in cima"
+                >
+                    <i className="fas fa-chevron-up"></i>
+                </button>
+            )}
 
-        {showTop && (
-            <button
-                className="rl-back-to-top"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                title="Torna in cima"
-            >
-                <i className="fas fa-chevron-up"></i>
-            </button>
-        )}
-    </div>
+        </div>
     )
 }

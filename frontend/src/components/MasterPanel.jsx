@@ -530,7 +530,7 @@ function QuestPanel({ questState, luogo }) {
                 {localOrder.map((name, idx) => (
                     <div key={name} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                         <span style={{
-                            fontSize: '12px', flex: 1, color: '#b4b6bf',
+                            fontSize: '12px', flex: 1,
                             fontWeight: questState.turnMode === 'fissi' && idx === questState.currentIdx ? 'bold' : 'normal',
                             color: questState.turnMode === 'fissi' && idx === questState.currentIdx ? '#ce846f' : '#b4b6bf',
                         }}>
