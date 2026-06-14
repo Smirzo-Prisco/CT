@@ -1991,22 +1991,20 @@ img.chat_avatar_inline {
 .gdr-tab-bar .gdr-tab {
     padding: 6px 14px;
     font-size: $text-sm;
-    border: 1px solid transparent;
-    border-radius: 4px 4px 0 0;
+    border: none;
+    border-bottom: 3px solid transparent;
     cursor: pointer;
-    color: #b4b6bf;
+    color: var(--text-light);
     background: transparent;
     transition: var(--transition);
 
     &:hover:not(.gdr-tab--active) {
-        background: rgb(255 255 255 / 6%);
-        color: #d0d2d8;
+        background: rgb(255 255 255 / 5%);
     }
 
     &.gdr-tab--active {
-        border-color: #ce846f;
-        color: #ce846f;
-        background: rgb(206 132 111 / 10%);
+        border-bottom-color: var(--accent-color);
+        color: var(--text-lighter);
         font-weight: $font-weight-bold;
     }
 }
