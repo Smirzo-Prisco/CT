@@ -52,7 +52,7 @@ const ZONES = [
             { dir: 2, img: 'porto.png' },
             { dir: 3, img: 'ponte.png' },
             { dir: 22, img: 'spiaggia.png' },
-            { dir: 32, img: 'regno_di_caos.png' },
+            // { dir: 32, img: 'regno_di_caos.png' },
         ],
     },
     {
@@ -63,7 +63,7 @@ const ZONES = [
         rooms: [
             { dir: 9, img: 'bosco.png' },
             { dir: 28, img: 'terme.png' },
-            { dir: 11, img: 'stella_prima.png' },
+            // { dir: 11, img: 'stella_prima.png' },
             { dir: 428, img: 'nikigori.png' },
             { dir: 10, img: 'altri_luoghi.png' },
         ],
@@ -74,7 +74,7 @@ const ZONES = [
         cx: 446, cy: 289,
         desc: 'Ueno (上野) è il quartiere in cui risiedono i più importanti musei e parchi di tutta la città. Densamente popolato soprattutto durante la fioritura dei sakura.',
         rooms: [
-            { dir: 43, img: 'giardini_dei_fiori_del_male.png' },
+            // { dir: 43, img: 'giardini_dei_fiori_del_male.png' },
             { dir: 16, img: 'luna_park.png' },
             { dir: 4, img: 'parco_di_ueno.png' },
             { dir: 12, img: 'periferia_nord.png' },
@@ -87,7 +87,7 @@ const ZONES = [
         cx: 47, cy: 298,
         desc: 'Shinjuku (新宿区) è il più importante e trafficato nodo di trasporto urbano della metropoli.',
         rooms: [
-            { dir: 27, img: 'villa_lancaster.png' },
+            // { dir: 27, img: 'villa_lancaster.png' },
             { dir: 14, img: 'secret_pandora.png' },
             { dir: 38, img: 'stazione.png' },
             { dir: 18, img: 'zona_malfamata.png' },
@@ -101,7 +101,7 @@ const ZONES = [
         rooms: [
             { dir: 36, img: 'corte.png' },
             { dir: 25, img: 'ospedale.png' },
-            { dir: 17, img: 'palazzo_di_cristallo.png' },
+            // { dir: 17, img: 'palazzo_di_cristallo.png' },
             // Chitoku Academy: compare solo di notte nel vecchio PHP (mostrata per prima di notte)
             { dir: 26, img: 'chitoku_academy.png', nightOnly: false },
         ],
@@ -139,8 +139,8 @@ const ZONES = [
         desc: 'Asakusa (浅草) viene spesso associata alla zona spirituale. Dominata da templi e santuari shinto, è possibile notare persone vestite con abiti tradizionali.',
         rooms: [
             { dir: 34, img: 'cimitero.png' },
-            { dir: 19, img: 'santuario_di_cosmos.png' },
-            { dir: 31, img: 'reggia_lunare.png' },
+            // { dir: 19, img: 'santuario_di_cosmos.png' },
+            // { dir: 31, img: 'reggia_lunare.png' },
             { dir: 48, img: 'zona_residenziale_est.png' },
         ],
     },
