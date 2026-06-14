@@ -243,6 +243,85 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 'current_user' => $_SESSION['login'],
             ]);
             break;
+        case 'getRoleLog':
+            $id_role  = isset($_GET['id']) ? (int)trim($_GET['id']) : 0;
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'ID mancante']); break; }
+
+            $is_staff = isAdminMasterMod($_SESSION);
+            $login_f  = gdrcd_filter('in', $_SESSION['login']);
+
+            // Verifica accesso: deve aver partecipato o essere staff
+            if (!$is_staff) {
+                $check = gdrcd_query("SELECT 1 FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login_f' LIMIT 1");
+                if (!$check) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); break; }
+            }
+
+            $role_row = gdrcd_query("SELECT rs.*, m.nome FROM role_sessions rs LEFT JOIN mappa m ON rs.location = m.id WHERE rs.id_role = $id_role");
+            if (!$role_row) { echo json_encode(['success' => false, 'message' => 'Giocata non trovata']); break; }
+
+            $r_start    = $role_row['start'];
+            $r_end      = $role_row['end'];
+            $r_location = (int)$role_row['location'];
+            $end_sql    = $r_end ? "AND ora <= '$r_end'" : "AND ora <= NOW()";
+
+            $role_info = [
+                'id'           => $id_role,
+                'luogo'        => gdrcd_filter('out', $role_row['nome']),
+                'luogo_id'     => $r_location,
+                'data'         => date('Y-m-d', strtotime($r_start)),
+                'oraInizio'    => date('H:i', strtotime($r_start)),
+                'oraFine'      => $r_end ? date('H:i', strtotime($r_end)) : null,
+                'totTurni'     => (int)$role_row['turn'],
+                'partecipanti' => getRolePgs($id_role, false),
+                'inCorso'      => $r_end === null,
+            ];
+
+            $msg_result = gdrcd_query(
+                "SELECT tipo, mittente, destinatario, ora, testo FROM chat
+                 WHERE stanza = $r_location AND ora >= '$r_start' $end_sql
+                 ORDER BY ora ASC",
+                'result'
+            );
+
+            $messages = [];
+            while ($msg = gdrcd_query($msg_result, 'fetch')) {
+                $tipo = $msg['tipo'];
+
+                // Sussurri: solo mittente, destinatario o staff
+                if ($tipo === 'S' && !$is_staff
+                    && $msg['mittente'] !== $_SESSION['login']
+                    && $msg['destinatario'] !== $_SESSION['login']) continue;
+
+                $testo = gdrcd_filter('out', $msg['testo']);
+
+                // Colora il dialogo tra parentesi/capovolta
+                if (in_array($tipo, ['P', 'A', 'M', 'G', 'X'])) {
+                    $testo = str_replace(['[', ']', '«', '»'],
+                        ['[<span class="rl-dialog">', '</span>]',
+                         '«<span class="rl-dialog">', '</span>»'],
+                        $testo);
+                }
+                // Colore natura per master/fato globale
+                if (in_array($tipo, ['M', 'G', 'X'])) {
+                    $testo = str_replace(['{', '}'], ['<span class="rl-nature">', '</span>'], $testo);
+                }
+                // Sottolinea nome utente corrente
+                if (in_array($tipo, ['P', 'A', 'M'])) {
+                    $testo = gdrcd_chatme($_SESSION['login'], $testo);
+                }
+
+                $messages[] = [
+                    'tipo'         => $tipo,
+                    'mittente'     => gdrcd_filter('out', $msg['mittente']),
+                    'destinatario' => gdrcd_filter('out', $msg['destinatario']),
+                    'ora'          => date('H:i', strtotime($msg['ora'])),
+                    'testo'        => $testo,
+                ];
+            }
+
+            echo json_encode(['success' => true, 'role' => $role_info, 'messages' => $messages, 'login' => $_SESSION['login']]);
+            break;
+
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
 } else {

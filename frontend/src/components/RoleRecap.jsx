@@ -81,8 +81,17 @@ function GameCard({ game }) {
                         {isToday && <span style={{ color: 'var(--secondary-color)', fontWeight: 'bold' }}> (Oggi)</span>}
                     </div>
                 </div>
-                <div className={`status-badge ${game.inCorso ? 'status-in-corso' : 'status-conclusa'}`}>
-                    {game.inCorso ? 'In corso' : 'Conclusa'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <button
+                        className="game-log-btn"
+                        title="Leggi log giocata"
+                        onClick={() => navigate(`main.php?page=role_log&id=${game.id}`)}
+                    >
+                        <i className="fas fa-scroll"></i>
+                    </button>
+                    <div className={`status-badge ${game.inCorso ? 'status-in-corso' : 'status-conclusa'}`}>
+                        {game.inCorso ? 'In corso' : 'Conclusa'}
+                    </div>
                 </div>
             </div>
 

@@ -48,6 +48,7 @@ import SchedaOggetti  from './components/SchedaOggetti'
 import Gestione             from './components/Gestione'
 import Uffici               from './components/Uffici'
 import RoleRecap            from './components/RoleRecap'
+import RoleLog              from './components/RoleLog'
 import ElencoStaff          from './components/ElencoStaff'
 import ElencoVolti          from './components/ElencoVolti'
 import Anagrafe             from './components/Anagrafe'
@@ -162,6 +163,10 @@ const ROUTES = {
     },
     role_recap: {
         component: RoleRecap,
+        css: [],
+    },
+    role_log: {
+        component: RoleLog,
         css: [],
     },
     elenco_staff: {

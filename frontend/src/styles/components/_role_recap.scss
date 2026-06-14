@@ -197,6 +197,26 @@
     .stat-value     { font-size: 1.8rem; font-weight: 700; color: var(--title); }
     .stat-label     { font-size: 0.9rem; color: var(--text-secondary); }
 
+    // ── Pulsante log ──────────────────────────────────────────
+
+    .game-log-btn {
+        background: transparent;
+        border: 1px solid var(--border-input);
+        border-radius: $radius-md;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 4px 10px;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        line-height: 1;
+
+        &:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba($palette-action, 0.08);
+        }
+    }
+
     // ── Badge stato ───────────────────────────────────────────
 
     .status-badge {
