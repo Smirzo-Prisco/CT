@@ -255,17 +255,23 @@ export default function RoleRecap() {
     const canFlag = selectedPg === currentUser
 
     const toggleFlag = useCallback(async (id_role) => {
-        const res  = await fetch('pages/api_roleSession.php?op=flagRole', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_role }),
-        })
-        const data = await res.json()
-        if (data.success) {
-            setRoles(prev => prev.map(r =>
-                r.id === id_role ? { ...r, my_shin: data.action === 'flagged' ? 'pending' : 'none' } : r
-            ))
-        } else {
-            setMsg({ type: 'err', text: data.message })
+        try {
+            const res  = await fetch('pages/api_roleSession.php?op=flagRole', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_role }),
+            })
+            const data = await res.json()
+            if (data.success) {
+                setRoles(prev => prev.map(r =>
+                    Number(r.id) === Number(id_role)
+                        ? { ...r, my_shin: data.action === 'flagged' ? 'pending' : 'none' }
+                        : r
+                ))
+            } else {
+                setMsg({ type: 'err', text: data.message })
+            }
+        } catch (e) {
+            setMsg({ type: 'err', text: 'Errore di rete — riprova' })
         }
     }, [])
 
@@ -431,7 +437,7 @@ export default function RoleRecap() {
                         <i className="fas fa-times"></i> Reset filtri
                     </button>
 
-                    {isStaff && filterFlagged && filtered.some(r => r.pending_count > 0) && (
+                    {isStaff && filtered.some(r => r.pending_count > 0) && (
                         <button
                             className="bulk-award-btn"
                             onClick={() => awardShin(filtered.filter(r => r.pending_count > 0).map(r => r.id))}
