@@ -195,8 +195,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false]); break; }
             $res_pgs = gdrcd_query("
                 SELECT DISTINCT rsp.pg_name,
-                       COALESCE(p.id_gilda, 0)    AS id_gilda,
-                       COALESCE(g.nome, 'Nessuna') AS gilda_nome
+                       CASE WHEN COALESCE(p.id_gilda, 0) > 0 THEN p.id_gilda ELSE 0 END        AS id_gilda,
+                       CASE WHEN COALESCE(p.id_gilda, 0) > 0 THEN COALESCE(g.nome, 'Senza razza') ELSE 'Senza razza' END AS gilda_nome
                 FROM role_session_players rsp
                 LEFT JOIN personaggio p ON p.nome = rsp.pg_name
                 LEFT JOIN gilda       g ON g.id_gilda = p.id_gilda
