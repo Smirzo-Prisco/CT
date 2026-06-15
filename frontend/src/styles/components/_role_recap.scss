@@ -224,6 +224,139 @@
         }
     }
 
+    // ── Pulsante flag shin ────────────────────────────────────
+
+    .game-flag-btn {
+        background: transparent;
+        border: 1px solid var(--border-input);
+        border-radius: $radius-md;
+        cursor: pointer;
+        padding: 4px 10px;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        line-height: 1;
+        color: #{$color-text-muted};
+
+        &--none:hover {
+            border-color: #{$palette-warning};
+            color: #{$palette-warning};
+            background: rgba($palette-warning, 0.08);
+        }
+
+        &--pending {
+            color: #{$palette-warning};
+            border-color: rgba($palette-warning, 0.5);
+            background: rgba($palette-warning, 0.08);
+            &:hover { background: rgba($palette-warning, 0.15); }
+        }
+
+        &--awarded {
+            color: #{$palette-success};
+            border-color: rgba($palette-success, 0.4);
+            background: rgba($palette-success, 0.08);
+            cursor: default;
+            opacity: 0.8;
+        }
+    }
+
+    // ── Pulsante award per card (staff) ───────────────────────
+
+    .game-award-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: $space-1;
+        background: rgba($palette-warning, 0.12);
+        border: 1px solid rgba($palette-warning, 0.4);
+        border-radius: $radius-md;
+        color: #{$palette-warning};
+        cursor: pointer;
+        padding: 4px 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: var(--transition);
+        line-height: 1;
+
+        &:hover { background: rgba($palette-warning, 0.22); }
+    }
+
+    // ── Toggle filtro flaggate ────────────────────────────────
+
+    .filter-flag-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: $space-2;
+        padding: $space-2 $space-4;
+        background: var(--surface);
+        border: 1px solid var(--border-input);
+        border-radius: var(--radius);
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: $text-sm;
+        font-weight: 600;
+        transition: var(--transition);
+        white-space: nowrap;
+
+        &:hover {
+            border-color: #{$palette-warning};
+            color: #{$palette-warning};
+        }
+
+        &--active {
+            background: rgba($palette-warning, 0.12);
+            border-color: rgba($palette-warning, 0.5);
+            color: #{$palette-warning};
+        }
+    }
+
+    // ── Pulsante bulk award (staff) ───────────────────────────
+
+    .bulk-award-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: $space-2;
+        padding: $space-2 $space-4;
+        background: rgba($palette-warning, 0.15);
+        border: 1px solid rgba($palette-warning, 0.5);
+        border-radius: var(--radius);
+        color: #{$palette-warning};
+        cursor: pointer;
+        font-size: $text-sm;
+        font-weight: 700;
+        transition: var(--transition);
+        white-space: nowrap;
+
+        &:hover { background: rgba($palette-warning, 0.25); }
+    }
+
+    // ── Messaggio feedback ────────────────────────────────────
+
+    .recap-msg {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+        padding: $space-3 $space-4;
+        border-radius: var(--radius);
+        margin-bottom: $space-4;
+        font-size: $text-md;
+
+        &--ok  { background: rgba($palette-success, 0.12); border: 1px solid rgba($palette-success, 0.3); color: #{$palette-success}; }
+        &--err { background: rgba($palette-danger,  0.12); border: 1px solid rgba($palette-danger,  0.3); color: #{$palette-danger}; }
+
+        i:first-child { flex-shrink: 0; }
+    }
+
+    .recap-msg-close {
+        margin-left: auto;
+        background: transparent;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        opacity: 0.7;
+        font-size: $text-md;
+        padding: 0 $space-1;
+        &:hover { opacity: 1; }
+    }
+
     // ── Badge stato ───────────────────────────────────────────
 
     .status-badge {

@@ -59,10 +59,17 @@ function StatCard({ icon, value, label }) {
     )
 }
 
-function GameCard({ game }) {
+function GameCard({ game, canFlag, isStaff, onFlag, onAward }) {
     const today = new Date().toISOString().split('T')[0]
     const isToday = game.data === today || new Date(game.data).toISOString().split('T')[0] === today
     const duration = calcDuration(game.oraInizio, game.oraFine)
+
+    const flagIcon  = game.my_shin === 'awarded' ? 'fas fa-coins'
+                    : game.my_shin === 'pending'  ? 'fas fa-bookmark'
+                    : 'far fa-bookmark'
+    const flagTitle = game.my_shin === 'awarded' ? 'Shin già assegnati'
+                    : game.my_shin === 'pending'  ? 'Richiesta inviata — clicca per rimuovere'
+                    : 'Richiedi shin per questa giocata'
 
     return (
         <div className={`game-card`}>
@@ -82,6 +89,26 @@ function GameCard({ game }) {
                     </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {canFlag && !game.inCorso && (
+                        <button
+                            className={`game-flag-btn game-flag-btn--${game.my_shin}`}
+                            title={flagTitle}
+                            disabled={game.my_shin === 'awarded'}
+                            onClick={() => onFlag(game.id)}
+                        >
+                            <i className={flagIcon}></i>
+                        </button>
+                    )}
+                    {isStaff && game.pending_count > 0 && (
+                        <button
+                            className="game-award-btn"
+                            title={`${game.pending_count} richiesta/e shin — clicca per premiare`}
+                            onClick={() => onAward([game.id])}
+                        >
+                            <i className="fas fa-coins"></i>
+                            <span>{game.pending_count}</span>
+                        </button>
+                    )}
                     <button
                         className="game-log-btn"
                         title="Leggi log giocata"
@@ -149,9 +176,11 @@ export default function RoleRecap() {
     const [currentUser, setCurrentUser] = useState('')
     const [pgList, setPgList]           = useState([])   // [{pg_name, id_gilda, gilda_nome}]
     const [selectedPg, setSelectedPg]   = useState('')
-    const [filterGilda, setFilterGilda] = useState('')
-    const [filterLuogo, setFilterLuogo] = useState('')
-    const [filterData, setFilterData]   = useState('')
+    const [filterGilda, setFilterGilda]     = useState('')
+    const [filterLuogo, setFilterLuogo]     = useState('')
+    const [filterData, setFilterData]       = useState('')
+    const [filterFlagged, setFilterFlagged] = useState(false)
+    const [msg, setMsg]                     = useState(null)
 
     // pg: nome specifico | 'all' | '' (utente corrente)
     // gilda: id numerico come stringa → carica tutte le giocate della razza
@@ -222,6 +251,39 @@ export default function RoleRecap() {
         }
     }
 
+    // Solo l'utente che guarda le proprie giocate può flaggare
+    const canFlag = selectedPg === currentUser
+
+    const toggleFlag = useCallback(async (id_role) => {
+        const res  = await fetch('pages/api_roleSession.php?op=flagRole', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_role }),
+        })
+        const data = await res.json()
+        if (data.success) {
+            setRoles(prev => prev.map(r =>
+                r.id === id_role ? { ...r, my_shin: data.action === 'flagged' ? 'pending' : 'none' } : r
+            ))
+        } else {
+            setMsg({ type: 'err', text: data.message })
+        }
+    }, [])
+
+    const awardShin = useCallback(async (id_roles) => {
+        setMsg(null)
+        const res  = await fetch('pages/api_roleSession.php?op=awardShin', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_roles }),
+        })
+        const data = await res.json()
+        setMsg({ type: data.success ? 'ok' : 'err', text: data.message })
+        if (data.success) {
+            const gilda = selectedPg === 'race' ? filterGilda : null
+            const pg    = selectedPg === 'race' ? '' : selectedPg
+            fetchRoles(pg, gilda)
+        }
+    }, [selectedPg, filterGilda, fetchRoles])
+
     // ── Valori unici per filtro luogo ────────────────────────────────────────
 
     const uniqueLocations = [...new Set(roles.map(r => r.luogo).filter(Boolean))].sort()
@@ -245,6 +307,12 @@ export default function RoleRecap() {
             const cutoff = new Date(now)
             cutoff.setDate(cutoff.getDate() - days)
             if (d < cutoff) return false
+        }
+        if (filterFlagged) {
+            // Staff: giocate con almeno una richiesta shin pendente
+            // Utente: giocate flaggate da lui (pending o awarded)
+            if (isStaff) return r.pending_count > 0
+            return r.my_shin !== 'none'
         }
         return true
     })
@@ -348,12 +416,40 @@ export default function RoleRecap() {
                     </div>
 
                     <button
+                        className={`filter-flag-toggle ${filterFlagged ? 'filter-flag-toggle--active' : ''}`}
+                        onClick={() => setFilterFlagged(f => !f)}
+                        title={isStaff ? 'Mostra solo giocate con richieste shin pendenti' : 'Mostra solo le mie giocate flaggate'}
+                    >
+                        <i className="fas fa-bookmark"></i>
+                        {isStaff ? 'Shin pendenti' : 'Le mie richieste'}
+                    </button>
+
+                    <button
                         className="reset-btn"
-                        onClick={() => { setFilterLuogo(''); setFilterData('') }}
+                        onClick={() => { setFilterLuogo(''); setFilterData(''); setFilterFlagged(false) }}
                     >
                         <i className="fas fa-times"></i> Reset filtri
                     </button>
+
+                    {isStaff && filterFlagged && filtered.some(r => r.pending_count > 0) && (
+                        <button
+                            className="bulk-award-btn"
+                            onClick={() => awardShin(filtered.filter(r => r.pending_count > 0).map(r => r.id))}
+                        >
+                            <i className="fas fa-coins"></i> Premia tutte ({filtered.filter(r => r.pending_count > 0).length})
+                        </button>
+                    )}
                 </div>
+
+                {msg && (
+                    <div className={`recap-msg recap-msg--${msg.type}`}>
+                        <i className={`fas fa-${msg.type === 'ok' ? 'check-circle' : 'exclamation-circle'}`}></i>
+                        {msg.text}
+                        <button className="recap-msg-close" onClick={() => setMsg(null)}>
+                            <i className="fas fa-times"></i>
+                        </button>
+                    </div>
+                )}
 
                 {loading && (
                     <div className="no-results">
@@ -383,7 +479,16 @@ export default function RoleRecap() {
 
                 {!loading && !error && filtered.length > 0 && (
                     <div className="games-list">
-                        {filtered.map(game => <GameCard key={game.id} game={game} />)}
+                        {filtered.map(game => (
+                        <GameCard
+                            key={game.id}
+                            game={game}
+                            canFlag={canFlag}
+                            isStaff={isStaff}
+                            onFlag={toggleFlag}
+                            onAward={awardShin}
+                        />
+                    ))}
                     </div>
                 )}
 
