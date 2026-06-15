@@ -39,6 +39,7 @@ const COLONNE = [
             { label: 'ALBERGO', url: 'main.php?page=servizi_prenotazioni_prova' },
             { label: 'CREA OGGETTO', url: 'main.php?page=oggetto_aggiungi_richiesta' },
             { label: 'SCEGLI MESTIERE', url: 'main.php?page=scegli_mestiere' },
+            { label: 'SCEGLI RAZZA',   url: 'main.php?page=scegli_razza' },
             // { label: 'LISTA SPIRITI',       url: 'main.php?page=user_razze' },
             // { label: 'BANCA', url: 'main.php?page=servizi_banca' },
             // { label: 'MERCATO', url: 'main.php?page=servizi_mercato' },

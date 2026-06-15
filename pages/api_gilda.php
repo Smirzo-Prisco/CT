@@ -345,6 +345,103 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
             break;
+        // ── Selezione razza (ScegliRazza SPA) ────────────────────────────────
+
+        case 'getGuildState':  // Stato del PG + elenco gilde 1-7
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+            $pg = gdrcd_query("SELECT p.nome, p.id_gilda,
+                                      g.nome AS gilda_nome, g.immagine AS gilda_immagine
+                               FROM personaggio p
+                               LEFT JOIN gilda g ON g.id_gilda = p.id_gilda
+                               WHERE p.nome = '$login_f'");
+
+            $res_gilde = gdrcd_query("SELECT g.id_gilda, g.nome, g.immagine,
+                                             r.id_ruolo AS ruolo_id, r.nome_ruolo AS ruolo_nome
+                                      FROM gilda g
+                                      LEFT JOIN ruolo r ON r.gilda = g.id_gilda AND r.livello = 1
+                                      WHERE g.id_gilda BETWEEN 1 AND 7
+                                      ORDER BY g.nome ASC", 'result');
+            $guilds = [];
+            while ($r = gdrcd_query($res_gilde, 'fetch')) {
+                $guilds[] = [
+                    'id'         => (int)$r['id_gilda'],
+                    'nome'       => $r['nome'],
+                    'immagine'   => $r['immagine'],
+                    'ruolo_id'   => (int)$r['ruolo_id'],
+                    'ruolo_nome' => $r['ruolo_nome'],
+                ];
+            }
+
+            echo json_encode([
+                'success' => true,
+                'pg'      => [
+                    'nome'           => $pg['nome'],
+                    'id_gilda'       => (int)($pg['id_gilda'] ?? 0),
+                    'gilda_nome'     => $pg['gilda_nome']     ?? null,
+                    'gilda_immagine' => $pg['gilda_immagine'] ?? null,
+                ],
+                'guilds' => $guilds,
+            ]);
+            break;
+
+        case 'joinGuild':  // Il PG sceglie la sua razza
+            $login_f  = gdrcd_filter('in', $_SESSION['login']);
+            $id_gilda = isset($data['id_gilda']) ? (int)$data['id_gilda'] : 0;
+
+            if ($id_gilda < 1 || $id_gilda > 7) {
+                echo json_encode(['success' => false, 'message' => 'Razza non valida']);
+                break;
+            }
+
+            $pg_now = gdrcd_query("SELECT id_gilda FROM personaggio WHERE nome = '$login_f'");
+            if ((int)($pg_now['id_gilda'] ?? 0) !== 0) {
+                echo json_encode(['success' => false, 'message' => 'Sei già affiliato ad una razza']);
+                break;
+            }
+
+            $ruolo_base = gdrcd_query("SELECT id_ruolo FROM ruolo WHERE gilda = $id_gilda AND livello = 1 LIMIT 1");
+            if (!$ruolo_base) {
+                echo json_encode(['success' => false, 'message' => 'Ruolo base non trovato per questa razza']);
+                break;
+            }
+            $id_ruolo = (int)$ruolo_base['id_ruolo'];
+
+            gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio = '$login_f'");
+            gdrcd_query("INSERT INTO clgpersonaggioruolo (personaggio, id_ruolo) VALUES ('$login_f', $id_ruolo)");
+            $ok = gdrcd_query("UPDATE personaggio SET id_gilda = $id_gilda, id_ruolo_gilda = $id_ruolo WHERE nome = '$login_f'");
+
+            if ($ok) echo json_encode(['success' => true, 'message' => 'Benvenuto nella tua nuova razza!']);
+            else echo json_encode(['success' => false, 'message' => 'Errore durante l\'affiliazione']);
+            break;
+
+        case 'leaveGuild':  // Il PG abbandona la razza (reset completo)
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+
+            $pg_now = gdrcd_query("SELECT id_gilda FROM personaggio WHERE nome = '$login_f'");
+            if ((int)($pg_now['id_gilda'] ?? 0) === 0) {
+                echo json_encode(['success' => false, 'message' => 'Non sei affiliato ad alcuna razza']);
+                break;
+            }
+
+            gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio = '$login_f'");
+            gdrcd_query("UPDATE personaggio SET
+                             id_gilda = 0, id_ruolo_gilda = 0, shin = 0,
+                             car0 = car0 - car1, car1 = 0,
+                             car2 = car2 - car3, car3 = 0,
+                             car4 = car4 - car5, car5 = 0,
+                             car6 = car6 - car7, car7 = 0,
+                             car8 = car8 - car9, car9 = 0
+                         WHERE nome = '$login_f'");
+            gdrcd_query("DELETE clgpersonaggioabilita
+                         FROM clgpersonaggioabilita
+                         JOIN abilita ON clgpersonaggioabilita.id_abilita = abilita.id_abilita
+                         WHERE clgpersonaggioabilita.nome = '$login_f'
+                         AND abilita.tipo NOT IN ('Talento', 'Skill temporanea')");
+            gdrcd_query("DELETE FROM log_spesa WHERE nome = '$login_f'");
+
+            echo json_encode(['success' => true, 'message' => 'Hai abbandonato la tua razza. Tutti i bonus sono stati rimossi.']);
+            break;
+
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
     /*********************  FINE    Recupero i dati dell'utente che voglio modificare   */

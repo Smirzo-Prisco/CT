@@ -54,6 +54,7 @@ import ElencoVolti          from './components/ElencoVolti'
 import Anagrafe             from './components/Anagrafe'
 import CambioPass           from './components/CambioPass'
 import ScegliMestiere       from './components/ScegliMestiere'
+import ScegliRazza          from './components/ScegliRazza'
 import MercatoAbilita       from './components/MercatoAbilita'
 import IncrementoParametri  from './components/IncrementoParametri'
 import PrenotazioniProva    from './components/PrenotazioniProva'
@@ -188,6 +189,10 @@ const ROUTES = {
     scegli_mestiere: {
         component: ScegliMestiere,
         css: ['/themes/crystal/famiglie.css'],
+    },
+    scegli_razza: {
+        component: ScegliRazza,
+        css: [],
     },
     mercato_abilita_atarashi: {
         component: MercatoAbilita,

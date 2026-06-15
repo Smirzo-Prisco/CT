@@ -1,0 +1,324 @@
+// ============================================================
+// _scegli_razza.scss — Selezione razza (ScegliRazza.jsx)
+// Scoped sotto #scegli-razza-app.
+// ============================================================
+@use '../tokens' as *;
+
+#scegli-razza-app {
+    font-family: $font-base;
+    background-color: #{$palette-surface-dark};
+    color: #{$color-text};
+    min-height: 100vh;
+    line-height: 1.6;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    // ── Header ───────────────────────────────────────────────
+
+    .sr-header {
+        display: flex;
+        align-items: center;
+        gap: $space-5;
+        padding: $space-5;
+        border-bottom: 2px solid #{$palette-action};
+        margin-bottom: $space-6;
+    }
+
+    .sr-back {
+        display: inline-flex;
+        align-items: center;
+        gap: $space-2;
+        padding: $space-2 $space-4;
+        background: transparent;
+        border: 1px solid #{$palette-surface-hover};
+        border-radius: #{$radius-md};
+        color: #{$color-text-secondary};
+        cursor: pointer;
+        font-size: $text-sm;
+        flex-shrink: 0;
+        transition: all #{$transition-normal};
+
+        &:hover {
+            border-color: #{$palette-action};
+            color: #{$palette-action};
+        }
+    }
+
+    .sr-title {
+        h1 {
+            font-size: 1.6rem;
+            color: #{$color-text-title};
+            display: flex;
+            align-items: center;
+            gap: $space-3;
+            i { color: #{$palette-action}; }
+        }
+    }
+
+    .sr-subtitle {
+        color: #{$color-text-secondary};
+        font-size: $text-md;
+        margin-top: $space-1;
+    }
+
+    // ── Messaggio feedback ────────────────────────────────────
+
+    .sr-msg {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+        margin: 0 $space-5 $space-5;
+        padding: $space-3 $space-4;
+        border-radius: #{$radius-md};
+        font-size: $text-md;
+
+        &--ok  { background: rgba($palette-success, 0.15); border: 1px solid rgba($palette-success, 0.4); color: #{$color-success}; }
+        &--err { background: rgba($palette-danger,  0.15); border: 1px solid rgba($palette-danger,  0.4); color: #{$color-danger}; }
+    }
+
+    // ── Razza corrente ────────────────────────────────────────
+
+    .sr-current {
+        margin: 0 $space-5 $space-6;
+        border: 1px solid rgba($palette-action, 0.3);
+        border-radius: #{$radius-lg};
+        overflow: hidden;
+    }
+
+    .sr-current-header {
+        background: rgba($palette-action, 0.08);
+        padding: $space-3 $space-5;
+        font-size: $text-sm;
+        font-weight: 600;
+        color: #{$palette-action};
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+    }
+
+    .sr-current-body {
+        padding: $space-5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: $space-4;
+    }
+
+    .sr-current-img {
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 8px rgba($palette-action, 0.4));
+    }
+
+    .sr-current-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #{$color-text-title};
+    }
+
+    .sr-current-info {
+        color: #{$color-text-secondary};
+        font-size: $text-md;
+        max-width: 480px;
+    }
+
+    // ── Pannello di conferma abbandono ────────────────────────
+
+    .sr-confirm {
+        width: 100%;
+        max-width: 520px;
+        background: rgba($palette-danger, 0.07);
+        border: 1px solid rgba($palette-danger, 0.3);
+        border-radius: #{$radius-md};
+        padding: $space-5;
+        text-align: left;
+    }
+
+    .sr-confirm-title {
+        font-weight: 700;
+        color: #{$color-danger};
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        margin-bottom: $space-4;
+        font-size: $text-lg;
+
+        i { flex-shrink: 0; }
+    }
+
+    .sr-confirm-list {
+        padding-left: $space-5;
+        color: #{$color-text-secondary};
+        font-size: $text-md;
+        line-height: 1.8;
+        margin-bottom: $space-5;
+
+        strong { color: #{$color-text}; }
+    }
+
+    .sr-confirm-actions {
+        display: flex;
+        gap: $space-3;
+        flex-wrap: wrap;
+    }
+
+    // ── Sezione griglia razze ─────────────────────────────────
+
+    .sr-section {
+        padding: 0 $space-5 $space-8;
+    }
+
+    .sr-section-title {
+        font-size: $text-xl;
+        color: #{$color-text-secondary};
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        margin-bottom: $space-5;
+        i { color: #{$palette-action}; }
+    }
+
+    .sr-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: $space-4;
+    }
+
+    // ── Card singola gilda ────────────────────────────────────
+
+    .sr-guild-card {
+        background: #{$palette-surface-raised};
+        border: 1px solid #{$palette-surface-hover};
+        border-radius: #{$radius-lg};
+        padding: $space-5 $space-4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: $space-3;
+        text-align: center;
+        transition: all #{$transition-normal};
+
+        &:hover:not(.sr-guild-card--disabled) {
+            border-color: rgba($palette-action, 0.5);
+            background: rgba($palette-action, 0.05);
+            transform: translateY(-2px);
+            box-shadow: #{$shadow-md};
+        }
+
+        &--disabled {
+            opacity: 0.45;
+            cursor: default;
+        }
+    }
+
+    .sr-guild-img {
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        i {
+            font-size: 2rem;
+            color: #{$color-text-muted};
+        }
+    }
+
+    .sr-guild-name {
+        font-weight: 700;
+        font-size: $text-lg;
+        color: #{$color-text-title};
+    }
+
+    .sr-guild-role {
+        font-size: $text-xs;
+        color: #{$color-text-secondary};
+        display: flex;
+        align-items: center;
+        gap: $space-1;
+        i { color: #{$palette-action}; font-size: $text-2xs; }
+    }
+
+    .sr-guild-locked {
+        font-size: $text-xs;
+        color: #{$color-text-muted};
+        display: flex;
+        align-items: center;
+        gap: $space-1;
+    }
+
+    // ── Bottoni ───────────────────────────────────────────────
+
+    .sr-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: $space-2;
+        padding: $space-2 $space-4;
+        border-radius: #{$radius-md};
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-size: $text-sm;
+        font-weight: 600;
+        transition: all #{$transition-fast};
+
+        &--join {
+            background: #{$palette-action};
+            color: #{$palette-surface-deep};
+            border-color: #{$palette-action};
+            &:hover { background: #{$palette-action-hover}; }
+        }
+
+        &--leave {
+            background: transparent;
+            color: #{$color-danger};
+            border-color: rgba($palette-danger, 0.5);
+            &:hover { background: rgba($palette-danger, 0.1); }
+        }
+
+        &--danger {
+            background: #{$palette-danger};
+            color: #fff;
+            border-color: #{$palette-danger};
+            &:hover { filter: brightness(1.1); }
+        }
+
+        &--cancel {
+            background: transparent;
+            color: #{$color-text-secondary};
+            border-color: #{$palette-surface-hover};
+            &:hover { border-color: #{$color-text-secondary}; color: #{$color-text}; }
+        }
+    }
+
+    // ── Stati loading / error ─────────────────────────────────
+
+    .sr-state {
+        text-align: center;
+        padding: $space-12 $space-5;
+        color: #{$color-text-secondary};
+
+        i  { font-size: 2.5rem; display: block; margin-bottom: $space-4; color: #{$palette-action}; }
+        p  { font-size: 1rem; }
+
+        &--error i { color: #{$color-warning}; }
+    }
+
+    // ── Responsive ────────────────────────────────────────────
+
+    @media (max-width: 600px) {
+        .sr-header { flex-direction: column; align-items: flex-start; gap: $space-3; padding: $space-3; }
+        .sr-section, .sr-current, .sr-msg { margin-left: $space-3; margin-right: $space-3; }
+        .sr-grid   { grid-template-columns: repeat(2, 1fr); }
+    }
+}
