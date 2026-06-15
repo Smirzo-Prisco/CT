@@ -214,15 +214,26 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
 
         case 'getPgAllRoles':
-            $is_staff   = isAdminMasterMod($_SESSION);
-            $login_f    = gdrcd_filter('in', $_SESSION['login']);
-            $pg_param   = isset($_GET['pg']) ? gdrcd_filter('in', trim($_GET['pg'])) : '';
-            $show_all   = $is_staff && $pg_param === 'all';
-            $pg_filter  = $show_all ? null : ($is_staff && $pg_param !== '' ? $pg_param : $login_f);
+            $is_staff    = isAdminMasterMod($_SESSION);
+            $login_f     = gdrcd_filter('in', $_SESSION['login']);
+            $pg_param    = isset($_GET['pg'])    ? gdrcd_filter('in', trim($_GET['pg'])) : '';
+            $gilda_param = ($is_staff && isset($_GET['gilda'])) ? (int)trim($_GET['gilda']) : null;
 
-            $where = $pg_filter !== null
-                ? "WHERE role_session_players.pg_name = '$pg_filter'"
-                : '';
+            $show_all   = $is_staff && $pg_param === 'all';
+            $show_gilda = $is_staff && $gilda_param !== null;
+
+            if ($show_gilda) {
+                // Giocate di tutti i PG della razza selezionata
+                $gilda_cond = ($gilda_param === 0)
+                    ? "COALESCE(id_gilda, 0) <= 0"
+                    : "id_gilda = $gilda_param";
+                $where = "WHERE role_session_players.pg_name IN (SELECT nome FROM personaggio WHERE $gilda_cond)";
+            } elseif ($show_all) {
+                $where = '';
+            } else {
+                $pg_filter = ($is_staff && $pg_param !== '') ? $pg_param : $login_f;
+                $where = "WHERE role_session_players.pg_name = '$pg_filter'";
+            }
 
             $query = "SELECT role_sessions.id_role, role_sessions.location, role_sessions.start,
                              role_sessions.end, role_sessions.turn, mappa.nome, mappa.id as luogo_id

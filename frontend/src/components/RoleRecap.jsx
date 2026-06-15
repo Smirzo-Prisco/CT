@@ -153,10 +153,14 @@ export default function RoleRecap() {
     const [filterLuogo, setFilterLuogo] = useState('')
     const [filterData, setFilterData]   = useState('')
 
-    const fetchRoles = useCallback((pg) => {
+    // pg: nome specifico | 'all' | '' (utente corrente)
+    // gilda: id numerico come stringa → carica tutte le giocate della razza
+    const fetchRoles = useCallback((pg, gilda = null) => {
         setLoading(true)
         setError(null)
-        const qs = pg ? `&pg=${encodeURIComponent(pg)}` : ''
+        let qs = ''
+        if (gilda !== null) qs = `&gilda=${encodeURIComponent(gilda)}`
+        else if (pg)        qs = `&pg=${encodeURIComponent(pg)}`
         fetch(`pages/api_roleSession.php?op=getPgAllRoles${qs}`)
             .then(r => r.json())
             .then(d => {
@@ -201,16 +205,21 @@ export default function RoleRecap() {
 
     function applyFilter(pg) {
         setSelectedPg(pg)
-        fetchRoles(pg)
+        if (pg === 'race') fetchRoles('', filterGilda)
+        else fetchRoles(pg)
     }
 
     function handleGildaChange(id_gilda) {
         setFilterGilda(id_gilda)
-        // Calcola la nuova lista con la stessa logica di filteredPgList
-        const newList = id_gilda === '' ? pgList.filter(p => p.id_gilda > 0) : pgList.filter(p => String(p.id_gilda) === id_gilda)
-        const stillValid = selectedPg === currentUser || selectedPg === 'all'
-            || newList.some(p => p.pg_name === selectedPg)
-        if (!stillValid) applyFilter(currentUser)
+        if (id_gilda === '') {
+            // Reset a "Tutte le razze": torna alle giocate dell'utente corrente
+            setSelectedPg(currentUser)
+            fetchRoles(currentUser)
+        } else {
+            // Razza selezionata: carica subito tutte le giocate della razza
+            setSelectedPg('race')
+            fetchRoles('', id_gilda)
+        }
     }
 
     // ── Valori unici per filtro luogo ────────────────────────────────────────
@@ -284,6 +293,11 @@ export default function RoleRecap() {
                                     value={selectedPg}
                                     onChange={e => applyFilter(e.target.value)}
                                 >
+                                    {filterGilda !== '' && (
+                                        <option value="race">
+                                            Tutti — {gildaList.find(g => String(g.id) === filterGilda)?.nome ?? ''}
+                                        </option>
+                                    )}
                                     <option value={currentUser}>Le mie ({currentUser})</option>
                                     {filterGilda === '' && <option value="all">Tutte le giocate</option>}
                                     {filteredPgList
