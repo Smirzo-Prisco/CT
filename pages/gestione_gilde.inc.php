@@ -469,6 +469,10 @@ if($_SESSION['admin'] != 1) {
                 <div id="mentaleSection" class="form-group" style="display: none;">
                     <label>Opzioni avanzate per skill mentali:</label>
                     <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="" id="nessuna_opzione_mentale" checked>
+                        <label for="nessuna_opzione_mentale">Nessuna opzione</label>
+                    </div>
+                    <div class="radio-group">
                         <input type="radio" name="sottotipo" value="comando" id="comando">
                         <label for="comando">La skill può essere utilizzata per imporre un comando al bersaglio.</label>
                     </div>

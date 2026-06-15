@@ -242,10 +242,16 @@ function editSkill(id) {
     fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=getSkill&id=' + id)
         .then(response => response.json())
         .then(data => {
-            // Sottotipo: deseleziona tutto, poi seleziona il valore corrente (o "nessuna_opzione")
+            // Sottotipo: deseleziona tutto, poi seleziona il valore corrente (o "Nessuna opzione")
             document.querySelectorAll('input[name="sottotipo"]').forEach(r => r.checked = false);
             const sottoEl = data.sottotipo ? document.getElementById(data.sottotipo) : null;
-            (sottoEl || document.getElementById('nessuna_opzione')).checked = true;
+            if (sottoEl) {
+                sottoEl.checked = true;
+            } else {
+                const nessId = data.tipo === 'Mentale' ? 'nessuna_opzione_mentale' : 'nessuna_opzione';
+                const nessEl = document.getElementById(nessId);
+                if (nessEl) nessEl.checked = true;
+            }
             // FINE sottotipo
 
             document.getElementById('id_abilita').value = data.id_abilita;
