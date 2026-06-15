@@ -198,7 +198,7 @@ export default function ScegliRazza() {
                 </button>
                 <div className="sr-title">
                     <h1><i className="fas fa-shield-alt"></i> Scegli Razza</h1>
-                    <p className="sr-subtitle">Seleziona la tua affiliazione</p>
+                    <p className="sr-subtitle">Seleziona la tua razza</p>
                 </div>
             </header>
 
