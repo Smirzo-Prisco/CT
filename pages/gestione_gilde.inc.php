@@ -354,7 +354,13 @@ if($_SESSION['admin'] != 1) {
                 <!-- Opzioni avanzate per skill generiche -->
                 <div id="genericaSection" class="form-group" style="display: none;">
                     <label>Opzioni avanzate per skill generiche (seleziona una sola clausola):</label>
-                    
+
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="" id="nessuna_opzione" checked>
+                        <label for="nessuna_opzione">
+                            Nessuna opzione
+                        </label>
+                    </div>
                     <div class="radio-group">
                         <input type="radio" name="sottotipo" value="usa_creatura" id="usa_creatura">
                         <label for="usa_creatura">

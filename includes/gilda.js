@@ -242,9 +242,10 @@ function editSkill(id) {
     fetch(ns_gilda.api_file + '?' + ns_gilda.param + '=getSkill&id=' + id)
         .then(response => response.json())
         .then(data => {
-            // Sottotipo
-            let sottotipo = document.getElementById(data.sottotipo);
-            if (sottotipo) sottotipo.checked = true;
+            // Sottotipo: deseleziona tutto, poi seleziona il valore corrente (o "nessuna_opzione")
+            document.querySelectorAll('input[name="sottotipo"]').forEach(r => r.checked = false);
+            const sottoEl = data.sottotipo ? document.getElementById(data.sottotipo) : null;
+            (sottoEl || document.getElementById('nessuna_opzione')).checked = true;
             // FINE sottotipo
 
             document.getElementById('id_abilita').value = data.id_abilita;

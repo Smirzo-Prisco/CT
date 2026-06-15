@@ -319,8 +319,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
                     foreach ($dati as $campo => $valore) {
                         if($campo == 'id_abilita') continue; // Salto l'id in fase di inserimento
-                        
-                        $setParts[] = "`$campo` = '".mysqli_real_escape_string(gdrcd_connect(), $valore)."'";
+                        $val_sql = ($campo === 'sottotipo' && $valore === '') ? 'NULL' : "'".mysqli_real_escape_string(gdrcd_connect(), $valore)."'";
+                        $setParts[] = "`$campo` = $val_sql";
                     }
                     
                     $query = "UPDATE abilita SET ".implode(', ', $setParts)." WHERE id_abilita = $id";
@@ -331,9 +331,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     
                     foreach ($dati as $campo => $valore) {
                         if($campo == 'id_abilita') continue; // Salto l'id in fase di inserimento
-
-                        $campi[] = "`$campo`";
-                        $valori[] = "'".mysqli_real_escape_string(gdrcd_connect(), $valore)."'";
+                        $campi[]  = "`$campo`";
+                        $valori[] = ($campo === 'sottotipo' && $valore === '') ? 'NULL' : "'".mysqli_real_escape_string(gdrcd_connect(), $valore)."'";
                     }
                     
                     $query = "INSERT INTO abilita (".implode(', ', $campi).") VALUES (".implode(', ', $valori).")";
