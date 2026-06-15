@@ -192,10 +192,12 @@ export default function RoleRecap() {
             .map(([id, nome]) => ({ id, nome }))
     }, [pgList])
 
-    // PG visibili nella dropdown in base alla razza selezionata
-    const filteredPgList = useMemo(() =>
-        filterGilda === '' ? pgList : pgList.filter(p => String(p.id_gilda) === filterGilda)
-    , [pgList, filterGilda])
+    // PG visibili nella dropdown in base alla razza selezionata.
+    // "Tutte le razze" (filterGilda='') esclude id_gilda=0 (senza razza).
+    const filteredPgList = useMemo(() => {
+        if (filterGilda === '') return pgList.filter(p => p.id_gilda > 0)
+        return pgList.filter(p => String(p.id_gilda) === filterGilda)
+    }, [pgList, filterGilda])
 
     function applyFilter(pg) {
         setSelectedPg(pg)
@@ -204,8 +206,8 @@ export default function RoleRecap() {
 
     function handleGildaChange(id_gilda) {
         setFilterGilda(id_gilda)
-        // Se il PG selezionato non appartiene alla nuova razza, resetta alla voce "Le mie"
-        const newList = id_gilda === '' ? pgList : pgList.filter(p => String(p.id_gilda) === id_gilda)
+        // Calcola la nuova lista con la stessa logica di filteredPgList
+        const newList = id_gilda === '' ? pgList.filter(p => p.id_gilda > 0) : pgList.filter(p => String(p.id_gilda) === id_gilda)
         const stillValid = selectedPg === currentUser || selectedPg === 'all'
             || newList.some(p => p.pg_name === selectedPg)
         if (!stillValid) applyFilter(currentUser)
