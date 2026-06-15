@@ -638,27 +638,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             }
             
             exit;
-        case 'removeGuildPg':  // Elimino il ruolo del personaggio
-            $nome = $data['nome'];
-            $role = gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio = '$nome'");
-            $pg = gdrcd_query("UPDATE personaggio SET id_gilda = 0 WHERE nome = '$nome'");
-            
-            if ($pg && $role) echo json_encode(['success' => true, 'message' => 'Personaggio rimosso dalla gilda', 'query' => "DELETE FROM clgpersonaggioruolo WHERE personaggio = '$nome'"]);
-            else echo json_encode(['error' => false, 'message' => 'Impossibile rimuovere il personaggio']);
-            
-            break;
-        case 'addGuildPg':  // Aggiungo il personaggio alla gilda, assegnandogli il ruolo di base
-            $nome = $data['nome'];
-            $id_gilda = $data['id_gilda'];
-            $remRole = gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio = '$nome'");
-            $role = gdrcd_query("SELECT * FROM ruolo WHERE gilda = $id_gilda AND livello = 1");
-            $addRole = gdrcd_query("INSERT INTO clgpersonaggioruolo (personaggio, id_ruolo) VALUES ('$nome', ".$role['id_ruolo'].")");
-            $pg = gdrcd_query("UPDATE personaggio SET id_gilda = $id_gilda WHERE nome = '$nome'");
-            
-            if ($remRole && $addRole && $pg) echo json_encode(['success' => true, 'message' => 'Personaggio aggiunto alla gilda']);
-            else echo json_encode(['error' => false, 'message' => 'Abilità non trovata']);
-            
-            break;
         // OGGETTI
         case 'getObj':  // Recupero i dati dell'oggetto
             $id = (int)$_GET['id'];
