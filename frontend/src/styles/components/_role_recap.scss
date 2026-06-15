@@ -62,9 +62,16 @@
     .filter-bar {
         display: flex;
         justify-content: center;
-        align-items: center;
-        gap: $space-3;
+        align-items: flex-end;
+        gap: $space-4;
         margin-top: $space-4;
+        flex-wrap: wrap;
+    }
+
+    .filter-bar-group {
+        display: flex;
+        flex-direction: column;
+        gap: $space-1;
     }
 
     .filter-label {

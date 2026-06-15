@@ -193,10 +193,24 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             exit;
         case 'getRoleParticipants':
             if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false]); break; }
-            $res_pgs = gdrcd_query("SELECT DISTINCT pg_name FROM role_session_players ORDER BY pg_name ASC", 'result');
-            $pg_names = [];
-            while ($r = gdrcd_query($res_pgs, 'fetch')) $pg_names[] = $r['pg_name'];
-            echo json_encode(['success' => true, 'pgs' => $pg_names]);
+            $res_pgs = gdrcd_query("
+                SELECT DISTINCT rsp.pg_name,
+                       COALESCE(p.id_gilda, 0)    AS id_gilda,
+                       COALESCE(g.nome, 'Nessuna') AS gilda_nome
+                FROM role_session_players rsp
+                LEFT JOIN personaggio p ON p.nome = rsp.pg_name
+                LEFT JOIN gilda       g ON g.id_gilda = p.id_gilda
+                ORDER BY rsp.pg_name ASC
+            ", 'result');
+            $pg_list = [];
+            while ($r = gdrcd_query($res_pgs, 'fetch')) {
+                $pg_list[] = [
+                    'pg_name'    => $r['pg_name'],
+                    'id_gilda'   => (int)$r['id_gilda'],
+                    'gilda_nome' => $r['gilda_nome'],
+                ];
+            }
+            echo json_encode(['success' => true, 'pgs' => $pg_list]);
             break;
 
         case 'getPgAllRoles':

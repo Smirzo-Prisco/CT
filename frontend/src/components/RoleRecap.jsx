@@ -13,7 +13,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -147,8 +147,9 @@ export default function RoleRecap() {
     const [error, setError]           = useState(null)
     const [isStaff, setIsStaff]       = useState(false)
     const [currentUser, setCurrentUser] = useState('')
-    const [pgList, setPgList]         = useState([])
-    const [selectedPg, setSelectedPg] = useState('')
+    const [pgList, setPgList]           = useState([])   // [{pg_name, id_gilda, gilda_nome}]
+    const [selectedPg, setSelectedPg]   = useState('')
+    const [filterGilda, setFilterGilda] = useState('')
     const [filterLuogo, setFilterLuogo] = useState('')
     const [filterData, setFilterData]   = useState('')
 
@@ -180,9 +181,34 @@ export default function RoleRecap() {
             .catch(() => {})
     }, [isStaff])
 
+    // Razze/gilde distinte presenti tra i partecipanti, ordinate per nome
+    const gildaList = useMemo(() => {
+        const map = new Map()
+        pgList.forEach(p => {
+            if (!map.has(p.id_gilda)) map.set(p.id_gilda, p.gilda_nome)
+        })
+        return [...map.entries()]
+            .sort((a, b) => a[1].localeCompare(b[1]))
+            .map(([id, nome]) => ({ id, nome }))
+    }, [pgList])
+
+    // PG visibili nella dropdown in base alla razza selezionata
+    const filteredPgList = useMemo(() =>
+        filterGilda === '' ? pgList : pgList.filter(p => String(p.id_gilda) === filterGilda)
+    , [pgList, filterGilda])
+
     function applyFilter(pg) {
         setSelectedPg(pg)
         fetchRoles(pg)
+    }
+
+    function handleGildaChange(id_gilda) {
+        setFilterGilda(id_gilda)
+        // Se il PG selezionato non appartiene alla nuova razza, resetta alla voce "Le mie"
+        const newList = id_gilda === '' ? pgList : pgList.filter(p => String(p.id_gilda) === id_gilda)
+        const stillValid = selectedPg === currentUser || selectedPg === 'all'
+            || newList.some(p => p.pg_name === selectedPg)
+        if (!stillValid) applyFilter(currentUser)
     }
 
     // ── Valori unici per filtro luogo ────────────────────────────────────────
@@ -230,22 +256,40 @@ export default function RoleRecap() {
                     <p className="subtitle">Storico giocate per partecipante</p>
                     {isStaff && (
                         <div className="filter-bar">
-                            <label className="filter-label" htmlFor="pg-select">
-                                <i className="fas fa-user"></i> Giocatore
-                            </label>
-                            <select
-                                id="pg-select"
-                                className="filter-select"
-                                value={selectedPg}
-                                onChange={e => applyFilter(e.target.value)}
-                            >
-                                <option value={currentUser}>Le mie ({currentUser})</option>
-                                <option value="all">Tutte le giocate</option>
-                                {pgList
-                                    .filter(p => p !== currentUser)
-                                    .map(p => <option key={p} value={p}>{p}</option>)
-                                }
-                            </select>
+                            <div className="filter-bar-group">
+                                <label className="filter-label" htmlFor="gilda-select">
+                                    <i className="fas fa-shield-alt"></i> Razza
+                                </label>
+                                <select
+                                    id="gilda-select"
+                                    className="filter-select"
+                                    value={filterGilda}
+                                    onChange={e => handleGildaChange(e.target.value)}
+                                >
+                                    <option value="">Tutte le razze</option>
+                                    {gildaList.map(g => (
+                                        <option key={g.id} value={String(g.id)}>{g.nome}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="filter-bar-group">
+                                <label className="filter-label" htmlFor="pg-select">
+                                    <i className="fas fa-user"></i> Giocatore
+                                </label>
+                                <select
+                                    id="pg-select"
+                                    className="filter-select"
+                                    value={selectedPg}
+                                    onChange={e => applyFilter(e.target.value)}
+                                >
+                                    <option value={currentUser}>Le mie ({currentUser})</option>
+                                    {filterGilda === '' && <option value="all">Tutte le giocate</option>}
+                                    {filteredPgList
+                                        .filter(p => p.pg_name !== currentUser)
+                                        .map(p => <option key={p.pg_name} value={p.pg_name}>{p.pg_name}</option>)
+                                    }
+                                </select>
+                            </div>
                         </div>
                     )}
                 </header>
