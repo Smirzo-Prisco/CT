@@ -100,7 +100,7 @@ function CurrentGuildPanel({ pg, onLeave }) {
                             <li>Tornerai ad essere <strong>senza razza</strong></li>
                             <li>Perderai tutti i punti <strong>shin</strong> non spesi</li>
                             <li>I punti spesi per le <strong>caratteristiche</strong> di razza verranno azzerati</li>
-                            <li>Tutte le <strong>skill di razza</strong> verranno rimosse (talenti e skill temporanee esclusi)</li>
+                            <li>Tutte le <strong>skill di razza</strong> verranno rimosse</li>
                             <li>Lo <strong>storico spese</strong> verrà cancellato</li>
                         </ul>
                         <div className="sr-confirm-actions">
