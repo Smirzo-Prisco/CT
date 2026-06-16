@@ -29,7 +29,7 @@ $id2 = $_GET['id2'];
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'storia' AND id_gilda = '$id' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'storia' AND id_gilda = '$id' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -44,7 +44,7 @@ $id2 = $_GET['id2'];
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'statuto' AND id_gilda = '$id' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'statuto' AND id_gilda = '$id' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -58,7 +58,7 @@ $id2 = $_GET['id2'];
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'skill' AND id_gilda = '$id' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'skill' AND id_gilda = '$id' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -72,7 +72,7 @@ $id2 = $_GET['id2'];
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'requisiti' AND id_gilda = '$id' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'requisiti' AND id_gilda = '$id' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -89,7 +89,7 @@ if ($id == 9) { ?>
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'cittadini' AND id_gilda = '$id' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'cittadini' AND id_gilda = '$id' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -105,7 +105,7 @@ if ($id == 9) { ?>
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'sit' AND id_gilda = '$id' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'sit' AND id_gilda = '$id' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -119,7 +119,7 @@ if ($id == 9) { ?>
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'wiccan' AND id_gilda = '$id' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'wiccan' AND id_gilda = '$id' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -133,7 +133,7 @@ if ($id == 9) { ?>
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'scorpion' AND id_gilda = '$id' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'scorpion' AND id_gilda = '$id' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -153,7 +153,7 @@ if ($id2 > 0) { ?>
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'storia' AND id_mestiere = '$id2' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'storia' AND id_mestiere = '$id2' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -168,7 +168,7 @@ if ($id2 > 0) { ?>
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'statuto' AND id_mestiere = '$id2' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'statuto' AND id_mestiere = '$id2' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -182,7 +182,7 @@ if ($id2 > 0) { ?>
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'skill' AND id_mestiere = '$id2' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'skill' AND id_mestiere = '$id2' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>
@@ -196,7 +196,7 @@ if ($id2 > 0) { ?>
     </div>
     <ul class="submenuItems">
       <li><p>       <?php 
-  $query = "SELECT * FROM statuti_new WHERE tipo = 'requisiti' AND id_mestiere = '$id2' ORDER BY articolo";
+  $query = "SELECT * FROM statuti WHERE tipo = 'requisiti' AND id_mestiere = '$id2' ORDER BY articolo";
   $result = gdrcd_query($query, 'result');
   while ($row = gdrcd_query($result, 'fetch')) { ?>
   <center><a href="statuto_testo.php?articolo=<?php echo gdrcd_filter('num', $row['articolo']); ?>" onclick="parent.document.querySelector('iframe[name=opendocframe]').src=this.href; return false;"><?php echo gdrcd_filter('out', $row['titolo']); ?></a><br></center>

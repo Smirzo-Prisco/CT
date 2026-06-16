@@ -35,12 +35,12 @@
             if($_POST['op'] == 'view') {
         
                /*Carico il record da modificare*/
-                $loaded_gilda = gdrcd_query("SELECT * FROM statuti_new WHERE id_gilda=".gdrcd_filter('num', $_POST['id_gilda'])."", 'result');
+                $loaded_gilda = gdrcd_query("SELECT * FROM statuti WHERE id_gilda=".gdrcd_filter('num', $_POST['id_gilda'])."", 'result');
                //Determinazione pagina (paginazione)
                 $pagebegin = (int) $_REQUEST['offset'] * $PARAMETERS['settings']['records_per_page'];
                 $pageend = $PARAMETERS['settings']['records_per_page'];
                 //Conteggio record totali
-                $record_globale = gdrcd_query("SELECT COUNT(*) FROM statuti_new");
+                $record_globale = gdrcd_query("SELECT COUNT(*) FROM statuti");
                 $totaleresults = $record_globale['COUNT(*)'];
                 //Lettura record
                 $numresults = gdrcd_query($loaded_gilda, 'num_rows');             
@@ -151,7 +151,7 @@
             if($_POST['op'] == 'insert') {
                 /*Eseguo l'inserimento*/
                 if(is_numeric($_POST['articolo']) == true) {
-                    gdrcd_query("INSERT INTO statuti_new (articolo, titolo, testo, tipo, id_gilda) VALUES (".gdrcd_filter('num', $_POST['articolo']).", '".gdrcd_filter('in', $_POST['titolo'])."', '".gdrcd_filter('in', $_POST['testo'])."', '".gdrcd_filter('in', $_POST['tipo'])."', '".gdrcd_filter('num', $_POST['id_gilda'])."')");
+                    gdrcd_query("INSERT INTO statuti (articolo, titolo, testo, tipo, id_gilda) VALUES (".gdrcd_filter('num', $_POST['articolo']).", '".gdrcd_filter('in', $_POST['titolo'])."', '".gdrcd_filter('in', $_POST['testo'])."', '".gdrcd_filter('in', $_POST['tipo'])."', '".gdrcd_filter('num', $_POST['id_gilda'])."')");
                     ?>
                     <div class="warning">
                         <?php echo gdrcd_filter('out', $MESSAGE['warning']['inserted']); ?>
@@ -172,7 +172,7 @@
             /* Cancellatura in un record */
             if($_POST['op'] == 'erase') {
                 /*Eseguo la cancellatura*/
-                gdrcd_query("DELETE FROM statuti_new WHERE articolo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1");
+                gdrcd_query("DELETE FROM statuti WHERE articolo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1");
                 ?>
                 <div class="warning">
                     <?php echo gdrcd_filter('out', $MESSAGE['warning']['deleted']); ?>
@@ -190,7 +190,7 @@
                 /*Processo le informazioni ricevute dal form*/
                 if((is_numeric($_POST['art']) == true) && (is_numeric($_POST['articolo']) == true)) {
                     /*Eseguo l'aggiornamento*/                
-             gdrcd_query("UPDATE statuti_new SET titolo ='".gdrcd_filter('in', $_POST['titolo'])."', testo ='".gdrcd_filter('in', $_POST['testo'])."', tipo ='".gdrcd_filter('in', $_POST['tipo'])."', articolo = ".gdrcd_filter('num', $_POST['articolo'])." WHERE articolo = ".gdrcd_filter('num', $_POST['art'])." LIMIT 1");                    
+             gdrcd_query("UPDATE statuti SET titolo ='".gdrcd_filter('in', $_POST['titolo'])."', testo ='".gdrcd_filter('in', $_POST['testo'])."', tipo ='".gdrcd_filter('in', $_POST['tipo'])."', articolo = ".gdrcd_filter('num', $_POST['articolo'])." WHERE articolo = ".gdrcd_filter('num', $_POST['art'])." LIMIT 1");                    
              /*Inserisco l'aggiornamento*/
              if ($_POST['id_gilda'] == 1) {
              $id_mex = '243202';
@@ -245,7 +245,7 @@
                 /*Se è stata richiesta una modifica*/
                 if($_POST['op'] == 'edit') {
                     /*Carico il record da modificare*/
-                    $loaded_record = gdrcd_query("SELECT * FROM statuti_new WHERE articolo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1 ");
+                    $loaded_record = gdrcd_query("SELECT * FROM statuti WHERE articolo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1 ");
                     /*Cambio l'operazione in modifica*/
                     $operation = 'edit';
                 } ?>
@@ -449,12 +449,12 @@
             if($_POST['op'] == 'view_mestiere') {
         
                /*Carico il record da modificare*/
-                $loaded_gilda = gdrcd_query("SELECT * FROM statuti_new WHERE id_mestiere=".gdrcd_filter('num', $_POST['id_mestiere'])."", 'result');
+                $loaded_gilda = gdrcd_query("SELECT * FROM statuti WHERE id_mestiere=".gdrcd_filter('num', $_POST['id_mestiere'])."", 'result');
                //Determinazione pagina (paginazione)
                 $pagebegin = (int) $_REQUEST['offset'] * $PARAMETERS['settings']['records_per_page'];
                 $pageend = $PARAMETERS['settings']['records_per_page'];
                 //Conteggio record totali
-                $record_globale = gdrcd_query("SELECT COUNT(*) FROM statuti_new");
+                $record_globale = gdrcd_query("SELECT COUNT(*) FROM statuti");
                 $totaleresults = $record_globale['COUNT(*)'];
                 //Lettura record
                 $numresults = gdrcd_query($loaded_gilda, 'num_rows');             
@@ -565,7 +565,7 @@
             if($_POST['op'] == 'insert_mestiere') {
                 /*Eseguo l'inserimento*/
                 if(is_numeric($_POST['articolo']) == true) {
-                    gdrcd_query("INSERT INTO statuti_new (articolo, titolo, testo, tipo, id_mestiere) VALUES (".gdrcd_filter('num', $_POST['articolo']).", '".gdrcd_filter('in', $_POST['titolo'])."', '".gdrcd_filter('in', $_POST['testo'])."', '".gdrcd_filter('in', $_POST['tipo'])."', '".gdrcd_filter('num', $_POST['id_mestiere'])."')");
+                    gdrcd_query("INSERT INTO statuti (articolo, titolo, testo, tipo, id_mestiere) VALUES (".gdrcd_filter('num', $_POST['articolo']).", '".gdrcd_filter('in', $_POST['titolo'])."', '".gdrcd_filter('in', $_POST['testo'])."', '".gdrcd_filter('in', $_POST['tipo'])."', '".gdrcd_filter('num', $_POST['id_mestiere'])."')");
                     ?>
                     <div class="warning">
                         <?php echo gdrcd_filter('out', $MESSAGE['warning']['inserted']); ?>
@@ -586,7 +586,7 @@
             /* Cancellatura in un record */
             if($_POST['op'] == 'erase_mestiere') {
                 /*Eseguo la cancellatura*/
-                gdrcd_query("DELETE FROM statuti_new WHERE articolo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1");
+                gdrcd_query("DELETE FROM statuti WHERE articolo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1");
                 ?>
                 <div class="warning">
                     <?php echo gdrcd_filter('out', $MESSAGE['warning']['deleted']); ?>
@@ -604,7 +604,7 @@
                 /*Processo le informazioni ricevute dal form*/
                 if((is_numeric($_POST['art']) == true) && (is_numeric($_POST['articolo']) == true)) {
                     /*Eseguo l'aggiornamento*/
-             gdrcd_query("UPDATE statuti_new SET titolo ='".gdrcd_filter('in', $_POST['titolo'])."', testo ='".gdrcd_filter('in', $_POST['testo'])."', tipo ='".gdrcd_filter('in', $_POST['tipo'])."', articolo = ".gdrcd_filter('num', $_POST['articolo'])." WHERE articolo = ".gdrcd_filter('num', $_POST['art'])." LIMIT 1");                    ?>
+             gdrcd_query("UPDATE statuti SET titolo ='".gdrcd_filter('in', $_POST['titolo'])."', testo ='".gdrcd_filter('in', $_POST['testo'])."', tipo ='".gdrcd_filter('in', $_POST['tipo'])."', articolo = ".gdrcd_filter('num', $_POST['articolo'])." WHERE articolo = ".gdrcd_filter('num', $_POST['art'])." LIMIT 1");                    ?>
                     <div class="warning">
                         <?php echo gdrcd_filter('out', $MESSAGE['warning']['modified']); ?>
                     </div>
@@ -636,7 +636,7 @@
                 /*Se è stata richiesta una modifica*/
                 if($_POST['op'] == 'edit_mestiere') {
                     /*Carico il record da modificare*/
-                    $loaded_record = gdrcd_query("SELECT * FROM statuti_new WHERE articolo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1 ");
+                    $loaded_record = gdrcd_query("SELECT * FROM statuti WHERE articolo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1 ");
                     /*Cambio l'operazione in modifica*/
                     $operation = 'edit_mestiere';
                 } ?>

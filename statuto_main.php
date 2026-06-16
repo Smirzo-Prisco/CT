@@ -29,7 +29,7 @@ if (!$background) exit;
  */
 function menuSection($tipo, $campo, $valore, $classe) {
     $valore = (int)$valore;
-    $res    = gdrcd_query("SELECT articolo, titolo FROM statuti_new WHERE tipo='$tipo' AND $campo='$valore' ORDER BY articolo", 'result');
+    $res    = gdrcd_query("SELECT articolo, titolo FROM statuti WHERE tipo='$tipo' AND $campo='$valore' ORDER BY articolo", 'result');
     $links  = '';
     while ($row = gdrcd_query($res, 'fetch')) {
         $art   = (int)$row['articolo'];

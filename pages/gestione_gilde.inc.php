@@ -85,7 +85,7 @@ if($_SESSION['admin'] != 1) {
                 <div class="guild-content" id="content-statuto-<?=$gilda['id_gilda']?>">
                     <div class="guild-header"><h4>Statuto</h4></div>
                     <?php
-                    $statuto = gdrcd_query("SELECT * FROM statuti_new WHERE id_gilda = ".$gilda['id_gilda'], 'result');
+                    $statuto = gdrcd_query("SELECT * FROM statuti WHERE id_gilda = ".$gilda['id_gilda'], 'result');
                     foreach ($statuto as $voce): ?>
                     <div class="guild-info">
                         <div><?= htmlspecialchars($voce['articolo']) ?></div>

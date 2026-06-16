@@ -227,7 +227,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
         case 'getVoceStatuto':  // Recupero i dati dello statuto della gilda
             $id = (int)$_GET['id'];
-            $voce_statuto = gdrcd_query("SELECT * FROM statuti_new WHERE articolo = $id");
+            $voce_statuto = gdrcd_query("SELECT * FROM statuti WHERE articolo = $id");
             
             if ($voce_statuto) echo json_encode($voce_statuto);
             else echo json_encode(['error' => false, 'message' => 'Voce statuto non trovata']);
@@ -235,7 +235,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
         case 'deleteVoceStatuto':  // Elimino lo statuto
             $id = (int)$_GET['id'];
-            $voce_statuto = gdrcd_query("DELETE FROM statuti_new WHERE articolo = $id");
+            $voce_statuto = gdrcd_query("DELETE FROM statuti WHERE articolo = $id");
             
             if ($voce_statuto) echo json_encode(['success' => true, 'message' => 'Voce eliminata con successo']);
             else echo json_encode(['error' => false, 'message' => 'Voce non trovata']);
@@ -263,7 +263,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         $setParts[] = "`$campo` = '".mysqli_real_escape_string(gdrcd_connect(), $valore)."'";
                     }
                     
-                    $query = "UPDATE statuti_new SET ".implode(', ', $setParts)." WHERE articolo = $id";
+                    $query = "UPDATE statuti SET ".implode(', ', $setParts)." WHERE articolo = $id";
                 } else {
                 // Creazione
                     $campi = [];
@@ -276,7 +276,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         $valori[] = "'".mysqli_real_escape_string(gdrcd_connect(), $valore)."'";
                     }
                     
-                    $query = "INSERT INTO statuti_new (".implode(', ', $campi).") VALUES (".implode(', ', $valori).")";
+                    $query = "INSERT INTO statuti (".implode(', ', $campi).") VALUES (".implode(', ', $valori).")";
                 }
 
                 if(gdrcd_query($query)) echo json_encode(['success' => true, 'message' => 'Voce salvata con successo!', 'query' => $query]);

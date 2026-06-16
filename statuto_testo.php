@@ -11,7 +11,7 @@ $handleDBConnection = gdrcd_connect();
 $articolo = (int)($_GET['articolo'] ?? 0);
 if (!$articolo) exit;
 
-$result = gdrcd_query("SELECT titolo, testo FROM statuti_new WHERE articolo='$articolo'");
+$result = gdrcd_query("SELECT titolo, testo FROM statuti WHERE articolo='$articolo'");
 if (!$result) exit;
 
 $titolo = gdrcd_filter('out', $result['titolo'] ?? '');
