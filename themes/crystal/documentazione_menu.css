@@ -6,6 +6,7 @@ a  { text-decoration: none; }
 .accordion-menu {
     width: 100%;
     max-width: 350px;
+    padding-left: 20px;
 }
 
 .accordion-menu li.open .dropdownlink .fa-chevron-down { transform: rotate(180deg); }
