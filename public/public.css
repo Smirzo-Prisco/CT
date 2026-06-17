@@ -1652,6 +1652,76 @@ p:last-child { margin-bottom: 0; }
     transform: rotate(180deg);
 }
 
+/* ============================================================
+   23. Tabella confronto tecnologia (il-gioco.php)
+   ============================================================ */
+.pub-tech-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 28px;
+    font-size: 0.9rem;
+}
+
+.pub-tech-table th,
+.pub-tech-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--pub-border);
+}
+
+.pub-tech-table thead th {
+    color: var(--pub-gold);
+    font-family: var(--font-head);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-weight: 700;
+    background: transparent;
+}
+
+.pub-tech-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.pub-tech-table tbody td:first-child {
+    color: var(--pub-text);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pub-tech-table tbody td:nth-child(2) {
+    color: var(--pub-muted);
+}
+
+.pub-tech-table tbody td:nth-child(3) {
+    color: var(--pub-text);
+}
+
+@media (max-width: 600px) {
+    .pub-tech-table thead { display: none; }
+    .pub-tech-table tbody tr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--pub-border);
+        gap: 4px 12px;
+    }
+    .pub-tech-table tbody tr:last-child { border-bottom: none; }
+    .pub-tech-table tbody td {
+        padding: 0;
+        border-bottom: none;
+    }
+    .pub-tech-table tbody td:first-child {
+        grid-column: 1 / -1;
+        font-size: 0.8rem;
+        color: var(--pub-gold);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .pub-tech-table tbody td:nth-child(2)::before { content: 'Prima: '; font-size: 0.75rem; opacity: 0.6; }
+    .pub-tech-table tbody td:nth-child(3)::before { content: 'Adesso: '; font-size: 0.75rem; opacity: 0.6; }
+}
+
 /* ── Responsive extra ────────────────────────────────────────────────────
    Aggiustamenti per le nuove classi aggiunte.
    ─────────────────────────────────────────────────────────────────────── */

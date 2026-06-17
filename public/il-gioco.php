@@ -92,10 +92,9 @@ public_head(
             dei personaggi.
         </p>
         <p>
-            Il gioco è costruito su una versione avanzata della piattaforma GDRCD, completamente
-            rivisitata per offrire un'esperienza stabile, profonda e orientata alla narrazione
-            condivisa. Le trame si sviluppano grazie all'interazione tra i giocatori e al supporto
-            dello staff narrativo.
+            Le trame si sviluppano grazie all'interazione tra i giocatori e al supporto
+            dello staff narrativo. Crystal Tokyo è attivo da oltre vent'anni e continua
+            a evolversi.
         </p>
     </section>
 
@@ -248,6 +247,63 @@ public_head(
         <p style="margin-top:2rem;">
             <a href="/come-si-gioca" class="pub-link">Leggi la guida completa su come si gioca &rsaquo;</a>
         </p>
+    </section>
+
+
+    <!-- ── Sezione 7: La piattaforma ────────────────────────────────────── -->
+    <section class="pub-section pub-section--highlight">
+        <h2>Una piattaforma moderna</h2>
+        <p>
+            Crystal Tokyo è più di un motore di gioco ereditato dal passato: negli ultimi anni
+            la piattaforma è stata riscritta quasi interamente per offrire un'esperienza fluida,
+            reattiva e stabile — indipendentemente dal dispositivo e dalla connessione.
+        </p>
+        <p>
+            <strong>Se non ti interessa la tecnologia</strong>, l'effetto concreto è questo:
+            il vecchio sito funzionava come un ristorante in cui ogni volta che volevate
+            cambiare piatto, il cameriere vi faceva uscire e rientrare dalla porta principale.
+            Ogni click causava il ricaricamento completo della pagina.
+            Oggi le colonne laterali, i menu e la struttura vengono caricati una volta sola.
+            Quando navigate tra scheda personaggio, forum, mappa e messaggi, cambia solo
+            il contenuto al centro — senza lampeggi, senza attese.
+        </p>
+        <p>
+            La chat funziona in modo altrettanto diverso: invece di interrogare il server ogni
+            pochi secondi sperando in novità, esiste ora una linea diretta sempre aperta.
+            I messaggi arrivano nell'istante esatto in cui vengono scritti.
+        </p>
+        <p>
+            <strong>Per chi vuole i dettagli tecnici:</strong> il frontend è stato migrato
+            verso una Single Page Application basata su React, con il backend PHP ridotto
+            ad API JSON pure. La chat usa connessioni WebSocket persistenti, suddivise per
+            stanza, utente e presenza globale — zero polling, aggiornamenti istantanei.
+        </p>
+        <table class="pub-tech-table" aria-label="Confronto prima e dopo">
+            <thead>
+                <tr>
+                    <th>Aspetto</th>
+                    <th>Prima</th>
+                    <th>Adesso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Navigazione</td>
+                    <td>Ricaricamento completo ad ogni click</td>
+                    <td>Solo il contenuto centrale cambia</td>
+                </tr>
+                <tr>
+                    <td>Chat in tempo reale</td>
+                    <td>Polling ogni 5–30 secondi</td>
+                    <td>WebSocket push istantaneo</td>
+                </tr>
+                <tr>
+                    <td>Frontend</td>
+                    <td>Rendering PHP classico</td>
+                    <td>React — interfaccia reattiva</td>
+                </tr>
+            </tbody>
+        </table>
     </section>
 
 
