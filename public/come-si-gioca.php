@@ -254,7 +254,7 @@ public_head(
         <h2>I livelli e le abilità</h2>
         <p>
             Man mano che le caratteristiche del personaggio crescono, il sistema calcola
-            in automatico il suo <strong>livello</strong>: un numero che riflette la potenza
+            in automatico il tuo <strong>livello</strong>: un numero che riflette la potenza
             complessiva raggiunta. Non serve fare nulla di speciale — basta giocare.
         </p>
         <p>
@@ -265,7 +265,7 @@ public_head(
         </p>
         <p>
             Le abilità si dividono in più categorie — offensive, difensive, mentali,
-            poteri speciali, talenti — e si scelgono liberamente all'interno di quelle
+            poteri speciali — e si scelgono liberamente all'interno di quelle
             rese disponibili dal livello raggiunto. Ogni scelta contribuisce a rendere
             il personaggio unico e difficile da replicare.
         </p>
@@ -276,16 +276,17 @@ public_head(
     <section class="pub-section">
         <h2>Role e turni</h2>
         <p>
-            Quando più personaggi si trovano nella stessa chat, il sistema li unisce
-            automaticamente in una <strong>role</strong> — una sessione di gioco condivisa,
-            registrata e scandita turno per turno.
+            Una <strong>role</strong> è una sessione di gioco strutturata che si avvia
+            quando i personaggi presenti in una chat decidono di aprirla. Da quel momento
+            la sessione è registrata, numerata turno per turno e visibile a tutti i partecipanti.
         </p>
         <p>
             Ogni <strong>turno</strong> funziona così: ciascun partecipante scrive la
             propria azione narrativa e, se lo desidera, attiva le proprie abilità.
-            Quando tutti hanno agito, il turno si chiude e il sistema elabora l'esito —
-            danni, effetti, conseguenze — mostrando un <strong>riepilogo automatico</strong>
-            di tutto ciò che è successo. Poi si passa al turno successivo.
+            Quando tutti hanno agito, il turno si chiude: il sistema elabora l'esito,
+            mostra un <strong>riepilogo automatico</strong> di tutto ciò che è successo
+            e scala automaticamente i punti salute e integrità in base ai danni subiti.
+            Poi si passa al turno successivo.
         </p>
         <p>
             Le role concluse restano accessibili a tempo indefinito: ogni giocatore può
