@@ -48,14 +48,15 @@ function formatDate(iso) {
 /**
  * Riga di un thread nell'elenco di una sezione.
  * Struttura identica al vecchio visit.inc.php:
- *   STATO | TOPIC (titolo+data) | AUTORE | RISPOSTE (n + ultima) | [AZIONI staff]
+ *   STATO | TOPIC (titolo+data) | AUTORE | RISPOSTE (n + ultima) | [AZIONI]
  *
- * @param {Object}   props.thread    - Dati del thread
- * @param {Function} props.onClick   - Callback al click per aprire il thread
- * @param {boolean}  props.isStaff   - true = mostra pulsanti azioni staff
- * @param {Function} props.onAction  - Callback ({ action, threadId }) per azioni staff
+ * @param {Object}   props.thread     - Dati del thread
+ * @param {Function} props.onClick    - Callback al click per aprire il thread
+ * @param {boolean}  props.isStaff    - true = mostra pulsanti importante/chiudi
+ * @param {boolean}  props.canDelete  - true = mostra pulsante elimina
+ * @param {Function} props.onAction   - Callback ({ action, thread }) per azioni
  */
-function ThreadRow({ thread, onClick, isStaff, onAction }) {
+function ThreadRow({ thread, onClick, isStaff, canDelete, onAction }) {
 
     /** Blocca la propagazione per non aprire il thread al click sui pulsanti */
     const action = (e, type) => {
@@ -102,39 +103,45 @@ function ThreadRow({ thread, onClick, isStaff, onAction }) {
                 )}
             </td>
 
-            {/* AZIONI staff: importante, chiudi/apri, elimina */}
-            {isStaff && (
+            {/* AZIONI: importante/chiudi per staff, elimina per chiunque abbia can_delete */}
+            {(isStaff || canDelete) && (
                 <td className={styles.actionsCell}>
-                    <img
-                        src={thread.importante
-                            ? '/themes/crystal/imgs/forum/freccia_giu.png'
-                            : '/themes/crystal/imgs/forum/freccia_su.png'}
-                        alt="Importante"
-                        title={thread.importante ? 'Rimuovi da importanti' : 'Segna come importante'}
-                        className={styles.actionIcon}
-                        onClick={e => action(e, 'toggle_important')}
-                    />
-                    <img
-                        src={thread.chiuso
-                            ? '/themes/crystal/imgs/forum/lucchetto_aperto.png'
-                            : '/themes/crystal/imgs/forum/lucchetto_chiuso.png'}
-                        alt={thread.chiuso ? 'Apri' : 'Chiudi'}
-                        title={thread.chiuso ? 'Apri post' : 'Chiudi post'}
-                        className={styles.actionIcon}
-                        onClick={e => action(e, 'toggle_close')}
-                    />
-                    <img
-                        src="/themes/crystal/imgs/forum/cancella_topic.png"
-                        alt="Elimina"
-                        title="Elimina thread"
-                        className={styles.actionIcon}
-                        onClick={e => {
-                            e.stopPropagation()
-                            if (confirm('Eliminare questo thread e tutte le risposte?')) {
-                                onAction && onAction({ action: 'delete_thread', thread })
-                            }
-                        }}
-                    />
+                    {isStaff && (
+                        <>
+                            <img
+                                src={thread.importante
+                                    ? '/themes/crystal/imgs/forum/freccia_giu.png'
+                                    : '/themes/crystal/imgs/forum/freccia_su.png'}
+                                alt="Importante"
+                                title={thread.importante ? 'Rimuovi da importanti' : 'Segna come importante'}
+                                className={styles.actionIcon}
+                                onClick={e => action(e, 'toggle_important')}
+                            />
+                            <img
+                                src={thread.chiuso
+                                    ? '/themes/crystal/imgs/forum/lucchetto_aperto.png'
+                                    : '/themes/crystal/imgs/forum/lucchetto_chiuso.png'}
+                                alt={thread.chiuso ? 'Apri' : 'Chiudi'}
+                                title={thread.chiuso ? 'Apri post' : 'Chiudi post'}
+                                className={styles.actionIcon}
+                                onClick={e => action(e, 'toggle_close')}
+                            />
+                        </>
+                    )}
+                    {canDelete && (
+                        <img
+                            src="/themes/crystal/imgs/forum/cancella_topic.png"
+                            alt="Elimina"
+                            title="Elimina thread"
+                            className={styles.actionIcon}
+                            onClick={e => {
+                                e.stopPropagation()
+                                if (confirm('Eliminare questo thread e tutte le risposte?')) {
+                                    onAction && onAction({ action: 'delete_thread', thread })
+                                }
+                            }}
+                        />
+                    )}
                 </td>
             )}
         </tr>
@@ -149,12 +156,14 @@ function ThreadRow({ thread, onClick, isStaff, onAction }) {
  * Post di un thread (sia il messaggio originale che le risposte).
  * Mostra avatar, autore, data e testo del messaggio.
  * Se msg.can_edit è true mostra il pulsante "Modifica" con editor inline.
+ * Se msg.can_delete è true mostra il pulsante "Elimina".
  *
- * @param {Object}   props.msg     - Dati del messaggio
- * @param {boolean}  props.isFirst - true se è il messaggio padre del thread
- * @param {Function} props.onEdit  - Callback ({ id, messaggio, titolo }) al salvataggio
+ * @param {Object}   props.msg      - Dati del messaggio
+ * @param {boolean}  props.isFirst  - true se è il messaggio padre del thread
+ * @param {Function} props.onEdit   - Callback ({ id, messaggio, titolo }) al salvataggio
+ * @param {Function} props.onDelete - Callback (id_messaggio) alla cancellazione
  */
-function PostCard({ msg, isFirst, onEdit }) {
+function PostCard({ msg, isFirst, onEdit, onDelete }) {
     const [isEditing,  setIsEditing]  = useState(false)
     const [editText,   setEditText]   = useState('')
     const [editTitolo, setEditTitolo] = useState('')
@@ -226,9 +235,22 @@ function PostCard({ msg, isFirst, onEdit }) {
                                 {msg.edit_note && (
                                     <div className={`forum_post_modify ${styles.editNote}`}>{msg.edit_note}</div>
                                 )}
-                                {msg.can_edit && (
+                                {(msg.can_edit || msg.can_delete) && (
                                     <div className={styles.editActions}>
-                                        <button onClick={startEdit} className={styles.editBtn}>Modifica</button>
+                                        {msg.can_edit && (
+                                            <button onClick={startEdit} className={styles.editBtn}>Modifica</button>
+                                        )}
+                                        {msg.can_delete && (
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm(isFirst ? 'Eliminare il thread e tutte le risposte?' : 'Eliminare questo messaggio?'))
+                                                        onDelete(msg.id)
+                                                }}
+                                                className={styles.deleteBtn}
+                                            >
+                                                Elimina
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </>
@@ -887,6 +909,47 @@ export default function Forum({ isStaff = false }) {
     }, [currentThread, fetchThread])
 
     /**
+     * Elimina una risposta (non il post radice) e ricarica il thread.
+     * @param {number} id_messaggio - ID del messaggio da eliminare
+     */
+    const handleDeletePost = useCallback((id_messaggio) => {
+        fetch('/pages/api_forum.php?op=delete_post', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ id_messaggio }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) fetchThread(currentThread.id)
+                else alert(data.message || 'Errore nell\'eliminazione')
+            })
+            .catch(console.error)
+    }, [currentThread, fetchThread])
+
+    /**
+     * Elimina il thread corrente (post radice + tutte le risposte) e torna alla lista.
+     * @param {number} id_messaggio - ID del thread (= id del post radice)
+     */
+    const handleDeleteThread = useCallback((id_messaggio) => {
+        fetch('/pages/api_forum.php?op=delete_thread', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ thread: id_messaggio, araldo: currentSection?.id }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setView('threads')
+                    setCurrentThread(null)
+                    setMessages([])
+                    setPuntiList([])
+                    if (currentSection) fetchThreads(currentSection.id, page)
+                } else alert(data.message || 'Errore nell\'eliminazione')
+            })
+            .catch(console.error)
+    }, [currentSection, fetchThreads, page])
+
+    /**
      * Invia un resoconto quest nella sezione corrente.
      * @param {Object} formData - Tutti i campi del form ComposeQuest
      */
@@ -979,6 +1042,7 @@ export default function Forum({ isStaff = false }) {
                 t.autore.toLowerCase().includes(searchQuery.toLowerCase())
               )
             : threads
+        const showActionsCol = isStaff || filteredThreads.some(t => t.can_delete)
 
         return (
             <div className="pagina_forum">
@@ -1017,12 +1081,12 @@ export default function Forum({ isStaff = false }) {
                                     <td className={styles.theadColor}>TOPIC</td>
                                     <td className={styles.theadColor} style={{ textAlign: 'center' }}>AUTORE</td>
                                     <td className={styles.theadColor} style={{ textAlign: 'center' }}>RISPOSTE</td>
-                                    {isStaff && <td className={styles.theadColor}></td>}
+                                    {showActionsCol && <td className={styles.theadColor}></td>}
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredThreads.length === 0 ? (
-                                    <tr><td colSpan={isStaff ? 5 : 4} className={styles.emptyState}>Nessuna discussione.</td></tr>
+                                    <tr><td colSpan={showActionsCol ? 5 : 4} className={styles.emptyState}>Nessuna discussione.</td></tr>
                                 ) : (
                                     filteredThreads.map(t => (
                                         <ThreadRow
@@ -1030,6 +1094,7 @@ export default function Forum({ isStaff = false }) {
                                             thread={t}
                                             onClick={openThread}
                                             isStaff={isStaff}
+                                            canDelete={t.can_delete}
                                             onAction={handleThreadAction}
                                         />
                                     ))
@@ -1108,7 +1173,12 @@ export default function Forum({ isStaff = false }) {
                         {/* Tutti i messaggi del thread */}
                         {messages.map((msg, i) => (
                             <div key={msg.id}>
-                                <PostCard msg={msg} isFirst={i === 0} onEdit={handleEditPost} />
+                                <PostCard
+                                    msg={msg}
+                                    isFirst={i === 0}
+                                    onEdit={handleEditPost}
+                                    onDelete={i === 0 ? handleDeleteThread : handleDeletePost}
+                                />
                                 {/* Tabella punti partecipanti — visibile solo a master/admin, solo sul post radice */}
                                 {i === 0 && <PuntiTable puntiList={puntiList} />}
                             </div>

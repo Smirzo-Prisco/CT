@@ -76,6 +76,11 @@ function section_label(int $tipo): string {
     };
 }
 
+// Helper: verifica se l'utente corrente è admin o moderatore
+function is_staff(): bool {
+    return $_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1;
+}
+
 switch ($op) {
 
     // -------------------------------------------------------------------------
@@ -157,6 +162,7 @@ switch ($op) {
                 'importante'           => (bool)$row['importante'],
                 'n_risposte'           => (int)$row['n_risposte'],
                 'letto'                => (bool)$row['letto'],
+                'can_delete'           => ($row['autore'] == $login || is_staff()),
             ];
         }
         gdrcd_query($result, 'free');
@@ -240,6 +246,7 @@ switch ($op) {
                 'chiuso'        => (bool)$post['chiuso'],
                 'giornalista'   => (bool)$post['giornalista'],
                 'can_edit'      => ($post['autore'] == $login || $_SESSION['admin'] == 1),
+                'can_delete'    => ($post['autore'] == $login || is_staff()),
             ];
         } while ($post = gdrcd_query($result, 'fetch'));
         gdrcd_query($result, 'free');
@@ -389,15 +396,34 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
-    // DELETE_THREAD — elimina un thread e tutte le sue risposte (solo admin/mod)
+    // DELETE_THREAD — elimina un thread e tutte le sue risposte (autore o staff)
     // -------------------------------------------------------------------------
     case 'delete_thread':
-        if ($_SESSION['admin'] != 1 && $_SESSION['moderatore'] != 1) {
-            http_response_code(403); echo json_encode(['success' => false]); exit;
+        $thread_id  = (int)($data['thread'] ?? 0);
+        $thread_row = gdrcd_query("SELECT autore FROM messaggioaraldo WHERE id_messaggio = $thread_id AND id_messaggio_padre = -1 LIMIT 1");
+        if (!$thread_row) { echo json_encode(['success' => false, 'message' => 'Thread non trovato']); exit; }
+        if (!is_staff() && $thread_row['autore'] != $login) {
+            http_response_code(403); echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit;
         }
-        $thread_id = (int)($data['thread'] ?? 0);
         gdrcd_query("DELETE FROM messaggioaraldo WHERE id_messaggio = $thread_id OR id_messaggio_padre = $thread_id");
         gdrcd_query("DELETE FROM araldo_letto WHERE thread_id = $thread_id");
+        echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // DELETE_POST — elimina un singolo messaggio/risposta (autore o staff)
+    // -------------------------------------------------------------------------
+    case 'delete_post':
+        $id_msg = (int)($data['id_messaggio'] ?? 0);
+        $row    = gdrcd_query("SELECT autore, id_messaggio_padre FROM messaggioaraldo WHERE id_messaggio = $id_msg LIMIT 1");
+        if (!$row) { echo json_encode(['success' => false, 'message' => 'Messaggio non trovato']); exit; }
+        if ($row['id_messaggio_padre'] == -1) {
+            echo json_encode(['success' => false, 'message' => 'Per eliminare un thread usa delete_thread']); exit;
+        }
+        if ($row['autore'] != $login && !is_staff()) {
+            http_response_code(403); echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit;
+        }
+        gdrcd_query("DELETE FROM messaggioaraldo WHERE id_messaggio = $id_msg LIMIT 1");
         echo json_encode(['success' => true]);
         break;
 

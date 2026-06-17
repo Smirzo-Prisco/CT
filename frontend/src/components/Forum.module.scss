@@ -367,3 +367,19 @@
         border-color: $palette-text;
     }
 }
+
+.deleteBtn {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: none;
+    border: 1px solid #c0392b;
+    color: #c0392b;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-left: 6px;
+
+    &:hover {
+        background: #c0392b;
+        color: #fff;
+    }
+}
