@@ -1004,7 +1004,11 @@ p:last-child { margin-bottom: 0; }
    16. RESPONSIVE
    ============================================================ */
 
-/* Tablet: 768px – 1023px */
+/* Tablet + Mobile: ≤ 1023px
+   Il menu diventa hamburger già dal breakpoint tablet:
+   a 768-1023px la barra orizzontale è troppo stretta per
+   logo + 4 voci + 2 bottoni auth.
+   ============================================================ */
 @media (max-width: 1023px) {
     .pub-cards {
         grid-template-columns: repeat(2, 1fr);
@@ -1013,20 +1017,18 @@ p:last-child { margin-bottom: 0; }
     .pub-footer-inner {
         grid-template-columns: 1fr 1fr;
     }
-}
 
-/* Mobile: < 768px */
-@media (max-width: 767px) {
-    /* Header sticky sempre opaco su mobile */
+    /* Header sempre opaco su tablet/mobile */
     .pub-header {
         background: rgba(8, 9, 26, 0.97);
     }
 
+    /* Mostra hamburger */
     .pub-hamburger {
         display: flex;
     }
 
-    /* Nav a tendina su mobile */
+    /* Nav a tendina (nascosta finché non si apre) */
     .pub-nav {
         position: absolute;
         top: var(--pub-nav-h);
@@ -1038,7 +1040,6 @@ p:last-child { margin-bottom: 0; }
         align-items: stretch;
         padding: 16px;
         gap: 12px;
-        /* Nascosto per default */
         display: none;
     }
 
@@ -1061,6 +1062,10 @@ p:last-child { margin-bottom: 0; }
         flex-direction: column;
         gap: 10px;
     }
+}
+
+/* Mobile: < 768px — solo aggiustamenti specifici al piccolo schermo */
+@media (max-width: 767px) {
 
     .pub-hero { min-height: 85vh; }
 
