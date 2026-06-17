@@ -11,7 +11,7 @@
  *   - Gilde (gruppi creati dai giocatori)
  *   - FAQ con JSON-LD FAQPage (Google rich results)
  *
- * URL pulito: /come-si-gioca → RewriteRule in .htaccess
+ * URL pulito: /come-si-gioca → location block nginx
  *
  * Dipendenze condivise: _head.php, _nav.php, _footer.php, _modals.php
  */
@@ -194,8 +194,9 @@ public_head(
                 <h3>Razza</h3>
                 <p>
                     La razza determina la natura magica del personaggio e le abilità che potrà
-                    sviluppare. Non ne impone l'allineamento: puoi seguire Cosmos, Caos o
-                    una via di mezzo indipendentemente dalla razza scelta.
+                    sviluppare. Porta con sé tendenze naturali ereditate dalla stirpe, ma queste
+                    sono inclinazioni, non destini: l'allineamento del personaggio dipende
+                    esclusivamente dalle scelte del giocatore.
                 </p>
             </div>
 
