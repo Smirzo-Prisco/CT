@@ -4,17 +4,14 @@
  *
  * Presenta il gioco ai potenziali nuovi giocatori:
  *   - Cos'è Crystal Tokyo GDR (storia, piattaforma)
- *   - L'ambientazione: la Città di Cristallo
- *   - Cosmos, Caos e le Vie Magiche
- *   - Le Razze (rimpiazzano le vecchie famiglie — nessun allineamento fisso)
+ *   - La storia in breve (Sorgente → Silver Millennium → Mana Cerace → Risveglio → 3060)
+ *   - Allineamento (scomparsa di Cosmos/Caos — tendenze di razza, non destini)
+ *   - Le Razze (sette razze flat, nessuna gerarchia)
  *   - Le Gilde (gruppi creati dai giocatori)
  *   - Come funziona il gioco (dadi, stats, shin)
  *   - CTA registrazione
  *
- * OBSOLETO DA ELIMINARE: docs/il_gioco.html — ancora esistente ma
- * TODO: DELETE docs/il_gioco.html una volta che questa pagina è live e indicizzata.
- *
- * URL pulito: /il-gioco → RewriteRule in .htaccess
+ * URL pulito: /il-gioco → location block nginx
  *
  * Dipendenze condivise: _head.php, _nav.php, _footer.php, _modals.php
  */
@@ -103,58 +100,81 @@ public_head(
     </section>
 
 
-    <!-- ── Sezione 2: Ambientazione ─────────────────────────────────────── -->
+    <!-- ── Sezione 2: La storia ──────────────────────────────────────────── -->
     <section class="pub-section">
-        <h2>L'ambientazione: la Città di Cristallo</h2>
+        <h2>La storia in breve</h2>
         <p>
-            Crystal Tokyo è ambientata in un futuro magico, successivo a una glaciazione durata
-            oltre mille anni che ha colpito il mondo intero. L'umanità è sopravvissuta e ha ripreso
-            a prosperare, raggiungendo nuovi livelli di sviluppo tecnologico e magico.
+            All'origine di tutto non vi è un dio, ma qualcosa di più antico: la <strong>Sorgente</strong>.
+            Da essa hanno preso forma lo spazio, il tempo, la magia, la vita e la morte.
+            Ciò che gli esseri chiamano "magia" ne è solo una minima parte.
         </p>
         <p>
-            Tokyo è stata la prima città a disgelarsi, diventando il simbolo della rinascita
-            e guadagnandosi il nome di <strong>Città di Cristallo</strong>. In apparenza la vita
-            scorre normalmente, ma sotto questa superficie si nasconde la vera natura del mondo:
-            la magia è una forza onnipresente, conosciuta da tutti e spesso volutamente ignorata.
+            Per secoli il Sistema Solare fu un impero pacifico, il <strong>Silver Millennium</strong>,
+            sotto l'egida della Famiglia Imperiale della Luna. Le razze magiche ne erano le guardiane,
+            ognuna con una natura, un potere e un ruolo diversi. Ma la guerra e le faide antiche
+            spezzarono l'equilibrio, e l'Impero crollò. La Terra fu l'unico pianeta a sopravvivere.
         </p>
         <p>
-            <a href="/ambientazione" class="pub-link">Scopri l'ambientazione completa &rsaquo;</a>
+            Alle soglie del XXI secolo emerse il <strong>Mana Cerace</strong>: le paure degli uomini
+            presero forma e divennero letali. L'alleanza tra le razze che avrebbe potuto fermarlo
+            non si trovò — le faide erano troppo vecchie. L'unica alternativa fu congelare il mondo.
+            Il ghiaccio coprì ogni superficie per <strong>mille anni</strong>, ibernando l'umanità intera.
+        </p>
+        <p>
+            Un cristallo antico risvegliò il pianeta. Il fuoco sciolse il ghiaccio, i mari tornarono
+            ad agitarsi. L'umanità si svegliò con i ricordi intatti ma senza la Paura — e senza
+            memoria della magia. Tokyo fu la prima città a rifiorire, diventando centro di una nuova civiltà.
+        </p>
+        <p>
+            Oggi è il <strong>3060</strong>. Tokyo ha tecnologie moderne, costumi metropolitani,
+            una Corte imperiale — vita ordinaria in apparenza. Ma sotto la superficie, la magia
+            si è risvegliata di nuovo, lenta e personale. Le razze sono tornate.
+            Le faide antiche si sono riaccese. E al centro di tutto, come sempre, c'è Tokyo.
+        </p>
+        <p>
+            <a href="/ambientazione" class="pub-link">Approfondisci l'ambientazione completa &rsaquo;</a>
         </p>
     </section>
 
 
-    <!-- ── Sezione 3: Cosmos e Caos ─────────────────────────────────────── -->
-    <section class="pub-section">
-        <h2>Cosmos, Caos e le Vie Magiche</h2>
+    <!-- ── Sezione 3: Allineamento ──────────────────────────────────────── -->
+    <section class="pub-section pub-section--highlight">
+        <h2>Allineamento</h2>
         <p>
-            L'esistenza magica di Crystal Tokyo è dominata da due grandi forze primordiali:
-            <strong>Cosmos</strong> e <strong>Caos</strong>. Entrambe sono considerate vere e
-            proprie divinità da coloro che ne traggono potere e devozione.
+            Con la scomparsa di Cosmos e Caos, la magia che un tempo definiva l'allineamento
+            non esiste più. Non c'è un positivo, un negativo o un neutrale imposto dall'esterno —
+            nessuna divinità a orientare la bussola morale, nessuna appartenenza che vincoli le scelte.
         </p>
         <p>
-            Da queste forze discendono le <strong>Vie Magiche</strong>: percorsi spirituali e mistici
-            che plasmano l'identità dei personaggi e ne determinano abilità e ideali.
-            Le Vie Magiche alimentano una lotta costante per il dominio della città e del mondo,
-            ma nessun personaggio è obbligato a scegliere una parte — l'ambiguità è parte
-            integrante di questa storia.
+            L'allineamento di ogni personaggio dipende esclusivamente da chi è: dal suo carattere,
+            dalla sua storia, dalle scelte che compie giorno per giorno. Può avere sfumature
+            contraddittorie, può cambiare nel tempo, può non essere facilmente etichettabile —
+            e va bene così.
+        </p>
+        <p>
+            Ogni razza mantiene delle <strong>tendenze naturali</strong> ereditate dalla propria stirpe,
+            ma queste sono inclinazioni, non destini. I Demoni hanno una tendenza negativa,
+            i Celestiali positiva — ma sta al giocatore decidere se assecondare questa inclinazione
+            o contrastarla. Un Demone potrebbe opporsi ogni giorno alla tentazione di prevaricare;
+            un Celestiale potrebbe sfruttare le sue capacità benevole per manipolare gli altri.
+            Alcuni abbinamenti saranno più difficili di altri, ma la scelta è sempre del giocatore.
         </p>
     </section>
 
 
     <!-- ── Sezione 4: Le Razze ──────────────────────────────────────────── -->
-    <section class="pub-section pub-section--highlight">
+    <section class="pub-section">
         <h2>Le Razze</h2>
         <p>
-            In Crystal Tokyo esistono diverse <strong>razze</strong>, ognuna con caratteristiche,
-            origini e legami magici propri. La razza definisce la natura profonda del personaggio
-            e ne influenza le abilità, ma <em>non ne determina l'allineamento</em>: ogni personaggio
-            è libero di scegliere il proprio percorso tra Cosmos, Caos o la via di mezzo.
+            In Crystal Tokyo esistono <strong>sette razze</strong>, ognuna con caratteristiche,
+            origini e poteri propri: <strong>Adamanti</strong>, <strong>Celestiali</strong>,
+            <strong>Elementali</strong>, <strong>Beast</strong>, <strong>Fiori</strong>,
+            <strong>Demoni</strong> e <strong>Lancaster</strong>.
         </p>
         <p>
-            Le razze spaziano da creature legate alle forze di Caos — come i Demoni del Regno
-            oscuro e i Lancaster, entità simili a vampiri — a quelle vicine a Cosmos, come i
-            Giustizieri e i Guardiani, fino alle razze neutrali che cercano il proprio equilibrio
-            tra le due grandi forze.
+            Non esiste una gerarchia tra le razze, né un percorso predestinato.
+            La razza definisce la natura profonda del personaggio e le sue inclinazioni naturali,
+            ma non ne determina il destino — quello è in mano esclusivamente al giocatore.
         </p>
         <p>
             <a href="/razze" class="pub-btn pub-btn--ghost">Scopri tutte le razze &rsaquo;</a>
@@ -163,19 +183,25 @@ public_head(
 
 
     <!-- ── Sezione 5: Le Gilde ──────────────────────────────────────────── -->
-    <section class="pub-section">
+    <section class="pub-section pub-section--highlight">
         <h2>Le Gilde</h2>
         <p>
-            Le <strong>gilde</strong> sono gruppi creati direttamente dai giocatori, con obiettivi
-            e tematiche scelte in piena autonomia. Si organizzano da soli e partecipano attivamente
-            alle trame del gioco, costruendo storie, alleanze e conflitti che arricchiscono
-            l'intera comunità.
+            Le <strong>Gilde</strong> sono gruppi creati dai giocatori all'interno della trama.
+            Possono nascere per qualsiasi scopo — un'organizzazione criminale, una compagnia di
+            mercenari, un circolo di studiosi, una banda di strada, una confraternita segreta.
+            Non esistono limiti di tipo o di natura: una Gilda può essere legale o illegale,
+            pubblica o clandestina, con una gerarchia rigida o completamente orizzontale.
         </p>
         <p>
-            Non esiste un'ideologia predefinita: ogni gilda si costruisce la propria identità,
-            può essere un'organizzazione criminale, una confraternita di guerrieri, un circolo
-            di studiosi della magia, o qualsiasi altra cosa i giocatori immaginino.
-            Le gilde sono il cuore pulsante della vita sociale e politica di Crystal Tokyo.
+            La struttura, il regolamento, le mansioni e gli obiettivi sono decisi interamente
+            dai giocatori che la compongono. Per fondarne una sono necessari almeno
+            <strong>3 personaggi</strong>. Ogni Gilda ha a disposizione uno spazio dedicato
+            nel forum per presentarsi alla comunità.
+        </p>
+        <p>
+            Tutto ciò che riguarda le Gilde — nascita, attività, conflitti — si svolge
+            esclusivamente <em>on game</em>. Non esistono meccaniche tecniche legate ad esse:
+            sono uno strumento narrativo nelle mani dei giocatori.
         </p>
     </section>
 
