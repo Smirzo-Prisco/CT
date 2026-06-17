@@ -170,10 +170,10 @@ public_head(
                     la magia è una forza onnipresente che nessuno può ignorare a lungo.
                 </p>
                 <p style="margin-top:16px;">
-                    Due grandi forze cosmiche — <strong>Cosmos</strong> e <strong>Caos</strong> —
-                    si contendono il controllo della città attraverso le razze, le gilde e i personaggi
-                    che vi abitano. Il tuo personaggio entra in questo conflitto con la propria storia,
-                    le proprie scelte e le proprie ambizioni.
+                    Le razze magiche si sono risvegliate. Le faide antiche, sopite per mille anni
+                    di ghiaccio, si sono riaccese. Il tuo personaggio entra in questo mondo
+                    con una storia, delle scelte e la libertà di decidere da che parte stare —
+                    o di non stare da nessuna parte.
                 </p>
                 <a href="/ambientazione" class="pub-btn pub-btn--ghost" style="margin-top:24px;">
                     Leggi l'ambientazione &rsaquo;
@@ -201,8 +201,8 @@ public_head(
         <p class="pub-section-label">Scegli la tua natura</p>
         <h2 class="pub-section-title">Le Razze</h2>
         <p class="pub-section-subtitle">
-            Ogni razza ha origini, poteri e legami magici propri.
-            Il tuo allineamento lo scegli tu — la razza è solo il punto di partenza.
+            Sette razze, ognuna con origini e poteri propri. Nessuna gerarchia,
+            nessun allineamento imposto — la storia del tuo personaggio la scrivi tu.
         </p>
 
         <!-- Tre card rappresentative (non tutte le razze, per non appesantire la homepage) -->
@@ -210,28 +210,30 @@ public_head(
 
             <div class="pub-card">
                 <div class="pub-card-icon"><i class="fas fa-sun"></i></div>
-                <h3 class="pub-card-title">Fedeli di Cosmos</h3>
+                <h3 class="pub-card-title">Celestiali</h3>
                 <p class="pub-card-text">
-                    Giustizieri e Guardiani traggono forza dai pianeti e dagli spiriti benevoli.
-                    Protettori del mondo, combattono l'oscurità con potere e dedizione.
+                    Portatori naturali di luce e protezione. La loro inclinazione benevola
+                    è una tendenza, non un obbligo — e i Celestiali che scelgono strade oscure
+                    sono tra i più temuti.
                 </p>
             </div>
 
             <div class="pub-card">
-                <div class="pub-card-icon"><i class="fas fa-moon"></i></div>
-                <h3 class="pub-card-title">Creature di Caos</h3>
+                <div class="pub-card-icon"><i class="fas fa-fire"></i></div>
+                <h3 class="pub-card-title">Demoni</h3>
                 <p class="pub-card-text">
-                    Demoni del Regno oscuro e Lancaster — entità simili a vampiri —
-                    abitano le ombre della città con poteri che sfidano ogni limite.
+                    Creature di potere grezzo, legate a forze primordiali.
+                    Si oppongono alla propria natura ogni giorno — o vi si abbandonano.
+                    La scelta è sempre del giocatore.
                 </p>
             </div>
 
             <div class="pub-card">
-                <div class="pub-card-icon"><i class="fas fa-yin-yang"></i></div>
-                <h3 class="pub-card-title">Razze Neutrali</h3>
+                <div class="pub-card-icon"><i class="fas fa-eye"></i></div>
+                <h3 class="pub-card-title">Lancaster</h3>
                 <p class="pub-card-text">
-                    Setta dei Miracoli, Fiori del Male, Custodi del Primordio:
-                    chi non sceglie né Cosmos né Caos percorre una via tutta propria.
+                    Affascinanti e pericolosi, i Lancaster traggono forza dalle ombre.
+                    La loro storia nella città è lunga quanto quella della magia stessa.
                 </p>
             </div>
 

@@ -227,12 +227,12 @@ public_head(
             <div class="pub-stat-item">
                 <span class="pub-stat-value">100</span>
                 <span class="pub-stat-label">Punti Salute</span>
-                <span class="pub-stat-desc">Resistenza fisica del personaggio</span>
+                <span class="pub-stat-desc">Salute fisica del personaggio</span>
             </div>
             <div class="pub-stat-item">
                 <span class="pub-stat-value">100</span>
                 <span class="pub-stat-label">Punti Integrità</span>
-                <span class="pub-stat-desc">Resistenza magica e mentale</span>
+                <span class="pub-stat-desc">Salute mentale del personaggio</span>
             </div>
             <div class="pub-stat-item">
                 <span class="pub-stat-value">4</span>
@@ -249,20 +249,71 @@ public_head(
     </section>
 
 
-    <!-- ── Sezione 4: Combattimento e dadi ─────────────────────────────── -->
+    <!-- ── Sezione 4: I livelli e le abilità ───────────────────────────── -->
+    <section class="pub-section pub-section--highlight">
+        <h2>I livelli e le abilità</h2>
+        <p>
+            Man mano che le caratteristiche del personaggio crescono, il sistema calcola
+            in automatico il suo <strong>livello</strong>: un numero che riflette la potenza
+            complessiva raggiunta. Non serve fare nulla di speciale — basta giocare.
+        </p>
+        <p>
+            Il livello dipende dalla somma delle quattro caratteristiche (Potere, Destrezza,
+            Mente, Tempra). Più è alto, più il personaggio può acquistare
+            <strong>abilità</strong> di grado superiore: attacchi più potenti,
+            difese più solide, poteri speciali avanzati.
+        </p>
+        <p>
+            Le abilità si dividono in più categorie — offensive, difensive, mentali,
+            poteri speciali, talenti — e si scelgono liberamente all'interno di quelle
+            rese disponibili dal livello raggiunto. Ogni scelta contribuisce a rendere
+            il personaggio unico e difficile da replicare.
+        </p>
+    </section>
+
+
+    <!-- ── Sezione 5: Role e turni ───────────────────────────────────────── -->
+    <section class="pub-section">
+        <h2>Role e turni</h2>
+        <p>
+            Quando più personaggi si trovano nella stessa chat, il sistema li unisce
+            automaticamente in una <strong>role</strong> — una sessione di gioco condivisa,
+            registrata e scandita turno per turno.
+        </p>
+        <p>
+            Ogni <strong>turno</strong> funziona così: ciascun partecipante scrive la
+            propria azione narrativa e, se lo desidera, attiva le proprie abilità.
+            Quando tutti hanno agito, il turno si chiude e il sistema elabora l'esito —
+            danni, effetti, conseguenze — mostrando un <strong>riepilogo automatico</strong>
+            di tutto ciò che è successo. Poi si passa al turno successivo.
+        </p>
+        <p>
+            Le role concluse restano accessibili a tempo indefinito: ogni giocatore può
+            rileggerle come un archivio vivo della propria storia nel gioco.
+        </p>
+    </section>
+
+
+    <!-- ── Sezione 6: Combattimento e dadi ──────────────────────────────── -->
     <section class="pub-section">
         <h2>Combattimento e dadi</h2>
         <p>
-            Nelle situazioni ad alto rischio — combattimenti, prove magiche, sfide critiche —
-            entrano in gioco i <strong>dadi</strong>. Il sistema è semplice: lanci un dado
-            (o più dadi) e il risultato, modificato dalle tue caratteristiche, determina
-            l'esito dell'azione.
+            Nei combattimenti e nelle situazioni ad alto rischio entrano in gioco i
+            <strong>dadi</strong> — ma non devi lanciarli tu. Il sistema li tira in
+            automatico nel momento in cui compi un'azione: basta scegliere cosa fare,
+            e il risultato arriva istantaneamente, già elaborato in base alle tue
+            caratteristiche e all'abilità usata.
         </p>
         <p>
-            Non tutti i momenti di gioco richiedono i dadi. La maggior parte delle interazioni
-            — dialoghi, esplorazioni, costruzione delle trame — avviene attraverso la sola
-            scrittura. I dadi servono a rendere i conflitti imprevedibili e a dare peso
-            alle azioni rischiose.
+            Quando qualcuno ti attacca, ricevi un <strong>avviso</strong> direttamente
+            in chat, a cui puoi rispondere scegliendo come reagire — deviare il colpo,
+            assorbirlo, contrattaccare. Il tutto si svolge all'interno del turno corrente,
+            in modo trasparente e leggibile per tutti i partecipanti.
+        </p>
+        <p>
+            Dialoghi, esplorazioni e costruzione delle trame non richiedono dadi: il sistema
+            interviene solo quando c'è davvero qualcosa in gioco, rendendo ogni lancio
+            significativo.
         </p>
         <p>
             <a href="/documentazione_main.php" class="pub-link">
