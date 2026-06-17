@@ -1,191 +1,323 @@
 <?php
+/**
+ * index.php — Homepage pubblica di Crystal Tokyo GDR.
+ *
+ * Inclusa da /index.php dopo header.inc.php (vedi architettura progetto).
+ * Emette un DOCTYPE completo: il doppio DOCTYPE nel DOM finale è gestito
+ * correttamente dai browser moderni — non modificare senza aggiornare anche
+ * il flusso di inclusione in index.php.
+ *
+ * File sostituiti/resi obsoleti da questa revisione:
+ *   TODO: DELETE themes/crystal/home/login_index_nuova.css — ora usiamo /public/public.css
+ *   TODO: DELETE themes/crystal/home/script_login_nuova.js — ora usiamo /public/public.js
+ *
+ * Componenti condivisi (da /public/):
+ *   _head.php    → <head> con SEO, OG, JSON-LD, Google Fonts, public.css
+ *   _nav.php     → header sticky + hamburger + bottoni Accedi/Registrati
+ *   _modals.php  → modali login, registrazione, segnalazione
+ *   _footer.php  → footer con colonne link + copyright + Palestine
+ *   public.js    → JS condiviso (modale, hamburger, API razze/termini)
+ */
+
+/* ── Protezione (solo se attiva nelle settings) ──────────────────────── */
 require_once 'config.inc.php';
 
-if ($PARAMETERS['settings']['protection'] == 'ON'){
+if ($PARAMETERS['settings']['protection'] == 'ON') {
     require 'protezione.php';
 }
+
+/* ── Include componenti condivisi da /public/ ───────────────────────── */
+/* Percorso assoluto: questa pagina è inclusa dalla root del sito */
+require_once $_SERVER['DOCUMENT_ROOT'] . '/public/_head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/public/_nav.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/public/_modals.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/public/_footer.php';
+
+/* ── JSON-LD: VideoGame schema ───────────────────────────────────────── */
+$json_ld_home = [
+    '@context'    => 'https://schema.org',
+    '@type'       => 'VideoGame',
+    'name'        => 'Crystal Tokyo GDR',
+    'description' => 'Gioco di ruolo online play by chat gratuito, attivo da oltre vent\'anni, ambientato in una Tokyo futuristica dove tecnologia e magia convivono.',
+    'url'         => 'https://crystaltokyo.it',
+    'image'       => 'https://crystaltokyo.it/themes/crystal/imgs/homepage.png',
+    'gamePlatform'=> 'Browser',
+    'genre'       => ['Gioco di ruolo', 'Play by chat', 'Fantasy urbano'],
+    'inLanguage'  => 'it',
+    'isAccessibleForFree' => true,
+    'applicationCategory' => 'Game',
+    'operatingSystem'     => 'Web browser',
+    'offers' => [
+        '@type'       => 'Offer',
+        'price'       => '0',
+        'priceCurrency' => 'EUR',
+        'availability' => 'https://schema.org/InStock',
+    ],
+    'publisher' => [
+        '@type' => 'Organization',
+        'name'  => 'Crystal Tokyo GDR',
+        'url'   => 'https://crystaltokyo.it',
+    ],
+];
+
+/* ── <head> ──────────────────────────────────────────────────────────── */
+public_head(
+    'Crystal Tokyo GDR',
+    'Gioco di ruolo online play by chat gratuito, attivo da oltre vent\'anni. Crea il tuo personaggio, scegli la tua razza e unisciti alla storia della Città di Cristallo.',
+    'https://crystaltokyo.it/',
+    'https://crystaltokyo.it/themes/crystal/imgs/homepage.png',
+    $json_ld_home
+);
 ?>
+<body>
+<?php public_nav('home'); ?>
+<?php public_modals(); ?>
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-    <meta charset="UTF-8">
-        <meta http-equiv="Content-Type" content="text/html;">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="description" content="Scopri Crystal Tokyo GDR, un GDR play by chat gratuito con combattimenti a dadi, famiglie magiche, crescita del personaggio e gioco narrativo condiviso.">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="canonical" href="https://crystaltokyo.it/">
-        
-        <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
-        <title>Crystal Tokyo GDR</title>
-        <link rel="stylesheet" href="../themes/crystal/home/login_index_nuova.css?<?=time()?>">
-        <!-- Aggiungi il nuovo nome del file JavaScript -->
-        <script src="../themes/crystal/home/script_login_nuova.js" defer></script>
-    </head>
-    <body>
-        <header>
-            <div class="logo">Crystal Tokyo GDR</div>
-            <nav>
-                <button id="hamburgerBtn" class="hamburger" aria-label="Menu">
-                    <span></span><span></span><span></span>
-                </button>
-                <ul class="navigation" id="mainNav">
-                    <li><a href="#" id="loginBtn">Login</a></li>
-                    <li><a href="#" id="registrazioneBtn">REGISTRAZIONE</a></li>
-                    <li><a href="../documentazione_main.php" target="_blank">AMBIENTAZIONE</a></li>
-                    <li><a href="/docs/il_gioco.html">Il Gioco</a></li>
-                    <li><a href="#" id="reportLink">SEGNALA</a></li>
-                </ul>
-            </nav>
-        </header>
+<!-- ── HERO ───────────────────────────────────────────────────────────────
+     Sfondo: immagine principale del gioco con overlay scuro.
+     Il CSS gestisce il fallback al gradiente scuro se l'immagine non carica.
+     ─────────────────────────────────────────────────────────────────────── -->
+<section class="pub-hero"
+         style="background-image: url('/themes/crystal/imgs/homepage.png');">
 
-        <section class="hero">
-            <div class="overlay-container">
-                <div class="content-box">
-                    <h1>Crystal Tokyo – GDR play by chat</h1>
-                    <p>Crystal Tokyo è un gioco di ruolo online play by chat gratuito, attivo da oltre vent’anni, ambientato in un mondo urban fantasy ricco di trame e interazioni. Il gioco utilizza un sistema a dadi per la gestione dei conflitti e offre sette famiglie magiche diverse, suddivise in tre correnti, ognuna con abilità e caratteristiche uniche.
+    <!-- Overlay sfumato per leggibilità testo -->
+    <div class="pub-hero-overlay"></div>
 
-I giocatori possono creare il proprio personaggio scegliendo una famiglia e un mestiere narrativo, partecipare alle trame e farlo crescere attraverso punti esperienza e punti shin, ottenuti rispettivamente dalla frequenza e dalla qualità del gioco. Crystal Tokyo è pensato sia per chi si avvicina per la prima volta ai GDR play by chat, sia per chi cerca un’esperienza profonda, collaborativa e orientata alla narrazione.</p>
-                </div>
-            </div>
-        </section>
+    <div class="pub-hero-content">
+        <!-- Eyebrow tag sopra il titolo -->
+        <span class="pub-hero-eyebrow">Attivo da oltre vent'anni &mdash; Gratis</span>
 
-        <!-- MODALE LOGIN -->
-        <div class="custom-content" id="loginContent" style="display: none;">
-            <div class="custom-box">
-                <span class="close">&times;</span>
-                <!-- <h2>Effettua il login</h2> -->
-                <!-- Modulo di login -->
-                <form class="myForm" method="post" action="login.php" id="do_login">
-                    <div class="input-group">
-                        <label for="nomePersonaggio">NOME PERSONAGGIO</label>
-                        <input type="text" name="login1" id="username" placeholder="Nome personaggio" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="password">PASSWORD</label>
-                        <input type="password" id="password" name="pass1" placeholder="Inserisci la tua password" required>
-                    </div>
-                    <div class="input-group">
-                        <button type="submit" class="submit-button">Entra nel gioco</button>
-                        <br><br>
-                        <center>
-                            <a href="#" id="passwordRecoveryLink" class="password-recovery-link">Recupero password</a>
-                        </center>
-                    </div>
-                </form>
+        <h1 class="pub-hero-title">
+            Entra nella<br>
+            <em>Città di Cristallo</em>
+        </h1>
 
-                <!-- Modulo di recupero password -->
-                <div id="passwordRecoveryDiv" style="display: none;">
-                    <form id="passwordRecoveryForm" action="index3.php" method="post">
-                        <div class="input-group">
-                            <label for="email">Indirizzo Email:</label>
-                            <input type="email" id="recoveryEmail" name="recoveryEmail" required>
-                        </div>
-                        <input type="hidden" name="op" value="recupera_pass" />
-                        <button type="submit" class="submit-button">Recupera password</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <p class="pub-hero-subtitle">
+            Crystal Tokyo è un gioco di ruolo online play by chat ambientato in una Tokyo futuristica
+            dove tecnologia e magia convivono. Scrivi la storia del tuo personaggio insieme
+            a una comunità attiva da oltre vent'anni.
+        </p>
 
-        <!-- MODALE REGISTRAZIONE -->
-        <div id="registrazioneContent" class="custom-content" style="display:none;">
-            <div class="custom-box reg-box">
-                <span id="closeRegModal" class="close">&times;</span>
-                <h2>Registrazione</h2>
-
-                <form id="regForm" method="post" action="iscrizione.php">
-                    <input type="hidden" name="fase" value="2">
-                    <input type="hidden" name="genere" value="m">
-
-                    <div class="input-group">
-                        <label>E-MAIL</label>
-                        <input type="email" name="email" placeholder="Inserisci la tua e-mail" required>
-                        <small>Inserire un'e-mail valida</small>
-                    </div>
-
-                    <div class="input-group">
-                        <label>NOME</label>
-                        <input type="text" name="nome" placeholder="Nome personaggio" required maxlength="20">
-                        <small>Max 20 caratteri, solo lettere, iniziale maiuscola</small>
-                    </div>
-
-                    <div class="input-group">
-                        <label>COGNOME</label>
-                        <input type="text" name="cognome" placeholder="Cognome personaggio" maxlength="20">
-                        <small>Max 20 caratteri, solo lettere, iniziale maiuscola</small>
-                    </div>
-
-                    <div class="input-group">
-                        <!-- /statuti/spiriti/spiriti.html -->
-                        <label>RAZZA (<a href="/statuti/inclinazioni/inclinazioni_vecchie.html" target="_blank">?</a>)</label>
-                        <select name="razza" id="regRazza" required>
-                            <option value="">Caricamento...</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label>MESTIERE (<a href="/statuti/mestieri/mestieri_info.html" target="_blank">?</a>)</label>
-                        <select name="mestiere" id="regMestiere" required>
-                            <option value="">Caricamento...</option>
-                        </select>
-                    </div>
-
-                    <!-- Informazioni sul gioco -->
-                    <div class="input-group tc-group">
-                        <button type="button" id="infoToggleBtn" class="tc-link">&#9432; Informazioni sul gioco</button>
-                        <div id="infoContent" class="tc-content" style="display:none;">
-                            <div id="infoText"><em>Caricamento...</em></div>
-                        </div>
-                    </div>
-
-                    <!-- Termini e condizioni -->
-                    <div class="input-group tc-group">
-                        <button type="button" id="tcToggleBtn" class="tc-link">&#9432; Termini e Condizioni</button>
-                        <div id="tcContent" class="tc-content" style="display:none;">
-                            <div id="tcText"><em>Caricamento...</em></div>
-                        </div>
-                        <div class="tc-check-row" style="margin-top:8px;">
-                            <input type="checkbox" id="regTc" required>
-                            <label for="regTc">Ho letto e accetto i Termini e Condizioni</label>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <button type="submit" class="submit-button">Avanti &rsaquo;</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- MODALE SEGNALA -->
-        <div id="reportContent" class="custom-content" style="display: none;">
-            <div class="custom-box">
-                <span id="closeReportModal" class="close">&times;</span>
-                <h2>Segnala un problema</h2>
-                <form id="reportForm" method="post" action="invio_segnalazione.php">
-                    <div class="input-group">
-                        <label for="email">Indirizzo Email</label>
-                        <input type="email" id="email" name="email" placeholder="Inserisci il tuo indirizzo email" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="problem">Descrivi il problema</label>
-                        <textarea id="problem" name="problem" rows="4" placeholder="Descrivi il problema" required></textarea>
-                    </div>
-                    <div class="input-group">
-                        <button type="submit" class="submit-button">Invia</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Bandiera Palestina con scritta -->
-        <div id="bottomBanner" style="position:fixed; bottom:20px; right:20px; z-index:9999; background:rgba(255,255,255,0.2); padding:10px; border-radius:8px; text-align:center; max-width:250px;">
-            <a href="https://globalsumudflotilla.org/" target="_blank" style="display:block; width:120px; height:80px; margin:0 auto 10px auto; background-image:url('https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Palestine.svg'); background-size:cover; background-position:center; border:2px solid #000; border-radius:6px;">
+        <!-- CTA principale -->
+        <div class="pub-hero-actions">
+            <button class="pub-btn pub-btn--gold" id="heroRegBtn">
+                <i class="fas fa-feather-alt"></i> Crea il tuo personaggio
+            </button>
+            <a href="/il-gioco" class="pub-btn pub-btn--ghost">
+                Scopri il gioco
             </a>
-            <div style="font-size:12px; color:white; font-weight:bold; line-height:1.2;">
-                Crystal Tokyo GDR supporta la Palestina<br>e la Global Sumud Flottilla
-            </div>
         </div>
-    </body>
+    </div>
+</section>
+
+
+<!-- ── SEZIONE: COSA TI ASPETTA ──────────────────────────────────────────── -->
+<section class="pub-section pub-section--dark">
+    <div class="pub-section-inner">
+        <p class="pub-section-label">Perché Crystal Tokyo</p>
+        <h2 class="pub-section-title">Cosa ti aspetta</h2>
+        <p class="pub-section-subtitle">
+            Un'esperienza narrativa completa, collaborativa e gratuita.
+        </p>
+
+        <div class="pub-cards">
+
+            <div class="pub-card">
+                <div class="pub-card-icon"><i class="fas fa-scroll"></i></div>
+                <h3 class="pub-card-title">Narrazione condivisa</h3>
+                <p class="pub-card-text">
+                    Ogni personaggio contribuisce a una storia collettiva in continua evoluzione.
+                    Le tue scelte hanno conseguenze reali nel mondo di gioco.
+                </p>
+            </div>
+
+            <div class="pub-card">
+                <div class="pub-card-icon"><i class="fas fa-dice-d20"></i></div>
+                <h3 class="pub-card-title">Sistema a dadi</h3>
+                <p class="pub-card-text">
+                    Combatti, esplora e sfida il destino con un sistema a dadi bilanciato.
+                    Quattro caratteristiche, 100 punti salute, infinite possibilità.
+                </p>
+            </div>
+
+            <div class="pub-card">
+                <div class="pub-card-icon"><i class="fas fa-users"></i></div>
+                <h3 class="pub-card-title">Comunità attiva</h3>
+                <p class="pub-card-text">
+                    Una comunità di giocatori appassionati, uno staff narrativo dedicato
+                    e trame sempre nuove. Non sei mai solo nella Città di Cristallo.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ── SEZIONE: AMBIENTAZIONE ────────────────────────────────────────────── -->
+<section class="pub-section pub-section--darker">
+    <div class="pub-section-inner">
+        <div class="pub-two-col">
+
+            <!-- Testo -->
+            <div>
+                <p class="pub-section-label">Il mondo di gioco</p>
+                <h2 class="pub-section-title">Una Tokyo del futuro sopravvissuta al gelo</h2>
+                <p>
+                    Dopo una glaciazione durata oltre mille anni, Tokyo è stata la prima città a disgelarsi,
+                    guadagnandosi il nome di <strong>Città di Cristallo</strong>. In superficie la vita
+                    scorre normale, ma sotto questa quiete si nasconde la vera natura del mondo:
+                    la magia è una forza onnipresente che nessuno può ignorare a lungo.
+                </p>
+                <p style="margin-top:16px;">
+                    Due grandi forze cosmiche — <strong>Cosmos</strong> e <strong>Caos</strong> —
+                    si contendono il controllo della città attraverso le razze, le gilde e i personaggi
+                    che vi abitano. Il tuo personaggio entra in questo conflitto con la propria storia,
+                    le proprie scelte e le proprie ambizioni.
+                </p>
+                <a href="/ambientazione" class="pub-btn pub-btn--ghost" style="margin-top:24px;">
+                    Leggi l'ambientazione &rsaquo;
+                </a>
+            </div>
+
+            <!-- Placeholder visuale (aggiungi immagine quando disponibile) -->
+            <div class="pub-two-col-img">
+                <!-- TODO: sostituire con immagine ambientazione quando disponibile -->
+                <div style="background: var(--pub-card-dark); border: 1px solid var(--pub-border);
+                            border-radius: 12px; height: 320px; display:flex; align-items:center;
+                            justify-content:center; color: var(--pub-muted); font-size:3rem;">
+                    <i class="fas fa-city"></i>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ── SEZIONE: LE RAZZE ──────────────────────────────────────────────────── -->
+<section class="pub-section pub-section--dark">
+    <div class="pub-section-inner">
+        <p class="pub-section-label">Scegli la tua natura</p>
+        <h2 class="pub-section-title">Le Razze</h2>
+        <p class="pub-section-subtitle">
+            Ogni razza ha origini, poteri e legami magici propri.
+            Il tuo allineamento lo scegli tu — la razza è solo il punto di partenza.
+        </p>
+
+        <!-- Tre card rappresentative (non tutte le razze, per non appesantire la homepage) -->
+        <div class="pub-cards">
+
+            <div class="pub-card">
+                <div class="pub-card-icon"><i class="fas fa-sun"></i></div>
+                <h3 class="pub-card-title">Fedeli di Cosmos</h3>
+                <p class="pub-card-text">
+                    Giustizieri e Guardiani traggono forza dai pianeti e dagli spiriti benevoli.
+                    Protettori del mondo, combattono l'oscurità con potere e dedizione.
+                </p>
+            </div>
+
+            <div class="pub-card">
+                <div class="pub-card-icon"><i class="fas fa-moon"></i></div>
+                <h3 class="pub-card-title">Creature di Caos</h3>
+                <p class="pub-card-text">
+                    Demoni del Regno oscuro e Lancaster — entità simili a vampiri —
+                    abitano le ombre della città con poteri che sfidano ogni limite.
+                </p>
+            </div>
+
+            <div class="pub-card">
+                <div class="pub-card-icon"><i class="fas fa-yin-yang"></i></div>
+                <h3 class="pub-card-title">Razze Neutrali</h3>
+                <p class="pub-card-text">
+                    Setta dei Miracoli, Fiori del Male, Custodi del Primordio:
+                    chi non sceglie né Cosmos né Caos percorre una via tutta propria.
+                </p>
+            </div>
+
+        </div>
+
+        <div style="text-align:center; margin-top:32px;">
+            <a href="/razze" class="pub-btn pub-btn--ghost">Scopri tutte le razze &rsaquo;</a>
+        </div>
+    </div>
+</section>
+
+
+<!-- ── SEZIONE: LE GILDE ──────────────────────────────────────────────────── -->
+<section class="pub-section pub-section--darker">
+    <div class="pub-section-inner" style="max-width:760px; text-align:center;">
+        <p class="pub-section-label">Costruisci la tua storia</p>
+        <h2 class="pub-section-title">Le Gilde</h2>
+        <p>
+            Le <strong>gilde</strong> sono il cuore della vita sociale di Crystal Tokyo.
+            Create dai giocatori stessi, con obiettivi e tematiche scelte in piena autonomia:
+            dalla confraternita di guerrieri all'organizzazione criminale, dal circolo di studiosi
+            alla rete di spionaggio. Ogni gilda costruisce la propria identità attraverso il gioco.
+        </p>
+        <p style="margin-top:16px; color: var(--pub-muted);">
+            Non esiste un'ideologia predefinita: la tua gilda è ciò che tu e i tuoi alleati
+            volete che sia.
+        </p>
+    </div>
+</section>
+
+
+<!-- ── CTA FINALE ──────────────────────────────────────────────────────────── -->
+<section class="pub-section pub-section--dark" style="text-align:center; padding: 100px 24px;">
+    <div class="pub-section-inner" style="max-width:640px;">
+        <p class="pub-section-label">Inizia ora</p>
+        <h2 class="pub-section-title">Pronto a entrare nella Città di Cristallo?</h2>
+        <p class="pub-section-subtitle">
+            È gratis. Non serve scaricare nulla. Basta un browser e la voglia di raccontare
+            una storia.
+        </p>
+        <div class="pub-hero-actions">
+            <button class="pub-btn pub-btn--gold" id="ctaRegBtn2">
+                <i class="fas fa-feather-alt"></i> Crea il tuo personaggio
+            </button>
+            <a href="/come-si-gioca" class="pub-btn pub-btn--ghost">Come si gioca</a>
+        </div>
+    </div>
+</section>
+
+
+<!-- ── Supporto Palestina (fixed) ────────────────────────────────────────── -->
+<!--
+    Mantenuto in posizione fixed come era nella versione precedente.
+    Il banner è già incluso anche nel footer; questo è il floating corner banner.
+-->
+<div id="bottomBanner"
+     style="position:fixed; bottom:20px; right:20px; z-index:9999;
+            background:rgba(255,255,255,0.15); backdrop-filter:blur(4px);
+            padding:10px 14px; border-radius:8px; text-align:center;
+            max-width:200px; border:1px solid rgba(255,255,255,0.2);">
+    <a href="https://globalsumudflotilla.org/" target="_blank" rel="noopener noreferrer"
+       style="display:block; width:80px; height:52px; margin:0 auto 8px;
+              background-image:url('https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Palestine.svg');
+              background-size:cover; background-position:center;
+              border-radius:4px; border:1px solid rgba(0,0,0,0.3);">
+    </a>
+    <div style="font-size:10px; color:rgba(255,255,255,0.85); font-weight:700; line-height:1.3;">
+        Crystal Tokyo GDR<br>supporta la Palestina
+    </div>
+</div>
+
+<?php public_footer(); ?>
+
+<!-- Apertura modali dai bottoni CTA della homepage -->
+<script>
+['heroRegBtn', 'ctaRegBtn2'].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (btn) {
+        btn.addEventListener('click', function () {
+            openModal('pubRegModal');
+            ensureOptionsLoaded();
+            ensureTerminiLoaded();
+        });
+    }
+});
+</script>
+
+</body>
 </html>
