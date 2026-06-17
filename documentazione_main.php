@@ -2,10 +2,9 @@
 /**
  * documentazione_main.php — Ambientazione & Regolamento
  *
- * Standalone: aperto in _blank dalle home page.
+ * Standalone: aperto in _blank dalle pagine pubbliche.
  * Menu accordion renderizzato inline via PHP.
  * Testo articoli e risultati ricerca caricati via fetch → documentazione_testo.php.
- * Non usa iframe.
  */
 
 session_start();
@@ -25,14 +24,14 @@ function menuSection($tipo, $classe) {
     while ($row = gdrcd_query($res, 'fetch')) {
         $art    = (int)$row['articolo'];
         $titolo = gdrcd_filter('out', $row['titolo']);
-        $links .= "<a href=\"#\" class=\"doc-link\" data-articolo=\"$art\">$titolo</a><br>\n";
+        $links .= "<a href=\"#\" class=\"doc-link\" data-articolo=\"$art\">$titolo</a>\n";
     }
     gdrcd_query($res, 'free');
     if (!$links) return '';
     return "
 <li>
-  <div class=\"dropdownlink $classe\"><i class=\"fa fa-chevron-down\"></i></div>
-  <ul class=\"submenuItems\"><li><p><center>$links</center></p></li></ul>
+  <div class=\"dropdownlink $classe\"><i class=\"fas fa-chevron-down\"></i></div>
+  <ul class=\"submenuItems\"><li>$links</li></ul>
 </li>\n";
 }
 ?>
@@ -40,44 +39,52 @@ function menuSection($tipo, $classe) {
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<title>CT - Documentazione</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CT — Documentazione</title>
 <link rel="stylesheet" href="themes/crystal/documentazione.css">
 <link rel="stylesheet" href="themes/crystal/documentazione_menu.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-<style>
-/* override documentazione_menu.css z-index:-1 */
-.pos-menu { z-index: 1; }
-</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-<div class="logo">
-    <img src="themes/crystal/imgs/documentazione/titolo.png" alt="">
-</div>
+<div class="doc-layout">
 
-<div class="openmenu">
-    <div class="pos-menu">
-        <ul class="accordion-menu">
-            <?php
-            echo menuSection('ambientazione', 'ambientazione');
-            echo menuSection('regolamento',   'regolamento');
-            echo menuSection('primipassi',    'primi_passi');
-            echo menuSection('manuali',       'manuale');
-            echo menuSection('combattimento', 'combattimento');
-            echo menuSection('staff',         'staff');
-            ?>
-        </ul>
-        <form id="doc-search-form" class="searchBar">
-            <div align="center">
-                <input id="doc-search-input" name="ricerca" style="width:200px;" placeholder="Inserire parola chiave"><br>
-                <input type="submit" value="cerca">
-            </div>
+    <!-- ── Sidebar: logo + menu accordion + ricerca ────────────────── -->
+    <aside class="doc-sidebar">
+
+        <div class="doc-logo">
+            <img src="themes/crystal/imgs/documentazione/titolo.png"
+                 alt="Crystal Tokyo — Documentazione">
+        </div>
+
+        <nav class="doc-nav" aria-label="Sezioni documentazione">
+            <ul class="accordion-menu">
+                <?php
+                echo menuSection('ambientazione', 'ambientazione');
+                echo menuSection('regolamento',   'regolamento');
+                echo menuSection('primipassi',    'primi_passi');
+                echo menuSection('manuali',       'manuale');
+                echo menuSection('combattimento', 'combattimento');
+                echo menuSection('staff',         'staff');
+                ?>
+            </ul>
+        </nav>
+
+        <form id="doc-search-form" class="doc-search">
+            <input id="doc-search-input" name="ricerca"
+                   placeholder="Cerca nella documentazione…" autocomplete="off">
+            <button type="submit" aria-label="Cerca"><i class="fas fa-search"></i></button>
         </form>
-    </div>
-</div>
 
-<div class="content">
-    <div id="doc-content"></div>
+    </aside>
+
+    <!-- ── Area contenuto principale ───────────────────────────────── -->
+    <main class="doc-content" id="doc-main">
+        <div id="doc-content">
+            <p class="doc-welcome">Seleziona una sezione dal menu per iniziare a leggere.</p>
+        </div>
+    </main>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -85,7 +92,13 @@ function menuSection($tipo, $classe) {
 function loadArticolo(id) {
     fetch('documentazione_testo.php?articolo=' + id)
         .then(function(r) { return r.text(); })
-        .then(function(html) { document.getElementById('doc-content').innerHTML = html; });
+        .then(function(html) {
+            document.getElementById('doc-content').innerHTML = html;
+            /* Su mobile scrolla automaticamente all'area contenuto */
+            if (window.innerWidth <= 768) {
+                document.getElementById('doc-main').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
 }
 
 /* Event delegation: gestisce link data-articolo nel menu e nei risultati ricerca */
@@ -103,7 +116,12 @@ document.getElementById('doc-search-form').addEventListener('submit', function(e
         body:    'ricerca=' + encodeURIComponent(q),
     })
         .then(function(r) { return r.text(); })
-        .then(function(html) { document.getElementById('doc-content').innerHTML = html; });
+        .then(function(html) {
+            document.getElementById('doc-content').innerHTML = html;
+            if (window.innerWidth <= 768) {
+                document.getElementById('doc-main').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
 });
 
 $(function() {

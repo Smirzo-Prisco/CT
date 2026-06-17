@@ -1,12 +1,12 @@
-/* documentazione_menu3.php — Menu accordion documentazione */
+/* documentazione_menu.css — Accordion menu documentazione */
 
 ul { list-style: none; }
 a  { text-decoration: none; }
 
 .accordion-menu {
     width: 100%;
-    max-width: 350px;
-    padding-left: 20px;
+    padding: 0;
+    margin: 0;
 }
 
 .accordion-menu li.open .dropdownlink .fa-chevron-down { transform: rotate(180deg); }
@@ -15,31 +15,43 @@ a  { text-decoration: none; }
 .dropdownlink {
     cursor: pointer;
     display: block;
-    width: 285px;
+    width: 100%;
     height: 55px;
     font-size: 18px;
     color: #212121;
     position: relative;
-    transition: all 0.4s ease-out;
+    transition: transform 0.25s ease-out;
 }
 
-.dropdownlink i { position: absolute; top: 17px; left: 16px; }
-.dropdownlink .fa-chevron-down { right: 12px; left: auto; }
+.dropdownlink i            { position: absolute; top: 17px; left: 16px; }
+.dropdownlink .fa-chevron-down { right: 12px; left: auto; transition: transform 0.25s; }
 
 .submenuItems { display: none; }
 
 .submenuItems li {
-    width: 271px;
+    width: 100%;
     background-color: #0f111d;
-    border: 1px solid #000;
-    padding-left: 15px;
+    border-bottom: 1px solid #000;
+    padding: 0;
 }
 
-.submenuItems a { transition: all 0.4s ease-out; }
-.submenuItems a:hover { background-color: transparent; color: #fff; }
+/* Link singolo articolo nel submenu */
+.submenuItems a.doc-link {
+    display: block;
+    padding: 7px 14px 7px 18px;
+    color: #8f8f8f;
+    font-size: 12px;
+    font-family: 'DejaVu Serif', Georgia, serif;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    transition: color 0.2s, background 0.2s;
+}
 
-.pos-menu { position: absolute; top: 109px; left: 18px; z-index: -1; }
+.submenuItems a.doc-link:hover {
+    color: #ce846f;
+    background: rgba(206, 132, 111, 0.06);
+}
 
+/* Immagini di categoria per ogni sezione del menu */
 .ambientazione       { padding: 4px; background: url("imgs/documentazione/manuale_ambientazione.png") no-repeat left center transparent; }
 .ambientazione:hover { padding: 4px; background: url("imgs/documentazione/ambientazione_manuale_mouseover.gif") no-repeat left center transparent; }
 .regolamento         { padding: 4px; background: url("imgs/documentazione/manuale_regolamento.png") no-repeat left center transparent; }

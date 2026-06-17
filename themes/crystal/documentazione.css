@@ -1,271 +1,193 @@
-body{background-image: url('imgs/documentazione/sfondo_senza_bordino_new.png');}
-/* LOGO */
+/* documentazione.css — Layout principale manuale Crystal Tokyo */
 
-img.logo{
-   display:inline;
+/* ── Reset ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-}
-/*PRE DOC*/
-
-div.container_pre {
-border: solid 1px red;
-}
-/* MENU SUPERIORE */
-nav.menu_top {
-    position:absolute;
-    top:0px;
-    left:0px;
-    height:90px;
-    right:0px;
-    background-color: #111423;
-    box-shadow: 6px 6px 6px rgba(0,0,0,0.6);
-}
-
-ul.ul-top{
-    display: inline;
-    width: 380px;
-    position: relative;
-    top: -25px;
-    left: calc(50% - 550px);
-}
-
-.separatore {
-    border-right: 1px solid #692222;
-}
-
-li.voci_menu{
-   text-transform:uppercase;
-   font-family:tahoma, sans-serif;
-   color: #A0A09F;
-   list-style-type: none;
-   display: inline;
-   padding:8px;
-}
-
-a.menutop{
-text-decoration:none; 
-color: #626262; 
-text-transform:uppercase;
-font-family: tahoma, sans-serif;
-font-size:16px;
-transition: all 0.5s ease-out;
-background: -webkit-linear-gradient(#eee, #333);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-a.menutop:hover{
-    color:silver;
-    font-size:18px;
-}
-
-li.active{
-    color:#892727;
-    font-size:20px;
-}
-/* MENU LATERALE (frame) */
-
-.openmenu{
-   position:fixed; 
-   top:10px; 
-   bottom:0px; 
-   margin:0 auto; 
-   width:320px; 
-   color: grey;
-   text-transform:uppercase;
-   font-size:13px;
-   font-family:tahoma;
-   color:#564330;
-   overflow-y:auto;
-   overflow-x: hidden;
-   border: solid 0px orange;
-}
-
-.logo {
-   position: absolute;
-   top: 0px;
-   left: 18px;
-}
-
-
-
-.menu_left{
-    position: relative;
-    top: 40px;
-    border: solid 1px red;
-}
-
-iframe.iframemenu{
-    width:100%;
-    height:100%;
-    position:relative;
-    top:0px;
-    bottom:0px;
-    overflow:auto;
-}
-
-ul.left-menu {
-    margin-left: 10px;
-}
-
-li.voce_menu_left{
-   color: #692222; 
-   list-style-type: none;
-   text-align: center;
-   text-transform: uppercase;
-}    
-
-a.menuleft{
-    text-decoration:none; 
-    text-align: center;
-    color: #b4b6bf; 
-    font-size:12px;
-    font-family: lato;
-
-}
-
-li.voce_menu_left.active{
-    background-color: rgba(54,66,115,0.1);
-    /*background-color: rgba(215, 44, 44, 0.1);
-    background-color: rgba(214, 53, 45, 0.1);*/
-    border-radius: 0px 10px 10px 0px;
-    box-shadow: 2px 2px 5px #000;
-}
-
-/* titoletti menu */
-p.docs-p{
-    color: #e2e2e2; 
-    font-family: lato;
-    font-size: 20px;
-    text-decoration: none;
-    text-transform: uppercase;
-    font-weight: normal;
-    letter-spacing: 0px;
-    background-color: rgba(151,155,165,0.1);
-    text-align: center;
-    padding: 5px;
-    border-bottom: 2px solid #979ba5;
-    border-top: 2px solid #979ba5;
-    box-shadow: 2px 2px 5px #000;
-    letter-spacing:1px;
-}
-
-/* CONTENITORE PAGINE, frame */
-
-.content{
-    position: absolute;
-    background-color: #14172a;
-    top: 20px;
-    left: 340px;
-    bottom: 20px;
-    right: 62px;
-    height:95%;
-}
-.opendoc{
-    position: relative;
-    right: 0px;
-    bottom: 0px;
-    background-color: #14172a;
-    background-repeat: repeat;
-    border: 1px solid #000000;
-    
-}
-iframe.iframedoc{    
-    margin-top: 0px;    
-    width: 100%;
+/* ── Base ────────────────────────────────────────────────────────── */
+html, body {
     height: 100%;
-    overflow:auto;
-    }
-
-.titoli{
-    font-family: DejaVu Serif;
-    font-size: 16px;
-    text-decoration: none;
+    background-color: #0e1020;
+    background-image: url('imgs/documentazione/sfondo_senza_bordino_new.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
     color: #8f8f8f;
+    font-family: 'DejaVu Serif', Georgia, serif;
+    font-size: 15px;
+}
+
+/* ── Layout flexbox: sidebar + contenuto ─────────────────────────── */
+.doc-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────── */
+.doc-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    background-color: rgba(10, 12, 28, 0.96);
+    border-right: 1px solid #1a1d35;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Logo in cima alla sidebar */
+.doc-logo {
+    padding: 16px 12px 12px;
+    text-align: center;
+    border-bottom: 1px solid #1a1d35;
+    flex-shrink: 0;
+}
+
+.doc-logo img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Menu accordion scrollabile */
+.doc-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* ── Barra di ricerca in fondo alla sidebar ───────────────────────── */
+.doc-search {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px;
+    border-top: 1px solid #1a1d35;
+    flex-shrink: 0;
+    background-color: rgba(10, 12, 28, 0.6);
+}
+
+.doc-search input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #2a2e50;
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: #ccc;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.doc-search input::placeholder { color: #444; }
+.doc-search input:focus { border-color: #ce846f; }
+
+.doc-search button {
+    background: rgba(206, 132, 111, 0.12);
+    border: 1px solid rgba(206, 132, 111, 0.4);
+    border-radius: 6px;
+    color: #ce846f;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.doc-search button:hover { background: rgba(206, 132, 111, 0.28); }
+
+/* ── Area contenuto principale ────────────────────────────────────── */
+.doc-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 40px;
+    min-width: 0;
+}
+
+/* Messaggio iniziale */
+.doc-welcome {
+    color: #333;
+    font-style: italic;
+    text-align: center;
+    margin-top: 80px;
+    font-size: 14px;
+}
+
+/* ── Stili testi articoli (output di documentazione_testo.php) ───── */
+.titoli {
+    font-family: 'DejaVu Serif', Georgia, serif;
+    font-size: 16px;
+    color: #ce846f;
+    text-shadow: 3px 2px 3px #000;
     text-transform: uppercase;
     font-weight: normal;
-    background-image: url(../themes/crystal/imgs/documentazione/barra_titolo.png);
+    background-image: url('imgs/documentazione/barra_titolo.png');
+    background-repeat: no-repeat;
+    background-position: center;
     text-align: center;
-    padding: 10px;
-    }
+    padding: 20px 10px 5px;
+}
 
-.testo{
-    font-family: DejaVu Serif;
+.testo {
+    font-family: 'DejaVu Serif', Georgia, serif;
     font-size: 15px;
     color: #8f8f8f;
-    line-height: 18px;
-    text-align:justify;
-    padding:20px;
-
+    line-height: 1.75;
+    text-align: justify;
+    padding: 16px 20px;
 }
 
-/*div pegi premessa*/
-.regola{
-    text-transform:uppercase;
-    background-color: #000000;
+span.look {
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #ce846f;
+}
+
+.regola {
+    text-transform: uppercase;
+    background-color: #000;
     text-align: center;
     padding: 2px;
-    font-size:10px;
+    font-size: 10px;
 }
 
-/*span pegi premessa*/
-span.evidenzia{
-   font-size: 12px;
-   font-style: italic;
-   color: #692222;
-   text-transform:none;
+span.evidenzia {
+    font-size: 12px;
+    font-style: italic;
+    color: #692222;
+    text-transform: none;
 }
 
-span.fa-icons {
-text-shadow: 2px 2px 5px #000; 
-color: #616161;
-}
-::-webkit-scrollbar {
-    border-radius: 5px;
-    width: 5px;
-    background-color: #111;
-    cursor: s-resize;
-}
+/* ── Scrollbar ───────────────────────────────────────────────────── */
+::-webkit-scrollbar          { width: 5px; background: #111; border-radius: 5px; }
+::-webkit-scrollbar-thumb    { background: #2a2a2a; border-radius: 5px; }
+::-webkit-scrollbar-track    { background: #111; border-radius: 5px; }
 
-::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    cursor: s-resize;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #222;
-}
-
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius: 5px;
-    background-color: #111;
-    cursor: s-resize;
-}
-
-.testo{
-    font-family: DejaVu Serif;
-    font-size: 15px;
-    color: #8f8f8f;
-    line-height: 18px;
-    text-align:justify;
-    padding:20px;
-
-}
-
-.titoli{
-    font-family: DejaVu Serif;
-    font-size: 16px;
-    text-decoration: none;
-    color: #ce846f;
-text-shadow: 3px 2px 3px #000;
-    text-transform: uppercase;
-    font-weight: normal;
-    background-image: url(../themes/crystal/imgs/documentazione/barra_titolo.png);
-    text-align: center;
-    padding-top:20px;
-padding-bottom:5px;
+/* ── Responsive: mobile / tablet ─────────────────────────────────── */
+@media (max-width: 768px) {
+    .doc-layout {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
     }
 
-span.look {font-size:13px;
-text-transform:uppercase;
-color: #ce846f;
+    .doc-sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 60vh;
+        overflow-y: auto;
+        border-right: none;
+        border-bottom: 1px solid #1a1d35;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .doc-nav { flex: none; }
+
+    .doc-content {
+        padding: 20px 16px;
+        overflow: visible;
+        min-height: 50vh;
+    }
 }

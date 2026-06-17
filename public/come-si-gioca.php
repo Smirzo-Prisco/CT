@@ -317,7 +317,7 @@ public_head(
             significativo.
         </p>
         <p>
-            <a href="/documentazione_main.php" class="pub-link">
+            <a href="/documentazione_main.php" class="pub-link" target="_blank" rel="noopener">
                 Leggi le regole complete del combattimento nel Manuale di Gioco &rsaquo;
             </a>
         </p>
