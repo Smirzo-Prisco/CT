@@ -1505,6 +1505,59 @@ p:last-child { margin-bottom: 0; }
     transform: rotate(180deg);
 }
 
+/* ============================================================
+   22. CONTENUTO DAL DB (regolamento, statuto gilda)
+   Il testo degli articoli usa classi e tag del sistema GDRCD.
+   Li normalizziamo qui per renderli leggibili sulle pagine pubbliche.
+   ============================================================ */
+
+/* Wrapper del testo importato dal DB */
+.pub-regolamento-content {
+    max-width: 820px;
+    margin: 0 auto;
+    line-height: 1.85;
+    color: var(--pub-muted);
+    font-size: 0.96rem;
+}
+
+/* .look — evidenziazione testuale usata nel sistema GDRCD */
+.pub-regolamento-content .look,
+.pub-razza-desc .look {
+    color: var(--pub-gold);
+    font-weight: 700;
+}
+
+/* <center> è deprecato ma ancora presente nel DB legacy */
+.pub-regolamento-content center {
+    display: block;
+    text-align: center;
+    margin: 16px 0;
+}
+
+.pub-regolamento-content p,
+.pub-regolamento-content br + br {
+    margin-top: 12px;
+}
+
+/* Immagine razza dal DB */
+.pub-razza-img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Header card razza senza bordo superiore colorato (nessuna affinità) */
+.pub-razza-card {
+    border-top: 3px solid var(--pub-border);
+}
+
+/* Titolo gruppo affinità sopra ogni blocco di razze */
+.pub-razze-group-header {
+    max-width: var(--pub-max);
+    margin: 0 auto 24px;
+}
+
 /* ── Responsive extra ────────────────────────────────────────────────────
    Aggiustamenti per le nuove classi aggiunte.
    ─────────────────────────────────────────────────────────────────────── */
