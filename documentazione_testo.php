@@ -15,19 +15,29 @@ header('Content-Type: text/html; charset=UTF-8');
 
 if ($op === 'search' && $ricerca !== '') {
     $safe = gdrcd_filter('in', $ricerca);
-    echo '<div class="testo">';
-    echo '<div class="titoli">PAROLA CERCATA: ' . gdrcd_filter('out', $ricerca) . '</div><br>';
     $res = gdrcd_query(
         "SELECT articolo, titolo FROM regolamento WHERE (titolo LIKE '%$safe%' OR testo LIKE '%$safe%') ORDER BY articolo",
         'result'
     );
+    $risultati = [];
     while ($row = gdrcd_query($res, 'fetch')) {
-        $art = (int)$row['articolo'];
-        $tit = gdrcd_filter('out', $row['titolo']);
-        echo "<center><a href=\"#\" class=\"doc-link\" data-articolo=\"$art\">$tit</a><br></center>\n";
+        $risultati[] = ['art' => (int)$row['articolo'], 'tit' => gdrcd_filter('out', $row['titolo'])];
     }
     gdrcd_query($res, 'free');
+
+    echo '<div class="doc-search-header">';
+    echo '<div class="titoli">Risultati per: <em>' . gdrcd_filter('out', $ricerca) . '</em></div>';
     echo '</div>';
+
+    if (empty($risultati)) {
+        echo '<p class="doc-search-empty">Nessun risultato trovato.</p>';
+    } else {
+        echo '<ul class="doc-search-results">';
+        foreach ($risultati as $r) {
+            echo "<li><a href=\"#\" class=\"doc-link\" data-articolo=\"{$r['art']}\">{$r['tit']}</a></li>\n";
+        }
+        echo '</ul>';
+    }
     exit;
 }
 

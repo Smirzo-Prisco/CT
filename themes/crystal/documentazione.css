@@ -158,6 +158,51 @@ span.evidenzia {
     text-transform: none;
 }
 
+/* ── Risultati ricerca ───────────────────────────────────────────── */
+.doc-search-header {
+    margin-bottom: 8px;
+}
+
+.doc-search-header .titoli em {
+    text-transform: none;
+    color: #e0a080;
+    font-style: normal;
+}
+
+.doc-search-results {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    border-top: 1px solid #1a1d35;
+}
+
+.doc-search-results li {
+    border-bottom: 1px solid #1a1d35;
+}
+
+.doc-search-results li a.doc-link {
+    display: block;
+    padding: 11px 18px;
+    color: #8f8f8f;
+    font-family: 'DejaVu Serif', Georgia, serif;
+    font-size: 13px;
+    transition: color 0.2s, background 0.2s, padding-left 0.2s;
+}
+
+.doc-search-results li a.doc-link:hover {
+    color: #ce846f;
+    background: rgba(206, 132, 111, 0.06);
+    padding-left: 24px;
+}
+
+.doc-search-empty {
+    color: #444;
+    font-style: italic;
+    text-align: center;
+    padding: 32px 0;
+    font-size: 13px;
+}
+
 /* ── Scrollbar ───────────────────────────────────────────────────── */
 ::-webkit-scrollbar          { width: 5px; background: #111; border-radius: 5px; }
 ::-webkit-scrollbar-thumb    { background: #2a2a2a; border-radius: 5px; }
