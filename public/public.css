@@ -1326,6 +1326,8 @@ p:last-child { margin-bottom: 0; }
     border-radius: var(--pub-radius);
     padding: 28px 24px;
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
 }
 
 .pub-razza-card:hover {
@@ -1558,10 +1560,39 @@ p:last-child { margin-bottom: 0; }
     margin: 0 auto 24px;
 }
 
+/* Wrapper troncante per le voci statuto */
+.pub-razza-content-wrap {
+    position: relative;
+    max-height: 200px;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+/* Gradient fade di chiusura */
+.pub-razza-content-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    background: linear-gradient(transparent, var(--pub-card-dark));
+    pointer-events: none;
+    transition: opacity 0.25s;
+}
+
+.pub-razza-content-wrap.expanded {
+    max-height: 4000px;
+}
+
+.pub-razza-content-wrap.expanded::after {
+    opacity: 0;
+}
+
 /* Contenuto statuto razza (voci dal DB) */
 .pub-razza-content {
     text-align: left;
-    margin-top: 12px;
+    padding-bottom: 4px;
 }
 
 .pub-razza-voce-titolo {
@@ -1586,6 +1617,39 @@ p:last-child { margin-bottom: 0; }
     line-height: 1.75;
     color: var(--pub-muted);
     margin: 0;
+}
+
+/* Bottone leggi di più / leggi meno */
+.pub-razza-leggi-piu {
+    background: none;
+    border: none;
+    color: var(--pub-gold);
+    cursor: pointer;
+    padding: 10px 0 2px;
+    font-family: var(--font-head);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    opacity: 0.85;
+    transition: opacity 0.2s;
+}
+
+.pub-razza-leggi-piu:hover {
+    opacity: 1;
+}
+
+.pub-razza-leggi-piu i {
+    transition: transform 0.3s ease;
+    font-size: 0.75rem;
+}
+
+.pub-razza-leggi-piu.expanded i {
+    transform: rotate(180deg);
 }
 
 /* ── Responsive extra ────────────────────────────────────────────────────

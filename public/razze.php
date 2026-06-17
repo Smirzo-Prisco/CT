@@ -157,16 +157,21 @@ public_head(
                 </div>
                 <h3><?= $nome ?></h3>
                 <?php if (!empty($razza['voci'])): ?>
-                <div class="pub-razza-content">
-                    <?php foreach ($razza['voci'] as $voce): ?>
-                    <?php if (!empty($voce['titolo'])): ?>
-                    <h4 class="pub-razza-voce-titolo"><?= htmlspecialchars($voce['titolo']) ?></h4>
-                    <?php endif; ?>
-                    <?php if (!empty($voce['testo'])): ?>
-                    <div class="pub-razza-voce-testo pub-regolamento-content"><?= $voce['testo'] ?></div>
-                    <?php endif; ?>
-                    <?php endforeach; ?>
+                <div class="pub-razza-content-wrap">
+                    <div class="pub-razza-content">
+                        <?php foreach ($razza['voci'] as $voce): ?>
+                        <?php if (!empty($voce['titolo'])): ?>
+                        <h4 class="pub-razza-voce-titolo"><?= htmlspecialchars($voce['titolo']) ?></h4>
+                        <?php endif; ?>
+                        <?php if (!empty($voce['testo'])): ?>
+                        <div class="pub-razza-voce-testo pub-regolamento-content"><?= $voce['testo'] ?></div>
+                        <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
+                <button class="pub-razza-leggi-piu" onclick="razzaToggle(this)" aria-expanded="false">
+                    <span>Leggi di più</span><i class="fas fa-chevron-down"></i>
+                </button>
                 <?php else: ?>
                 <p class="pub-razza-desc"><em>Descrizione in arrivo.</em></p>
                 <?php endif; ?>
@@ -199,6 +204,14 @@ document.getElementById('ctaRegBtn').addEventListener('click', function () {
     ensureOptionsLoaded();
     ensureTerminiLoaded();
 });
+
+function razzaToggle(btn) {
+    const wrap = btn.previousElementSibling;
+    const expanded = wrap.classList.toggle('expanded');
+    btn.classList.toggle('expanded', expanded);
+    btn.setAttribute('aria-expanded', String(expanded));
+    btn.querySelector('span').textContent = expanded ? 'Leggi meno' : 'Leggi di più';
+}
 </script>
 
 </body>
