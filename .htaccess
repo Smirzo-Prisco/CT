@@ -1,17 +1,6 @@
-# av:php5-engine
-AddHandler av-php56 .php
+# Server: nginx — questo file è ignorato.
+# Il routing delle pagine pubbliche è in /etc/nginx/sites-available/crystaltokyo.it
+# Vedi location block per /il-gioco, /ambientazione, /razze, /come-si-gioca.
 
-# ── Clean URLs per le pagine pubbliche ────────────────────────────────────
-# Options +FollowSymLinks è richiesto da Apache per abilitare RewriteEngine
-# in .htaccess. Senza questa riga RewriteEngine viene ignorato silenziosamente.
-
-Options +FollowSymLinks
-RewriteEngine On
-RewriteBase /
-
-# Non toccare file e directory che esistono già (CSS, JS, immagini, ecc.)
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-# /il-gioco, /ambientazione, /razze, /come-si-gioca → file in /public/
-RewriteRule ^(il-gioco|ambientazione|razze|come-si-gioca)$ /public/$1.php [L]
+# Mantenuto nel repo solo come documentazione e per compatibilità
+# nel caso il server venga mai migrato ad Apache.
