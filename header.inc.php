@@ -90,7 +90,37 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             <link rel="stylesheet" href="layouts/<?=$PARAMETERS['themes']['kind_of_layout'], '_frames.php?css=true'; ?>" type="text/css">
         <?php endif; ?>
 
-        <title><?=$PARAMETERS['info']['site_name']; ?></title>
+        <title><?= empty($_SESSION['login']) ? 'Crystal Tokyo – GDR play by chat' : $PARAMETERS['info']['site_name']; ?></title>
+
+        <!-- SEO: Open Graph, Twitter Card e JSON-LD — solo per visitatori non autenticati -->
+        <?php if (empty($_SESSION['login'])): ?>
+        <link rel="canonical" href="https://crystaltokyo.it/">
+        <meta property="og:type"         content="website">
+        <meta property="og:url"          content="https://crystaltokyo.it/">
+        <meta property="og:title"        content="Crystal Tokyo – GDR play by chat">
+        <meta property="og:description"  content="Scopri Crystal Tokyo GDR, un gioco di ruolo online play by chat gratuito, attivo da oltre vent'anni. Urban fantasy, famiglie magiche, combattimenti a dadi.">
+        <meta property="og:image"        content="https://crystaltokyo.it/themes/crystal/imgs/homepage.png">
+        <meta property="og:locale"       content="it_IT">
+        <meta name="twitter:card"        content="summary_large_image">
+        <meta name="twitter:title"       content="Crystal Tokyo – GDR play by chat">
+        <meta name="twitter:description" content="Gioco di ruolo online gratuito, urban fantasy. Vent'anni di gioco narrativo condiviso.">
+        <meta name="twitter:image"       content="https://crystaltokyo.it/themes/crystal/imgs/homepage.png">
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "VideoGame",
+            "name": "Crystal Tokyo GDR",
+            "url": "https://crystaltokyo.it",
+            "description": "Gioco di ruolo online play by chat gratuito, ambientato in un mondo urban fantasy. Attivo da oltre vent'anni, con famiglie magiche, quest, sistema a dadi e crescita del personaggio.",
+            "genre": ["Gioco di ruolo", "Play by chat", "Urban Fantasy"],
+            "gamePlatform": "Browser web",
+            "inLanguage": "it",
+            "isAccessibleForFree": true,
+            "operatingSystem": "Browser",
+            "applicationCategory": "Game"
+        }
+        </script>
+        <?php endif; ?>
 
         <!-- CT_USER + Socket.io: spostati nell'<head> per garantire disponibilità
              anche quando footer.inc.php non esegue (die() nel contenuto della pagina) -->

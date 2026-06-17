@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /index.php
+Allow: /documentazione_main.php
+Disallow: /main.php
+Disallow: /chat.php
+Disallow: /pages/
+Disallow: /giocate/
+Disallow: /nodeserver/
+
+Sitemap: https://crystaltokyo.it/sitemap.xml
