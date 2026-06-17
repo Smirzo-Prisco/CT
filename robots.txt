@@ -1,11 +1,19 @@
 User-agent: *
+
+# Pagine pubbliche indicizzabili
 Allow: /
-Allow: /index.php
+Allow: /il-gioco
+Allow: /ambientazione
+Allow: /razze
+Allow: /come-si-gioca
 Allow: /documentazione_main.php
+
+# Aree del gioco — non indicizzare (richiedono sessione)
 Disallow: /main.php
 Disallow: /chat.php
 Disallow: /pages/
 Disallow: /giocate/
 Disallow: /nodeserver/
+Disallow: /public/
 
 Sitemap: https://crystaltokyo.it/sitemap.xml
