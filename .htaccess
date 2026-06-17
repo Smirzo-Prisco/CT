@@ -1,21 +1,17 @@
-
 # av:php5-engine
 AddHandler av-php56 .php
 
 # ── Clean URLs per le pagine pubbliche ────────────────────────────────────
-# Mappa gli URL senza estensione ai file PHP in /public/.
-# Ogni RewriteRule è indipendente: aggiungere nuove pagine segue lo stesso schema.
+# Options +FollowSymLinks è richiesto da Apache per abilitare RewriteEngine
+# in .htaccess. Senza questa riga RewriteEngine viene ignorato silenziosamente.
 
+Options +FollowSymLinks
 RewriteEngine On
+RewriteBase /
 
-# /il-gioco  → /public/il-gioco.php
-RewriteRule ^il-gioco$  /public/il-gioco.php  [L,QSA]
+# Non toccare file e directory che esistono già (CSS, JS, immagini, ecc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 
-# /ambientazione → /public/ambientazione.php
-RewriteRule ^ambientazione$  /public/ambientazione.php  [L,QSA]
-
-# /razze → /public/razze.php
-RewriteRule ^razze$  /public/razze.php  [L,QSA]
-
-# /come-si-gioca → /public/come-si-gioca.php
-RewriteRule ^come-si-gioca$  /public/come-si-gioca.php  [L,QSA]
+# /il-gioco, /ambientazione, /razze, /come-si-gioca → file in /public/
+RewriteRule ^(il-gioco|ambientazione|razze|come-si-gioca)$ /public/$1.php [L]
