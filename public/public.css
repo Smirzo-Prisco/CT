@@ -1558,6 +1558,36 @@ p:last-child { margin-bottom: 0; }
     margin: 0 auto 24px;
 }
 
+/* Contenuto statuto razza (voci dal DB) */
+.pub-razza-content {
+    text-align: left;
+    margin-top: 12px;
+}
+
+.pub-razza-voce-titolo {
+    font-family: var(--font-head);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--pub-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 16px 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--pub-border);
+}
+
+.pub-razza-voce-titolo:first-child {
+    margin-top: 0;
+}
+
+.pub-razza-voce-testo {
+    max-width: none;
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: var(--pub-muted);
+    margin: 0;
+}
+
 /* ── Responsive extra ────────────────────────────────────────────────────
    Aggiustamenti per le nuove classi aggiunte.
    ─────────────────────────────────────────────────────────────────────── */

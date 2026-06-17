@@ -20,18 +20,45 @@ require_once __DIR__ . '/_footer.php';
 require_once __DIR__ . '/_modals.php';
 
 /* ── Lettura razze dal DB ────────────────────────────────────────────────── */
+/*
+ * Le descrizioni delle razze sono in tabella `statuti` (non in gilda.statuto
+ * che è un campo legacy). Ogni razza ha N voci statuto, ognuna con:
+ *   articolo  → chiave primaria / numero d'ordine
+ *   titolo    → titolo della voce
+ *   testo     → corpo della voce
+ */
 $handleDBConnection = gdrcd_connect();
 
 $razze = [];
 $r = gdrcd_query(
-    "SELECT id_gilda, nome, statuto, immagine
-       FROM gilda
-      WHERE visibile = 1
-      ORDER BY nome ASC",
+    "SELECT g.id_gilda, g.nome, g.immagine,
+            s.articolo AS voce_articolo,
+            s.titolo   AS voce_titolo,
+            s.testo    AS voce_testo
+       FROM gilda g
+       LEFT JOIN statuti s ON g.id_gilda = s.id_gilda
+      WHERE g.visibile = 1
+      ORDER BY g.nome ASC, s.articolo ASC",
     'result'
 );
 while ($row = gdrcd_query($r, 'fetch')) {
-    $razze[] = $row;
+    $id = $row['id_gilda'];
+    /* Prima occorrenza: inizializza la razza */
+    if (!isset($razze[$id])) {
+        $razze[$id] = [
+            'id_gilda' => $id,
+            'nome'     => $row['nome'],
+            'immagine' => $row['immagine'],
+            'voci'     => [],
+        ];
+    }
+    /* Aggiungi la voce statuto se presente (LEFT JOIN può dare NULL) */
+    if ($row['voce_articolo'] !== null) {
+        $razze[$id]['voci'][] = [
+            'titolo' => $row['voce_titolo'],
+            'testo'  => $row['voce_testo'],
+        ];
+    }
 }
 gdrcd_query($r, 'free');
 gdrcd_close_connection($handleDBConnection);
@@ -116,10 +143,9 @@ public_head(
         <?php else: ?>
         <div class="pub-razze-grid">
             <?php foreach ($razze as $razza):
-                $nome    = htmlspecialchars($razza['nome']);
-                $statuto = nl2br(gdrcd_filter('out', $razza['statuto'] ?? ''));
-                $icon    = $razza_icons[$razza['nome']] ?? 'fas fa-star';
-                $img     = !empty($razza['immagine']) ? htmlspecialchars($razza['immagine']) : null;
+                $nome = htmlspecialchars($razza['nome']);
+                $icon = $razza_icons[$razza['nome']] ?? 'fas fa-star';
+                $img  = !empty($razza['immagine']) ? htmlspecialchars($razza['immagine']) : null;
             ?>
             <article class="pub-razza-card">
                 <div class="pub-razza-card-header">
@@ -130,8 +156,17 @@ public_head(
                     <?php endif; ?>
                 </div>
                 <h3><?= $nome ?></h3>
-                <?php if ($statuto): ?>
-                <p class="pub-razza-desc"><?= $statuto ?></p>
+                <?php if (!empty($razza['voci'])): ?>
+                <div class="pub-razza-content">
+                    <?php foreach ($razza['voci'] as $voce): ?>
+                    <?php if (!empty($voce['titolo'])): ?>
+                    <h4 class="pub-razza-voce-titolo"><?= htmlspecialchars($voce['titolo']) ?></h4>
+                    <?php endif; ?>
+                    <?php if (!empty($voce['testo'])): ?>
+                    <div class="pub-razza-voce-testo pub-regolamento-content"><?= $voce['testo'] ?></div>
+                    <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
                 <?php else: ?>
                 <p class="pub-razza-desc"><em>Descrizione in arrivo.</em></p>
                 <?php endif; ?>
