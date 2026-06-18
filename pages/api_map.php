@@ -434,7 +434,7 @@ switch ($op) {
                 'razza_nome'    => $row['sing_' . $row['sesso']] ?? '',
                 'stanza'        => $row['stanza_apparente'] ?: ($row['stanza_nome'] ?? ''),
                 'mappa'         => $row['mappa_nome']    ?? '',
-                'mestiere_img'  => $row['mestiere_img'] ? 'imgs/mestieri/' . $row['mestiere_img'] : '',
+                'mestiere_img'  => 'imgs/mestieri/' . ($row['mestiere_img'] ?: 'Umani.png'),
                 'mestiere_nome' => $row['mestiere_nome'] ?? '',
                 // Famiglia/inclinazione: inizializzata dalla query principale,
                 // sovrascritta dalla query batch inclinazioni se il pg ne ha una
