@@ -74,6 +74,24 @@ function formatDate(dateStr) {
 }
 
 /**
+ * Estrae il video ID da un URL YouTube (youtube.com/watch?v=, youtu.be/, /embed/).
+ * Restituisce null se l'URL non è YouTube.
+ */
+function getYoutubeId(url) {
+    if (!url) return null
+    const patterns = [
+        /[?&]v=([^&#]+)/,
+        /youtu\.be\/([^?&#]+)/,
+        /\/embed\/([^?&#]+)/,
+    ]
+    for (const re of patterns) {
+        const m = url.match(re)
+        if (m?.[1]) return m[1]
+    }
+    return null
+}
+
+/**
  * Apre il frame modale per l'invio di un SMS privato al personaggio.
  * changeFrame() è definita in left-right_frames.php ed è globale.
  * @param {string} nome - Nome del destinatario
@@ -392,12 +410,23 @@ export default function Scheda() {
 
             </div>{/* fine scheda_page_body */}
 
-            {/* ── Audio (se il pg ha musica in scheda e l'utente ha i suoni scheda attivi) ── */}
-            {url_media && !!soundScheda && (
-                <audio autoPlay>
-                    <source src={url_media} type="audio/mpeg" />
-                </audio>
-            )}
+            {/* ── Audio scheda: file MP3 diretto o embed YouTube invisibile ── */}
+            {url_media && !!soundScheda && (() => {
+                const ytId = getYoutubeId(url_media)
+                return ytId ? (
+                    <iframe
+                        key={ytId}
+                        src={`https://www.youtube.com/embed/${ytId}?autoplay=1`}
+                        allow="autoplay"
+                        style={{ position: 'absolute', width: 0, height: 0, border: 0 }}
+                        title="Musica scheda"
+                    />
+                ) : (
+                    <audio autoPlay>
+                        <source src={url_media} type="audio/mpeg" />
+                    </audio>
+                )
+            })()}
 
         </div>
     )

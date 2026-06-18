@@ -213,8 +213,9 @@ export default function SchedaModifica() {
                                 </FormRow> */}
                                 {allow_audio && (
                                     <FormRow label="Musica in scheda">
-                                        <input type="url" className={`form_input ${styles.fullWidth}`}
-                                            value={form.url_media ?? ''} onChange={upd('url_media')} />
+                                        <input type="text" className={`form_input ${styles.fullWidth}`}
+                                            value={form.url_media ?? ''} onChange={upd('url_media')}
+                                            placeholder="URL file MP3 o link YouTube" />
                                     </FormRow>
                                 )}
 
