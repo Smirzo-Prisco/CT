@@ -180,14 +180,10 @@ public_head(
                 </a>
             </div>
 
-            <!-- Placeholder visuale (aggiungi immagine quando disponibile) -->
             <div class="pub-two-col-img">
-                <!-- TODO: sostituire con immagine ambientazione quando disponibile -->
-                <div style="background: var(--pub-card-dark); border: 1px solid var(--pub-border);
-                            border-radius: 12px; height: 320px; display:flex; align-items:center;
-                            justify-content:center; color: var(--pub-muted); font-size:3rem;">
-                    <i class="fas fa-city"></i>
-                </div>
+                <img src="/themes/crystal/imgs/gioco_preview.png"
+                     alt="Interfaccia di gioco di Crystal Tokyo"
+                     style="width:100%; border-radius:12px; display:block; object-fit:cover;">
             </div>
 
         </div>
