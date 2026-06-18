@@ -3,6 +3,11 @@
 // ============================================================
 @use '../tokens' as *;
 
+@keyframes chatoff-border-pulse {
+    0%, 100% { border-color: $palette-surface-hover; }
+    50%       { border-color: $palette-action; }
+}
+
 .chatoff-panel {
     border: 1px solid $palette-surface-hover;
     border-radius: $radius-lg;
@@ -19,6 +24,10 @@
 
     @media screen and (max-width: 768px) {
         width: calc(100% - 70px);
+    }
+
+    &--new {
+        animation: chatoff-border-pulse 1.4s ease-in-out infinite;
     }
 }
 

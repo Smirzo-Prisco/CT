@@ -31,6 +31,7 @@ export default function ChattingOff() {
     const [html, setHtml]               = useState('')
     const [text, setText]               = useState('')
     const [typingUsers, setTypingUsers] = useState(new Set())
+    const [hasNew, setHasNew]           = useState(false)
 
     const boxRef            = useRef(null)
     const inputRef          = useRef(null)
@@ -53,8 +54,10 @@ export default function ChattingOff() {
     useEffect(() => {
         fetchMessages()
         const sock = window.ctSocket
-        if (sock) sock.on('chatoff:update', fetchMessages)
-        return () => { if (sock) sock.off('chatoff:update', fetchMessages) }
+        if (!sock) return
+        const handleUpdate = () => { setHasNew(true); fetchMessages() }
+        sock.on('chatoff:update', handleUpdate)
+        return () => { sock.off('chatoff:update', handleUpdate) }
     }, [fetchMessages])
 
     // ---------------------------------------------------------------------------
@@ -142,7 +145,11 @@ export default function ChattingOff() {
         : `${names.join(', ')} stanno scrivendo...`
 
     return (
-        <div className="chatoff-panel">
+        <div
+            className={`chatoff-panel${hasNew ? ' chatoff-panel--new' : ''}`}
+            onFocus={() => setHasNew(false)}
+            onClick={() => setHasNew(false)}
+        >
 
             <div className="chatoff-title">
                 Chat Off
