@@ -54,7 +54,7 @@ switch ($op) {
         $login    = $_SESSION['login'];
         $login_f  = gdrcd_filter('in', $login);
         $escaped  = htmlspecialchars(stripslashes($text));
-        $line     = "<div class='msgln'>(" . date('m.d.y, g:i A') . ") <b>" . $login . "</b>: " . $escaped . "<br></div>\n";
+        $line     = "<div class='msgln'>(" . date('d.m.y, H:i') . ") <b>" . $login . "</b>: " . $escaped . "<br></div>\n";
 
         $existing = (file_exists($LOG) && filesize($LOG) > 0) ? file_get_contents($LOG) : '';
         file_put_contents($LOG, $line . $existing);
