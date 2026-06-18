@@ -4,7 +4,8 @@
 // ============================================================
 @use '../tokens' as *;
 
-#scegli-razza-app {
+#scegli-razza-app,
+#scegli-mestiere-app {
     font-family: $font-base;
     background-color: #{$palette-surface-dark};
     color: #{$color-text};
@@ -72,8 +73,9 @@
         border-radius: #{$radius-md};
         font-size: $text-md;
 
-        &--ok  { background: rgba($palette-success, 0.15); border: 1px solid rgba($palette-success, 0.4); color: #{$color-success}; }
-        &--err { background: rgba($palette-danger,  0.15); border: 1px solid rgba($palette-danger,  0.4); color: #{$color-danger}; }
+        &--ok   { background: rgba($palette-success, 0.15); border: 1px solid rgba($palette-success, 0.4); color: #{$color-success}; }
+        &--err  { background: rgba($palette-danger,  0.15); border: 1px solid rgba($palette-danger,  0.4); color: #{$color-danger}; }
+        &--warn { background: rgba($palette-warning, 0.12); border: 1px solid rgba($palette-warning, 0.35); color: #{$color-warning}; }
     }
 
     // ── Razza corrente ────────────────────────────────────────
@@ -214,6 +216,11 @@
             opacity: 0.45;
             cursor: default;
         }
+
+        &--selected {
+            border-color: rgba($palette-action, 0.5);
+            background: rgba($palette-action, 0.05);
+        }
     }
 
     .sr-guild-img {
@@ -298,6 +305,16 @@
             color: #{$color-text-secondary};
             border-color: #{$palette-surface-hover};
             &:hover { border-color: #{$color-text-secondary}; color: #{$color-text}; }
+        }
+
+        &--statute {
+            background: transparent;
+            color: #{$color-text-muted};
+            border-color: #{$palette-surface-hover};
+            font-size: $text-xs;
+            padding: $space-1 $space-3;
+            margin-top: auto;
+            &:hover { border-color: #{$palette-action}; color: #{$palette-action}; }
         }
     }
 

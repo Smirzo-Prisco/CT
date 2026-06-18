@@ -53,6 +53,12 @@ function GuildCard({ guild, onJoin, disabled }) {
                     <i className="fas fa-lock"></i> Non disponibile
                 </span>
             )}
+            <button
+                className="sr-btn sr-btn--statute"
+                onClick={() => navigate(`main.php?page=statuto_main&id=${guild.id}`)}
+            >
+                <i className="fas fa-book-open"></i> Statuto
+            </button>
         </div>
     )
 }

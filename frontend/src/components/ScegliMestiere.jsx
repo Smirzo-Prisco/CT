@@ -1,161 +1,210 @@
 /**
  * ScegliMestiere.jsx — Selezione e avanzamento del mestiere del personaggio.
  *
- * Step 2 (senza conferma): elenco dei mestieri di livello 3 con pulsante
- *   "Cambia" e, se il PG ha >= 10 esperienza e il mestiere è già selezionato,
- *   pulsante "Conferma Mestiere".
+ * Step 2: elenco mestieri di base — cambia liberamente, conferma a 10 px.
+ * Step 3: elenco livelli del mestiere corrente — avanza se hai esperienza sufficiente.
  *
- * Step 3 (con conferma): elenco dei livelli inferiori del mestiere corrente.
- *   Mostra "Cambia" solo se il PG ha abbastanza esperienza mestiere.
+ * API: pages/api_mestiere.php
+ *   op=getState  GET              → { step, esperienza, expMestiere, mestieri, hasConferma }
+ *   op=change    POST { id_record, mestiere } → cambia mestiere (step 2)
+ *   op=pick      POST { mestiere }            → conferma mestiere (step 2)
+ *   op=levelUp   POST { id_record, mestiere } → avanza livello (step 3)
  *
- * API: api_mestiere.php
- * Stili: /themes/crystal/famiglie.css (iniettato da AppRouter).
+ * Stili: _scegli_razza.scss (classi sr- condivise, scoped su #scegli-mestiere-app)
  *
  * @author Crystal Tokyo Dev
  */
 
 import { useState, useEffect, useCallback } from 'react'
 
-/** Naviga via CT.navigate (SPA) se disponibile, altrimenti reload. */
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
     else window.top.location.href = url
 }
 
+// ── Card singolo mestiere ─────────────────────────────────────────────────────
+
+function MesteireCard({ mestiere, step, esperienza, onAction }) {
+    const isSelected = mestiere.selected
+
+    const handlePick = () => {
+        if (!window.confirm('Confermare il mestiere? Non sarà più possibile cambiarlo.')) return
+        onAction('pick', { mestiere: mestiere.mestiere })
+    }
+
+    return (
+        <div className={`sr-guild-card${isSelected ? ' sr-guild-card--selected' : ''}`}>
+            <div className="sr-guild-img">
+                <img src={`imgs/mestieri/${mestiere.immagine}`} alt={mestiere.nome} />
+            </div>
+            <div className="sr-guild-name">{mestiere.nome}</div>
+
+            {/* Indicatore mestiere attuale (step 2) */}
+            {step === 2 && isSelected && (
+                <div className="sr-guild-role">
+                    <i className="fas fa-check"></i> Mestiere attuale
+                </div>
+            )}
+
+            {/* Azioni step 2 */}
+            {step === 2 && isSelected && esperienza >= 10 && (
+                <button className="sr-btn sr-btn--join" onClick={handlePick}>
+                    <i className="fas fa-check-circle"></i> Conferma
+                </button>
+            )}
+            {step === 2 && isSelected && esperienza < 10 && (
+                <span className="sr-guild-locked">
+                    <i className="fas fa-clock"></i> Conferma a 10 px
+                </span>
+            )}
+            {step === 2 && !isSelected && (
+                <button
+                    className="sr-btn sr-btn--cancel"
+                    onClick={() => onAction('change', { id_record: mestiere.id, mestiere: mestiere.mestiere })}
+                >
+                    <i className="fas fa-exchange-alt"></i> Cambia
+                </button>
+            )}
+
+            {/* Azioni step 3 */}
+            {step === 3 && (
+                mestiere.unlocked
+                    ? <button
+                        className="sr-btn sr-btn--join"
+                        onClick={() => onAction('levelUp', { id_record: mestiere.id, mestiere: mestiere.mestiere })}
+                      >
+                        <i className="fas fa-arrow-up"></i> Avanza
+                      </button>
+                    : <span className="sr-guild-locked">
+                        <i className="fas fa-lock"></i> Esperienza insufficiente
+                      </span>
+            )}
+        </div>
+    )
+}
+
 // ── Componente principale ─────────────────────────────────────────────────────
 
 export default function ScegliMestiere() {
-    const [state, setState]       = useState(null)
-    const [loading, setLoading]   = useState(true)
-    const [fetchError, setFetchError] = useState(null)
-    const [msg, setMsg]           = useState(null)   // { type: 'ok'|'err', text }
+    const [state, setState]     = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError]     = useState(null)
+    const [msg, setMsg]         = useState(null)
 
     const fetchState = useCallback(() => {
         setLoading(true)
         setMsg(null)
-        setFetchError(null)
+        setError(null)
         fetch('pages/api_mestiere.php?op=getState')
             .then(r => r.json())
             .then(d => {
                 if (d.success) setState(d)
-                else setFetchError(d.message ?? 'Errore sconosciuto')
+                else setError(d.message ?? 'Errore sconosciuto')
                 setLoading(false)
             })
-            .catch(err => { setFetchError(err.message); setLoading(false) })
+            .catch(err => { setError(err.message); setLoading(false) })
     }, [])
 
     useEffect(() => { fetchState() }, [fetchState])
 
-    /** Esegue un'operazione POST e ricarica lo stato. */
     const doAction = async (op, payload) => {
         setMsg(null)
-        const res  = await fetch(`pages/api_mestiere.php?op=${op}`, {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload),
-        })
-        const data = await res.json()
-        setMsg({ type: data.success ? 'ok' : 'err', text: data.message })
-        if (data.success) fetchState()
+        try {
+            const res  = await fetch(`pages/api_mestiere.php?op=${op}`, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(payload),
+            })
+            const data = await res.json()
+            setMsg({ type: data.success ? 'ok' : 'err', text: data.message })
+            if (data.success) fetchState()
+        } catch (e) {
+            setMsg({ type: 'err', text: e.message })
+        }
     }
 
-    if (loading) return <p><i className="fas fa-spinner fa-spin"></i> Caricamento…</p>
-    if (fetchError) return <p className="error">Errore: {fetchError}</p>
+    if (loading) return (
+        <div id="scegli-mestiere-app">
+            <div className="sr-state">
+                <i className="fas fa-spinner fa-spin"></i>
+                <p>Caricamento…</p>
+            </div>
+        </div>
+    )
 
-    const { step, esperienza, expMestiere, mestieri, hasConferma } = state
+    if (error) return (
+        <div id="scegli-mestiere-app">
+            <div className="sr-state sr-state--error">
+                <i className="fas fa-exclamation-triangle"></i>
+                <p>{error}</p>
+            </div>
+        </div>
+    )
+
+    const { step, esperienza, expMestiere, mestieri } = state
 
     return (
-        <div>
-            {/* Intestazione esperienza */}
+        <div id="scegli-mestiere-app">
+
+            <header className="sr-header">
+                <button className="sr-back" onClick={() => navigate('main.php?page=uffici')}>
+                    <i className="fas fa-arrow-left"></i> Uffici
+                </button>
+                <div className="sr-title">
+                    <h1><i className="fas fa-briefcase"></i> Scegli Mestiere</h1>
+                    <p className="sr-subtitle">
+                        {step === 2 ? 'Seleziona il tuo mestiere' : 'Avanza nel tuo mestiere'}
+                    </p>
+                </div>
+            </header>
+
+            {/* Info esperienza */}
             {step === 2 && esperienza < 10 && (
-                <div className="error">
-                    Non avendo ancora acquisito un minimo di 10 punti esperienza:
-                    <ul>
-                        <li>Puoi cambiare mestiere quando lo riterrai opportuno, purché si segua la coerenza ON.</li>
-                        <li><b>Non</b> sei abilitato a leggere le bacheche ON e OFF del mestiere.</li>
-                        <li><b>Non</b> compari nella lista dei membri del mestiere.</li>
-                        <li>A 10 px potrai confermare l'appartenenza.</li>
-                    </ul>
+                <div className="sr-msg sr-msg--warn">
+                    <i className="fas fa-info-circle"></i>
+                    Non hai ancora 10 px: non sei abilitato alle bacheche né alla lista membri. A 10 px potrai confermare il mestiere.
                 </div>
             )}
             {step === 2 && esperienza >= 10 && (
-                <div className="error">Hai {expMestiere} punti mestiere</div>
+                <div className="sr-msg sr-msg--ok">
+                    <i className="fas fa-star"></i>
+                    Hai {expMestiere} punti mestiere
+                </div>
             )}
-            {step === 3 && expMestiere > 55 && (
-                <div className="error">Hai raggiunto il massimo dei punti mestiere.</div>
-            )}
-            {step === 3 && expMestiere <= 55 && (
-                <div className="error">Hai {expMestiere} punti mestiere</div>
+            {step === 3 && (
+                <div className="sr-msg sr-msg--ok">
+                    <i className="fas fa-star"></i>
+                    {expMestiere > 55
+                        ? 'Hai raggiunto il massimo dei punti mestiere.'
+                        : `Hai ${expMestiere} punti mestiere`}
+                </div>
             )}
 
             {msg && (
-                <div className={msg.type === 'ok' ? 'warning' : 'error'}>{msg.text}</div>
+                <div className={`sr-msg sr-msg--${msg.type}`}>
+                    <i className={`fas fa-${msg.type === 'ok' ? 'check-circle' : 'exclamation-circle'}`}></i>
+                    {msg.text}
+                </div>
             )}
 
-            <table className="customTable">
-                <thead>
-                    <tr>
-                        <th colSpan="3" style={{ backgroundColor: '#181c31', fontSize: '13px', color: '#9a6353', fontFamily: 'DejaVu Serif' }}>
-                            ELENCO RUOLI MESTIERI<br />
-                            {step === 2 ? 'Una volta confermato non sarà più possibile cambiarlo' : 'Una volta confermato non sarà più possibile cambiarlo'}
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr className="second_header">
-                        <td></td>
-                        <td>NOME</td>
-                        <td></td>
-                    </tr>
-
+            <section className="sr-section">
+                <h2 className="sr-section-title">
+                    <i className="fas fa-list"></i>
+                    {step === 2 ? 'Mestieri disponibili' : 'Livelli disponibili'}
+                </h2>
+                <div className="sr-grid">
                     {mestieri.map(m => (
-                        <tr key={m.id}>
-                            <td>
-                                <img src={`imgs/mestieri/${m.immagine}`} width="25" height="25" alt={m.nome} />
-                            </td>
-                            <td style={{ color: '#8f8f8f' }}>{m.nome}</td>
-                            <td style={{ color: '#8f8f8f' }}>
-                                {step === 2 && (
-                                    <>
-                                        {/* Pulsante Conferma — solo se questo mestiere è selezionato e si ha >= 10 exp */}
-                                        {m.selected && esperienza >= 10 && (
-                                            <button
-                                                onClick={() => {
-                                                    if (!window.confirm('Confermare il mestiere? Non sarà più possibile cambiarlo.')) return
-                                                    doAction('pick', { mestiere: m.mestiere })
-                                                }}
-                                            >
-                                                Conferma Mestiere
-                                            </button>
-                                        )}
-                                        {m.selected && esperienza < 10 && (
-                                            <span>Puoi confermare a 10 px</span>
-                                        )}
-                                        {/* Pulsante Cambia — sempre disponibile se non è quello attuale */}
-                                        {!m.selected && (
-                                            <button onClick={() => doAction('change', { id_record: m.id, mestiere: m.mestiere })}>
-                                                Cambia
-                                            </button>
-                                        )}
-                                    </>
-                                )}
-
-                                {step === 3 && (
-                                    m.unlocked
-                                        ? <button onClick={() => doAction('levelUp', { id_record: m.id, mestiere: m.mestiere })}>Cambia</button>
-                                        : <span>Non hai ancora abbastanza esperienza</span>
-                                )}
-                            </td>
-                        </tr>
+                        <MesteireCard
+                            key={m.id}
+                            mestiere={m}
+                            step={step}
+                            esperienza={esperienza}
+                            onAction={doAction}
+                        />
                     ))}
-                </tbody>
-            </table>
+                </div>
+            </section>
 
-            <div className="panels_link" style={{ marginTop: '16px' }}>
-                <span style={{ cursor: 'pointer' }} onClick={() => navigate('main.php?page=uffici')}>
-                    Torna indietro
-                </span>
-            </div>
         </div>
     )
 }
