@@ -206,11 +206,11 @@ export default function SchedaModifica() {
                                 {/* ── IMPOSTAZIONI ─────────────────────── */}
                                 <SectionHeader>Impostazioni</SectionHeader>
 
-                                <FormRow label="Blocca media">
+                                {/* <FormRow label="Blocca media">
                                     <input type="checkbox"
                                         checked={!!form.blocca_media}
                                         onChange={upd('blocca_media')} />
-                                </FormRow>
+                                </FormRow> */}
                                 {allow_audio && (
                                     <FormRow label="Musica in scheda">
                                         <input type="url" className={`form_input ${styles.fullWidth}`}

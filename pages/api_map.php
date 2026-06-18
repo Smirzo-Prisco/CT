@@ -434,11 +434,11 @@ switch ($op) {
                 'razza_nome'    => $row['sing_' . $row['sesso']] ?? '',
                 'stanza'        => $row['stanza_apparente'] ?: ($row['stanza_nome'] ?? ''),
                 'mappa'         => $row['mappa_nome']    ?? '',
-                'mestiere_img'  => 'imgs/mestieri/' . ($row['mestiere_img'] ?? ''),
+                'mestiere_img'  => $row['mestiere_img'] ? 'imgs/mestieri/' . $row['mestiere_img'] : '',
                 'mestiere_nome' => $row['mestiere_nome'] ?? '',
                 // Famiglia/inclinazione: inizializzata dalla query principale,
                 // sovrascritta dalla query batch inclinazioni se il pg ne ha una
-                'gruppo_img'    => 'imgs/guilds/'  . ($row['fam_img']  ?? ''),
+                'gruppo_img'    => $row['fam_img'] ? 'imgs/guilds/' . $row['fam_img'] : '',
                 'gruppo_nome'   => $row['fam_nome'] ?? '',
                 'staff'         => [
                     'admin'      => !empty($row['p_admin']),
