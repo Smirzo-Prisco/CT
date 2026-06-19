@@ -72,7 +72,7 @@ const PAGE_CONFIG = {
             { key: 'titolo',      label: 'Titolo' },
             { key: 'commento',    label: 'Commento' },
             { key: 'esperienza',  label: 'Punti Exp' },
-            { key: 'notorieta',   label: 'Notorietà' },
+            // { key: 'notorieta',   label: 'Notorietà' },
         ],
     },
     scheda_px_shin: {

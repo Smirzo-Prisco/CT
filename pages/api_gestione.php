@@ -109,7 +109,7 @@ switch ($op) {
         }
 
         // OGGETTI
-        if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['capogilda'] || $perms['capomestiere'] || $perms['magic']) {
+        if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic']) {
             $voci = [['label' => 'Oggetti', 'url' => 'gestione.php?page=gestione_oggetti']];
             if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic'])
                 $voci[] = ['label' => 'Ricarica oggetto', 'url' => 'gestione.php?page=oggetto_ricarica'];
