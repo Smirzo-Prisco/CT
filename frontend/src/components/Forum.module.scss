@@ -87,7 +87,7 @@
 
 .authorName {
     font-size: 12px;
-    color: #ce846f;
+    color: $color-text-title;
     text-align: center;
 }
 
@@ -162,7 +162,7 @@
 }
 
 .formTitle {
-    color: #ce846f;
+    color: $color-text-title;
     margin-bottom: 10px;
 }
 
@@ -319,7 +319,7 @@
 
 .questHeader {
     text-align: center;
-    color: #ce846f;
+    color: $color-text-title;
     padding: 8px;
     font-family: 'DejaVu Serif', serif;
 }
@@ -338,7 +338,7 @@
 }
 
 .puntiName {
-    color: #ce846f;
+    color: $color-action;
     text-decoration: none;
 }
 

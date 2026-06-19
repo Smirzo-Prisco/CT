@@ -47,7 +47,7 @@ export default function ElencoStaff() {
     ]
 
     return (
-        <>
+        <div className="elenco-staff-page">
             <table className="customTable">
                 <tbody>
                     {sections.map(({ key, label }) => (
@@ -59,14 +59,14 @@ export default function ElencoStaff() {
                                 <td>
                                     {staff[key].length === 0
                                         ? <span>—</span>
-                                        : staff[key].map((nome, i) => (
+                                        : staff[key].map((nome) => (
                                             <span key={nome}>
-                                                <span
-                                                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                                    onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(nome)}`)}
+                                                <a
+                                                    href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`}
+                                                    onClick={e => { e.preventDefault(); navigate(`main.php?page=scheda&pg=${encodeURIComponent(nome)}`) }}
                                                 >
                                                     {nome}
-                                                </span>
+                                                </a>
                                                 <br />
                                             </span>
                                         ))
@@ -79,13 +79,13 @@ export default function ElencoStaff() {
             </table>
             <br /><br />
             <div className="panels_link">
-                <span
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => navigate('main.php?page=uffici')}
+                <a
+                    href="main.php?page=uffici"
+                    onClick={e => { e.preventDefault(); navigate('main.php?page=uffici') }}
                 >
                     Torna indietro
-                </span>
+                </a>
             </div>
-        </>
+        </div>
     )
 }

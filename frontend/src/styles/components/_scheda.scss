@@ -29,7 +29,21 @@ div.pagina_scheda {
     div.form_info { color: $color-text; }
 
     // ── Tabella form modifica ─────────────────────────────────
-    table.customTable { width: 100%; }
+    // Override colori legacy: customTable usa #ce846f (arancione) e DejaVu Serif di default.
+    // Nelle schede usiamo palette e font del progetto.
+    table.customTable {
+        width: 100%;
+        color: $palette-text;
+        font-family: $font-base;
+    }
+
+    table.customTable td,
+    table.customTable th {
+        font-family: $font-base;
+    }
+
+    .titoli_elenco  { color: $palette-text-title; }
+    .elementi_elenco { color: $palette-text; }
 
     // Sovrascrive il beige legacy di .second_header (ct-styles.css) per i label del form
     td.second_header { color: $scheda-body-text; }
@@ -663,5 +677,38 @@ span[style*="position:relative"]:hover .tooltip-animated {
         scrollbar-width: none;
         padding-bottom: 120px !important;
         margin-bottom: -120px !important;
+    }
+}
+
+// ── Inventario oggetti (pagina_scheda_oggetti) ─────────────────
+// Questo wrapper non è figlio di pagina_scheda, override separato.
+
+div.pagina_scheda_oggetti {
+    table.customTable {
+        color: $palette-text;
+        font-family: $font-base;
+    }
+
+    table.customTable td,
+    table.customTable th {
+        font-family: $font-base;
+    }
+
+    .titoli_elenco  { color: $palette-text-title; }
+    .elementi_elenco { color: $palette-text; }
+}
+
+// ── Elenco staff ───────────────────────────────────────────────
+// Wrapper div.elenco-staff-page aggiunto in ElencoStaff.jsx.
+
+.elenco-staff-page {
+    table.customTable {
+        color: $palette-text;
+        font-family: $font-base;
+    }
+
+    table.customTable td,
+    table.customTable th {
+        font-family: $font-base;
     }
 }
