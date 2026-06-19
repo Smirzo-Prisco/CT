@@ -1722,6 +1722,51 @@ p:last-child { margin-bottom: 0; }
     .pub-tech-table tbody td:nth-child(3)::before { content: 'Adesso: '; font-size: 0.75rem; opacity: 0.6; }
 }
 
+/* ── Privacy ─────────────────────────────────────────────────────────────
+   Corpo della pagina informativa privacy.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.pub-privacy-body {
+    color: var(--pub-text);
+    line-height: 1.8;
+    font-size: 0.95rem;
+}
+
+.pub-privacy-body p {
+    margin-bottom: 1rem;
+}
+
+.pub-privacy-body h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--pub-gold);
+    margin: 2rem 0 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--pub-border);
+}
+
+.pub-privacy-body ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.pub-privacy-body ul li {
+    margin-bottom: 0.35rem;
+}
+
+.pub-privacy-body a {
+    color: var(--pub-gold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.pub-privacy-body a:hover {
+    color: #fff;
+}
+
 /* ── Responsive extra ────────────────────────────────────────────────────
    Aggiustamenti per le nuove classi aggiunte.
    ─────────────────────────────────────────────────────────────────────── */

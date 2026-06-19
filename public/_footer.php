@@ -62,7 +62,7 @@ function public_footer(): void {
 
     <!-- Barra copyright -->
     <div class="pub-footer-copy">
-        <p>&copy; <?= $year ?> Crystal Tokyo GDR — Tutti i diritti riservati.</p>
+        <p>&copy; <?= $year ?> Crystal Tokyo GDR — Tutti i diritti riservati. &nbsp;|&nbsp; <a href="/privacy">Privacy Policy</a></p>
     </div>
 </footer>
 
