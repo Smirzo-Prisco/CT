@@ -12,13 +12,16 @@
 @use '../tokens' as *;
 
 // ── customTable — condiviso tra famiglie.css e mestieri.css ────────────────────
-// Tabella legacy usata in ~40 pagine PHP (gestione, oggetti, schede, uffici)
+// Tabella legacy usata in ~40 pagine PHP (gestione, oggetti, schede, uffici).
+// color è sul TABLE (non su td/th) così ogni route CSS può sovrascriverla
+// caricando il proprio CSS dopo ct-styles.css (AppRouter inject).
+// NB: border-top su td/th era sintassi invalida nell'originale → ignorata dal browser
+//     → non aggiungere border-top qui per mantenere compatibilità visiva.
 table.customTable {
-    width: 100%;
     background-color: #181c31;
     border-collapse: collapse;
     border: 1px solid #000;
-    color: #8f8f8f;
+    color: #ce846f;
     font-size: 12px;
     font-family: "DejaVu Serif";
     filter: drop-shadow(0 0 5px rgba(0,0,0,0.57));
@@ -26,19 +29,14 @@ table.customTable {
 
 table.customTable td,
 table.customTable th {
-    border-top: 1px solid #000;
     padding: 5px;
     font-size: 12px;
-    color: #ce846f;
     font-family: "DejaVu Serif";
     text-transform: uppercase;
 }
 
 table.customTable thead {
     background-color: #1a2240;
-    font-size: 12px;
-    color: #ce846f;
-    font-family: "DejaVu Serif";
 }
 
 div.titolo {
