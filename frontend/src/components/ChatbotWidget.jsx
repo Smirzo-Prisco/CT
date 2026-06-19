@@ -26,7 +26,9 @@ function markdownToHtml(text) {
 
 export default function ChatbotWidget() {
     const [open, setOpen]         = useState(false)
-    const [messages, setMessages] = useState([])
+    const [messages, setMessages] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('ct-bot-history') ?? '[]') } catch { return [] }
+    })
     const [input, setInput]       = useState('')
     const [loading, setLoading]   = useState(false)
     const [tokenData, setTokenData] = useState({ used: 0, limit: 5000 })
@@ -43,6 +45,11 @@ export default function ChatbotWidget() {
             })
             .catch(() => {})
     }, [])
+
+    // Persiste lo storico in localStorage (ultimi 100 messaggi)
+    useEffect(() => {
+        try { localStorage.setItem('ct-bot-history', JSON.stringify(messages.slice(-100))) } catch {}
+    }, [messages])
 
     // Scroll automatico in fondo ai messaggi
     useEffect(() => {
