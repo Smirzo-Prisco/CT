@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
+
 <link rel="stylesheet" href="../themes/crystal/main.css">
 
 <?php
@@ -290,6 +290,4 @@ $px_totali_pg = $personaggio['esperienza'];
     <div class="form_info" style="display: none;">
         <?php echo gdrcd_filter('out', $MESSAGE['interface']['sheet']['info_skill_cost']); ?>
     </div>
-
-
 </div>

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../themes/crystal/mestieri.css">
+
 <div class="pagina_gestione_mercato">
 <?php
 /*Controllo permessi utente*/

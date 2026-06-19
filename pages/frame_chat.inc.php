@@ -15,7 +15,5 @@
       3. AppRouter renderizza ChatShell con key={dir}
       4. ChatShell chiama op=shell → stessa risposta del flusso PHP
 -->
-<link rel="stylesheet" href="../themes/crystal/mestieri.css">
-
 <!-- AppRouter legge ?dir=X e renderizza il componente ChatShell -->
 <div id="ct-app-content"></div>

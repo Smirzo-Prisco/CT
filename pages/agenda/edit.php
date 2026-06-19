@@ -11,7 +11,7 @@ $Login = $_SESSION['login'];
 $pg = $_SESSION['login'];
 ?>
 <head>
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
+
 <?php
 
 if (isset($_POST['submit']) && $_POST['submit'] == "Modifica") {
@@ -84,8 +84,6 @@ O QUEST <?php } ?>
 </td>
 </tr>
 
-
-
 <tr class="second_header">
 <td>
 <b>Tuo personaggio</b>
@@ -105,8 +103,6 @@ O QUEST <?php } ?>
 </td>
 </tr>  
 
-
-
 <tr class="second_header">
 <td>
 <b>Giocare con:</b>
@@ -120,10 +116,6 @@ O QUEST <?php } ?>
 <input type=text size=40 name="destinatario" placeholder="Usare virgola se presenti più personaggi" class=ares style="background-color: #0f111d;" value="<?php echo $skill['destinatario']; ?>"> 
 </td>
 </tr> 
-
-
-
-
 <tr class="second_header">
 <td>
 <b>Luogo:</b>

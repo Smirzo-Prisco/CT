@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
-
 <div class="pagina_gestione_mercato">
 
     <form class="form_gestione" action="main.php?page=oggetto_ricarica" method="post">
@@ -122,8 +120,6 @@ if(isset($_POST['seleziona_pg'])) {
     gdrcd_query($oggetti_scaduti, 'free');
 }
 ?>
-
-
 <?php
 if(isset($_POST['ricarica'])) {
     $pg_selezionato = gdrcd_filter('in', $_POST['pg_selezionato']);

@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
-
 <?php
 // Verifica se il personaggio appartiene già a una gilda o fazione
 $check_ruolo = gdrcd_query("SELECT id_gilda FROM personaggio WHERE nome = '".$_SESSION['login']."'");

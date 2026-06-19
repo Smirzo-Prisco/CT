@@ -20,7 +20,7 @@ $pg = $_SESSION['login'];
 ?>
 
 <head>
-    <link rel="stylesheet" href="../themes/crystal/famiglie.css">
+    
 
 <?php
 // Cancellazione appuntamenti

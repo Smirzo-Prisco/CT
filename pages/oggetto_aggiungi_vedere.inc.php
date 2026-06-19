@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
-
 <?php
 // Se è stata selezionata una tipologia, salvala
 if (isset($_POST['tipo_oggetto'])) {
@@ -196,10 +194,6 @@ if (isset($_POST['tipo_oggetto'])) {
     <input type="hidden" name="richiede_ricarica" value="1">
     
 <?php } ?>
-
-
-
-
 <?php if ($tipo_oggetto_selezionato === 'curativo') { ?>
     <!-- Sezione aggiuntiva per gli oggetti curativi -->
 
@@ -238,12 +232,6 @@ if (isset($_POST['tipo_oggetto'])) {
     <input type="hidden" name="cariche" value="1">
 
 <?php } ?>
-
-
-
-
-
-
 <?php if ($tipo_oggetto_selezionato === 'statistica') { ?>
     <!-- Sezione aggiuntiva per oggetti che aumentano le statistiche -->
 
@@ -338,10 +326,6 @@ if (isset($_POST['tipo_oggetto'])) {
     <input type="hidden" name="isTemp" value="1">
 
 <?php } ?>
-
-
-
-
 <?php if ($tipo_oggetto_selezionato === 'standard' || $tipo_oggetto_selezionato === 'magico') { ?>
     <!-- Sezione aggiuntiva per oggetti standard e magici -->
 
@@ -364,12 +348,6 @@ if (isset($_POST['tipo_oggetto'])) {
     <input type="hidden" name="richiede_ricarica" value="0">
 
 <?php } ?>
-
-
-
-
-
-
             <!-- Submit -->
             <tr>
                 <td>

@@ -1,13 +1,9 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
-
 <?php
      
      /* iniziamo */
 ?>
 
     <div class="pagina_servizi_lavoro"> 
-
-
     
     <?php /*Elenco inclinazioni*/
         if(isset($_POST['op']) === false) {

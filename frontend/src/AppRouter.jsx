@@ -122,7 +122,7 @@ const ROUTES = {
     },
     scheda_modifica: {
         component: SchedaModifica,
-        css: ['/themes/crystal/scheda_menu.css', '/themes/crystal/mestieri.css'],
+        css: ['/themes/crystal/scheda_menu.css'],
     },
     scheda_affetti: {
         component: SchedaAffetti,
@@ -170,7 +170,7 @@ const ROUTES = {
     },
     elenco_staff: {
         component: ElencoStaff,
-        css: ['/themes/crystal/famiglie.css'],
+        css: [],
     },
     elenco_volti: {
         component: ElencoVolti,
@@ -178,7 +178,7 @@ const ROUTES = {
     },
     anagrafe: {
         component: Anagrafe,
-        css: ['/themes/crystal/famiglie.css'],
+        css: [],
     },
     user_cambio_pass: {
         component: CambioPass,
@@ -186,7 +186,7 @@ const ROUTES = {
     },
     scegli_mestiere: {
         component: ScegliMestiere,
-        css: ['/themes/crystal/famiglie.css'],
+        css: [],
     },
     scegli_razza: {
         component: ScegliRazza,
@@ -206,7 +206,7 @@ const ROUTES = {
     },
     servizi_gilde: {
         component: ServiziGilde,
-        css: ['/themes/crystal/famiglie.css'],
+        css: [],
     },
     statuto_main: {
         component: Statuto,
@@ -367,7 +367,7 @@ export default function AppRouter({ isStaff = false }) {
     // perché agisce solo sui link in uscita, non su quelli appena aggiunti.
     useEffect(() => {
         const needed = new Set(
-            isChat ? ['/themes/crystal/mestieri.css'] : (route?.css ?? [])
+            isChat ? [] : (route?.css ?? [])
         )
         document.querySelectorAll('link[data-spa-css]').forEach(link => {
             if (!needed.has(link.getAttribute('href'))) link.remove()
@@ -389,7 +389,6 @@ export default function AppRouter({ isStaff = false }) {
     // key={params.dir}: forza unmount+remount di ChatShell ad ogni cambio stanza,
     // così il nuovo mount chiama op=shell con la sessione aggiornata dal move.
     if (isChat) {
-        injectCSS('/themes/crystal/mestieri.css')
         return <ChatShell key={params.dir} />
     }
 

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="themes/crystal/mestieri.css">
+
 <?php
 /*elenco ruoli*/
             $query = gdrcd_query("SELECT * FROM PNG WHERE IDPng = ".gdrcd_filter('num', $_REQUEST['IDPng'])."", 'result');

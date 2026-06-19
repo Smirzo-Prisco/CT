@@ -27,8 +27,6 @@ $personaggi = gdrcd_query("SELECT
                             ) AS subquery
                             ORDER BY tot DESC", 'result');
 ?>
-
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
 <div class="pagina_gestione_manutenzione">
     <div class="page_title">Controllo Parametri Personaggi</div>
     <table class="customTable" style="width:95%; margin:auto; text-align:left;">

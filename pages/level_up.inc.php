@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
-
 <div class="pagina_gestione_mercato">
 <table class="customTable" style="width: 20%">
 <tr class="second_header" >

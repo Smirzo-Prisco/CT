@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="themes/crystal/famiglie.css">
+
 <div class="pagina_servizi_gilde">
     <!-- Titolo della pagina -->
     <div class="page_title"><h2>Inclinazioni</h2></div>

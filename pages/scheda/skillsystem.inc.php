@@ -3,7 +3,7 @@
     $("#" + row).toggle(); 
   } 
 </script> 
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
+
 <?php
 //carico le sole abilità del pg
 $abilita = gdrcd_query("SELECT * FROM clgpersonaggioabilita WHERE nome='".gdrcd_filter('in', $_REQUEST['pg'])."'", 'result');
@@ -115,5 +115,3 @@ foreach ($ordine_categorie as $tipo) {
 }
 
     ?>
-
-

@@ -17,8 +17,6 @@ if (isset($_POST['destinatario']) && isset($_POST['messaggio'])) {
 }
 ?>
 
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
-
 <div class="pagina_gestione_mercato" style="max-width:600px; margin:auto; padding:20px; background-color:#1b1f30; border-radius:10px; box-shadow:0 0 10px #000; color:#ce846f; font-family:Lato;">
 
     <h2 style="text-align:center; margin-bottom:20px;">Invia Messaggio della Moderazione</h2>

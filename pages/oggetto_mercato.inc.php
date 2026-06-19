@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
-
 <div class="pagina_gestione_mercato">
 
     <form class="form_gestione" action="main.php?page=oggetto_mercato" method="post">

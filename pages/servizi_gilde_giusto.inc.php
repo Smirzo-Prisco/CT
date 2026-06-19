@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="themes/crystal/famiglie.css">
+
 <div class="pagina_servizi_gilde">
     <!-- Titolo della pagina -->
     <div class="page_title">
@@ -140,8 +140,6 @@
             /*elenco ruoli*/
             $query = "SELECT * FROM ruolo WHERE gilda = ".gdrcd_filter('num', $_REQUEST['id_gilda'])." ORDER BY livello DESC, nome_ruolo DESC";
             $result = gdrcd_query($query, 'result'); ?>
-
-
                     <table class="customTable">
                         <tr>
                             <td colspan="4">

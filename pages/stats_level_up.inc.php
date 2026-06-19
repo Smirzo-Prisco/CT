@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
-
 <?php
 //carico tutto ciò di cui ho bisogno
 $abilita = gdrcd_query("SELECT clgpersonaggioabilita.id_abilita, grado FROM clgpersonaggioabilita LEFT JOIN abilita ON clgpersonaggioabilita.id_abilita = abilita.id_abilita WHERE clgpersonaggioabilita.nome='".gdrcd_filter('in', $_SESSION['login'])."' AND abilita.tipo!='Talento' AND abilita.tipo!='Default' AND abilita.tipo!='Difesa' AND abilita.tipo!='Temporanea'", 'result');
@@ -8,11 +6,7 @@ $id_ruolo_pg = gdrcd_query("SELECT id_ruolo FROM clgpersonaggioruolo WHERE perso
 $id_ruolo_pg = $id_ruolo_pg['id_ruolo'];
 $livello_ruolo_gilda = gdrcd_query("SELECT livello FROM ruolo WHERE id_ruolo='".gdrcd_filter('in', $id_ruolo_pg)."'");
 $livello_ruolo_gilda = $livello_ruolo_gilda['livello'];
-
-
         #controllo per il tetto massimo
-
-
 //calcolo l'esperienza che il personaggio ha già speso per le abilità 
 $tot_esperienza_abilita = 0;
 while($row = gdrcd_query($abilita, 'fetch')){
@@ -28,8 +22,6 @@ $tot_stats = $info_pg['car0'] + $info_pg['car2'] + $info_pg['car4'] + $info_pg['
 $exp_usata = $info_pg['esperienza'] - $info_pg['esperienza_r'];
 //stats solo esperienza
 $tot_stats_pre = $info_pg['car0']-$info_pg['car1'] + $info_pg['car2']-$info_pg['car3']+ $info_pg['car4']-$info_pg['car5'] + $info_pg['car6']-$info_pg['car7'];
-
-
 
 if($tot_stats_pre-40 >=260){
     $info_pg['esperienza_r'] = 0;
@@ -123,8 +115,6 @@ if((gdrcd_filter('get', $_REQUEST['op']) == 'addstat') && (($_SESSION['login'] =
     $livello_ruolo_gilda = $livello_ruolo_gilda['livello'];
     
     
-
-
     //calcolo l'esperienza che il personaggio ha già speso per le abilità 
     $tot_esperienza_abilita = 0;
 while($row = gdrcd_query($abilita, 'fetch')){
@@ -140,8 +130,6 @@ $tot_stats = $info_pg['car0'] + $info_pg['car2'] + $info_pg['car4'] + $info_pg['
 $exp_usata = $info_pg['esperienza'] - $info_pg['esperienza_r'];
 
         #controllo per il tetto massimo
-
-
         $tot_stats_pre = $info_pg['car0']-$info_pg['car1'] + $info_pg['car2']-$info_pg['car3']+ $info_pg['car4']-$info_pg['car5'] + $info_pg['car6']-$info_pg['car7'];
         if($tot_stats_pre-40 >=260){
         	$info_pg['esperienza_r'] = 0;
@@ -149,8 +137,6 @@ $exp_usata = $info_pg['esperienza'] - $info_pg['esperienza_r'];
         
 #echo "<script type='text/javascript'>alert('$exp_usata');</script>";
 #echo "<script type='text/javascript'>alert('$tot_esperienza_abilita');</script>";
-
-
 //Se si tolgono le tre skill di default a 1 è da togliere il + 15
 $exp_no_abilita = $exp_usata - $tot_esperienza_abilita;
 //calcolo quindi le stats incrementate 
@@ -168,8 +154,6 @@ $tot_stats_incremento = ceil(($exp_no_abilita/5));
 #echo "<script type='text/javascript'>alert('$exp_no_abilita');</script>";
 #echo "<script type='text/javascript'>alert('$tot_stats');</script>";
 #echo "<script type='text/javascript'>alert('$tot_stats_incremento');</script>";
-
-
 $stats_rimanenti = $tot_stats - $tot_stats_incremento - 40; 
 echo "<div class='warning'>Il reset del personaggio avviene solo per errori tecnici, non per errori di distribuzione</div>";
 

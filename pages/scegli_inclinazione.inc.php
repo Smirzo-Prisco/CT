@@ -7,8 +7,6 @@ $pg = gdrcd_query("SELECT personaggio.*, clgpersonaggioinclinazione.*
 $inclinazione = $pg['id_ruolo'] ?? 0; // i ruoli sono da 1, 2 e 3. Zero non deve esistere
 ?>
 
-<link rel="stylesheet" href="/themes/crystal/famiglie.css">
-
 <div class="pagina_servizi_lavoro">
     <div class="page_title"><h2><?php echo gdrcd_filter('out', $MESSAGE['interface']['inclinazioni']['page_name']); ?></h2></div>
 
@@ -81,12 +79,6 @@ if(isset($_POST['op']) && isset($_POST['id_record']) && $_POST['op'] == 'change'
     // Mando la notifica al referente di corrente
     send_sms('System', $referente["referente"], $title, $text);
 }
-
-
-
-
-
-
 
 if($_POST['op'] == 'quit') $quit_incli = gdrcd_query("DELETE FROM clgpersonaggioinclinazione WHERE personaggio = '" . gdrcd_filter('in', $_SESSION['login']) . "'");    
 ?>

@@ -1,4 +1,4 @@
-﻿<link rel="stylesheet" href="themes/crystal/famiglie.css">
+﻿
 <div class="pagina_servizi_adm_gilde">
 
 <!-- Titolo della pagina -->
@@ -155,8 +155,6 @@
 				gdrcd_query("UPDATE personaggio SET id_gilda = ".$gilda['gilda'].", id_ruolo_gilda = ".$_POST['ruolo']." WHERE nome = '".$_POST['nome']."'");      
                 /*Confermo l'operazione*/
                 echo '<div class="warning">'.gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['ok_hire']).'</div>';
-
-
                 /*Avviso l'utente*/
                 $ruolo_name = "SELECT * FROM ruolo WHERE id_ruolo =". $_POST['ruolo'] ."";
                 $nome = gdrcd_query($ruolo_name);
@@ -356,32 +354,6 @@
     </form>
     </table>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <?php
 /************** ISTRUZIONI MARCO ************************
 Allora Mà, ho diviso il tutto in 2 tabelle.
@@ -396,30 +368,12 @@ Poi i due submit: modifica per degradare/promuovere ||| Elimina per cacciare
 <input type="hidden" name="op" value="update" />
 <input type="submit" name="grade" value="Modifica" /><br>
 <input type="submit" name="fire" value="Elimina" />
-
-
 La seconda tabella è per gildare qualcuno. 
 A sx ci sono i personaggio che nella tabella personaggio hanno id_gilda < 1 (dunque o sono SIT, SCORPION, WIKKAN o CITTADINI)
 Riga 142 (<select name="nome">)
 A destra un select con i ruoli.
-
-
 ***************************FINE**************************/
 ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <?php
 
 }//fine if permessi

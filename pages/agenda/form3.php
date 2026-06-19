@@ -11,7 +11,7 @@ $Login = $_SESSION['login'];
 $pg = $_SESSION['login'];
 ?>
 <head>
-<link rel="stylesheet" href="../themes/crystal/mestieri.css">
+
 <?php
 if (isset($_POST['submit']) && $_POST['submit']=="Invia")
 {
@@ -68,8 +68,6 @@ O QUEST <?php } ?>
 </td>
 </tr>
 
-
-
 <tr class="second_header">
 <td>
 <b>Tuo personaggio</b>
@@ -88,8 +86,6 @@ O QUEST <?php } ?>
 </select>
 </td>
 </tr>  
-
-
 
 <tr class="second_header">
 <td>
@@ -117,10 +113,6 @@ $rs->close;
 </select>
 </td>
 </tr> 
-
-
-
-
 <tr class="second_header">
 <td>
 <b>Luogo:</b>
@@ -225,10 +217,6 @@ AGENDA DI <font style="text-transform: uppercase;"><?php echo "$pg"; ?></font>
 }
  ?>
 </table><br><br> 
-
-
-
-
 <?php if ($_SESSION['admin'] == 1 || $_SESSION['master'] == 1) { ?>
 <table class="customTable">
 <tr>

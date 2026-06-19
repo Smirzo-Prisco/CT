@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="../themes/crystal/famiglie.css">
-
 
 <div class="elenco_abilita">
 <!-- Elenco talenti-->

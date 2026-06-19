@@ -1,18 +1,12 @@
-<link rel="stylesheet" href="../themes/crystal/mestieri.css">
+
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-
 <script src="http://code.jquery.com/jquery-latest.pack.js" type="text/javascript"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/jquery-1.10.2.js"></script>
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script src="../statuti/general_script.js"></script>
 <link href="../statuti/general_css.css" rel="stylesheet" type="text/css" />
-
-
 <div class="pagina_gestione_mercato">
-
-
 <?php
 //creo form di contatto
 if (isset($_POST['fase']) === false)
@@ -220,6 +214,4 @@ LISTA RICHIESTE DI <font style="text-transform: uppercase;"><?php echo $_SESSION
 /***** FINE Fase 3 *****/
         }
 ?>
-
-
 </div>

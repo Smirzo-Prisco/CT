@@ -1,4 +1,4 @@
-﻿<link rel="stylesheet" href="../themes/crystal/famiglie.css">
+﻿
 
 <?php
 // Se è stata selezionata una tipologia, salvala
@@ -169,8 +169,6 @@ if (isset($_POST['submit']) && $_POST['submit'] == 'Aggiungi Oggetto') {
     <form class="form_gestione" action="main.php?page=oggetto_aggiungi" method="post" enctype="multipart/form-data">
         <!-- Mantieni categoria e tipo di oggetto selezionati -->
         <input type="hidden" name="categoria" value="<?php echo $tipo_oggetto_selezionato; ?>">
-
-
         <table class="customTable">
             <tr>
                 <td style="font-size: 12px; color: #a7a7a8;">
@@ -368,10 +366,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1) {
     <input type="hidden" name="richiede_ricarica" id="richiede_ricarica" value="1">
     
 <?php } ?>
-
-
-
-
 <?php if ($tipo_oggetto_selezionato === 'curativo') { ?>
     <!-- Sezione aggiuntiva per gli oggetti curativi -->
 
@@ -421,12 +415,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1) {
     <input type="hidden" name="richiede_ricarica" value="0">
 
 <?php } ?>
-
-
-
-
-
-
 <?php if ($tipo_oggetto_selezionato === 'statistica') { ?>
     <!-- Sezione aggiuntiva per oggetti che aumentano le statistiche -->
 
@@ -545,10 +533,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1) {
     <input type="hidden" name="isTemp" value="1">
 
 <?php } ?>
-
-
-
-
 <?php if ($tipo_oggetto_selezionato === 'standard') { ?>
     <!-- Sezione aggiuntiva per oggetti standard e magici -->
 
@@ -571,8 +555,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1) {
     <input type="hidden" name="richiede_ricarica" value="0">
 
 <?php } ?>
-
-
 <?php if ($tipo_oggetto_selezionato === 'magico') { ?>
     <!-- Sezione per oggetti magici (RICARICABILI) -->
 
@@ -606,10 +588,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1) {
 
     <input type="hidden" name="richiede_ricarica" value="1">
 <?php } ?>
-
-
-
-
             <!-- Submit -->
             <tr>
                 <td>
@@ -670,16 +648,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php } 
-
-
-
-
-
-
-
-
-
-
 
 } 
 ?>
