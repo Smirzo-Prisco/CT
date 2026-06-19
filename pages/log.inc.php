@@ -10,8 +10,6 @@ require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'azioni';
 ?>
 
-<link rel="stylesheet" href="../themes/crystal/log.css">
-
 <div class="log-container">
     <h1>Logs</h1>
     <!-- TABS -->

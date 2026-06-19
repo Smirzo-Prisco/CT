@@ -86,9 +86,7 @@ const ROUTES = {
     },
     presenti_estesi: {
         component: PresentiEstesi,
-        css: [
-            '/themes/crystal/anagrafe.css',
-        ],
+        css: [],
     },
     mappaclick: {
         component: MapClick,
