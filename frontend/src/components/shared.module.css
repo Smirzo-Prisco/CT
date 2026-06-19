@@ -11,6 +11,6 @@
 .fullTable     { width: 100%; table-layout: fixed; word-break: break-word; }
 
 /* Testo specifici scheda */
-.schedaSerial  { font-size: 12px; color: #8f8f8f; font-family: 'DejaVu Serif'; }
+.schedaSerial  { font-size: 12px; color: var(--color-text-secondary); }
 .schedaUpper   { text-transform: uppercase; }
 .primaryColor  { color: #9a6353; }

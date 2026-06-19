@@ -680,6 +680,20 @@ span[style*="position:relative"]:hover .tooltip-animated {
     }
 }
 
+// ── Servizi gilde (pagina_servizi_gilde) ──────────────────────
+
+div.pagina_servizi_gilde {
+    table.customTable {
+        color: $palette-text;
+        font-family: $font-base;
+    }
+
+    table.customTable td,
+    table.customTable th {
+        font-family: $font-base;
+    }
+}
+
 // ── Inventario oggetti (pagina_scheda_oggetti) ─────────────────
 // Questo wrapper non è figlio di pagina_scheda, override separato.
 

@@ -16,6 +16,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
+import shared from './shared.module.css'
 
 // ── Navigazione ───────────────────────────────────────────────────────────────
 
@@ -60,7 +61,7 @@ function GildeTable({ gilde, onSelectGilda }) {
                             </a>
                         </td>
                         <td>
-                            <div style={{ fontSize: '12px', color: '#8f8f8f', fontFamily: 'DejaVu Serif' }}>
+                            <div className={shared.schedaSerial}>
                                 {g.count}
                             </div>
                         </td>
@@ -130,7 +131,7 @@ function MestieriSection({ mestieri }) {
                                         )}
                                     </td>
                                     <td>
-                                        <div style={{ fontSize: '12px', color: '#8f8f8f', fontFamily: 'DejaVu Serif' }}>
+                                        <div className={shared.schedaSerial}>
                                             {m.count}
                                         </div>
                                     </td>
@@ -181,7 +182,7 @@ function GuildDetail({ gildaId, onBack }) {
                         <tr key={i}>
                             <td><div><img src={`imgs/guilds/${r.immagine}`} alt="" /></div></td>
                             <td>
-                                <div style={{ fontSize: '12px', color: '#8f8f8f', fontFamily: 'DejaVu Serif' }}>
+                                <div className={shared.schedaSerial}>
                                     {r.nome_ruolo}
                                 </div>
                             </td>
@@ -218,7 +219,7 @@ function GuildDetail({ gildaId, onBack }) {
                                 </div>
                             </td>
                             <td>
-                                <div style={{ fontSize: '12px', color: '#8f8f8f', fontFamily: 'DejaVu Serif' }}>
+                                <div className={shared.schedaSerial}>
                                     {a.nickname ?? a.nome_ruolo}
                                 </div>
                             </td>
@@ -248,9 +249,9 @@ function GuildDetail({ gildaId, onBack }) {
 
             {/* Torna alla lista */}
             <div className="panels_link" style={{ marginTop: '16px' }}>
-                <span style={{ cursor: 'pointer' }} onClick={onBack}>
+                <a href="#" onClick={e => { e.preventDefault(); onBack() }}>
                     Torna indietro
-                </span>
+                </a>
             </div>
         </div>
     )
