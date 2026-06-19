@@ -29,10 +29,11 @@ function GuildCard({ guild, onJoin, disabled }) {
     return (
         <div className={`sr-guild-card ${disabled ? 'sr-guild-card--disabled' : ''}`}>
             <div className="sr-guild-img">
-                {guild.immagine
-                    ? <img src={`imgs/guilds/${guild.immagine}`} alt={guild.nome} />
-                    : <i className="fas fa-shield-alt"></i>
-                }
+                <img
+                    src={guild.immagine ? `imgs/guilds/${guild.immagine}` : 'imgs/guilds/standard_gilda.png'}
+                    alt={guild.nome}
+                    onError={e => { e.currentTarget.src = 'imgs/guilds/standard_gilda.png' }}
+                />
             </div>
             <div className="sr-guild-name">{guild.nome}</div>
             {guild.ruolo_nome && (
@@ -74,13 +75,12 @@ function CurrentGuildPanel({ pg, onLeave }) {
                 <i className="fas fa-shield-alt"></i> La tua razza attuale
             </div>
             <div className="sr-current-body">
-                {pg.gilda_immagine && (
-                    <img
-                        className="sr-current-img"
-                        src={`imgs/guilds/${pg.gilda_immagine}`}
-                        alt={pg.gilda_nome}
-                    />
-                )}
+                <img
+                    className="sr-current-img"
+                    src={pg.gilda_immagine ? `imgs/guilds/${pg.gilda_immagine}` : 'imgs/guilds/standard_gilda.png'}
+                    alt={pg.gilda_nome}
+                    onError={e => { e.currentTarget.src = 'imgs/guilds/standard_gilda.png' }}
+                />
                 <div className="sr-current-name">{pg.gilda_nome}</div>
                 <p className="sr-current-info">
                     Sei già affiliato a questa razza. Per cambiare affiliazione
