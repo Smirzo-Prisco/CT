@@ -121,13 +121,16 @@ export default function Documentazione() {
                         <input type="submit" value="cerca" />
                     </div>
                 </form>
+                <div style={{ marginTop: '12px' }}>
+                    <button onClick={() => window.history.back()}>← Torna indietro</button>
+                </div>
             </div>
 
-            <div id="doc-content" onClick={handleContentClick}>
-                <button onClick={() => window.history.back()}>← Torna indietro</button>
-                <div dangerouslySetInnerHTML={{ __html: content }} />
-                <button style={{ marginTop: '10px' }} onClick={() => window.history.back()}>← Torna indietro</button>
-            </div>
+            <div
+                id="doc-content"
+                onClick={handleContentClick}
+                dangerouslySetInnerHTML={{ __html: content }}
+            />
         </div>
     )
 }

@@ -1118,7 +1118,7 @@ export default function Forum({ isStaff = false }) {
                             </div>
                         )}
 
-                        <div className={styles.backBar}>
+                        <div className={styles.backBar} style={{ marginTop: '10px' }}>
                             <button onClick={backToSections}>← Torna indietro</button>
                         </div>
                     </>
