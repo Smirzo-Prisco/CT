@@ -218,7 +218,7 @@ const ROUTES = {
     },
     chat_help: {
         component: ChatHelp,
-        css: ['/themes/crystal/chat_help.css'],
+        css: [],
     },
 }
 

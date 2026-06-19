@@ -11,8 +11,6 @@ if($_SESSION['admin'] != 1) {
     add_script("/includes/gilda.js");
 ?>
 
-<link rel="stylesheet" href="../themes/crystal/gestione_gilde.css">
-
 <div class="guild-container">
     <!-- Top bar -->
     <div class="topbar">

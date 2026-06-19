@@ -11,15 +11,6 @@ import { useState, useEffect } from 'react'
 export default function ChatHelp({ onBack }) {
     const [soglie, setSoglie] = useState([])
 
-    useEffect(() => {
-        const href = '/themes/crystal/chat_help.css'
-        if (!document.querySelector(`link[href="${href}"]`)) {
-            const link = document.createElement('link')
-            link.rel = 'stylesheet'
-            link.href = href
-            document.head.appendChild(link)
-        }
-    }, [])
 
     useEffect(() => {
         fetch('/pages/api_chatHelp.php')

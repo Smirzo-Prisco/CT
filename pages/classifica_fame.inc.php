@@ -1,6 +1,4 @@
-﻿<link rel="stylesheet" href="../themes/crystal/volti.css">
-
-<div class="page_body">  
+﻿<div class="page_body">
 
 
 <table class="customTable">
