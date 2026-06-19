@@ -23,17 +23,22 @@ $bgMestieri = [1=>'icc.png',2=>'tae.png',3=>'magic.png',4=>'pandora.png',6=>'cor
 $background = $bgGilde[$id] ?? ($bgMestieri[$id2] ?? null);
 if (!$background) exit;
 
+$firstArticolo = 0;
+
 /**
  * Renderizza una sezione accordion del menu.
  * Restituisce HTML stringa o '' se non ci sono articoli.
+ * Salva in $firstArticolo il primo articolo trovato in assoluto.
  */
 function menuSection($tipo, $campo, $valore, $classe) {
+    global $firstArticolo;
     $valore = (int)$valore;
     $res    = gdrcd_query("SELECT articolo, titolo FROM statuti WHERE tipo='$tipo' AND $campo='$valore' ORDER BY articolo", 'result');
     $links  = '';
     while ($row = gdrcd_query($res, 'fetch')) {
         $art   = (int)$row['articolo'];
         $tit   = gdrcd_filter('out', $row['titolo']);
+        if (!$firstArticolo) $firstArticolo = $art;
         $links .= "<a href=\"#\" onclick=\"loadArticolo($art);return false;\">$tit</a><br>\n";
     }
     gdrcd_query($res, 'free');
@@ -86,6 +91,9 @@ function menuSection($tipo, $campo, $valore, $classe) {
             echo menuSection('requisiti', 'id_mestiere', $id2, 'specifiche');
         endif; ?>
       </ul>
+      <div style="margin-top: 12px;">
+        <button onclick="window.history.back()">← Torna indietro</button>
+      </div>
     </div>
   </div>
 
@@ -127,6 +135,12 @@ $(function () {
     };
 
     new Accordion($('.accordion-menu'), false);
+
+    <?php if ($firstArticolo): ?>
+    // Apri prima sezione e carica subito il primo articolo
+    $('.accordion-menu > li:first-child .dropdownlink').trigger('click');
+    loadArticolo(<?= $firstArticolo ?>);
+    <?php endif; ?>
 });
 </script>
 </body>
