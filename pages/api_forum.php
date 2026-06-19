@@ -64,7 +64,7 @@ function section_label(int $tipo): string {
         COMUNICAZIONI    => 'Bacheche Informazioni',
         PERTUTTI         => 'Bacheche Off-Game',
         SOLORAZZA        => 'Bacheche di Razza',
-        SOLOGILDA        => 'Bacheche Via',
+        SOLOGILDA        => 'Bacheche Razza',
         SOLOMESTIERE     => 'Bacheche Mestieri',
         SOLOMASTERS      => 'Bacheche Master',
         SOLOMODERATORS   => 'Bacheche Moderatori',
