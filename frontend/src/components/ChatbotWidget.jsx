@@ -14,6 +14,16 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 const MAX_CHARS = 500
 const API_BASE  = '/pages/api_chatbot.php'
 
+/** Converte markdown base in HTML per la visualizzazione in chat */
+function markdownToHtml(text) {
+    return text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/^#{1,6}\s+(.+)$/gm, '<strong>$1</strong>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>')
+}
+
 export default function ChatbotWidget() {
     const [open, setOpen]         = useState(false)
     const [messages, setMessages] = useState([])
@@ -60,7 +70,7 @@ export default function ChatbotWidget() {
             })
             const data = await resp.json()
             if (data.success) {
-                setMessages(prev => [...prev, { role: 'ai', text: data.risposta }])
+                setMessages(prev => [...prev, { role: 'ai', text: markdownToHtml(data.risposta) }])
                 setTokenData({ used: data.tokens_used, limit: data.tokens_limit })
             } else {
                 setMessages(prev => [...prev, { role: 'error', text: data.message }])
