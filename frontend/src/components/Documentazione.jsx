@@ -89,7 +89,6 @@ export default function Documentazione() {
     }
 
     return (
-        <>
         <div id="doc-wrap">
             <div className="doc-logo">
                 <img src="themes/crystal/imgs/documentazione/titolo.png" alt="" />
@@ -124,17 +123,11 @@ export default function Documentazione() {
                 </form>
             </div>
 
-            <div
-                id="doc-content"
-                onClick={handleContentClick}
-                dangerouslySetInnerHTML={{ __html: content }}
-            />
+            <div id="doc-content" onClick={handleContentClick}>
+                <button onClick={() => window.history.back()}>← Torna indietro</button>
+                <div dangerouslySetInnerHTML={{ __html: content }} />
+                <button style={{ marginTop: '10px' }} onClick={() => window.history.back()}>← Torna indietro</button>
+            </div>
         </div>
-        <div className="panels_link">
-            <a href="#" onClick={e => { e.preventDefault(); window.history.back() }}>
-                Torna indietro
-            </a>
-        </div>
-        </>
     )
 }
