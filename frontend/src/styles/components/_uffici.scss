@@ -1,6 +1,9 @@
-/* uffici_layout.css — Layout a tre colonne della pagina Uffici
-   (Utilità, Strumenti, Potenziamento) — sostituisce il blocco <style> inline
-   che era in uffici.inc.php prima della migrazione SPA */
+// ============================================================
+// _uffici.scss — Pagina Uffici (3 colonne) e Prenotazioni Prova (albergo)
+// ============================================================
+@use '../tokens' as *;
+
+// ── Uffici: layout tre colonne ────────────────────────────────
 
 .uffici-container {
     width: 100%;
@@ -85,4 +88,58 @@
 @media (width <= 380px) {
     .ufficio-content  { width: 200px; height: 180px; padding: 12px; }
     .ufficio-content a { font-size: 10px; margin: 3px 0; }
+}
+
+// ── Prenotazioni prova / albergo ──────────────────────────────
+// Tabella stile sfondo (tasto albergo)
+// NB: a:hover globale omesso — già coperto dai token base
+
+.tg {
+    border-collapse: collapse;
+    border-spacing: 0;
+    position: relative;
+    width: 550px;
+    margin: 0 auto 30px;
+    table-layout: fixed;
+
+    tbody { border: 2px black solid; }
+
+    td {
+        border: 1px black solid;
+        font-family: Lato;
+        font-size: 10px;
+        color: #e2e2e2;
+        overflow: hidden;
+        padding: 10px 5px;
+        word-break: normal;
+        background: url('imgs/uffici/sfondo_tasto.png') no-repeat center / cover;
+        text-align: center;
+        width: 30px;
+        height: 20px;
+        vertical-align: center;
+        filter: drop-shadow(0 0 5px rgb(0 0 0 / 57%));
+    }
+
+    th {
+        border-style: solid;
+        border-width: 0;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        font-weight: normal;
+        overflow: hidden;
+        padding: 20px 10px;
+        word-break: normal;
+        background-repeat: no-repeat;
+    }
+
+    .tg-73oq { border-color: #000; text-align: center; vertical-align: top; }
+}
+
+.tg_no {
+    border-collapse: collapse;
+    border-spacing: 0;
+    position: relative;
+    width: 550px;
+    margin: 0 auto 30px;
+    table-layout: fixed;
 }

@@ -96,55 +96,55 @@ const ROUTES = {
     },
     scheda: {
         component: Scheda,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_storia: {
         component: SchedaSub,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_dice: {
         component: SchedaSub,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_off: {
         component: SchedaSub,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_skills: {
         component: SchedaSkills,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_trans: {
         component: SchedaTrans,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_modifica: {
         component: SchedaModifica,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_affetti: {
         component: SchedaAffetti,
-        css: ['/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_affetto.css', '/themes/crystal/volti.css'],
+        css: ['/themes/crystal/scheda_affetto.css', '/themes/crystal/volti.css'],
     },
     scheda_px: {
         component: SchedaPunti,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_px_shin: {
         component: SchedaPunti,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_px_mestiere: {
         component: SchedaPunti,
-        css: ['/themes/crystal/scheda_menu.css'],
+        css: [],
     },
     scheda_equip: {
         component: SchedaEquip,
-        css: ['/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_equip.css'],
+        css: [],
     },
     scheda_oggetti: {
         component: SchedaOggetti,
-        css: ['/themes/crystal/scheda_menu.css', '/themes/crystal/scheda_equip.css'],
+        css: [],
     },
     gestione: {
         component: Gestione,
@@ -154,9 +154,7 @@ const ROUTES = {
     },
     uffici: {
         component: Uffici,
-        css: [
-            '/themes/crystal/uffici_layout.css',
-        ],
+        css: [],
     },
     role_recap: {
         component: RoleRecap,
@@ -196,11 +194,11 @@ const ROUTES = {
     },
     incremento_parametri: {
         component: IncrementoParametri,
-        css: ['/themes/crystal/incremento_parametri.css'],
+        css: [],
     },
     servizi_prenotazioni_prova: {
         component: PrenotazioniProva,
-        css: ['/themes/crystal/albergo.css'],
+        css: [],
     },
     servizi_gilde: {
         component: ServiziGilde,
@@ -210,14 +208,12 @@ const ROUTES = {
         component: Statuto,
         css: [
             '/themes/crystal/statuto_menu.css',
-            '/themes/crystal/statuto.css',
         ],
     },
     documentazione_main: {
         component: Documentazione,
         css: [
             '/themes/crystal/documentazione_menu.css',
-            '/themes/crystal/documentazione_spa.css',
         ],
     },
     chat_help: {

@@ -1,0 +1,89 @@
+// ============================================================
+// _statuto.scss — Layout Statuto gilda/mestiere nella SPA
+// ============================================================
+@use '../tokens' as *;
+
+#statuto-wrap {
+    position: relative;
+    width: 985px;
+    min-height: 640px;
+    margin: 0 auto;
+    overflow: hidden;
+
+    .statuto-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        pointer-events: none;
+
+        img { display: block; }
+    }
+
+    // Override z-index:-1 da statuto_menu.css
+    .pos-menu {
+        position: absolute;
+        top: 148px;
+        left: 24px;
+        z-index: 1;
+    }
+
+    // Scoped overrides — stessi nomi di classe usati da documentazione_menu.css
+    .ambientazione {
+        padding: 4px;
+        background: url("imgs/statuti/tasti/storia_base.png") no-repeat left center transparent;
+
+        &:hover { background: url("imgs/statuti/tasti/storia_hover.gif") no-repeat left center transparent; }
+    }
+
+    .regolamento {
+        padding: 5px;
+        background: url("imgs/statuti/tasti/statuto_base.png") no-repeat left center transparent;
+
+        &:hover { background: url("imgs/statuti/tasti/statuto_hover.gif") no-repeat left center transparent; }
+    }
+
+    .primi_passi {
+        padding: 6px;
+        background: url("imgs/statuti/tasti/skill_base.png") no-repeat left center transparent;
+
+        &:hover { background: url("imgs/statuti/tasti/skill_hover.gif") no-repeat left center transparent; }
+    }
+
+    .manuale {
+        padding: 4px;
+        background: url("imgs/statuti/tasti/requisiti_base.png") no-repeat left center transparent;
+
+        &:hover { background: url("imgs/statuti/tasti/requisiti_hover.gif") no-repeat left center transparent; }
+    }
+}
+
+#statuto-content {
+    position: absolute;
+    top: 15px;
+    left: 337px;
+    width: 527px;
+    min-height: 400px;
+    max-height: 580px;
+    overflow-y: auto;
+    z-index: 1;
+    padding: 8px;
+
+    .titoli {
+        color: #ce846f;
+        text-transform: uppercase;
+        font-weight: normal;
+        background-image: url("/imgs/documentazione/barra_titolo.png");
+        background-repeat: no-repeat;
+        text-align: center;
+        padding: 10px;
+        text-shadow: 3px 2px 3px #000;
+    }
+
+    .testo {
+        color: #8f8f8f;
+        line-height: 18px;
+        text-align: justify;
+        padding: 20px;
+    }
+}
