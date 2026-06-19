@@ -297,24 +297,15 @@ export default function ServiziGilde() {
         <div className="pagina_servizi_gilde">
             <div className="page_body">
 
-                {/* Link ambientazione */}
-                <table className="customTable" style={{ width: '100%', marginBottom: '16px' }}>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div>
-                                    <a
-                                        className="table-title"
-                                        href="#"
-                                        onClick={e => { e.preventDefault(); navigate('main.php?page=documentazione_main') }}
-                                    >
-                                        AMBIENTAZIONE &amp; REGOLAMENTO
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                {/* Link ambientazione — voce principale, in evidenza */}
+                <a
+                    className="servizi-gilde-banner"
+                    href="main.php?page=documentazione_main"
+                    onClick={e => { e.preventDefault(); navigate('main.php?page=documentazione_main') }}
+                >
+                    <i className="fa-solid fa-book-open" />
+                    &nbsp; AMBIENTAZIONE &amp; REGOLAMENTO
+                </a>
 
                 <GildeTable gilde={gilde} onSelectGilda={setSelected} />
                 <br />

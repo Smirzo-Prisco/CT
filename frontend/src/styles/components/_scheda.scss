@@ -694,6 +694,36 @@ div.pagina_servizi_gilde {
     }
 }
 
+// Banner "Ambientazione & Regolamento" — voce principale della pagina servizi gilde
+a.servizi-gilde-banner {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: $space-4;
+    padding: $space-4 $space-6;
+    background: linear-gradient(135deg, $palette-surface-raised 0%, $palette-surface-hover 100%);
+    border: 1px solid $palette-surface-hover;
+    border-left: 4px solid $color-action;
+    border-radius: $radius-md;
+    color: $palette-text-title;
+    font-family: $font-base;
+    font-size: $text-xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: 1px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background $transition-fast, color $transition-fast, border-color $transition-fast;
+
+    &:visited { color: $palette-text-title; }
+
+    &:hover {
+        background: linear-gradient(135deg, $palette-surface-hover 0%, $palette-blue-dark 100%);
+        color: $color-action;
+        border-left-color: $color-action-hover;
+    }
+}
+
 // ── Inventario oggetti (pagina_scheda_oggetti) ─────────────────
 // Questo wrapper non è figlio di pagina_scheda, override separato.
 
