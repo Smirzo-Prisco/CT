@@ -64,6 +64,7 @@
         top: 109px;
         left: 18px;
         z-index: 1;
+        width: 300px; // doc-content inizia a left:340px, pos-menu a left:18px → ~322px disponibili
     }
 
     // Scoped overrides — stessi nomi di classe usati da statuto_menu.css
