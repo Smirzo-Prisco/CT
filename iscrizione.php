@@ -9,7 +9,6 @@ if ($PARAMETERS['settings']['protection'] == 'ON') {
 }
 
 require 'header.inc.php';
-require 'includes/credits.inc.php';
 ?>
 <link rel="stylesheet" href="themes/crystal/iscrizione_new.css">
 <script>
