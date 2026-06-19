@@ -35,8 +35,7 @@ $typeOrder = ($PARAMETERS['mode']['chat_from_bottom'] == 'ON') ? 'DESC' : 'ASC';
         <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-        <link rel="stylesheet" href="../themes/<?php echo $PARAMETERS['themes']['current_theme'];?>/main.css" TYPE="text/css">
-        <link rel="stylesheet" href="../themes/<?php echo $PARAMETERS['themes']['current_theme'];?>/chat.css" TYPE="text/css">
+        <link rel="stylesheet" href="../themes/<?php echo $PARAMETERS['themes']['current_theme'];?>/ct-styles.css" TYPE="text/css">
         
         <script language="Javascript">
 function SaveToDisk(fileURL, fileName) {

@@ -310,9 +310,7 @@ if($_SESSION['login'] != '') {
     <html>
     <head>
         <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-        <link rel='stylesheet' href='themes/<?=$PARAMETERS['themes']['current_theme']?>/main.css' TYPE='text/css'>
-        <link rel='stylesheet' href='themes/<?=$PARAMETERS['themes']['current_theme']?>/homepage.css'
-              TYPE='text/css'>
+        <link rel='stylesheet' href='themes/<?=$PARAMETERS['themes']['current_theme']?>/ct-styles.css' TYPE='text/css'>
         <link rel='shortcut icon' href='favicon.ico' />
     </head>
     <body>

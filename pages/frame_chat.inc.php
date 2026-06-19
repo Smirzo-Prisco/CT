@@ -16,7 +16,6 @@
       4. ChatShell chiama op=shell → stessa risposta del flusso PHP
 -->
 <link rel="stylesheet" href="../themes/crystal/mestieri.css">
-<link rel="stylesheet" href="../themes/crystal/chat.css">
 
 <!-- AppRouter legge ?dir=X e renderizza il componente ChatShell -->
 <div id="ct-app-content"></div>

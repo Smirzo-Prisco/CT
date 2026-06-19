@@ -14,7 +14,6 @@ $handleDBConnection = gdrcd_connect();
 ?>
 <link rel="stylesheet" href="../themes/crystal/main.css" TYPE="text/css">
 <link rel="stylesheet" href="../themes/crystal/banca.css" TYPE="text/css">
-<link rel="stylesheet" href="../themes/crystal/chat.css" TYPE="text/css">
 
 <div class="pagina_gestione_mercato">
 <?php
