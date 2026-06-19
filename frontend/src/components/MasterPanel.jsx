@@ -105,7 +105,7 @@ function ModificaPG() {
                         <input className="gdr-input" type="number" min={0} max={100} value={form.notorieta ?? 0}
                             onChange={e => setForm(f => ({ ...f, notorieta: e.target.value }))} />
                     </div>
-                    <button className="gdr-button gdr-btn-success" onClick={save} disabled={saving}>
+                    <button className="btn btn--success" onClick={save} disabled={saving}>
                         {saving ? 'Salvataggio…' : 'Salva'}
                     </button>
                     {msg && <p style={{ color: '#8cba8c', marginTop: '6px', fontSize: '12px' }}>{msg}</p>}
@@ -175,7 +175,7 @@ function CreaPng() {
                 <input className="gdr-input" type="number" min={1} max={20} value={newPng.tempra}
                     onChange={e => setNewPng(f => ({ ...f, tempra: +e.target.value }))} />
             </div>
-            <button className="gdr-button gdr-btn-success" onClick={createPng} disabled={creating}>
+            <button className="btn btn--success" onClick={createPng} disabled={creating}>
                 {creating ? 'Aggiunta…' : 'Aggiungi PNG'}
             </button>
             {createMsg && <p style={{ color: '#8cba8c', marginTop: '6px', fontSize: '12px' }}>{createMsg}</p>}
@@ -310,7 +310,7 @@ function GestionePng() {
                         <input className="gdr-input" type="number" min={1} max={100} value={damagePercent}
                             onChange={e => setDamagePercent(Math.max(1, Math.min(100, +e.target.value)))} />
                     </div>
-                    <button className="gdr-button gdr-btn-success" onClick={sendAttack} disabled={sending}>
+                    <button className="btn btn--success" onClick={sendAttack} disabled={sending}>
                         {sending ? 'Invio…' : 'Invia Attacco'}
                     </button>
                     {sendMsg && <p style={{ color: '#8cba8c', marginTop: '6px', fontSize: '12px' }}>{sendMsg}</p>}
@@ -489,7 +489,7 @@ function QuestPanel({ questState, luogo }) {
                     <span style={{ color: '#b4b6bf' }}>sec</span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-                    <button className="gdr-button gdr-btn-success" onClick={avviaTimer}>Avvia</button>
+                    <button className="btn btn--success" onClick={avviaTimer}>Avvia</button>
                     {questState.timerEnd && (
                         <button className="gdr-button" onClick={fermaTimer}>Ferma</button>
                     )}
@@ -544,7 +544,7 @@ function QuestPanel({ questState, luogo }) {
                 ))}
                 {localOrder.length > 0 && (
                     <>
-                        <button className="gdr-button gdr-btn-success" onClick={salvaOrdine} style={{ marginTop: '8px' }}>
+                        <button className="btn btn--success" onClick={salvaOrdine} style={{ marginTop: '8px' }}>
                             Salva Ordine
                         </button>
                         {orderMsg && <p style={{ color: '#8cba8c', fontSize: '12px', marginTop: '6px' }}>{orderMsg}</p>}

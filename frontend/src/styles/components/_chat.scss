@@ -225,23 +225,7 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
     }
 }
 
-.gdr-btn-success {
-    background-color: var(--success-color);
-
-    &:hover {
-        background-color: #219653;
-    }
-
-    &:disabled,
-    &[disabled] {
-        background-color: rgb(39 174 96 / 30%) !important;
-        border-color: rgb(255 255 255 / 10%) !important;
-
-        &:hover {
-            background-color: rgb(39 174 96 / 30%) !important;
-        }
-    }
-}
+// .gdr-btn-success rimosso: usare .btn.btn--success (sistema globale _buttons.scss)
 
 .gdr-btn-warning {
     background-color: var(--warning-color);
@@ -250,6 +234,9 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
         background-color: #e67e22;
     }
 }
+
+// I bottoni globali (.btn) dentro le card del pannello azioni devono essere full-width
+.gdr-card .btn { width: 100%; }
 
 // ── Form elementi pannello ────────────────────────────────────
 
