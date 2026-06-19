@@ -23,22 +23,17 @@ $bgMestieri = [1=>'icc.png',2=>'tae.png',3=>'magic.png',4=>'pandora.png',6=>'cor
 $background = $bgGilde[$id] ?? ($bgMestieri[$id2] ?? null);
 if (!$background) exit;
 
-$firstArticolo = 0;
-
 /**
  * Renderizza una sezione accordion del menu.
  * Restituisce HTML stringa o '' se non ci sono articoli.
- * Salva in $firstArticolo il primo articolo trovato in assoluto.
  */
 function menuSection($tipo, $campo, $valore, $classe) {
-    global $firstArticolo;
     $valore = (int)$valore;
     $res    = gdrcd_query("SELECT articolo, titolo FROM statuti WHERE tipo='$tipo' AND $campo='$valore' ORDER BY articolo", 'result');
     $links  = '';
     while ($row = gdrcd_query($res, 'fetch')) {
         $art   = (int)$row['articolo'];
         $tit   = gdrcd_filter('out', $row['titolo']);
-        if (!$firstArticolo) $firstArticolo = $art;
         $links .= "<a href=\"#\" onclick=\"loadArticolo($art);return false;\">$tit</a><br>\n";
     }
     gdrcd_query($res, 'free');
@@ -94,10 +89,6 @@ function menuSection($tipo, $campo, $valore, $classe) {
     </div>
   </div>
 
-  <div style="position: fixed; bottom: 20px; left: 24px; z-index: 10;">
-    <button onclick="window.history.back()">← Torna indietro</button>
-  </div>
-
   <!-- Area contenuto (ex iframe opendocframe) -->
   <div class="content">
     <div class="opendoc" id="doc-content"></div>
@@ -136,13 +127,6 @@ $(function () {
     };
 
     new Accordion($('.accordion-menu'), false);
-
-    // Auto-carica il primo articolo disponibile leggendo il DOM
-    var $firstLink = $('.accordion-menu .submenuItems a').first();
-    if ($firstLink.length) {
-        var m = ($firstLink.attr('onclick') || '').match(/loadArticolo\((\d+)\)/);
-        if (m) loadArticolo(parseInt(m[1], 10));
-    }
 });
 </script>
 </body>

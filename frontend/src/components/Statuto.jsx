@@ -80,8 +80,15 @@ export default function Statuto() {
         fetch(`pages/api_statuto.php?op=getMenu&${qs}`)
             .then(r => r.json())
             .then(d => {
-                if (d.success) setSections(d.menu)
-                else setError(d.message ?? 'Errore caricamento menu')
+                if (d.success) {
+                    setSections(d.menu)
+                    const firstItem = d.menu[0]?.items[0]
+                    if (firstItem) {
+                        fetch(`statuto_testo.php?articolo=${firstItem.articolo}`)
+                            .then(r => r.text())
+                            .then(html => setContent(html))
+                    }
+                } else setError(d.message ?? 'Errore caricamento menu')
                 setLoading(false)
             })
             .catch(err => { setError(err.message); setLoading(false) })
@@ -120,6 +127,9 @@ export default function Statuto() {
                         />
                     ))}
                 </ul>
+                <div style={{ marginTop: '12px' }}>
+                    <button onClick={() => window.history.back()}>← Torna indietro</button>
+                </div>
             </div>
 
             <div
