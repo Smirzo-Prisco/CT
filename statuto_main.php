@@ -91,10 +91,11 @@ function menuSection($tipo, $campo, $valore, $classe) {
             echo menuSection('requisiti', 'id_mestiere', $id2, 'specifiche');
         endif; ?>
       </ul>
-      <div style="margin-top: 12px;">
-        <button onclick="window.history.back()">← Torna indietro</button>
-      </div>
     </div>
+  </div>
+
+  <div style="position: fixed; bottom: 20px; left: 24px; z-index: 10;">
+    <button onclick="window.history.back()">← Torna indietro</button>
   </div>
 
   <!-- Area contenuto (ex iframe opendocframe) -->
@@ -136,11 +137,12 @@ $(function () {
 
     new Accordion($('.accordion-menu'), false);
 
-    <?php if ($firstArticolo): ?>
-    // Apri prima sezione e carica subito il primo articolo
-    $('.accordion-menu > li:first-child .dropdownlink').trigger('click');
-    loadArticolo(<?= $firstArticolo ?>);
-    <?php endif; ?>
+    // Auto-carica il primo articolo disponibile leggendo il DOM
+    var $firstLink = $('.accordion-menu .submenuItems a').first();
+    if ($firstLink.length) {
+        var m = ($firstLink.attr('onclick') || '').match(/loadArticolo\((\d+)\)/);
+        if (m) loadArticolo(parseInt(m[1], 10));
+    }
 });
 </script>
 </body>
