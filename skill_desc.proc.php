@@ -14,7 +14,6 @@
 ?>
 
 <body style="background-color:transparent;">
-    <link rel="stylesheet" href="/themes/crystal/descrizione.css">
     <div id="container"><span class="luogo"><?=$result['nome']?></span><br></div>
     <div class="container2">
         <span class="testo"><?=$result['descrizione']?></span>

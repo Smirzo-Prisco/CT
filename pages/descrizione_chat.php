@@ -7,7 +7,6 @@ include_once('../header.inc.php');
     $record_exists = gdrcd_query($result, 'num_rows');
     $record = gdrcd_query($result, 'fetch');
 ?>
-<link rel="stylesheet" href="/themes/crystal/descrizione.css">
 <div id="container">
 <img src="/themes/crystal/imgs/descrizioni/<?php echo $record['descrizione_immagine']; ?>"><br>
 <span class="luogo"><?php echo $record['nome']?></span><br>
