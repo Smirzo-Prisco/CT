@@ -13,6 +13,51 @@
     background-repeat: no-repeat;
     background-size: cover;
 
+    // ── Accordion menu (documentazione_menu.css) ──────────────
+    // Scoped qui: le stesse classi sono definite in statuto_menu.css
+    // con url diverse — lo scoping evita conflitti in ct-styles.css.
+
+    .accordion-menu {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+
+        li.open .dropdownlink .fa-chevron-down { transform: rotate(180deg); }
+        li:last-child .dropdownlink { border-bottom: 0; }
+    }
+
+    .dropdownlink {
+        cursor: pointer;
+        display: block;
+        width: 100%;
+        height: 55px;
+        font-size: 18px;
+        color: #212121;
+        position: relative;
+        transition: transform 0.25s ease-out;
+
+        i { position: absolute; top: 17px; left: 16px; }
+        .fa-chevron-down { right: 12px; left: auto; transition: transform 0.25s; }
+    }
+
+    .submenuItems {
+        display: none;
+
+        li { width: 100%; background-color: #0f111d; border-bottom: 1px solid #000; padding: 0; }
+
+        a.doc-link {
+            display: block;
+            padding: 7px 14px 7px 18px;
+            color: #8f8f8f;
+            font-size: 12px;
+            font-family: 'DejaVu Serif', Georgia, serif;
+            border-bottom: 1px solid rgba(255 255 255 / 3%);
+            transition: color 0.2s, background 0.2s;
+
+            &:hover { color: #ce846f; background: rgba(206 132 111 / 6%); }
+        }
+    }
+
     // Override z-index:-1 da documentazione_menu.css
     .pos-menu {
         position: absolute;

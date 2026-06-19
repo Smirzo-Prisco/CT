@@ -206,15 +206,11 @@ const ROUTES = {
     },
     statuto_main: {
         component: Statuto,
-        css: [
-            '/themes/crystal/statuto_menu.css',
-        ],
+        css: [],
     },
     documentazione_main: {
         component: Documentazione,
-        css: [
-            '/themes/crystal/documentazione_menu.css',
-        ],
+        css: [],
     },
     chat_help: {
         component: ChatHelp,

@@ -28,6 +28,51 @@
         z-index: 1;
     }
 
+    // ── Accordion menu (statuto_menu.css) ─────────────────────
+    // Scoped qui: le stesse classi sono definite in documentazione_menu.css
+    // con url diverse — lo scoping evita conflitti in ct-styles.css.
+
+    .accordion-menu {
+        width: 100%;
+        max-width: 350px;
+        padding-left: 20px;
+
+        li.open .dropdownlink .fa-chevron-down { transform: rotate(180deg); }
+        li:last-child .dropdownlink { border-bottom: 0; }
+    }
+
+    .dropdownlink {
+        cursor: pointer;
+        display: block;
+        width: 285px;
+        height: 55px;
+        font-size: 18px;
+        color: #212121;
+        position: relative;
+        transition: all 0.4s ease-out;
+
+        i { position: absolute; top: 17px; left: 16px; }
+        .fa-chevron-down { right: 12px; left: auto; }
+    }
+
+    .submenuItems {
+        display: none;
+
+        li { width: 271px; background-color: #0f111d; border: 1px solid #000; padding-left: 15px; }
+        a { transition: all 0.4s ease-out; }
+        a:hover { background-color: transparent; color: #fff; }
+    }
+
+    // ── Tasti categoria mestieri (extra rispetto a statuto_menu.css gilde) ─
+    .statutom   { padding: 4px; background: url("imgs/statuti/tasti/statutom_base.png") no-repeat left center transparent; &:hover { background: url("imgs/statuti/tasti/statutom_hover.gif") no-repeat left center transparent; } }
+    .descrizione { padding: 4px; background: url("imgs/statuti/tasti/descrizione_base.png") no-repeat left center transparent; &:hover { background: url("imgs/statuti/tasti/descrizione_hover.gif") no-repeat left center transparent; } }
+    .cariche    { padding: 6px; background: url("imgs/statuti/tasti/cariche_base.png") no-repeat left center transparent; &:hover { background: url("imgs/statuti/tasti/cariche_hover.gif") no-repeat left center transparent; } }
+    .specifiche { padding: 6px; background: url("imgs/statuti/tasti/specifiche_base.png") no-repeat left center transparent; &:hover { background: url("imgs/statuti/tasti/specifiche_hover.gif") no-repeat left center transparent; } }
+    .cittadini  { padding: 4px; background: url("imgs/statuti/tasti/cittadini_base.png") no-repeat left center transparent; &:hover { background: url("imgs/statuti/tasti/cittadini_hover.gif") no-repeat left center transparent; } }
+    .scorpion   { padding: 4px; background: url("imgs/statuti/tasti/scorpion_base.png") no-repeat left center transparent; &:hover { background: url("imgs/statuti/tasti/scorpion_hover.gif") no-repeat left center transparent; } }
+    .sit        { padding: 6px; background: url("imgs/statuti/tasti/SIT_base.png") no-repeat left center transparent; &:hover { background: url("imgs/statuti/tasti/SIT_hover.gif") no-repeat left center transparent; } }
+    .wikkan     { padding: 6px; background: url("imgs/statuti/tasti/Wiccan_base.png") no-repeat left center transparent; &:hover { background: url("imgs/statuti/tasti/wiccan_hover.gif") no-repeat left center transparent; } }
+
     // Scoped overrides — stessi nomi di classe usati da documentazione_menu.css
     .ambientazione {
         padding: 4px;
