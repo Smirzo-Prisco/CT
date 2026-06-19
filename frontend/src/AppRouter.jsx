@@ -90,9 +90,7 @@ const ROUTES = {
     },
     mappaclick: {
         component: MapClick,
-        css: [
-            '/themes/crystal/mappa_principale.css',
-        ],
+        css: [],
     },
     scheda: {
         component: Scheda,
@@ -148,9 +146,7 @@ const ROUTES = {
     },
     gestione: {
         component: Gestione,
-        css: [
-            '/themes/crystal/uffici_nuovi.css',
-        ],
+        css: [],
     },
     uffici: {
         component: Uffici,
