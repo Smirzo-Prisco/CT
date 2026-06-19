@@ -56,7 +56,7 @@ export default function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
                             <ul className="subMenu">
                                 <li className="subMenuItem"><a href={`main.php?page=scheda_px&pg=${enc}`}>Esperienza</a></li>
                                 <li className="subMenuItem"><a href={`main.php?page=scheda_px_shin&pg=${enc}`}>Punti Shin</a></li>
-                                <li className="subMenuItem"><a href={`main.php?page=scheda_px_mestiere&pg=${enc}`}>Punti Mestiere</a></li>
+                                {/* <li className="subMenuItem"><a href={`main.php?page=scheda_px_mestiere&pg=${enc}`}>Punti Mestiere</a></li> */}
                             </ul>
                         </li>
                         <li className="menuItem">
