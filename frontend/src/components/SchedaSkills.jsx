@@ -10,7 +10,8 @@
  *   Generica base + avanzata       → Generica
  *   Attacco base/medio/avanzato    → Attacco
  *   Mentale base/media/avanzata/di attacco → Mentale
- *   Potere speciale / Talento / Skill temporanea → label propria
+ *   Potere speciale / Skill temporanea → label propria
+ *   Talento → escluso dalla visualizzazione
  *
  * Ogni categoria usa <table class="customTable"> con header second_header,
  * identico al layout PHP originale (skillsystem.inc.php).
@@ -43,7 +44,6 @@ const TYPE_MERGE = {
     'Mentale avanzata': 'Mentale',
     'Mentale di attacco': 'Mentale',
     'Potere speciale': 'Potere speciale',
-    'Talento': 'Talento',
     'Skill temporanea': 'Skill temporanee',
 }
 
@@ -54,7 +54,6 @@ const CATEGORY_ORDER = [
     'Attacco',
     'Mentale',
     'Potere speciale',
-    'Talento',
     'Skill temporanee',
 ]
 
@@ -68,6 +67,7 @@ const CATEGORY_ORDER = [
 function mergeByCategory(skillsByTipo) {
     const merged = {}
     for (const [tipo, lista] of Object.entries(skillsByTipo)) {
+        if (tipo === 'Talento') continue
         const cat = TYPE_MERGE[tipo] ?? tipo
         if (!merged[cat]) merged[cat] = []
         merged[cat].push(...lista)
@@ -90,7 +90,7 @@ function mergeByCategory(skillsByTipo) {
 /**
  * Singola riga skill nella tabella categoria.
  * Cliccando sul nome si espande/comprime la descrizione (inline, come popup originale).
- * Per le categorie "Talento" showLevel=false: il livello non viene mostrato.
+ * showLevel=false per categorie senza livello numerico significativo.
  */
 function SkillRow({ skill, showLevel }) {
     const [open, setOpen] = useState(false)
