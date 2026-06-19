@@ -192,10 +192,9 @@ public_head(
                     evadere le richieste entro il termine massimo di un mese dalla ricezione.
                 </p>
 
-                <h2>Titolari del trattamento</h2>
+                <h2>Titolare del trattamento</h2>
                 <p>
-                    Titolare del trattamento: <a href="mailto:marko.momo@hotmail.it">marko.momo@hotmail.it</a><br>
-                    Contitolare del trattamento: <a href="mailto:marika.yumioshi@libero.it">marika.yumioshi@libero.it</a>
+                    Titolare del trattamento: <a href="mailto:gestione@crystaltokyo.it">gestione@crystaltokyo.it</a>
                 </p>
                 <p>
                     Responsabile del trattamento per l'attività di memorizzazione dei dati è il provider
