@@ -78,8 +78,6 @@ const ROUTES = {
         component: Forum,
         css: [
             '/themes/crystal/bacheca.css',
-            '/themes/crystal/forum.css',
-            '/themes/crystal/presenti.css',
         ],
     },
     messages_center: {
