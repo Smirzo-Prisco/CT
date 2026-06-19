@@ -109,6 +109,7 @@ switch ($op) {
         }
 
         // OGGETTI
+        /*
         if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic']) {
             $voci = [['label' => 'Oggetti', 'url' => 'gestione.php?page=gestione_oggetti']];
             if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic'])
@@ -117,6 +118,7 @@ switch ($op) {
                 $voci[] = ['label' => 'Tipi di oggetto', 'url' => 'gestione.php?page=gestione_tipi&types=items'];
             $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
         }
+        */
 
         // STRUMENTI (solo admin)
         if ($perms['admin']) {
