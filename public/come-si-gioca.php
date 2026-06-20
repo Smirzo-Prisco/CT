@@ -422,7 +422,6 @@ public_head(
             <div class="faq-item">
                 <button class="faq-q" type="button">
                     <?= htmlspecialchars($item['q']) ?>
-                    <span class="faq-arrow"><i class="fas fa-chevron-down"></i></span>
                 </button>
                 <div class="faq-a" style="display:none;">
                     <p><?= htmlspecialchars($item['a']) ?></p>
