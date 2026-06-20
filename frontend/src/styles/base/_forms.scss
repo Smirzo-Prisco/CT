@@ -139,11 +139,11 @@ textarea {
     resize: vertical;
     min-height: 60px;
     cursor: text;
-    overflow-y: hidden; // evita scrollbar interna durante l'auto-grow via JS
 
     // Su touch device il drag handle è inutilizzabile: l'auto-grow JS lo sostituisce
     @media (pointer: coarse) {
         resize: none;
+        overflow-y: hidden; // nasconde scrollbar; l'altezza cresce via JS
     }
 }
 

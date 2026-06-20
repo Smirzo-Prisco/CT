@@ -227,5 +227,9 @@ function autoGrow(el) {
 document.addEventListener('input', e => {
     if (e.target.tagName === 'TEXTAREA') autoGrow(e.target)
 }, true)
+// Inizializza le textarea già presenti nel DOM al caricamento (contenuto pre-compilato)
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('textarea').forEach(autoGrow)
+})
 
 console.log('[CT] bundle caricato — componenti registrati:', Object.keys(registry))
