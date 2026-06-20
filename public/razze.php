@@ -36,9 +36,9 @@ $r = gdrcd_query(
             s.titolo   AS voce_titolo,
             s.testo    AS voce_testo
        FROM gilda g
-       LEFT JOIN statuti s ON g.id_gilda = s.id_gilda
+       LEFT JOIN statuti s ON g.id_gilda = s.id_gilda AND s.titolo = 'Caratteristiche'
       WHERE g.visibile = 1
-      ORDER BY g.nome ASC, s.articolo ASC",
+      ORDER BY g.nome ASC",
     'result'
 );
 while ($row = gdrcd_query($r, 'fetch')) {
