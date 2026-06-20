@@ -686,7 +686,8 @@ window.initChatListeners = function () {
     // Apertura funestra di scrittura libera
     var btn_scritturaLibera = document.getElementById("gdrOpenTextareaButton");
     if (btn_scritturaLibera) {
-        btn_scritturaLibera.onclick = function () {
+        btn_scritturaLibera.onclick = function (e) {
+            e.preventDefault();
             var popupFreeWrite = window.open("", "ScritturaLiberaPopup", "width=600,height=800,resizable=yes,scrollbars=yes");
 
             popupFreeWrite.document.write(
