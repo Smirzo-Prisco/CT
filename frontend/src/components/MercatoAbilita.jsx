@@ -85,6 +85,12 @@ export default function MercatoAbilita() {
                     <button id="close-modal">Chiudi</button>
                 </div>
             </div>
+            <div className="link_back">
+                <button onClick={() => {
+                    if (window.CT?.navigate) window.CT.navigate('main.php?page=uffici')
+                    else window.top.location.href = 'main.php?page=uffici'
+                }}>← Torna indietro</button>
+            </div>
         </>
     )
 }
