@@ -17,11 +17,11 @@ function navigate(url) {
     else window.top.location.href = url
 }
 
-/** Restituisce le iniziali (prima lettera di nome + cognome, oppure solo nome). */
-function initials(nome) {
-    const parts = nome.trim().split(/\s+/)
-    if (parts.length === 1) return parts[0][0].toUpperCase()
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+/** Restituisce le iniziali come fallback quando manca l'immagine. */
+function initials(nome, cognome) {
+    const n = nome?.[0]?.toUpperCase() ?? ''
+    const c = cognome?.[0]?.toUpperCase() ?? ''
+    return c ? n + c : n
 }
 
 // ── Sezioni da renderizzare ──────────────────────────────────────────────────
@@ -65,15 +65,20 @@ export default function ElencoStaff() {
                         ? <p className="elenco-staff__empty">Nessun membro</p>
                         : (
                             <div className="elenco-staff__grid">
-                                {staff[key].map(nome => (
-                                    <div key={nome} className="elenco-staff__card">
-                                        <div className="elenco-staff__avatar">{initials(nome)}</div>
+                                {staff[key].map(membro => (
+                                    <div key={membro.nome} className="elenco-staff__card">
+                                        <div className="elenco-staff__avatar">
+                                            {membro.url_img_chat
+                                                ? <img src={membro.url_img_chat} alt={membro.nome} />
+                                                : initials(membro.nome, membro.cognome)
+                                            }
+                                        </div>
                                         <a
-                                            href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`}
+                                            href={`main.php?page=scheda&pg=${encodeURIComponent(membro.nome)}`}
                                             className="elenco-staff__name"
-                                            onClick={e => { e.preventDefault(); navigate(`main.php?page=scheda&pg=${encodeURIComponent(nome)}`) }}
+                                            onClick={e => { e.preventDefault(); navigate(`main.php?page=scheda&pg=${encodeURIComponent(membro.nome)}`) }}
                                         >
-                                            {nome}
+                                            {membro.nome}{membro.cognome ? ` ${membro.cognome}` : ''}
                                         </a>
                                     </div>
                                 ))}

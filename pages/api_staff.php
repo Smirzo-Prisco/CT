@@ -40,7 +40,7 @@ switch ($op) {
         $data = [];
         foreach ($groups as $key => $where) {
             $res = gdrcd_query(
-                "SELECT personaggio.nome FROM personaggio
+                "SELECT personaggio.nome, personaggio.cognome, personaggio.url_img_chat FROM personaggio
                  LEFT JOIN privilegi ON personaggio.nome = privilegi.nome
                  WHERE $where
                  ORDER BY personaggio.nome",
@@ -48,7 +48,11 @@ switch ($op) {
             );
             $list = [];
             while ($row = gdrcd_query($res, 'fetch')) {
-                $list[] = gdrcd_filter('out', $row['nome']);
+                $list[] = [
+                    'nome'         => $row['nome'],
+                    'cognome'      => $row['cognome'],
+                    'url_img_chat' => $row['url_img_chat'] ?? '',
+                ];
             }
             gdrcd_query($res, 'free');
             $data[$key] = $list;
