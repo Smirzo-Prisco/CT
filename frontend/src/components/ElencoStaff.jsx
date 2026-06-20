@@ -83,13 +83,8 @@ export default function ElencoStaff() {
                 </div>
             ))}
 
-            <div className="elenco-staff__back">
-                <a
-                    href="main.php?page=uffici"
-                    onClick={e => { e.preventDefault(); navigate('main.php?page=uffici') }}
-                >
-                    ← Torna indietro
-                </a>
+            <div className="link_back">
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
         </div>
     )

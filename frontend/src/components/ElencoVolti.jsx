@@ -110,14 +110,8 @@ export default function ElencoVolti() {
                 </table>
             )}
 
-            <br /><br />
-            <div className="panels_link">
-                <span
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => navigate('main.php?page=uffici')}
-                >
-                    Torna indietro
-                </span>
+            <div className="link_back">
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
 
         </div>

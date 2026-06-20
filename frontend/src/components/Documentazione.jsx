@@ -121,7 +121,7 @@ export default function Documentazione() {
                         <input type="submit" value="cerca" />
                     </div>
                 </form>
-                <div style={{ marginTop: '12px' }}>
+                <div className="link_back">
                     <button onClick={() => window.history.back()}>← Torna indietro</button>
                 </div>
             </div>

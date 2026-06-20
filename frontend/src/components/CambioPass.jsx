@@ -167,10 +167,7 @@ export default function CambioPass() {
             </div>
 
             <div className="link_back">
-                <br />
-                <span style={{ cursor: 'pointer' }} onClick={() => navigate('main.php?page=uffici')}>
-                    Torna indietro
-                </span>
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
         </div>
     )

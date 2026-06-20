@@ -127,7 +127,7 @@ export default function Statuto() {
                         />
                     ))}
                 </ul>
-                <div style={{ marginTop: '12px' }}>
+                <div className="link_back">
                     <button onClick={() => window.history.back()}>← Torna indietro</button>
                 </div>
             </div>

@@ -133,10 +133,8 @@ export default function Anagrafe() {
         <div className="anagrafe">
 
             {/* ── Link indietro (in cima) ───────────────────────────────────── */}
-            <div className="panels_link anagrafe-back">
-                <span style={{ cursor: 'pointer' }} onClick={() => navigate('main.php?page=uffici')}>
-                    Torna indietro
-                </span>
+            <div className="link_back">
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
 
             {/* ── Barra statistiche ─────────────────────────────────────────── */}

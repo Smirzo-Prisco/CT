@@ -131,10 +131,8 @@ export default function PrenotazioniProva() {
                     </form>
                 )}
 
-                <div className="panels_link" style={{ marginTop: '16px' }}>
-                    <span style={{ cursor: 'pointer' }} onClick={() => navigate('main.php?page=uffici')}>
-                        Torna indietro
-                    </span>
+                <div className="link_back">
+                    <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
                 </div>
             </div>
         </div>

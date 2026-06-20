@@ -248,10 +248,8 @@ function GuildDetail({ gildaId, onBack }) {
             )}
 
             {/* Torna alla lista */}
-            <div className="panels_link" style={{ marginTop: '16px' }}>
-                <a href="#" onClick={e => { e.preventDefault(); onBack() }}>
-                    Torna indietro
-                </a>
+            <div className="link_back">
+                <button onClick={onBack}>← Torna indietro</button>
             </div>
         </div>
     )

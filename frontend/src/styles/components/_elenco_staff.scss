@@ -99,21 +99,6 @@ $es-muted:   #7a8499;
         padding: 8px 0;
     }
 
-    // ── Link torna indietro ──────────────────────────────────
-    &__back {
-        margin-top: 32px;
-        text-align: center;
-
-        a {
-            color: $es-gold;
-            font-size: 12px;
-            text-decoration: none;
-            letter-spacing: 0.05em;
-
-            &:hover { color: $es-gold-h; text-decoration: underline; }
-        }
-    }
-
     // ── Responsive ──────────────────────────────────────────
     @media (width <= 480px) {
         &__grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
