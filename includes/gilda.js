@@ -203,6 +203,7 @@ function editVoceStatuto(id) {
             document.getElementById('testo_voce_statuto').value = data.testo;
             document.getElementById('modalStatutoTitle').textContent = 'Modifica Statuto';
             openGuildModal('statuto');
+            setTimeout(() => document.getElementById('testo_voce_statuto').dispatchEvent(new Event('input', { bubbles: true })), 0);
         });
 }
 function deleteVoceStatuto(id) {
@@ -263,6 +264,7 @@ function editSkill(id) {
             document.getElementById('livello_sblocco').value = data.livello_sblocco;
             document.getElementById('modalSkillTitle').textContent = 'Modifica Abilità';
             openGuildModal('skill');
+            setTimeout(() => document.getElementById('descrizione_skill').dispatchEvent(new Event('input', { bubbles: true })), 0);
             checkSkillType(); // Se generica, mostra le opzioni avanzate
         });
 }
