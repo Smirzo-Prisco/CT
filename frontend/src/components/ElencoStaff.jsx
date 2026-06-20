@@ -1,29 +1,44 @@
 /**
  * ElencoStaff.jsx — Elenco dei personaggi staff divisi per ruolo.
  *
- * Recupera i dati da api_staff.php?op=getStaff e mostra quattro sezioni:
- * Coordinatori, Master, Moderatori, Guide. Ogni nome è cliccabile e apre
- * la scheda del personaggio via SPA.
+ * Recupera i dati da api_staff.php?op=getStaff e mostra quattro sezioni
+ * (Coordinatori, Master, Moderatori, Guide) in una card-grid con stile
+ * coerente alla landing page: sfondo scuro, accenti oro, font Cinzel.
  *
- * Stili: /themes/crystal/famiglie.css (customTable, second_header).
- *
- * @author Crystal Tokyo Dev
+ * Ogni card mostra un avatar circolare con le iniziali del nome e un link
+ * alla scheda del personaggio via SPA.
  */
 
 import { useState, useEffect } from 'react'
 
-/** Naviga via CT.navigate (SPA) se disponibile, altrimenti reload. */
+/** Naviga via CT.navigate (SPA) se disponibile, altrimenti cambia href. */
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
     else window.top.location.href = url
 }
 
-// ── Componente principale ─────────────────────────────────────────────────────
+/** Restituisce le iniziali (prima lettera di nome + cognome, oppure solo nome). */
+function initials(nome) {
+    const parts = nome.trim().split(/\s+/)
+    if (parts.length === 1) return parts[0][0].toUpperCase()
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+// ── Sezioni da renderizzare ──────────────────────────────────────────────────
+
+const SECTIONS = [
+    { key: 'coordinatori', label: 'Coordinatori' },
+    { key: 'master',       label: 'Master'        },
+    { key: 'moderatori',   label: 'Moderatori'    },
+    { key: 'guide',        label: 'Guide'          },
+]
+
+// ── Componente principale ────────────────────────────────────────────────────
 
 export default function ElencoStaff() {
-    const [staff, setStaff]     = useState(null)
+    const [staff,   setStaff]   = useState(null)
     const [loading, setLoading] = useState(true)
-    const [error, setError]     = useState(null)
+    const [error,   setError]   = useState(null)
 
     useEffect(() => {
         fetch('pages/api_staff.php?op=getStaff')
@@ -36,54 +51,44 @@ export default function ElencoStaff() {
             .catch(err => { setError(err.message); setLoading(false) })
     }, [])
 
-    if (loading) return <p><i className="fas fa-spinner fa-spin"></i> Caricamento…</p>
+    if (loading) return <p><i className="fas fa-spinner fa-spin" /> Caricamento…</p>
     if (error)   return <p className="error">{error}</p>
 
-    const sections = [
-        { key: 'coordinatori', label: 'COORDINATORI' },
-        { key: 'master',       label: 'MASTER' },
-        { key: 'moderatori',   label: 'MODERATORI' },
-        { key: 'guide',        label: 'GUIDE' },
-    ]
-
     return (
-        <div className="elenco-staff-page">
-            <table className="customTable">
-                <tbody>
-                    {sections.map(({ key, label }) => (
-                        <>
-                            <tr className="second_header" key={`hdr-${key}`}>
-                                <td>{label}</td>
-                            </tr>
-                            <tr key={`row-${key}`}>
-                                <td>
-                                    {staff[key].length === 0
-                                        ? <span>—</span>
-                                        : staff[key].map((nome) => (
-                                            <span key={nome}>
-                                                <a
-                                                    href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`}
-                                                    onClick={e => { e.preventDefault(); navigate(`main.php?page=scheda&pg=${encodeURIComponent(nome)}`) }}
-                                                >
-                                                    {nome}
-                                                </a>
-                                                <br />
-                                            </span>
-                                        ))
-                                    }
-                                </td>
-                            </tr>
-                        </>
-                    ))}
-                </tbody>
-            </table>
-            <br /><br />
-            <div className="panels_link">
+        <div className="elenco-staff">
+
+            {SECTIONS.map(({ key, label }) => (
+                <div key={key}>
+                    <div className="elenco-staff__section-title">{label}</div>
+
+                    {staff[key].length === 0
+                        ? <p className="elenco-staff__empty">Nessun membro</p>
+                        : (
+                            <div className="elenco-staff__grid">
+                                {staff[key].map(nome => (
+                                    <div key={nome} className="elenco-staff__card">
+                                        <div className="elenco-staff__avatar">{initials(nome)}</div>
+                                        <a
+                                            href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`}
+                                            className="elenco-staff__name"
+                                            onClick={e => { e.preventDefault(); navigate(`main.php?page=scheda&pg=${encodeURIComponent(nome)}`) }}
+                                        >
+                                            {nome}
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+                        )
+                    }
+                </div>
+            ))}
+
+            <div className="elenco-staff__back">
                 <a
                     href="main.php?page=uffici"
                     onClick={e => { e.preventDefault(); navigate('main.php?page=uffici') }}
                 >
-                    Torna indietro
+                    ← Torna indietro
                 </a>
             </div>
         </div>

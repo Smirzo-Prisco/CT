@@ -1,0 +1,123 @@
+// ============================================================
+// _elenco_staff.scss — Card-grid per la pagina Elenco Staff
+// Palette e font coerenti con la landing page pubblica.
+// ============================================================
+@use '../tokens' as *;
+
+// Colori locali che replicano le variabili di public.css
+$es-dark:    #08091a;
+$es-surface: #161b35;
+$es-border:  rgba(196, 148, 48, 0.22);
+$es-gold:    #c4922a;
+$es-gold-h:  #daa832;
+$es-text:    #e8e4da;
+$es-muted:   #7a8499;
+
+.elenco-staff {
+    padding: 24px 16px 40px;
+    background: $es-dark;
+    min-height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: $es-text;
+
+    // ── Titolo sezione ────────────────────────────────────────
+    &__section-title {
+        font-family: 'Cinzel', 'Georgia', serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: $es-gold;
+        margin: 28px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid $es-border;
+
+        &:first-of-type { margin-top: 0; }
+    }
+
+    // ── Griglia card ─────────────────────────────────────────
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    // ── Singola card ─────────────────────────────────────────
+    &__card {
+        background: $es-surface;
+        border: 1px solid $es-border;
+        border-radius: 8px;
+        padding: 16px 12px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        text-align: center;
+        transition: border-color 0.2s ease, transform 0.15s ease;
+
+        &:hover {
+            border-color: rgba(196, 148, 48, 0.5);
+            transform: translateY(-2px);
+        }
+    }
+
+    // ── Avatar circolare con iniziali ────────────────────────
+    &__avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, darken($es-gold, 15%), $es-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Cinzel', 'Georgia', serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: $es-dark;
+        flex-shrink: 0;
+        box-shadow: 0 0 10px rgba(196, 148, 48, 0.25);
+    }
+
+    // ── Nome cliccabile ──────────────────────────────────────
+    &__name {
+        font-size: 12px;
+        font-weight: 600;
+        color: $es-text;
+        text-decoration: none;
+        line-height: 1.3;
+        word-break: break-word;
+
+        &:hover { color: $es-gold-h; }
+    }
+
+    // ── Nessun membro ────────────────────────────────────────
+    &__empty {
+        color: $es-muted;
+        font-style: italic;
+        font-size: 12px;
+        padding: 8px 0;
+    }
+
+    // ── Link torna indietro ──────────────────────────────────
+    &__back {
+        margin-top: 32px;
+        text-align: center;
+
+        a {
+            color: $es-gold;
+            font-size: 12px;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+
+            &:hover { color: $es-gold-h; text-decoration: underline; }
+        }
+    }
+
+    // ── Responsive ──────────────────────────────────────────
+    @media (width <= 480px) {
+        &__grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+        &__avatar { width: 40px; height: 40px; font-size: 14px; }
+        &__name { font-size: 11px; }
+    }
+}

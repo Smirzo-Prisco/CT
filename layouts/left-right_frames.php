@@ -97,8 +97,23 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
         let currentOpenSidebar = null;
         let isMobile = window.innerWidth <= 768;
 
-        // Forza un reset completo del layout (usato dopo chiusura sidebar su mobile)
+        // Forza un reset completo del layout (usato dopo chiusura sidebar)
         function forceLayoutReset() {
+            if (!isMobile) {
+                // Desktop: rimuovi tutti gli stili inline impostati durante le sidebar mobile
+                // così il CSS grid/flex del layout può tornare a governare le dimensioni
+                mainContent.style.transform  = '';
+                mainContent.style.width      = '';
+                mainContent.style.left       = '';
+                mainContent.style.right      = '';
+                mainContent.style.overflowX  = '';
+                mainContent.style.overflow   = '';
+                document.body.style.overflowX = '';
+                document.body.style.width     = '';
+                document.body.style.overflow  = '';
+                document.body.classList.remove('sidebars-closed');
+                return;
+            }
             document.body.style.overflowX = 'hidden';
             document.body.style.width     = '100%';
             document.body.classList.add('sidebars-closed');
