@@ -318,7 +318,7 @@
     function upload_image(){
 $allow = array("jpg", "jpeg", "gif", "png");
 
-$todir = 'themes/crystal/imgs/races/';
+$todir = 'imgs/guilds/';
 $test = $_FILES['img_oggetto']['name'];
 
 if ( !!$_FILES['img_oggetto']['tmp_name'] ) // is the file uploaded yet?

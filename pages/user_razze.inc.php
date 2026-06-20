@@ -48,7 +48,7 @@
                             <tr>
                                 <td>
                                     <div>
-                                        <img src="themes/crystal/imgs/races/<?php echo gdrcd_filter('out', $row['immagine']); ?>" />
+                                        <img src="imgs/guilds/<?php echo gdrcd_filter('out', $row['immagine']); ?>" />
                                     </div>
                                 </td>
                                 <td>
@@ -100,7 +100,7 @@
                             
                             <td>
                                 <div>
-                                    <img src="themes/crystal/imgs/races/<?php echo gdrcd_filter('out',
+                                    <img src="imgs/guilds/<?php echo gdrcd_filter('out',
                                                                                                                                                                     $row['immagine']
                                     ); ?>" />
                                 </div>
@@ -149,7 +149,7 @@
       $row_razza = gdrcd_query($mestiere);
  ?>
  
-                                    <img src="themes/crystal/imgs/races/<?php echo gdrcd_filter('out', $row_razza['immagine']); ?>" />
+                                    <img src="imgs/guilds/<?php echo gdrcd_filter('out', $row_razza['immagine']); ?>" />
                                 </div>
                             </td>
                             <td>
