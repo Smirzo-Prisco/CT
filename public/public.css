@@ -1317,6 +1317,7 @@ p:last-child { margin-bottom: 0; }
     gap: 24px;
     max-width: var(--pub-max);
     margin: 0 auto;
+    align-items: start;
 }
 
 /* Card singola razza */
