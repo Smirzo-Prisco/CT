@@ -89,9 +89,9 @@ function UserRow({ user }) {
                 </a>
             </td>
 
-            {/* Icona razza */}
-            <td style={{ textAlign: 'center' }}>
-                <img width="25" height="25" src={user.razza_img} alt={user.razza_nome} title={user.razza_nome} />
+            {/* Icona razza — nascosta */}
+            <td style={{ display: 'none' }}>
+                <img src={user.razza_img} alt={user.razza_nome} title={user.razza_nome} />
             </td>
 
             {/* Icona famiglia / inclinazione / gilda (rinominata Razza nell'header) */}
@@ -216,8 +216,8 @@ export default function PresentiEstesi() {
                     <tr className="second_header">
                         <td>AVATAR</td>
                         <td>SMS</td>
+                        <td style={{ display: 'none' }}>RAZZA ICO</td>
                         <td>RAZZA</td>
-                        <td>GILDA</td>
                         <td>LAVORO</td>
                         <td>NOME E COGNOME</td>
                         <td>CARICHE</td>
