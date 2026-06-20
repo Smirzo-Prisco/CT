@@ -1602,14 +1602,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $is_mod    = (int)$_SESSION['moderatore'] === 1;
             $is_staff  = $is_admin || $is_master || $is_mod;
 
-            // Visibilità pulsanti
-            $show_backchat   = (float)$pg['esperienza'] > 19;
-            $backchat_on     = (int)$pg['back_chat'] === 1;
-            $show_cura       = ($luogo === 25 && (int)$pg['salute'] > 0 && (int)$pg['salute'] < (int)$pg['salute_max']);
-            $show_pulisci    = $is_staff;
-            $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
-            $can_master_msg  = $is_admin || $is_master;
-
             // Membro del mestiere Ospedale (id_mestiere = 10): può curare altri pg
             $is_ospedale_row = gdrcd_query(
                 "SELECT 1 FROM clgpersonaggiomestiere
@@ -1620,6 +1612,16 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                  LIMIT 1"
             );
             $is_ospedale = !empty($is_ospedale_row);
+
+            // Visibilità pulsanti
+            $show_backchat   = (float)$pg['esperienza'] > 19;
+            $backchat_on     = (int)$pg['back_chat'] === 1;
+            // I medici vedono il pannello anche a piena salute (per curare altri PG)
+            $can_self_cure   = (int)$pg['salute'] > 0 && (int)$pg['salute'] < (int)$pg['salute_max'];
+            $show_cura       = $luogo === 25 && ($can_self_cure || $is_ospedale);
+            $show_pulisci    = $is_staff;
+            $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
+            $can_master_msg  = $is_admin || $is_master;
 
             // Helper: recupera oggetti per categoria come array JSON
             $fetch_oggetti = function(string $categoria, string $extra = '') use ($login_f): array {
