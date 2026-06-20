@@ -238,7 +238,7 @@ export default function SchedaModifica() {
 
                                 {nickname_gilda_set && (
                                     <FormRow label={
-                                        <>Famiglia<br />
+                                        <>Razza<br />
                                         <em className={styles.smallText}>
                                             (Modificabile una sola volta)
                                         </em></>

@@ -28,7 +28,7 @@ import SchedaMenu from './SchedaMenu'
 const TIPO_LABELS = {
     legami: 'Legami',
     nemici: 'Nemici',
-    famiglia: 'Famiglia',
+    famiglia: 'Razza',
     conoscenze: 'Conoscenze',
     memories: 'Memories',
 }
