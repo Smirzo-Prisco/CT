@@ -145,7 +145,7 @@ public_head(
             <?php foreach ($razze as $razza):
                 $nome = htmlspecialchars($razza['nome']);
                 $icon = $razza_icons[$razza['nome']] ?? 'fas fa-star';
-                $img  = !empty($razza['immagine']) ? htmlspecialchars($razza['immagine']) : null;
+                $img  = !empty($razza['immagine']) ? '/imgs/guilds/' . htmlspecialchars($razza['immagine']) : null;
             ?>
             <article class="pub-razza-card">
                 <div class="pub-razza-card-header">
