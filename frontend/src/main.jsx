@@ -224,12 +224,22 @@ function autoGrow(el) {
     el.style.height = 'auto'
     el.style.height = el.scrollHeight + 'px'
 }
+// Crescita al typing
 document.addEventListener('input', e => {
     if (e.target.tagName === 'TEXTAREA') autoGrow(e.target)
 }, true)
-// Inizializza le textarea già presenti nel DOM al caricamento (contenuto pre-compilato)
+// Inizializza textarea già nel DOM al caricamento (form PHP pre-compilati)
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('textarea').forEach(autoGrow)
 })
+// Inizializza textarea aggiunte dopo (componenti React montati dopo DOMContentLoaded)
+new MutationObserver(mutations => {
+    for (const m of mutations)
+        for (const node of m.addedNodes)
+            if (node.nodeType === 1) {
+                if (node.tagName === 'TEXTAREA') autoGrow(node)
+                node.querySelectorAll?.('textarea').forEach(autoGrow)
+            }
+}).observe(document.body, { childList: true, subtree: true })
 
 console.log('[CT] bundle caricato — componenti registrati:', Object.keys(registry))
