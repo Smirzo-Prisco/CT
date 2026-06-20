@@ -164,7 +164,7 @@ function SchedaProfilo({ profile }) {
                 <span className={styles.valueRight}>{razza}</span>
                 <br /> */}
 
-                <span className={styles.labelLeft}>Famiglia:</span>
+                <span className={styles.labelLeft}>Razza:</span>
                 <span className={styles.valueRight}>{nome_ruolo}</span>
                 <br />
 
