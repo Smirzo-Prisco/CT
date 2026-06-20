@@ -215,4 +215,17 @@ document.addEventListener('click', function(e) {
     }
 }, true)
 
+// ---------------------------------------------------------------------------
+// AUTO-GROW TEXTAREA — funziona su desktop e mobile
+// Espande la textarea con il contenuto eliminando il bisogno del drag handle
+// (inutilizzabile su touch). Usa event delegation su document.
+// ---------------------------------------------------------------------------
+function autoGrow(el) {
+    el.style.height = 'auto'
+    el.style.height = el.scrollHeight + 'px'
+}
+document.addEventListener('input', e => {
+    if (e.target.tagName === 'TEXTAREA') autoGrow(e.target)
+}, true)
+
 console.log('[CT] bundle caricato — componenti registrati:', Object.keys(registry))
