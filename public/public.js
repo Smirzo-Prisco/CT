@@ -228,9 +228,9 @@ function ensureOptionsLoaded() {
 
             const selRazza = document.getElementById('pubRegRazza');
             if (selRazza && data.razze) {
-                selRazza.innerHTML = data.razze.map(
-                    r => `<option value="${r.id}">${r.nome}</option>`
-                ).join('');
+                selRazza.innerHTML =
+                    '<option value="0">Decidi poi</option>' +
+                    data.razze.map(r => `<option value="${r.id}">${r.nome}</option>`).join('');
             }
 
             const selMest = document.getElementById('pubRegMestiere');
