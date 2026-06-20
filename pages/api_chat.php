@@ -1616,9 +1616,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Visibilità pulsanti
             $show_backchat   = (float)$pg['esperienza'] > 19;
             $backchat_on     = (int)$pg['back_chat'] === 1;
-            // I medici vedono il pannello anche a piena salute (per curare altri PG)
+            // I medici vedono il pannello solo dopo almeno 2 azioni (tipo P) in stanza, come il Magic Shop
             $can_self_cure   = (int)$pg['salute'] > 0 && (int)$pg['salute'] < (int)$pg['salute_max'];
-            $show_cura       = $luogo === 25 && ($can_self_cure || $is_ospedale);
+            $medico_abilitato = false;
+            if ($is_ospedale && $luogo === 25) {
+                $azioni_row   = gdrcd_query("SELECT COUNT(*) AS n FROM chat WHERE stanza = '$luogo' AND mittente = '$login_f' AND tipo = 'P'");
+                $medico_abilitato = (int)($azioni_row['n'] ?? 0) > 1;
+            }
+            $show_cura       = $luogo === 25 && ($can_self_cure || $medico_abilitato);
             $show_pulisci    = $is_staff;
             $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
             $can_master_msg  = $is_admin || $is_master;
@@ -1756,7 +1761,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'show_scacchiera' => $show_scacchiera,
                     'is_staff'        => $is_staff,
                     'can_master_msg'  => $can_master_msg,
-                    'is_ospedale'     => $is_ospedale,
+                    'is_ospedale'     => $medico_abilitato,
                 ],
                 'oggetti'      => [
                     'curativi'      => $curativi,
