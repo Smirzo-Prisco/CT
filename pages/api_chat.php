@@ -1623,7 +1623,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $azioni_row   = gdrcd_query("SELECT COUNT(*) AS n FROM chat WHERE stanza = '$luogo' AND mittente = '$login_f' AND tipo = 'P'");
                 $medico_abilitato = (int)($azioni_row['n'] ?? 0) > 1;
             }
-            $show_cura       = $luogo === 25 && ($can_self_cure || $medico_abilitato);
+            $show_cura       = $luogo === 25 && ($can_self_cure || $is_ospedale);
             $show_pulisci    = $is_staff;
             $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
             $can_master_msg  = $is_admin || $is_master;
