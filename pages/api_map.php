@@ -430,7 +430,7 @@ switch ($op) {
                 'ultima_mappa'  => (int)$row['ultima_mappa'],
                 'ultimo_luogo'  => (int)$row['ultimo_luogo'],
                 'url_img_chat'  => $row['url_img_chat']  ?? '',
-                'razza_img'     => 'imgs/races/' . ($row['razza_img'] ?: 'standard_razza.png'),
+                'razza_img'     => 'themes/crystal/imgs/races/' . ($row['razza_img'] ?: 'standard_razza.png'),
                 'razza_nome'    => $row['sing_' . $row['sesso']] ?? '',
                 'stanza'        => $row['stanza_apparente'] ?: ($row['stanza_nome'] ?? ''),
                 'mappa'         => $row['mappa_nome']    ?? '',
