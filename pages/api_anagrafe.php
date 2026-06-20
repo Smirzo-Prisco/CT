@@ -73,13 +73,13 @@ function buildPersonaggiList(string $where, array $soglie): array {
     $list = [];
     while ($row = gdrcd_query($res, 'fetch')) {
         $list[] = [
-            'nome'          => gdrcd_filter('out', $row['nome']),
-            'cognome'       => gdrcd_filter('out', $row['cognome']),
+            'nome'          => $row['nome'],
+            'cognome'       => $row['cognome'],
             'ultimoRefresh' => $row['ultimo_refresh'],
             'livello'       => computeLevel((int)$row['tot_stats'], $soglie),
-            'gilda'         => ['nome' => gdrcd_filter('out', $row['nome_gilda']  ?? ''), 'img' => $row['img_gilda']    ?? ''],
-            'mestiere'      => ['nome' => gdrcd_filter('out', $row['nome_mestiere'] ?? ''), 'img' => $row['img_mestiere'] ?? ''],
-            'razza'         => ['nome' => gdrcd_filter('out', $row['sing_m']       ?? ''), 'img' => $row['img_razza']    ?? ''],
+            'gilda'         => ['nome' => $row['nome_gilda']    ?? '', 'img' => $row['img_gilda']    ?? ''],
+            'mestiere'      => ['nome' => $row['nome_mestiere'] ?? '', 'img' => $row['img_mestiere'] ?? ''],
+            'razza'         => ['nome' => $row['sing_m']        ?? '', 'img' => $row['img_razza']    ?? ''],
         ];
     }
     gdrcd_query($res, 'free');
@@ -111,7 +111,7 @@ switch ($op) {
         $razze = [];
         while ($r = gdrcd_query($rRes, 'fetch')) {
             $razze[] = [
-                'nome'  => gdrcd_filter('out', $r['nome_gilda'] ?? ''),
+                'nome'  => $r['nome_gilda'] ?? '',
                 'img'   => $r['immagine'] ?? '',
                 'count' => (int)$r['cnt'],
             ];

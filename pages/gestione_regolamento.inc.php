@@ -180,17 +180,47 @@
                 //Determinazione pagina (paginazione)
                 $pagebegin = (int) $_REQUEST['offset'] * $PARAMETERS['settings']['records_per_page'];
                 $pageend = $PARAMETERS['settings']['records_per_page'];
+                //Filtro per tipo
+                $valid_tipi = ['ambientazione', 'primipassi', 'regolamento', 'regolegioco', 'manuali', 'combattimento', 'staff'];
+                $tipo_filter = (isset($_GET['tipo_filter']) && in_array($_GET['tipo_filter'], $valid_tipi)) ? $_GET['tipo_filter'] : '';
                 //Conteggio record totali
-                $record_globale = gdrcd_query("SELECT COUNT(*) FROM regolamento");
+                if ($_SESSION['admin'] == 1) {
+                    $count_where = $tipo_filter ? "WHERE tipo = '$tipo_filter'" : '';
+                } else {
+                    $count_where = $tipo_filter ? "WHERE tipo != 'ambientazione' AND tipo = '$tipo_filter'" : "WHERE tipo != 'ambientazione'";
+                }
+                $record_globale = gdrcd_query("SELECT COUNT(*) FROM regolamento $count_where");
                 $totaleresults = $record_globale['COUNT(*)'];
                 //Lettura record
                 if ($_SESSION['admin'] == 1) {
-                $result = gdrcd_query("SELECT articolo, titolo, tipo, testo FROM regolamento ORDER BY articolo LIMIT ".$pagebegin.", ".$pageend."", 'result');
+                    $where = $tipo_filter ? "WHERE tipo = '$tipo_filter'" : '';
+                    $result = gdrcd_query("SELECT articolo, titolo, tipo, testo FROM regolamento $where ORDER BY articolo LIMIT ".$pagebegin.", ".$pageend, 'result');
                 } else if ($_SESSION['guida'] == 1) {
-                $result = gdrcd_query("SELECT articolo, titolo, tipo, testo FROM regolamento WHERE tipo != 'ambientazione' ORDER BY articolo LIMIT ".$pagebegin.", ".$pageend."", 'result');
+                    $where = $tipo_filter ? "WHERE tipo != 'ambientazione' AND tipo = '$tipo_filter'" : "WHERE tipo != 'ambientazione'";
+                    $result = gdrcd_query("SELECT articolo, titolo, tipo, testo FROM regolamento $where ORDER BY articolo LIMIT ".$pagebegin.", ".$pageend, 'result');
                 }
                 $numresults = gdrcd_query($result, 'num_rows');
 
+                ?>
+                <!-- Pulsante indietro + filtro tipo -->
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                    <a href="main.php?page=gestione">← Indietro</a>
+                    <form method="get" action="main.php" style="display:flex; align-items:center; gap:6px; margin:0;">
+                        <input type="hidden" name="page" value="gestione_regolamento" />
+                        <select name="tipo_filter" onchange="this.form.submit()" style="margin:0;">
+                            <option value="">— Tutti i tipi —</option>
+                            <?php
+                            $tipi_disponibili = $_SESSION['admin'] == 1
+                                ? ['ambientazione', 'primipassi', 'regolamento', 'regolegioco', 'manuali', 'combattimento', 'staff']
+                                : ['primipassi', 'regolamento', 'regolegioco', 'manuali', 'combattimento', 'staff'];
+                            foreach ($tipi_disponibili as $t):
+                            ?>
+                            <option value="<?php echo $t; ?>" <?php if ($tipo_filter === $t) echo 'selected'; ?>><?php echo ucfirst($t); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
+                <?php
                 /* Se esistono record */
                 if($numresults > 0) { ?>
                     <!-- Elenco dei record paginato -->
@@ -246,7 +276,8 @@
                                                     <input type="hidden" name="op" value="erase" />
                                                     <input type="image" src="imgs/icons/erase.png"
                                                            alt="<?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['ops']['erase']); ?>"
-                                                           title="<?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['ops']['erase']); ?>" />
+                                                           title="<?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['ops']['erase']); ?>"
+                                                           onclick="return confirm('Eliminare questo articolo del regolamento?')" />
                                                 </form>
                                             </div>
                                         </div>
@@ -262,10 +293,11 @@
                 <div class="pager">
                     <?php if($totaleresults > $PARAMETERS['settings']['records_per_page']) {
                         echo gdrcd_filter('out', $MESSAGE['interface']['pager']['pages_name']);
+                        $tipo_qs = $tipo_filter ? '&tipo_filter=' . urlencode($tipo_filter) : '';
                         for($i = 0; $i <= floor($totaleresults / $PARAMETERS['settings']['records_per_page']); $i++) {
                             if($i != gdrcd_filter('num', $_REQUEST['offset'])) {
                                 ?>
-                                <a href="main.php?page=gestione_regolamento&offset=<?php echo $i; ?>"><?php echo $i + 1; ?></a>
+                                <a href="main.php?page=gestione_regolamento&offset=<?php echo $i; ?><?php echo $tipo_qs; ?>"><?php echo $i + 1; ?></a>
                             <?php } else {
                                 echo ' '.($i + 1).' ';
                             }

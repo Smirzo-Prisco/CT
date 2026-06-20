@@ -1638,11 +1638,13 @@ display: none; /* nasconde la checkbox nativa */
         padding: 10px;
         align-items: flex-start; /* Allinea in alto su mobile */
     }
-    
+
     .pg-edit-container .modal-content {
         max-height: 95vh;
         padding: 15px;
         margin-top: 20px;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .pg-edit-container input[type="text"],

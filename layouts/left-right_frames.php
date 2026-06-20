@@ -150,9 +150,13 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
             if (currentOpenSidebar) { e.stopPropagation(); e.preventDefault(); closeAllSidebars(); }
         });
 
-        // Previeni che un click dentro la sidebar la chiuda
-        sidebarLeft.addEventListener('click',  function(e) { e.stopPropagation(); });
-        sidebarRight.addEventListener('click', function(e) { e.stopPropagation(); });
+        // Click dentro la sidebar: chiudi se è un link, altrimenti blocca la propagazione
+        sidebarLeft.addEventListener('click', function(e) {
+            if (e.target.closest('a')) { closeAllSidebars(); } else { e.stopPropagation(); }
+        });
+        sidebarRight.addEventListener('click', function(e) {
+            if (e.target.closest('a')) { closeAllSidebars(); } else { e.stopPropagation(); }
+        });
 
         window.addEventListener('resize', function() {
             const newIsMobile = window.innerWidth <= 768;
