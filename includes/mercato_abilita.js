@@ -57,7 +57,7 @@ async function loadSkills() {
 
         // 🔥 AGGIORNA il DOM
         if (skillPointsEl) skillPointsEl.textContent = data.shinDisponibili;
-        if (playerLevel) playerLevelEl.textContent = data.livelloPg;
+        if (playerLevelEl) playerLevelEl.textContent = data.livelloPg;
         skillLevels = {};
         maxSklLvl = {};
         itCosts = {};

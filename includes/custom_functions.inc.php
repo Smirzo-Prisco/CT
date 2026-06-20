@@ -574,7 +574,7 @@ function getLevelPg($totStats) {
     $level = 1;
 
     while($row = gdrcd_query($soglie, 'fetch')) {
-        if ($totStats <= (int)$row['soglia']) return (int)$row['livello']-1; // Considero il livello precedente
+        if ($totStats <= (int)$row['soglia']) return max(1, (int)$row['livello'] - 1); // Livello minimo 1 per i pg regolari
 
         $level = (int)$row['livello'];
     }
