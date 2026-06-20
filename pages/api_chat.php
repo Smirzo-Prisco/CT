@@ -1819,6 +1819,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $sal_max_t    = $result_target['salute_max'];
             chatInsertMessage($luogo, 'System', $login, "cura $target_raw di $ps_cura PS. Salute attuale: $nuova_sal/$sal_max_t.", 'N');
 
+            gdrcd_query("UPDATE personaggio SET esperienza_mestiere = esperienza_mestiere + 1 WHERE nome = '$login_f'");
+
             echo json_encode(['success' => true, 'punti_effettivi' => $ps_cura, 'nuova_salute' => $nuova_sal]);
             break;
 
