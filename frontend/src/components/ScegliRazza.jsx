@@ -26,6 +26,8 @@ function navigate(url) {
 // ── Griglia delle razze ───────────────────────────────────────────────────────
 
 function GuildCard({ guild, onJoin, disabled }) {
+    const [confirmOpen, setConfirmOpen] = useState(false)
+
     return (
         <div className={`sr-guild-card ${disabled ? 'sr-guild-card--disabled' : ''}`}>
             <div className="sr-guild-img">
@@ -41,13 +43,35 @@ function GuildCard({ guild, onJoin, disabled }) {
                     <i className="fas fa-star"></i> {guild.ruolo_nome}
                 </div>
             )}
-            {!disabled && (
+            {!disabled && !confirmOpen && (
                 <button
                     className="sr-btn sr-btn--join"
-                    onClick={() => onJoin(guild)}
+                    onClick={() => setConfirmOpen(true)}
                 >
                     <i className="fas fa-plus-circle"></i> Entra
                 </button>
+            )}
+            {!disabled && confirmOpen && (
+                <div className="sr-confirm">
+                    <div className="sr-confirm-title">
+                        <i className="fas fa-exclamation-triangle"></i>
+                        Entrare in <strong>{guild.nome}</strong>?
+                    </div>
+                    <div className="sr-confirm-actions">
+                        <button
+                            className="sr-btn sr-btn--join"
+                            onClick={() => { setConfirmOpen(false); onJoin(guild) }}
+                        >
+                            <i className="fas fa-check"></i> Confermo
+                        </button>
+                        <button
+                            className="sr-btn sr-btn--cancel"
+                            onClick={() => setConfirmOpen(false)}
+                        >
+                            <i className="fas fa-times"></i> Annulla
+                        </button>
+                    </div>
+                </div>
             )}
             {disabled && (
                 <span className="sr-guild-locked">
