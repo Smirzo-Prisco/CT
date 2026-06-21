@@ -56,30 +56,31 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 // Gestione immagine
                 $dati = saveImgGuild($_POST, $isEdit ? $guildEsistente['immagine'] : null, $_FILES);
                 
+                // Colonne scrivibili della tabella gilda (esclude id_gilda dalla SET)
+                $campiConsentiti = ['nome', 'tipo', 'visibile', 'immagine'];
+
                 // Modifica
                 if ($isEdit) {
                     $setParts = [];
-
-                    foreach ($dati as $campo => $valore) $setParts[] = "`$campo` = '" . gdrcd_filter('in', $valore) . "'";
-                    
+                    foreach ($dati as $campo => $valore) {
+                        if (!in_array($campo, $campiConsentiti)) continue;
+                        $setParts[] = "`$campo` = '" . gdrcd_filter('in', $valore) . "'";
+                    }
                     $query = "UPDATE gilda SET ".implode(', ', $setParts)." WHERE id_gilda = $id";
                 } else {
                 // Creazione
                     $campi = [];
                     $valori = [];
-                    
                     foreach ($dati as $campo => $valore) {
-                        if($campo == 'id_gilda') continue; // Salto l'id in fase di inserimento
-
-                        $campi[] = "`$campo`";
+                        if (!in_array($campo, $campiConsentiti)) continue;
+                        $campi[]  = "`$campo`";
                         $valori[] = "'".gdrcd_filter('in', $valore)."'";
                     }
-                    
                     $query = "INSERT INTO gilda (".implode(', ', $campi).") VALUES (".implode(', ', $valori).")";
                 }
-                
-                if(gdrcd_query($query)) echo json_encode(['success' => true, 'message' => 'Gilda salvata con successo!', 'query' => $query]);
-                else echo json_encode(['success' => false, 'message' => 'Errore nel salvataggio della gilda']);
+
+                gdrcd_query($query, 'query', true);
+                echo json_encode(['success' => true, 'message' => 'Gilda salvata con successo!']);
             } catch (Exception $e) {
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
