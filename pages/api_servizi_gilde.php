@@ -42,12 +42,24 @@ switch ($op) {
             ORDER BY g.tipo, g.id_gilda
         ", 'result');
 
+        $reliquie = [
+            1 => 'Reidh',
+            2 => 'Corona di Caos',
+            3 => 'Silver Crystal',
+            4 => 'Nihil',
+            5 => 'Coppa Lunare',
+            6 => 'Albero della Vita',
+            7 => 'Cristallo Corvino',
+        ];
+
         $gilde = [];
         while ($row = gdrcd_query($resG, 'fetch')) {
+            $id = (int)$row['id_gilda'];
             $gilde[] = [
-                'id'    => (int)$row['id_gilda'],
-                'nome'  => $row['nome'],
-                'count' => (int)$row['cnt'],
+                'id'      => $id,
+                'nome'    => $row['nome'],
+                'count'   => (int)$row['cnt'],
+                'reliquia' => $reliquie[$id] ?? null,
             ];
         }
         gdrcd_query($resG, 'free');
@@ -105,9 +117,9 @@ switch ($op) {
             exit;
         }
 
-        // Ruoli ordinati per livello
+        // Ruoli ordinati per livello (dal più alto al più basso)
         $resR = gdrcd_query("
-            SELECT immagine, nome_ruolo, livello
+            SELECT immagine, nome_ruolo, livello, capo
             FROM ruolo
             WHERE gilda = $idGilda
             ORDER BY livello DESC, nome_ruolo DESC
@@ -118,6 +130,7 @@ switch ($op) {
             $ruoli[] = [
                 'immagine'   => $row['immagine'],
                 'nome_ruolo' => $row['nome_ruolo'],
+                'capo'       => (bool)$row['capo'],
             ];
         }
         gdrcd_query($resR, 'free');
@@ -125,7 +138,7 @@ switch ($op) {
         // Affiliati — personaggi speciali in cima (hardcoded nel PHP originale)
         $resA = gdrcd_query("
             SELECT cpr.personaggio, cpr.nickname, p.cognome,
-                   r.immagine, r.nome_ruolo, r.livello,
+                   r.immagine, r.nome_ruolo, r.capo, r.livello,
                    CASE WHEN p.nome IN ('Acamar','Kirari','Etsuya') THEN 1 ELSE 0 END AS special
             FROM ruolo r
             JOIN clgpersonaggioruolo cpr ON cpr.id_ruolo = r.id_ruolo
@@ -142,6 +155,7 @@ switch ($op) {
                 'nickname'   => $row['nickname'] ?: null,
                 'immagine'   => $row['immagine'],
                 'nome_ruolo' => $row['nome_ruolo'],
+                'capo'       => (bool)$row['capo'],
                 'special'    => (bool)$row['special'],
             ];
         }

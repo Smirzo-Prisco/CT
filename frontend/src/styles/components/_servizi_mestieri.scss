@@ -306,6 +306,43 @@
         text-align: justify;
     }
 
+    // ── Banner ambientazione ──────────────────────────────────
+
+    .sg-banner {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+        padding: $space-3 $space-4;
+        background: rgba($palette-action, 0.06);
+        border: 1px solid rgba($palette-action, 0.2);
+        border-radius: #{$radius-md};
+        color: #{$palette-action};
+        text-decoration: none;
+        font-size: $text-sm;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        margin-bottom: $space-5;
+        transition: all #{$transition-fast};
+
+        &:hover {
+            background: rgba($palette-action, 0.12);
+            border-color: rgba($palette-action, 0.4);
+        }
+    }
+
+    // ── Stati loading / error ─────────────────────────────────
+
+    .sm-state {
+        text-align: center;
+        padding: $space-12 $space-5;
+        color: #{$color-text-secondary};
+
+        i  { font-size: 2rem; display: block; margin-bottom: $space-4; color: #{$palette-action}; }
+        p  { font-size: $text-md; }
+
+        &--error i { color: #{$color-warning}; }
+    }
+
     // ── Responsive ────────────────────────────────────────────
 
     @media (max-width: 480px) {

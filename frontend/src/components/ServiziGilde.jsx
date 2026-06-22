@@ -1,79 +1,74 @@
 /**
- * ServiziGilde.jsx — Famiglie e mestieri del gioco (Phase 3: SPA)
+ * ServiziGilde.jsx — Razze e mestieri del gioco.
  *
  * Vista lista:
- *   - Tabella famiglie: nome (→ dettaglio), icona statuto (→ statuto_main.php top-frame), iscritti
- *   - Sezione mestieri: tabella per tipo con nome (→ servizi_mestieri PHP) e icona statuto
+ *   - Sezione Razze: elenco gilde con conteggio iscritti, link reliquia e statuto
+ *   - Sezione(i) Mestieri: raggruppate per tipo, navigano a servizi_mestieri PHP
+ *     passando from=servizi_gilde per il back button contestuale
  *
- * Vista dettaglio famiglia:
- *   - Tabella ruoli, tabella affiliati con link scheda, testo statuto inline
+ * Vista dettaglio razza:
+ *   - Gerarchia gradi, lista affiliati, statuto inline
  *
- * Fix statuto: i link usano window.CT.navigate invece di target="_blank",
- * così statuto_main.php viene aperto nel frame principale (che include
- * header.inc.php e il bundle React) invece di una nuova scheda isolata.
+ * Stili: _servizi_mestieri.scss (classi .sm-*)
  *
  * API: api_servizi_gilde.php (op=getList, op=getGuild)
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import shared from './shared.module.css'
-
-// ── Navigazione ───────────────────────────────────────────────────────────────
 
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
     else window.top.location.href = url
 }
 
-// ── Componente lista ──────────────────────────────────────────────────────────
+// ── Sezione Razze ─────────────────────────────────────────────────────────────
 
-function GildeTable({ gilde, onSelectGilda }) {
+function GildeSection({ gilde, onSelectGilda }) {
     return (
-        <table className="customTable" style={{ width: '100%' }}>
-            <tbody>
-                <tr className="second_header">
-                    <td style={{ width: '60%' }}><div>RAZZE</div></td>
-                    <td><div>Statuto</div></td>
-                    <td><div>Iscritti</div></td>
-                </tr>
+        <section className="sm-section">
+            <div className="sm-section-title">
+                <i className="fas fa-shield-alt" /> Razze
+            </div>
+            <div className="sm-list">
                 {gilde.map(g => (
-                    <tr key={g.id}>
-                        <td style={{ width: '60%' }}>
-                            <div>
-                                <a
-                                    href="#"
-                                    onClick={e => { e.preventDefault(); onSelectGilda(g.id) }}
-                                >
-                                    {g.nome}
-                                </a>
-                            </div>
-                        </td>
-                        <td>
-                            {/* Naviga nel top-frame invece di aprire una nuova scheda:
-                                statuto_main.php include header.inc.php e funziona solo
-                                nel contesto di navigazione principale, non in una scheda vuota */}
+                    <div key={g.id} className="sm-list-item">
+                        <a
+                            href="#"
+                            className="sm-list-link"
+                            onClick={e => { e.preventDefault(); onSelectGilda(g.id) }}
+                        >
+                            <i className="fas fa-shield-alt sm-list-icon" />
+                            <span className="sm-list-name">{g.nome}</span>
+                        </a>
+                        <span className="sm-list-count">{g.count}</span>
+                        {g.reliquia && (
                             <a
                                 href="#"
-                                onClick={e => { e.preventDefault(); navigate(`main.php?page=statuto_main&id=${g.id}`) }}
-                                title="Statuto"
+                                className="sm-list-statute"
+                                title={`Reliquia: ${g.reliquia}`}
+                                onClick={e => { e.preventDefault(); navigate(`main.php?page=elenco_reliquie&IDPng=${g.id}`) }}
                             >
-                                <i className="fa-solid fa-scroll" />
+                                <i className="fas fa-gem" />
                             </a>
-                        </td>
-                        <td>
-                            <div className={shared.schedaSerial}>
-                                {g.count}
-                            </div>
-                        </td>
-                    </tr>
+                        )}
+                        <a
+                            href="#"
+                            className="sm-list-statute"
+                            title="Statuto"
+                            onClick={e => { e.preventDefault(); navigate(`main.php?page=statuto_main&id=${g.id}`) }}
+                        >
+                            <i className="fas fa-scroll" />
+                        </a>
+                    </div>
                 ))}
-            </tbody>
-        </table>
+            </div>
+        </section>
     )
 }
 
-function MestieriSection({ mestieri }) {
-    // Raggruppa per tipo preservando l'ordine
+// ── Sezioni Mestieri ──────────────────────────────────────────────────────────
+
+function MestieriSections({ mestieri }) {
     const grouped = useMemo(() => {
         const map = []
         const seen = {}
@@ -87,65 +82,45 @@ function MestieriSection({ mestieri }) {
         return map
     }, [mestieri])
 
-    return (
-        <>
-            <div className="titolo" style={{ textAlign: 'center', margin: '16px 0 8px' }}>
-                <img src="/themes/crystal/imgs/mestieri/titolo_mestieri.png" alt="Mestieri" />
+    return grouped.map(group => (
+        <section key={group.tipo} className="sm-section">
+            <div className="sm-section-title">{group.desc}</div>
+            <div className="sm-list">
+                {group.items.map(m => (
+                    <div key={m.id} className="sm-list-item">
+                        <a
+                            href="#"
+                            className="sm-list-link"
+                            onClick={e => {
+                                e.preventDefault()
+                                navigate(`main.php?page=servizi_mestieri&id_mestiere=${m.id}&from=servizi_gilde`)
+                            }}
+                        >
+                            <i className="fas fa-briefcase sm-list-icon" />
+                            <span className="sm-list-name">{m.nome}</span>
+                        </a>
+                        <span className="sm-list-count">{m.count}</span>
+                        {m.url_sito && (
+                            <a
+                                href="#"
+                                className="sm-list-statute"
+                                title="Statuto"
+                                onClick={e => {
+                                    e.preventDefault()
+                                    navigate(`main.php?page=statuto_main&id2=${m.id}`)
+                                }}
+                            >
+                                <i className="fas fa-scroll" />
+                            </a>
+                        )}
+                    </div>
+                ))}
             </div>
-            <table className="customTable" style={{ width: '100%' }}>
-                <tbody>
-                    {grouped.map(group => (
-                        <>
-                            <tr key={`h-${group.tipo}`} className="second_header">
-                                <td><div>Mestiere</div></td>
-                                <td><div>Statuto</div></td>
-                                <td><div>Iscritti</div></td>
-                            </tr>
-                            {group.items.map(m => (
-                                <tr key={m.id}>
-                                    <td style={{ width: '60%' }}>
-                                        <div>
-                                            <a
-                                                href="#"
-                                                onClick={e => {
-                                                    e.preventDefault()
-                                                    navigate(`main.php?page=servizi_mestieri&id_mestiere=${m.id}`)
-                                                }}
-                                            >
-                                                {m.nome}
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td style={{ width: '20%' }}>
-                                        {m.url_sito && (
-                                            <a
-                                                href="#"
-                                                onClick={e => {
-                                                    e.preventDefault()
-                                                    navigate(`main.php?page=statuto_main&id2=${m.id}`)
-                                                }}
-                                                title="Statuto"
-                                            >
-                                                <i className="fa-solid fa-scroll" />
-                                            </a>
-                                        )}
-                                    </td>
-                                    <td>
-                                        <div className={shared.schedaSerial}>
-                                            {m.count}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </>
-                    ))}
-                </tbody>
-            </table>
-        </>
-    )
+        </section>
+    ))
 }
 
-// ── Componente dettaglio famiglia ─────────────────────────────────────────────
+// ── Dettaglio razza ───────────────────────────────────────────────────────────
 
 function GuildDetail({ gildaId, onBack }) {
     const [data, setData]       = useState(null)
@@ -164,93 +139,102 @@ function GuildDetail({ gildaId, onBack }) {
             .catch(err => { setError(err.message); setLoading(false) })
     }, [gildaId])
 
-    if (loading) return <p><i className="fas fa-spinner fa-spin" /> Caricamento…</p>
-    if (error)   return <p className="error">Errore: {error}</p>
+    if (loading) return (
+        <div className="sm-page">
+            <div className="sm-state">
+                <i className="fas fa-spinner fa-spin" />
+                <p>Caricamento…</p>
+            </div>
+        </div>
+    )
+    if (error) return (
+        <div className="sm-page">
+            <div className="sm-state sm-state--error">
+                <i className="fas fa-exclamation-triangle" />
+                <p>{error}</p>
+            </div>
+        </div>
+    )
 
     const { gilda, ruoli, affiliati } = data
 
     return (
-        <div>
-            {/* Ruoli */}
-            <table className="customTable" style={{ width: '100%' }}>
-                <tbody>
-                    <tr className="second_header">
-                        <td><div>&nbsp;</div></td>
-                        <td><div>GRADO</div></td>
-                    </tr>
-                    {ruoli.map((r, i) => (
-                        <tr key={i}>
-                            <td><div><img src={`imgs/guilds/${r.immagine}`} alt="" /></div></td>
-                            <td>
-                                <div className={shared.schedaSerial}>
-                                    {r.nome_ruolo}
+        <div className="sm-page">
+            <div className="sm-header">
+                <button className="sm-back" onClick={onBack}>
+                    <i className="fas fa-arrow-left" /> Razze e Mestieri
+                </button>
+                <h2 className="sm-title">{gilda.nome}</h2>
+            </div>
+
+            {ruoli.length > 0 && (
+                <section className="sm-section">
+                    <div className="sm-section-title">
+                        <i className="fas fa-layer-group" /> Gerarchia
+                    </div>
+                    <div className="sm-rank-list">
+                        {ruoli.map((r, i) => (
+                            <div key={i} className={`sm-rank-item${r.capo ? ' sm-rank-item--top' : ''}`}>
+                                <span className="sm-rank-badge">{i + 1}</span>
+                                <div className="sm-img-box">
+                                    {r.immagine
+                                        ? <img src={`imgs/guilds/${r.immagine}`} alt={r.nome_ruolo} />
+                                        : <i className="fas fa-medal" />
+                                    }
                                 </div>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                                <span className="sm-rank-name">{r.nome_ruolo}</span>
+                                {r.capo && <i className="fas fa-crown sm-rank-crown" />}
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
-            <br /><br />
-
-            {/* Affiliati */}
-            <table className="customTable" style={{ width: '100%' }}>
-                <tbody>
-                    <tr className="second_header">
-                        <td><div>&nbsp;</div></td>
-                        <td><div>MEMBRI</div></td>
-                        <td><div>GRADO</div></td>
-                    </tr>
-                    {affiliati.map((a, i) => (
-                        <tr key={i}>
-                            <td><div><img src={`imgs/guilds/${a.immagine}`} alt="" /></div></td>
-                            <td>
-                                <div>
+            {affiliati.length > 0 && (
+                <section className="sm-section">
+                    <div className="sm-section-title">
+                        <i className="fas fa-users" /> Membri
+                    </div>
+                    <div className="sm-member-list">
+                        {affiliati.map((a, i) => (
+                            <div key={i} className={`sm-member-item${a.capo || a.special ? ' sm-member-item--leader' : ''}`}>
+                                <div className="sm-img-box">
+                                    {a.immagine
+                                        ? <img src={`imgs/guilds/${a.immagine}`} alt={a.nome_ruolo} />
+                                        : <i className="fas fa-user" />
+                                    }
+                                </div>
+                                <div className="sm-member-info">
                                     <a
                                         href="#"
+                                        className="sm-member-name"
                                         onClick={e => {
                                             e.preventDefault()
                                             navigate(`main.php?page=scheda&pg=${encodeURIComponent(a.nome)}`)
                                         }}
-                                        style={a.special ? { color: '#9a6353' } : undefined}
                                     >
                                         {a.nome}{a.cognome ? ` ${a.cognome}` : ''}
                                     </a>
+                                    <span className="sm-member-role">{a.nickname ?? a.nome_ruolo}</span>
                                 </div>
-                            </td>
-                            <td>
-                                <div className={shared.schedaSerial}>
-                                    {a.nickname ?? a.nome_ruolo}
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            {/* Statuto inline (BBCode già processato lato server) */}
-            {gilda.statuto && (
-                <table style={{ marginTop: '16px', width: '100%' }}>
-                    <tbody>
-                        <tr className="second_header">
-                            <td colSpan={4}><div>Statuto</div></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div
-                                    style={{ textAlign: 'justify' }}
-                                    dangerouslySetInnerHTML={{ __html: gilda.statuto }}
-                                />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                {(a.capo || a.special) && <i className="fas fa-crown sm-member-crown" />}
+                            </div>
+                        ))}
+                    </div>
+                </section>
             )}
 
-            {/* Torna alla lista */}
-            <div className="link_back">
-                <button onClick={onBack}>← Torna indietro</button>
-            </div>
+            {gilda.statuto && (
+                <section className="sm-section">
+                    <div className="sm-section-title">
+                        <i className="fas fa-scroll" /> Statuto
+                    </div>
+                    <div
+                        className="sm-statute"
+                        dangerouslySetInnerHTML={{ __html: gilda.statuto }}
+                    />
+                </section>
+            )}
         </div>
     )
 }
@@ -258,10 +242,10 @@ function GuildDetail({ gildaId, onBack }) {
 // ── Componente principale ─────────────────────────────────────────────────────
 
 export default function ServiziGilde() {
-    const [loading, setLoading]         = useState(true)
-    const [error, setError]             = useState(null)
-    const [gilde, setGilde]             = useState([])
-    const [mestieri, setMestieri]       = useState([])
+    const [loading, setLoading]          = useState(true)
+    const [error, setError]              = useState(null)
+    const [gilde, setGilde]              = useState([])
+    const [mestieri, setMestieri]        = useState([])
     const [selectedGildaId, setSelected] = useState(null)
 
     useEffect(() => {
@@ -275,41 +259,45 @@ export default function ServiziGilde() {
             .catch(err => { setError(err.message); setLoading(false) })
     }, [])
 
-    if (loading) return <p><i className="fas fa-spinner fa-spin" /> Caricamento…</p>
-    if (error)   return <p className="error">Errore: {error}</p>
+    if (loading) return (
+        <div className="sm-page">
+            <div className="sm-state">
+                <i className="fas fa-spinner fa-spin" />
+                <p>Caricamento…</p>
+            </div>
+        </div>
+    )
+    if (error) return (
+        <div className="sm-page">
+            <div className="sm-state sm-state--error">
+                <i className="fas fa-exclamation-triangle" />
+                <p>{error}</p>
+            </div>
+        </div>
+    )
 
     if (selectedGildaId !== null) {
-        return (
-            <div className="pagina_servizi_gilde">
-                <div className="page_body">
-                    <GuildDetail
-                        gildaId={selectedGildaId}
-                        onBack={() => setSelected(null)}
-                    />
-                </div>
-            </div>
-        )
+        return <GuildDetail gildaId={selectedGildaId} onBack={() => setSelected(null)} />
     }
 
     return (
-        <div className="pagina_servizi_gilde">
-            <div className="page_body">
-
-                {/* Link ambientazione — voce principale, in evidenza */}
-                <a
-                    className="servizi-gilde-banner"
-                    href="main.php?page=documentazione_main"
-                    onClick={e => { e.preventDefault(); navigate('main.php?page=documentazione_main') }}
-                >
-                    <i className="fa-solid fa-book-open" />
-                    &nbsp; AMBIENTAZIONE &amp; REGOLAMENTO
-                </a>
-
-                <GildeTable gilde={gilde} onSelectGilda={setSelected} />
-                <br />
-                <MestieriSection mestieri={mestieri} />
-
+        <div className="sm-page">
+            <div className="sm-header sm-header--list">
+                <h2 className="sm-title">
+                    <i className="fas fa-shield-alt" /> Razze e Mestieri
+                </h2>
             </div>
+
+            <a
+                href="#"
+                className="sg-banner"
+                onClick={e => { e.preventDefault(); navigate('main.php?page=documentazione_main') }}
+            >
+                <i className="fas fa-book-open" /> AMBIENTAZIONE &amp; REGOLAMENTO
+            </a>
+
+            <GildeSection gilde={gilde} onSelectGilda={setSelected} />
+            <MestieriSections mestieri={mestieri} />
         </div>
     )
 }

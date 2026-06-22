@@ -5,6 +5,15 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 $id_mestiere = isset($_REQUEST['id_mestiere']) ? (int)gdrcd_filter('num', $_REQUEST['id_mestiere']) : null;
+
+$allowed_from = ['servizi_mestieri', 'servizi_gilde'];
+$from         = isset($_REQUEST['from']) && in_array($_REQUEST['from'], $allowed_from, true)
+    ? $_REQUEST['from']
+    : 'servizi_mestieri';
+$back_url     = 'main.php?page=' . $from;
+$back_label   = $from === 'servizi_gilde'
+    ? 'Razze e Mestieri'
+    : gdrcd_filter('out', $PARAMETERS['names']['job_name']['plur']);
 ?>
 <div class="sm-page">
 
@@ -117,9 +126,9 @@ $id_mestiere = isset($_REQUEST['id_mestiere']) ? (int)gdrcd_filter('num', $_REQU
 ?>
 
     <div class="sm-header">
-        <a href="main.php?page=servizi_mestieri" class="sm-back">
+        <a href="<?= $back_url ?>" class="sm-back">
             <i class="fas fa-arrow-left"></i>
-            <?= gdrcd_filter('out', $PARAMETERS['names']['job_name']['plur']) ?>
+            <?= $back_label ?>
         </a>
         <h2 class="sm-title"><?= $mestiere_nome ?></h2>
     </div>
