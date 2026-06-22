@@ -25,10 +25,20 @@ if (empty($_SESSION['login'])) {
     exit;
 }
 
-$op          = $_GET['op'] ?? '';
-$nome        = gdrcd_filter('in', $_SESSION['login']);
-$TOKEN_LIMIT = (int)($PARAMETERS['anthropic']['daily_token_limit'] ?? 5000);
-$MAX_CHARS   = 500;
+$op               = $_GET['op'] ?? '';
+$nome             = gdrcd_filter('in', $_SESSION['login']);
+$TOKEN_LIMIT_BASE = (int)($PARAMETERS['anthropic']['daily_token_limit'] ?? 5000);
+$MAX_CHARS        = 500;
+
+// Limite dinamico in base ai giorni di iscrizione:
+//   ≤ 7 giorni  → 3× (nuovi utenti, prima settimana)
+//   ≤ 30 giorni → 2× (utenti in rodaggio, fino al primo mese)
+//   > 30 giorni → 1× (standard)
+$pg_row      = gdrcd_query("SELECT DATEDIFF(CURDATE(), DATE(data_iscrizione)) AS giorni FROM personaggio WHERE nome = '$nome'");
+$giorni_iscr = (int)($pg_row['giorni'] ?? 9999);
+$TOKEN_LIMIT = $giorni_iscr <= 7  ? $TOKEN_LIMIT_BASE * 3
+             : ($giorni_iscr <= 30 ? $TOKEN_LIMIT_BASE * 2
+             : $TOKEN_LIMIT_BASE);
 
 // ── op=status ──────────────────────────────────────────────────────────────
 
