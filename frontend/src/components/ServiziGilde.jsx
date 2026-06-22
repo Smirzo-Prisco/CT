@@ -41,7 +41,7 @@ function GildeSection({ gilde, onSelectGilda }) {
                             <span className="sm-list-name">{g.nome}</span>
                         </a>
                         <span className="sm-list-count">{g.count}</span>
-                        <
+                        <a
                             href="#"
                             className="sm-list-statute"
                             title="Statuto"
