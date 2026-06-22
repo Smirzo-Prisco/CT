@@ -73,8 +73,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     exit;
                 }
 
-                // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno
-                if($skill_info['car'] > 0 && checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'", "'generica'"], $turn)) {
+                // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno (include 'oggetto' per bloccare attacchi dopo uso oggetto)
+                if($skill_info['car'] > 0 && checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'", "'generica'", "'oggetto'"], $turn)) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi effettuare due lanci nello stesso turno'));
                     exit;
                 }
@@ -529,8 +529,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     exit;
                 }
 
-                // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno
-                if(checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'", "'devia'"], $turn)) {
+                // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno (include 'oggetto' per bloccare attacchi dopo uso oggetto)
+                if(checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'", "'devia'", "'oggetto'"], $turn)) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi effettuare due lanci nello stesso turno'));
                     exit;
                 }
@@ -1209,7 +1209,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $nome_oggetto = $oggetto['nome'];
             $messaggio = "$login ha usato l\'oggetto " . gdrcd_filter('in', $nome_oggetto) . ".";
 
-            $oggetto_usato = false;
+            $oggetto_usato  = false;
+            $has_roll_bonus = (
+                (int)$oggetto['bonus_car2_extra'] > 0 ||
+                (int)$oggetto['bonus_car3_extra'] > 0 ||
+                (int)$oggetto['bonus_car4_extra'] > 0 ||
+                (int)$oggetto['bonus_car5_extra'] > 0
+            );
 
             // Logica per curare SALUTE
             if ($oggetto['heal'] > 0) {
@@ -1234,33 +1240,48 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             } // Se almeno uno dei due effetti è stato applicato, consumo l'oggetto e invio il messaggio
             if ($oggetto_usato) {
                 chatInsertMessage($_SESSION['luogo'], $login, null, $messaggio, 'C');
-
                 gestisciInventario($login, $id_oggetto, $cariche);
-            } // Verifica se l'oggetto è potenziabile (isTemp = 1)
-            elseif ($oggetto['isTemp'] == 1) {
-                // Controlla se c'è già un potenziamento attivo
-                $potenziamento_attivo = gdrcd_query("SELECT id_oggetto FROM clgpersonaggiooggetto WHERE nome = '$login' AND used = 1", 'result');
-                
-                // Se c'è già un potenziamento attivo, invia un messaggio privato di tipo "Q" e non usare l'oggetto
-                if((gdrcd_query($potenziamento_attivo, 'num_rows') > 0)) chatInsertMessage($_SESSION['luogo'], 'System', $login, "Hai già un potenziamento attivo. Non puoi usare un altro oggetto potenziabile.", 'Q');
-                else {
-                    // Applica il potenziamento e segna l'oggetto come usato
-                    gdrcd_query("UPDATE personaggio SET 
-                        car0 = car0 + {$oggetto['bonus_car1_extra']}, 
-                        car2 = car2 + {$oggetto['bonus_car2_extra']}, 
-                        car4 = car4 + {$oggetto['bonus_car3_extra']}, 
-                        car6 = car6 + {$oggetto['bonus_car4_extra']}, 
-                        car8 = car8 + {$oggetto['bonus_car5_extra']}
-                        WHERE nome = '$login'");
+            } elseif ($has_roll_bonus) {
+                // Bonus al lancio differito: registra il buff pendente nella role corrente.
+                // Viene consumato al primo lancio che usa la caratteristica corrispondente.
+                $id_role_ogg = locationActiveRole($luogo);
+                $login_f_ogg = gdrcd_filter('in', $login);
+                $turn_ogg    = getTurn($id_role_ogg);
 
-                    $data_scadenza = date('Y-m-d H:i:s', strtotime("+{$oggetto['temp_giorni']} days"));
-                    gdrcd_query("UPDATE clgpersonaggiooggetto SET used = 1, data_scadenza = '$data_scadenza' WHERE id_oggetto = '$id_oggetto' AND nome = '$login'");
-
-                    // Invia un messaggio in chat per indicare che l'oggetto è stato usato
-                    chatInsertMessage($_SESSION['luogo'], $login, null, "$login ha usato l\'oggetto $nome_oggetto, potenziando i suoi parametri.", 'C', "Hai potenziato i tuoi parametri con $nome_oggetto. Effetto attivo fino al $data_scadenza.");
+                // Verifica che non sia già stato effettuato un lancio in questo turno
+                if (checkMultipleLounch($id_role_ogg, $login, ["'destrezza'", "'potere'", "'mente'", "'devia'", "'generica'", "'oggetto'"], $turn_ogg)) {
+                    echo json_encode(['success' => false, 'message' => 'Attenzione! Non puoi usare un oggetto nello stesso turno in cui hai già fatto un lancio.']);
+                    exit;
                 }
+
+                $b_des = (int)$oggetto['bonus_car2_extra'];
+                $b_men = (int)$oggetto['bonus_car3_extra'];
+                $b_tem = (int)$oggetto['bonus_car4_extra'];
+                $b_pot = (int)$oggetto['bonus_car5_extra'];
+
+                // ON DUPLICATE KEY UPDATE: stesso oggetto già pendente viene sovrascritto
+                gdrcd_query("INSERT INTO role_item_buffs (id_role, pg_name, id_oggetto, bonus_destrezza, bonus_mente, bonus_tempra, bonus_potere)
+                    VALUES ($id_role_ogg, '$login_f_ogg', $id_oggetto, $b_des, $b_men, $b_tem, $b_pot)
+                    ON DUPLICATE KEY UPDATE
+                        bonus_destrezza = $b_des, bonus_mente = $b_men, bonus_tempra = $b_tem, bonus_potere = $b_pot");
+
+                // Registra l'azione in role_fights con car='oggetto' per bloccare ulteriori lanci nel turno
+                fight($id_role_ogg, $login_f_ogg, '', 0, 0, 'oggetto', 0);
+
+                gestisciInventario($login, $id_oggetto, 0);
+
+                $bonus_parts = [];
+                if ($b_des > 0) $bonus_parts[] = "+$b_des Destrezza";
+                if ($b_men > 0) $bonus_parts[] = "+$b_men Mente";
+                if ($b_tem > 0) $bonus_parts[] = "+$b_tem Tempra";
+                if ($b_pot > 0) $bonus_parts[] = "+$b_pot Potere";
+                $bonus_desc = implode(', ', $bonus_parts);
+
+                chatInsertMessage($luogo, $login, null, "$login usa $nome_oggetto e si prepara al prossimo lancio.", 'C');
+                echo json_encode(['success' => true, 'message' => "Oggetto usato. Il bonus ($bonus_desc) verrà applicato al tuo prossimo lancio."]);
+                exit;
             }
-            // Se l'oggetto non è curativo né potenziabile, applica la logica di default
+            // Se l'oggetto non è curativo né a bonus lancio, applica la logica di default
             else {
                 chatInsertMessage($_SESSION['luogo'], $login, null, $messaggio, 'C');
                 gestisciInventario($login, $id_oggetto, $cariche);

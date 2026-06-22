@@ -609,6 +609,33 @@ function lanciaStat($id_role, $login, $bersaglio, $bonus_stats, $dice_type, $nom
             
             $numtot_finale -= $malus_salute;
         }
+        // Buff pendenti da oggetti usati nella role (consumati al primo lancio sulla caratteristica corrispondente)
+        $buff_col_map = [
+            'Destrezza' => 'bonus_destrezza',
+            'Mente'     => 'bonus_mente',
+            'Tempra'    => 'bonus_tempra',
+            'Potere'    => 'bonus_potere',
+        ];
+        if ($id_role && isset($buff_col_map[$dice_type])) {
+            $col     = $buff_col_map[$dice_type];
+            $lgn_f   = gdrcd_filter('in', $login);
+            $buf_res = gdrcd_query(
+                "SELECT id, $col AS bonus FROM role_item_buffs WHERE id_role = $id_role AND pg_name = '$lgn_f' AND $col > 0",
+                'result'
+            );
+            $item_bonus = 0;
+            $buff_ids   = [];
+            while ($b = gdrcd_query($buf_res, 'fetch')) {
+                $item_bonus += (int)$b['bonus'];
+                $buff_ids[]  = (int)$b['id'];
+            }
+            gdrcd_query($buf_res, 'free');
+            if (!empty($buff_ids)) {
+                $dice_bonus += $item_bonus;
+                gdrcd_query("DELETE FROM role_item_buffs WHERE id IN (" . implode(',', $buff_ids) . ")");
+            }
+        }
+
         // Aggiungo bonus e malus selezionati dall'utente
         $numtot_finale += $dice_bonus;
         $numtot_finale -= $dice_malus;
@@ -842,6 +869,9 @@ function locationActiveRole($location) {
 }
 
 function endRoleSession($location) {
+    $role_row = gdrcd_query("SELECT id_role FROM role_sessions WHERE location = $location AND end IS NULL");
+    if ($role_row) gdrcd_query("DELETE FROM role_item_buffs WHERE id_role = " . (int)$role_row['id_role']);
+
     gdrcd_query("UPDATE role_sessions SET `end` = NOW() WHERE `location` = $location");
 
     chatInsertMessage($location, 'System', null, 'Role conclusa!', 'N');
