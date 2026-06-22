@@ -228,7 +228,7 @@ export default function PresentiEstesi() {
 
                     {/* Intestazioni colonne */}
                     <tr className="second_header">
-                        <td>IN ROLE</td>
+                        <td></td>
                         <td>AVATAR</td>
                         <td>SMS</td>
                         <td style={{ display: 'none' }}>RAZZA ICO</td>
