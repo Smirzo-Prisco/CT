@@ -452,10 +452,12 @@ switch ($op) {
         }
         gdrcd_query($result, 'free');
 
-        // Query batch per le inclinazioni: un solo round-trip invece di N query.
-        // I pg con inclinazione hanno un'immagine diversa rispetto alla gilda/famiglia.
+        // Query batch per le inclinazioni e per lo stato "in role":
+        // un solo round-trip per gruppo invece di N query per utente.
+        $in_role_set = [];
         if (!empty($nomi)) {
             $nomi_str = "'" . implode("','", $nomi) . "'";
+
             $r_incl = gdrcd_query("
                 SELECT cpi.personaggio, i.immagine, i.nome
                 FROM clgpersonaggioinclinazione cpi
@@ -470,7 +472,26 @@ switch ($op) {
                 }
             }
             gdrcd_query($r_incl, 'free');
+
+            // Recupera i pg attualmente in una role attiva (non terminata, non freezata)
+            $r_role = gdrcd_query("
+                SELECT rsp.pg_name
+                FROM role_session_players rsp
+                INNER JOIN role_sessions rs ON rsp.id_role = rs.id_role
+                WHERE rs.end IS NULL AND rs.freezed IS NULL AND rsp.end IS NULL
+                  AND rsp.pg_name IN ($nomi_str)
+            ", 'result');
+            while ($row = gdrcd_query($r_role, 'fetch')) {
+                $in_role_set[$row['pg_name']] = true;
+            }
+            gdrcd_query($r_role, 'free');
         }
+
+        // Aggiunge il flag in_role a ciascun utente
+        foreach ($users as $nome => &$u) {
+            $u['in_role'] = isset($in_role_set[$nome]);
+        }
+        unset($u);
 
         echo json_encode([
             'success' => true,

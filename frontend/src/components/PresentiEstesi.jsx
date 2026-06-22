@@ -77,6 +77,20 @@ function UserRow({ user }) {
     return (
         <tr className={`presente${!user.disponibile ? ' presente-assente' : ''}`}>
 
+            {/* Pallino In Role */}
+            <td style={{ textAlign: 'center', width: '24px' }}>
+                <span
+                    title={user.in_role ? 'In giocata' : 'Non in giocata'}
+                    style={{
+                        display: 'inline-block',
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        backgroundColor: user.in_role ? '#4caf50' : '#757575',
+                    }}
+                />
+            </td>
+
             {/* Avatar del personaggio */}
             <td width="10%" style={{ textAlign: 'center' }}>
                 <img width="50" height="50" src={user.url_img_chat} alt={user.nome} />
@@ -205,7 +219,7 @@ export default function PresentiEstesi() {
                 <thead>
                     <tr>
                         {/* Header con conteggio — si aggiorna automaticamente ad ogni evento socket */}
-                        <th colSpan="7" className={shared.schedaSerial}>
+                        <th colSpan="9" className={shared.schedaSerial}>
                             PRESENTI: {total}
                         </th>
                     </tr>
@@ -214,6 +228,7 @@ export default function PresentiEstesi() {
 
                     {/* Intestazioni colonne */}
                     <tr className="second_header">
+                        <td>IN ROLE</td>
                         <td>AVATAR</td>
                         <td>SMS</td>
                         <td style={{ display: 'none' }}>RAZZA ICO</td>
@@ -229,7 +244,7 @@ export default function PresentiEstesi() {
 
                             {/* Header mappa */}
                             <tr className="mappa">
-                                <td colSpan="8" className={shared.schedaUpper}>{mappa}</td>
+                                <td colSpan="9" className={shared.schedaUpper}>{mappa}</td>
                             </tr>
 
                             {/* Iterazione per stanza — Fragment con key, obbligatorio per liste React */}
@@ -243,7 +258,7 @@ export default function PresentiEstesi() {
                                       */}
                                     {stanza && (
                                         <tr className="third_header">
-                                            <td colSpan="8" className={shared.schedaUpper}>
+                                            <td colSpan="9" className={shared.schedaUpper}>
                                                 <a href={`main.php?dir=${utenti[0].ultimo_luogo}`}>
                                                     {stanza}
                                                 </a>
@@ -263,7 +278,7 @@ export default function PresentiEstesi() {
                     {/* Messaggio quando non ci sono utenti online */}
                     {users.length === 0 && (
                         <tr>
-                            <td colSpan="7" style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
+                            <td colSpan="8" style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
                                 Nessun utente online
                             </td>
                         </tr>
