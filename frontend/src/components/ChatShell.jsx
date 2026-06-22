@@ -89,19 +89,29 @@ function AbilitaOptions({ abilita }) {
 function CuraPanel({ onClose, isOspedale }) {
     const [loadingGiorn, setLoadingGiorn] = useState(false)
     const [feedbackGiorn, setFeedbackGiorn] = useState(null)
+    const [loadingGiornPI, setLoadingGiornPI] = useState(false)
+    const [feedbackGiornPI, setFeedbackGiornPI] = useState(null)
 
     const [punti, setPunti] = useState(10)
     const [loading, setLoading] = useState(false)
     const [feedback, setFeedback] = useState(null)
+    const [loadingPI, setLoadingPI] = useState(false)
+    const [feedbackPI, setFeedbackPI] = useState(null)
 
     const [target, setTarget] = useState('')
     const [loadingStaff, setLoadingStaff] = useState(false)
     const [feedbackStaff, setFeedbackStaff] = useState(null)
+    const [loadingStaffPI, setLoadingStaffPI] = useState(false)
+    const [feedbackStaffPI, setFeedbackStaffPI] = useState(null)
 
     const handleCuraGiornaliera = useCallback(() => {
         setLoadingGiorn(true)
         setFeedbackGiorn(null)
-        fetch('/pages/api_chat.php?op=curaPgGiornaliera', { method: 'POST' })
+        fetch('/pages/api_chat.php?op=curaPgGiornaliera', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tipo: 'ps' }),
+        })
             .then(r => r.json())
             .then(data => {
                 if (data.success)
@@ -113,6 +123,25 @@ function CuraPanel({ onClose, isOspedale }) {
             .finally(() => setLoadingGiorn(false))
     }, [])
 
+    const handleCuraGiornalieraPI = useCallback(() => {
+        setLoadingGiornPI(true)
+        setFeedbackGiornPI(null)
+        fetch('/pages/api_chat.php?op=curaPgGiornaliera', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tipo: 'pi' }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success)
+                    setFeedbackGiornPI(`+${data.punti_effettivi} PI. Integrità: ${data.nuova_integrita}.`)
+                else
+                    setFeedbackGiornPI(data.message)
+            })
+            .catch(() => setFeedbackGiornPI('Errore di rete.'))
+            .finally(() => setLoadingGiornPI(false))
+    }, [])
+
     const handleApplica = useCallback(() => {
         const p = Math.max(1, Math.min(90, punti))
         setLoading(true)
@@ -120,7 +149,7 @@ function CuraPanel({ onClose, isOspedale }) {
         fetch('/pages/api_chat.php?op=curaPg', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ punti: p }),
+            body: JSON.stringify({ punti: p, tipo: 'ps' }),
         })
             .then(r => r.json())
             .then(data => {
@@ -133,6 +162,26 @@ function CuraPanel({ onClose, isOspedale }) {
             .finally(() => setLoading(false))
     }, [punti])
 
+    const handleApplicaPI = useCallback(() => {
+        const p = Math.max(1, Math.min(90, punti))
+        setLoadingPI(true)
+        setFeedbackPI(null)
+        fetch('/pages/api_chat.php?op=curaPg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ punti: p, tipo: 'pi' }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success)
+                    setFeedbackPI(`+${data.punti_effettivi} PI. Integrità attuale: ${data.nuova_integrita}.`)
+                else
+                    setFeedbackPI(data.message)
+            })
+            .catch(() => setFeedbackPI('Errore di rete.'))
+            .finally(() => setLoadingPI(false))
+    }, [punti])
+
     const handleCuraAltro = useCallback(() => {
         if (!target.trim()) return
         setLoadingStaff(true)
@@ -140,7 +189,7 @@ function CuraPanel({ onClose, isOspedale }) {
         fetch('/pages/api_chat.php?op=curaAltroPg', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ target: target.trim() }),
+            body: JSON.stringify({ target: target.trim(), tipo: 'ps' }),
         })
             .then(r => r.json())
             .then(data => {
@@ -153,6 +202,28 @@ function CuraPanel({ onClose, isOspedale }) {
             })
             .catch(() => setFeedbackStaff('Errore di rete.'))
             .finally(() => setLoadingStaff(false))
+    }, [target])
+
+    const handleCuraAltroPI = useCallback(() => {
+        if (!target.trim()) return
+        setLoadingStaffPI(true)
+        setFeedbackStaffPI(null)
+        fetch('/pages/api_chat.php?op=curaAltroPg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target: target.trim(), tipo: 'pi' }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setFeedbackStaffPI(`${target}: +${data.punti_effettivi} PI. Integrità: ${data.nuova_integrita}.`)
+                    setTarget('')
+                } else {
+                    setFeedbackStaffPI(data.message)
+                }
+            })
+            .catch(() => setFeedbackStaffPI('Errore di rete.'))
+            .finally(() => setLoadingStaffPI(false))
     }, [target])
 
     return (
@@ -173,8 +244,16 @@ function CuraPanel({ onClose, isOspedale }) {
                     >
                         {loadingGiorn ? '...' : 'Ricevi +10 PS'}
                     </button>
+                    <button
+                        className="cura-panel__btn"
+                        onClick={handleCuraGiornalieraPI}
+                        disabled={loadingGiornPI}
+                    >
+                        {loadingGiornPI ? '...' : 'Ricevi +10 PI'}
+                    </button>
                 </div>
                 {feedbackGiorn && <div className="cura-panel__feedback">{feedbackGiorn}</div>}
+                {feedbackGiornPI && <div className="cura-panel__feedback">{feedbackGiornPI}</div>}
             </div>
 
             {/* ── Cura di emergenza ── */}
@@ -203,10 +282,18 @@ function CuraPanel({ onClose, isOspedale }) {
                         onClick={handleApplica}
                         disabled={loading}
                     >
-                        {loading ? '...' : 'Applica cura'}
+                        {loading ? '...' : 'Applica PS'}
+                    </button>
+                    <button
+                        className="cura-panel__btn"
+                        onClick={handleApplicaPI}
+                        disabled={loadingPI}
+                    >
+                        {loadingPI ? '...' : 'Applica PI'}
                     </button>
                 </div>
                 {feedback && <div className="cura-panel__feedback">{feedback}</div>}
+                {feedbackPI && <div className="cura-panel__feedback">{feedbackPI}</div>}
 
                 {isOspedale && (
                     <div className="cura-panel__staff">
@@ -227,8 +314,16 @@ function CuraPanel({ onClose, isOspedale }) {
                             >
                                 {loadingStaff ? '...' : 'Assegna 25 PS'}
                             </button>
+                            <button
+                                className="cura-panel__btn"
+                                onClick={handleCuraAltroPI}
+                                disabled={loadingStaffPI || !target.trim()}
+                            >
+                                {loadingStaffPI ? '...' : 'Assegna 25 PI'}
+                            </button>
                         </div>
                         {feedbackStaff && <div className="cura-panel__feedback">{feedbackStaff}</div>}
+                        {feedbackStaffPI && <div className="cura-panel__feedback">{feedbackStaffPI}</div>}
                     </div>
                 )}
             </div>{/* end cura-panel__section */}

@@ -990,38 +990,65 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 exit;
             }
 
+            $input_cg = json_decode(file_get_contents('php://input'), true) ?? [];
+            $tipo_cg  = ($input_cg['tipo'] ?? 'ps') === 'pi' ? 'pi' : 'ps';
+
             // Reset giornaliero alle 7:00 — stesso comportamento del sistema originale
             $now   = new DateTime('now');
             $reset = new DateTime('today 7:00');
             if ($now < $reset) $reset->modify('-1day');
 
-            $last_cure = gdrcd_query("SELECT data_cura FROM cure WHERE nome = '$login_f'");
-            if ($last_cure && new DateTime($last_cure['data_cura']) >= $reset) {
-                echo json_encode(['success' => false, 'message' => 'Hai già usato la cura giornaliera. Torna dopo le 7:00!']);
-                exit;
+            $cure_row = gdrcd_query("SELECT data_cura, data_cura_pi FROM cure WHERE nome = '$login_f'");
+
+            if ($tipo_cg === 'ps') {
+                $last_ts = $cure_row['data_cura'] ?? null;
+                if ($last_ts && new DateTime($last_ts) >= $reset) {
+                    echo json_encode(['success' => false, 'message' => 'Hai già usato la cura PS giornaliera. Torna dopo le 7:00!']);
+                    exit;
+                }
+                $result_g = adjustPgStats($login, 10);
+                if (!$result_g) {
+                    echo json_encode(['success' => false, 'message' => 'Personaggio non trovato.']);
+                    exit;
+                }
+                if ($result_g['delta_salute'] === 0) {
+                    echo json_encode(['success' => false, 'message' => "La tua salute è già al massimo ({$result_g['salute_max']} PS)."]);
+                    exit;
+                }
+                if ($cure_row)
+                    gdrcd_query("UPDATE cure SET data_cura = NOW() WHERE nome = '$login_f'");
+                else
+                    gdrcd_query("INSERT INTO cure (nome, data_cura) VALUES ('$login_f', NOW())");
+                $pts = $result_g['delta_salute'];
+                $cur = $result_g['salute'];
+                $max = $result_g['salute_max'];
+                chatInsertMessage($luogo, 'System', $login, "ha ricevuto la cura giornaliera di $pts PS. Salute: $cur/$max.", 'N');
+                echo json_encode(['success' => true, 'punti_effettivi' => $pts, 'nuova_salute' => $cur]);
+            } else {
+                $last_ts = $cure_row['data_cura_pi'] ?? null;
+                if ($last_ts && new DateTime($last_ts) >= $reset) {
+                    echo json_encode(['success' => false, 'message' => 'Hai già usato la cura PI giornaliera. Torna dopo le 7:00!']);
+                    exit;
+                }
+                $result_g = adjustPgStats($login, 0, 10);
+                if (!$result_g) {
+                    echo json_encode(['success' => false, 'message' => 'Personaggio non trovato.']);
+                    exit;
+                }
+                if ($result_g['delta_integrita'] === 0) {
+                    echo json_encode(['success' => false, 'message' => "La tua integrità è già al massimo ({$result_g['integrita_max']} PI)."]);
+                    exit;
+                }
+                if ($cure_row)
+                    gdrcd_query("UPDATE cure SET data_cura_pi = NOW() WHERE nome = '$login_f'");
+                else
+                    gdrcd_query("INSERT INTO cure (nome, data_cura, data_cura_pi) VALUES ('$login_f', NULL, NOW())");
+                $pts = $result_g['delta_integrita'];
+                $cur = $result_g['integrita'];
+                $max = $result_g['integrita_max'];
+                chatInsertMessage($luogo, 'System', $login, "ha ricevuto la cura giornaliera di $pts PI. Integrità: $cur/$max.", 'N');
+                echo json_encode(['success' => true, 'punti_effettivi' => $pts, 'nuova_integrita' => $cur]);
             }
-
-            $result_g = adjustPgStats($login, 10);
-            if (!$result_g) {
-                echo json_encode(['success' => false, 'message' => 'Personaggio non trovato.']);
-                exit;
-            }
-            if ($result_g['delta_salute'] === 0) {
-                echo json_encode(['success' => false, 'message' => "La tua salute è già al massimo ({$result_g['salute_max']} PS)."]);
-                exit;
-            }
-
-            if ($last_cure)
-                gdrcd_query("UPDATE cure SET data_cura = NOW() WHERE nome = '$login_f'");
-            else
-                gdrcd_query("INSERT INTO cure (nome, data_cura) VALUES ('$login_f', NOW())");
-
-            $ps_g   = $result_g['delta_salute'];
-            $sal_g  = $result_g['salute'];
-            $max_g  = $result_g['salute_max'];
-            chatInsertMessage($luogo, 'System', $login, "ha ricevuto la cura giornaliera di $ps_g PS. Salute: $sal_g/$max_g.", 'N');
-
-            echo json_encode(['success' => true, 'punti_effettivi' => $ps_g, 'nuova_salute' => $sal_g]);
             break;
 
         case 'curaPg':
@@ -1040,32 +1067,46 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             $input_cura      = json_decode(file_get_contents('php://input'), true);
             $punti_richiesti = isset($input_cura['punti']) ? (int)$input_cura['punti'] : 0;
+            $tipo_emg        = ($input_cura['tipo'] ?? 'ps') === 'pi' ? 'pi' : 'ps';
 
             if ($punti_richiesti < 1 || $punti_richiesti > 90) {
                 echo json_encode(['success' => false, 'message' => 'Valore non valido. Inserisci un numero tra 1 e 90.']);
                 exit;
             }
 
-            $result = adjustPgStats($login, $punti_richiesti);
+            $result  = $tipo_emg === 'pi'
+                ? adjustPgStats($login, 0, $punti_richiesti)
+                : adjustPgStats($login, $punti_richiesti);
             if (!$result) {
                 echo json_encode(['success' => false, 'message' => 'Personaggio non trovato.']);
                 exit;
             }
-            if ($result['delta_salute'] === 0) {
-                echo json_encode(['success' => false, 'message' => "La tua salute è già al massimo ({$result['salute_max']} PS)."]);
-                exit;
+            $login_f = gdrcd_filter('in', $login);
+
+            if ($tipo_emg === 'ps') {
+                if ($result['delta_salute'] === 0) {
+                    echo json_encode(['success' => false, 'message' => "La tua salute è già al massimo ({$result['salute_max']} PS)."]);
+                    exit;
+                }
+                $punti_effettivi = $result['delta_salute'];
+                $nuova_salute    = $result['salute'];
+                $sal_max         = $result['salute_max'];
+                // Accumula il debito giornaliero: un record per coppia (nome, data)
+                gdrcd_query("INSERT INTO cure_emergenza (nome, punti, data_cura) VALUES ('$login_f', $punti_effettivi, CURDATE()) ON DUPLICATE KEY UPDATE punti = punti + $punti_effettivi");
+                chatInsertMessage($luogo, 'System', $login, "ha ricevuto una cura di emergenza di $punti_effettivi PS. Salute attuale: $nuova_salute/$sal_max.", 'N');
+                echo json_encode(['success' => true, 'punti_effettivi' => $punti_effettivi, 'nuova_salute' => $nuova_salute]);
+            } else {
+                if ($result['delta_integrita'] === 0) {
+                    echo json_encode(['success' => false, 'message' => "La tua integrità è già al massimo ({$result['integrita_max']} PI)."]);
+                    exit;
+                }
+                $punti_effettivi = $result['delta_integrita'];
+                $nuova_integrita = $result['integrita'];
+                $int_max         = $result['integrita_max'];
+                gdrcd_query("INSERT INTO cure_emergenza (nome, punti_pi, data_cura) VALUES ('$login_f', $punti_effettivi, CURDATE()) ON DUPLICATE KEY UPDATE punti_pi = punti_pi + $punti_effettivi");
+                chatInsertMessage($luogo, 'System', $login, "ha ricevuto una cura di emergenza di $punti_effettivi PI. Integrità attuale: $nuova_integrita/$int_max.", 'N');
+                echo json_encode(['success' => true, 'punti_effettivi' => $punti_effettivi, 'nuova_integrita' => $nuova_integrita]);
             }
-
-            $punti_effettivi = $result['delta_salute'];
-            $nuova_salute    = $result['salute'];
-            $sal_max         = $result['salute_max'];
-            $login_f         = gdrcd_filter('in', $login);
-
-            // Accumula il debito giornaliero: un record per coppia (nome, data)
-            gdrcd_query("INSERT INTO cure_emergenza (nome, punti, data_cura) VALUES ('$login_f', $punti_effettivi, CURDATE()) ON DUPLICATE KEY UPDATE punti = punti + $punti_effettivi");
-            chatInsertMessage($luogo, 'System', $login, "ha ricevuto una cura di emergenza di $punti_effettivi PS. Salute attuale: $nuova_salute/$sal_max.", 'N');
-
-            echo json_encode(['success' => true, 'punti_effettivi' => $punti_effettivi, 'nuova_salute' => $nuova_salute]);
             break;
         case 'setBackChat':
             $login = $_SESSION['login'];
@@ -1617,13 +1658,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $show_backchat   = (float)$pg['esperienza'] > 19;
             $backchat_on     = (int)$pg['back_chat'] === 1;
             // I medici vedono il pannello solo dopo almeno 2 azioni (tipo P) in stanza, come il Magic Shop
-            $can_self_cure   = (int)$pg['salute'] > 0 && (int)$pg['salute'] < (int)$pg['salute_max'];
+            $can_self_cure    = (int)$pg['salute'] > 0 && (int)$pg['salute'] < (int)$pg['salute_max'];
+            $can_self_cure_pi = (int)$pg['integrita'] < (int)$pg['integrita_max'];
             $medico_abilitato = false;
             if ($is_ospedale && $luogo === 25) {
                 $azioni_row   = gdrcd_query("SELECT COUNT(*) AS n FROM chat WHERE stanza = '$luogo' AND mittente = '$login_f' AND tipo = 'P'");
                 $medico_abilitato = (int)($azioni_row['n'] ?? 0) > 1;
             }
-            $show_cura       = $luogo === 25 && ($can_self_cure || $is_ospedale);
+            $show_cura        = $luogo === 25 && ($can_self_cure || $can_self_cure_pi || $is_ospedale);
             $show_pulisci    = $is_staff;
             $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
             $can_master_msg  = $is_admin || $is_master;
@@ -1801,32 +1843,46 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 exit;
             }
 
-            $input_cura2   = json_decode(file_get_contents('php://input'), true);
-            $target_raw    = trim($input_cura2['target'] ?? '');
+            $input_cura2 = json_decode(file_get_contents('php://input'), true);
+            $target_raw  = trim($input_cura2['target'] ?? '');
+            $tipo_altro  = ($input_cura2['tipo'] ?? 'ps') === 'pi' ? 'pi' : 'ps';
 
             if ($target_raw === '') {
                 echo json_encode(['success' => false, 'message' => 'Specifica il nome del personaggio da curare.']);
                 exit;
             }
 
-            $result_target = adjustPgStats($target_raw, 25);
+            $result_target = $tipo_altro === 'pi'
+                ? adjustPgStats($target_raw, 0, 25)
+                : adjustPgStats($target_raw, 25);
             if (!$result_target) {
                 echo json_encode(['success' => false, 'message' => 'Personaggio non trovato.']);
                 exit;
             }
-            if ($result_target['delta_salute'] === 0) {
-                echo json_encode(['success' => false, 'message' => "Il personaggio ha già la salute al massimo ({$result_target['salute_max']} PS)."]);
-                exit;
+
+            if ($tipo_altro === 'ps') {
+                if ($result_target['delta_salute'] === 0) {
+                    echo json_encode(['success' => false, 'message' => "Il personaggio ha già la salute al massimo ({$result_target['salute_max']} PS)."]);
+                    exit;
+                }
+                $pts = $result_target['delta_salute'];
+                $cur = $result_target['salute'];
+                $max = $result_target['salute_max'];
+                chatInsertMessage($luogo, 'System', $login, "cura $target_raw di $pts PS. Salute attuale: $cur/$max.", 'N');
+                gdrcd_query("UPDATE personaggio SET esperienza_mestiere = esperienza_mestiere + 1 WHERE nome = '$login_f'");
+                echo json_encode(['success' => true, 'punti_effettivi' => $pts, 'nuova_salute' => $cur]);
+            } else {
+                if ($result_target['delta_integrita'] === 0) {
+                    echo json_encode(['success' => false, 'message' => "Il personaggio ha già l'integrità al massimo ({$result_target['integrita_max']} PI)."]);
+                    exit;
+                }
+                $pts = $result_target['delta_integrita'];
+                $cur = $result_target['integrita'];
+                $max = $result_target['integrita_max'];
+                chatInsertMessage($luogo, 'System', $login, "ripristina $pts PI a $target_raw. Integrità attuale: $cur/$max.", 'N');
+                gdrcd_query("UPDATE personaggio SET esperienza_mestiere = esperienza_mestiere + 1 WHERE nome = '$login_f'");
+                echo json_encode(['success' => true, 'punti_effettivi' => $pts, 'nuova_integrita' => $cur]);
             }
-
-            $ps_cura      = $result_target['delta_salute'];
-            $nuova_sal    = $result_target['salute'];
-            $sal_max_t    = $result_target['salute_max'];
-            chatInsertMessage($luogo, 'System', $login, "cura $target_raw di $ps_cura PS. Salute attuale: $nuova_sal/$sal_max_t.", 'N');
-
-            gdrcd_query("UPDATE personaggio SET esperienza_mestiere = esperienza_mestiere + 1 WHERE nome = '$login_f'");
-
-            echo json_encode(['success' => true, 'punti_effettivi' => $ps_cura, 'nuova_salute' => $nuova_sal]);
             break;
 
         case 'getQuestState':
