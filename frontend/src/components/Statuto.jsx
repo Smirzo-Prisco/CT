@@ -104,7 +104,30 @@ export default function Statuto() {
         setOpenIdx(prev => prev === idx ? null : idx)
     }
 
-    if (!background) return <p>Pagina non trovata.</p>
+    if (!background) return (
+        <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', padding: '48px 24px', gap: '16px',
+            color: 'var(--color-text)', textAlign: 'center', minHeight: '200px',
+        }}>
+            <i className="fas fa-scroll" style={{ fontSize: '2.5rem', color: 'var(--color-action)' }} />
+            <p style={{ fontWeight: 700, fontSize: '1rem', margin: 0 }}>Statuto non disponibile</p>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', margin: 0 }}>
+                Non è ancora stato pubblicato uno statuto per questa sezione.
+            </p>
+            <button
+                onClick={() => window.history.back()}
+                style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '8px',
+                    padding: '7px 14px', background: 'transparent',
+                    border: '1px solid rgba(174,231,255,0.3)', borderRadius: '6px',
+                    color: 'var(--color-action)', cursor: 'pointer', fontSize: '0.85rem',
+                }}
+            >
+                <i className="fas fa-arrow-left" /> Torna indietro
+            </button>
+        </div>
+    )
 
     const sectionsWithHandler = sections.map(sec => ({ ...sec, onLoad: loadArticolo }))
 
