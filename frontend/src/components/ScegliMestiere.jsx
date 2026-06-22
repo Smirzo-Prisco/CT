@@ -79,6 +79,13 @@ function MesteireCard({ mestiere, step, esperienza, onAction }) {
                         <i className="fas fa-lock"></i> Esperienza insufficiente
                       </span>
             )}
+
+            <button
+                className="sr-btn sr-btn--statute"
+                onClick={() => navigate(`main.php?page=statuto_main&id2=${mestiere.mestiere}`)}
+            >
+                <i className="fas fa-book-open"></i> Statuto
+            </button>
         </div>
     )
 }
