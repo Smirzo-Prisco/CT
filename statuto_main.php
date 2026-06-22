@@ -21,7 +21,50 @@ $bgGilde   = [1=>'paladini.png',2=>'demoni.png',3=>'setta.png',4=>'custodi.png',
 $bgMestieri = [1=>'icc.png',2=>'tae.png',3=>'magic.png',4=>'pandora.png',6=>'corte.png',10=>'corte.png'];
 
 $background = $bgGilde[$id] ?? ($bgMestieri[$id2] ?? null);
-if (!$background) exit;
+
+if (!$background):
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>CT - Statuto</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<style>
+body { margin:0; background:#0f111d; }
+.st-empty {
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100vh; gap:16px; color:#e8e4da;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    text-align:center; padding:32px; box-sizing:border-box;
+}
+.st-empty__icon { font-size:3rem; color:#AEE7FF; }
+.st-empty__title { font-size:1.2rem; font-weight:700; }
+.st-empty__msg { color:#A8A6B3; font-size:0.9rem; max-width:340px; line-height:1.6; }
+.st-back {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 16px; background:transparent;
+    border:1px solid rgba(174,231,255,0.3); border-radius:6px;
+    color:#AEE7FF; cursor:pointer; font-size:0.85rem; margin-top:4px;
+}
+.st-back:hover { background:rgba(174,231,255,0.1); }
+</style>
+</head>
+<body>
+<div class="st-empty">
+    <i class="fa fa-file-text-o st-empty__icon"></i>
+    <div class="st-empty__title">Statuto non disponibile</div>
+    <p class="st-empty__msg">Non è ancora stato pubblicato uno statuto per questa sezione.</p>
+    <button class="st-back" onclick="window.history.back()">
+        <i class="fa fa-arrow-left"></i> Torna indietro
+    </button>
+</div>
+</body>
+</html>
+<?php
+    gdrcd_close_connection($handleDBConnection);
+    exit;
+endif;
 
 /**
  * Renderizza una sezione accordion del menu.
@@ -53,8 +96,23 @@ function menuSection($tipo, $campo, $valore, $classe) {
 <link rel="stylesheet" href="themes/crystal/statuti.css">
 <link rel="stylesheet" href="themes/crystal/statuto_menu.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<style>
+.st-back-fixed {
+    position:fixed; top:10px; left:10px; z-index:1000;
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; background:rgba(15,17,29,0.85);
+    border:1px solid rgba(174,231,255,0.25); border-radius:6px;
+    color:#AEE7FF; cursor:pointer; font-size:0.8rem;
+    backdrop-filter:blur(4px);
+}
+.st-back-fixed:hover { background:rgba(174,231,255,0.12); }
+</style>
 </head>
 <body>
+
+<button class="st-back-fixed" onclick="window.history.back()">
+    <i class="fa fa-arrow-left"></i> Indietro
+</button>
 
 <div id="main-container">
 
