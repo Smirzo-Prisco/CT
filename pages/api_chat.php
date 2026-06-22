@@ -998,10 +998,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $reset = new DateTime('today 7:00');
             if ($now < $reset) $reset->modify('-1day');
 
-            $cure_row = gdrcd_query("SELECT data_cura, data_cura_pi FROM cure WHERE nome = '$login_f'");
-
             if ($tipo_cg === 'ps') {
-                $last_ts = $cure_row['data_cura'] ?? null;
+                $cure_row = gdrcd_query("SELECT data_cura FROM cure WHERE nome = '$login_f'");
+                $last_ts  = $cure_row['data_cura'] ?? null;
                 if ($last_ts && new DateTime($last_ts) >= $reset) {
                     echo json_encode(['success' => false, 'message' => 'Hai già usato la cura PS giornaliera. Torna dopo le 7:00!']);
                     exit;
@@ -1025,7 +1024,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 chatInsertMessage($luogo, 'System', $login, "ha ricevuto la cura giornaliera di $pts PS. Salute: $cur/$max.", 'N');
                 echo json_encode(['success' => true, 'punti_effettivi' => $pts, 'nuova_salute' => $cur]);
             } else {
-                $last_ts = $cure_row['data_cura_pi'] ?? null;
+                $cure_row = gdrcd_query("SELECT data_cura, data_cura_pi FROM cure WHERE nome = '$login_f'");
+                $last_ts  = $cure_row['data_cura_pi'] ?? null;
                 if ($last_ts && new DateTime($last_ts) >= $reset) {
                     echo json_encode(['success' => false, 'message' => 'Hai già usato la cura PI giornaliera. Torna dopo le 7:00!']);
                     exit;
