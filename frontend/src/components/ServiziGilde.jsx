@@ -41,17 +41,7 @@ function GildeSection({ gilde, onSelectGilda }) {
                             <span className="sm-list-name">{g.nome}</span>
                         </a>
                         <span className="sm-list-count">{g.count}</span>
-                        {g.reliquia && (
-                            <a
-                                href="#"
-                                className="sm-list-statute"
-                                title={`Reliquia: ${g.reliquia}`}
-                                onClick={e => { e.preventDefault(); navigate(`main.php?page=elenco_reliquie&IDPng=${g.id}`) }}
-                            >
-                                <i className="fas fa-gem" />
-                            </a>
-                        )}
-                        <a
+                        <
                             href="#"
                             className="sm-list-statute"
                             title="Statuto"
@@ -84,7 +74,9 @@ function MestieriSections({ mestieri }) {
 
     return grouped.map(group => (
         <section key={group.tipo} className="sm-section">
-            <div className="sm-section-title">{group.desc}</div>
+            <div className="sm-section-title">
+                {group.desc.toLowerCase() === 'generici' ? 'Mestieri' : group.desc}
+            </div>
             <div className="sm-list">
                 {group.items.map(m => (
                     <div key={m.id} className="sm-list-item">
