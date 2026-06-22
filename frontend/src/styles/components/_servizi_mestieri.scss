@@ -1,0 +1,318 @@
+// ============================================================
+// _servizi_mestieri.scss — Elenco e dettaglio mestieri
+// Scoped sotto .sm-page.
+// ============================================================
+@use '../tokens' as *;
+
+.sm-page {
+    padding: $space-5;
+    max-width: 580px;
+    margin: 0 auto;
+    color: #{$color-text};
+    font-family: $font-base;
+
+    * { box-sizing: border-box; }
+
+    // ── Header ────────────────────────────────────────────────
+
+    .sm-header {
+        display: flex;
+        align-items: center;
+        gap: $space-4;
+        margin-bottom: $space-6;
+        padding-bottom: $space-4;
+        border-bottom: 1px solid rgba($palette-action, 0.2);
+
+        &--list { justify-content: flex-start; }
+    }
+
+    .sm-back {
+        display: inline-flex;
+        align-items: center;
+        gap: $space-2;
+        padding: $space-2 $space-3;
+        background: transparent;
+        border: 1px solid #{$palette-surface-hover};
+        border-radius: #{$radius-md};
+        color: #{$color-text-secondary};
+        text-decoration: none;
+        font-size: $text-sm;
+        flex-shrink: 0;
+        transition: all #{$transition-fast};
+
+        &:hover {
+            border-color: #{$palette-action};
+            color: #{$palette-action};
+        }
+    }
+
+    .sm-title {
+        font-size: $text-2xl;
+        font-weight: 700;
+        color: #{$color-text-title};
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+
+        i { color: #{$palette-action}; }
+    }
+
+    // ── Sezione ───────────────────────────────────────────────
+
+    .sm-section {
+        margin-bottom: $space-6;
+
+        &:last-child { margin-bottom: $space-2; }
+    }
+
+    .sm-section-title {
+        font-size: $text-xs;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #{$palette-action};
+        padding-bottom: $space-2;
+        border-bottom: 1px solid rgba($palette-action, 0.2);
+        margin-bottom: $space-3;
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+    }
+
+    // ── Box immagine (risolve dimensioni variabili) ────────────
+
+    .sm-img-box {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba($palette-action, 0.05);
+        border-radius: #{$radius-md};
+        border: 1px solid rgba($palette-action, 0.12);
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        i {
+            font-size: 1.2rem;
+            color: #{$color-text-muted};
+        }
+    }
+
+    // ── Lista mestieri (vista elenco) ─────────────────────────
+
+    .sm-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .sm-list-item {
+        display: flex;
+        align-items: center;
+        border-radius: #{$radius-md};
+        overflow: hidden;
+        transition: background #{$transition-fast};
+
+        &:hover { background: rgba($palette-action, 0.05); }
+    }
+
+    .sm-list-link {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+        padding: $space-2 $space-3;
+        text-decoration: none;
+        color: #{$color-text};
+        font-size: $text-md;
+        min-width: 0;
+
+        &:hover { color: #{$palette-action}; }
+    }
+
+    .sm-list-icon {
+        width: 16px;
+        text-align: center;
+        color: #{$color-text-muted};
+        flex-shrink: 0;
+        transition: color #{$transition-fast};
+
+        .sm-list-link:hover & { color: #{$palette-action}; }
+    }
+
+    .sm-list-name {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sm-list-count {
+        font-size: $text-xs;
+        color: #{$color-text-muted};
+        padding: 2px $space-2;
+        background: rgba($palette-action, 0.06);
+        border-radius: #{$radius-sm};
+        flex-shrink: 0;
+        margin-right: $space-2;
+    }
+
+    .sm-list-statute {
+        display: flex;
+        align-items: center;
+        padding: $space-2 $space-3;
+        color: #{$color-text-muted};
+        text-decoration: none;
+        font-size: $text-sm;
+        flex-shrink: 0;
+        border-left: 1px solid rgba($palette-action, 0.1);
+        transition: color #{$transition-fast};
+
+        &:hover { color: #{$palette-action}; }
+    }
+
+    // ── Lista gradi / gerarchia (vista dettaglio) ─────────────
+
+    .sm-rank-list {
+        display: flex;
+        flex-direction: column;
+        gap: $space-2;
+    }
+
+    .sm-rank-item {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+        padding: $space-2 $space-3;
+        border-radius: #{$radius-md};
+        border: 1px solid #{$palette-surface-hover};
+        background: #{$palette-surface-raised};
+        transition: border-color #{$transition-fast};
+
+        &--top {
+            border-color: rgba($palette-action, 0.35);
+            background: rgba($palette-action, 0.04);
+        }
+    }
+
+    .sm-rank-badge {
+        width: 24px;
+        height: 24px;
+        border-radius: #{$radius-full};
+        background: rgba($palette-action, 0.08);
+        border: 1px solid rgba($palette-action, 0.2);
+        color: #{$color-text-secondary};
+        font-size: $text-2xs;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        .sm-rank-item--top & {
+            background: rgba($palette-action, 0.18);
+            border-color: rgba($palette-action, 0.45);
+            color: #{$palette-action};
+        }
+    }
+
+    .sm-rank-name {
+        flex: 1;
+        font-size: $text-md;
+        font-weight: 600;
+        color: #{$color-text};
+    }
+
+    .sm-rank-crown {
+        color: #{$palette-action};
+        font-size: $text-md;
+        flex-shrink: 0;
+    }
+
+    // ── Lista affiliati (vista dettaglio) ─────────────────────
+
+    .sm-member-list {
+        display: flex;
+        flex-direction: column;
+        gap: $space-2;
+    }
+
+    .sm-member-item {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+        padding: $space-2 $space-3;
+        border-radius: #{$radius-md};
+        border: 1px solid transparent;
+        transition: all #{$transition-fast};
+
+        &:hover { background: rgba($palette-action, 0.04); border-color: rgba($palette-action, 0.1); }
+
+        &--leader {
+            border-color: rgba($palette-action, 0.2);
+            background: rgba($palette-action, 0.04);
+        }
+    }
+
+    .sm-member-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .sm-member-name {
+        color: #{$palette-action};
+        text-decoration: none;
+        font-size: $text-md;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover { color: #{$palette-action-hover}; text-decoration: underline; }
+    }
+
+    .sm-member-role {
+        color: #{$color-text-secondary};
+        font-size: $text-sm;
+    }
+
+    .sm-member-crown {
+        color: #{$palette-action};
+        font-size: $text-md;
+        flex-shrink: 0;
+    }
+
+    // ── Statuto ───────────────────────────────────────────────
+
+    .sm-statute {
+        background: #{$palette-surface-raised};
+        border: 1px solid rgba($palette-action, 0.12);
+        border-radius: #{$radius-lg};
+        padding: $space-5;
+        font-size: $text-md;
+        color: #{$color-text-secondary};
+        line-height: 1.8;
+        text-align: justify;
+    }
+
+    // ── Responsive ────────────────────────────────────────────
+
+    @media (max-width: 480px) {
+        padding: $space-3;
+
+        .sm-header { gap: $space-3; margin-bottom: $space-4; }
+        .sm-title  { font-size: $text-xl; }
+        .sm-img-box { width: 36px; height: 36px; }
+    }
+}
