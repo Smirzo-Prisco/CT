@@ -28,17 +28,22 @@
     background: $palette-warning;
     color: $palette-bg;
     font-size: 20px;
-    cursor: pointer;
+    cursor: grab;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
-    transition: background 0.2s, transform 0.15s;
+    transition: background 0.2s;   // rimosso transform: lag visibile durante il drag
     flex-shrink: 0;
+    user-select: none;             // evita selezione testo accidentale durante il drag
+    touch-action: none;            // cede il controllo dei touch ai listener JS
 
     &:hover {
         background: darken($palette-warning, 12%);
-        transform: scale(1.08);
+    }
+
+    &:active {
+        cursor: grabbing;
     }
 
     &--open {
