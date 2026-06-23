@@ -280,6 +280,7 @@ export default function Scheda() {
     const [noteFatoOpen, setNoteFatoOpen] = useState(false)
     const [soundScheda, setSoundScheda] = useState(() => window.CT_USER?.soundPrefs?.scheda ?? 1)
     const scopedStyleEl = useRef(null)
+    const schedaRef     = useRef(null)
 
     // Reagisce in real-time al cambio preferenza musica schede
     useEffect(() => {
@@ -287,6 +288,56 @@ export default function Scheda() {
         document.addEventListener('ct:soundprefs:update', onSoundUpdate)
         return () => document.removeEventListener('ct:soundprefs:update', onSoundUpdate)
     }, [])
+
+    // Muta/smuta TUTTI gli elementi audio presenti nell'HTML inserito dall'utente.
+    // Copre <audio>, <video>, <iframe>, <embed>, <object> — inclusi quelli incollati
+    // manualmente dall'utente nei campi descrizione/particolari/note.
+    // Gira ogni volta che cambia la preferenza, il profilo o si apre la sezione Note.
+    useEffect(() => {
+        const container = schedaRef.current
+        if (!container) return
+        const mute = !soundScheda
+
+        // <audio> e <video>: mute diretto + pausa quando si disattiva
+        container.querySelectorAll('audio, video').forEach(el => {
+            el.muted = mute
+            if (mute) el.pause()
+        })
+
+        // <iframe>: impossibile controllare l'audio cross-origin dall'esterno,
+        // quindi scambiamo il src con about:blank. L'originale viene preservato
+        // in data-original-src la prima volta che viene silenziato.
+        container.querySelectorAll('iframe').forEach(el => {
+            if (mute) {
+                if (el.dataset.originalSrc === undefined) {
+                    el.dataset.originalSrc = el.getAttribute('src') ?? ''
+                }
+                el.src = 'about:blank'
+            } else if (el.dataset.originalSrc !== undefined) {
+                el.src = el.dataset.originalSrc
+            }
+        })
+
+        // <embed>: stessa logica di src-swap
+        container.querySelectorAll('embed').forEach(el => {
+            if (mute) {
+                if (el.dataset.originalSrc === undefined) el.dataset.originalSrc = el.src ?? ''
+                el.src = ''
+            } else if (el.dataset.originalSrc !== undefined) {
+                el.src = el.dataset.originalSrc
+            }
+        })
+
+        // <object>: stessa logica sul campo data
+        container.querySelectorAll('object').forEach(el => {
+            if (mute) {
+                if (el.dataset.originalData === undefined) el.dataset.originalData = el.data ?? ''
+                el.data = ''
+            } else if (el.dataset.originalData !== undefined) {
+                el.data = el.dataset.originalData
+            }
+        })
+    }, [soundScheda, profile, noteFatoOpen])
 
     useEffect(() => {
         if (!pg) { setError('Personaggio non specificato'); return }
@@ -342,7 +393,7 @@ export default function Scheda() {
     const { html: noteFatoHtml }    = extractAndScopeStyles(note_fato)
 
     return (
-        <div className="pagina_scheda">
+        <div className="pagina_scheda" ref={schedaRef}>
             <div className="page_title">
                 <h2>Scheda del personaggio</h2>
             </div>
