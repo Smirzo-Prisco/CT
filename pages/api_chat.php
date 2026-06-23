@@ -74,7 +74,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 }
 
                 // Se sto lanciando un attacco, devo verificare se non l'ho già lanciato in questo turno (include 'oggetto' per bloccare attacchi dopo uso oggetto)
-                if($skill_info['car'] > 0 && checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'", "'generica'", "'oggetto'"], $turn)) {
+                if($skill_info['car'] > 0 && checkMultipleLounch($id_role, $login, ["'destrezza'", "'potere'", "'mente'", "'difesa'", "'generica'", "'oggetto'", "'speciale'"], $turn)) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi effettuare due lanci nello stesso turno'));
                     exit;
                 }
@@ -154,8 +154,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     }
                     break;
                 case 'Potere speciale':
+                    $car_orig = $car; // Caratteristica dell'abilità (es. "Potere") prima di sovrascrivere $car
                     $car = 'speciale';
-                    $messaggio .= "$login usa la skill potere speciale ".$skill_info['nome']." di livello $livello";
+                    $messaggio .= "$login usa il potere speciale ".$skill_info['nome']." di livello $livello";
+                    $diceLounch = lanciaStat($id_role, $login, implode(',', $bersaglio), true, $car_orig, $car_orig, $pg['car'.$skill_info['car']], $salute, 0, 0);
+                    $dice = $diceLounch['risultato'];
+                    $dado_raw = $diceLounch['dado_raw'];
+                    $tiro = " con un tiro totale di $car_orig di " . $diceLounch['risultato'];
+                    $sussurro = $diceLounch['sussurro'];
                     break;
                 case 'Skill Temporanea':
                     $car = 'temporanea';

@@ -636,6 +636,15 @@ function lanciaStat($id_role, $login, $bersaglio, $bonus_stats, $dice_type, $nom
             }
         }
 
+        // Buff persistenti da abilità speciali riuscite nella role (non consumati al lancio)
+        if ($id_role && isset($buff_col_map[$dice_type])) {
+            $col    = $buff_col_map[$dice_type];
+            $lgn_f  = gdrcd_filter('in', $login);
+            $sk_row = gdrcd_query("SELECT COALESCE(SUM($col), 0) AS bonus FROM role_skill_buffs WHERE id_role = $id_role AND pg_name = '$lgn_f'");
+            $skill_bonus = (int)($sk_row['bonus'] ?? 0);
+            if ($skill_bonus > 0) $dice_bonus += $skill_bonus;
+        }
+
         // Aggiungo bonus e malus selezionati dall'utente
         $numtot_finale += $dice_bonus;
         $numtot_finale -= $dice_malus;
@@ -870,7 +879,11 @@ function locationActiveRole($location) {
 
 function endRoleSession($location) {
     $role_row = gdrcd_query("SELECT id_role FROM role_sessions WHERE location = $location AND end IS NULL");
-    if ($role_row) gdrcd_query("DELETE FROM role_item_buffs WHERE id_role = " . (int)$role_row['id_role']);
+    if ($role_row) {
+        $rid = (int)$role_row['id_role'];
+        gdrcd_query("DELETE FROM role_item_buffs WHERE id_role = $rid");
+        gdrcd_query("DELETE FROM role_skill_buffs WHERE id_role = $rid");
+    }
 
     gdrcd_query("UPDATE role_sessions SET `end` = NOW() WHERE `location` = $location");
 
@@ -1068,6 +1081,29 @@ function elaboratePrint($riepilogo, $turn = null) {
             }
         }
 
+        // Poteri speciali
+        if (isset($dati['potere_speciale']) && is_array($dati['potere_speciale'])) {
+            $statNames = ['bonus_destrezza' => 'Destrezza', 'bonus_mente' => 'Mente', 'bonus_tempra' => 'Tempra', 'bonus_potere' => 'Potere'];
+            foreach ($dati['potere_speciale'] as $ps) {
+                if ($ps['esito']) {
+                    $badge = $mkBadge('Potere attivato', 'ok');
+                    $parts = [];
+                    foreach (($ps['bonuses'] ?? []) as $col => $val) {
+                        if ($val > 0 && isset($statNames[$col])) $parts[] = "+{$val} {$statNames[$col]}";
+                    }
+                    $detail = !empty($parts)
+                        ? "<div class=\"ct-turn__formula\">" . implode(', ', $parts) . " per tutta la role</div>"
+                        : '';
+                } else {
+                    $badge  = $mkBadge('Potere fallito', 'fail');
+                    $detail = "<div class=\"ct-turn__formula\">Dado: {$ps['dice']}/20 — soglia non raggiunta</div>";
+                }
+                $cardsHtml .= "<div class=\"ct-turn__card\"><div class=\"ct-turn__row\">"
+                            . $mkAvatar($pg) . "<span class=\"ct-turn__name\">{$pg}</span>"
+                            . $badge . "</div>{$detail}</div>";
+            }
+        }
+
         // Attacca: una card per attacco
         if (isset($dati['attacca'])) {
             foreach ($dati['attacca'] as $att) {
@@ -1220,6 +1256,10 @@ function elaborateTurn($id_role) {
     /****************************** GENERICHE POST  **************************************/
     // Elaboro eventuali skill generiche che agiscono sul danno (calcolato dopo l'attacco)
     elaborateGenerichePost($id_role, $turn, $riepilogo);
+
+    /****************************** POTERI SPECIALI  **************************************/
+    // Registra i buff persistenti per tutta la role se il tiro è riuscito (dado >= 10)
+    elaboratePotereSpeciale($id_role, $turn, $riepilogo);
 
     /****************************** STAMPA RIEPILOGO e TOGLIE I PUNTI  **************************************/
     $msg = elaboratePrint($riepilogo, $turn);
@@ -1704,6 +1744,82 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
 
     return; // array('riepilogo' => $riepilogo);
 }
+
+/**
+ * Elabora i poteri speciali del turno.
+ *
+ * Per ogni azione car='speciale' del turno corrente:
+ *  - Se dado >= 10: inserisce i bonus in role_skill_buffs (INSERT IGNORE: non sovrascrive se già attivo per lo stesso pg + abilità)
+ *  - Aggiunge la card di risultato al riepilogo (riuscito/fallito + bonus attivati)
+ *
+ * I bonus restano attivi fino a fine role e vengono sommati a ogni tiro in lanciaStat().
+ * La tabella viene svuotata da endRoleSession() al termine della role.
+ */
+function elaboratePotereSpeciale($id_role, $turn, &$riepilogo) {
+    // Mappa id_gilda → colonne bonus da inserire in role_skill_buffs
+    $guild_buffs = [
+        1 => ['bonus_potere' => 5],                                                         // Adamanti
+        2 => ['bonus_potere' => 5],                                                         // Demoni
+        3 => ['bonus_potere' => 2, 'bonus_destrezza' => 1, 'bonus_mente' => 1, 'bonus_tempra' => 1], // Elementali
+        4 => ['bonus_destrezza' => 5],                                                      // Beast
+        5 => ['bonus_destrezza' => 3, 'bonus_tempra' => 2],                                 // Celestiali
+        6 => ['bonus_mente' => 5],                                                          // Fiori
+        7 => ['bonus_mente' => 5],                                                          // Lancaster
+    ];
+
+    $all_cols = ['bonus_destrezza', 'bonus_mente', 'bonus_tempra', 'bonus_potere'];
+
+    $result = gdrcd_query(
+        "SELECT rf.id, rf.striker, rf.dice, rf.id_skill, a.id_gilda
+         FROM role_fights rf
+         JOIN abilita a ON a.id_abilita = rf.id_skill
+         WHERE rf.id_role = $id_role AND rf.turn = $turn AND rf.car = 'speciale'
+         ORDER BY rf.id ASC",
+        'result'
+    );
+    if (!$result) return;
+
+    while ($r = gdrcd_query($result, 'fetch')) {
+        $striker  = $r['striker'];
+        $dice     = (int)$r['dice'];
+        $id_gilda = (int)$r['id_gilda'];
+        $id_skill = (int)$r['id_skill'];
+
+        if (!isset($riepilogo[$striker])) $riepilogo[$striker] = [];
+
+        if ($dice < 10) {
+            $riepilogo[$striker]['potere_speciale'][] = ['esito' => false, 'dice' => $dice];
+            continue;
+        }
+
+        $partial_bonuses = $guild_buffs[$id_gilda] ?? null;
+        if (!$partial_bonuses) {
+            // Gilda sconosciuta — non applicare alcun buff ma segnalare nel riepilogo
+            $riepilogo[$striker]['potere_speciale'][] = ['esito' => false, 'dice' => $dice];
+            continue;
+        }
+
+        // Normalizza: assicura che tutte e 4 le colonne siano presenti (0 se non specificate)
+        $col_vals = [];
+        foreach ($all_cols as $c) $col_vals[$c] = $partial_bonuses[$c] ?? 0;
+
+        $striker_f = gdrcd_filter('in', $striker);
+
+        // INSERT IGNORE: se il pg ha già attivato la stessa abilità in questa role, non sovrascrive
+        gdrcd_query(
+            "INSERT IGNORE INTO role_skill_buffs (id_role, pg_name, id_abilita, bonus_destrezza, bonus_mente, bonus_tempra, bonus_potere)
+             VALUES ($id_role, '$striker_f', $id_skill, {$col_vals['bonus_destrezza']}, {$col_vals['bonus_mente']}, {$col_vals['bonus_tempra']}, {$col_vals['bonus_potere']})"
+        );
+
+        $riepilogo[$striker]['potere_speciale'][] = [
+            'esito'   => true,
+            'dice'    => $dice,
+            'bonuses' => $col_vals,
+        ];
+    }
+    gdrcd_query($result, 'free');
+}
+
 /*************************  FINE  ELABORAZIONE TURNO */
 
 // In base alla caratteristica di attacco, torno quella di difesa
