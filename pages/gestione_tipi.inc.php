@@ -20,6 +20,9 @@
                 if($types == "guilds") {
                     $query = "INSERT INTO codtipogilda (descrizione) VALUES ('".gdrcd_filter('in', $_POST['nome'])."')";
                 }
+                if($types == "jobs") {
+                    $query = "INSERT INTO codtipomestiere (descrizione) VALUES ('".gdrcd_filter('in', $_POST['nome'])."')";
+                }
                 gdrcd_query($query); ?>
                 <div class="warning">
                     <?php echo gdrcd_filter('out', $MESSAGE['warning']['inserted']); ?>
@@ -42,6 +45,10 @@
                 if($types == "guilds") {
                     $query = "DELETE FROM codtipogilda WHERE cod_tipo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1";
                     $query_update = "UPDATE gilda SET tipo = 0 WHERE tipo = ".gdrcd_filter('num', $_POST['id_record'])."";
+                }
+                if($types == "jobs") {
+                    $query = "DELETE FROM codtipomestiere WHERE cod_tipo=".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1";
+                    $query_update = "UPDATE mestiere SET tipo = 0 WHERE tipo = ".gdrcd_filter('num', $_POST['id_record'])."";
                 }
                 gdrcd_query($query);
                 gdrcd_query($query_update);
@@ -67,6 +74,9 @@
                 if($types == "guilds") {
                     $query = "UPDATE codtipogilda SET descrizione ='".gdrcd_filter('in', $_POST['nome'])."' WHERE cod_tipo = ".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1";
                 }
+                if($types == "jobs") {
+                    $query = "UPDATE codtipomestiere SET descrizione ='".gdrcd_filter('in', $_POST['nome'])."' WHERE cod_tipo = ".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1";
+                }
                 gdrcd_query($query); ?>
                 <div class="warning">
                     <?php echo gdrcd_filter('out', $MESSAGE['warning']['modified']); ?>
@@ -90,6 +100,9 @@
                     }
                     if($types == "guilds") {
                         $query = "SELECT * FROM codtipogilda WHERE cod_tipo=".gdrcd_filter('in', $_POST['id_record'])." LIMIT 1 ";
+                    }
+                    if($types == "jobs") {
+                        $query = "SELECT * FROM codtipomestiere WHERE cod_tipo=".gdrcd_filter('in', $_POST['id_record'])." LIMIT 1 ";
                     }
 
                     $loaded_record = gdrcd_query($query);
@@ -152,6 +165,9 @@
                 if($types == 'guilds') {
                     $query = "SELECT COUNT(*) FROM codtipogilda";
                 }
+                if($types == 'jobs') {
+                    $query = "SELECT COUNT(*) FROM codtipomestiere";
+                }
                 $record_globale = gdrcd_query($query);
                 $totaleresults = $record_globale['COUNT(*)'];
                 //Lettura record
@@ -160,6 +176,9 @@
                 }
                 if($types == 'guilds') {
                     $query = "SELECT cod_tipo, descrizione FROM codtipogilda ORDER BY descrizione LIMIT ".$pagebegin.", ".$pageend."";
+                }
+                if($types == 'jobs') {
+                    $query = "SELECT cod_tipo, descrizione FROM codtipomestiere ORDER BY descrizione LIMIT ".$pagebegin.", ".$pageend."";
                 }
                 $result = gdrcd_query($query, 'result');
                 $numresults = gdrcd_query($result, 'num_rows');
@@ -262,6 +281,11 @@
                         <a href="main.php?page=gestione_mercato">
                             <?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['types']['link']['items']); ?>
                         </a>
+                    </div>
+                <?php } ?>
+                <?php if($types == 'jobs') { ?>
+                    <div class="link_back">
+                        <a href="main.php?page=gestione_mestieri">Torna ai mestieri</a>
                     </div>
                 <?php } ?>
             <?php }//else ?>
