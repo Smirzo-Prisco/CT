@@ -6,9 +6,18 @@
     } else { ?>
         <!-- Titolo della pagina -->
         <?php $types = (isset($_REQUEST['types']) === false) ? 'items' : gdrcd_filter('get', $_REQUEST['types']); ?>
+        <?php if($types == 'jobs'): ?>
+        <div class="guild-container" style="margin-bottom:16px;">
+            <div class="topbar">
+                <a href="main.php?page=gestione_mestieri" class="btn btn--ghost">← Mestieri</a>
+                <span style="font-weight:bold;">Tipi mestiere</span>
+            </div>
+        </div>
+        <?php else: ?>
         <div class="page_title">
             <h2><?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['types']['page_name'][$types]); ?></h2>
         </div>
+        <?php endif; ?>
         <!-- Corpo della pagina -->
         <div class="page_body">
             <?php /*Inserimento di un nuovo record*/
