@@ -69,8 +69,8 @@ if (gdrcd_filter('get', $_POST['op']) == $MESSAGE['interface']['administration']
 if (isset($feedback_msg)): ?>
 <div class="guild-container">
     <div class="topbar">
+        <a href="<?= $feedback_back ?>" class="back">⬅️ Indietro</a>
         <span style="font-weight:bold;">Gestione Mestieri</span>
-        <a href="<?= $feedback_back ?>" class="btn btn--ghost">← Torna indietro</a>
     </div>
     <div style="padding:30px; text-align:center;">
         <p style="color:#4caf50; font-size:1.1em; margin-bottom:20px;"><?= $feedback_msg ?></p>
@@ -89,6 +89,7 @@ elseif (!isset($_POST['op']) && !isset($_REQUEST['op'])):
 ?>
 <div class="guild-container">
     <div class="topbar">
+        <a href="javascript:history.back()" class="back">⬅️ Indietro</a>
         <span style="font-weight:bold;">Gestione Mestieri</span>
         <div style="display:flex; gap:8px;">
             <a href="main.php?page=gestione_mestieri&op=new" class="btn btn-sm btn-primary"><i class="fa-solid fa-plus"></i>&nbsp; Nuovo Mestiere</a>
@@ -172,7 +173,7 @@ elseif (in_array(gdrcd_filter('get', $_REQUEST['op'] ?? ''), ['new', 'edit'])):
 <!-- ── Form mestiere ───────────────────────────────────────────────── -->
 <div class="guild-container">
     <div class="topbar">
-        <a href="main.php?page=gestione_mestieri" class="btn btn--ghost">← Indietro</a>
+        <a href="javascript:history.back()" class="back">⬅️ Indietro</a>
         <span style="font-weight:bold;"><?= $operation == 'edit' ? 'Modifica Mestiere' : 'Nuovo Mestiere' ?></span>
     </div>
 
@@ -240,7 +241,6 @@ elseif (in_array(gdrcd_filter('get', $_REQUEST['op'] ?? ''), ['new', 'edit'])):
                         <i class="fa-solid fa-plus"></i>&nbsp; Crea mestiere
                     </button>
                 <?php endif; ?>
-                <a href="main.php?page=gestione_mestieri" class="btn btn--ghost">Annulla</a>
             </div>
         </form>
     </div>
