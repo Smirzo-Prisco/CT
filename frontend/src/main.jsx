@@ -187,11 +187,14 @@ document.addEventListener('click', function(e) {
     const link = e.target.closest('a')
     if (!link || !link.href) return
 
-    // Ignora link con href="#" o "javascript:..." — non sono navigazioni reali.
-    // Senza questo check, href="#" viene risolto a URL corrente+hash, e l'interceptor
-    // potrebbe estrarne parametri (es. dir=5) dando luogo a navigate indesiderate.
+    // Blocca la navigazione default per href="#" e "javascript:..." (non sono link reali).
+    // e.preventDefault() impedisce al browser di aggiungere "#" all'URL (che può scatenare
+    // popstate e uscire dalla stanza), ma NON blocca gli onclick/handler già attaccati al link.
     const rawHref = link.getAttribute('href') ?? ''
-    if (!rawHref || rawHref === '#' || rawHref.startsWith('#') || rawHref.startsWith('javascript:')) return
+    if (!rawHref || rawHref === '#' || rawHref.startsWith('#') || rawHref.startsWith('javascript:')) {
+        e.preventDefault()
+        return
+    }
 
     try {
         const url  = new URL(link.href)
