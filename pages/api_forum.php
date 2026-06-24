@@ -685,14 +685,16 @@ switch ($op) {
 
         $titolo   = $thread_row['titolo'];
         $autore   = $post_row['autore'];
-        $post_ref = ($post_id !== $thread_id) ? " (risposta di $autore)" : '';
+        $post_ref = ($post_id !== $thread_id) ? ' (risposta di ' . htmlspecialchars($autore, ENT_QUOTES, 'UTF-8') . ')' : '';
         $url      = 'main.php?page=forum&thread=' . $thread_id;
 
+        // Il testo è salvato come HTML e renderizzato con dangerouslySetInnerHTML in MessagesInbox.
+        // I valori utente (login, titolo, commento) vengono escaped; l'URL è derivato da un intero.
         $testo = gdrcd_filter('in',
-            "Segnalazione staff da $login\n\n" .
-            "Thread: $titolo$post_ref\n" .
-            "Link: $url\n\n" .
-            "Note: $commento"
+            '<b>Segnalazione staff da ' . htmlspecialchars($login, ENT_QUOTES, 'UTF-8') . '</b><br><br>' .
+            'Thread: <i>' . htmlspecialchars($titolo, ENT_QUOTES, 'UTF-8') . $post_ref . '</i><br>' .
+            '<a href="' . $url . '" target="_blank">Clicca qui</a><br><br>' .
+            'Note: ' . nl2br(htmlspecialchars($commento, ENT_QUOTES, 'UTF-8'))
         );
 
         // Invia DM off-game a tutti i giocatori
