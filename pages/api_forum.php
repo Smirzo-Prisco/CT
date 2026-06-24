@@ -219,6 +219,9 @@ switch ($op) {
                 VALUES ('" . gdrcd_filter('in', $login) . "', $araldo_id_r, $thread_id)");
         }
 
+        // Salva info sezione dal primo post (prima che il do-while consumi tutti i record)
+        $sezione = ['id' => (int)$post['id_araldo'], 'nome' => $post['nome_sezione']];
+
         // Costruisci la risposta con padre + risposte
         $messages = [];
         do {
@@ -271,7 +274,7 @@ switch ($op) {
 
         echo json_encode([
             'success'    => true,
-            'sezione_id' => (int)$messages[0]['padre'] == -1 ? $post['id_araldo'] : null,
+            'sezione'    => $sezione,
             'thread_id'  => $thread_id,
             'chiuso'     => $messages[0]['chiuso'],
             'messages'   => $messages,

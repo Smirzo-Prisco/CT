@@ -715,7 +715,7 @@ function ComposeQuest({ section, sending, onSubmit, onCancel }) {
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
-export default function Forum({ isStaff = false }) {
+export default function Forum({ isStaff = false, initialThread = null }) {
 
     // --- vista attiva ---
     /**
@@ -725,7 +725,7 @@ export default function Forum({ isStaff = false }) {
      *   'read'     → lettura di un thread
      *   'compose'  → composizione nuovo thread
      */
-    const [view, setView] = useState('sections')
+    const [view, setView] = useState(initialThread ? 'read' : 'sections')
 
     // --- dati ---
     /** Sezioni del forum raggruppate per tipo: { tipoLabel: [sezione, ...] } */
@@ -751,7 +751,7 @@ export default function Forum({ isStaff = false }) {
     // --- stati UI ---
     const [loadingSections, setLoadingSections] = useState(true)
     const [loadingThreads,  setLoadingThreads]  = useState(false)
-    const [loadingRead,     setLoadingRead]     = useState(false)
+    const [loadingRead,     setLoadingRead]     = useState(!!initialThread)
     const [sending,         setSending]         = useState(false)
 
     // ---------------------------------------------------------------------------
@@ -812,6 +812,29 @@ export default function Forum({ isStaff = false }) {
 
     // Caricamento iniziale delle sezioni al mount del componente
     useEffect(() => { fetchSections() }, [fetchSections])
+
+    // Deep-link: se il forum viene aperto con ?thread=X, naviga direttamente al thread
+    useEffect(() => {
+        if (!initialThread) return
+        setLoadingRead(true)
+        fetch(`/pages/api_forum.php?op=read&thread=${initialThread}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setMessages(data.messages)
+                    setPuntiList(data.punti_list ?? [])
+                    if (data.sezione) setCurrentSection(data.sezione)
+                    setCurrentThread({
+                        id:     initialThread,
+                        titolo: data.messages[0]?.titolo ?? '',
+                        chiuso: data.messages[0]?.chiuso ?? false,
+                    })
+                    setView('read')
+                }
+                setLoadingRead(false)
+            })
+            .catch(() => setLoadingRead(false))
+    }, [initialThread]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Aggiornamento real-time via socket: 'forum:update' arriva quando
     // qualcuno pubblica un post. Aggiorna la vista corrente di conseguenza.

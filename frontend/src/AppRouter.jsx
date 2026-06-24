@@ -244,12 +244,14 @@ function injectCSS(href) {
  * alla mappa (< 0) tramite main.php?dir=X.
  */
 function readParams() {
-    const p      = new URLSearchParams(window.location.search)
-    const dirRaw = p.get('dir')
+    const p         = new URLSearchParams(window.location.search)
+    const dirRaw    = p.get('dir')
+    const threadRaw = p.get('thread')
     return {
-        page: p.get('page'),
-        dir:  dirRaw !== null ? parseInt(dirRaw, 10) : null,
-        to:   p.get('to') ?? null,
+        page:   p.get('page'),
+        dir:    dirRaw    !== null ? parseInt(dirRaw,    10) : null,
+        to:     p.get('to') ?? null,
+        thread: threadRaw !== null ? parseInt(threadRaw, 10) : null,
     }
 }
 
@@ -381,5 +383,5 @@ export default function AppRouter({ isStaff = false }) {
     // ── Pagina React migrata (page=X) ─────────────────────────────────────
     route.css.forEach(injectCSS)
     const Component = route.component
-    return <Component isStaff={isStaff} toPg={params.to} />
+    return <Component isStaff={isStaff} toPg={params.to} initialThread={params.thread} />
 }
