@@ -16,7 +16,7 @@
 // Redirect anticipato prima che header.inc.php emetta HTML (riga 62 del file).
 // gdrcd_controllo_sessione() chiamata dopo non può inviare Location: perché
 // l'output è già partito e header() fallisce silenziosamente.
-session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
 if (empty($_SESSION['login'])) {
     header('Location: /');
     exit;
