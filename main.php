@@ -13,6 +13,15 @@
  * @author Crystal Tokyo Dev
  */
 
+// Redirect anticipato prima che header.inc.php emetta HTML (riga 62 del file).
+// gdrcd_controllo_sessione() chiamata dopo non può inviare Location: perché
+// l'output è già partito e header() fallisce silenziosamente.
+session_start();
+if (empty($_SESSION['login'])) {
+    header('Location: /');
+    exit;
+}
+
 require('header.inc.php');
 gdrcd_controllo_sessione();
 
