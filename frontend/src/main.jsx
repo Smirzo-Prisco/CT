@@ -29,13 +29,16 @@
 import { createRoot } from 'react-dom/client'
 import { initIdleDetector } from './utils/idleDetector'
 
-// Interceptor globale: qualsiasi risposta 401 = sessione scaduta → redirect al login.
-// Copre sia gli accessi diretti con sessione scaduta sia la navigazione SPA dopo logout.
+// Interceptor globale: risposta 401 = sessione scaduta → redirect al login.
+// Controlla window.CT_USER: è definito solo quando l'utente è/era autenticato
+// (header.inc.php lo inietta solo se $_SESSION['login'] è valorizzato).
+// Senza il controllo, i 401 delle API chiamate sulla homepage (utente non loggato)
+// causerebbero un reload infinito della pagina di login stessa.
 ;(function () {
     const _fetch = window.fetch
     window.fetch = async function (...args) {
         const res = await _fetch.apply(this, args)
-        if (res.status === 401) {
+        if (res.status === 401 && window.CT_USER) {
             window.top.location.href = '/'
         }
         return res
