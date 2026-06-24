@@ -29,6 +29,19 @@
 import { createRoot } from 'react-dom/client'
 import { initIdleDetector } from './utils/idleDetector'
 
+// Interceptor globale: qualsiasi risposta 401 = sessione scaduta → redirect al login.
+// Copre sia gli accessi diretti con sessione scaduta sia la navigazione SPA dopo logout.
+;(function () {
+    const _fetch = window.fetch
+    window.fetch = async function (...args) {
+        const res = await _fetch.apply(this, args)
+        if (res.status === 401) {
+            window.top.location.href = '/'
+        }
+        return res
+    }
+})()
+
 // Importazione di tutti i componenti registrati
 import OnlineUsers     from './components/OnlineUsers'
 import ChatViewer      from './components/ChatViewer'
