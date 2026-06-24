@@ -4,6 +4,7 @@ export default function ChatViewer() {
   const [messages, setMessages] = useState([])
   const lastIdRef = useRef(0)
   const bottomRef = useRef(null)
+  const chatRef   = useRef(null)
 
   /** true quando c'è una role attiva — nasconde la descrizione stanza */
   const [hasRole,  setHasRole]  = useState(false)
@@ -59,25 +60,43 @@ export default function ChatViewer() {
       .catch(() => {})
   }, [])
 
+  // Dopo ogni aggiornamento dei messaggi: marca solo l'ultimo [data-editable] come attivo.
+  // La classe chat_editable--active abilita il cursore di edit e l'handler di click.
+  useEffect(() => {
+    const container = chatRef.current
+    if (!container) return
+    const editables = container.querySelectorAll('[data-editable]')
+    editables.forEach(el => el.classList.remove('chat_editable--active'))
+    if (editables.length > 0) editables[editables.length - 1].classList.add('chat_editable--active')
+  }, [messages])
+
+  // Event delegation: click su qualsiasi [data-editable].chat_editable--active apre il modale
+  const handleChatClick = useCallback((e) => {
+    const target = e.target.closest('[data-editable].chat_editable--active')
+    if (!target) return
+    if (typeof window.editAction === 'function') window.editAction(target.dataset.raw ?? '', target.id)
+  }, [])
+
   useEffect(() => {
     fetchMessages()
     fetchRoomDesc()
 
-    const sock = window.ctSocket
-    if (sock) {
-      sock.on('chat:update', fetchMessages)
-      // Aggiorna la descrizione quando il pg cambia stanza
-      sock.on('users:update', fetchRoomDesc)
-    }
-
-    // Espone alle funzioni globali in chat.js
     window.refreshChat = fetchMessages
     window.clearChat   = () => { setMessages([]); lastIdRef.current = 0 }
 
-    return () => {
-      if (sock) {
+    const sock = window.ctSocket
+    if (sock) {
+      // chat:edit = azione modificata: full-refresh perché il messaggio modificato
+      // ha id <= lastIdRef e non verrebbe incluso in un fetch incrementale
+      const onChatEdit = () => { setMessages([]); lastIdRef.current = 0; fetchMessages() }
+      sock.on('chat:update', fetchMessages)
+      sock.on('users:update', fetchRoomDesc)
+      sock.on('chat:edit',   onChatEdit)
+
+      return () => {
         sock.off('chat:update', fetchMessages)
         sock.off('users:update', fetchRoomDesc)
+        sock.off('chat:edit',   onChatEdit)
       }
     }
   }, [fetchMessages, fetchRoomDesc])
@@ -88,7 +107,7 @@ export default function ChatViewer() {
   }, [messages])
 
   return (
-    <div className="chat_inner">
+    <div className="chat_inner" ref={chatRef} onClick={handleChatClick}>
 
       {/* Descrizione stanza — visibile solo quando la chat è vuota e nessuna role è attiva */}
       {messages.length === 0 && !hasRole && roomDesc && (

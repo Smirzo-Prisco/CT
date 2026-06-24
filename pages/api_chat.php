@@ -671,20 +671,20 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Costruzione query messaggi
             if ($_SESSION['admin'] == 1 || $check_expp['esperienza'] < 20) {
                 $query = gdrcd_query(
-                    "SELECT chat.id, chat.imgs, chat.mittente, chat.destinatario, chat.tipo, chat.ora, chat.testo, personaggio.url_img_chat, mappa.ora_prenotazione
+                    "SELECT chat.id, chat.imgs, chat.mittente, chat.destinatario, chat.tipo, chat.ora, chat.testo, chat.modificato, personaggio.url_img_chat, mappa.ora_prenotazione
                     FROM chat
                     INNER JOIN mappa ON mappa.id = chat.stanza
                     LEFT JOIN personaggio ON personaggio.nome = chat.mittente
-                    WHERE chat.id > ".$last_message." 
-                    AND (stanza = $luogo OR chat.tipo = 'G') 
-                    AND chat.ora > IFNULL(mappa.ora_prenotazione, '0000-00-00 00:00:00') 
-                    AND DATE_SUB(NOW(), INTERVAL 180 MINUTE) < ora 
+                    WHERE chat.id > ".$last_message."
+                    AND (stanza = $luogo OR chat.tipo = 'G')
+                    AND chat.ora > IFNULL(mappa.ora_prenotazione, '0000-00-00 00:00:00')
+                    AND DATE_SUB(NOW(), INTERVAL 180 MINUTE) < ora
                     ORDER BY id ". $typeOrder,
                     'result'
                 );
             } else if(gdrcd_query($check_back_chat, 'num_rows') < 1) {
                 $query = gdrcd_query(
-                    "SELECT chat.id, chat.imgs, chat.mittente, chat.destinatario, chat.tipo, chat.ora, chat.testo, chat.backing, personaggio.url_img_chat, mappa.ora_prenotazione
+                    "SELECT chat.id, chat.imgs, chat.mittente, chat.destinatario, chat.tipo, chat.ora, chat.testo, chat.modificato, chat.backing, personaggio.url_img_chat, mappa.ora_prenotazione
                     FROM chat
                     INNER JOIN mappa ON mappa.id = chat.stanza
                     LEFT JOIN personaggio ON personaggio.nome = chat.mittente
@@ -698,14 +698,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 );
             } else {
                 $query = gdrcd_query(
-                    "SELECT chat.id, chat.imgs, chat.mittente, chat.destinatario, chat.tipo, chat.ora, chat.testo, personaggio.url_img_chat, mappa.ora_prenotazione
+                    "SELECT chat.id, chat.imgs, chat.mittente, chat.destinatario, chat.tipo, chat.ora, chat.testo, chat.modificato, personaggio.url_img_chat, mappa.ora_prenotazione
                     FROM chat
                     INNER JOIN mappa ON mappa.id = chat.stanza
                     LEFT JOIN personaggio ON personaggio.nome = chat.mittente
-                    WHERE chat.id > ".$last_message." 
-                    AND (stanza = $luogo OR chat.tipo = 'G') 
-                    AND chat.ora > IFNULL(mappa.ora_prenotazione, '0000-00-00 00:00:00') 
-                    AND DATE_SUB(NOW(), INTERVAL 180 MINUTE) < ora 
+                    WHERE chat.id > ".$last_message."
+                    AND (stanza = $luogo OR chat.tipo = 'G')
+                    AND chat.ora > IFNULL(mappa.ora_prenotazione, '0000-00-00 00:00:00')
+                    AND DATE_SUB(NOW(), INTERVAL 180 MINUTE) < ora
                     ORDER BY id ". $typeOrder, 'result' );
             }
 
@@ -739,8 +739,16 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                                 </span>';
                 }
 
-                $editAction = $login == $row['mittente'] ? 'onclick="editAction(this.innerText, '.$row['id'].');"' : '';
-                $add_chat .= '<div id="'.$row['id'].'" class="chat_row_'.$row['tipo'].'" '.($row['tipo'] === 'P' ? $editAction : '').'>';
+                // Cattura il testo grezzo dal DB prima che le trasformazioni HTML lo alterino,
+                // così il textarea di modifica mostra il testo originale digitato dall'utente.
+                $raw_testo = $row['testo'];
+
+                // Attributi data- per la modifica in-place (solo propri messaggi P o A)
+                $edit_attrs = '';
+                if ($login === $row['mittente'] && ($row['tipo'] === 'P' || $row['tipo'] === 'A')) {
+                    $edit_attrs = ' data-editable="1" data-raw="'.htmlspecialchars($raw_testo, ENT_QUOTES, 'UTF-8').'"';
+                }
+                $add_chat .= '<div id="'.$row['id'].'" class="chat_row_'.$row['tipo'].'"'.$edit_attrs.'>';
                         
                 switch ($row['tipo']) {
                     case 'P': // messaggi parlati
@@ -760,6 +768,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                             $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar" style="width:'.$PARAMETERS['settings']['chat_avatar']['width'].'px; height:'.$PARAMETERS['settings']['chat_avatar']['height'].'px;" />';
                         }
                         $add_chat .= '<span class="chat_time">'.gdrcd_format_time($row['ora']).'</span>';
+                        if ($row['modificato']) $add_chat .= '<span class="chat_badge--modificato" title="Modificato">✎</span>';
                         if (!empty($row['url_img_chat'])) $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar_inline" />';
                         if ($PARAMETERS['mode']['chaticons']=='ON') $add_chat .= $add_icon;
                         $add_chat .= '<span class="chat_name"><a href="main.php?page=scheda&pg='.$row['mittente'].'">'.$row['mittente'].'</a>';
@@ -774,6 +783,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                             $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar" style="width:'.$PARAMETERS['settings']['chat_avatar']['width'].'px; height:'.$PARAMETERS['settings']['chat_avatar']['height'].'px;" />';
                         }
                         $add_chat .= '<span class="chat_time">'.gdrcd_format_time($row['ora']).'</span>';
+                        if ($row['modificato']) $add_chat .= '<span class="chat_badge--modificato" title="Modificato">✎</span>';
                         if (!empty($row['url_img_chat'])) $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar_inline" />';
                         if ($PARAMETERS['mode']['chaticons']=='ON') $add_chat .= $add_icon;
                         $add_chat .= '<span class="chat_name"><a href="#" onclick="document.getElementById(\'tag\').value=\''.$row['mittente'].'\'; document.getElementById(\'type\')[2].selected = \'1\'; document.getElementById(\'message\').focus();">'.$row['mittente'].'</a>';
@@ -961,13 +971,37 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             ));
             exit;
         case 'saveEditAction':
-            $content = isset($data['content']) ? gdrcd_filter('in', gdrcd_angs($data['content'])) : '';
-            $id = isset($data['id']) ? gdrcd_filter('in', $data['id']) : '';
+            $login  = $_SESSION['login'];
+            $luogo  = (int)$_SESSION['luogo'];
+            $id     = isset($data['id']) ? (int)$data['id'] : 0;
+            $content = isset($data['content']) ? gdrcd_filter('in', gdrcd_angs(trim($data['content']))) : '';
 
-            // Modifico l'azione
-            if(gdrcd_query("UPDATE chat set testo = '$content' WHERE id = $id")) echo json_encode(array('success' => true, 'message' => "Azione modificata con successo!"));
-            else echo json_encode(array('success' => false, 'message' => "Errore nella modifica dell'azione."));
+            if (!$id || $content === '') {
+                echo json_encode(['success' => false, 'message' => 'Dati mancanti.']);
+                break;
+            }
 
+            // Verifica: messaggio esiste, appartiene all'utente e ha tipo modificabile (P o A)
+            $msg_row = gdrcd_query("SELECT id, mittente, stanza, tipo FROM chat WHERE id = $id LIMIT 1");
+            if (!$msg_row || $msg_row['mittente'] !== $login || !in_array($msg_row['tipo'], ['P', 'A'])) {
+                echo json_encode(['success' => false, 'message' => 'Non autorizzato.']);
+                break;
+            }
+
+            // Verifica: deve essere l'ultimo messaggio P/A dell'utente in quella stanza
+            $stanza = (int)$msg_row['stanza'];
+            $last_row = gdrcd_query("SELECT id FROM chat WHERE mittente = '$login' AND stanza = $stanza AND (tipo = 'P' OR tipo = 'A') ORDER BY id DESC LIMIT 1");
+            if (!$last_row || (int)$last_row['id'] !== $id) {
+                echo json_encode(['success' => false, 'message' => 'Puoi modificare solo la tua ultima azione inviata.']);
+                break;
+            }
+
+            if (gdrcd_query("UPDATE chat SET testo = '$content', modificato = 1 WHERE id = $id")) {
+                notifySocketServer('chat:edit', 'chat:' . $stanza);
+                echo json_encode(['success' => true, 'message' => 'Azione modificata con successo!']);
+            } else {
+                echo json_encode(['success' => false, 'message' => "Errore nella modifica dell'azione."]);
+            }
             break;
         case 'pulisciChat':
             if (isAdminMasterMod($_SESSION)) {

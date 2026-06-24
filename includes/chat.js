@@ -254,10 +254,14 @@ function saveEditAction() {
         .then(data => {
             if (data.success) {
                 document.getElementById("editAction-modal").style.display = "none";
-
+                showNotification(data.message, 'success');
+                // Full-refresh locale: il server ha già notificato gli altri via socket chat:edit.
+                // Necessario perché il messaggio modificato ha id < lastIdRef, non tornerebbe altrimenti.
+                window.clearChat?.();
+                window.refreshChat?.();
             } else showNotification(data.message, 'error');
         })
-        .catch(err => console.error('Errore caricamento chat:', err));
+        .catch(err => console.error('Errore modifica azione:', err));
 }
 
 // Imposta limite caratteri

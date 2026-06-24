@@ -2162,6 +2162,29 @@ span.testo {
     }
 }
 
+// ── Badge "modificato" accanto all'orario del messaggio ──────────────────────
+
+.chat_badge--modificato {
+    font-size: $text-xs;
+    color: $palette-text-secondary;
+    margin-left: 4px;
+    opacity: 0.65;
+    cursor: default;
+    user-select: none;
+}
+
+// ── Ultima riga propria modificabile: cursore + highlight su hover ────────────
+
+[data-editable].chat_editable--active {
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background $transition-fast;
+
+    &:hover {
+        background: rgb(255 255 255 / 4%);
+    }
+}
+
 .help-soglie-table {
     width: 100%;
     margin-top: 10px;
