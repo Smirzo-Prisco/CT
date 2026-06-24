@@ -438,8 +438,8 @@ function gdrcd_html_filter($str) {
  */
 function gdrcd_controllo_sessione() {
     if(empty($_SESSION['login'])) {
-        echo '<div class="error">', $GLOBALS['MESSAGE']['error']['session_expired'], '<br />', $GLOBALS['MESSAGE']['warning']['please_login_again'], '<a href="', $GLOBALS['PARAMETERS']['info']['site_url'], '">Homepage</a></div>';
-        die();
+        header('Location: ' . $GLOBALS['PARAMETERS']['info']['site_url']);
+        exit;
     }
 }
 
