@@ -383,3 +383,124 @@
         color: #fff;
     }
 }
+
+// ── Segnala post (solo staff) ─────────────────────────────────────────────────
+
+.segnalaRow {
+    margin-top: 6px;
+    text-align: right;
+}
+
+.segnalaBtn {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: none;
+    border: 1px solid $palette-warning;
+    color: $palette-warning;
+    cursor: pointer;
+    border-radius: 3px;
+
+    &:hover {
+        background: $palette-warning;
+        color: $color-bg;
+    }
+}
+
+.segnalaOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgb(0 0 0 / 60%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.segnalaModal {
+    background: $palette-surface-raised;
+    border-radius: $radius-lg;
+    padding: 24px;
+    width: 90%;
+    max-width: 480px;
+    border: 1px solid $palette-surface-hover;
+    box-shadow: 0 8px 32px rgb(0 0 0 / 50%);
+
+    h3 {
+        margin: 0 0 12px;
+        color: $palette-text-title;
+        font-size: $text-lg;
+    }
+}
+
+.segnalaInfo {
+    font-size: $text-sm;
+    color: $palette-text-secondary;
+    margin-bottom: 12px;
+}
+
+.segnalaTextarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: $palette-surface-input;
+    border: 1px solid $palette-surface-hover;
+    border-radius: $radius-sm;
+    color: $palette-text;
+    font-size: $text-md;
+    padding: 8px;
+    resize: vertical;
+    font-family: inherit;
+
+    &:focus {
+        outline: none;
+        border-color: $palette-warning;
+    }
+}
+
+.segnalaActions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.segnalaConfirmBtn {
+    font-size: $text-sm;
+    padding: 4px 14px;
+    background: $palette-warning;
+    border: none;
+    color: $color-bg;
+    cursor: pointer;
+    border-radius: $radius-sm;
+    font-weight: 600;
+
+    &:hover:not(:disabled) {
+        background: darken($palette-warning, 12%);
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+}
+
+.segnalaCancelBtn {
+    font-size: $text-sm;
+    padding: 4px 14px;
+    background: none;
+    border: 1px solid $palette-surface-hover;
+    color: $palette-text-secondary;
+    cursor: pointer;
+    border-radius: $radius-sm;
+
+    &:hover {
+        border-color: $palette-text-secondary;
+        color: $palette-text;
+    }
+}
+
+.segnalaSuccess {
+    color: $palette-success;
+    font-size: $text-md;
+    text-align: center;
+    padding: 20px 0;
+}

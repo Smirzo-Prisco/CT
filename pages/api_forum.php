@@ -3,6 +3,7 @@ session_start();
 header('Content-Type: application/json');
 
 require_once(__DIR__ . '/../includes/required.php');
+require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 $handleDBConnection = gdrcd_connect();
 
 if (empty($_SESSION['login'])) {
@@ -652,6 +653,58 @@ switch ($op) {
         gdrcd_query("UPDATE messaggioaraldo SET messaggio = '$messaggio\n\n\n\n $text_edit', titolo = '$titolo' WHERE id_messaggio = $id_msg LIMIT 1");
 
         echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // SEGNALA — staff invia un DM globale con link al post segnalato
+    // -------------------------------------------------------------------------
+    case 'segnala':
+        if (!($_SESSION['admin'] ?? 0) && !($_SESSION['moderatore'] ?? 0) && !($_SESSION['master'] ?? 0)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Non autorizzato.']);
+            break;
+        }
+
+        $thread_id = isset($data['thread_id']) ? (int)$data['thread_id'] : 0;
+        $post_id   = isset($data['post_id'])   ? (int)$data['post_id']   : 0;
+        $commento  = trim($data['commento'] ?? '');
+
+        if (!$thread_id || !$post_id || $commento === '') {
+            echo json_encode(['success' => false, 'message' => 'Dati mancanti.']);
+            break;
+        }
+
+        // Recupera titolo del thread e autore del post segnalato
+        $thread_row = gdrcd_query("SELECT titolo FROM messaggioaraldo WHERE id_messaggio = $thread_id LIMIT 1");
+        $post_row   = gdrcd_query("SELECT autore  FROM messaggioaraldo WHERE id_messaggio = $post_id   LIMIT 1");
+
+        if (!$thread_row || !$post_row) {
+            echo json_encode(['success' => false, 'message' => 'Post non trovato.']);
+            break;
+        }
+
+        $titolo   = $thread_row['titolo'];
+        $autore   = $post_row['autore'];
+        $post_ref = ($post_id !== $thread_id) ? " (risposta di $autore)" : '';
+        $url      = 'main.php?page=forum&thread=' . $thread_id;
+
+        $testo = gdrcd_filter('in',
+            "Segnalazione staff da $login\n\n" .
+            "Thread: $titolo$post_ref\n" .
+            "Link: $url\n\n" .
+            "Note: $commento"
+        );
+
+        // Invia DM off-game a tutti i giocatori
+        $res = gdrcd_query("SELECT nome FROM personaggio", 'result');
+        $inviati = 0;
+        while ($row = gdrcd_query($res, 'fetch')) {
+            send_sms($login, $row['nome'], '', $testo, 0);
+            $inviati++;
+        }
+        gdrcd_query($res, 'free');
+
+        echo json_encode(['success' => true, 'message' => "Segnalazione inviata a $inviati giocatori."]);
         break;
 
     default:

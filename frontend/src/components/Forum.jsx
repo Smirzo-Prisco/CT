@@ -163,11 +163,35 @@ function ThreadRow({ thread, onClick, isStaff, canDelete, onAction }) {
  * @param {Function} props.onEdit   - Callback ({ id, messaggio, titolo }) al salvataggio
  * @param {Function} props.onDelete - Callback (id_messaggio) alla cancellazione
  */
-function PostCard({ msg, isFirst, onEdit, onDelete }) {
+function PostCard({ msg, isFirst, onEdit, onDelete, isStaff = false, threadId = null }) {
     const [isEditing,  setIsEditing]  = useState(false)
     const [editText,   setEditText]   = useState('')
     const [editTitolo, setEditTitolo] = useState('')
     const textareaRef = useRef(null)
+
+    // Stato modale segnalazione
+    const [segnalaOpen,    setSegnalaOpen]    = useState(false)
+    const [segnalaText,    setSegnalaText]    = useState('')
+    const [segnalaLoading, setSegnalaLoading] = useState(false)
+    const [segnalaDone,    setSegnalaDone]    = useState(false)
+
+    const handleSegnala = async () => {
+        if (!segnalaText.trim()) return
+        setSegnalaLoading(true)
+        try {
+            const res = await fetch('/pages/api_forum.php?op=segnala', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ thread_id: threadId ?? msg.id, post_id: msg.id, commento: segnalaText }),
+            })
+            const d = await res.json()
+            if (d.success) {
+                setSegnalaDone(true)
+                setTimeout(() => { setSegnalaOpen(false); setSegnalaText(''); setSegnalaDone(false) }, 2000)
+            }
+        } catch {}
+        setSegnalaLoading(false)
+    }
 
     const startEdit = () => {
         setEditText(msg.messaggio_raw ?? '')
@@ -251,6 +275,59 @@ function PostCard({ msg, isFirst, onEdit, onDelete }) {
                                                 Elimina
                                             </button>
                                         )}
+                                    </div>
+                                )}
+
+                                {/* Bottone segnalazione — solo staff, non mostrato durante l'editing */}
+                                {isStaff && (
+                                    <div className={styles.segnalaRow}>
+                                        <button className={styles.segnalaBtn} onClick={() => setSegnalaOpen(true)}>
+                                            📌 Segnala
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Modale segnalazione */}
+                                {segnalaOpen && (
+                                    <div
+                                        className={styles.segnalaOverlay}
+                                        onClick={e => { if (e.target === e.currentTarget) setSegnalaOpen(false) }}
+                                    >
+                                        <div className={styles.segnalaModal}>
+                                            <h3>Segnala post</h3>
+                                            {segnalaDone ? (
+                                                <p className={styles.segnalaSuccess}>✓ Segnalazione inviata a tutti i giocatori.</p>
+                                            ) : (
+                                                <>
+                                                    <p className={styles.segnalaInfo}>
+                                                        Post di <strong>{msg.autore}</strong> — il messaggio verrà inviato via DM a tutti i giocatori.
+                                                    </p>
+                                                    <textarea
+                                                        className={styles.segnalaTextarea}
+                                                        placeholder="Note per la segnalazione…"
+                                                        value={segnalaText}
+                                                        onChange={e => setSegnalaText(e.target.value)}
+                                                        rows={4}
+                                                        disabled={segnalaLoading}
+                                                    />
+                                                    <div className={styles.segnalaActions}>
+                                                        <button
+                                                            onClick={handleSegnala}
+                                                            disabled={!segnalaText.trim() || segnalaLoading}
+                                                            className={styles.segnalaConfirmBtn}
+                                                        >
+                                                            {segnalaLoading ? 'Invio…' : 'Invia a tutti'}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setSegnalaOpen(false)}
+                                                            className={styles.segnalaCancelBtn}
+                                                        >
+                                                            Annulla
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
                             </>
@@ -1178,6 +1255,8 @@ export default function Forum({ isStaff = false }) {
                                     isFirst={i === 0}
                                     onEdit={handleEditPost}
                                     onDelete={i === 0 ? handleDeleteThread : handleDeletePost}
+                                    isStaff={isStaff}
+                                    threadId={messages[0]?.id}
                                 />
                                 {/* Tabella punti partecipanti — visibile solo a master/admin, solo sul post radice */}
                                 {i === 0 && <PuntiTable puntiList={puntiList} />}
