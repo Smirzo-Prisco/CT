@@ -111,8 +111,8 @@ function openSmsFrame(nome) {
  */
 function SchedaAvatar({ urlImg, nome }) {
     return (
-        <div className="ritratto_avatar">
-            <img src={urlImg} className="ritratto_avatar_immagine" alt={nome} />
+        <div className={styles.avatarFrame}>
+            <img src={urlImg} alt={nome} />
         </div>
     )
 }
@@ -137,47 +137,35 @@ function SchedaProfilo({ profile }) {
     ]
 
     return (
-        <div className="profilo">
-            <div className="titolo_box">Profilo</div>
-            <div className="primo_box">
+        <div className={styles.profileCard}>
 
-                {/* ── PROFILO ───────────────────────────────────────────── */}
-                <div className="header_box">▪ PROFILO ▪</div><br />
+            {/* ── PROFILO ──────────────────────────────────────────────── */}
+            <div className={styles.cardSection}>
+                <div className={styles.sectionLabel}>Profilo</div>
+                <div className={styles.infoRow}>
+                    <span className={styles.infoLabel}>Età</span>
+                    <span className={styles.infoValue}>{eta}</span>
+                </div>
+                <div className={styles.infoRow}>
+                    <span className={styles.infoLabel}>Luogo</span>
+                    <span className={styles.infoValue}>{natoa}</span>
+                </div>
+                <div className={styles.infoRow}>
+                    <span className={styles.infoLabel}>Razza</span>
+                    <span className={styles.infoValue}>{nome_ruolo}</span>
+                </div>
+                <div className={styles.infoRow}>
+                    <span className={styles.infoLabel}>Mestiere</span>
+                    <span className={styles.infoValue}>{nome_ruolo_mestiere}</span>
+                </div>
+            </div>
 
-                <span className={styles.labelLeft}>Età:</span>
-                <span className={styles.valueRight}>{eta}</span>
-                <br />
-
-                <span className={styles.labelLeft}>Luogo:</span>
-                <span className={styles.valueRight}>{natoa}</span>
-                <br />
-
-                {/* lavoro && (
-                    <>
-                        <span className={styles.labelLeft}>Lavoro:</span>
-                        <span className={styles.valueRight}>{lavoro}</span>
-                        <br />
-                    </>
-                )*/}
-
-                {/* <span className={styles.labelLeft}>{sn.race_sing ?? 'Spirito'}:</span>
-                <span className={styles.valueRight}>{razza}</span>
-                <br /> */}
-
-                <span className={styles.labelLeft}>Razza:</span>
-                <span className={styles.valueRight}>{nome_ruolo}</span>
-                <br />
-
-                <span className={styles.labelLeft}>Mestiere:</span>
-                <span className={styles.valueRight}>{nome_ruolo_mestiere}</span>
-                <br /><br />
-
-                {/* ── STATISTICHE (solo proprio pg o staff) ─────────────── */}
-                {statistiche && (
-                    <>
-                        <div className="header_box">▪ STATISTICHE ▪</div><br />
-
-                        <span className="level-stat">
+            {/* ── STATISTICHE (solo proprio pg o staff) ────────────────── */}
+            {statistiche && (
+                <div className={styles.cardSection}>
+                    <div className={styles.sectionLabel}>Statistiche</div>
+                    <div className={styles.infoRow}>
+                        <span className={styles.infoLabel}>
                             Livello
                             <span className="help-animated">?</span>
                             <div className="tooltip-animated">
@@ -197,72 +185,64 @@ function SchedaProfilo({ profile }) {
                                 </table>
                             </div>
                         </span>
-                        <span className={styles.levelValue}>
+                        <span className={`${styles.infoValue} ${styles.infoValueAccent}`}>
                             {statistiche.livello}
                         </span>
-                        <br /><br />
-
-                        <span className={styles.labelLeft}>Tot. Caratteristiche</span>
-                        <span className={styles.boldValue}>
+                    </div>
+                    <div className={styles.infoRow}>
+                        <span className={styles.infoLabel}>Tot. Caratteristiche</span>
+                        <span className={`${styles.infoValue} ${styles.infoValueBold}`}>
                             {statistiche.totale}
                         </span>
-                        <br />
+                    </div>
+                    {['car8', 'car2', 'car4', 'car6'].map(k => (
+                        <div key={k} className={styles.infoRow}>
+                            <span className={styles.infoLabel}>{sn[k] ?? k}</span>
+                            <span className={styles.infoValue}>{statistiche[k]}</span>
+                        </div>
+                    ))}
+                </div>
+            )}
 
-                        {['car8', 'car2', 'car4', 'car6'].map(k => (
-                            <span key={k}>
-                                <span className={styles.labelLeft}>{sn[k] ?? k}:</span>
-                                <span className={styles.valueRight}>{statistiche[k]}</span>
-                                <br />
-                            </span>
-                        ))}
-                    </>
-                )}
-
-                {/* ── INFO ──────────────────────────────────────────────── */}
-                <div className="header_box">▪ INFO ▪</div><br />
-
-                <span className={styles.labelLeft}>{sn.hitpoints ?? 'Salute'}:</span>
-                <span className={styles.valueRight}>{salute}/{salute_max}</span>
-                <br />
-
-                <span className={styles.labelLeft}>{sn.integrita ?? 'Integrità'}:</span>
-                <span className={styles.valueRight}>{integrita}/{integrita_max}</span>
-
+            {/* ── INFO ─────────────────────────────────────────────────── */}
+            <div className={styles.cardSection}>
+                <div className={styles.sectionLabel}>Info</div>
+                <div className={styles.infoRow}>
+                    <span className={styles.infoLabel}>{sn.hitpoints ?? 'Salute'}</span>
+                    <span className={styles.infoValue}>{salute}/{salute_max}</span>
+                </div>
+                <div className={styles.infoRow}>
+                    <span className={styles.infoLabel}>{sn.integrita ?? 'Integrità'}</span>
+                    <span className={styles.infoValue}>{integrita}/{integrita_max}</span>
+                </div>
                 {statistiche && (
                     <>
-                        <br />
-                        <span className={styles.labelLeft}>Esperienza:</span>
-                        <span className={styles.valueRight}>
-                            {Math.floor(esperienza ?? 0)}
-                        </span>
-                        <br />
-                        <span className={styles.labelLeft}>Shin:</span>
-                        <span className={styles.valueRight}>
-                            {Math.floor(shin ?? 0)}
-                        </span>
+                        <div className={styles.infoRow}>
+                            <span className={styles.infoLabel}>Esperienza</span>
+                            <span className={styles.infoValue}>{Math.floor(esperienza ?? 0)}</span>
+                        </div>
+                        <div className={styles.infoRow}>
+                            <span className={styles.infoLabel}>Shin</span>
+                            <span className={styles.infoValue}>{Math.floor(shin ?? 0)}</span>
+                        </div>
                     </>
                 )}
-
-                <br />
-                {/* <span className={styles.labelLeft}>{sn.notorieta ?? 'Notorietà'}:</span>
-                <span className={styles.valueRight}>{Math.floor(notorieta)}</span>
-                <br /><br /> */}
-
-                {/* ── CARICHE STAFF ─────────────────────────────────────── */}
-                <span className={styles.labelLeft}>Cariche</span>
-                <span className={styles.valueRight}>
-                    {staffIcons.map(({ key, file, label }) =>
-                        privilegi?.[key] == 1 ? (
-                            <img key={key}
-                                src={`themes/crystal/imgs/staff/${file}`}
-                                width="20" height="20"
-                                alt={label} title={label} />
-                        ) : null
-                    )}
-                </span>
-                <br /><br />
-
+                <div className={styles.infoRow}>
+                    <span className={styles.infoLabel}>Cariche</span>
+                    <span className={styles.infoValue}>
+                        {staffIcons.map(({ key, file, label }) =>
+                            privilegi?.[key] == 1 ? (
+                                <img key={key}
+                                    src={`themes/crystal/imgs/staff/${file}`}
+                                    width="16" height="16"
+                                    alt={label} title={label}
+                                    style={{ marginLeft: '2px' }} />
+                            ) : null
+                        )}
+                    </span>
+                </div>
             </div>
+
         </div>
     )
 }
@@ -413,15 +393,14 @@ export default function Scheda() {
                 <div className="title scheda-pg-name">{nome} {cognome}</div>
 
                 {/* ── Riga principale: avatar + profilo ────────────────── */}
-                <div className="pg-infos">
+                <div className={styles.schedaHero}>
                     <SchedaAvatar urlImg={profile.url_img} nome={nome} />
                     <SchedaProfilo profile={profile} />
                 </div>
 
                 {/* ── Seconda riga: Note&Fato + accessi + SMS ──────────── */}
-                <div className="pg-infos">
-                    <div className="secondo_box">
-                        {/* Toggle Note & Fato collassabili */}
+                <div className={styles.schedaMeta}>
+                    <div className={styles.metaBox}>
                         <div
                             className="titolo_box_scheda"
                             onClick={() => setNoteFatoOpen(o => !o)}
@@ -430,10 +409,14 @@ export default function Scheda() {
                             Note e Fato
                         </div>
                     </div>
-                    <div className="terzo_box">
-                        {data_iscrizione && <>Primo accesso: {formatDate(data_iscrizione)}<br /></>}
-                        {ora_entrata    && <>Ultimo accesso: {formatDate(ora_entrata)}<br /></>}
-                        <a href="#" onClick={e => { e.preventDefault(); openSmsFrame(nome) }}>
+                    <div className={styles.metaBox}>
+                        {data_iscrizione && <div>Primo accesso: {formatDate(data_iscrizione)}</div>}
+                        {ora_entrata    && <div>Ultimo accesso: {formatDate(ora_entrata)}</div>}
+                        <a
+                            href="#"
+                            className={styles.smsLink}
+                            onClick={e => { e.preventDefault(); openSmsFrame(nome) }}
+                        >
                             ▪ INVIA SMS ▪
                         </a>
                     </div>

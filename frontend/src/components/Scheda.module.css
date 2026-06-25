@@ -1,14 +1,170 @@
 /* Scheda.module.css — stili scoped per Scheda.jsx */
 
-/* ── Righe profilo (float layout) ──────────────────────────── */
-.labelLeft  { float: left; margin-left: 5px; }
-.valueRight { float: right; margin-right: 5px; text-align: right; }
+/* ── Hero: avatar + profilo ──────────────────────────────── */
 
-.levelValue {
-    float: right;
-    margin-right: 5px;
-    text-align: right;
-    color: var(--color-primary);
-    font-weight: bold;
+.schedaHero {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 10px;
+    text-align: left;
 }
-.boldValue  { float: right; margin-right: 5px; text-align: right; font-weight: bold; }
+
+/* Frame avatar */
+
+.avatarFrame {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #2e3350;
+    box-shadow: 0 6px 24px rgb(0 0 0 / 60%);
+    background: #111827;
+    aspect-ratio: 3 / 4;
+    width: 100%;
+}
+
+.avatarFrame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Card profilo */
+
+.profileCard {
+    border: 1px solid #2e3350;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #111827;
+    text-align: left;
+}
+
+/* Blocco sezione (Profilo / Statistiche / Info) */
+
+.cardSection {
+    border-bottom: 1px solid #2e3350;
+}
+
+.cardSection:last-child {
+    border-bottom: none;
+}
+
+/* Header di sezione */
+
+.sectionLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #89aee7;
+    background: #0c0d17;
+    padding: 5px 12px;
+    border-bottom: 1px solid #2e3350;
+    position: relative;
+}
+
+/* Riga label + valore */
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 12px;
+    border-bottom: 1px solid rgb(46 51 80 / 35%);
+}
+
+.infoRow:last-child {
+    border-bottom: none;
+}
+
+.infoLabel {
+    color: #a8a6b3;
+    font-size: 11px;
+    flex-shrink: 0;
+    margin-right: 8px;
+    position: relative;
+    float: none;
+    margin-left: 0;
+}
+
+.infoValue {
+    color: #e8e6e3;
+    font-size: 11px;
+    text-align: right;
+}
+
+.infoValueAccent {
+    color: #aee7ff;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.infoValueBold {
+    font-weight: 700;
+}
+
+/* ── Meta: Note&Fato + accessi ─────────────────────────────── */
+
+.schedaMeta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.metaBox {
+    background: #111827;
+    border: 1px solid #2e3350;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 11px;
+    color: #a8a6b3;
+    line-height: 1.8;
+    text-align: center;
+}
+
+.smsLink {
+    display: inline-block;
+    margin-top: 8px;
+    color: #aee7ff;
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 1px;
+    border: 1px solid rgb(174 231 255 / 30%);
+    padding: 3px 12px;
+    border-radius: 4px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.smsLink:hover {
+    background: rgb(174 231 255 / 8%);
+    border-color: rgb(174 231 255 / 60%);
+    color: #aee7ff;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+@media (width <= 900px) {
+    .schedaHero {
+        grid-template-columns: 160px 1fr;
+    }
+}
+
+@media (width <= 600px) {
+    .schedaHero {
+        grid-template-columns: 1fr;
+    }
+
+    .avatarFrame {
+        max-width: 200px;
+        margin: 0 auto;
+    }
+
+    .schedaMeta {
+        grid-template-columns: 1fr;
+    }
+}

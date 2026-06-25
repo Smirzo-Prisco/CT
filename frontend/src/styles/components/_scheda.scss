@@ -55,13 +55,7 @@ div.pagina_scheda {
     width: 100%;
 }
 
-.pg-infos {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
+// .pg-infos — layout ora gestito da Scheda.module.css (.schedaHero / .schedaMeta)
 
 // ── Ritratto ─────────────────────────────────────────────────
 
@@ -227,7 +221,9 @@ div.titolo_box_scheda {
     font-size: 15px;
     color: $color-text-light;
     text-transform: uppercase;
-    width: 305px;
+    max-width: 305px;
+    width: 100%;
+    box-sizing: border-box;
     padding: 5px;
     background-color: $color-surface;
     border: 1px solid $scheda-border;
