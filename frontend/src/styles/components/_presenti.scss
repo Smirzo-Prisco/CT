@@ -29,6 +29,15 @@ div.presenti_estesi {
     padding: 15px 35px 0px 40px;
 }
 
+#online-users-container {
+    div.presente { font-size: 15px; }
+
+    .online-user-link { font-size: 15px; }
+
+    // SMS icon e icona gruppo (img inline) scalate uniformemente
+    div.presente img { height: 17px; width: auto; }
+}
+
 div.luogo {
     margin: 20px 10px 0 0;
     font-size: $text-2xl;
@@ -62,6 +71,12 @@ tr.presente.pg-morto {
     font-size: 11px;
     margin-right: 4px;
     vertical-align: middle;
+}
+
+// Teschio nella tabella presenti estesa: dimensioni doppie rispetto alla sidebar
+div.presenti_estesi .pg-morto-icon {
+    font-size: 22px;
+    margin-right: 6px;
 }
 
 div.presente a {
