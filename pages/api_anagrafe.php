@@ -40,7 +40,7 @@ function loadSoglie(): array {
 function computeLevel(int $totStats, array $soglie): int {
     $level = 1;
     foreach ($soglie as $row) {
-        if ($totStats <= (int)$row['soglia']) return max(1, (int)$row['livello'] - 1);
+        if ($totStats <= (int)$row['soglia']) return max(1, (int)$row['livello']);
         $level = (int)$row['livello'];
     }
     return $level;

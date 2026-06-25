@@ -573,13 +573,12 @@ function getLevelPg($totStats) {
     $soglie = gdrcd_query("SELECT livello, soglia FROM gilda_soglie ORDER BY soglia ASC", 'result');
     $level = 1;
 
-    while($row = gdrcd_query($soglie, 'fetch')) {
-        if ($totStats <= (int)$row['soglia']) return max(1, (int)$row['livello'] - 1); // Livello minimo 1 per i pg regolari
-
+    while ($row = gdrcd_query($soglie, 'fetch')) {
+        if ($totStats <= (int)$row['soglia']) return max(1, (int)$row['livello']);
         $level = (int)$row['livello'];
     }
 
-    return $level; // se supera tutte le soglie
+    return $level;
 }
 /************* FINE PERSONAGGI ******************************/
 
