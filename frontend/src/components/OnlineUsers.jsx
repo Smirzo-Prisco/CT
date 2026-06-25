@@ -71,7 +71,7 @@ export default function OnlineUsers() {
                 </a>
                 &nbsp;&nbsp;
                 {user.gruppo_img && (
-                  <img src={`/${user.gruppo_img}`} alt="" style={{ height: '17px', width: 'auto' }} />
+                  <img src={`/${user.gruppo_img}`} alt="" />
                 )}
                 &nbsp;&nbsp;
                 {morto && <i className="fa-solid fa-skull pg-morto-icon" title="Morto" />}

@@ -93,10 +93,9 @@ function UserRow({ user }) {
                 />
             </td>
 
-            {/* Avatar del personaggio — in bianco/nero se morto */}
+            {/* Avatar del personaggio — grayscale se morto via CSS su .pg-morto */}
             <td width="10%" style={{ textAlign: 'center' }}>
-                <img width="50" height="50" src={user.url_img_chat} alt={user.nome}
-                    style={morto ? { filter: 'grayscale(100%)' } : undefined} />
+                <img width="50" height="50" src={user.url_img_chat} alt={user.nome} />
             </td>
 
             {/* Link per messaggio privato */}

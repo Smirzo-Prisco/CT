@@ -34,8 +34,8 @@ div.presenti_estesi {
 
     .online-user-link { font-size: 15px; }
 
-    // SMS icon e icona gruppo (img inline) scalate uniformemente
-    div.presente img { height: 17px; width: auto; }
+    // SMS icon e icona gruppo scalate uniformemente
+    div.presente img { height: 20px; width: auto; }
 }
 
 div.luogo {
@@ -66,9 +66,14 @@ tr.presente.pg-morto {
     opacity: 0.75;
 }
 
+// Avatar in bianco/nero nella tabella presenti estesa (grayscale via CSS, non inline)
+tr.presente.pg-morto img {
+    filter: grayscale(100%);
+}
+
 .pg-morto-icon {
     color: #8b1a1a;
-    font-size: 11px;
+    font-size: 17px;
     margin-right: 4px;
     vertical-align: middle;
 }
