@@ -6,7 +6,7 @@
     display: grid;
     grid-template-columns: 200px 1fr;
     gap: 12px;
-    align-items: start;
+    align-items: stretch;
     margin-bottom: 10px;
     text-align: left;
 }
@@ -19,7 +19,7 @@
     border: 1px solid #2e3350;
     box-shadow: 0 6px 24px rgb(0 0 0 / 60%);
     background: #111827;
-    aspect-ratio: 3 / 4;
+    min-height: 200px;
 }
 
 .avatarFrame img {
@@ -38,6 +38,10 @@
     /* overflow: hidden rimosso — clippava il tooltip .help-animated che esce sopra la card */
     background: #111827;
     text-align: left;
+
+    /* min-height pari all'altezza della card con tutte le sezioni staff visibili,
+       così l'avatar non si accorcia quando le sezioni private sono nascoste */
+    min-height: 360px;
 }
 
 /* Primo header di sezione: arrotondare i corner superiori manualmente

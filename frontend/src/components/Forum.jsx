@@ -1161,8 +1161,8 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                     <span className={styles.sectionHeading}>{currentSection?.nome}</span>
                 </div>
                 <div className={styles.buttonsBar}>
-                    <button onClick={() => setView(isStaff && currentSection?.nome?.toLowerCase().includes('resoconti') ? 'compose_quest' : 'compose')}>
-                        {isStaff && currentSection?.nome?.toLowerCase().includes('resoconti') ? 'Nuova Quest' : 'Nuovo Messaggio'}
+                    <button onClick={() => setView(isStaff && currentSection?.tipo === 1 ? 'compose_quest' : 'compose')}>
+                        {isStaff && currentSection?.tipo === 1 ? 'Assegna punti' : 'Nuovo Messaggio'}
                     </button>
                 </div>
 

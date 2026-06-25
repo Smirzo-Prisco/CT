@@ -329,12 +329,12 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                 <?php if (hasPermesso($_SESSION, $permessi_sezioni['area_custodi'])): ?>
                 <div class="form-row">
                     <div class="form-group form-column">
-                        <label for="salute">Salute <span class="gp-label-note">/ 100</span></label>
-                        <input type="number" id="salute" name="salute" min="0" max="100">
+                        <label for="salute">Salute <span class="gp-label-note" id="salute-max-note"></span></label>
+                        <input type="number" id="salute" name="salute" min="0">
                     </div>
                     <div class="form-group form-column">
-                        <label for="integrita">Integrità <span class="gp-label-note">/ 10</span></label>
-                        <input type="number" id="integrita" name="integrita" min="0" max="10">
+                        <label for="integrita">Integrità <span class="gp-label-note" id="integrita-max-note"></span></label>
+                        <input type="number" id="integrita" name="integrita" min="0">
                     </div>
                 </div>
                 <?php endif; ?>

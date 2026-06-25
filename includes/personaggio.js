@@ -74,6 +74,20 @@ function popolaPgForm(nome) {
                 suoniCheckbox.checked = (user.suoni == '1');
             }
 
+            // max dinamico per salute e integrità dal DB
+            const saluteInput = document.getElementById('salute');
+            const saluteNote  = document.getElementById('salute-max-note');
+            if (saluteInput && user.salute_max != null) {
+                saluteInput.max = user.salute_max;
+                if (saluteNote) saluteNote.textContent = '/ ' + user.salute_max;
+            }
+            const integritaInput = document.getElementById('integrita');
+            const integritaNote  = document.getElementById('integrita-max-note');
+            if (integritaInput && user.integrita_max != null) {
+                integritaInput.max = user.integrita_max;
+                if (integritaNote) integritaNote.textContent = '/ ' + user.integrita_max;
+            }
+
             const pgNameEl = document.getElementById('gp-modal-pg-name');
             if (pgNameEl) pgNameEl.textContent = nome;
 

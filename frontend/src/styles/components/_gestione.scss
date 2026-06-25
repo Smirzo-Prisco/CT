@@ -381,6 +381,13 @@ header {
         button { white-space: nowrap; }
     }
 
+    @media (width <= 1024px) {
+        .form-row {
+            flex-direction: column;
+            gap: $space-4;
+        }
+    }
+
     @media (width <= 768px) {
         padding: $space-4 $space-2;
 
@@ -395,10 +402,7 @@ header {
             box-sizing: border-box;
         }
 
-        .form-row {
-            flex-direction: column;
-            gap: 15px;
-        }
+        .form-row { gap: 15px; }
 
         .inline-group .input-with-button {
             flex-direction: column;
