@@ -1076,7 +1076,7 @@ export default function ChatShell() {
                                                 ))}
                                             </select>
                                         </div>
-                                        <button className="btn btn--success" onClick={() => window.tiraDadoGenericoChat?.()}>Tira Dado Generico</button>
+                                        <button className="gdr-button" onClick={() => window.tiraDadoGenericoChat?.()}>Tira Dado Generico</button>
                                     </div>
 
                                     {/* Oggetti */}
@@ -1108,7 +1108,7 @@ export default function ChatShell() {
                                                 )}
                                             </select>
                                         </div>
-                                        <button className="btn btn--success" onClick={() => window.usaOggettoChat?.()}>Usa Oggetto</button>
+                                        <button className="gdr-button" onClick={() => window.usaOggettoChat?.()}>Usa Oggetto</button>
                                     </div>
                                 </div>
                             </div>
@@ -1144,7 +1144,7 @@ export default function ChatShell() {
                                                 <option value="0">0</option>
                                             </select>
                                         </div>
-                                        <button className="btn btn--success" onClick={() => window.tiraSkillChat?.()}>Usa Abilità</button>
+                                        <button className="gdr-button" onClick={() => window.tiraSkillChat?.()}>Usa Abilità</button>
                                     </div>
 
                                     {/* Armi */}
@@ -1177,7 +1177,7 @@ export default function ChatShell() {
                                                 <option value="punto_vitale">Punto vitale</option>
                                             </select>
                                         </div>
-                                        <button className="btn btn--success" onClick={() => window.usaAttaccoChat?.()}>Usa Arma</button>
+                                        <button className="gdr-button" onClick={() => window.usaAttaccoChat?.()}>Usa Arma</button>
                                     </div>
                                 </div>
                             </div>
@@ -1191,7 +1191,7 @@ export default function ChatShell() {
                                             <label className="gdr-label" htmlFor="caratteri">Limite Caratteri Azione</label>
                                             <input className="gdr-input" name="caratteri" id="caratteri" placeholder="Limite caratteri" />
                                         </div>
-                                        <button className="btn btn--success" onClick={() => window.setCharLimit?.()}>Imposta Limite</button>
+                                        <button className="gdr-button" onClick={() => window.setCharLimit?.()}>Imposta Limite</button>
                                     </div>
                                 </div>
                             </div>

@@ -797,8 +797,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     case 'Q':
                         if ($_SESSION['login']==$row['destinatario']) {
                             $add_chat .= '<span class="chat_sussurro">'.gdrcd_format_time($row['ora']).'</span> &nbsp;';
-                            $msg_type = ($row['tipo']=='S') ? $MESSAGE['chat']['whisper']['by'] : $MESSAGE['chat']['whisper']['skill'];
-                            $add_chat .= '<span class="chat_sussurro">'.$row['mittente'].' '.$msg_type.': </span>';
+                            $msg_sfx  = ($row['tipo']=='S') ? ' '.$MESSAGE['chat']['whisper']['by'] : '';
+                            $add_chat .= '<span class="chat_sussurro">'.$row['mittente'].$msg_sfx.': </span>';
                             $add_chat .= '<span class="chat_sussurro">'.$row['testo'].'</span>';
                         } elseif ($_SESSION['login']==$row['mittente']) {
                             if ($row['tipo']=='S') {
@@ -1479,36 +1479,35 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             if (!$pngName) { echo json_encode(['success' => false, 'message' => 'Nome PNG mancante']); exit; }
 
-            // Mappa nome caratteristica → colonna DB
-            $carColMap = ['destrezza'=>'car2','mente'=>'car4','tempra'=>'car6','potere'=>'car8'];
-            $carCol    = $carColMap[$pngCar] ?? 'car2';
-
-            // Recupera il valore della caratteristica dal PNG
-            $pngRow = gdrcd_query("SELECT $carCol FROM personaggio WHERE nome = '$pngName' LIMIT 1");
-            if (!$pngRow) { echo json_encode(['success' => false, 'message' => 'PNG non trovato']); exit; }
-            $carVal = (int)$pngRow[$carCol];
-
-            // Calcola il tiro: bonus dalla caratteristica (formula uguale a lanciaStat)
-            $bonus  = (int)(($carVal / 10) - 1);
-            $raw    = mt_rand(1, 20);
-            $dice   = max(1, $raw + $bonus);
-
-            // Messaggio azione in chat
+            // Messaggio azione in chat (sempre, se presente)
             if ($pngMessage) {
                 checkTurnEnd($luogo, $pngName, $id_role);
                 chatInsertMessage($luogo, $login, $pngName, $pngMessage, 'N', null);
             }
 
+            $dice = 0;
             if (!empty($targets)) {
+                // Mappa nome caratteristica → colonna DB
+                $carColMap = ['destrezza'=>'car2','mente'=>'car4','tempra'=>'car6','potere'=>'car8'];
+                $carCol    = $carColMap[$pngCar] ?? 'car2';
+
+                $pngRow = gdrcd_query("SELECT $carCol FROM personaggio WHERE nome = '$pngName' LIMIT 1");
+                if (!$pngRow) { echo json_encode(['success' => false, 'message' => 'PNG non trovato']); exit; }
+                $carVal = (int)$pngRow[$carCol];
+
+                $bonus = (int)(($carVal / 10) - 1);
+                $raw   = mt_rand(1, 20);
+                $dice  = max(1, $raw + $bonus);
+
                 $targetsStr = implode(',', array_map(fn($t) => gdrcd_filter('post', $t), $targets));
                 $id_fight   = fight($id_role, $pngName, $targetsStr, 0, 0, $pngCar, $dice, 'attacco PNG master', $damagePercent);
                 notifyAttackIncoming($id_role, $luogo, $pngName, $targets, $pngCar, $dice, $id_fight, $turn);
+
+                $rollMsg = "$pngName esegue un tiro totale di $pngCar di $dice ($raw/20 + $bonus)";
+                chatInsertMessage($luogo, $pngName, null, $rollMsg, 'C', null);
             }
 
-            $rollMsg = "$pngName esegue un tiro totale di $pngCar di $dice ($raw/20 + $bonus)";
-            chatInsertMessage($luogo, $pngName, null, $rollMsg, 'C', null);
-
-            echo json_encode(['success' => true, 'message' => 'Attacco PNG inviato.', 'dice' => $dice]);
+            echo json_encode(['success' => true, 'message' => 'Azione PNG inviata.', 'dice' => $dice]);
             break;
 
         /**
