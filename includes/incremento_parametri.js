@@ -311,7 +311,7 @@ function getLevelPg(totStats, soglie) {
 	let level = 1;
 
 	for (const row of soglie) {
-		if (totStats <= Number(row.soglia)) return Number(row.livello - 1);
+		if (totStats <= Number(row.soglia)) return Math.max(1, Number(row.livello));
 
 		level = Number(row.livello);
 	}
