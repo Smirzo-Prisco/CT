@@ -1605,7 +1605,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     break;
                 case 'subisce':
                     fight($id_role, $attacker, $pngName, 0, 0, 'subisce', 0, 'risposta PNG subisce');
-                    $messaggio = "<i>Risultato provvisorio:</i> $pngName subisce l'attacco di $attacker";
+                    $messaggio = "<i>Risultato provvisorio:</i> $pngName subisce l'attacco di $attacker (tiro: <b>{$fightRow['dice']}</b>)";
                     break;
                 default:
                     echo json_encode(['success' => false, 'message' => 'Scelta non valida']); exit;
