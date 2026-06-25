@@ -774,23 +774,25 @@ span[style*="position:relative"]:hover .tooltip-bottom {
         background: $gestione-surface;
         border-radius: $radius-lg;
         overflow: hidden;
+        table-layout: auto;
     }
 
     th,
     td {
-        padding: $space-2 $space-3;
+        padding: $space-1 $space-2;
         text-align: left;
         border-bottom: 1px solid $gestione-hover;
-        font-size: $text-md;
+        font-size: $text-sm;
     }
 
     th {
         background: $gestione-hover;
         font-weight: $font-weight-bold;
         color: $color-text-muted;
-        font-size: $text-sm;
+        font-size: 10px;
         letter-spacing: 1px;
         text-transform: uppercase;
+        white-space: nowrap;
     }
 
     tr:last-child td { border-bottom: none; }

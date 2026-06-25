@@ -87,19 +87,18 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
 
 <!-- ── Lista personaggi ──────────────────────────────────────── -->
 <div class="gp-list">
-    <div class="ct-table-responsive">
-        <table id="pgTable">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Personaggio</th>
-                    <th>Razza</th>
-                    <th>Gilda</th>
-                    <th>Mestiere</th>
-                    <th>Esilio</th>
-                    <th class="gp-th-actions">Azioni</th>
-                </tr>
-            </thead>
+    <table id="pgTable">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Personaggio</th>
+                <?php /* <th>Spirito</th> */ ?>
+                <th>Razza</th>
+                <th>Mestiere</th>
+                <th>Esilio</th>
+                <th class="gp-th-actions">Azioni</th>
+            </tr>
+        </thead>
             <tbody>
                 <?php foreach ($personaggi as $pg):
                     $isExiled = !empty($pg['esilio'])
@@ -127,10 +126,11 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                         <?php endif; ?>
                     </td>
 
-                    <!-- Razza -->
+                    <?php /* Spirito (ex Razza) — rimossa dalla visualizzazione:
                     <td class="gp-cell--meta"><?= htmlspecialchars($pg['nome_razza'] ?? '—') ?></td>
+                    */ ?>
 
-                    <!-- Gilda -->
+                    <!-- Razza (ex Gilda) -->
                     <td class="gp-cell--meta"><?= htmlspecialchars($pg['nome_gilda'] ?? '—') ?></td>
 
                     <!-- Mestiere -->
@@ -205,7 +205,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                 <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
 </div>
 
 <!-- ── Modale modifica personaggio ──────────────────────────── -->
