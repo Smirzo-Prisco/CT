@@ -1505,6 +1505,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 notifyAttackIncoming($id_role, $luogo, $pngName, $targets, $pngCar, $dice, $id_fight, $turn);
             }
 
+            $rollMsg = "$pngName esegue un tiro totale di $pngCar di $dice ($raw/20 + $bonus)";
+            chatInsertMessage($luogo, $pngName, null, $rollMsg, 'C', null);
+
             echo json_encode(['success' => true, 'message' => 'Attacco PNG inviato.', 'dice' => $dice]);
             break;
 
