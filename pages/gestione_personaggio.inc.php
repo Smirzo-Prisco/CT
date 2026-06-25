@@ -55,7 +55,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
         <a href="javascript:history.back()" class="gp-back" title="Indietro">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
-        <h1 class="gp-title"><i class="fa-solid fa-users"></i> Personaggi</h1>
     </div>
 
     <div class="gp-topbar__center">
@@ -72,13 +71,13 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
 
     <div class="gp-topbar__right">
         <?php if (hasPermesso($_SESSION, $permessi_azioni['reset'])): ?>
-        <button class="btn-action btn-action--reset" title="Reset punti di tutti i personaggi" onclick="resetPg([])">
-            <i class="fa-solid fa-rotate"></i> Reset tutti
+        <button class="btn-action btn-action--reset btn-action--icon" title="Reset punti di tutti i personaggi" onclick="resetPg([])">
+            <i class="fa-solid fa-rotate"></i>
         </button>
         <?php endif; ?>
         <?php if (hasPermesso($_SESSION, $permessi_azioni['cancella'])): ?>
-        <button class="btn-action btn-action--delete" title="Elimina definitivamente tutti gli esiliati" onclick="eliminaEsiliati()">
-            <i class="fa-solid fa-trash"></i> Elimina esiliati
+        <button class="btn-action btn-action--delete btn-action--icon" title="Elimina definitivamente tutti gli esiliati" onclick="eliminaEsiliati()">
+            <i class="fa-solid fa-trash"></i>
         </button>
         <?php endif; ?>
     </div>
