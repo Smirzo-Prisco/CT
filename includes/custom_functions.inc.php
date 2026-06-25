@@ -569,15 +569,24 @@ function getTotStatsPg($pg) {
     return gdrcd_query("SELECT SUM(COALESCE(car2, 0) + COALESCE(car4, 0) + COALESCE(car6, 0) + COALESCE(car8, 0)) as tot_stats FROM personaggio $where")['tot_stats'];
 }
 
-function getLevelPg($totStats) {
-    $soglie = gdrcd_query("SELECT livello, soglia FROM gilda_soglie ORDER BY soglia ASC", 'result');
-    $level = 1;
+/**
+ * Calcola il livello di un personaggio in base al totale delle sue caratteristiche.
+ *
+ * @param int   $totStats Somma di car2+car4+car6+car8 del personaggio.
+ * @param array $soglie   Soglie precaricate [{livello, soglia}, …] ordinate per soglia ASC.
+ *                        Se vuoto, vengono lette dal DB (usare il parametro per query in lista).
+ */
+function getLevelPg(int $totStats, array $soglie = []): int {
+    if (empty($soglie)) {
+        $res = gdrcd_query("SELECT livello, soglia FROM gilda_soglie ORDER BY soglia ASC", 'result');
+        while ($row = gdrcd_query($res, 'fetch')) $soglie[] = $row;
+    }
 
-    while ($row = gdrcd_query($soglie, 'fetch')) {
+    $level = 1;
+    foreach ($soglie as $row) {
         if ($totStats <= (int)$row['soglia']) return max(1, (int)$row['livello']);
         $level = (int)$row['livello'];
     }
-
     return $level;
 }
 /************* FINE PERSONAGGI ******************************/

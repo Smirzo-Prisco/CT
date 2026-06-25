@@ -36,16 +36,6 @@ function loadSoglie(): array {
     return $soglie;
 }
 
-/** Calcola il livello del personaggio dalle soglie precaricate. */
-function computeLevel(int $totStats, array $soglie): int {
-    $level = 1;
-    foreach ($soglie as $row) {
-        if ($totStats <= (int)$row['soglia']) return max(1, (int)$row['livello']);
-        $level = (int)$row['livello'];
-    }
-    return $level;
-}
-
 // ── Query condivisa ───────────────────────────────────────────────────────────
 
 /**
@@ -76,7 +66,7 @@ function buildPersonaggiList(string $where, array $soglie): array {
             'nome'          => $row['nome'],
             'cognome'       => $row['cognome'],
             'ultimoRefresh' => $row['ultimo_refresh'],
-            'livello'       => computeLevel((int)$row['tot_stats'], $soglie),
+            'livello'       => getLevelPg((int)$row['tot_stats'], $soglie),
             'gilda'         => ['nome' => $row['nome_gilda']    ?? '', 'img' => $row['img_gilda']    ?? ''],
             'mestiere'      => ['nome' => $row['nome_mestiere'] ?? '', 'img' => $row['img_mestiere'] ?? ''],
             'razza'         => ['nome' => $row['sing_m']        ?? '', 'img' => $row['img_razza']    ?? ''],
