@@ -1528,10 +1528,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 'result'
             );
             $pngNames = [];
-            while ($row = gdrcd_query($pngRes, 'fetch')) $pngNames[] = "'" . gdrcd_filter('in', $row['pg_name']) . "'";
+            while ($row = gdrcd_query($pngRes, 'fetch')) $pngNames[] = $row['pg_name'];
 
             if (empty($pngNames)) { echo json_encode(['success' => true, 'attacks' => []]); exit; }
-            $pngList = implode(',', $pngNames);
 
             $res = gdrcd_query("
                 SELECT rf.id, rf.striker, rf.car, rf.dice, rf.target
@@ -1546,6 +1545,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                       AND (r2.car IN ('dado_risposta','subisce','difesa'))
                       AND r2.striker = rf.striker
                       AND FIND_IN_SET(r2.target, rf.target) > 0
+                      AND r2.id > rf.id
                   )
             ", 'result');
 
@@ -1553,7 +1553,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             while ($row = gdrcd_query($res, 'fetch')) {
                 $rowTargets = array_map('trim', explode(',', $row['target']));
                 foreach ($rowTargets as $t) {
-                    if (!in_array("'$t'", $pngNames)) continue;
+                    if (!in_array($t, $pngNames)) continue;
                     $attacks[] = [
                         'id_fight' => (int)$row['id'],
                         'attacker' => $row['striker'],
