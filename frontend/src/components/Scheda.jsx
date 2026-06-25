@@ -410,7 +410,7 @@ export default function Scheda() {
                         </div>
                     </div>
                     <div className={styles.metaBox}>
-                        {data_iscrizione && <div>Primo accesso: {formatDate(data_iscrizione)}</div>}
+                        {data_iscrizione && <div>Iscrizione: {formatDate(data_iscrizione)}</div>}
                         {ora_entrata    && <div>Ultimo accesso: {formatDate(ora_entrata)}</div>}
                         <a
                             href="#"
