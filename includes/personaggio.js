@@ -288,6 +288,12 @@ function resetPg(pgs) {
 
 /****************   Al completo caricamento del DOM della pagina... **********************************/
 document.addEventListener('DOMContentLoaded', function () {
+    // Sposta il modal fuori da #maincontent e sotto <body> — il modal ha position:fixed
+    // e z-index:1500, ma se rimane dentro #maincontent (z-index:auto) viene dipinto
+    // sotto le sidebar (z-index:1000). Il teleport risolve il conflitto di stacking context.
+    const pgEditContainer = document.getElementById('pg_edit_container');
+    if (pgEditContainer) document.body.appendChild(pgEditContainer);
+
     // Gestione modale di modifica personaggio
     const closePgModal = document.getElementById("closePgModal");
 
