@@ -181,6 +181,9 @@ div.body_box {
     color: $color-text-light;
     clear: both;
     text-transform: none;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
 }
 
 td.casella_titolo {
