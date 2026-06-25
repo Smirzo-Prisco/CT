@@ -505,3 +505,14 @@
     </div>
 
 </div><!-- pagina -->
+
+<?php if (isset($_REQUEST['pg']) && $_SESSION['login'] == $_REQUEST['pg'] && !isset($_POST['op'])): ?>
+<div class="sm-sticky-bar">
+    <button type="button" class="sm-btn" title="Vai in cima"
+            onclick="window.scrollTo({top:0,behavior:'smooth'})">▲</button>
+    <button type="button" class="sm-btn sm-btn--save" title="Salva modifiche"
+            onclick="document.querySelector('.form_gioco form')?.requestSubmit()">💾 Salva</button>
+    <button type="button" class="sm-btn" title="Vai in fondo"
+            onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">▼</button>
+</div>
+<?php endif; ?>

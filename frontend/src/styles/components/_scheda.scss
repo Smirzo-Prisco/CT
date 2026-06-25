@@ -768,3 +768,47 @@ div.pagina_scheda_oggetti {
         font-family: $font-base;
     }
 }
+
+// ── scheda_modifica: barra azioni sticky ─────────────────────
+
+.sm-sticky-bar {
+    position: fixed;
+    bottom: $space-5;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: $space-2;
+    background: $palette-surface-raised;
+    border: 1px solid $color-border;
+    border-radius: $radius-full;
+    padding: $space-1 $space-3;
+    box-shadow: $shadow-lg;
+    z-index: 500;
+}
+
+.sm-btn {
+    background: none;
+    border: 1px solid transparent;
+    color: $color-text-muted;
+    cursor: pointer;
+    font-size: $text-md;
+    padding: $space-1 + 1 $space-3;
+    border-radius: $radius-full;
+    transition: background $transition-fast, color $transition-fast;
+    white-space: nowrap;
+    line-height: 1;
+
+    &:hover {
+        background: $palette-surface-hover;
+        color: $color-text;
+    }
+
+    &--save {
+        color: $palette-blue-alt;
+        font-weight: $font-weight-bold;
+        background: rgb(77 166 255 / 10%);
+        border-color: rgb(77 166 255 / 30%);
+
+        &:hover { background: rgb(77 166 255 / 20%); }
+    }
+}
