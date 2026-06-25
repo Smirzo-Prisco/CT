@@ -36,16 +36,8 @@ import styles from './Scheda.module.css'
  * Questo consente al CSS scritto nei campi del personaggio di operare
  * solo all'interno della scheda senza colpire il resto della pagina.
  */
-function extractAndScopeStyles(html) {
-    if (!html) return { html: '', css: '' }
-    let css = ''
-    const cleaned = html.replace(/<style[\s\S]*?>([\s\S]*?)<\/style>/gi, (_, block) => {
-        css += block
-        return ''
-    })
-    if (!css) return { html, css: '' }
-    // Prefissa ogni selettore con .pagina_scheda
-    const scoped = css.replace(/([^@{}]+)\{/g, (_, selector) => {
+function scopeSelectors(css) {
+    return css.replace(/([^@{}]+)\{/g, (_, selector) => {
         const prefixed = selector
             .split(',')
             .map(s => {
@@ -59,6 +51,66 @@ function extractAndScopeStyles(html) {
             .join(', ')
         return `${prefixed} {`
     })
+}
+
+/**
+ * Divide il CSS in blocchi "at-rule" (@keyframes, @media, @font-face, ecc.)
+ * e blocchi "normali", rispettando le graffe annidate (un solo livello,
+ * sufficiente per i casi reali: @keyframes con le sue percentuali interne,
+ * @media con le sue regole interne).
+ */
+function splitAtRules(css) {
+    const blocks = []
+    let i = 0
+    while (i < css.length) {
+        const atIndex = css.indexOf('@', i)
+        if (atIndex === -1) {
+            blocks.push({ type: 'plain', content: css.slice(i) })
+            break
+        }
+        if (atIndex > i) blocks.push({ type: 'plain', content: css.slice(i, atIndex) })
+        const braceStart = css.indexOf('{', atIndex)
+        if (braceStart === -1) {
+            blocks.push({ type: 'plain', content: css.slice(atIndex) })
+            break
+        }
+        let depth = 1
+        let j = braceStart + 1
+        while (j < css.length && depth > 0) {
+            if (css[j] === '{') depth++
+            else if (css[j] === '}') depth--
+            j++
+        }
+        blocks.push({ type: 'at', content: css.slice(atIndex, j) })
+        i = j
+    }
+    return blocks
+}
+
+function extractAndScopeStyles(html) {
+    if (!html) return { html: '', css: '' }
+    let css = ''
+    const cleaned = html.replace(/<style[\s\S]*?>([\s\S]*?)<\/style>/gi, (_, block) => {
+        css += block
+        return ''
+    })
+    if (!css) return { html, css: '' }
+
+    // Le @-rule (@keyframes, @font-face, @media, ecc.) non vanno trattate
+    // come selettori: altrimenti "@keyframes nome {" viene scambiato per un
+    // selettore e l'intera animazione viene corrotta dallo scoping.
+    const scoped = splitAtRules(css).map(block => {
+        if (block.type === 'plain') return scopeSelectors(block.content)
+
+        const match = block.content.match(/^@([a-zA-Z-]+)\s*([^{]*)\{([\s\S]*)\}$/)
+        if (!match) return block.content
+        const [, name, prelude, inner] = match
+        // @media va scopato internamente (contiene normali regole CSS);
+        // @keyframes/@font-face/@page restano intatti.
+        const innerCss = /^-?(webkit-|moz-|o-)?media$/i.test(name) ? scopeSelectors(inner) : inner
+        return `@${name} ${prelude.trim()} {${innerCss}}`
+    }).join('')
+
     return { html: cleaned, css: scoped }
 }
 
