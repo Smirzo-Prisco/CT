@@ -158,6 +158,13 @@ function savePgForm(event) {
         });
 }
 
+// Normalizza un valore testuale: unifica i line-ending e rimuove spazi finali.
+// I browser normalizzano \r\n → \n nei textarea; senza questa funzione i campi
+// HTML dal DB (che arrivano con \r\n) risultano sempre "modificati".
+function normalizeText(val) {
+    return String(val ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trimEnd();
+}
+
 // Funzione per confrontare i dati e trovare i campi modificati
 function getModifiedFields(formData) {
     if (!window.originalData) return {};
@@ -191,11 +198,13 @@ function getModifiedFields(formData) {
     };
 
     Object.keys(fieldMappings).forEach(formField => {
-        const currentValue = getFormFieldValue(formData, formField);
-        const originalValue = window.originalData[formField] || '';
+        // Campo non nel form (sezione nascosta per permessi) → ignora
+        if (formField !== 'suoni' && formData.get(formField) === null) return;
 
-        // Confronta i valori (gestendo tipi diversi)
-        if (String(currentValue) != '' && String(currentValue) !== String(originalValue)) {
+        const currentValue  = getFormFieldValue(formData, formField);
+        const originalValue = String(window.originalData[formField] ?? '');
+
+        if (normalizeText(currentValue) !== normalizeText(originalValue)) {
             modified[formField] = currentValue;
         }
     });
@@ -206,10 +215,9 @@ function getModifiedFields(formData) {
 // Funzione helper per ottenere il valore di un campo form
 function getFormFieldValue(formData, fieldName) {
     if (fieldName === 'suoni') {
-        // Checkbox special handling
         return formData.get(fieldName) ? '1' : '0';
     }
-    return formData.get(fieldName) || '';
+    return formData.get(fieldName) ?? '';
 }
 // Cancellazione esiliati
 function eliminaEsiliati() {

@@ -84,21 +84,28 @@ div.error {
     padding: $space-4 - 1 $space-5;
     border-radius: $radius-lg - 3;
     color: $color-text-light;
+    font-family: $font-base;
+    font-size: $text-sm;
     z-index: 10000;
+    display: none;
 
     &.success {
+        display: block;
         background: $color-success;
     }
 
     &.warning {
+        display: block;
         background: $color-warning;
     }
 
     &.error {
+        display: block;
         background: $color-danger;
     }
 
     &.info {
+        display: block;
         background: $color-info;
     }
 }

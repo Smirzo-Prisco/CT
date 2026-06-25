@@ -189,15 +189,21 @@ function changeFrame(input_text) {
     document.getElementById("myframe").src = input_text;
 }
 
-// Funzione per mostrare notifiche
+// Elemento singleton per le notifiche — creato una volta sola, aggiornato ad ogni chiamata
 function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `save-notification ${type}`;
-    notification.textContent = message;
+    let el = document.getElementById('ct-notification');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'ct-notification';
+        document.body.appendChild(el);
+    }
 
-    document.body.appendChild(notification);
+    clearTimeout(el._hideTimer);
+    el.className = `save-notification ${type}`;
+    el.textContent = message;
 
-    setTimeout(() => { notification.remove(); }, 10000);
+    // Dopo 5 s rimuove il tipo → il CSS nasconde l'elemento
+    el._hideTimer = setTimeout(() => { el.className = 'save-notification'; }, 5000);
 }
 
 /***********    GESTIONE PERSONAGGI  *********************/
@@ -356,6 +362,10 @@ function savePgForm(event) {
         });
 }
 
+function normalizeText(val) {
+    return String(val ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trimEnd();
+}
+
 // Funzione per confrontare i dati e trovare i campi modificati
 function getModifiedFields(formData) {
     if (!window.originalData) return {};
@@ -389,11 +399,12 @@ function getModifiedFields(formData) {
     };
 
     Object.keys(fieldMappings).forEach(formField => {
-        const currentValue = getFormFieldValue(formData, formField);
-        const originalValue = window.originalData[formField] || '';
+        if (formField !== 'suoni' && formData.get(formField) === null) return;
 
-        // Confronta i valori (gestendo tipi diversi)
-        if (String(currentValue) != '' && String(currentValue) !== String(originalValue)) {
+        const currentValue  = getFormFieldValue(formData, formField);
+        const originalValue = String(window.originalData[formField] ?? '');
+
+        if (normalizeText(currentValue) !== normalizeText(originalValue)) {
             modified[formField] = currentValue;
         }
     });
@@ -404,10 +415,9 @@ function getModifiedFields(formData) {
 // Funzione helper per ottenere il valore di un campo form
 function getFormFieldValue(formData, fieldName) {
     if (fieldName === 'suoni') {
-        // Checkbox special handling
         return formData.get(fieldName) ? '1' : '0';
     }
-    return formData.get(fieldName) || '';
+    return formData.get(fieldName) ?? '';
 }
 // Cancellazione esiliati
 function eliminaEsiliati() {
