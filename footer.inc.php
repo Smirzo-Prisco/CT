@@ -28,10 +28,12 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
          disponibilità anche quando footer non esegue (die() nel contenuto) -->
 
     <!-- COREFUNCTIONS -->
-    <script src="/includes/corefunctions.js"></script>
-    
+    <script src="/includes/corefunctions.js?v=<?= filemtime(__DIR__ . '/includes/corefunctions.js') ?>"></script>
+
     <!-- Tutti i file js specifici da includere dopo -->
-    <?php foreach ($scripts as $s): ?><script src="<?= $s ?>"></script><?php endforeach; ?>
+    <?php foreach ($scripts as $s): ?>
+    <script src="<?= $s ?>?v=<?= file_exists(__DIR__ . $s) ? filemtime(__DIR__ . $s) : 0 ?>"></script>
+    <?php endforeach; ?>
 </html>
 
 <?php
