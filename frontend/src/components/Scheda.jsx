@@ -7,7 +7,7 @@
  * Sezioni renderizzate:
  *   - Menu sub-sezioni (link PHP, causano reload — non ancora migrate)
  *   - Avatar + blocco profilo/statistiche
- *   - Note & Fato collassabili
+ *   - Note del Fato collassabili
  *   - Background principale
  *
  * Flag di visibilità (is_own, is_staff, is_admin, is_master) vengono
@@ -108,7 +108,7 @@ function openSmsFrame(nome) {
 // SchedaMenu è ora in SchedaMenu.jsx (condiviso con le sotto-sezioni)
 
 /**
- * Modale Note & Fato — portaled su document.body per evitare clip da transform.
+ * Modale Note del Fato — portaled su document.body per evitare clip da transform.
  * Chiudibile con Esc, clic sul backdrop o il pulsante ✕.
  */
 function NoteFatoModal({ nome, particolariHtml, noteFatoHtml, onClose }) {
@@ -122,7 +122,7 @@ function NoteFatoModal({ nome, particolariHtml, noteFatoHtml, onClose }) {
         <div className={styles.noteFatoBackdrop} onClick={onClose}>
             <div className={styles.noteFatoModal} onClick={e => e.stopPropagation()}>
                 <div className={styles.noteFatoHeader}>
-                    <span>✦ Note & Fato — {nome}</span>
+                    <span>✦ Note del Fato — {nome}</span>
                     <button className={styles.noteFatoClose} onClick={onClose} aria-label="Chiudi">✕</button>
                 </div>
                 <div className={styles.noteFatoContent}>
@@ -447,7 +447,7 @@ export default function Scheda() {
                                 className={styles.noteFatoBtn}
                                 onClick={() => setNoteFatoOpen(true)}
                             >
-                                ✦ Note & Fato
+                                ✦ Note del Fato
                             </button>
                         </div>
                         <div className={styles.metaBox}>
@@ -465,7 +465,7 @@ export default function Scheda() {
 
                 </div>
 
-                {/* ── Modale Note & Fato ───────────────────────────────── */}
+                {/* ── Modale Note del Fato ───────────────────────────────── */}
                 {noteFatoOpen && (
                     <NoteFatoModal
                         nome={nome}
