@@ -675,6 +675,7 @@ span[style*="position:relative"]:hover .tooltip-bottom {
 
 .gp-topbar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: $space-3;
     background: $gestione-surface;
@@ -1065,15 +1066,19 @@ span[style*="position:relative"]:hover .tooltip-bottom {
 
 // ── Responsive gp-topbar ──────────────────────────────────────
 
-@media (width <= 1024px) {
+// Su schermi dove #maincontent < ~730px (viewport < 1280px con sidebar da 260px ciascuna),
+// i pulsanti admin vanno in seconda riga per evitare overflow orizzontale.
+@media (width <= 1280px) {
     .gp-topbar {
-        flex-wrap: wrap;
-
-        &__center {
+        &__right {
             order: 3;
-            flex: 1 1 100%;
+            flex-wrap: wrap;
         }
+    }
+}
 
+@media (width <= 768px) {
+    .gp-topbar {
         &__right { flex-wrap: wrap; }
     }
 }
