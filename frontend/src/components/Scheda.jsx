@@ -368,6 +368,9 @@ export default function Scheda() {
             particolari, note_fato, principale,
             data_iscrizione, ora_entrata, url_media } = profile
 
+    const lvNum   = profile.statistiche?.livello
+    const lvClass = `${styles.pgCardWrapper}${lvNum >= 1 && lvNum <= 8 ? ` ${styles[`lv-${lvNum}`]}` : ''}`
+
     const { html: principaleHtml } = extractAndScopeStyles(principale)
     const { html: particolariHtml } = extractAndScopeStyles(particolari)
     const { html: noteFatoHtml }    = extractAndScopeStyles(note_fato)
@@ -389,37 +392,42 @@ export default function Scheda() {
                     isMaster={is_master}
                 />
 
-                {/* ── Nome e cognome ───────────────────────────────────── */}
-                <div className="title scheda-pg-name">{nome} {cognome}</div>
+                {/* ── Card pg: nome + hero + meta — glow visivo in base al livello ── */}
+                <div className={lvClass}>
 
-                {/* ── Riga principale: avatar + profilo ────────────────── */}
-                <div className={styles.schedaHero}>
-                    <SchedaAvatar urlImg={profile.url_img} nome={nome} />
-                    <SchedaProfilo profile={profile} />
-                </div>
+                    {/* ── Nome e cognome ───────────────────────────────────── */}
+                    <div className="title scheda-pg-name">{nome} {cognome}</div>
 
-                {/* ── Seconda riga: Note&Fato + accessi + SMS ──────────── */}
-                <div className={styles.schedaMeta}>
-                    <div className={styles.metaBox}>
-                        <div
-                            className="titolo_box_scheda"
-                            onClick={() => setNoteFatoOpen(o => !o)}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            Note e Fato
+                    {/* ── Riga principale: avatar + profilo ────────────────── */}
+                    <div className={styles.schedaHero}>
+                        <SchedaAvatar urlImg={profile.url_img} nome={nome} />
+                        <SchedaProfilo profile={profile} />
+                    </div>
+
+                    {/* ── Seconda riga: Note&Fato + accessi + SMS ──────────── */}
+                    <div className={styles.schedaMeta}>
+                        <div className={styles.metaBox}>
+                            <div
+                                className="titolo_box_scheda"
+                                onClick={() => setNoteFatoOpen(o => !o)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                Note e Fato
+                            </div>
+                        </div>
+                        <div className={styles.metaBox}>
+                            {data_iscrizione && <div>Iscrizione: {formatDate(data_iscrizione)}</div>}
+                            {ora_entrata    && <div>Ultimo accesso: {formatDate(ora_entrata)}</div>}
+                            <a
+                                href="#"
+                                className={styles.smsLink}
+                                onClick={e => { e.preventDefault(); openSmsFrame(nome) }}
+                            >
+                                ▪ INVIA SMS ▪
+                            </a>
                         </div>
                     </div>
-                    <div className={styles.metaBox}>
-                        {data_iscrizione && <div>Iscrizione: {formatDate(data_iscrizione)}</div>}
-                        {ora_entrata    && <div>Ultimo accesso: {formatDate(ora_entrata)}</div>}
-                        <a
-                            href="#"
-                            className={styles.smsLink}
-                            onClick={e => { e.preventDefault(); openSmsFrame(nome) }}
-                        >
-                            ▪ INVIA SMS ▪
-                        </a>
-                    </div>
+
                 </div>
 
                 {/* ── Note & Fato (collassabili) ───────────────────────── */}

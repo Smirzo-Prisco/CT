@@ -175,3 +175,67 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ── Wrapper progressione visiva livello ────────────────────── */
+
+.pgCardWrapper {
+    border: 2px solid transparent;
+    border-radius: 12px;
+    transition: border 0.4s, box-shadow 0.4s;
+}
+
+.lv-1 { border: 2px solid #666; }
+
+.lv-2 { border: 2px solid #7b5ea7; }
+
+.lv-3 {
+    border: 2px solid #9b7ec8;
+    box-shadow: 0 0 10px #9b7ec8;
+}
+
+.lv-4 {
+    border: 2px solid #b89de0;
+    box-shadow: 0 0 14px #b89de0, 0 0 5px #b89de0 inset;
+}
+
+.lv-5 {
+    border: 2px solid #c9a84c;
+    box-shadow: 0 0 16px #c9a84c, 0 0 32px rgb(201 168 76 / 27%);
+    animation: ct-pulse 2s ease-in-out infinite;
+}
+
+.lv-6 {
+    border: 2px solid #c9a84c;
+    box-shadow: 0 0 18px #c9a84c, 0 0 36px rgb(201 168 76 / 27%);
+    animation: ct-pulse 1.8s ease-in-out infinite;
+}
+
+.lv-7 {
+    border: 2px solid #d4af5a;
+    box-shadow: 0 0 22px #c9a84c, 0 0 46px rgb(201 168 76 / 27%);
+    animation: ct-shimmer 2s ease-in-out infinite;
+}
+
+.lv-8 {
+    border: 2px solid #c9a84c;
+    box-shadow: 0 0 24px #c9a84c, 0 0 50px rgb(123 94 167 / 33%);
+    animation: ct-rainbow 3s linear infinite;
+}
+
+@keyframes ct-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}
+
+@keyframes ct-shimmer {
+    0%, 100% { border-color: #c9a84c; }
+    50%       { border-color: #fffae0; }
+}
+
+@keyframes ct-rainbow {
+    0%   { border-color: #c9a84c; }
+    25%  { border-color: #85c; }
+    50%  { border-color: #38d; }
+    75%  { border-color: #c36; }
+    100% { border-color: #c9a84c; }
+}
