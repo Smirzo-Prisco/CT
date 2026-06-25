@@ -15,7 +15,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import SchedaMenu from './SchedaMenu'
 import styles from './SchedaModifica.module.css'
 
@@ -51,7 +51,8 @@ function SectionHeader({ children }) {
 // ---------------------------------------------------------------------------
 
 export default function SchedaModifica() {
-    const pg = new URLSearchParams(window.location.search).get('pg') ?? ''
+    const pg      = new URLSearchParams(window.location.search).get('pg') ?? ''
+    const formRef = useRef(null)
 
     const [form,   setForm]   = useState(null)
     const [saving, setSaving] = useState(false)
@@ -102,6 +103,9 @@ export default function SchedaModifica() {
             )
             const d = await r.json()
             setMsg({ ok: d.success, text: d.message ?? (d.success ? 'Salvato' : 'Errore') })
+            if (typeof showNotification === 'function') {
+                showNotification(d.message ?? (d.success ? 'Scheda salvata!' : 'Errore nel salvataggio'), d.success ? 'success' : 'error')
+            }
         } catch {
             setMsg({ ok: false, text: 'Errore di rete' })
         } finally {
@@ -138,7 +142,7 @@ export default function SchedaModifica() {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit}>
+                        <form ref={formRef} onSubmit={handleSubmit}>
                             <table className="customTable">
 
                                 {/* ── DATI PERSONALI ───────────────────── */}
@@ -263,6 +267,18 @@ export default function SchedaModifica() {
                         </form>
                     </div>
                 </div>
+            </div>
+            <div className={styles.stickyBar}>
+                <button type="button" className={styles.stickyBtn}
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>▲</button>
+                <button type="button"
+                        className={`${styles.stickyBtn} ${styles.stickyBtnSave}`}
+                        onClick={() => formRef.current?.requestSubmit()}
+                        disabled={saving}>
+                    {saving ? '…' : '💾 Salva'}
+                </button>
+                <button type="button" className={styles.stickyBtn}
+                        onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}>▼</button>
             </div>
         </div>
     )

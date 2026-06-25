@@ -10,3 +10,54 @@
 .fullResize      { width: 100%; resize: vertical; }
 .smallText       { font-size: 11px; text-transform: none; }
 .centered        { text-align: center; padding: 20px; }
+
+/* ── Barra azioni sticky ────────────────────────────────────── */
+
+.stickyBar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    background: #1c1f2e;
+    border: 1px solid #2e3350;
+    border-radius: 999px;
+    padding: 4px 12px;
+    box-shadow: 0 6px 20px rgb(0 0 0 / 60%);
+    z-index: 500;
+}
+
+.stickyBtn {
+    background: none;
+    border: 1px solid transparent;
+    color: #a8a6b3;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.stickyBtn:hover {
+    background: #2e3350;
+    color: #e8e6e3;
+}
+
+.stickyBtnSave {
+    color: #4da6ff;
+    font-weight: 700;
+    background: rgb(77 166 255 / 10%);
+    border-color: rgb(77 166 255 / 30%);
+}
+
+.stickyBtnSave:hover {
+    background: rgb(77 166 255 / 20%);
+}
+
+.stickyBtnSave:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
