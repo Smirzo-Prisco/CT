@@ -693,3 +693,384 @@ span[style*="position:relative"]:hover .tooltip-bottom {
 
 .checkbox-group label, .radio-group label { flex: 8; }
 .checkbox-group input, .radio-group input { flex: 1; }
+
+// ── Gestione Personaggi: topbar ───────────────────────────────
+
+.gp-topbar {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    background: $gestione-surface;
+    padding: $space-3 $space-4;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: $shadow-sm;
+
+    &__left {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        flex-shrink: 0;
+    }
+
+    &__center {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        flex: 1;
+    }
+
+    &__right {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        flex-shrink: 0;
+    }
+}
+
+.gp-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-md;
+    background: $gestione-hover;
+    color: $color-text-muted;
+    transition: background $transition-fast, color $transition-fast;
+    text-decoration: none;
+
+    &:hover {
+        background: $gestione-action;
+        color: $color-text-light;
+    }
+}
+
+.gp-title {
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
+    color: $color-text;
+    margin: 0;
+    white-space: nowrap;
+
+    i { margin-right: $space-1; }
+}
+
+.gp-filter-form {
+    select {
+        background: $palette-surface-deep;
+        border: 1px solid $color-border;
+        border-radius: $radius-md;
+        color: $color-text;
+        padding: $space-1 + 1 $space-3;
+        font-size: $text-md;
+        cursor: pointer;
+
+        &:focus { outline: none; border-color: $gestione-action; }
+    }
+}
+
+.gp-search {
+    flex: 1;
+    min-width: 160px;
+    background: $palette-surface-deep;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    color: $color-text;
+    padding: $space-1 + 1 $space-3;
+    font-size: $text-md;
+
+    &::placeholder { color: $color-text-muted; }
+    &:focus { outline: none; border-color: $gestione-action; }
+}
+
+// ── Lista personaggi ──────────────────────────────────────────
+
+.gp-list {
+    padding: $space-3;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: $gestione-surface;
+        border-radius: $radius-lg;
+        overflow: hidden;
+    }
+
+    th,
+    td {
+        padding: $space-2 $space-3;
+        text-align: left;
+        border-bottom: 1px solid $gestione-hover;
+        font-size: $text-md;
+    }
+
+    th {
+        background: $gestione-hover;
+        font-weight: $font-weight-bold;
+        color: $color-text-muted;
+        font-size: $text-sm;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tbody tr {
+        transition: background $transition-fast;
+
+        &:hover { background: $gestione-hover; }
+    }
+}
+
+.gp-th-actions { text-align: center; }
+
+.gp-cell--avatar {
+    width: 48px;
+
+    img {
+        display: block;
+        width: 32px;
+        height: 32px;
+        border-radius: $radius-full;
+        object-fit: cover;
+        border: 1px solid $color-border;
+    }
+}
+
+.gp-cell--name {
+    font-weight: $font-weight-bold;
+
+    a {
+        color: $gestione-action;
+        font-size: $text-md;
+        letter-spacing: 0;
+
+        &:hover { text-decoration: underline; }
+    }
+}
+
+.gp-cognome {
+    display: block;
+    font-size: $text-sm;
+    color: $color-text-muted;
+    font-weight: normal;
+}
+
+.gp-cell--meta {
+    color: $color-text-muted;
+    font-size: $text-md;
+}
+
+.gp-cell--esilio { white-space: nowrap; }
+
+.gp-cell--actions {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.gp-actions {
+    display: flex;
+    gap: $space-1;
+    align-items: center;
+    justify-content: center;
+
+    form { margin: 0; }
+}
+
+.gp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-1;
+    padding: 2px $space-2;
+    border-radius: $radius-full;
+    font-size: $text-sm;
+
+    i { font-size: 10px; }
+}
+
+.gp-badge--exile {
+    background: rgb(240 130 50 / 15%);
+    color: #f08230;
+    border: 1px solid rgb(240 130 50 / 30%);
+}
+
+.gp-row--exiled td {
+    opacity: 0.65;
+    font-style: italic;
+}
+
+.gp-avatar-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-full;
+    background: $gestione-hover;
+    color: $color-text-muted;
+    font-size: $text-sm;
+}
+
+// ── Pulsanti azione ───────────────────────────────────────────
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-1 + 1;
+    padding: $space-1 + 1 $space-3;
+    border: none;
+    border-radius: $radius-md;
+    font-size: $text-md;
+    font-weight: $font-weight-bold;
+    cursor: pointer;
+    transition: background $transition-fast, transform $transition-fast;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover { transform: translateY(-1px); }
+
+    &--icon {
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        justify-content: center;
+        border-radius: $radius-md;
+        gap: 0;
+    }
+
+    &--edit {
+        background: rgb(77 166 255 / 15%);
+        color: #4da6ff;
+        border: 1px solid rgb(77 166 255 / 30%);
+
+        &:hover { background: rgb(77 166 255 / 25%); }
+    }
+
+    &--delete {
+        background: rgb(224 92 122 / 15%);
+        color: #e05c7a;
+        border: 1px solid rgb(224 92 122 / 30%);
+
+        &:hover { background: rgb(224 92 122 / 25%); }
+    }
+
+    &--exile {
+        background: rgb(240 130 50 / 15%);
+        color: #f08230;
+        border: 1px solid rgb(240 130 50 / 30%);
+
+        &:hover { background: rgb(240 130 50 / 25%); }
+    }
+
+    &--skill {
+        background: rgb(136 85 204 / 15%);
+        color: #8855cc;
+        border: 1px solid rgb(136 85 204 / 30%);
+
+        &:hover { background: rgb(136 85 204 / 25%); }
+    }
+
+    &--reset {
+        background: rgb(136 136 136 / 15%);
+        color: #888;
+        border: 1px solid rgb(136 136 136 / 30%);
+
+        &:hover { background: rgb(136 136 136 / 25%); }
+    }
+}
+
+// ── Modal header/footer ───────────────────────────────────────
+
+.gp-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-4 $space-5;
+    border-bottom: 1px solid $gestione-hover;
+    position: sticky;
+    top: 0;
+    background: $color-bg;
+    z-index: 1;
+}
+
+.gp-modal-title {
+    font-size: $text-xl;
+    color: $color-text;
+    margin: 0;
+
+    i { margin-right: $space-2; color: $gestione-action; }
+}
+
+.gp-modal-close {
+    background: none;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    color: $color-text-muted;
+    font-size: $text-lg;
+    cursor: pointer;
+    padding: $space-1 $space-2;
+    line-height: 1;
+    transition: background $transition-fast, color $transition-fast;
+
+    &:hover {
+        background: $gestione-hover;
+        color: $color-text;
+    }
+}
+
+.gp-modal-footer {
+    padding: $space-4 $space-5;
+    border-top: 1px solid $gestione-hover;
+    text-align: center;
+    position: sticky;
+    bottom: 0;
+    background: $color-bg;
+}
+
+.section-title {
+    font-size: $text-md;
+    font-weight: $font-weight-bold;
+    color: $gestione-action;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: $space-4;
+    padding-bottom: $space-1 + 1;
+    border-bottom: 1px solid $gestione-hover;
+}
+
+.gp-label-note {
+    color: $color-text-muted;
+    font-size: $text-sm;
+    font-weight: normal;
+}
+
+.gp-checkbox-field {
+    flex-direction: row !important;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $space-2;
+
+    label { margin-bottom: 0; }
+
+    input[type="checkbox"] {
+        width: auto;
+        accent-color: $gestione-action;
+    }
+}
+
+// ── Responsive gp-topbar ──────────────────────────────────────
+
+@media (width <= 768px) {
+    .gp-topbar {
+        flex-wrap: wrap;
+
+        &__center {
+            order: 3;
+            width: 100%;
+        }
+
+        &__right { flex-wrap: wrap; }
+    }
+}

@@ -74,6 +74,9 @@ function popolaPgForm(nome) {
                 suoniCheckbox.checked = (user.suoni == '1');
             }
 
+            const pgNameEl = document.getElementById('gp-modal-pg-name');
+            if (pgNameEl) pgNameEl.textContent = nome;
+
             document.getElementById('pg_edit_container').style.display = 'block';
         })
         .catch(error => {
