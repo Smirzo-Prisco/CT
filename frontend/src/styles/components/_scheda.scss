@@ -210,10 +210,9 @@ div.particolari {
 div.background {
     margin: $space-2 + 6 auto $space-1 + 1 auto;
     clear: both;
-    max-width: 567px;
     overflow-x: auto;
 
-    img { max-width: 563px; }
+    img { max-width: 100%; }
 }
 
 // ── Titoli e menu scheda ─────────────────────────────────────
