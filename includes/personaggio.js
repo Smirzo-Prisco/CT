@@ -77,7 +77,7 @@ function popolaPgForm(nome) {
             const pgNameEl = document.getElementById('gp-modal-pg-name');
             if (pgNameEl) pgNameEl.textContent = nome;
 
-            document.getElementById('pg_edit_container').style.display = 'block';
+            document.getElementById('pg_edit_container').style.display = 'flex';
         })
         .catch(error => {
             console.error('Errore:', error);
@@ -125,11 +125,8 @@ function savePgForm(event) {
     });
 
     const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
     submitBtn.innerHTML = '<span class="save-loader"></span> Salvando...';
     submitBtn.disabled = true;
-
-    console.log('Campi modificati:', Object.keys(modifiedData).length, modifiedData);
 
     fetch(ns_personaggio.api_file + '?' + ns_personaggio.param + '=savePg', {
         method: 'POST',
@@ -138,10 +135,16 @@ function savePgForm(event) {
         .then(response => response.json())
         .then(result => {
             if (result.success) {
-                showNotification('Modifiche salvate con successo! (' + result.campi_modificati + ' campi)', 'success');
-                document.getElementById('pg_edit_container').style.display = 'none';
+                showNotification('Modifiche salvate con successo!', 'success');
 
-                // Aggiorna i dati originali con quelli nuovi
+                submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Salvato!';
+                submitBtn.classList.add('btn-action--saved');
+                submitBtn.disabled = false;
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salva modifiche';
+                    submitBtn.classList.remove('btn-action--saved');
+                }, 2500);
+
                 if (window.originalData) {
                     Object.keys(modifiedData).forEach(field => {
                         window.originalData[field] = modifiedData[field];
@@ -152,12 +155,13 @@ function savePgForm(event) {
             }
         })
         .catch(error => {
-            console.error('Errore:', error);
             showNotification('Errore: ' + error.message, 'error');
         })
         .finally(() => {
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
+            if (!submitBtn.classList.contains('btn-action--saved')) {
+                submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salva modifiche';
+                submitBtn.disabled = false;
+            }
         });
 }
 
@@ -222,6 +226,13 @@ function getFormFieldValue(formData, fieldName) {
     }
     return formData.get(fieldName) ?? '';
 }
+// Scorrimento rapido del form nel modale (top / bottom)
+function gpScrollForm(dir) {
+    const form = document.getElementById('formSavePg');
+    if (!form) return;
+    form.scrollTo({ top: dir === 'top' ? 0 : form.scrollHeight, behavior: 'smooth' });
+}
+
 // Cancellazione esiliati
 function eliminaEsiliati() {
     if (confirm('Eliminare definitivamente tutti i personaggi esiliati? Questa operazione è irreversibile.')) {

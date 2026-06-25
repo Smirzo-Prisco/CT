@@ -217,7 +217,11 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                 <i class="fa-solid fa-pen-to-square"></i>
                 Modifica — <span id="gp-modal-pg-name">…</span>
             </h2>
-            <button type="button" class="gp-modal-close" id="closePgModal" aria-label="Chiudi">✕</button>
+            <div class="gp-modal-header-actions">
+                <button type="button" class="gp-scroll-btn" title="Vai in cima" onclick="gpScrollForm('top')">▲</button>
+                <button type="button" class="gp-scroll-btn" title="Vai in fondo" onclick="gpScrollForm('bottom')">▼</button>
+                <button type="button" class="gp-modal-close" id="closePgModal" aria-label="Chiudi">✕</button>
+            </div>
         </div>
 
         <form id="formSavePg" method="post">
