@@ -74,8 +74,10 @@ function UserRow({ user }) {
     /** Naviga alla pagina DM con il destinatario pre-selezionato */
     const openSms = () => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(user.nome)}`)
 
+    const morto = user.salute === 0
+
     return (
-        <tr className={`presente${!user.disponibile ? ' presente-assente' : ''}`}>
+        <tr className={`presente${!user.disponibile ? ' presente-assente' : ''}${morto ? ' pg-morto' : ''}`}>
 
             {/* Pallino In Role */}
             <td style={{ textAlign: 'center', width: '24px' }}>
@@ -91,9 +93,10 @@ function UserRow({ user }) {
                 />
             </td>
 
-            {/* Avatar del personaggio */}
+            {/* Avatar del personaggio — in bianco/nero se morto */}
             <td width="10%" style={{ textAlign: 'center' }}>
-                <img width="50" height="50" src={user.url_img_chat} alt={user.nome} />
+                <img width="50" height="50" src={user.url_img_chat} alt={user.nome}
+                    style={morto ? { filter: 'grayscale(100%)' } : undefined} />
             </td>
 
             {/* Link per messaggio privato */}
@@ -124,6 +127,7 @@ function UserRow({ user }) {
 
             {/* Nome e cognome con link alla scheda */}
             <td>
+                {morto && <i className="fa-solid fa-skull pg-morto-icon" title="Morto" />}
                 <a href={`main.php?page=scheda&pg=${encodeURIComponent(user.nome)}`} className={`link_sheet gender_${user.sesso}`}>
                     {user.nome}{user.cognome ? ` ${user.cognome}` : ''}
                     {/* Flag visibilità — visibile solo allo staff */}

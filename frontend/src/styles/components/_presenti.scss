@@ -50,6 +50,20 @@ tr.presente-assente {
     transition: opacity $transition-fast;
 }
 
+// Personaggio morto (salute = 0)
+div.presente.pg-morto,
+tr.presente.pg-morto {
+    filter: grayscale(60%);
+    opacity: 0.75;
+}
+
+.pg-morto-icon {
+    color: #8b1a1a;
+    font-size: 11px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
 div.presente a {
     line-height: 0;
     text-transform: none; // specificità (0,1,2) batte a:link (0,1,1)

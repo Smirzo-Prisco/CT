@@ -62,25 +62,29 @@ export default function OnlineUsers() {
             Nessun utente online
           </div>
         ) : (
-          users.map(user => (
-            <div key={user.nome} className={`presente${!user.disponibile ? ' presente-assente' : ''}`}>
-              <a href="#" onClick={e => { e.preventDefault(); openMsg(user.nome) }}>
-                <img src="/themes/crystal/imgs/race_presenti/Sms.png" alt="Messaggio" />
-              </a>
-              &nbsp;&nbsp;
-              {user.gruppo_img && (
-                <img src={`/${user.gruppo_img}`} alt="" style={{ height: '14px', width: 'auto' }} />
-              )}
-              &nbsp;&nbsp;
-              <a
-                href={`/main.php?page=scheda&pg=${encodeURIComponent(user.nome)}`}
-                target="_top"
-                className="online-user-link"
-              >
-                {user.nome}
-              </a>
-            </div>
-          ))
+          users.map(user => {
+            const morto = user.salute === 0
+            return (
+              <div key={user.nome} className={`presente${!user.disponibile ? ' presente-assente' : ''}${morto ? ' pg-morto' : ''}`}>
+                <a href="#" onClick={e => { e.preventDefault(); openMsg(user.nome) }}>
+                  <img src="/themes/crystal/imgs/race_presenti/Sms.png" alt="Messaggio" />
+                </a>
+                &nbsp;&nbsp;
+                {user.gruppo_img && (
+                  <img src={`/${user.gruppo_img}`} alt="" style={{ height: '14px', width: 'auto' }} />
+                )}
+                &nbsp;&nbsp;
+                {morto && <i className="fa-solid fa-skull pg-morto-icon" title="Morto" />}
+                <a
+                  href={`/main.php?page=scheda&pg=${encodeURIComponent(user.nome)}`}
+                  target="_top"
+                  className="online-user-link"
+                >
+                  {user.nome}
+                </a>
+              </div>
+            )
+          })
         )}
       </div>
     </div>

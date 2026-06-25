@@ -313,7 +313,7 @@ switch ($op) {
 
         $result = gdrcd_query(
             "SELECT p.nome, p.cognome, p.permessi, p.sesso, p.id_razza,
-                    p.disponibile, p.is_invisible,
+                    p.disponibile, p.is_invisible, p.salute,
                     m.stanza_apparente, m.nome AS luogo_nome,
                     ru_fam.immagine AS fam_img
              FROM personaggio p
@@ -338,6 +338,7 @@ switch ($op) {
                     'id_razza'         => (int)$row['id_razza'],
                     'disponibile'      => (int)$row['disponibile'],
                     'is_invisible'     => (int)$row['is_invisible'],
+                    'salute'           => (int)$row['salute'],
                     'luogo_nome'       => $row['stanza_apparente'] ?: ($row['luogo_nome'] ?? ''),
                     'gruppo_img'       => $row['fam_img'] ? 'imgs/guilds/' . $row['fam_img'] : '',
                 ];
@@ -391,7 +392,7 @@ switch ($op) {
             SELECT
                 p.nome, p.cognome, p.sesso,
                 p.is_invisible, p.disponibile, p.ultima_mappa, p.ultimo_luogo,
-                p.url_img_chat, p.id_gilda, p.id_ruolo_gilda,
+                p.url_img_chat, p.id_gilda, p.id_ruolo_gilda, p.salute,
                 r.sing_m, r.sing_f, r.immagine             AS razza_img,
                 m.stanza_apparente,    m.nome              AS stanza_nome,
                 mc.nome                                    AS mappa_nome,
@@ -430,6 +431,7 @@ switch ($op) {
                 'ultima_mappa'  => (int)$row['ultima_mappa'],
                 'ultimo_luogo'  => (int)$row['ultimo_luogo'],
                 'url_img_chat'  => $row['url_img_chat']  ?? '',
+                'salute'        => (int)$row['salute'],
                 'razza_img'     => 'imgs/guilds/' . ($row['razza_img'] ?: 'standard_razza.png'),
                 'razza_nome'    => $row['sing_' . $row['sesso']] ?? '',
                 'stanza'        => $row['stanza_apparente'] ?: ($row['stanza_nome'] ?? ''),
