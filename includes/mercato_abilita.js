@@ -180,15 +180,13 @@ function resetSkills() {
     let refund = 0;
 
     // 1️⃣ Calcolo i punti da restituire PRIMA di resettare i livelli
+    // Specchio esatto della logica di deducazione: 1 shin per level-up, solo se itCosts è true
     for (const id in skillLevels) {
         const oldL = originalSkills[id];
         const newL = skillLevels[id];
 
-        if (newL > oldL) {
-            // costo cumulativo per ogni livello aumentato
-            for (let lvl = oldL + 1; lvl <= newL; lvl++) {
-                refund += lvl;
-            }
+        if (newL > oldL && itCosts[id]) {
+            refund += (newL - oldL);
         }
     }
 
@@ -205,7 +203,7 @@ function resetSkills() {
     document.querySelectorAll(".skill-row").forEach(row => {
         const btn = row.querySelector(".btn-up");
         const id = btn.dataset.skill;
-        row.querySelector(".skill-level").textContent = originalSkills[id];
+        row.querySelector(".skill-level").textContent = originalSkills[id] + '/' + maxSklLvl[id];
     });
 
     // 5️⃣ Nascondo il pulsante reset
