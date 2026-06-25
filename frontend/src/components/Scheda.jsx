@@ -20,7 +20,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, forwardRef } from 'react'
 import { createPortal } from 'react-dom'
 import SchedaMenu from './SchedaMenu'
 import styles from './Scheda.module.css'
@@ -197,19 +197,19 @@ function NoteFatoModal({ nome, particolariHtml, noteFatoHtml, onClose }) {
 /**
  * Blocco profilo sinistro: avatar grande del personaggio.
  */
-function SchedaAvatar({ urlImg, nome }) {
+const SchedaAvatar = forwardRef(function SchedaAvatar({ urlImg, nome }, ref) {
     return (
-        <div className={styles.avatarFrame}>
+        <div className={styles.avatarFrame} ref={ref}>
             <img src={urlImg} alt={nome} />
         </div>
     )
-}
+})
 
 /**
  * Blocco profilo destro: stats pubbliche + statistiche private + info.
  * stat_names proviene da profile.config.stat_names (configurazione backend).
  */
-function SchedaProfilo({ profile }) {
+const SchedaProfilo = forwardRef(function SchedaProfilo({ profile }, ref) {
     const { nome, cognome, eta, natoa, lavoro, razza, nome_ruolo, nome_ruolo_mestiere,
             salute, salute_max, integrita, integrita_max, /* notorieta, */
             esperienza, shin, statistiche, privilegi, config } = profile
@@ -225,7 +225,7 @@ function SchedaProfilo({ profile }) {
     ]
 
     return (
-        <div className={styles.profileCard}>
+        <div className={styles.profileCard} ref={ref}>
 
             {/* ── PROFILO ──────────────────────────────────────────────── */}
             <div className={styles.cardSection}>
@@ -349,6 +349,35 @@ export default function Scheda() {
     const [soundScheda, setSoundScheda] = useState(() => window.CT_USER?.soundPrefs?.scheda ?? 1)
     const scopedStyleEl = useRef(null)
     const schedaRef     = useRef(null)
+    const avatarRef     = useRef(null)
+    const profileRef    = useRef(null)
+
+    // Sincronizza l'altezza dell'avatarFrame con quella del profileCard su desktop.
+    // Necessario perché in CSS non è possibile far sì che la larghezza dell'immagine
+    // segua le proprie proporzioni mantenendo come vincolo l'altezza del sibling,
+    // senza che l'immagine grande non spinga verso l'alto il profileCard.
+    useEffect(() => {
+        const avatar  = avatarRef.current
+        const profile = profileRef.current
+        if (!avatar || !profile) return
+
+        const sync = () => {
+            if (window.innerWidth > 1024) {
+                avatar.style.height = profile.offsetHeight + 'px'
+            } else {
+                avatar.style.height = ''
+            }
+        }
+
+        sync()
+        const ro = new ResizeObserver(sync)
+        ro.observe(profile)
+        window.addEventListener('resize', sync)
+        return () => {
+            ro.disconnect()
+            window.removeEventListener('resize', sync)
+        }
+    }, [profile])
 
     // Reagisce in real-time al cambio preferenza musica schede
     useEffect(() => {
@@ -488,8 +517,8 @@ export default function Scheda() {
 
                     {/* ── Riga principale: avatar + profilo ────────────────── */}
                     <div className={styles.schedaHero}>
-                        <SchedaAvatar urlImg={profile.url_img} nome={nome} />
-                        <SchedaProfilo profile={profile} />
+                        <SchedaAvatar ref={avatarRef} urlImg={profile.url_img} nome={nome} />
+                        <SchedaProfilo ref={profileRef} profile={profile} />
                     </div>
 
                     {/* ── Seconda riga: Note&Fato + accessi + SMS ──────────── */}

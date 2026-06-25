@@ -4,7 +4,7 @@
 
 .schedaHero {
     display: flex;
-    align-items: stretch;
+    align-items: flex-start;
     gap: 12px;
     margin-bottom: 10px;
     text-align: left;
