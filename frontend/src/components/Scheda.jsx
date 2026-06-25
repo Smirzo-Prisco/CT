@@ -333,7 +333,7 @@ const SchedaProfilo = forwardRef(function SchedaProfilo({ profile }, ref) {
 
         </div>
     )
-}
+})
 
 // ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
