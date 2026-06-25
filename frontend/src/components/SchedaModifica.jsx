@@ -270,7 +270,7 @@ export default function SchedaModifica() {
             </div>
             <div className={styles.stickyBar}>
                 <button type="button" className={styles.stickyBtn}
-                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>▲</button>
+                        onClick={() => document.getElementById('maincontent')?.scrollTo({ top: 0, behavior: 'smooth' })}>▲</button>
                 <button type="button"
                         className={`${styles.stickyBtn} ${styles.stickyBtnSave}`}
                         onClick={() => formRef.current?.requestSubmit()}
@@ -278,7 +278,7 @@ export default function SchedaModifica() {
                     {saving ? '…' : '💾 Salva'}
                 </button>
                 <button type="button" className={styles.stickyBtn}
-                        onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}>▼</button>
+                        onClick={() => { const el = document.getElementById('maincontent'); el?.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }) }}>▼</button>
             </div>
         </div>
     )
