@@ -6,7 +6,7 @@
     display: grid;
     grid-template-columns: 200px 1fr;
     gap: 12px;
-    align-items: stretch;
+    align-items: start;
     margin-bottom: 10px;
     text-align: left;
 }
@@ -19,7 +19,7 @@
     border: 1px solid #2e3350;
     box-shadow: 0 6px 24px rgb(0 0 0 / 60%);
     background: #111827;
-    min-height: 200px;
+    aspect-ratio: 3 / 4;
 }
 
 .avatarFrame img {
