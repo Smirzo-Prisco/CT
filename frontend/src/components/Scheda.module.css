@@ -3,24 +3,27 @@
 /* ── Hero: avatar + profilo ──────────────────────────────── */
 
 .schedaHero {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 12px;
+    display: flex;
     align-items: stretch;
+    gap: 12px;
     margin-bottom: 10px;
     text-align: left;
 }
 
-/* Frame avatar */
+/* Frame avatar — flex item non-shrinkable; la sua altezza è determinata
+   dal profileCard (align-items: stretch), non dall'immagine */
 
 .avatarFrame {
+    flex-shrink: 0;
     border-radius: 10px;
     overflow: hidden;
     border: 1px solid #2e3350;
     box-shadow: 0 6px 24px rgb(0 0 0 / 60%);
     background: #111827;
-    min-height: 200px;
 }
+
+/* height:100% si risolve sull'altezza del frame imposta dallo stretch;
+   width:auto mantiene le proporzioni naturali dell'immagine */
 
 .avatarFrame img {
     height: 100%;
@@ -28,9 +31,11 @@
     display: block;
 }
 
-/* Card profilo */
+/* Card profilo — guida l'altezza della riga tramite il suo contenuto */
 
 .profileCard {
+    flex: 1;
+    min-width: 0;
     border: 1px solid #2e3350;
     border-radius: 10px;
 
@@ -159,7 +164,7 @@
 
 @media (width <= 1024px) {
     .schedaHero {
-        grid-template-columns: 1fr;
+        flex-direction: column;
     }
 
     .avatarFrame {
