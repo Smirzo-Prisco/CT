@@ -21,6 +21,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import SchedaMenu from './SchedaMenu'
 import styles from './Scheda.module.css'
 
@@ -105,6 +106,41 @@ function openSmsFrame(nome) {
 // ---------------------------------------------------------------------------
 
 // SchedaMenu è ora in SchedaMenu.jsx (condiviso con le sotto-sezioni)
+
+/**
+ * Modale Note & Fato — portaled su document.body per evitare clip da transform.
+ * Chiudibile con Esc, clic sul backdrop o il pulsante ✕.
+ */
+function NoteFatoModal({ nome, particolariHtml, noteFatoHtml, onClose }) {
+    useEffect(() => {
+        const onKey = e => { if (e.key === 'Escape') onClose() }
+        document.addEventListener('keydown', onKey)
+        return () => document.removeEventListener('keydown', onKey)
+    }, [onClose])
+
+    return createPortal(
+        <div className={styles.noteFatoBackdrop} onClick={onClose}>
+            <div className={styles.noteFatoModal} onClick={e => e.stopPropagation()}>
+                <div className={styles.noteFatoHeader}>
+                    <span>✦ Note & Fato — {nome}</span>
+                    <button className={styles.noteFatoClose} onClick={onClose} aria-label="Chiudi">✕</button>
+                </div>
+                <div className={styles.noteFatoContent}>
+                    {particolariHtml && (
+                        <div dangerouslySetInnerHTML={{ __html: particolariHtml }} />
+                    )}
+                    {particolariHtml && noteFatoHtml && (
+                        <hr className={styles.noteFatoSep} />
+                    )}
+                    {noteFatoHtml && (
+                        <div dangerouslySetInnerHTML={{ __html: noteFatoHtml }} />
+                    )}
+                </div>
+            </div>
+        </div>,
+        document.body
+    )
+}
 
 /**
  * Blocco profilo sinistro: avatar grande del personaggio.
@@ -407,13 +443,12 @@ export default function Scheda() {
                     {/* ── Seconda riga: Note&Fato + accessi + SMS ──────────── */}
                     <div className={styles.schedaMeta}>
                         <div className={styles.metaBox}>
-                            <div
-                                className="titolo_box_scheda"
-                                onClick={() => setNoteFatoOpen(o => !o)}
-                                style={{ cursor: 'pointer' }}
+                            <button
+                                className={styles.noteFatoBtn}
+                                onClick={() => setNoteFatoOpen(true)}
                             >
-                                Note e Fato
-                            </div>
+                                ✦ Note & Fato
+                            </button>
                         </div>
                         <div className={styles.metaBox}>
                             {data_iscrizione && <div>Iscrizione: {formatDate(data_iscrizione)}</div>}
@@ -430,17 +465,14 @@ export default function Scheda() {
 
                 </div>
 
-                {/* ── Note & Fato (collassabili) ───────────────────────── */}
+                {/* ── Modale Note & Fato ───────────────────────────────── */}
                 {noteFatoOpen && (
-                    <div className="hidden_row" id="NoteEFato">
-                        <div className="particolari">
-                            {/* Contenuto HTML grezzo dal DB — solo utenti autenticati */}
-                            <div className="green"
-                                dangerouslySetInnerHTML={{ __html: particolariHtml }} />
-                            <div className="blue"
-                                dangerouslySetInnerHTML={{ __html: noteFatoHtml }} />
-                        </div>
-                    </div>
+                    <NoteFatoModal
+                        nome={nome}
+                        particolariHtml={particolariHtml}
+                        noteFatoHtml={noteFatoHtml}
+                        onClose={() => setNoteFatoOpen(false)}
+                    />
                 )}
 
                 {/* ── Background principale ────────────────────────────── */}
