@@ -371,13 +371,15 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
 
             <input type="hidden" name="personaggio" id="personaggio">
 
-            <div class="gp-modal-footer">
-                <button type="submit" class="btn-action btn-action--edit">
-                    <i class="fa-solid fa-floppy-disk"></i> Salva modifiche
-                </button>
-            </div>
-
         </form>
+
+        <!-- Footer fuori dal form: flex child di .modal-content, sempre visibile -->
+        <div class="gp-modal-footer">
+            <button type="submit" id="gp-save-btn" form="formSavePg" class="btn-action btn-action--edit">
+                <i class="fa-solid fa-floppy-disk"></i> Salva modifiche
+            </button>
+        </div>
+
     </div>
 </div>
 

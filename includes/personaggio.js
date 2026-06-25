@@ -124,7 +124,7 @@ function savePgForm(event) {
         submitData.append(field, modifiedData[field]);
     });
 
-    const submitBtn = form.querySelector('button[type="submit"]');
+    const submitBtn = document.getElementById('gp-save-btn') || form.querySelector('button[type="submit"]');
     submitBtn.innerHTML = '<span class="save-loader"></span> Salvando...';
     submitBtn.disabled = true;
 
