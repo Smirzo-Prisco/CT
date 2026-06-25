@@ -4,7 +4,7 @@
 
 .schedaHero {
     display: grid;
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 12px;
     align-items: stretch;
     margin-bottom: 10px;
@@ -157,7 +157,7 @@
 
 @media (width <= 900px) {
     .schedaHero {
-        grid-template-columns: 160px 1fr;
+        grid-template-columns: 200px 1fr;
     }
 }
 
