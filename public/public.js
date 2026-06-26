@@ -323,6 +323,58 @@ function ensureTerminiLoaded() {
 
 
 /* ============================================================
+   9. LOGIN VIA FETCH
+   Intercetta il submit del form di login, invia le credenziali
+   a api_auth.php?op=login via JSON, mostra l'errore inline
+   nella modale oppure reindirizza al gioco sul successo.
+   Nessun reload di pagina.
+   ============================================================ */
+(function initLoginForm() {
+    const form  = document.getElementById('pubDoLogin');
+    const error = document.getElementById('pubLoginError');
+    if (!form) return;
+
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+
+        /* Nascondi errore precedente e disabilita il bottone */
+        if (error) error.style.display = 'none';
+        const btn = form.querySelector('[type="submit"]');
+        if (btn) btn.disabled = true;
+
+        const login    = document.getElementById('pubUsername')?.value ?? '';
+        const password = document.getElementById('pubPassword')?.value ?? '';
+
+        try {
+            const res  = await fetch('/pages/api_auth.php?op=login', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ login, password }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = data.redirect;
+                return;
+            }
+
+            if (error) {
+                error.textContent   = data.message || 'Nome personaggio o password non riconosciuti.';
+                error.style.display = 'block';
+            }
+        } catch {
+            if (error) {
+                error.textContent   = 'Errore di connessione — riprova tra qualche istante.';
+                error.style.display = 'block';
+            }
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    });
+}());
+
+
+/* ============================================================
    VALIDAZIONE FORM REGISTRAZIONE
    Verifica che i T&C siano accettati prima dell'invio.
    ============================================================ */
