@@ -128,14 +128,6 @@ const ROUTES = {
         component: SchedaPunti,
         css: [],
     },
-    scheda_px_shin: {
-        component: SchedaPunti,
-        css: [],
-    },
-    scheda_px_mestiere: {
-        component: SchedaPunti,
-        css: [],
-    },
     scheda_equip: {
         component: SchedaEquip,
         css: [],

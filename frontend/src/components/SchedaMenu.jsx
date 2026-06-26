@@ -54,9 +54,7 @@ export default function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
                 {/* ── Punti (solo proprio pg o admin) ─────────────────── */}
                 {(isOwn || isAdmin) && (
                     <div className={styles.group}>
-                        {tab('scheda_px',           'Esperienza')}
-                        {tab('scheda_px_shin',      'Shin')}
-                        {tab('scheda_px_mestiere',  'Mestiere')}
+                        {tab('scheda_px', 'Punti')}
                     </div>
                 )}
 

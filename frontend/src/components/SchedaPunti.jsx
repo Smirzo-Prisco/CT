@@ -32,9 +32,7 @@ const TIPO_LABELS = { px: 'PX', shin: 'Shin', mestiere: 'Mestiere' }
 const TIPO_COLORS = { px: '#4a9eff', shin: '#ffa726', mestiere: '#4caf50' }
 
 const PAGE_TO_FILTER = {
-    scheda_px:          'px',
-    scheda_px_shin:     'shin',
-    scheda_px_mestiere: 'mestiere',
+    scheda_px: 'px',
 }
 
 // ---------------------------------------------------------------------------
@@ -164,7 +162,7 @@ export default function SchedaPunti() {
                         )
                     })}
                     <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#6b6f8a', alignSelf: 'center' }}>
-                        {filtered.length} record
+                        {filtered.length} assegnazioni
                     </span>
                 </div>
 
