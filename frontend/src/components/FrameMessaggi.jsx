@@ -21,7 +21,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 // ---------------------------------------------------------------------------
 // GRIGLIA ICONE
@@ -42,7 +42,7 @@ function buildIcons(hasEvents, hasOpenRoles) {
         { id: 'giocate', href: 'main.php?page=role_recap', img: roleImg, alt: 'Giocate' },
         { id: 'calendario', href: 'main.php?page=agenda_center', img: calImg, alt: 'Calendario' },
         { id: 'gestione', href: 'main.php?page=gestione', img: 'icon_strumenti.png', alt: 'Gestione' },
-        { id: 'logout', href: 'logout.php', img: 'icon_exit.png', alt: 'Esci' },
+        { id: 'logout', href: null, img: 'icon_exit.png', alt: 'Esci' },
     ]
 }
 
@@ -57,6 +57,18 @@ export default function FrameMessaggi() {
     const [hasNewMessages, setHasNewMessages] = useState(false)
     const [hasEvents, setHasEvents]           = useState(false)
     const [hasOpenRoles, setHasOpenRoles]     = useState(false)
+    const loggingOut                          = useRef(false)
+
+    const handleLogout = useCallback(async e => {
+        e.preventDefault()
+        if (loggingOut.current) return
+        loggingOut.current = true
+        try {
+            await fetch('/pages/api_auth.php?op=logout', { method: 'POST' })
+        } finally {
+            window.top.location.href = '/'
+        }
+    }, [])
 
     useEffect(() => {
         fetch('/pages/api_global.php?op=events_today')
@@ -120,9 +132,13 @@ export default function FrameMessaggi() {
                             <a id="message-link" className="icon-link" href={icon.href} title={icon.alt}>
                                 <img src={msgIcon} alt={icon.alt} />
                             </a>
+                        ) : icon.id === 'logout' ? (
+                            <a className="icon-link" href="#" title={icon.alt}
+                               onClick={handleLogout}>
+                                <img src={`${ICO}${icon.img}`} alt={icon.alt} />
+                            </a>
                         ) : (
-                            <a className="icon-link" href={icon.href} title={icon.alt}
-                               target={icon.id === 'logout' ? '_top' : undefined}>
+                            <a className="icon-link" href={icon.href} title={icon.alt}>
                                 <img src={`${ICO}${icon.img}`} alt={icon.alt} />
                             </a>
                         )}
