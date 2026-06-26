@@ -27,8 +27,8 @@ function public_modals(): void {
 
         <h2 class="pub-modal-title">Accedi al Gioco</h2>
 
-        <!-- Form di login — invia al controller login.php del motore GDRCD -->
-        <form class="pub-form" method="post" action="/login.php" id="pubDoLogin">
+        <!-- Form di login — gestito via fetch da public.js → api_auth.php?op=login -->
+        <form class="pub-form" id="pubDoLogin">
             <div class="pub-form-group">
                 <label for="pubUsername">Nome personaggio</label>
                 <input type="text" id="pubUsername" name="login1" placeholder="Il tuo nome personaggio" required autocomplete="username">
