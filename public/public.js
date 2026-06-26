@@ -364,7 +364,7 @@ function ensureTerminiLoaded() {
             }
         } catch {
             if (error) {
-                error.textContent   = 'Errore di connessione — riprova tra qualche istante.';
+                error.textContent   = 'Nome personaggio o password non riconosciuti.';
                 error.style.display = 'block';
             }
         } finally {
