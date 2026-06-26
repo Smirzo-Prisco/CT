@@ -2,30 +2,22 @@
 
 .nav {
     width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
     margin-bottom: 14px;
 }
 
-.nav::-webkit-scrollbar { display: none; }
-
 .strip {
     display: flex;
-    min-width: max-content;
-    background: #111827;
-    border: 1px solid #2e3350;
-    border-radius: 10px;
-    overflow: hidden;
+    flex-wrap: wrap;
+    gap: 4px;
 }
 
 .group {
     display: flex;
     align-items: stretch;
-}
-
-.group + .group {
-    border-left: 1px solid #2e3350;
+    background: #111827;
+    border: 1px solid #2e3350;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .tab {
@@ -53,4 +45,8 @@
     color: #aee7ff;
     background: #0e1628;
     border-bottom-color: #aee7ff;
+}
+
+.tab + .tab {
+    border-left: 1px solid #2e3350;
 }
