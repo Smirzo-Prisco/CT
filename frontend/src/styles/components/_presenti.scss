@@ -30,7 +30,10 @@ div.presenti_estesi {
 }
 
 #online-users-container {
-    div.presente { font-size: 15px; }
+    div.presente {
+        display: flex;
+        align-items: center;
+    }
 
     .online-user-link { font-size: 15px; }
 
@@ -48,7 +51,7 @@ div.luogo {
 
 div.presente {
     font-weight: $font-weight-normal;
-    font-size: $text-md;
+    font-size: 12px;
     text-transform: none;
 }
 
@@ -60,9 +63,7 @@ tr.presente-assente {
 }
 
 // Personaggio morto (salute = 0)
-div.presente.pg-morto,
 tr.presente.pg-morto {
-    filter: grayscale(60%);
     opacity: 0.75;
 }
 
@@ -72,8 +73,6 @@ tr.presente.pg-morto img {
 }
 
 .pg-morto-icon {
-    color: #8b1a1a;
-    font-size: 17px;
     margin-right: 4px;
     vertical-align: middle;
 }
