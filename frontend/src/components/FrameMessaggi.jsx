@@ -35,7 +35,7 @@ function buildIcons(hasEvents, hasOpenRoles) {
 
     return [
         { id: 'mappa', href: `main.php?page=mappaclick&map_id=${mappa}`, img: 'icon_mappa.png', alt: 'Mappa' },
-        { id: 'famiglie', href: 'main.php?page=servizi_gilde', img: 'icon_fam.png', alt: 'Info' },
+        { id: 'famiglie', href: 'main.php?page=servizi_gilde', img: 'icon_fam.png', alt: 'Manuali' },
         { id: 'messaggi', href: 'main.php?page=messages_center&offset=0', img: null, alt: 'Messaggi' },
         { id: 'forum', href: 'main.php?page=forum', img: 'icon_forum.png', alt: 'Forum' },
         { id: 'uffici', href: 'main.php?page=uffici', img: 'icon_uff.png', alt: 'Uffici' },
