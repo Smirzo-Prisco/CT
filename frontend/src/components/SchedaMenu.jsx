@@ -40,8 +40,8 @@ export default function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
                     {tab('scheda',        'Scheda')}
                     {tab('scheda_storia', 'Storia')}
                     {tab('scheda_dice',   'Dice di sé')}
-                    {tab('scheda_affetti','Affetti')}
                     {tab('scheda_off',    'Off')}
+                    {tab('scheda_affetti','Affetti')}
                 </div>
 
                 {/* ── Skill & Oggetti ─────────────────────────────────── */}
@@ -58,10 +58,16 @@ export default function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
                     </div>
                 )}
 
-                {/* ── Modifica (solo proprio pg o admin) ──────────────── */}
+                {/* ── Modifica (solo proprio pg o admin) — icona compatta ── */}
                 {(isOwn || isAdmin) && (
                     <div className={styles.group}>
-                        {tab('scheda_modifica', 'Modifica')}
+                        <a
+                            href={`main.php?page=scheda_modifica&pg=${enc}`}
+                            className={`${styles.tab}${activePage === 'scheda_modifica' ? ` ${styles.active}` : ''}`}
+                            title="Modifica scheda"
+                        >
+                            <i className="fa-solid fa-pen-to-square" />
+                        </a>
                     </div>
                 )}
 

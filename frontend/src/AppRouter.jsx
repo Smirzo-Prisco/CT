@@ -122,7 +122,7 @@ const ROUTES = {
     },
     scheda_affetti: {
         component: SchedaAffetti,
-        css: ['/themes/crystal/scheda_affetto.css', '/themes/crystal/volti.css'],
+        css: [],
     },
     scheda_px: {
         component: SchedaPunti,
