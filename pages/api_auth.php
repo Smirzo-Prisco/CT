@@ -34,7 +34,7 @@ switch ($op) {
         $pass1  = gdrcd_filter('get', $data['password'] ?? '');
 
         // Blacklist
-        $bl = gdrcd_query("SELECT id FROM blacklist WHERE ip = '" . $_SERVER['REMOTE_ADDR'] . "' AND granted = 0", 'result');
+        $bl = gdrcd_query("SELECT * FROM blacklist WHERE ip = '" . $_SERVER['REMOTE_ADDR'] . "' AND granted = 0", 'result');
         if (gdrcd_query($bl, 'num_rows') > 0) {
             gdrcd_query($bl, 'free');
             echo json_encode(['success' => false, 'message' => $MESSAGE['warning']['blacklisted'] ?? 'Accesso bloccato.']);
