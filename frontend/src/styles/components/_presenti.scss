@@ -79,7 +79,7 @@ tr.presente.pg-morto img {
 
 // Teschio nella tabella presenti estesa: dimensioni doppie rispetto alla sidebar
 div.presenti_estesi .pg-morto-icon {
-    font-size: 22px;
+    font-size: 15px;
     margin-right: 6px;
 }
 
@@ -216,7 +216,6 @@ table.customTable {
     background-color: $palette-surface-raised;
     border-collapse: collapse;
     border: 1px solid $color-bg;
-    color: $color-text;
     margin: auto;
     text-align: center;
 
