@@ -1,7 +1,8 @@
 /**
- * SchedaMenu.jsx — Menu di navigazione condiviso tra tutte le sotto-sezioni scheda
+ * SchedaMenu.jsx — Tab bar di navigazione per tutte le sotto-sezioni scheda
  *
- * Usato da: Scheda.jsx, SchedaSub.jsx, SchedaSkills.jsx, SchedaTrans.jsx
+ * Sostituisce il vecchio menu a dropdown con una tab bar piatta e responsiva
+ * con scroll orizzontale nascosto su mobile.
  *
  * Props:
  *   pg       {string}  — nome del personaggio (raw, verrà urlencoded)
@@ -10,62 +11,63 @@
  *   isStaff  {boolean}
  *   isMaster {boolean}
  *
- * I link puntano a pagine PHP; per quelle migrate a React il click interceptor
- * di main.jsx intercetterà la navigazione e la gestirà via SPA.
- *
  * @author Crystal Tokyo Dev
  */
+import { useMemo } from 'react'
+import styles from './SchedaMenu.module.css'
+
 export default function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
     const enc = encodeURIComponent(pg)
+
+    const activePage = useMemo(() => new URLSearchParams(window.location.search).get('page') ?? '', [])
+
+    const tab = (page, label) => (
+        <a
+            key={page}
+            href={`main.php?page=${page}&pg=${enc}`}
+            className={`${styles.tab}${activePage === page ? ` ${styles.active}` : ''}`}
+        >
+            {label}
+        </a>
+    )
+
     return (
-        <div className="menu_scheda">
-            <ul className="menu">
+        <nav className={styles.nav}>
+            <div className={styles.strip}>
 
-                {/* ── Personaggio ─────────────────────────────────────── */}
-                <li className="menuItem">
-                    <a href="#">PERSONAGGIO</a>
-                    <ul className="subMenu">
-                        <li className="subMenuItem"><a href={`main.php?page=scheda&pg=${enc}`}>Scheda</a></li>
-                        <li className="subMenuItem"><a href={`main.php?page=scheda_storia&pg=${enc}`}>Storia</a></li>
-                        <li className="subMenuItem"><a href={`main.php?page=scheda_dice&pg=${enc}`}>Dice di sé</a></li>
-                        <li className="subMenuItem"><a href={`main.php?page=scheda_affetti&pg=${enc}`}>Affetti</a></li>
-                        <li className="subMenuItem"><a href={`main.php?page=scheda_off&pg=${enc}`}>Off</a></li>
-                        {/* <li className="subMenuItem"><a href={`main.php?page=scheda_trans&pg=${enc}`}>Transizioni</a></li> */}
-                    </ul>
-                </li>
+                {/* ── Personaggio ────────────────────────────────────── */}
+                <div className={styles.group}>
+                    {tab('scheda',        'Scheda')}
+                    {tab('scheda_storia', 'Storia')}
+                    {tab('scheda_dice',   'Dice di sé')}
+                    {tab('scheda_affetti','Affetti')}
+                    {tab('scheda_off',    'Off')}
+                </div>
 
-                {/* ── Skill & Oggetti ──────────────────────────────────── */}
-                <li className="menuItem">
-                    <a href="#">SKILL&amp;OGGETTI</a>
-                    <ul className="subMenu">
-                        {(isOwn || isAdmin || isMaster) && (
-                            <li className="subMenuItem"><a href={`main.php?page=scheda_skills&pg=${enc}`}>Abilità</a></li>
-                        )}
-                        <li className="subMenuItem"><a href={`main.php?page=scheda_equip&pg=${enc}`}>Equipaggiamento</a></li>
-                        {(isOwn || isAdmin) && (
-                            <li className="subMenuItem"><a href={`main.php?page=scheda_oggetti&pg=${enc}`}>Inventario</a></li>
-                        )}
-                    </ul>
-                </li>
+                {/* ── Skill & Oggetti ─────────────────────────────────── */}
+                <div className={styles.group}>
+                    {(isOwn || isAdmin || isMaster) && tab('scheda_skills', 'Abilità')}
+                    {tab('scheda_equip', 'Equipaggiamento')}
+                    {(isOwn || isAdmin) && tab('scheda_oggetti', 'Inventario')}
+                </div>
 
-                {/* ── Punti + Modifica (solo proprio pg o admin) ───────── */}
+                {/* ── Punti (solo proprio pg o admin) ─────────────────── */}
                 {(isOwn || isAdmin) && (
-                    <>
-                        <li className="menuItem">
-                            <a href="#">PUNTI</a>
-                            <ul className="subMenu">
-                                <li className="subMenuItem"><a href={`main.php?page=scheda_px&pg=${enc}`}>Esperienza</a></li>
-                                <li className="subMenuItem"><a href={`main.php?page=scheda_px_shin&pg=${enc}`}>Punti Shin</a></li>
-                                <li className="subMenuItem"><a href={`main.php?page=scheda_px_mestiere&pg=${enc}`}>Punti Mestiere</a></li>
-                            </ul>
-                        </li>
-                        <li className="menuItem">
-                            <a href={`main.php?page=scheda_modifica&pg=${enc}`}>MODIFICA</a>
-                        </li>
-                    </>
+                    <div className={styles.group}>
+                        {tab('scheda_px',           'Esperienza')}
+                        {tab('scheda_px_shin',      'Shin')}
+                        {tab('scheda_px_mestiere',  'Mestiere')}
+                    </div>
                 )}
 
-            </ul>
-        </div>
+                {/* ── Modifica (solo proprio pg o admin) ──────────────── */}
+                {(isOwn || isAdmin) && (
+                    <div className={styles.group}>
+                        {tab('scheda_modifica', 'Modifica')}
+                    </div>
+                )}
+
+            </div>
+        </nav>
     )
 }

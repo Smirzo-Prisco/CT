@@ -1,0 +1,56 @@
+/* SchedaMenu.module.css — tab bar navigazione scheda personaggio */
+
+.nav {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin-bottom: 14px;
+}
+
+.nav::-webkit-scrollbar { display: none; }
+
+.strip {
+    display: flex;
+    min-width: max-content;
+    background: #111827;
+    border: 1px solid #2e3350;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.group {
+    display: flex;
+    align-items: stretch;
+}
+
+.group + .group {
+    border-left: 1px solid #2e3350;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    padding: 9px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #a8a6b3;
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: background 0.15s, color 0.15s;
+}
+
+.tab:hover {
+    background: #1c1f2e;
+    color: #e8e6e3;
+    text-decoration: none;
+}
+
+.active {
+    color: #aee7ff;
+    background: #0e1628;
+    border-bottom-color: #aee7ff;
+}
