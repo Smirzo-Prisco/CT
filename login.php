@@ -304,33 +304,8 @@ if($_SESSION['login'] != '') {
         }
     }//else
 } else {
-    /*Dichiaro il fallimento dell'operazione di login*/
-    ?>
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-        <link rel='stylesheet' href='themes/<?=$PARAMETERS['themes']['current_theme']?>/ct-styles.css' TYPE='text/css'>
-        <link rel='shortcut icon' href='favicon.ico' />
-    </head>
-    <body>
-        <div class="error_box">
-            <h2 class="error_major"><?=$MESSAGE['error']['unknown_username']?></h2>
-            <span class="error_details"><?=$MESSAGE['error']['unknown_username_details']?></span>
-            <span class="error_details"><?=$MESSAGE['error']['unknown_username_failure_count']?></span>
-            <span class="error_details"><?=$iErrorsNumber?></span>
-            <span class="error_details"><?=$MESSAGE['error']['unknown_username_warning']?></span>
-            <span class="error_details"><?=$MESSAGE['warning']['mailto']?></span>
-            <a href="mailto:<?=$PARAMETERS['menu']['webmaster_email'] ?>">
-                <?=$PARAMETERS['menu']['webmaster_email'] ?>
-            </a> .
-        </div>
-    <?php
     session_destroy();
+    header('Location: /?login_error=1', true, 303);
+    exit();
 }
-?>
-    </body>
-</html>
-<?php
 gdrcd_close_connection($handleDBConnection);
-?>

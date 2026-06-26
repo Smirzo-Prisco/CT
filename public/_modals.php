@@ -37,6 +37,11 @@ function public_modals(): void {
                 <label for="pubPassword">Password</label>
                 <input type="password" id="pubPassword" name="pass1" placeholder="Password" required autocomplete="current-password">
             </div>
+            <?php if (!empty($_GET['login_error'])): ?>
+            <div class="pub-form-error" role="alert">
+                Nome personaggio o password non riconosciuti.
+            </div>
+            <?php endif; ?>
             <button type="submit" class="pub-btn pub-btn--gold pub-btn--full">Entra nel gioco</button>
             <!-- Link recupero password -->
             <p class="pub-form-link">
@@ -66,6 +71,15 @@ function public_modals(): void {
     </div>
 </div>
 
+
+<?php if (!empty($_GET['login_error'])): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var m = document.getElementById('pubLoginModal');
+    if (m) m.style.display = 'flex';
+});
+</script>
+<?php endif; ?>
 
 <!-- ── MODALE REGISTRAZIONE ──────────────────────────────────────────────── -->
 <div class="pub-modal-overlay" id="pubRegModal" role="dialog" aria-modal="true" aria-label="Registrazione" style="display:none;">
