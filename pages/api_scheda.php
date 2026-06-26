@@ -851,6 +851,69 @@ switch ($op) {
         ]);
         break;
 
+    // PUNTI_ALL — storico unificato PX + Shin + Mestiere, senza paginazione server-side.
+    // Il client filtra per tipo e pagina lato React.
+    // -------------------------------------------------------------------------
+    case 'punti_all':
+        if (!$is_own && !$is_admin) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Sezione riservata']);
+            exit;
+        }
+        $all = [];
+
+        // Tabella Punti: ogni riga è sempre 'px'; se shin > 0 è anche 'shin'
+        $res = gdrcd_query(
+            "SELECT p.*, ma.titolo
+             FROM Punti p
+             LEFT JOIN messaggioaraldo ma ON ma.id_messaggio = p.id_messaggio
+             WHERE p.nome = '$pg'
+             ORDER BY p.data_evento DESC",
+            'result'
+        );
+        if ($res) {
+            while ($row = gdrcd_query($res, 'fetch')) {
+                $tipi  = ['px'];
+                $punti = ['px' => (float)($row['esperienza'] ?? 0)];
+                $shin  = (float)($row['shin'] ?? 0);
+                if ($shin > 0) { $tipi[] = 'shin'; $punti['shin'] = $shin; }
+                $all[] = [
+                    'data'     => $row['data_evento'] ?? '',
+                    'titolo'   => !empty($row['titolo']) ? $row['titolo'] : 'Ruolata libera',
+                    'commento' => $row['commento'] ?? '',
+                    'tipi'     => $tipi,
+                    'punti'    => $punti,
+                ];
+            }
+            gdrcd_query($res, 'free');
+        }
+
+        // Tabella PuntiMestiere
+        $res = gdrcd_query(
+            "SELECT pm.*, ma.titolo
+             FROM PuntiMestiere pm
+             LEFT JOIN messaggioaraldo ma ON ma.id_messaggio = pm.id_messaggio
+             WHERE pm.nome = '$pg'
+             ORDER BY pm.data_evento DESC",
+            'result'
+        );
+        if ($res) {
+            while ($row = gdrcd_query($res, 'fetch')) {
+                $all[] = [
+                    'data'     => $row['data_evento'] ?? '',
+                    'titolo'   => !empty($row['titolo']) ? $row['titolo'] : 'Ruolata di mestiere',
+                    'commento' => $row['commento'] ?? '',
+                    'tipi'     => ['mestiere'],
+                    'punti'    => ['mestiere' => (float)($row['mestiere'] ?? 0)],
+                ];
+            }
+            gdrcd_query($res, 'free');
+        }
+
+        usort($all, fn($a, $b) => strcmp($b['data'], $a['data']));
+        echo json_encode(['success' => true, 'records' => $all]);
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Operazione non valida']);

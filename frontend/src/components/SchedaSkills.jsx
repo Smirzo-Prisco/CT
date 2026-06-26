@@ -5,17 +5,8 @@
  *   api_scheda.php?op=profile  → dati pg + flag permessi per il menu
  *   api_scheda.php?op=skills   → abilità raggruppate per tipo DB
  *
- * I tipi DB vengono fusi nelle stesse categorie dell'originale PHP:
- *   Default + Difensiva            → Default/Difensiva
- *   Generica base + avanzata       → Generica
- *   Attacco base/medio/avanzato    → Attacco
- *   Mentale base/media/avanzata/di attacco → Mentale
- *   Potere speciale / Skill temporanea → label propria
- *   Talento → escluso dalla visualizzazione
- *
- * Ogni categoria usa <table class="customTable"> con header second_header,
- * identico al layout PHP originale (skillsystem.inc.php).
- * Per il tipo "Talento" il livello non viene mostrato (come nell'originale).
+ * Visualizzazione: griglia card responsive, raggruppata per categoria.
+ * Ogni card mostra nome, barra livello e descrizione espandibile al click.
  *
  * Accesso ristretto: solo proprio pg, admin o master (403 dall'API).
  *
@@ -24,30 +15,28 @@
 
 import { useState, useEffect, Fragment } from 'react'
 import SchedaMenu from './SchedaMenu'
-import shared from './shared.module.css'
+import styles from './SchedaSkills.module.css'
 
 // ---------------------------------------------------------------------------
 // MAPPA TIPI DB → CATEGORIE DISPLAY
 // ---------------------------------------------------------------------------
 
-/** Fusione tipi DB → label categoria (come nell'originale PHP) */
 const TYPE_MERGE = {
-    'Default': 'Default/Difensiva',
-    'Difensiva': 'Default/Difensiva',
-    'Generica base': 'Generica',
-    'Generica avanzata': 'Generica',
-    'Attacco base': 'Attacco',
-    'Attacco medio': 'Attacco',
+    'Default':          'Default/Difensiva',
+    'Difensiva':        'Default/Difensiva',
+    'Generica base':    'Generica',
+    'Generica avanzata':'Generica',
+    'Attacco base':     'Attacco',
+    'Attacco medio':    'Attacco',
     'Attacco avanzato': 'Attacco',
-    'Mentale base': 'Mentale',
-    'Mentale media': 'Mentale',
+    'Mentale base':     'Mentale',
+    'Mentale media':    'Mentale',
     'Mentale avanzata': 'Mentale',
-    'Mentale di attacco': 'Mentale',
-    'Potere speciale': 'Potere speciale',
+    'Mentale di attacco':'Mentale',
+    'Potere speciale':  'Potere speciale',
     'Skill temporanea': 'Skill temporanee',
 }
 
-/** Ordine canonico delle categorie display */
 const CATEGORY_ORDER = [
     'Default/Difensiva',
     'Generica',
@@ -57,13 +46,17 @@ const CATEGORY_ORDER = [
     'Skill temporanee',
 ]
 
-/**
- * Fonde i gruppi per-tipo restituiti dall'API nelle categorie display,
- * rispettando l'ordine canonico e appendendo eventuali tipi extra in fondo.
- *
- * @param {Object} skillsByTipo - { tipo: [skill, …], … }
- * @returns {Array} [[categoria, [skill, …]], …]
- */
+const CAT_COLORS = {
+    'Default/Difensiva': '#4a9eff',
+    'Generica':          '#4caf50',
+    'Attacco':           '#ef5350',
+    'Mentale':           '#ab47bc',
+    'Potere speciale':   '#ffa726',
+    'Skill temporanee':  '#78909c',
+}
+
+const DEFAULT_COLOR = '#607d8b'
+
 function mergeByCategory(skillsByTipo) {
     const merged = {}
     for (const [tipo, lista] of Object.entries(skillsByTipo)) {
@@ -76,7 +69,6 @@ function mergeByCategory(skillsByTipo) {
     for (const cat of CATEGORY_ORDER) {
         if (merged[cat]) ordered.push([cat, merged[cat]])
     }
-    // Tipi extra non mappati (fallback)
     for (const [cat, lista] of Object.entries(merged)) {
         if (!CATEGORY_ORDER.includes(cat)) ordered.push([cat, lista])
     }
@@ -87,62 +79,57 @@ function mergeByCategory(skillsByTipo) {
 // SOTTO-COMPONENTI
 // ---------------------------------------------------------------------------
 
-/**
- * Singola riga skill nella tabella categoria.
- * Cliccando sul nome si espande/comprime la descrizione (inline, come popup originale).
- * showLevel=false per categorie senza livello numerico significativo.
- */
-function SkillRow({ skill, showLevel }) {
+function SkillCard({ skill, showLevel, catColor }) {
     const [open, setOpen] = useState(false)
+    const hasDesc = !!skill.descrizione
+    const pct = showLevel && skill.max_lvl > 0
+        ? Math.min(100, (skill.grado / skill.max_lvl) * 100)
+        : 0
+
     return (
-        <Fragment>
-            <tr>
-                <td width="40%">
-                    {skill.descrizione
-                        ? <a href="#" onClick={e => { e.preventDefault(); setOpen(o => !o) }}>{skill.nome}</a>
-                        : skill.nome
-                    }
-                    {showLevel && (
-                        <><br /><span className={shared.primaryColor}>Livello attuale: {skill.grado}/{skill.max_lvl}</span></>
-                    )}
-                </td>
-            </tr>
-            {open && skill.descrizione && (
-                <tr>
-                    <td>
-                        <div className="skill-desc"
-                            dangerouslySetInnerHTML={{ __html: skill.descrizione }} />
-                    </td>
-                </tr>
+        <div
+            className={`${styles.card}${hasDesc ? ` ${styles.clickable}` : ''}`}
+            style={{ '--cat-color': catColor }}
+            onClick={() => hasDesc && setOpen(o => !o)}
+        >
+            <div className={styles.skillName}>
+                <span>{skill.nome}</span>
+                {hasDesc && (
+                    <span className={`${styles.expandIcon}${open ? ` ${styles.open}` : ''}`}>▾</span>
+                )}
+            </div>
+
+            {showLevel && (
+                <div className={styles.levelBar}>
+                    <div className={styles.levelText}>Liv {skill.grado} / {skill.max_lvl}</div>
+                    <div className={styles.barTrack}>
+                        <div className={styles.barFill} style={{ width: `${pct}%` }} />
+                    </div>
+                </div>
             )}
-        </Fragment>
+
+            {open && hasDesc && (
+                <div className={styles.desc} dangerouslySetInnerHTML={{ __html: skill.descrizione }} />
+            )}
+        </div>
     )
 }
 
-/**
- * Tabella categoria con header second_header, identica alla struttura PHP originale.
- */
-function SkillGroup({ categoria, lista }) {
+function SkillCategory({ categoria, lista }) {
+    const catColor = CAT_COLORS[categoria] ?? DEFAULT_COLOR
     const showLevel = categoria !== 'Talento'
+
     return (
-        <table className="customTable">
-            <tbody>
-                <tr className="second_header">
-                    <td colSpan="1" style={{
-                        textTransform: 'uppercase',
-                        fontSize: 'var(--text-md)',
-                        color: 'var(--palette-rust)',
-                        fontFamily: 'var(--font-base)',
-                        filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.57))',
-                    }}>
-                        {categoria}
-                    </td>
-                </tr>
+        <div className={styles.section}>
+            <div className={styles.categoryHeader} style={{ '--cat-color': catColor }}>
+                <span className={styles.categoryLabel}>{categoria}</span>
+            </div>
+            <div className={styles.grid}>
                 {lista.map(skill => (
-                    <SkillRow key={skill.id} skill={skill} showLevel={showLevel} />
+                    <SkillCard key={skill.id} skill={skill} showLevel={showLevel} catColor={catColor} />
                 ))}
-            </tbody>
-        </table>
+            </div>
+        </div>
     )
 }
 
@@ -154,8 +141,8 @@ export default function SchedaSkills() {
     const pg = new URLSearchParams(window.location.search).get('pg') ?? ''
 
     const [profile, setProfile] = useState(null)
-    const [skills, setSkills] = useState(null)
-    const [error, setError] = useState(null)
+    const [skills,  setSkills]  = useState(null)
+    const [error,   setError]   = useState(null)
 
     useEffect(() => {
         if (!pg) { setError('Personaggio non specificato'); return }
@@ -174,7 +161,7 @@ export default function SchedaSkills() {
         }).catch(e => setError(e.message ?? 'Errore di rete'))
     }, [pg])
 
-    if (error) return <div className="pagina_scheda"><div className="error">{error}</div></div>
+    if (error)              return <div className="pagina_scheda"><div className="error">{error}</div></div>
     if (!profile || !skills) return <div className="pagina_scheda"><div>Caricamento…</div></div>
 
     const { nome, cognome, is_own, is_admin, is_staff, is_master } = profile
@@ -195,11 +182,11 @@ export default function SchedaSkills() {
 
                 <div className="title">{nome} {cognome}</div>
 
-                <div className="page_scheda_skills">
+                <div style={{ marginTop: '16px' }}>
                     {gruppi.length === 0
-                        ? <p>Nessuna abilità registrata.</p>
+                        ? <p style={{ color: '#6b6f8a', fontStyle: 'italic' }}>Nessuna abilità registrata.</p>
                         : gruppi.map(([cat, lista]) => (
-                            <SkillGroup key={cat} categoria={cat} lista={lista} />
+                            <SkillCategory key={cat} categoria={cat} lista={lista} />
                         ))
                     }
                 </div>
