@@ -17,7 +17,7 @@
  */
 
 import { useState, useEffect, useCallback, Fragment } from 'react'
-import shared from './shared.module.css'
+import styles from './PresentiEstesi.module.css'
 
 // ---------------------------------------------------------------------------
 // COSTANTI
@@ -210,7 +210,7 @@ export default function PresentiEstesi() {
     // --- Rendering ---
 
     if (loading) {
-        return <div className={shared.centered}>Caricamento presenti...</div>
+        return <div className="centered">Caricamento presenti...</div>
     }
 
     /** Struttura annidata { mappa: { stanza: [utenti] } } per il rendering gerarchico */
@@ -218,11 +218,11 @@ export default function PresentiEstesi() {
 
     return (
         <div className="presenti_estesi">
-            <table className={`customTable ${shared.fullTable}`}>
+            <table className={`customTable ${styles.fullTable}`}>
                 <thead>
                     <tr>
                         {/* Header con conteggio — si aggiorna automaticamente ad ogni evento socket */}
-                        <th colSpan="9" className={shared.schedaSerial}>
+                        <th colSpan="9" className={styles.schedaSerial}>
                             PRESENTI: {total}
                         </th>
                     </tr>
@@ -247,7 +247,7 @@ export default function PresentiEstesi() {
 
                             {/* Header mappa */}
                             <tr className="mappa">
-                                <td colSpan="9" className={shared.schedaUpper}>{mappa}</td>
+                                <td colSpan="9" className={styles.schedaUpper}>{mappa}</td>
                             </tr>
 
                             {/* Iterazione per stanza — Fragment con key, obbligatorio per liste React */}
@@ -261,7 +261,7 @@ export default function PresentiEstesi() {
                                       */}
                                     {stanza && (
                                         <tr className="third_header">
-                                            <td colSpan="9" className={shared.schedaUpper}>
+                                            <td colSpan="9" className={styles.schedaUpper}>
                                                 <a href={`main.php?dir=${utenti[0].ultimo_luogo}`}>
                                                     {stanza}
                                                 </a>

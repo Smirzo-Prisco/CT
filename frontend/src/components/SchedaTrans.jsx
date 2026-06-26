@@ -11,7 +11,6 @@
 
 import { useState, useEffect } from 'react'
 import SchedaMenu from './SchedaMenu'
-import shared from './shared.module.css'
 
 // ---------------------------------------------------------------------------
 // UTILITÀ
@@ -84,7 +83,7 @@ export default function SchedaTrans() {
                                 </thead>
                                 <tbody>
                                     {trans.length === 0
-                                        ? <tr><td colSpan="4" className={shared.centered}>
+                                        ? <tr><td colSpan="4" className="centered">
                                             Nessuna transizione registrata.
                                           </td></tr>
                                         : trans.map((t, i) => (

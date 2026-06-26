@@ -25,7 +25,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import shared from './shared.module.css'
 
 export default function InfoLocation() {
 
@@ -67,7 +66,7 @@ export default function InfoLocation() {
     // ---------------------------------------------------------------------------
 
     if (!data) {
-        return <div className="pagina_info_location"><div className={shared.muted}>...</div></div>
+        return <div className="pagina_info_location"><div style={{ color: '#aaa' }}>...</div></div>
     }
 
     /** Naviga al luogo corrente via CT.navigate (SPA) o href diretto.

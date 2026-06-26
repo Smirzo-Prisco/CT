@@ -19,7 +19,6 @@
 
 import { useState, useEffect } from 'react'
 import SchedaMenu from './SchedaMenu'
-import shared from './shared.module.css'
 import styles from './SchedaPunti.module.css'
 
 // ---------------------------------------------------------------------------
@@ -181,8 +180,7 @@ export default function SchedaPunti() {
                         <tbody>
                             {pageRecords.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className={shared.centered}
-                                        style={{ padding: '20px', fontStyle: 'italic', color: '#6b6f8a' }}>
+                                    <td colSpan="5" style={{ textAlign: 'center', padding: '20px', fontStyle: 'italic', color: '#6b6f8a' }}>
                                         Nessun record trovato.
                                     </td>
                                 </tr>
