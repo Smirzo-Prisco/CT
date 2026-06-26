@@ -43,7 +43,7 @@ import SchedaTrans    from './components/SchedaTrans'
 import SchedaModifica from './components/SchedaModifica'
 import SchedaAffetti  from './components/SchedaAffetti'
 import SchedaPunti    from './components/SchedaPunti'
-import SchedaEquip    from './components/SchedaEquip'
+// SchedaEquip rimosso: la vista è ora unificata in SchedaOggetti (scheda_oggetti)
 import SchedaOggetti  from './components/SchedaOggetti'
 import Gestione             from './components/Gestione'
 import Uffici               from './components/Uffici'
@@ -126,10 +126,6 @@ const ROUTES = {
     },
     scheda_px: {
         component: SchedaPunti,
-        css: [],
-    },
-    scheda_equip: {
-        component: SchedaEquip,
         css: [],
     },
     scheda_oggetti: {

@@ -1,4 +1,4 @@
-/* SchedaOggetti.module.css — Inventario: category index + item card grid */
+/* SchedaOggetti.module.css — vista unificata oggetti: omino + zaino + inventario */
 
 /* ── Feedback ─────────────────────────────────────────── */
 
@@ -12,115 +12,70 @@
     color: #aee7ff;
 }
 
-/* ── Category index ─────────────────────────────────────── */
+/* ── Sezioni (Zaino / Inventario) ───────────────────────── */
 
-.catList {
-    margin-top: 16px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
+.section { margin-top: 20px; }
 
-.catRow {
+.sectionHeader {
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 100%;
-    padding: 12px 16px;
-    background: transparent;
-    border: none;
-    border-top: 1px solid var(--color-border);
-    cursor: pointer;
-    text-align: left;
-    color: var(--color-text);
-    transition: background 0.15s;
-}
-
-.catRow:first-child { border-top: none; }
-
-.catRow:hover { background: #141c2e; }
-
-.catName {
-    flex: 1;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.catCount {
-    min-width: 28px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #1a2540;
-    border: 1px solid #2e3350;
-    border-radius: 20px;
-    font-size: 11px;
+    margin-bottom: 10px;
+    font-size: 10px;
     font-weight: 700;
-    color: #aee7ff;
-    padding: 0 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #4a9eff;
 }
 
-.catRow i { font-size: 11px; color: var(--color-text-secondary); }
+.sectionHeader::before {
+    content: '';
+    flex: 0 0 10px;
+    height: 1px;
+    background: #4a9eff;
+}
+
+.sectionHeader::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #2e3350;
+}
+
+/* ── Sotto-gruppo categoria (dentro Inventario) ──────────── */
+
+.catHeader {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    margin: 14px 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.catHeader:first-child { margin-top: 0; }
 
 /* ── Empty state ────────────────────────────────────────── */
 
 .empty {
-    padding: 24px 16px;
+    padding: 20px;
     font-size: 12px;
     color: var(--color-text-secondary);
     font-style: italic;
     text-align: center;
 }
 
-/* ── Detail header ──────────────────────────────────────── */
-
-.detailHeader {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 16px;
-    margin-bottom: 4px;
-}
-
-.backBtn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    background: transparent;
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    color: var(--color-text-secondary);
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-}
-
-.backBtn:hover { background: #141c2e; color: var(--color-text); }
-
-.catTitle {
-    font-size: 13px;
-    font-weight: 700;
-    color: #aee7ff;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-}
-
-/* ── Item grid ──────────────────────────────────────────── */
+/* ── Grid oggetti ───────────────────────────────────────── */
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 12px;
-    margin-top: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
 }
 
-/* ── Item card ──────────────────────────────────────────── */
+/* ── Card oggetto ───────────────────────────────────────── */
 
 .card {
     background: var(--color-surface);
@@ -141,8 +96,8 @@
 }
 
 .cardImg {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     object-fit: contain;
 }
 
@@ -151,7 +106,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .cardName {
@@ -162,26 +117,46 @@
     letter-spacing: 0.5px;
 }
 
-.cardCount {
+.cardMeta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
     font-size: 11px;
     color: var(--color-text-secondary);
 }
 
 .cardCharges { color: #ffa726; }
 
+.cardBadge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid #2e3350;
+    color: var(--color-text-secondary);
+}
+
+.cardBadgeWorn {
+    border-color: #4a9eff;
+    color: #4a9eff;
+}
+
 .cardDesc {
     font-size: 11px;
     color: var(--color-text-secondary);
     line-height: 1.5;
     border-top: 1px solid var(--color-border);
-    padding-top: 8px;
+    padding-top: 6px;
 }
 
-/* ── Comment blocks ─────────────────────────────────────── */
+/* ── Blocchi commento ───────────────────────────────────── */
 
 .commentBlock {
     border-top: 1px solid var(--color-border);
-    padding-top: 8px;
+    padding-top: 6px;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -207,7 +182,7 @@
 
 .commentTextarea {
     width: 100%;
-    min-height: 60px;
+    min-height: 56px;
     background: #0d1117;
     border: 1px solid var(--color-border);
     border-radius: 4px;
@@ -232,13 +207,16 @@
     transition: background 0.15s, color 0.15s;
 }
 
-.saveBtn:hover { background: #141c2e; color: var(--color-text); }
+.saveBtn:hover {
+    background: #141c2e;
+    color: var(--color-text);
+}
 
-/* ── Action buttons ─────────────────────────────────────── */
+/* ── Azioni ─────────────────────────────────────────────── */
 
 .actions {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     flex-wrap: wrap;
     border-top: 1px solid var(--color-border);
     padding-top: 8px;
@@ -248,8 +226,8 @@
 .actionBtn {
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
+    gap: 4px;
+    padding: 5px 9px;
     background: transparent;
     border: 1px solid var(--color-border);
     border-radius: 4px;
@@ -258,16 +236,56 @@
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
 }
 
-.actionBtn:hover { background: #141c2e; color: var(--color-text); }
+.actionBtn:hover {
+    background: #141c2e;
+    color: var(--color-text);
+}
 
-.actionBtnDanger { border-color: #ef5350; color: #ef5350; }
+.actionBtnDanger {
+    border-color: #ef5350;
+    color: #ef5350;
+}
 
-.actionBtnDanger:hover { background: rgba(239, 83, 80, 0.1); color: #ef5350; }
+.actionBtnDanger:hover {
+    background: rgb(239 83 80 / 10%);
+}
+
+/* ── Cedi: select + button inline ───────────────────────── */
+
+.cediRow {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.cediSelect {
+    flex: 1;
+    min-width: 0;
+    background: #0d1117;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text);
+    font-size: 10px;
+    padding: 4px 6px;
+}
+
+/* ── Mannequin wrapper ──────────────────────────────────── */
+
+.mannequinWrap {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+}
 
 /* ── Mobile ─────────────────────────────────────────────── */
 
-@media (max-width: 640px) {
-    .grid { grid-template-columns: 1fr; }
+@media (width <= 640px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
 }

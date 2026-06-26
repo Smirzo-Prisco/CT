@@ -47,8 +47,7 @@ export default function SchedaMenu({ pg, isOwn, isAdmin, isStaff, isMaster }) {
                 {/* ── Skill & Oggetti ─────────────────────────────────── */}
                 <div className={styles.group}>
                     {(isOwn || isAdmin || isMaster) && tab('scheda_skills', 'Abilità')}
-                    {tab('scheda_equip', 'Equipaggiamento')}
-                    {(isOwn || isAdmin) && tab('scheda_oggetti', 'Inventario')}
+                    {tab('scheda_oggetti', 'Oggetti')}
                 </div>
 
                 {/* ── Punti (solo proprio pg o admin) ─────────────────── */}
