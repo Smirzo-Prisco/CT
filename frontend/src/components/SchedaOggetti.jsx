@@ -1,42 +1,38 @@
 /**
  * SchedaOggetti.jsx — Inventario del personaggio (Phase SPA)
  *
- * Fetch: api_scheda.php?op=profile + api_scheda.php?op=oggetti
+ * Fetch parallele:
+ *   api_scheda.php?op=profile     → dati pg + flag permessi per il menu
+ *   api_scheda.php?op=oggetti     → categorie con conteggio (vista indice)
+ *   api_scheda.php?op=oggetti&what=X → oggetti di una categoria (vista dettaglio)
  *
  * Due viste gestite via stato interno (nessun cambio URL):
- *   Vista indice  — tabella con categorie di oggetti posseduti + conteggio
- *   Vista dettaglio — oggetti di una categoria specifica, con commenti
- *                     e pulsanti azione
+ *   Indice    — lista categorie con badge conteggio, cliccabili
+ *   Dettaglio — card grid con immagine, descrizione, commenti, azioni
  *
  * Operazioni (solo proprietario):
- *   abbandona   — rimuove un oggetto
- *   in_zaino    — sposta dall'inventario al backpack (posizione=1)
- *   commenta    — aggiunge/modifica nota personale
+ *   abbandona — rimuove un oggetto (quantità -1 o DELETE)
+ *   in_zaino  — sposta in zaino (posizione=1)
+ *   commenta  — nota personale
  *
- * Operazioni aggiuntive per admin/master:
+ * Operazioni per admin/master:
  *   commenta_master — nota master
  *
- * Operazioni aggiuntive per shop keeper (mestiere 3=Magic, 4=Pandora):
+ * Operazioni per shop keeper (mestiere 3=Magic, 4=Pandora):
  *   commenta_shop — nota negozio
- *
- * Accesso: solo proprietario, admin, o shop keeper per tipo specifico.
  *
  * @author Crystal Tokyo Dev
  */
 
 import { useState, useEffect, useCallback } from 'react'
 import SchedaMenu from './SchedaMenu'
-import shared from './shared.module.css'
+import styles from './SchedaOggetti.module.css'
 
 // ---------------------------------------------------------------------------
-// ITEM DETAIL
+// ITEM CARD
 // ---------------------------------------------------------------------------
 
-/**
- * Riga singolo oggetto nella vista dettaglio categoria.
- * Mostra immagine, descrizione, commenti, form per aggiungere note, pulsanti.
- */
-function OggettoRow({ item, isOwn, isAdmin, isMaster, idMestiere, pg, onAction, onReload }) {
+function OggettoCard({ item, isOwn, isAdmin, isMaster, idMestiere, onAction }) {
     const [commento,       setCommento]       = useState(item.commento)
     const [commentoMaster, setCommentoMaster] = useState(item.commento_master)
     const [commentoShop,   setCommentoShop]   = useState(item.commento_shop)
@@ -45,102 +41,130 @@ function OggettoRow({ item, isOwn, isAdmin, isMaster, idMestiere, pg, onAction, 
 
     const canMaster    = isAdmin || isMaster
     const canShop      = isAdmin || idMestiere === 3 || idMestiere === 4
-    const isMagic      = false   // tipo risolto server-side; lato client non distinguiamo qui
-    const isViewerOnly = !isOwn  // può vedere commenti ma non modificarli
+    const isViewerOnly = !isOwn
 
     return (
-        <tr>
-            {/* Immagine */}
-            <td className="casella_elemento casella_img_col">
-                <img src={`/imgs/items/${item.urlimg}`} align="center"
-                    style={{ height: 120, width: 120 }} alt={item.nome} />
-            </td>
+        <div className={styles.card}>
 
-            {/* Descrizione + commenti */}
-            <td className="casella_elemento">
-                <div className="inventario_riga_descrizione">
-                    <span className={shared.schedaUpper}>
-                        <center>
-                            <b>{item.nome}</b> (<i>x {item.numero}
-                                {item.cariche > 1 && ` Cariche: ${item.cariche}`}
-                            </i>)
-                        </center>
-                    </span>
-                    {item.descrizione && (
-                        <div dangerouslySetInnerHTML={{ __html: item.descrizione }} />
+            <div className={styles.cardImgWrap}>
+                <img src={`/imgs/items/${item.urlimg}`} alt={item.nome} className={styles.cardImg} />
+            </div>
+
+            <div className={styles.cardBody}>
+                <div className={styles.cardName}>{item.nome}</div>
+                <div className={styles.cardCount}>
+                    × {item.numero}
+                    {item.cariche > 1 && (
+                        <span className={styles.cardCharges}> · {item.cariche} cariche</span>
                     )}
                 </div>
 
-                {/* Commento personale */}
+                {item.descrizione && (
+                    <div
+                        className={styles.cardDesc}
+                        dangerouslySetInnerHTML={{ __html: item.descrizione }}
+                    />
+                )}
+
+                {/* ── Commento personale ── */}
                 {!isOwn && item.commento && (
-                    <div className="inventario_riga_commento">
-                        <span className={shared.schedaUpper}><center><b>COMMENTO</b></center></span>
-                        <i>{item.commento}</i>
+                    <div className={styles.commentBlock}>
+                        <div className={styles.commentLabel}>Commento</div>
+                        <span className={styles.commentText}>{item.commento}</span>
                     </div>
                 )}
                 {isOwn && (
-                    <div>
-                        <textarea className="form_textarea" value={commento}
-                            onChange={e => setCommento(e.target.value)} />
-                        <br />
-                        <center>
-                            <button onClick={() => act('commenta', { commento })}>
-                                Commenta
-                            </button>
-                        </center>
+                    <div className={styles.commentBlock}>
+                        <div className={styles.commentLabel}>Commento personale</div>
+                        <textarea
+                            className={styles.commentTextarea}
+                            value={commento}
+                            onChange={e => setCommento(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            className={styles.saveBtn}
+                            onClick={() => act('commenta', { commento })}
+                        >
+                            Salva commento
+                        </button>
                     </div>
                 )}
 
-                {/* Commento master */}
+                {/* ── Commento master (modificabile solo se admin/master + proprietario) ── */}
                 {canMaster && !isViewerOnly && (
-                    <div>
-                        <hr />
-                        <textarea className="form_textarea" value={commentoMaster}
-                            onChange={e => setCommentoMaster(e.target.value)} />
-                        <button onClick={() => act('commenta_master', { commento_master: commentoMaster })}>
-                            Commento Master
+                    <div className={styles.commentBlock}>
+                        <div className={`${styles.commentLabel} ${styles.commentLabelMaster}`}>Nota Master</div>
+                        <textarea
+                            className={styles.commentTextarea}
+                            value={commentoMaster}
+                            onChange={e => setCommentoMaster(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            className={styles.saveBtn}
+                            onClick={() => act('commenta_master', { commento_master: commentoMaster })}
+                        >
+                            Salva nota master
                         </button>
                     </div>
                 )}
                 {!canMaster && item.commento_master && (
-                    <div>
-                        <hr />
-                        <span className={shared.schedaUpper}><center><b>COMMENTO MASTER</b></center></span>
+                    <div className={styles.commentBlock}>
+                        <div className={`${styles.commentLabel} ${styles.commentLabelMaster}`}>Nota Master</div>
                         <span dangerouslySetInnerHTML={{ __html: item.commento_master }} />
                     </div>
                 )}
 
-                {/* Commento shop */}
+                {/* ── Commento shop (modificabile solo da shop keeper su pagine altrui) ── */}
                 {canShop && !isOwn && (
-                    <div>
-                        <hr />
-                        <textarea className="form_textarea" value={commentoShop}
-                            onChange={e => setCommentoShop(e.target.value)} />
-                        <button onClick={() => act('commenta_shop', { commento_shop: commentoShop })}>
-                            Commento Shop
+                    <div className={styles.commentBlock}>
+                        <div className={`${styles.commentLabel} ${styles.commentLabelShop}`}>Nota Shop</div>
+                        <textarea
+                            className={styles.commentTextarea}
+                            value={commentoShop}
+                            onChange={e => setCommentoShop(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            className={styles.saveBtn}
+                            onClick={() => act('commenta_shop', { commento_shop: commentoShop })}
+                        >
+                            Salva nota shop
                         </button>
                     </div>
                 )}
                 {!canShop && isOwn && item.commento_shop && (
-                    <div>
-                        <hr />
+                    <div className={styles.commentBlock}>
+                        <div className={`${styles.commentLabel} ${styles.commentLabelShop}`}>Nota Shop</div>
                         <span dangerouslySetInnerHTML={{ __html: item.commento_shop }} />
                     </div>
                 )}
-            </td>
 
-            {/* Pulsanti */}
-            <td className="casella_controlli casella_azioni_col">
+                {/* ── Azioni ── */}
                 {isOwn && (
-                    <div className="form_gioco">
-                        <button onClick={() => act('abbandona')}>Abbandona</button>
+                    <div className={styles.actions}>
                         {item.ubicabile > 0 && (
-                            <button onClick={() => act('in_zaino')}>Equipaggia</button>
+                            <button
+                                type="button"
+                                className={styles.actionBtn}
+                                onClick={() => act('in_zaino')}
+                            >
+                                <i className="fa-solid fa-box-archive" /> Zaino
+                            </button>
                         )}
+                        <button
+                            type="button"
+                            className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
+                            onClick={() => act('abbandona')}
+                        >
+                            <i className="fa-solid fa-trash" /> Abbandona
+                        </button>
                     </div>
                 )}
-            </td>
-        </tr>
+
+            </div>
+        </div>
     )
 }
 
@@ -152,25 +176,22 @@ export default function SchedaOggetti() {
     const pg = new URLSearchParams(window.location.search).get('pg') ?? ''
 
     const [profile,     setProfile]     = useState(null)
-    const [indexData,   setIndexData]   = useState(null)   // categorie
-    const [detailData,  setDetailData]  = useState(null)   // items per categoria
-    const [selectedCat, setSelectedCat] = useState(null)   // cod_tipo selezionato
+    const [indexData,   setIndexData]   = useState(null)
+    const [detailData,  setDetailData]  = useState(null)
+    const [selectedCat, setSelectedCat] = useState(null)
     const [feedback,    setFeedback]    = useState(null)
     const [error,       setError]       = useState(null)
 
-    // Carica indice categorie
     const loadIndex = useCallback(() => {
         const enc = encodeURIComponent(pg)
         return fetch(`/pages/api_scheda.php?op=oggetti&pg=${enc}`).then(r => r.json())
     }, [pg])
 
-    // Carica items per categoria
     const loadDetail = useCallback((codTipo) => {
         const enc = encodeURIComponent(pg)
         return fetch(`/pages/api_scheda.php?op=oggetti&pg=${enc}&what=${encodeURIComponent(codTipo)}`).then(r => r.json())
     }, [pg])
 
-    // Caricamento iniziale
     useEffect(() => {
         if (!pg) { setError('Personaggio non specificato'); return }
         const enc = encodeURIComponent(pg)
@@ -185,7 +206,6 @@ export default function SchedaOggetti() {
         }).catch(e => setError(e.message ?? 'Errore di rete'))
     }, [pg, loadIndex])
 
-    // Quando l'utente clicca su una categoria
     const openCategory = useCallback((codTipo) => {
         setSelectedCat(codTipo)
         setFeedback(null)
@@ -195,7 +215,6 @@ export default function SchedaOggetti() {
         })
     }, [loadDetail])
 
-    // Esegue un'azione e ricarica la vista corrente
     const doAction = useCallback(async (params) => {
         const enc = encodeURIComponent(pg)
         try {
@@ -207,11 +226,9 @@ export default function SchedaOggetti() {
             const data = await resp.json()
             if (data.success) {
                 setFeedback('Operazione eseguita.')
-                // Ricarica dettaglio corrente
                 if (selectedCat !== null) {
                     loadDetail(selectedCat).then(d => { if (d.success) setDetailData(d) })
                 }
-                // Aggiorna anche i conteggi indice
                 loadIndex().then(d => { if (d.success) setIndexData(d) })
             } else {
                 setFeedback(data.message ?? 'Errore')
@@ -221,19 +238,17 @@ export default function SchedaOggetti() {
         }
     }, [pg, selectedCat, loadDetail, loadIndex])
 
-    if (error)               return <div className="pagina_scheda"><div className="error">{error}</div></div>
+    if (error)                  return <div className="pagina_scheda"><div className="error">{error}</div></div>
     if (!profile || !indexData) return <div className="pagina_scheda"><div>Caricamento…</div></div>
 
     const { nome, cognome, is_own, is_admin, is_staff, is_master } = profile
     const { categorie, id_mestiere } = indexData
 
     return (
-        <div className="pagina_scheda_oggetti">
-            <div className="page_title">
-                <h2>Inventario</h2>
-            </div>
+        <div className="pagina_scheda">
+            <div className="page_title"><h2>Inventario</h2></div>
 
-            <div className="menu_scheda">
+            <div className="scheda_page_body">
                 <SchedaMenu
                     pg={pg}
                     isOwn={is_own}
@@ -241,89 +256,69 @@ export default function SchedaOggetti() {
                     isStaff={is_staff}
                     isMaster={is_master}
                 />
-            </div>
 
-            {feedback && <div className="warning">{feedback}</div>}
+                <div className="title">{nome} {cognome}</div>
 
-            <div className="page_body">
+                {feedback && <div className={styles.feedback}>{feedback}</div>}
 
-                {/* ── Vista indice ────────────────────────────────────── */}
+                {/* ── Vista indice categorie ─────────────────────────── */}
                 {selectedCat === null && (
-                    <table className="customTable">
-                        <tbody>
-                            <tr className="second_header">
-                                <td colSpan="3"><div>Tipo</div></td>
-                                <td colSpan="3"><div>Numero oggetti</div></td>
-                            </tr>
-                            {categorie.length === 0
-                                ? <tr><td colSpan="6" className={shared.centered}>
-                                    Nessun oggetto in inventario.
-                                  </td></tr>
-                                : categorie.map(cat => (
-                                    <tr key={cat.cod_tipo}>
-                                        <td className="casella_elemento" colSpan="3">
-                                            <a href="#" onClick={e => { e.preventDefault(); openCategory(cat.cod_tipo) }}>
-                                                {cat.descrizione}
-                                            </a>
-                                        </td>
-                                        <td className="casella_elemento" colSpan="3">
-                                            {cat.numero}
-                                        </td>
-                                    </tr>
-                                ))
-                            }
-                        </tbody>
-                    </table>
+                    <div className={styles.catList}>
+                        {categorie.length === 0 ? (
+                            <div className={styles.empty}>Nessun oggetto in inventario.</div>
+                        ) : categorie.map(cat => (
+                            <button
+                                type="button"
+                                key={cat.cod_tipo}
+                                className={styles.catRow}
+                                onClick={() => openCategory(cat.cod_tipo)}
+                            >
+                                <span className={styles.catName}>{cat.descrizione}</span>
+                                <span className={styles.catCount}>{cat.numero}</span>
+                                <i className="fa-solid fa-chevron-right" />
+                            </button>
+                        ))}
+                    </div>
                 )}
 
-                {/* ── Vista dettaglio categoria ────────────────────────── */}
-                {selectedCat !== null && detailData && (
+                {/* ── Vista dettaglio categoria ──────────────────────── */}
+                {selectedCat !== null && (
                     <>
-                        <div style={{ marginBottom: 8 }}>
-                            <a href="#" onClick={e => { e.preventDefault(); setSelectedCat(null); setDetailData(null) }}>
-                                ← Torna all'indice
-                            </a>
+                        <div className={styles.detailHeader}>
+                            <button
+                                type="button"
+                                className={styles.backBtn}
+                                onClick={() => { setSelectedCat(null); setDetailData(null) }}
+                            >
+                                <i className="fa-solid fa-arrow-left" /> Torna all'indice
+                            </button>
+                            {detailData && (
+                                <span className={styles.catTitle}>{detailData.categoria}</span>
+                            )}
                         </div>
-                        <div className="panels_box">
-                            <div className="elenco_record_gioco">
-                                <table className="customTable inventory-table">
-                                    <thead>
-                                        <tr>
-                                            <td className="casella_titolo casella_img_col">
-                                                <div className="titoli_elenco">Immagine</div>
-                                            </td>
-                                            <td className="casella_titolo">
-                                                <div className="titoli_elenco">Descrizioni e Commenti</div>
-                                            </td>
-                                            <td className="casella_titolo casella_azioni_col">
-                                                <div className="titoli_elenco">&nbsp;</div>
-                                            </td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {detailData.items.length === 0
-                                            ? <tr><td colSpan="3" className={shared.centered}>
-                                                Nessun oggetto.
-                                              </td></tr>
-                                            : detailData.items.map(item => (
-                                                <OggettoRow
-                                                    key={item.id}
-                                                    item={item}
-                                                    isOwn={is_own}
-                                                    isAdmin={is_admin}
-                                                    isMaster={is_master}
-                                                    idMestiere={id_mestiere}
-                                                    pg={pg}
-                                                    onAction={doAction}
-                                                />
-                                            ))
-                                        }
-                                    </tbody>
-                                </table>
+
+                        {detailData ? (
+                            <div className={styles.grid}>
+                                {detailData.items.length === 0 ? (
+                                    <div className={styles.empty}>Nessun oggetto.</div>
+                                ) : detailData.items.map(item => (
+                                    <OggettoCard
+                                        key={item.id}
+                                        item={item}
+                                        isOwn={is_own}
+                                        isAdmin={is_admin}
+                                        isMaster={is_master}
+                                        idMestiere={id_mestiere}
+                                        onAction={doAction}
+                                    />
+                                ))}
                             </div>
-                        </div>
+                        ) : (
+                            <div>Caricamento…</div>
+                        )}
                     </>
                 )}
+
             </div>
         </div>
     )
