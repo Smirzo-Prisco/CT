@@ -487,6 +487,15 @@ MESTIERE (<a style="font-size: 18px; color: #8f8f8f; font-family: DejaVu Serif; 
                 gdrcd_query("INSERT INTO clgpersonaggioabilita (nome, id_abilita, grado) VALUES ('" . trim(gdrcd_capital_letter(gdrcd_filter('in', $_POST['nome']))) . "', " . gdrcd_filter('num', $row['id_abilita']) . ", '1')");
                 }
 
+                // DM di notifica a tutti gli admin — nuovo personaggio iscritto
+                $new_pg_name = trim(gdrcd_capital_letter(gdrcd_filter('in', $_POST['nome'])));
+                $testo_dm    = 'Nuovo personaggio iscritto il ' . date('d/m/Y') . ' alle ' . date('H:i') . ': ' . $new_pg_name;
+                $admin_list  = gdrcd_query("SELECT nome FROM privilegi WHERE admin = 1", 'result');
+                while ($admin_row = gdrcd_query($admin_list, 'fetch')) {
+                    gdrcd_query("INSERT INTO messaggi (mittente, destinatario, spedito, letto, testo) VALUES ('System', '" . gdrcd_filter('in', $admin_row['nome']) . "', NOW(), 0, '" . gdrcd_filter('in', $testo_dm) . "')");
+                }
+                gdrcd_query($admin_list, 'free');
+
             echo '<div class="page_title_finale"</div><img src="themes/crystal/imgs/iscrizione/iscrizione_completata.png"></div><br>';
 
             if ($PARAMETERS['mode']['emailconfirmation'] == 'ON') {
