@@ -158,7 +158,26 @@ switch ($op) {
             ['label' => "Azioni settimana: $azioni_sett", 'url' => '#'],
         ]];
 
-        // Ultimi iscritti — nascosta
+        // Ultimi iscritti (admin, master, moderatore)
+        if ($perms['admin'] || $perms['master'] || $perms['moderatore']) {
+            $ultimi_res    = gdrcd_query(
+                "SELECT nome, data_iscrizione FROM personaggio
+                 WHERE permessi >= 0 AND sesso != 'b'
+                 ORDER BY data_iscrizione DESC LIMIT 5",
+                'result'
+            );
+            $voci_iscritti = [];
+            while ($u = gdrcd_query($ultimi_res, 'fetch')) {
+                $voci_iscritti[] = [
+                    'label' => $u['nome'] . ' — ' . substr($u['data_iscrizione'], 0, 10),
+                    'url'   => 'main.php?page=scheda&pg=' . urlencode($u['nome']),
+                ];
+            }
+            gdrcd_query($ultimi_res, 'free');
+            if (!empty($voci_iscritti)) {
+                $menu[] = ['key' => 'ultimi_iscritti', 'label' => 'Ultimi iscritti', 'icon' => 'fa-user-plus', 'voci' => $voci_iscritti];
+            }
+        }
 
         echo json_encode([
             'success'   => true,

@@ -488,11 +488,12 @@ MESTIERE (<a style="font-size: 18px; color: #8f8f8f; font-family: DejaVu Serif; 
                 }
 
                 // DM di notifica a tutti gli admin — nuovo personaggio iscritto
-                $new_pg_name = trim(gdrcd_capital_letter(gdrcd_filter('in', $_POST['nome'])));
-                $testo_dm    = 'Nuovo personaggio iscritto il ' . date('d/m/Y') . ' alle ' . date('H:i') . ': ' . $new_pg_name;
+                require_once __DIR__ . '/includes/custom_functions.inc.php';
+                $new_pg_name = trim(gdrcd_capital_letter($_POST['nome']));
+                $testo_dm    = gdrcd_filter('in', 'Nuovo personaggio iscritto il ' . date('d/m/Y') . ' alle ' . date('H:i') . ': ' . $new_pg_name);
                 $admin_list  = gdrcd_query("SELECT nome FROM privilegi WHERE admin = 1", 'result');
                 while ($admin_row = gdrcd_query($admin_list, 'fetch')) {
-                    gdrcd_query("INSERT INTO messaggi (mittente, destinatario, spedito, letto, testo) VALUES ('System', '" . gdrcd_filter('in', $admin_row['nome']) . "', NOW(), 0, '" . gdrcd_filter('in', $testo_dm) . "')");
+                    send_sms('System', $admin_row['nome'], '', $testo_dm, 0);
                 }
                 gdrcd_query($admin_list, 'free');
 
