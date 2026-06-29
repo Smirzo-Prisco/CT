@@ -624,7 +624,9 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
-    // GET_QUEST — recupera dati grezzi di una quest per il form di modifica
+    // GET_QUEST — recupera dati grezzi di una quest per il form di modifica.
+    // Fallback: se messaggio_quest non ha il record (post legacy), restituisce
+    // il titolo da messaggioaraldo e campi vuoti — così il form si apre comunque.
     // -------------------------------------------------------------------------
     case 'get_quest':
         if ($_SESSION['master'] != 1 && $_SESSION['admin'] != 1) {
@@ -638,16 +640,32 @@ switch ($op) {
             echo json_encode(['success' => false, 'message' => 'ID non valido']);
             exit;
         }
-        $quest = gdrcd_query(
-            "SELECT titolo, tipologia, location, partecipanti, riassunto, conseguenze, note, valutazioni
-             FROM messaggio_quest WHERE id_messaggio = $thread_id LIMIT 1"
+        $row = gdrcd_query(
+            "SELECT mq.titolo AS mq_titolo, mq.tipologia, mq.location, mq.partecipanti,
+                    mq.riassunto, mq.conseguenze, mq.note, mq.valutazioni,
+                    ma.titolo AS ma_titolo
+             FROM messaggioaraldo ma
+             LEFT JOIN messaggio_quest mq ON mq.id_messaggio = ma.id_messaggio
+             WHERE ma.id_messaggio = $thread_id LIMIT 1"
         );
-        if (!$quest) {
+        if (!$row) {
             http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Quest non trovata']);
+            echo json_encode(['success' => false, 'message' => 'Thread non trovato']);
             exit;
         }
-        echo json_encode(['success' => true, 'quest' => $quest]);
+        echo json_encode([
+            'success' => true,
+            'quest'   => [
+                'titolo'       => $row['mq_titolo']    ?? $row['ma_titolo'] ?? '',
+                'tipologia'    => $row['tipologia']    ?? '',
+                'location'     => $row['location']     ?? '',
+                'partecipanti' => $row['partecipanti'] ?? '',
+                'riassunto'    => $row['riassunto']    ?? '',
+                'conseguenze'  => $row['conseguenze']  ?? '',
+                'note'         => $row['note']         ?? '',
+                'valutazioni'  => $row['valutazioni']  ?? '',
+            ],
+        ]);
         break;
 
     // -------------------------------------------------------------------------
@@ -709,17 +727,31 @@ switch ($op) {
                  messaggio = '" . gdrcd_filter('in', $testo_quest) . "'
              WHERE id_messaggio = $thread_id LIMIT 1"
         );
+        // UPSERT: crea il record se mancante (post legacy senza riga in messaggio_quest)
+        $t_db  = gdrcd_filter('in', $titolo);
+        $tp_db = gdrcd_filter('in', $tipologia);
+        $l_db  = gdrcd_filter('in', $location);
+        $p_db  = gdrcd_filter('in', $partec);
+        $r_db  = gdrcd_filter('in', $riassunto);
+        $c_db  = gdrcd_filter('in', $cons);
+        $n_db  = gdrcd_filter('in', $note);
+        $v_db  = gdrcd_filter('in', $valu);
         gdrcd_query(
-            "UPDATE messaggio_quest
-             SET titolo       = '" . gdrcd_filter('in', $titolo)    . "',
-                 tipologia    = '" . gdrcd_filter('in', $tipologia)  . "',
-                 location     = '" . gdrcd_filter('in', $location)   . "',
-                 partecipanti = '" . gdrcd_filter('in', $partec)     . "',
-                 riassunto    = '" . gdrcd_filter('in', $riassunto)  . "',
-                 conseguenze  = '" . gdrcd_filter('in', $cons)       . "',
-                 note         = '" . gdrcd_filter('in', $note)       . "',
-                 valutazioni  = '" . gdrcd_filter('in', $valu)       . "'
-             WHERE id_messaggio = $thread_id LIMIT 1"
+            "INSERT INTO messaggio_quest
+                 (id_messaggio, titolo, tipologia, location, partecipanti,
+                  riassunto, conseguenze, note, valutazioni)
+             VALUES
+                 ($thread_id, '$t_db', '$tp_db', '$l_db', '$p_db',
+                  '$r_db', '$c_db', '$n_db', '$v_db')
+             ON DUPLICATE KEY UPDATE
+                 titolo       = '$t_db',
+                 tipologia    = '$tp_db',
+                 location     = '$l_db',
+                 partecipanti = '$p_db',
+                 riassunto    = '$r_db',
+                 conseguenze  = '$c_db',
+                 note         = '$n_db',
+                 valutazioni  = '$v_db'"
         );
 
         echo json_encode(['success' => true]);
