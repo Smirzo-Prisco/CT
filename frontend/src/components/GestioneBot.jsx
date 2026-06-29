@@ -386,7 +386,16 @@ export default function GestioneBot() {
                                             onChange={() => toggleSelect(bot.nome)}
                                         />
                                     </td>
-                                    <td>{bot.nome} {bot.cognome}</td>
+                                    <td>
+                                        <a
+                                            href={`main.php?page=scheda&pg=${encodeURIComponent(bot.nome)}`}
+                                            className={styles.nameLink}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            {bot.nome} {bot.cognome}
+                                        </a>
+                                    </td>
                                     <td>
                                         <span className={bot.online ? styles.badgeOnline : styles.badgeOffline}>
                                             {bot.online ? 'Online' : 'Offline'}

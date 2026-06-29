@@ -163,6 +163,18 @@
 }
 .btnSm:hover { background: rgb(201 168 76 / 10%); }
 
+/* ── Name link ─────────────────────── */
+
+.nameLink {
+    color: var(--color-text, #ccc);
+    text-decoration: none;
+}
+
+.nameLink:hover {
+    color: var(--color-gold, #c9a84c);
+    text-decoration: underline;
+}
+
 /* ── Table ──────────────────────────── */
 
 .table {
