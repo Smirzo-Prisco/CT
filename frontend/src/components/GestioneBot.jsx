@@ -369,8 +369,6 @@ export default function GestioneBot() {
                                     />
                                 </th>
                                 <th>Nome</th>
-                                <th>Razza</th>
-                                <th>Mestiere</th>
                                 <th>Status</th>
                                 <th>DM</th>
                                 <th>Azioni</th>
@@ -387,8 +385,6 @@ export default function GestioneBot() {
                                         />
                                     </td>
                                     <td>{bot.nome} {bot.cognome}</td>
-                                    <td>{bot.nome_razza}</td>
-                                    <td>{bot.nome_mestiere}</td>
                                     <td>
                                         <span className={bot.online ? styles.badgeOnline : styles.badgeOffline}>
                                             {bot.online ? 'Online' : 'Offline'}
