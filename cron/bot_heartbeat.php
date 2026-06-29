@@ -32,10 +32,13 @@ $active = gdrcd_query(
     'result'
 );
 
+// Inizializza ora_uscita per bot che non l'hanno mai avuta (evita NULL in confronti)
+gdrcd_query("UPDATE personaggio SET ora_uscita = '2000-01-01 00:00:00' WHERE sesso = 'b' AND ora_uscita IS NULL");
+
 $count = 0;
 while ($row = gdrcd_query($active, 'fetch')) {
     $nome = gdrcd_filter('in', $row['nome']);
-    gdrcd_query("UPDATE personaggio SET ultimo_refresh = NOW() WHERE nome = '$nome'");
+    gdrcd_query("UPDATE personaggio SET ultimo_refresh = NOW(), ora_entrata = NOW() WHERE nome = '$nome'");
     $count++;
 }
 gdrcd_query($active, 'free');
