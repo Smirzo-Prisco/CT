@@ -624,6 +624,108 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // GET_QUEST — recupera dati grezzi di una quest per il form di modifica
+    // -------------------------------------------------------------------------
+    case 'get_quest':
+        if ($_SESSION['master'] != 1 && $_SESSION['admin'] != 1) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Non autorizzato']);
+            exit;
+        }
+        $thread_id = (int)($_GET['thread_id'] ?? 0);
+        if ($thread_id <= 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'ID non valido']);
+            exit;
+        }
+        $quest = gdrcd_query(
+            "SELECT titolo, tipologia, location, partecipanti, riassunto, conseguenze, note, valutazioni
+             FROM messaggio_quest WHERE id_messaggio = $thread_id LIMIT 1"
+        );
+        if (!$quest) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Quest non trovata']);
+            exit;
+        }
+        echo json_encode(['success' => true, 'quest' => $quest]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // EDIT_QUEST — modifica quest: rigenera HTML + aggiorna dati grezzi
+    // Non modifica i punti già assegnati (gestiti separatamente da punti_png)
+    // -------------------------------------------------------------------------
+    case 'edit_quest':
+        if ($_SESSION['master'] != 1 && $_SESSION['admin'] != 1) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Non autorizzato']);
+            exit;
+        }
+        $thread_id = (int)($data['thread_id'] ?? 0);
+        $titolo    = trim($data['titolo']       ?? '');
+        $tipologia = trim($data['tipologia']    ?? '');
+        $partec    = trim($data['partecipanti'] ?? '');
+        $location  = trim($data['location']     ?? '');
+        $riassunto = trim($data['riassunto']    ?? '');
+        $cons      = trim($data['conseguenze']  ?? '');
+        $note      = trim($data['note']         ?? '');
+        $valu      = trim($data['valutazioni']  ?? '');
+
+        if ($thread_id <= 0 || empty($titolo)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Dati non validi']);
+            exit;
+        }
+
+        // Rigenera il corpo HTML esattamente come in post_quest
+        $t_h  = htmlspecialchars($titolo);
+        $tp_h = htmlspecialchars($tipologia);
+        $l_h  = htmlspecialchars($location);
+        $p_h  = htmlspecialchars($partec);
+        $r_h  = htmlspecialchars($riassunto);
+        $c_h  = htmlspecialchars($cons);
+        $n_h  = htmlspecialchars($note);
+        $v_h  = htmlspecialchars($valu);
+
+        $testo_quest = "<center>
+<font color=\"#9a6353\" style=\"font-size:20px; text-transform: uppercase;\"><b>$t_h</b></font><br>
+<font color=\"#9a6353\" style=\"font-size:12px;\">$tp_h</font>
+</center><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Luogo</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$l_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Partecipanti</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$p_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Riassunto</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$r_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Conseguenze</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$c_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Note</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$n_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Valutazioni</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$v_h</font>";
+
+        gdrcd_query(
+            "UPDATE messaggioaraldo
+             SET titolo = '"    . gdrcd_filter('in', $titolo)     . "',
+                 messaggio = '" . gdrcd_filter('in', $testo_quest) . "'
+             WHERE id_messaggio = $thread_id LIMIT 1"
+        );
+        gdrcd_query(
+            "UPDATE messaggio_quest
+             SET titolo       = '" . gdrcd_filter('in', $titolo)    . "',
+                 tipologia    = '" . gdrcd_filter('in', $tipologia)  . "',
+                 location     = '" . gdrcd_filter('in', $location)   . "',
+                 partecipanti = '" . gdrcd_filter('in', $partec)     . "',
+                 riassunto    = '" . gdrcd_filter('in', $riassunto)  . "',
+                 conseguenze  = '" . gdrcd_filter('in', $cons)       . "',
+                 note         = '" . gdrcd_filter('in', $note)       . "',
+                 valutazioni  = '" . gdrcd_filter('in', $valu)       . "'
+             WHERE id_messaggio = $thread_id LIMIT 1"
+        );
+
+        echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
     // EDIT_POST — modifica testo e titolo di un messaggio (autore o admin)
     // -------------------------------------------------------------------------
     case 'edit_post':

@@ -163,7 +163,7 @@ function ThreadRow({ thread, onClick, isStaff, canDelete, onAction }) {
  * @param {Function} props.onEdit   - Callback ({ id, messaggio, titolo }) al salvataggio
  * @param {Function} props.onDelete - Callback (id_messaggio) alla cancellazione
  */
-function PostCard({ msg, isFirst, onEdit, onDelete, isStaff = false, threadId = null }) {
+function PostCard({ msg, isFirst, onEdit, onDelete, onEditQuest = null, isStaff = false, threadId = null }) {
     const [isEditing,  setIsEditing]  = useState(false)
     const [editText,   setEditText]   = useState('')
     const [editTitolo, setEditTitolo] = useState('')
@@ -194,6 +194,10 @@ function PostCard({ msg, isFirst, onEdit, onDelete, isStaff = false, threadId = 
     }
 
     const startEdit = () => {
+        if (onEditQuest) {
+            onEditQuest()
+            return
+        }
         setEditText(msg.messaggio_raw ?? '')
         setEditTitolo(msg.titolo ?? '')
         setIsEditing(true)
@@ -553,15 +557,15 @@ const TIPOLOGIE_QUEST = [
  * @param {Function} props.onSubmit - Callback con i dati del form
  * @param {Function} props.onCancel - Callback per tornare indietro
  */
-function ComposeQuest({ section, sending, onSubmit, onCancel }) {
-    const [titolo,      setTitolo]      = useState('')
-    const [tipologia,   setTipologia]   = useState(TIPOLOGIE_QUEST[0])
-    const [partec,      setPartec]      = useState('')
-    const [location,    setLocation]    = useState('')
-    const [riassunto,   setRiassunto]   = useState('')
-    const [conseguenze, setConseguenze] = useState('')
-    const [note,        setNote]        = useState('')
-    const [valutazioni, setValutazioni] = useState('')
+function ComposeQuest({ section, sending, onSubmit, onCancel, initialData = null }) {
+    const [titolo,      setTitolo]      = useState(initialData?.titolo       ?? '')
+    const [tipologia,   setTipologia]   = useState(initialData?.tipologia    ?? TIPOLOGIE_QUEST[0])
+    const [partec,      setPartec]      = useState(initialData?.partecipanti ?? '')
+    const [location,    setLocation]    = useState(initialData?.location     ?? '')
+    const [riassunto,   setRiassunto]   = useState(initialData?.riassunto    ?? '')
+    const [conseguenze, setConseguenze] = useState(initialData?.conseguenze  ?? '')
+    const [note,        setNote]        = useState(initialData?.note         ?? '')
+    const [valutazioni, setValutazioni] = useState(initialData?.valutazioni  ?? '')
 
     /** 20 righe vuote per i punti partecipanti */
     const [pgPunti, setPgPunti] = useState(() =>
@@ -598,7 +602,7 @@ function ComposeQuest({ section, sending, onSubmit, onCancel }) {
 
             <table className="customTable" style={{ width: '100%' }}>
                 <tbody>
-                    <tr><td colSpan="2" className={styles.questHeader}>INSERIMENTO QUEST</td></tr>
+                    <tr><td colSpan="2" className={styles.questHeader}>{initialData ? 'MODIFICA QUEST' : 'INSERIMENTO QUEST'}</td></tr>
 
                     <tr className="second_header"><td colSpan="2"><b>TITOLO QUEST</b></td></tr>
                     <tr><td colSpan="2">
@@ -703,7 +707,7 @@ function ComposeQuest({ section, sending, onSubmit, onCancel }) {
 
             <div className={styles.buttonsBar} style={{ marginTop: '10px' }}>
                 <button onClick={handleSubmit} disabled={sending || !titolo.trim()}>
-                    {sending ? 'Invio...' : 'Invia Quest'}
+                    {sending ? (initialData ? 'Salvataggio…' : 'Invio…') : (initialData ? 'Salva' : 'Invia Quest')}
                 </button>
                 <button onClick={onCancel}>Annulla</button>
             </div>
@@ -747,6 +751,8 @@ export default function Forum({ isStaff = false, initialThread = null }) {
 
     /** Punti assegnati nel thread corrente (da Punti table, solo per master/admin) */
     const [puntiList,       setPuntiList]       = useState([])
+    /** Dati grezzi quest precaricati per la vista edit_quest */
+    const [editQuestData,   setEditQuestData]   = useState(null)
 
     // --- stati UI ---
     const [loadingSections, setLoadingSections] = useState(true)
@@ -1050,6 +1056,49 @@ export default function Forum({ isStaff = false, initialThread = null }) {
     }, [currentSection, fetchThreads, page])
 
     /**
+     * Apre il form di modifica quest caricando i dati grezzi da messaggio_quest.
+     * Chiamato solo sul primo messaggio di un thread in id_araldo=10.
+     */
+    const handleStartEditQuest = useCallback((threadId) => {
+        fetch(`/pages/api_forum.php?op=get_quest&thread_id=${threadId}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setEditQuestData(data.quest)
+                    setView('edit_quest')
+                } else {
+                    alert(data.message || 'Errore nel caricamento della quest')
+                }
+            })
+            .catch(console.error)
+    }, [])
+
+    /**
+     * Salva le modifiche a una quest esistente (no punti — gestiti da punti_png).
+     */
+    const handleEditQuest = (formData) => {
+        if (sending) return
+        setSending(true)
+        fetch('/pages/api_forum.php?op=edit_quest', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ thread_id: currentThread?.id, ...formData }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    setView('read')
+                    setEditQuestData(null)
+                    fetchThread(currentThread.id)
+                } else {
+                    alert(data.message || 'Errore nella modifica')
+                }
+            })
+            .catch(console.error)
+            .finally(() => setSending(false))
+    }
+
+    /**
      * Invia un resoconto quest nella sezione corrente.
      * @param {Object} formData - Tutti i campi del form ComposeQuest
      */
@@ -1161,8 +1210,8 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                     <span className={styles.sectionHeading}>{currentSection?.nome}</span>
                 </div>
                 <div className={styles.buttonsBar}>
-                    <button onClick={() => setView(isStaff && currentSection?.tipo === 1 ? 'compose_quest' : 'compose')}>
-                        {isStaff && currentSection?.tipo === 1 ? 'Assegna punti' : 'Nuovo Messaggio'}
+                    <button onClick={() => setView(isStaff && currentSection?.id === 10 ? 'compose_quest' : 'compose')}>
+                        {isStaff && currentSection?.id === 10 ? 'Assegna punti' : 'Nuovo Messaggio'}
                     </button>
                 </div>
 
@@ -1239,6 +1288,19 @@ export default function Forum({ isStaff = false, initialThread = null }) {
         )
     }
 
+    // --- VISTA MODIFICA QUEST (primo messaggio di un thread in id_araldo=10) ---
+    if (view === 'edit_quest') {
+        return (
+            <ComposeQuest
+                section={currentSection}
+                sending={sending}
+                onSubmit={handleEditQuest}
+                onCancel={() => { setView('read'); setEditQuestData(null) }}
+                initialData={editQuestData}
+            />
+        )
+    }
+
     // --- VISTA COMPOSIZIONE NUOVO THREAD ---
     if (view === 'compose') {
         return (
@@ -1278,6 +1340,9 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                                     isFirst={i === 0}
                                     onEdit={handleEditPost}
                                     onDelete={i === 0 ? handleDeleteThread : handleDeletePost}
+                                    onEditQuest={i === 0 && isStaff && currentSection?.id === 10
+                                        ? () => handleStartEditQuest(messages[0].id)
+                                        : undefined}
                                     isStaff={isStaff}
                                     threadId={messages[0]?.id}
                                 />
