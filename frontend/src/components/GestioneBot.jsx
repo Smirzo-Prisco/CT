@@ -319,6 +319,7 @@ export default function GestioneBot() {
 
     return (
         <div className={styles.wrap}>
+            <a href="gestione.php" className={styles.backLink}>← Torna alla gestione</a>
             <h2 className={styles.title}>Gestione Bot</h2>
 
             {/* Password comune */}

@@ -7,6 +7,15 @@
     color: var(--color-text, #ccc);
 }
 
+.backLink {
+    display: inline-block;
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+    color: #888;
+    text-decoration: none;
+}
+.backLink:hover { color: var(--color-gold, #c9a84c); }
+
 .title {
     font-size: 1.4rem;
     font-weight: 700;
@@ -141,7 +150,7 @@
     font-size: 0.78rem;
     cursor: pointer;
 }
-.btnSm:hover { background: rgba(201, 168, 76, 0.1); }
+.btnSm:hover { background: rgb(201 168 76 / 10%); }
 
 /* ── Table ──────────────────────────── */
 
@@ -164,12 +173,12 @@
 
 .table td {
     padding: 9px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgb(255 255 255 / 5%);
     vertical-align: middle;
 }
 
 .rowSelected td {
-    background: rgba(201, 168, 76, 0.06);
+    background: rgb(201 168 76 / 6%);
 }
 
 /* ── Badges ─────────────────────────── */
@@ -231,7 +240,7 @@
 .modalOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgb(0 0 0 / 70%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -279,7 +288,7 @@
 
 .scheduleTable td {
     padding: 7px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgb(255 255 255 / 4%);
 }
 
 .scheduleTable td input[type="time"] {
@@ -341,7 +350,11 @@
     padding: 2px 6px;
     border-radius: 4px;
 }
-.closeBtn:hover { color: #ccc; background: rgba(255,255,255,0.05); }
+
+.closeBtn:hover {
+    color: #ccc;
+    background: rgb(255 255 255 / 5%);
+}
 
 .dmBody {
     display: flex;
@@ -360,13 +373,16 @@
 .convItem {
     padding: 10px 14px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgb(255 255 255 / 4%);
     transition: background 0.12s;
 }
-.convItem:hover { background: rgba(255,255,255,0.04); }
+
+.convItem:hover {
+    background: rgb(255 255 255 / 4%);
+}
 
 .convActive {
-    background: rgba(201, 168, 76, 0.08);
+    background: rgb(201 168 76 / 8%);
 }
 
 .convUser {
@@ -410,7 +426,7 @@
 
 .threadHeader {
     padding: 10px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgb(255 255 255 / 4%);
     font-size: 0.85rem;
     color: #888;
 }
@@ -447,7 +463,7 @@
 }
 
 .msgTesto {
-    background: rgba(255,255,255,0.06);
+    background: rgb(255 255 255 / 6%);
     border-radius: 8px;
     padding: 7px 11px;
     font-size: 0.87rem;
@@ -456,7 +472,7 @@
 }
 
 .msgBot .msgTesto {
-    background: rgba(201, 168, 76, 0.12);
+    background: rgb(201 168 76 / 12%);
     color: #e0c87c;
 }
 
