@@ -145,15 +145,13 @@ switch ($op) {
         }
 
         // ── Statistiche sito (visibili a tutti) ──────────────────────────
-        $iscritti    = (int)gdrcd_query("SELECT COUNT(nome) AS num FROM personaggio")['num'];
-        $esiliati    = (int)gdrcd_query("SELECT COUNT(nome) AS num FROM personaggio WHERE esilio > NOW()")['num'];
+        $iscritti    = (int)gdrcd_query("SELECT COUNT(nome) AS num FROM personaggio WHERE permessi >= 0 AND sesso != 'b'")['num'];
         $bacheca     = (int)gdrcd_query("SELECT COUNT(id_messaggio) AS num FROM messaggioaraldo")['num'];
-        $azioni_sett = (int)gdrcd_query("SELECT COUNT(id) AS num FROM chat WHERE ora > DATE_SUB(NOW(), INTERVAL 7 DAY)")['num'];
+        $azioni_sett = (int)gdrcd_query("SELECT COUNT(id) AS num FROM chat WHERE ora > DATE_SUB(NOW(), INTERVAL 7 DAY) AND (tipo = 'P' OR tipo = 'A')")['num'];
 
         $menu[] = ['key' => 'stats', 'label' => 'Informazioni', 'icon' => 'fa-chart-line', 'voci' => [
             ['label' => 'Contatta la moderazione',    'url' => 'gestione.php?page=contatta_moderazione'],
             ['label' => "Iscritti: $iscritti",        'url' => '#'],
-            ['label' => "Esiliati: $esiliati",        'url' => '#'],
             ['label' => "Post in bacheca: $bacheca",  'url' => '#'],
             ['label' => "Azioni settimana: $azioni_sett", 'url' => '#'],
         ]];
