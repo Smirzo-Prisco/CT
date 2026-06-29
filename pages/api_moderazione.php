@@ -71,10 +71,12 @@ switch ($op) {
             exit;
         }
 
-        $titolo_db  = gdrcd_filter('in', $titolo);
-        $testo_db   = gdrcd_filter('in', $testo);
-        $autore_db  = gdrcd_filter('in', $me);
-        $anonimo_db = gdrcd_filter('in', $anonimo);
+        $titolo_db    = gdrcd_filter('in', $titolo);
+        $testo_db     = gdrcd_filter('in', $testo);
+        $autore_db    = gdrcd_filter('in', $me);
+        $anonimo_db   = gdrcd_filter('in', $anonimo);
+        // messaggioaraldo usa 1/0 per anonimo; messaggio_moderazione usa 'si'/'no'
+        $anonimo_int  = ($anonimo === 'si') ? 1 : 0;
 
         gdrcd_query(
             "INSERT INTO messaggio_moderazione
@@ -89,7 +91,7 @@ switch ($op) {
               data_messaggio, data_ultimo_messaggio, giornalista, anonimo)
              VALUES
              ('-1', '86', '$titolo_db', '$testo_db', '$autore_db',
-              NOW(), NOW(), 'no', '$anonimo_db')"
+              NOW(), NOW(), 'no', $anonimo_int)"
         );
 
         echo json_encode(['success' => true]);
