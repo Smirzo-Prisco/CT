@@ -73,30 +73,49 @@ switch ($op) {
 
             ORDER BY ora_spedizione DESC", 'result');
 
+        // Prima passata: raccoglie tutte le righe
+        $rows = [];
+        while ($row = gdrcd_query($result, 'fetch')) $rows[] = $row;
+        gdrcd_query($result, 'free');
+
+        // Batch query avatar: una sola SELECT IN invece di N query separate
+        $contact_names = [];
+        foreach ($rows as $row) {
+            if ($row['tipo'] === 'individuale') {
+                $contact_names[] = gdrcd_filter('in',
+                    $row['mittente_nome'] === $_SESSION['login']
+                        ? $row['destinatario_nome']
+                        : $row['mittente_nome']
+                );
+            }
+        }
+        $avatars = [];
+        if (!empty($contact_names)) {
+            $names_in  = implode(',', array_map(fn($n) => "'$n'", array_unique($contact_names)));
+            $av_result = gdrcd_query("SELECT nome, url_img_chat FROM personaggio WHERE nome IN ($names_in)", 'result');
+            while ($av = gdrcd_query($av_result, 'fetch')) $avatars[$av['nome']] = $av['url_img_chat'];
+            gdrcd_query($av_result, 'free');
+        }
+
+        // Seconda passata: costruisce l'array conversazioni
         $conversations = [];
-        while ($row = gdrcd_query($result, 'fetch')) {
+        foreach ($rows as $row) {
             $tipo = $row['tipo'];
 
-            // Determina il nome da mostrare e lo stato non letto
             if ($tipo === 'individuale') {
                 $display_name = ($row['mittente_nome'] === $_SESSION['login'])
                     ? $row['destinatario_nome']
                     : $row['mittente_nome'];
-                $unread = ($row['lettura'] == 0);
+                $unread     = ($row['lettura'] == 0);
+                $avatar_url = $avatars[$display_name] ?? '';
             } elseif ($tipo === 'gruppo') {
                 $display_name = $row['titolo_gruppo'] ?? 'Gruppo';
-                $unread = ($row['lettura'] == 0);
+                $unread       = ($row['lettura'] == 0);
+                $avatar_url   = '';
             } else {
                 $display_name = $row['titolo_gruppo'] ?? 'Globale';
-                $unread = false;
-            }
-
-            // Recupera l'avatar del contatto (per gruppi e globali usa icone fisse lato client)
-            $avatar_url = '';
-            if ($tipo === 'individuale') {
-                $av = gdrcd_query("SELECT url_img_chat FROM personaggio
-                    WHERE nome = '" . gdrcd_filter('in', $display_name) . "' LIMIT 1");
-                $avatar_url = $av['url_img_chat'] ?? '';
+                $unread       = false;
+                $avatar_url   = '';
             }
 
             $conversations[] = [
@@ -113,7 +132,6 @@ switch ($op) {
                 'non_letto'        => $unread,
             ];
         }
-        gdrcd_query($result, 'free');
 
         // Conta totali non letti
         $unread_ind = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali
@@ -164,9 +182,12 @@ switch ($op) {
             $result = gdrcd_query("SELECT s.mittente_nome, s.destinatario_nome,
                     s.testo, s.ongame, s.ora_spedizione, s.tipo_messaggio,
                     p.url_img_chat
-                FROM sms s
+                FROM (
+                    SELECT * FROM sms
+                    WHERE id_conversazione = $conv_id{$ongame_filter}
+                    ORDER BY ora_spedizione DESC LIMIT 200
+                ) s
                 LEFT JOIN personaggio p ON s.mittente_nome = p.nome
-                WHERE s.id_conversazione = $conv_id{$ongame_filter}
                 ORDER BY s.ora_spedizione ASC", 'result');
 
             // Segna come letto (solo se non è una chiamata "silent" fatta per aggiornare
@@ -190,9 +211,12 @@ switch ($op) {
             $result = gdrcd_query("SELECT s.mittente_nome, NULL AS destinatario_nome,
                     s.testo, s.ongame, s.ora_spedizione, s.tipo_messaggio,
                     p.url_img_chat
-                FROM sms s
+                FROM (
+                    SELECT * FROM sms
+                    WHERE gruppo_id = $gruppo_id
+                    ORDER BY ora_spedizione DESC LIMIT 200
+                ) s
                 LEFT JOIN personaggio p ON s.mittente_nome = p.nome
-                WHERE s.gruppo_id = $gruppo_id
                 ORDER BY s.ora_spedizione ASC", 'result');
 
             // Segna come letto (solo se non è una chiamata silent)
