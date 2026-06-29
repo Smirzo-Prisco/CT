@@ -62,6 +62,7 @@ import LinkMenu        from './components/LinkMenu'
 import ChattingOff     from './components/ChattingOff'
 import Meteo           from './components/Meteo'
 import ChatbotWidget   from './components/ChatbotWidget'
+import GestioneBot    from './components/GestioneBot'
 
 /**
  * Registry privato dei componenti.
@@ -159,6 +160,9 @@ window.CT.register('Meteo', Meteo)
 
 /** Chatbot AI floating widget — bottom-right, 5 domande/giorno, max 500 char */
 window.CT.register('ChatbotWidget', ChatbotWidget)
+
+/** Pannello admin gestione bot (sesso='b'): lista, schedule, DM */
+window.CT.register('GestioneBot', GestioneBot)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.
