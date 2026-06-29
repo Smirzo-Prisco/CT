@@ -63,6 +63,7 @@ import ChattingOff     from './components/ChattingOff'
 import Meteo           from './components/Meteo'
 import ChatbotWidget   from './components/ChatbotWidget'
 import GestioneBot    from './components/GestioneBot'
+import ContattaModerazione from './components/ContattaModerazione'
 
 /**
  * Registry privato dei componenti.
@@ -163,6 +164,9 @@ window.CT.register('ChatbotWidget', ChatbotWidget)
 
 /** Pannello admin gestione bot (sesso='b'): lista, schedule, DM */
 window.CT.register('GestioneBot', GestioneBot)
+
+/** Form + cronologia richieste di moderazione, con pannello staff integrato */
+window.CT.register('ContattaModerazione', ContattaModerazione)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.
