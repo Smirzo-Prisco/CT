@@ -643,7 +643,7 @@ switch ($op) {
         $row = gdrcd_query(
             "SELECT mq.titolo AS mq_titolo, mq.tipologia, mq.location, mq.partecipanti,
                     mq.riassunto, mq.conseguenze, mq.note, mq.valutazioni,
-                    ma.titolo AS ma_titolo
+                    ma.titolo AS ma_titolo, ma.messaggio AS ma_messaggio
              FROM messaggioaraldo ma
              LEFT JOIN messaggio_quest mq ON mq.id_messaggio = ma.id_messaggio
              WHERE ma.id_messaggio = $thread_id LIMIT 1"
@@ -653,19 +653,70 @@ switch ($op) {
             echo json_encode(['success' => false, 'message' => 'Thread non trovato']);
             exit;
         }
-        echo json_encode([
-            'success' => true,
-            'quest'   => [
-                'titolo'       => $row['mq_titolo']    ?? $row['ma_titolo'] ?? '',
-                'tipologia'    => $row['tipologia']    ?? '',
-                'location'     => $row['location']     ?? '',
-                'partecipanti' => $row['partecipanti'] ?? '',
-                'riassunto'    => $row['riassunto']    ?? '',
-                'conseguenze'  => $row['conseguenze']  ?? '',
-                'note'         => $row['note']         ?? '',
-                'valutazioni'  => $row['valutazioni']  ?? '',
-            ],
-        ]);
+
+        // Se non esiste un record in messaggio_quest (post legacy), parsa l'HTML del post
+        if ($row['mq_titolo'] === null) {
+            $html = $row['ma_messaggio'] ?? '';
+            $dec  = fn($s) => html_entity_decode($s, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+            $parsed_titolo = '';
+            if (preg_match('/<b>(.*?)<\/b>/is', $html, $m)) {
+                $parsed_titolo = $dec($m[1]);
+            }
+
+            $parsed_tipologia = '';
+            // Cerca i font color="#9a6353": il primo contiene <b>titolo</b>, il secondo è la tipologia
+            if (preg_match_all('/<font[^>]*color="#9a6353"[^>]*>(.*?)<\/font>/is', $html, $matches)) {
+                foreach ($matches[1] as $chunk) {
+                    if (stripos($chunk, '<b>') === false) { // salta il titolo in grassetto
+                        $parsed_tipologia = trim($dec(strip_tags($chunk)));
+                        break;
+                    }
+                }
+            }
+
+            $label_map = [
+                'Luogo'        => 'location',
+                'Partecipanti' => 'partecipanti',
+                'Riassunto'    => 'riassunto',
+                'Conseguenze'  => 'conseguenze',
+                'Note'         => 'note',
+                'Valutazioni'  => 'valutazioni',
+            ];
+            $parsed_fields = [];
+            foreach ($label_map as $label => $key) {
+                $pat = '/<font[^>]*color="#e8967e"[^>]*>' . preg_quote($label, '/') . '<\/font><br>\s*<font[^>]*color="#8f8f8f"[^>]*>(.*?)<\/font>/is';
+                $parsed_fields[$key] = preg_match($pat, $html, $m) ? $dec($m[1]) : '';
+            }
+
+            echo json_encode([
+                'success' => true,
+                'quest'   => [
+                    'titolo'       => $parsed_titolo ?: ($dec(strip_tags($row['ma_titolo'] ?? ''))),
+                    'tipologia'    => $parsed_tipologia,
+                    'location'     => $parsed_fields['location'],
+                    'partecipanti' => $parsed_fields['partecipanti'],
+                    'riassunto'    => $parsed_fields['riassunto'],
+                    'conseguenze'  => $parsed_fields['conseguenze'],
+                    'note'         => $parsed_fields['note'],
+                    'valutazioni'  => $parsed_fields['valutazioni'],
+                ],
+            ]);
+        } else {
+            echo json_encode([
+                'success' => true,
+                'quest'   => [
+                    'titolo'       => $row['mq_titolo'],
+                    'tipologia'    => $row['tipologia']    ?? '',
+                    'location'     => $row['location']     ?? '',
+                    'partecipanti' => $row['partecipanti'] ?? '',
+                    'riassunto'    => $row['riassunto']    ?? '',
+                    'conseguenze'  => $row['conseguenze']  ?? '',
+                    'note'         => $row['note']         ?? '',
+                    'valutazioni'  => $row['valutazioni']  ?? '',
+                ],
+            ]);
+        }
         break;
 
     // -------------------------------------------------------------------------
