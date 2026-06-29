@@ -169,7 +169,7 @@ switch ($op) {
             $voci_iscritti = [];
             while ($u = gdrcd_query($ultimi_res, 'fetch')) {
                 $voci_iscritti[] = [
-                    'label' => $u['nome'] . ' — ' . substr($u['data_iscrizione'], 0, 10),
+                    'label' => $u['nome'] . ' — ' . date('d/m/Y', strtotime($u['data_iscrizione'])),
                     'url'   => 'main.php?page=scheda&pg=' . urlencode($u['nome']),
                 ];
             }
