@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, Fragment } from 'react'
+import { createPortal } from 'react-dom'
 import styles from './ContattaModerazione.module.css'
 
 // ── RispondiModal ─────────────────────────────────────────────────────────────
@@ -57,7 +58,9 @@ function RispondiModal({ requestId, onClose, onDone }) {
         }
     }
 
-    return (
+    // Portal su document.body: sfugge al transform della colonna laterale
+    // (translateX(0) crea un containing block che intrappola position:fixed)
+    return createPortal(
         <div className={styles.modalOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
             <div className={styles.modal}>
                 <h3>Rispondi alla richiesta</h3>
@@ -97,7 +100,8 @@ function RispondiModal({ requestId, onClose, onDone }) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
 

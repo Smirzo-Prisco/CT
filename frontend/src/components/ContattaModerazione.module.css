@@ -336,10 +336,10 @@
     border: 1px solid var(--color-border, #444);
     border-radius: 10px;
     padding: 24px 28px;
-    min-width: 420px;
-    max-width: 95vw;
+    width: clamp(300px, 90vw, 560px);
     max-height: 90vh;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .modal h3 {
