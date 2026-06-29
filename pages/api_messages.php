@@ -426,6 +426,19 @@ switch ($op) {
                 exit;
         }
 
+        $label_tipo = [
+            'presenti'        => 'Comunicazione ai personaggi in linea',
+            'broadcast'       => 'Comunicazione a tutti i personaggi',
+            'capogilda'       => 'Comunicazione ai capogilda',
+            'capomestiere'    => 'Comunicazione ai capomestiere',
+            'gilda'           => 'Comunicazione ai membri della gilda',
+            'tutto_mestiere'  => 'Comunicazione ai membri del mestiere',
+            'tutto_inclinati' => 'Comunicazione agli inclinati',
+            'multiplo'        => 'Comunicazione a piu destinatari',
+        ];
+        $label     = $label_tipo[$tipo] ?? 'Comunicazione collettiva';
+        $messaggio = '[' . $label . "]\n\n" . $messaggio;
+
         $inviati = 0;
         foreach ($destinatari as $dest_nome) {
             send_sms($_SESSION['login'], $dest_nome, '', $messaggio, $ongame);
