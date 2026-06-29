@@ -158,19 +158,7 @@ switch ($op) {
             ['label' => "Azioni settimana: $azioni_sett", 'url' => '#'],
         ]];
 
-        // ── Ultimi iscritti (ultimi 7 giorni) ────────────────────────────
-        $result  = gdrcd_query(
-            "SELECT nome, cognome FROM personaggio WHERE data_iscrizione > DATE_SUB(NOW(), INTERVAL 7 DAY)",
-            'result'
-        );
-        $ultimi_voci = [['label' => 'Ultimi iscritti:', 'url' => '#']];
-        while ($row = gdrcd_query($result, 'fetch')) {
-            $ultimi_voci[] = [
-                'label' => $row['nome'] . ' ' . $row['cognome'],
-                'url'   => 'main.php?page=scheda&pg=' . urlencode($row['nome']),
-            ];
-        }
-        $menu[] = ['key' => 'ultimi_iscritti', 'label' => 'Ultimi iscritti', 'icon' => 'fa-users', 'voci' => $ultimi_voci];
+        // Ultimi iscritti — nascosta
 
         echo json_encode([
             'success'   => true,
