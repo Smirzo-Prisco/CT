@@ -8,12 +8,18 @@ function sendPing() {
 }
 
 export default function OnlineUsers() {
-  const [users, setUsers] = useState([])
+  const [users, setUsers]     = useState([])
+  const [isStaff, setIsStaff] = useState(false)
 
   const fetchPresenti = useCallback(() => {
     fetch('/pages/api_map.php?op=presenti')
       .then(r  => r.json())
-      .then(data => { if (data.success) setUsers(data.users) })
+      .then(data => {
+        if (data.success) {
+          setUsers(data.users)
+          setIsStaff(!!data.is_staff)
+        }
+      })
       .catch(console.error)
   }, [])
 
@@ -81,6 +87,9 @@ export default function OnlineUsers() {
                 >
                   {user.nome}
                 </a>
+                {isStaff && user.sesso === 'b' && (
+                  <span className="badge-bot">B</span>
+                )}
               </div>
             )
           })
