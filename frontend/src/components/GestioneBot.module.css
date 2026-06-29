@@ -104,8 +104,15 @@
     cursor: pointer;
     transition: opacity 0.15s;
 }
-.btnPrimary:hover:not(:disabled) { opacity: 0.85; }
-.btnPrimary:disabled { opacity: 0.4; cursor: default; }
+
+.btnPrimary:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.btnPrimary:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
 
 .btnSecondary {
     padding: 7px 14px;
@@ -117,7 +124,11 @@
     cursor: pointer;
     transition: border-color 0.15s;
 }
-.btnSecondary:hover { border-color: var(--color-gold, #c9a84c); color: var(--color-gold, #c9a84c); }
+
+.btnSecondary:hover {
+    border-color: var(--color-gold, #c9a84c);
+    color: var(--color-gold, #c9a84c);
+}
 
 .btnOnline {
     padding: 7px 14px;
@@ -128,7 +139,7 @@
     font-size: 0.85rem;
     cursor: pointer;
 }
-.btnOnline:hover { background: #336633; }
+.btnOnline:hover { background: #363; }
 
 .btnOffline {
     padding: 7px 14px;
@@ -220,6 +231,23 @@
     border-radius: 10px;
     font-size: 0.73rem;
     font-weight: 700;
+}
+
+/* ── Schedule cell ──────────────────── */
+
+.scheduleCell {
+    font-size: 0.78rem;
+    line-height: 1.7;
+}
+
+.scheduleSlot {
+    display: block;
+    color: #b8a04a;
+    white-space: nowrap;
+}
+
+.noSchedule {
+    color: #555;
 }
 
 /* ── Empty / Error ──────────────────── */
@@ -468,7 +496,7 @@
     padding: 7px 11px;
     font-size: 0.87rem;
     color: #d0d0d0;
-    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .msgBot .msgTesto {

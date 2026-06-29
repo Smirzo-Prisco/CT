@@ -52,6 +52,18 @@ switch ($op) {
              ORDER BY p.nome ASC",
             'result'
         );
+        // Carica tutti gli schedule in una query sola, indicizzati per bot_nome
+        $sched_result = gdrcd_query("SELECT bot_nome, giorno, ora_inizio, ora_fine FROM bot_schedule ORDER BY bot_nome, giorno", 'result');
+        $schedules = [];
+        while ($s = gdrcd_query($sched_result, 'fetch')) {
+            $schedules[$s['bot_nome']][] = [
+                'giorno'     => (int)$s['giorno'],
+                'ora_inizio' => substr($s['ora_inizio'], 0, 5),
+                'ora_fine'   => substr($s['ora_fine'],   0, 5),
+            ];
+        }
+        gdrcd_query($sched_result, 'free');
+
         $bots = [];
         while ($row = gdrcd_query($result, 'fetch')) {
             $bots[] = [
@@ -62,6 +74,7 @@ switch ($op) {
                 'online'        => !empty($row['ultimo_refresh']) && strtotime($row['ultimo_refresh']) + 240 > time(),
                 'paused'        => (int)$row['paused'],
                 'unread_conv'   => (int)$row['unread_conv'],
+                'schedule'      => $schedules[$row['nome']] ?? [],
             ];
         }
         gdrcd_query($result, 'free');

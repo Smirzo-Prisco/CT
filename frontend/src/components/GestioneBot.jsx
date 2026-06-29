@@ -11,7 +11,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import styles from './GestioneBot.module.css'
 
-const GIORNI = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
+const GIORNI     = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
+const GIORNI_ABB = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']
 
 function emptySchedule() {
     return GIORNI.map(() => ({ enabled: false, ora_inizio: '09:00', ora_fine: '18:00' }))
@@ -370,6 +371,7 @@ export default function GestioneBot() {
                                 </th>
                                 <th>Nome</th>
                                 <th>Status</th>
+                                <th>Schedule</th>
                                 <th>DM</th>
                                 <th>Azioni</th>
                             </tr>
@@ -392,6 +394,16 @@ export default function GestioneBot() {
                                         {!!bot.paused && (
                                             <span className={styles.badgePaused}>(pausa)</span>
                                         )}
+                                    </td>
+                                    <td className={styles.scheduleCell}>
+                                        {bot.schedule.length === 0
+                                            ? <span className={styles.noSchedule}>—</span>
+                                            : bot.schedule.map((s, i) => (
+                                                <span key={i} className={styles.scheduleSlot}>
+                                                    {GIORNI_ABB[s.giorno]} {s.ora_inizio}–{s.ora_fine}
+                                                </span>
+                                            ))
+                                        }
                                     </td>
                                     <td>
                                         {bot.unread_conv > 0 && (
