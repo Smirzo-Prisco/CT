@@ -567,10 +567,12 @@ function ComposeQuest({ section, sending, onSubmit, onCancel, initialData = null
     const [note,        setNote]        = useState(initialData?.note         ?? '')
     const [valutazioni, setValutazioni] = useState(initialData?.valutazioni  ?? '')
 
-    /** 20 righe vuote per i punti partecipanti */
-    const [pgPunti, setPgPunti] = useState(() =>
-        Array.from({ length: 20 }, () => ({ nome: '', exp: 0, shin: 0, notorieta: 0, mestiere: 0 }))
-    )
+    const [pgPunti, setPgPunti] = useState(() => {
+        const existing = initialData?.partecipanti_punti ?? []
+        return Array.from({ length: 20 }, (_, i) =>
+            existing[i] ?? { nome: '', exp: 0, shin: 0, notorieta: 0, mestiere: 0 }
+        )
+    })
 
     const showPunti = (section?.punti ?? 0) > 0
 

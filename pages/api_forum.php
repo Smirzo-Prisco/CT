@@ -654,6 +654,26 @@ switch ($op) {
             exit;
         }
 
+        // Punti partecipanti esistenti (commento vuoto = partecipanti, non master)
+        $punti_res = gdrcd_query(
+            "SELECT nome, esperienza AS exp, shin, notorieta, mestiere
+             FROM Punti
+             WHERE id_messaggio = $thread_id AND (commento = '' OR commento IS NULL)
+             ORDER BY ID",
+            'result'
+        );
+        $existing_punti = [];
+        while ($p = gdrcd_query($punti_res, 'fetch')) {
+            $existing_punti[] = [
+                'nome'      => $p['nome'],
+                'exp'       => (float)$p['exp'],
+                'shin'      => (float)$p['shin'],
+                'notorieta' => (int)$p['notorieta'],
+                'mestiere'  => (float)$p['mestiere'],
+            ];
+        }
+        gdrcd_query($punti_res, 'free');
+
         // Se non esiste un record in messaggio_quest (post legacy), parsa l'HTML del post
         if ($row['tipologia'] === null) {
             $html = $row['ma_messaggio'] ?? '';
@@ -692,28 +712,30 @@ switch ($op) {
             echo json_encode([
                 'success' => true,
                 'quest'   => [
-                    'titolo'       => $parsed_titolo ?: ($dec(strip_tags($row['ma_titolo'] ?? ''))),
-                    'tipologia'    => $parsed_tipologia,
-                    'location'     => $parsed_fields['location'],
-                    'partecipanti' => $parsed_fields['partecipanti'],
-                    'riassunto'    => $parsed_fields['riassunto'],
-                    'conseguenze'  => $parsed_fields['conseguenze'],
-                    'note'         => $parsed_fields['note'],
-                    'valutazioni'  => $parsed_fields['valutazioni'],
+                    'titolo'             => $parsed_titolo ?: ($dec(strip_tags($row['ma_titolo'] ?? ''))),
+                    'tipologia'          => $parsed_tipologia,
+                    'location'           => $parsed_fields['location'],
+                    'partecipanti'       => $parsed_fields['partecipanti'],
+                    'riassunto'          => $parsed_fields['riassunto'],
+                    'conseguenze'        => $parsed_fields['conseguenze'],
+                    'note'               => $parsed_fields['note'],
+                    'valutazioni'        => $parsed_fields['valutazioni'],
+                    'partecipanti_punti' => $existing_punti,
                 ],
             ]);
         } else {
             echo json_encode([
                 'success' => true,
                 'quest'   => [
-                    'titolo'       => $row['ma_titolo'],
-                    'tipologia'    => $row['tipologia']    ?? '',
-                    'location'     => $row['location']     ?? '',
-                    'partecipanti' => $row['partecipanti'] ?? '',
-                    'riassunto'    => $row['riassunto']    ?? '',
-                    'conseguenze'  => $row['conseguenze']  ?? '',
-                    'note'         => $row['note']         ?? '',
-                    'valutazioni'  => $row['valutazioni']  ?? '',
+                    'titolo'             => $row['ma_titolo'],
+                    'tipologia'          => $row['tipologia']    ?? '',
+                    'location'           => $row['location']     ?? '',
+                    'partecipanti'       => $row['partecipanti'] ?? '',
+                    'riassunto'          => $row['riassunto']    ?? '',
+                    'conseguenze'        => $row['conseguenze']  ?? '',
+                    'note'               => $row['note']         ?? '',
+                    'valutazioni'        => $row['valutazioni']  ?? '',
+                    'partecipanti_punti' => $existing_punti,
                 ],
             ]);
         }
@@ -804,6 +826,54 @@ switch ($op) {
                  note         = '$n_db',
                  valutazioni  = '$v_db'"
         );
+
+        // Aggiorna punti partecipanti se la sezione li prevede
+        $pg_punti = is_array($data['partecipanti_punti'] ?? null) ? $data['partecipanti_punti'] : [];
+        $section_check = gdrcd_query(
+            "SELECT a.punti FROM messaggioaraldo ma
+             JOIN araldo a ON a.id_araldo = ma.id_araldo
+             WHERE ma.id_messaggio = $thread_id LIMIT 1"
+        );
+        if ((int)($section_check['punti'] ?? 0) > 0) {
+            // Reversa i punti partecipanti esistenti (commento vuoto = partecipanti, non master)
+            $old_res = gdrcd_query(
+                "SELECT nome, esperienza, shin, notorieta, mestiere FROM Punti
+                 WHERE id_messaggio = $thread_id AND (commento = '' OR commento IS NULL)",
+                'result'
+            );
+            while ($old = gdrcd_query($old_res, 'fetch')) {
+                $old_f = gdrcd_filter('in', $old['nome']);
+                gdrcd_query("UPDATE personaggio SET
+                    esperienza          = esperienza          - '{$old['esperienza']}',
+                    esperienza_r        = esperienza_r        - '{$old['esperienza']}',
+                    notorieta           = notorieta           - '{$old['notorieta']}',
+                    esperienza_mestiere = esperienza_mestiere - '{$old['mestiere']}',
+                    shin                = shin                - '{$old['shin']}'
+                    WHERE nome = '$old_f'");
+            }
+            gdrcd_query($old_res, 'free');
+
+            gdrcd_query("DELETE FROM Punti WHERE id_messaggio = $thread_id AND (commento = '' OR commento IS NULL)");
+
+            foreach ($pg_punti as $pg) {
+                $pg_nome = trim($pg['nome'] ?? '');
+                $pg_exp  = (float)($pg['exp']      ?? 0);
+                $pg_shin = (float)($pg['shin']     ?? 0);
+                $pg_not  = (int)($pg['notorieta']  ?? 0);
+                $pg_mest = (float)($pg['mestiere'] ?? 0);
+                if ($pg_nome === '' || ($pg_exp == 0 && $pg_shin == 0 && $pg_not == 0 && $pg_mest == 0)) continue;
+                $pg_f = gdrcd_filter('in', $pg_nome);
+                gdrcd_query("INSERT INTO Punti (nome, esperienza, notorieta, mestiere, shin, data_evento, id_messaggio, commento)
+                    VALUES ('$pg_f', '$pg_exp', '$pg_not', '$pg_mest', '$pg_shin', NOW(), '$thread_id', '')");
+                gdrcd_query("UPDATE personaggio SET
+                    esperienza          = esperienza          + '$pg_exp',
+                    esperienza_r        = esperienza_r        + '$pg_exp',
+                    notorieta           = notorieta           + '$pg_not',
+                    esperienza_mestiere = esperienza_mestiere + '$pg_mest',
+                    shin                = shin                + '$pg_shin'
+                    WHERE nome = '$pg_f'");
+            }
+        }
 
         echo json_encode(['success' => true]);
         break;
