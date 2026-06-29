@@ -103,7 +103,7 @@ switch ($op) {
             exit;
         }
         $result = gdrcd_query(
-            "SELECT id, titolo, data_messaggio, stato, anonimo
+            "SELECT id, titolo, messaggio, autore, anonimo, data_messaggio, stato, risposta
              FROM messaggio_moderazione
              ORDER BY stato ASC, id DESC",
             'result'
@@ -113,9 +113,14 @@ switch ($op) {
             $rows[] = [
                 'id'             => (int)$fetch['id'],
                 'titolo'         => gdrcd_filter('out', $fetch['titolo']),
+                'messaggio'      => gdrcd_filter('out', $fetch['messaggio']),
+                'autore'         => $fetch['anonimo'] === 'si' ? null : $fetch['autore'],
+                'anonimo'        => $fetch['anonimo'],
                 'data_messaggio' => $fetch['data_messaggio'],
                 'stato'          => (int)$fetch['stato'],
-                'anonimo'        => $fetch['anonimo'],
+                'risposta'       => $fetch['risposta'] !== null
+                                        ? gdrcd_filter('out', $fetch['risposta'])
+                                        : null,
             ];
         }
         gdrcd_query($result, 'free');

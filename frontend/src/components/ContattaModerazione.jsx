@@ -7,7 +7,7 @@
  *  C — [solo staff] Vista richieste di tutti gli utenti con modale risposta
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Fragment } from 'react'
 import styles from './ContattaModerazione.module.css'
 
 // ── RispondiModal ─────────────────────────────────────────────────────────────
@@ -379,8 +379,8 @@ export default function ContattaModerazione() {
                     </thead>
                     <tbody>
                         {history.map(req => (
-                            <>
-                                <tr key={req.id}>
+                            <Fragment key={req.id}>
+                                <tr>
                                     <td>{req.data_messaggio?.slice(0, 16)}</td>
                                     <td>
                                         {req.risposta ? (
@@ -408,7 +408,7 @@ export default function ContattaModerazione() {
                                     </td>
                                 </tr>
                                 {openRespId === req.id && req.risposta && (
-                                    <tr key={`resp-${req.id}`} className={styles.rispostaRow}>
+                                    <tr className={styles.rispostaRow}>
                                         <td colSpan={3}>
                                             <div className={styles.rispostaLabel}>
                                                 Risposta della moderazione
@@ -419,7 +419,7 @@ export default function ContattaModerazione() {
                                         </td>
                                     </tr>
                                 )}
-                            </>
+                            </Fragment>
                         ))}
                     </tbody>
                 </table>
