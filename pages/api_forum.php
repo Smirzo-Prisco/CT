@@ -641,7 +641,7 @@ switch ($op) {
             exit;
         }
         $row = gdrcd_query(
-            "SELECT mq.titolo AS mq_titolo, mq.tipologia, mq.location, mq.partecipanti,
+            "SELECT mq.tipologia, mq.location, mq.partecipanti,
                     mq.riassunto, mq.conseguenze, mq.note, mq.valutazioni,
                     ma.titolo AS ma_titolo, ma.messaggio AS ma_messaggio
              FROM messaggioaraldo ma
@@ -655,7 +655,7 @@ switch ($op) {
         }
 
         // Se non esiste un record in messaggio_quest (post legacy), parsa l'HTML del post
-        if ($row['mq_titolo'] === null) {
+        if ($row['tipologia'] === null) {
             $html = $row['ma_messaggio'] ?? '';
             $dec  = fn($s) => html_entity_decode($s, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
@@ -706,7 +706,7 @@ switch ($op) {
             echo json_encode([
                 'success' => true,
                 'quest'   => [
-                    'titolo'       => $row['mq_titolo'],
+                    'titolo'       => $row['ma_titolo'],
                     'tipologia'    => $row['tipologia']    ?? '',
                     'location'     => $row['location']     ?? '',
                     'partecipanti' => $row['partecipanti'] ?? '',
@@ -778,8 +778,8 @@ switch ($op) {
                  messaggio = '" . gdrcd_filter('in', $testo_quest) . "'
              WHERE id_messaggio = $thread_id LIMIT 1"
         );
-        // UPSERT: crea il record se mancante (post legacy senza riga in messaggio_quest)
-        $t_db  = gdrcd_filter('in', $titolo);
+        // UPSERT: crea il record se mancante (post legacy senza riga in messaggio_quest).
+        // titolo escluso dall'UPDATE: messaggioaraldo.titolo è già aggiornato sopra ed è la sorgente autorevole.
         $tp_db = gdrcd_filter('in', $tipologia);
         $l_db  = gdrcd_filter('in', $location);
         $p_db  = gdrcd_filter('in', $partec);
@@ -787,6 +787,7 @@ switch ($op) {
         $c_db  = gdrcd_filter('in', $cons);
         $n_db  = gdrcd_filter('in', $note);
         $v_db  = gdrcd_filter('in', $valu);
+        $t_db  = gdrcd_filter('in', mb_substr($titolo, 0, 200));
         gdrcd_query(
             "INSERT INTO messaggio_quest
                  (id_messaggio, titolo, tipologia, location, partecipanti,
@@ -795,7 +796,6 @@ switch ($op) {
                  ($thread_id, '$t_db', '$tp_db', '$l_db', '$p_db',
                   '$r_db', '$c_db', '$n_db', '$v_db')
              ON DUPLICATE KEY UPDATE
-                 titolo       = '$t_db',
                  tipologia    = '$tp_db',
                  location     = '$l_db',
                  partecipanti = '$p_db',
