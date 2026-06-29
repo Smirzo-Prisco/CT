@@ -182,13 +182,10 @@ switch ($op) {
             $result = gdrcd_query("SELECT s.mittente_nome, s.destinatario_nome,
                     s.testo, s.ongame, s.ora_spedizione, s.tipo_messaggio,
                     p.url_img_chat
-                FROM (
-                    SELECT * FROM sms
-                    WHERE id_conversazione = $conv_id{$ongame_filter}
-                    ORDER BY ora_spedizione DESC LIMIT 200
-                ) s
+                FROM sms s
                 LEFT JOIN personaggio p ON s.mittente_nome = p.nome
-                ORDER BY s.ora_spedizione ASC", 'result');
+                WHERE s.id_conversazione = $conv_id{$ongame_filter}
+                ORDER BY s.ora_spedizione DESC LIMIT 200", 'result');
 
             // Segna come letto (solo se non è una chiamata "silent" fatta per aggiornare
             // il thread senza emettere eventi — evita il loop dm:update → re-read → dm:update)
@@ -211,13 +208,10 @@ switch ($op) {
             $result = gdrcd_query("SELECT s.mittente_nome, NULL AS destinatario_nome,
                     s.testo, s.ongame, s.ora_spedizione, s.tipo_messaggio,
                     p.url_img_chat
-                FROM (
-                    SELECT * FROM sms
-                    WHERE gruppo_id = $gruppo_id
-                    ORDER BY ora_spedizione DESC LIMIT 200
-                ) s
+                FROM sms s
                 LEFT JOIN personaggio p ON s.mittente_nome = p.nome
-                ORDER BY s.ora_spedizione ASC", 'result');
+                WHERE s.gruppo_id = $gruppo_id
+                ORDER BY s.ora_spedizione DESC LIMIT 200", 'result');
 
             // Segna come letto (solo se non è una chiamata silent)
             if (empty($_GET['silent'])) {
@@ -244,6 +238,9 @@ switch ($op) {
             ];
         }
         gdrcd_query($result, 'free');
+
+        // Riporta in ordine cronologico (la query usa DESC per il LIMIT efficiente)
+        $messages = array_reverse($messages);
 
         echo json_encode(['success' => true, 'messages' => $messages]);
         break;
