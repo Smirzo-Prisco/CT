@@ -23,9 +23,17 @@
         add_header Vary "Accept-Encoding";
     }
 
-    # Altri JS/CSS (includes/, public/, themes/) — 1 settimana
+    # Font Awesome — mai cambia (vendor), 1 anno
+    location ~* /fontawesome/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        add_header Vary "Accept-Encoding";
+    }
+
+    # Altri JS/CSS versioned (public.css?v=, public.js?v=, includes/*.js?v=) — 1 anno
+    # Tutti i file serviti senza ?v= mantengono 7gg come fallback sicuro
     location ~* \.(js|css)$ {
-        expires 7d;
+        expires 1y;
         add_header Cache-Control "public";
         add_header Vary "Accept-Encoding";
     }

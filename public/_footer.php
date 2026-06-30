@@ -67,6 +67,7 @@ function public_footer(): void {
 </footer>
 
 <!-- Script condiviso pagine pubbliche — modale login/registrazione, hamburger -->
-<script src="/public/public.js" defer></script>
+<?php $pjs_v = @filemtime($_SERVER['DOCUMENT_ROOT'] . '/public/public.js') ?: 0; ?>
+<script src="/public/public.js?v=<?= $pjs_v ?>" defer></script>
 <?php
 }

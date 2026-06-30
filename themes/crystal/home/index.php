@@ -182,7 +182,12 @@ public_head(
 
             <div class="pub-two-col-img">
                 <picture>
-                    <source srcset="/themes/crystal/imgs/gioco_preview.webp" type="image/webp">
+                    <source
+                        type="image/webp"
+                        srcset="/themes/crystal/imgs/gioco_preview-700.webp 700w,
+                                /themes/crystal/imgs/gioco_preview-1400.webp 1400w,
+                                /themes/crystal/imgs/gioco_preview.webp 2857w"
+                        sizes="(max-width: 767px) calc(100vw - 48px), calc(50vw - 54px)">
                     <img src="/themes/crystal/imgs/gioco_preview.png"
                          alt="Interfaccia di gioco di Crystal Tokyo"
                          width="2857" height="1452"

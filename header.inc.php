@@ -94,7 +94,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"></noscript>
         <link rel="preload" href="/themes/crystal/fontawesome/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
         <noscript><link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css"></noscript>
-        <link rel="stylesheet" href="/public/public.css">
+        <?php $pcss_v = @filemtime($_SERVER['DOCUMENT_ROOT'] . '/public/public.css') ?: 0; ?>
+        <link rel="stylesheet" href="/public/public.css?v=<?= $pcss_v ?>">
         <?php $GLOBALS['ct_public_assets_in_head'] = true; ?>
         <?php endif; ?>
         <?php
