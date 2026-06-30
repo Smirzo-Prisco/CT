@@ -473,7 +473,7 @@ p:last-child { margin-bottom: 0; }
 
 .pub-card-text {
     font-size: 0.92rem;
-    color: var(--pub-muted);
+    color: #8c9ab3; /* #7a8499 schiarito: contrasto 5.6:1 su --pub-card-dark #161b35 (WCAG AA) */
     line-height: 1.7;
     margin-bottom: 0;
 }
@@ -905,7 +905,8 @@ p:last-child { margin-bottom: 0; }
     line-height: 1.4;
 }
 
-.pub-footer-col h4 {
+.pub-footer-col h4,
+.pub-footer-col-heading {
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 700;
@@ -942,6 +943,10 @@ p:last-child { margin-bottom: 0; }
     font-size: 0.78rem;
     color: var(--pub-muted);
     margin: 0;
+}
+
+.pub-footer-copy a {
+    text-decoration: underline;
 }
 
 /* ============================================================

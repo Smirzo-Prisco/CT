@@ -30,7 +30,7 @@ function public_footer(): void {
 
         <!-- Colonna: Il Gioco -->
         <div class="pub-footer-col">
-            <h4>Il Gioco</h4>
+            <p class="pub-footer-col-heading">Il Gioco</p>
             <ul>
                 <li><a href="/il-gioco">Cos'è Crystal Tokyo</a></li>
                 <li><a href="/ambientazione">Ambientazione</a></li>
@@ -41,7 +41,7 @@ function public_footer(): void {
 
         <!-- Colonna: Documentazione -->
         <div class="pub-footer-col">
-            <h4>Documentazione</h4>
+            <p class="pub-footer-col-heading">Documentazione</p>
             <ul>
                 <!-- documentazione_main.php è la pagina esistente del manuale di gioco -->
                 <li><a href="/documentazione_main.php">Manuale di Gioco</a></li>
@@ -51,7 +51,7 @@ function public_footer(): void {
 
         <!-- Colonna: Accesso -->
         <div class="pub-footer-col">
-            <h4>Accesso</h4>
+            <p class="pub-footer-col-heading">Accesso</p>
             <ul>
                 <li><a href="/" id="footerLoginLink">Accedi al Gioco</a></li>
                 <li><a href="/" id="footerRegLink">Registrati</a></li>

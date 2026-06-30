@@ -72,6 +72,7 @@ public_head(
 <body>
 <?php public_nav('home'); ?>
 <?php public_modals(); ?>
+<main id="main-content">
 
 <!-- ── HERO ───────────────────────────────────────────────────────────────
      Sfondo: immagine principale del gioco con overlay scuro.
@@ -310,6 +311,7 @@ public_head(
     </div>
 </div>
 
+</main>
 <?php public_footer(); ?>
 
 <!-- Apertura modali dai bottoni CTA della homepage -->
