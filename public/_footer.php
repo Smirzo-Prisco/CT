@@ -19,7 +19,7 @@ function public_footer(): void {
             <!-- Supporto Palestina — coerente con la homepage -->
             <div class="pub-footer-palestine">
                 <a href="https://globalsumudflotilla.org/" target="_blank" rel="noopener noreferrer">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Palestine.svg"
+                    <img src="/themes/crystal/imgs/flag-palestine.svg"
                          alt="Bandiera Palestina"
                          width="40" height="26"
                          loading="lazy">

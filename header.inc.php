@@ -99,6 +99,9 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"></noscript>
         <link rel="preload" href="/themes/crystal/fontawesome/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
         <noscript><link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css"></noscript>
+        <!-- Preload icona solid usata above-fold (hero + nav) — il browser scarica il woff2
+             subito invece di aspettare che il CSS async carichi e scateni la richiesta. -->
+        <link rel="preload" href="/themes/crystal/fontawesome/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
         <?php $pcss_v = @filemtime($_SERVER['DOCUMENT_ROOT'] . '/public/public.css') ?: 0; ?>
         <link rel="preload" as="style" href="/public/public.css?v=<?= $pcss_v ?>" onload="this.onload=null;this.rel='stylesheet'">
         <noscript><link rel="stylesheet" href="/public/public.css?v=<?= $pcss_v ?>"></noscript>
