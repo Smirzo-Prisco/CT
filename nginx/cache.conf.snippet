@@ -1,0 +1,31 @@
+# Cache headers per risorse statiche — Crystal Tokyo
+# Incollare DENTRO il blocco server { } in /etc/nginx/sites-available/crystaltokyo
+# Dopo la modifica: sudo nginx -t && sudo systemctl reload nginx
+
+    # Font (mai cambiano) — 1 anno
+    location ~* \.(woff2?|ttf|eot|otf)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        add_header Vary "Accept-Encoding";
+    }
+
+    # Immagini — 30 giorni
+    location ~* \.(png|jpg|jpeg|gif|ico|svg|webp)$ {
+        expires 30d;
+        add_header Cache-Control "public";
+        add_header Vary "Accept-Encoding";
+    }
+
+    # Bundle Vite in dist/ — versioned via ?v=, 1 anno
+    location ~* /dist/.*\.(js|css)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        add_header Vary "Accept-Encoding";
+    }
+
+    # Altri JS/CSS (includes/, public/, themes/) — 1 settimana
+    location ~* \.(js|css)$ {
+        expires 7d;
+        add_header Cache-Control "public";
+        add_header Vary "Accept-Encoding";
+    }

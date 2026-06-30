@@ -181,9 +181,12 @@ public_head(
             </div>
 
             <div class="pub-two-col-img">
-                <img src="/themes/crystal/imgs/gioco_preview.png"
-                     alt="Interfaccia di gioco di Crystal Tokyo"
-                     style="width:100%; border-radius:12px; display:block; object-fit:cover;">
+                <picture>
+                    <source srcset="/themes/crystal/imgs/gioco_preview.webp" type="image/webp">
+                    <img src="/themes/crystal/imgs/gioco_preview.png"
+                         alt="Interfaccia di gioco di Crystal Tokyo"
+                         style="width:100%; border-radius:12px; display:block; object-fit:cover;">
+                </picture>
             </div>
 
         </div>
