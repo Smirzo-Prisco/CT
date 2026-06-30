@@ -317,10 +317,14 @@ switch ($op) {
                     m.stanza_apparente, m.nome AS luogo_nome,
                     ru_fam.immagine AS fam_img
              FROM personaggio p
-             LEFT JOIN mappa  m      ON p.ultimo_luogo  = m.id
-             LEFT JOIN ruolo  ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
+             LEFT JOIN mappa       m    ON p.ultimo_luogo   = m.id
+             LEFT JOIN ruolo       ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
+             LEFT JOIN bot_status  bs   ON bs.bot_nome = p.nome
              WHERE p.ora_entrata > p.ora_uscita
-               AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
+               AND (
+                 (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
+                 OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
+               )
                AND p.ultimo_luogo = $luogo
                AND p.ultima_mappa = $mappa
              ORDER BY p.is_invisible, p.nome",
@@ -347,10 +351,15 @@ switch ($op) {
         gdrcd_query($result, 'free');
 
         $tot = gdrcd_query(
-            "SELECT COUNT(*) AS n FROM personaggio
-             WHERE ora_entrata > ora_uscita
-               AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
-               AND is_invisible = 0"
+            "SELECT COUNT(*) AS n
+             FROM personaggio p
+             LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
+             WHERE p.ora_entrata > p.ora_uscita
+               AND (
+                 (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
+                 OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
+               )
+               AND p.is_invisible = 0"
         );
 
         echo json_encode([
@@ -408,8 +417,12 @@ switch ($op) {
             LEFT JOIN ruolo_mestiere rm   ON p.id_ruolo_mestiere= rm.id_ruolo
             LEFT JOIN ruolo          ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
             LEFT JOIN privilegi      pr   ON pr.nome            = p.nome
+            LEFT JOIN bot_status     bs   ON bs.bot_nome        = p.nome
             WHERE p.ora_entrata > p.ora_uscita
-              AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
+              AND (
+                (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
+                OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
+              )
               $exclude
             ORDER BY p.is_invisible, mc.nome, m.nome, p.nome
         ", 'result');

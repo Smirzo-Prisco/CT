@@ -68,9 +68,10 @@ function groupUsers(users) {
 /**
  * Riga della tabella per un singolo personaggio.
  *
- * @param {Object} props.user - Dati utente restituiti dall'API
+ * @param {Object}  props.user    - Dati utente restituiti dall'API
+ * @param {boolean} props.isStaff - true se il viewer è staff
  */
-function UserRow({ user }) {
+function UserRow({ user, isStaff }) {
     /** Naviga alla pagina DM con il destinatario pre-selezionato */
     const openSms = () => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(user.nome)}`)
 
@@ -131,6 +132,8 @@ function UserRow({ user }) {
                     {user.nome}{user.cognome ? ` ${user.cognome}` : ''}
                     {/* Flag visibilità — visibile solo allo staff */}
                     {user.is_invisible && <em> (inv)</em>}
+                    {/* Badge bot — visibile solo allo staff, coerente con OnlineUsers */}
+                    {isStaff && user.sesso === 'b' && <span className="badge-bot">B</span>}
                 </a>
             </td>
 
@@ -150,7 +153,7 @@ function UserRow({ user }) {
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
-export default function PresentiEstesi() {
+export default function PresentiEstesi({ isStaff = false }) {
 
     /** Lista flat degli utenti online restituita dall'API */
     const [users,   setUsers]   = useState([])
@@ -270,7 +273,7 @@ export default function PresentiEstesi() {
                                     )}
 
                                     {/* Righe utente */}
-                                    {utenti.map(u => <UserRow key={u.nome} user={u} />)}
+                                    {utenti.map(u => <UserRow key={u.nome} user={u} isStaff={isStaff} />)}
 
                                 </Fragment>
                             ))}
