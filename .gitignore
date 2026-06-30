@@ -452,3 +452,6 @@ sounds/
 statuti/
 # Chattina off — log messaggi generato a runtime
 log.html
+
+# Build artifact: generato da frontend/scripts/build-public.mjs
+public/critical.min.css

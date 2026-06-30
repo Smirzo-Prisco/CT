@@ -86,8 +86,13 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <link rel="stylesheet" href="<?=$css_v('ct-styles.css')?>" type="text/css">
         <link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css">
         <?php else: ?>
-        <!-- Per ospiti: risorse pubbliche caricate nel vero <head> per evitare render-blocking nel body.
-             public/_head.php le salta se $GLOBALS['ct_public_assets_in_head'] è true. -->
+        <!-- Per ospiti: critical CSS inline (above-fold, ~5 KiB) elimina render-blocking.
+             public.css completo caricato async; public/_head.php salta le risorse già qui. -->
+        <?php
+        $critical_css = @file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/public/critical.min.css');
+        if ($critical_css): ?>
+        <style><?= $critical_css ?></style>
+        <?php endif; ?>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -95,7 +100,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <link rel="preload" href="/themes/crystal/fontawesome/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
         <noscript><link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css"></noscript>
         <?php $pcss_v = @filemtime($_SERVER['DOCUMENT_ROOT'] . '/public/public.css') ?: 0; ?>
-        <link rel="stylesheet" href="/public/public.css?v=<?= $pcss_v ?>">
+        <link rel="preload" as="style" href="/public/public.css?v=<?= $pcss_v ?>" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/public/public.css?v=<?= $pcss_v ?>"></noscript>
         <?php $GLOBALS['ct_public_assets_in_head'] = true; ?>
         <?php endif; ?>
         <?php
