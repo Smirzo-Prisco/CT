@@ -290,12 +290,12 @@ public_head(
             background:rgba(255,255,255,0.15); backdrop-filter:blur(4px);
             padding:10px 14px; border-radius:8px; text-align:center;
             max-width:200px; border:1px solid rgba(255,255,255,0.2);">
-    <a href="https://globalsumudflotilla.org/" target="_blank" rel="noopener noreferrer"
+    <!-- <a href="https://globalsumudflotilla.org/" target="_blank" rel="noopener noreferrer"
        style="display:block; width:80px; height:52px; margin:0 auto 8px;
               background-image:url('https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Palestine.svg');
               background-size:cover; background-position:center;
               border-radius:4px; border:1px solid rgba(0,0,0,0.3);">
-    </a>
+    </a> -->
     <div style="font-size:10px; color:rgba(255,255,255,0.85); font-weight:700; line-height:1.3;">
         Crystal Tokyo GDR<br>supporta la Palestina
     </div>
