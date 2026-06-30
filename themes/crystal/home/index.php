@@ -185,6 +185,7 @@ public_head(
                     <source srcset="/themes/crystal/imgs/gioco_preview.webp" type="image/webp">
                     <img src="/themes/crystal/imgs/gioco_preview.png"
                          alt="Interfaccia di gioco di Crystal Tokyo"
+                         width="2857" height="1452"
                          style="width:100%; border-radius:12px; display:block; object-fit:cover;">
                 </picture>
             </div>
