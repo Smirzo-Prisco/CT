@@ -79,12 +79,17 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             return $theme_path . '/' . $file . '?v=' . (file_exists($abs) ? filemtime($abs) : 0);
         };
         ?>
+        <?php if (!empty($_SESSION['login'])): ?>
         <link rel="stylesheet" href="<?=$css_v('main.css')?>" type="text/css">
         <!-- ct-styles.css: compilato da SCSS, source of truth — sovrascrive main.css e tutti i vecchi CSS -->
         <!-- homepage.css, chat.css, presenti.css, scheda.css, messaggi.css, forum.css, lettura_bacheca.css rimossi: tutte le regole sono ora in ct-styles.css -->
         <link rel="stylesheet" href="<?=$css_v('ct-styles.css')?>" type="text/css">
-
         <link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css">
+        <?php else: ?>
+        <!-- Font Awesome caricato async per gli ospiti: non blocca il rendering della homepage pubblica -->
+        <link rel="preload" href="/themes/crystal/fontawesome/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css"></noscript>
+        <?php endif; ?>
         <?php
         /** * Il controllo individua se l'header non è impiegato per il main */
         if(!isset($check_for_update)): ?>
@@ -123,9 +128,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         </script>
         <?php endif; ?>
 
-        <!-- CT_USER + Socket.io: spostati nell'<head> per garantire disponibilità
-             anche quando footer.inc.php non esegue (die() nel contenuto della pagina) -->
-        <?php if (isset($_SESSION['login'])): ?>
+        <!-- CT_USER + Socket.io: solo per utenti autenticati; non caricato per ospiti -->
+        <?php if (!empty($_SESSION['login'])): ?>
         <?php
         $pg_avatar = '';
         $r_avatar = gdrcd_query("SELECT url_img_chat FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "' LIMIT 1");
@@ -145,9 +149,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         };
         window.ctSocket = null;
         </script>
-        <?php endif; ?>
         <script src="/socket.io/socket.io.js"></script>
-        <?php if (isset($_SESSION['login'])): ?>
         <script>
         if (typeof io !== 'undefined' && window.CT_USER) {
             window.ctSocket = io({ auth: window.CT_USER });
@@ -155,11 +157,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         </script>
         <?php endif; ?>
 
-        <!-- Bundle React — type="module" è sempre deferred: esegue dopo il DOM
-             anche se caricato nell'<head>. Posizionato qui (anziché in footer)
-             per garantire che sia in pagina anche se footer.inc.php non esegue
-             a causa di un die() interno al contenuto della pagina. -->
-        <?php if (file_exists(__DIR__ . '/themes/crystal/dist/ct-app.js')): ?>
+        <!-- Bundle React — solo per utenti autenticati; type="module" è sempre deferred -->
+        <?php if (!empty($_SESSION['login']) && file_exists(__DIR__ . '/themes/crystal/dist/ct-app.js')): ?>
         <?php if (file_exists(__DIR__ . '/themes/crystal/dist/ct-main.css')): ?>
         <?php $css_v = filemtime(__DIR__ . '/themes/crystal/dist/ct-main.css'); ?>
         <link rel="stylesheet" href="/themes/crystal/dist/ct-main.css?v=<?= $css_v ?>" type="text/css">
@@ -168,8 +167,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <script type="module" src="/themes/crystal/dist/ct-app.js?v=<?= $js_v ?>"></script>
         <?php endif; ?>
 
-        <!-- Listener ct:ready: monta i componenti React sidebar e AppRouter.
-             Deve stare nell'<head> per la stessa ragione del bundle. -->
+        <!-- Listener ct:ready: monta i componenti React; solo per utenti autenticati -->
+        <?php if (!empty($_SESSION['login'])): ?>
         <?php
         $isStaff = (($_SESSION['admin'] ?? 0) == 1 || ($_SESSION['moderatore'] ?? 0) == 1 || ($_SESSION['master'] ?? 0) == 1) ? 'true' : 'false';
         $lm_items = [];
@@ -225,6 +224,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
                 CT.mount('ChatbotWidget', 'chatbot-widget-container', {});
         });
         </script>
+        <?php endif; ?>
     </head>
     <body class="main_body">
 <?php if (!empty($_SESSION['login'])): ?>
