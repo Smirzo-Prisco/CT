@@ -86,9 +86,16 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <link rel="stylesheet" href="<?=$css_v('ct-styles.css')?>" type="text/css">
         <link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css">
         <?php else: ?>
-        <!-- Font Awesome caricato async per gli ospiti: non blocca il rendering della homepage pubblica -->
+        <!-- Per ospiti: risorse pubbliche caricate nel vero <head> per evitare render-blocking nel body.
+             public/_head.php le salta se $GLOBALS['ct_public_assets_in_head'] è true. -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"></noscript>
         <link rel="preload" href="/themes/crystal/fontawesome/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
         <noscript><link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css"></noscript>
+        <link rel="stylesheet" href="/public/public.css">
+        <?php $GLOBALS['ct_public_assets_in_head'] = true; ?>
         <?php endif; ?>
         <?php
         /** * Il controllo individua se l'header non è impiegato per il main */

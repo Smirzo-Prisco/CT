@@ -68,6 +68,7 @@ function public_head(
     </script>
     <?php endif; ?>
 
+    <?php if (empty($GLOBALS['ct_public_assets_in_head'])): ?>
     <!-- Google Fonts: Cinzel (headings fantasy) + Lato (body leggibile) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,6 +79,7 @@ function public_head(
 
     <!-- CSS condiviso per tutte le pagine pubbliche -->
     <link rel="stylesheet" href="/public/public.css">
+    <?php endif; ?>
 
     <link rel="icon" type="image/x-icon" href="/imgs/favicon.ico">
 </head>

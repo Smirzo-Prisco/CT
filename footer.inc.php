@@ -1,3 +1,4 @@
+<?php if (!empty($_SESSION['login'])): ?>
 <?php
 /** * Abilitazione tooltip
  * @author Blancks
@@ -20,6 +21,7 @@ if($PARAMETERS['mode']['alert_pm_via_pagetitle'] == 'ON') echo '<script type="te
  */
 if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascript" src="/includes/popupchoise.js"></script>';
 ?>
+<?php endif; ?>
 
     </body>
 
@@ -27,6 +29,7 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
     <!-- CT_USER, socket.io e bundle React spostati in header.inc.php per garantire
          disponibilità anche quando footer non esegue (die() nel contenuto) -->
 
+    <?php if (!empty($_SESSION['login'])): ?>
     <!-- COREFUNCTIONS -->
     <script src="/includes/corefunctions.js?v=<?= filemtime(__DIR__ . '/includes/corefunctions.js') ?>"></script>
 
@@ -34,6 +37,7 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
     <?php foreach ($scripts as $s): ?>
     <script src="<?= $s ?>?v=<?= file_exists(__DIR__ . $s) ? filemtime(__DIR__ . $s) : 0 ?>"></script>
     <?php endforeach; ?>
+    <?php endif; ?>
 </html>
 
 <?php
