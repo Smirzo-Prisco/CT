@@ -142,9 +142,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         </script>
         <?php endif; ?>
 
-        <!-- CT_USER + Socket.io: nell'<head> per garantire che la socket sia
-             connessa (non solo istanziata) prima che il bundle React monti i
-             componenti e registri i listener. Solo per utenti autenticati. -->
+        <!-- CT_USER: dati utente per il bundle React e per socket.io-client (bundlato in ct-app.js).
+             Solo per utenti autenticati. -->
         <?php if (!empty($_SESSION['login'])): ?>
         <?php
         $pg_avatar = '';
@@ -164,18 +163,6 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             }
         };
         window.ctSocket = null;
-        </script>
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-        if (typeof io !== 'undefined' && window.CT_USER) {
-            window.ctSocket = io({ auth: window.CT_USER });
-            // Dopo ogni (ri)connessione sincronizza la room socket con la stanza corrente.
-            // Necessario quando il server socket viene riavviato (pm2 restart): auth.luogo
-            // è stale se l'utente ha navigato tra stanze dall'ultimo caricamento di pagina.
-            window.ctSocket.on('connect', function() {
-                window.ctSocket.emit('room:change', { newLuogo: window.CT_USER.luogo });
-            });
-        }
         </script>
         <?php endif; ?>
 

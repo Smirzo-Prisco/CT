@@ -28,6 +28,7 @@
 
 import { createRoot } from 'react-dom/client'
 import { initIdleDetector } from './utils/idleDetector'
+import { initSocket } from './socket'
 
 // Interceptor globale: risposta 401 = sessione scaduta → redirect al login.
 // Controlla window.CT_USER: è definito solo quando l'utente è/era autenticato
@@ -191,6 +192,7 @@ window.CT.navigate = (url) => { window.top.location.href = url }
 // I file PHP ascoltano questo evento per montare i componenti al momento giusto,
 // evitando race condition tra il caricamento del modulo e il parsing del DOM.
 // --------------------------------------------------------------------------------------------
+initSocket()
 document.dispatchEvent(new CustomEvent('ct:ready'))
 initIdleDetector()
 
