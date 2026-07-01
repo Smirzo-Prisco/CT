@@ -196,9 +196,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Aggiorna la salute del personaggio se la skill lanciata non è un talento
             if($car != 'talento') gdrcd_query("UPDATE personaggio SET salute = salute-1 WHERE nome = '$login'");
 
-            // Solo lo scudo (car='difesa') chiude il turno automaticamente se sent=1.
-            // Le skill di attacco richiedono che il pg clicchi il bottone "Chiudi il turno".
-            if ($car === 'difesa') checkAutoCloseAfterLaunch($id_role, $login, $luogo);
+            // Qualsiasi lancio (attacco, scudo, talento) chiude automaticamente il turno.
+            if ($id_role) checkTurnEnd($luogo, $login, $id_role);
 
             // Risposta JSON per AJAX
             echo json_encode(array(
@@ -613,6 +612,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro);
             gestionePoliziaAutomatica($luogo);
+
+            // Chiude automaticamente il turno dell'attaccante (non per devia che è una reazione difensiva).
+            if ($id_role && !$is_devia) checkTurnEnd($luogo, $login, $id_role);
 
             echo json_encode(['success' => true, 'message' => $is_devia ? 'Deviazione dichiarata con successo.' : 'Attacco eseguito con successo.', 'tipo_attacco' => $tipo_attacco]);
 
