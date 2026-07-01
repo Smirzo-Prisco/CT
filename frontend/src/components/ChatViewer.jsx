@@ -96,12 +96,7 @@ export default function ChatViewer() {
       sock.on('chat:edit',   onChatEdit)
     }
 
-    // Polling fallback ogni 8s: garantisce aggiornamenti chat anche quando
-    // il socket non consegna eventi (server restart, PHP non raggiunge node, ecc.)
-    const interval = setInterval(fetchMessages, 8_000)
-
     return () => {
-      clearInterval(interval)
       if (sock) {
         sock.off('chat:update', fetchMessages)
         sock.off('users:update', fetchRoomDesc)
