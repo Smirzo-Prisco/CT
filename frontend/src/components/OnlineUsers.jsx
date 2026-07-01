@@ -38,6 +38,8 @@ export default function OnlineUsers() {
     }
     if (sock) sock.on('users:update', onUsersUpdate)
 
+    const onLocationChanged = () => fetchPresenti()
+
     const onIdle   = () => {
       isIdleRef.current = true
       clearInterval(heartbeatRef.current)
@@ -49,12 +51,14 @@ export default function OnlineUsers() {
         heartbeatRef.current = setInterval(sendPing, HEARTBEAT_MS)
       }
     }
+    window.addEventListener('ct:location-changed', onLocationChanged)
     window.addEventListener('ct:idle',   onIdle)
     window.addEventListener('ct:active', onActive)
 
     return () => {
       clearInterval(heartbeatRef.current)
       if (sock) sock.off('users:update', onUsersUpdate)
+      window.removeEventListener('ct:location-changed', onLocationChanged)
       window.removeEventListener('ct:idle',   onIdle)
       window.removeEventListener('ct:active', onActive)
     }
