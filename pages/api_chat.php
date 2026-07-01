@@ -613,8 +613,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro);
             gestionePoliziaAutomatica($luogo);
 
-            // Chiude automaticamente il turno dell'attaccante (non per devia che è una reazione difensiva).
-            if ($id_role && !$is_devia) checkTurnEnd($luogo, $login, $id_role);
+            if ($id_role) checkTurnEnd($luogo, $login, $id_role);
 
             echo json_encode(['success' => true, 'message' => $is_devia ? 'Deviazione dichiarata con successo.' : 'Attacco eseguito con successo.', 'tipo_attacco' => $tipo_attacco]);
 
