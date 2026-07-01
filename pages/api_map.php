@@ -218,6 +218,24 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // LEAVE — esce dalla stanza corrente e torna alla mappa (luogo=-1)
+    // -------------------------------------------------------------------------
+    case 'leave':
+        $login_f = gdrcd_filter('in', $_SESSION['login']);
+        $old_luogo = (int)($_SESSION['luogo'] ?? -1);
+
+        gdrcd_query("UPDATE personaggio SET ultimo_luogo = -1 WHERE nome = '$login_f'");
+        $_SESSION['luogo'] = -1;
+        session_write_close();
+
+        if ($old_luogo >= 0) notifySocketServer('users:update', 'loc:' . $old_luogo);
+        notifySocketServer('users:update', 'loc:-1');
+        notifySocketServer('presenti:update', 'global');
+
+        echo json_encode(['success' => true, 'old_luogo' => $old_luogo]);
+        break;
+
+    // -------------------------------------------------------------------------
     // CHANGEMAP — cambio mappa (map_id=X, porta l'utente a luogo=-1)
     // -------------------------------------------------------------------------
     case 'changemap':

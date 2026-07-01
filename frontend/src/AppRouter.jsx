@@ -292,8 +292,14 @@ export default function AppRouter({ isStaff = false }) {
         if (targetDir !== null) {
             const dir = parseInt(targetDir, 10)
 
-            // dir < 0 → torna alla mappa (equivale a ?page=mappaclick)
+            // dir < 0 → esce dalla stanza e torna alla mappa
             if (dir < 0) {
+                try {
+                    await fetch('/pages/api_map.php?op=leave', { method: 'POST' })
+                } catch { /* best-effort */ }
+                if (window.CT_USER) window.CT_USER.luogo = -1
+                window.ctSocket?.emit('room:change', { newLuogo: -1 })
+                window.dispatchEvent(new CustomEvent('ct:location-changed'))
                 window.history.pushState({}, '', 'main.php?page=mappaclick')
                 setParams(readParams())
                 return
