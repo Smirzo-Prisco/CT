@@ -281,6 +281,19 @@ export default function AppRouter({ isStaff = false }) {
         const targetPage = target.searchParams.get('page')
         const targetDir  = target.searchParams.get('dir')
 
+        // ── Torna alla mappa (mappaclick) — aggiorna sessione e socket ──
+        if (targetPage === 'mappaclick') {
+            try {
+                await fetch('/pages/api_map.php?op=leave', { method: 'POST' })
+            } catch { /* best-effort */ }
+            if (window.CT_USER) window.CT_USER.luogo = -1
+            window.ctSocket?.emit('room:change', { newLuogo: -1 })
+            window.dispatchEvent(new CustomEvent('ct:location-changed'))
+            window.history.pushState({}, '', url)
+            setParams(readParams())
+            return
+        }
+
         // ── Pagina React migrata ──────────────────────────────────────────
         if (targetPage && MIGRATED_PAGES.has(targetPage)) {
             window.history.pushState({}, '', url)
