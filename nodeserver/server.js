@@ -7,6 +7,9 @@ const PORT = 3000;
 const HOST = '127.0.0.1';
 
 const httpServer = http.createServer((req, res) => {
+    // Le richieste /socket.io/* sono gestite da engine.io — non toccare
+    if (req.url && req.url.startsWith('/socket.io')) return;
+
     if (req.method !== 'POST' || req.url !== '/notify') {
         res.writeHead(404);
         return res.end();
