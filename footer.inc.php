@@ -27,17 +27,6 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
 
 
     <?php if (!empty($_SESSION['login'])): ?>
-    <!-- Socket.io + init ctSocket: caricati qui (dopo </body>) invece che nel <head>
-         per non bloccare il rendering iniziale. I module script deferred eseguono
-         DOPO gli script blocking del footer, quindi ctSocket è già settato quando
-         ct:ready viene emesso dal bundle React. -->
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-    if (typeof io !== 'undefined' && window.CT_USER) {
-        window.ctSocket = io({ auth: window.CT_USER });
-    }
-    </script>
-
     <!-- COREFUNCTIONS -->
     <script src="/includes/corefunctions.js?v=<?= filemtime(__DIR__ . '/includes/corefunctions.js') ?>"></script>
 

@@ -142,11 +142,9 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         </script>
         <?php endif; ?>
 
-        <!-- CT_USER: iniettato nel <head> così il bundle React lo trova già disponibile
-             al mount. Socket.io e ctSocket sono inizializzati nel footer (dopo </body>)
-             per non bloccare il rendering iniziale — i module script (deferred) eseguono
-             DOPO gli script blocking del footer, quindi ctSocket è già settato quando
-             ct:ready viene emesso. -->
+        <!-- CT_USER + Socket.io: nell'<head> per garantire che la socket sia
+             connessa (non solo istanziata) prima che il bundle React monti i
+             componenti e registri i listener. Solo per utenti autenticati. -->
         <?php if (!empty($_SESSION['login'])): ?>
         <?php
         $pg_avatar = '';
@@ -166,6 +164,12 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             }
         };
         window.ctSocket = null;
+        </script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+        if (typeof io !== 'undefined' && window.CT_USER) {
+            window.ctSocket = io({ auth: window.CT_USER });
+        }
         </script>
         <?php endif; ?>
 
