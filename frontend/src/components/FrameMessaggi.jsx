@@ -114,7 +114,13 @@ export default function FrameMessaggi() {
         fetchMessages()
         const sock = window.ctSocket
         if (sock) sock.on('dm:update', fetchMessages)
-        return () => { if (sock) sock.off('dm:update', fetchMessages) }
+        // Polling fallback: aggiorna ogni 60s anche senza eventi socket
+        // (copertura per server socket down, nginx timeout, ecc.)
+        const interval = setInterval(fetchMessages, 60_000)
+        return () => {
+            clearInterval(interval)
+            if (sock) sock.off('dm:update', fetchMessages)
+        }
     }, [fetchMessages])
 
     const msgIcon = hasNewMessages

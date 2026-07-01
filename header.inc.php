@@ -169,6 +169,12 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <script>
         if (typeof io !== 'undefined' && window.CT_USER) {
             window.ctSocket = io({ auth: window.CT_USER });
+            // Dopo ogni (ri)connessione sincronizza la room socket con la stanza corrente.
+            // Necessario quando il server socket viene riavviato (pm2 restart): auth.luogo
+            // è stale se l'utente ha navigato tra stanze dall'ultimo caricamento di pagina.
+            window.ctSocket.on('connect', function() {
+                window.ctSocket.emit('room:change', { newLuogo: window.CT_USER.luogo });
+            });
         }
         </script>
         <?php endif; ?>

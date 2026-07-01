@@ -85,18 +85,27 @@ export default function ChatViewer() {
     window.clearChat   = () => { setMessages([]); lastIdRef.current = 0 }
 
     const sock = window.ctSocket
+    let onChatEdit = null
+
     if (sock) {
       // chat:edit = azione modificata: full-refresh perché il messaggio modificato
       // ha id <= lastIdRef e non verrebbe incluso in un fetch incrementale
-      const onChatEdit = () => { setMessages([]); lastIdRef.current = 0; fetchMessages() }
+      onChatEdit = () => { setMessages([]); lastIdRef.current = 0; fetchMessages() }
       sock.on('chat:update', fetchMessages)
       sock.on('users:update', fetchRoomDesc)
       sock.on('chat:edit',   onChatEdit)
+    }
 
-      return () => {
+    // Polling fallback ogni 8s: garantisce aggiornamenti chat anche quando
+    // il socket non consegna eventi (server restart, PHP non raggiunge node, ecc.)
+    const interval = setInterval(fetchMessages, 8_000)
+
+    return () => {
+      clearInterval(interval)
+      if (sock) {
         sock.off('chat:update', fetchMessages)
         sock.off('users:update', fetchRoomDesc)
-        sock.off('chat:edit',   onChatEdit)
+        if (onChatEdit) sock.off('chat:edit', onChatEdit)
       }
     }
   }, [fetchMessages, fetchRoomDesc])
