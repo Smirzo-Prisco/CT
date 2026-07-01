@@ -33,7 +33,10 @@ export default function OnlineUsers() {
     const sock = window.ctSocket
     // Non chiamare fetchPresenti se l'utente è idle: op=presenti resetta
     // disponibile=1 nel DB, annullando lo stato assente.
-    if (sock) sock.on('users:update', () => { if (!isIdleRef.current) fetchPresenti() })
+    const onUsersUpdate = () => {
+      if (!isIdleRef.current) fetchPresenti()
+    }
+    if (sock) sock.on('users:update', onUsersUpdate)
 
     const onIdle   = () => {
       isIdleRef.current = true
@@ -51,7 +54,7 @@ export default function OnlineUsers() {
 
     return () => {
       clearInterval(heartbeatRef.current)
-      if (sock) sock.off('users:update')
+      if (sock) sock.off('users:update', onUsersUpdate)
       window.removeEventListener('ct:idle',   onIdle)
       window.removeEventListener('ct:active', onActive)
     }

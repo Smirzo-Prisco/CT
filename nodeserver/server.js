@@ -43,14 +43,17 @@ const io = new Server(httpServer, {
 
 io.on('connection', socket => {
     const { login, luogo } = socket.handshake.auth;
+    let currentLuogo = parseInt(luogo, 10);
 
     if (!login) {
         socket.disconnect(true);
         return;
     }
 
-    socket.join(`chat:${luogo}`);
-    socket.join(`loc:${luogo}`);
+    if (isNaN(currentLuogo)) currentLuogo = -1;
+
+    socket.join(`chat:${currentLuogo}`);
+    socket.join(`loc:${currentLuogo}`);
     socket.join(`dm:${login}`);
     socket.join(`chatoff:${login}`);
 
@@ -65,7 +68,7 @@ io.on('connection', socket => {
     // React si registra nel primo tick dopo il mount, ma l'evento socket
     // arriva prima. Rimandando al tick successivo il componente è già pronto.
     setImmediate(() => {
-        io.to(`loc:${luogo}`).emit('users:update');
+        io.to(`loc:${currentLuogo}`).emit('users:update');
         io.to('global').emit('presenti:update');
     });
 
@@ -73,12 +76,15 @@ io.on('connection', socket => {
     socket.on('room:change', ({ newLuogo }) => {
         const nl = parseInt(newLuogo, 10);
         if (isNaN(nl)) return;
+        const oldLuogo = currentLuogo;
         for (const room of [...socket.rooms]) {
             if (room.startsWith('chat:') || room.startsWith('loc:')) socket.leave(room);
         }
         socket.join(`chat:${nl}`);
         socket.join(`loc:${nl}`);
-        // Notifica la nuova stanza (presenti aggiornati) e il pannello globale
+        currentLuogo = nl;
+        // Notifica vecchia e nuova stanza (presenti aggiornati) e il pannello globale
+        if (oldLuogo !== nl) io.to(`loc:${oldLuogo}`).emit('users:update');
         io.to(`loc:${nl}`).emit('users:update');
         io.to('global').emit('presenti:update');
     });
@@ -89,7 +95,7 @@ io.on('connection', socket => {
     });
 
     socket.on('disconnect', () => {
-        io.to(`loc:${luogo}`).emit('users:update');
+        io.to(`loc:${currentLuogo}`).emit('users:update');
         io.to('global').emit('presenti:update');
         // Assicura che il typing indicator venga rimosso se il socket cade
         socket.to('global').emit('chatoff:typing', { nome: login, typing: false });

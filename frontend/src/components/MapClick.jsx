@@ -285,7 +285,13 @@ export default function MapClick() {
         })
             .then(r => r.json())
             .then(d => {
-                if (d.success && window.CT_USER) window.CT_USER.mappa = effectiveMapId
+                if (d.success) {
+                    if (window.CT_USER) {
+                        window.CT_USER.mappa = effectiveMapId
+                        window.CT_USER.luogo = -1
+                    }
+                    window.ctSocket?.emit('room:change', { newLuogo: -1 })
+                }
             })
             .catch(console.error)
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
