@@ -118,7 +118,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <meta property="og:type"         content="website">
         <meta property="og:url"          content="https://crystaltokyo.it/">
         <meta property="og:title"        content="Crystal Tokyo – GDR play by chat">
-        <meta property="og:description"  content="Scopri Crystal Tokyo GDR, un gioco di ruolo online play by chat gratuito, attivo da oltre vent'anni. Urban fantasy, famiglie magiche, combattimenti a dadi.">
+        <meta property="og:description"  content="Scopri Crystal Tokyo GDR, un gioco di ruolo online play by chat gratuito, attivo da oltre vent'anni. Urban fantasy, razze magiche, combattimenti a dadi.">
         <meta property="og:image"        content="https://crystaltokyo.it/themes/crystal/imgs/homepage.png">
         <meta property="og:locale"       content="it_IT">
         <meta name="twitter:card"        content="summary_large_image">
@@ -131,7 +131,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             "@type": "VideoGame",
             "name": "Crystal Tokyo GDR",
             "url": "https://crystaltokyo.it",
-            "description": "Gioco di ruolo online play by chat gratuito, ambientato in un mondo urban fantasy. Attivo da oltre vent'anni, con famiglie magiche, quest, sistema a dadi e crescita del personaggio.",
+            "description": "Gioco di ruolo online play by chat gratuito, ambientato in un mondo urban fantasy. Attivo da oltre vent'anni, con razze magiche, quest, sistema a dadi e crescita del personaggio.",
             "genre": ["Gioco di ruolo", "Play by chat", "Urban Fantasy"],
             "gamePlatform": "Browser web",
             "inLanguage": "it",
@@ -142,7 +142,11 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         </script>
         <?php endif; ?>
 
-        <!-- CT_USER + Socket.io: solo per utenti autenticati; non caricato per ospiti -->
+        <!-- CT_USER: iniettato nel <head> così il bundle React lo trova già disponibile
+             al mount. Socket.io e ctSocket sono inizializzati nel footer (dopo </body>)
+             per non bloccare il rendering iniziale — i module script (deferred) eseguono
+             DOPO gli script blocking del footer, quindi ctSocket è già settato quando
+             ct:ready viene emesso. -->
         <?php if (!empty($_SESSION['login'])): ?>
         <?php
         $pg_avatar = '';
@@ -162,12 +166,6 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             }
         };
         window.ctSocket = null;
-        </script>
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-        if (typeof io !== 'undefined' && window.CT_USER) {
-            window.ctSocket = io({ auth: window.CT_USER });
-        }
         </script>
         <?php endif; ?>
 
