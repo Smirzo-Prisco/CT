@@ -29,9 +29,10 @@ if ($PARAMETERS['settings']['protection'] == 'ON') {
 /* ── Statistiche live per la homepage ───────────────────────────────── */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/functions.inc.php';
 $_db_home = gdrcd_connect();
-$stat_iscritti    = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE permessi >= 0 AND sesso != 'b'")['n'] ?? 0);
-$stat_online      = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM personaggio WHERE ora_entrata > ora_uscita AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW() AND is_invisible = 0")['n'] ?? 0);
-$stat_azioni_oggi = (int)(gdrcd_query("SELECT COUNT(id) AS n FROM chat WHERE DATE(ora) = CURDATE() AND tipo IN ('P','A')")['n'] ?? 0);
+$stat_iscritti       = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE permessi >= 0 AND sesso != 'b'")['n'] ?? 0);
+$stat_online         = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM personaggio WHERE ora_entrata > ora_uscita AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW() AND is_invisible = 0")['n'] ?? 0);
+$stat_azioni_oggi    = (int)(gdrcd_query("SELECT COUNT(id) AS n FROM chat WHERE DATE(ora) = CURDATE() AND tipo IN ('P','A')")['n'] ?? 0);
+$stat_nuovi_settimana = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE permessi >= 0 AND sesso != 'b' AND data_iscrizione >= DATE_SUB(NOW(), INTERVAL 7 DAY)")['n'] ?? 0);
 $_mesi = ['','gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 $_data_iso  = date('Y-m-d');
 $_data_it   = (int)date('j') . ' ' . $_mesi[(int)date('n')] . ' ' . date('Y');
@@ -143,9 +144,9 @@ public_head(
                 <span class="pub-stat-desc">narrativa scritta</span>
             </div>
             <div class="pub-stat-item">
-                <span class="pub-stat-value">20+</span>
-                <span class="pub-stat-label">Anni attivi</span>
-                <span class="pub-stat-desc">comunità online</span>
+                <span class="pub-stat-value"><?= $stat_nuovi_settimana ?></span>
+                <span class="pub-stat-label">Nuovi questa settimana</span>
+                <span class="pub-stat-desc">personaggi creati</span>
             </div>
         </div>
     </div>
