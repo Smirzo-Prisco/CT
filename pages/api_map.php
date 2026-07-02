@@ -424,6 +424,7 @@ switch ($op) {
                 m.stanza_apparente,    m.nome              AS stanza_nome,
                 mc.nome                                    AS mappa_nome,
                 rm.immagine            AS mestiere_img,    rm.nome_ruolo AS mestiere_nome,
+                mm.tipo                AS mestiere_tipo,
                 ru_fam.immagine        AS fam_img,         ru_fam.nome_ruolo AS fam_nome,
                 pr.admin               AS p_admin,         pr.moderatore AS p_mod,
                 pr.master              AS p_master,        pr.guida      AS p_guida,
@@ -433,6 +434,7 @@ switch ($op) {
             LEFT JOIN mappa_click    mc   ON p.ultima_mappa     = mc.id_click
             LEFT JOIN razza          r    ON p.id_razza         = r.id_razza
             LEFT JOIN ruolo_mestiere rm   ON p.id_ruolo_mestiere= rm.id_ruolo
+            LEFT JOIN mestiere       mm   ON rm.mestiere        = mm.id_mestiere
             LEFT JOIN ruolo          ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
             LEFT JOIN privilegi      pr   ON pr.nome            = p.nome
             LEFT JOIN bot_status     bs   ON bs.bot_nome        = p.nome
@@ -453,6 +455,11 @@ switch ($op) {
             if ($row['is_invisible'] == 1 && !$is_staff) continue;
 
             $nome = $row['nome'];
+            // Le gilde giocatore (mestiere.tipo != 1) riusano le stesse colonne dei mestieri
+            // veri (id_ruolo_mestiere): senza questa distinzione il grado di gilda finirebbe
+            // mostrato nella colonna "LAVORO" insieme ai mestieri, non era previsto quando
+            // questa lista è stata costruita — va nella sua colonna GILDA dedicata.
+            $e_gilda_giocatore = $row['mestiere_tipo'] !== null && (int)$row['mestiere_tipo'] !== 1;
             $users[$nome] = [
                 'nome'          => $nome,
                 'cognome'       => $row['cognome']       ?? '',
@@ -467,8 +474,10 @@ switch ($op) {
                 'razza_nome'    => $row['sing_' . $row['sesso']] ?? '',
                 'stanza'        => $row['stanza_apparente'] ?: ($row['stanza_nome'] ?? ''),
                 'mappa'         => $row['mappa_nome']    ?? '',
-                'mestiere_img'  => 'imgs/mestieri/' . ($row['mestiere_img'] ?: 'Umani.png'),
-                'mestiere_nome' => $row['mestiere_nome'] ?? '',
+                'mestiere_img'  => $e_gilda_giocatore ? '' : 'imgs/mestieri/' . ($row['mestiere_img'] ?: 'Umani.png'),
+                'mestiere_nome' => $e_gilda_giocatore ? '' : ($row['mestiere_nome'] ?? ''),
+                'gilda_img'     => $e_gilda_giocatore ? 'imgs/mestieri/' . ($row['mestiere_img'] ?: 'standard_gilda.png') : '',
+                'gilda_nome'    => $e_gilda_giocatore ? ($row['mestiere_nome'] ?? '') : '',
                 // Famiglia/inclinazione: inizializzata dalla query principale,
                 // sovrascritta dalla query batch inclinazioni se il pg ne ha una
                 'gruppo_img'    => $row['fam_img'] ? 'imgs/guilds/' . $row['fam_img'] : '',

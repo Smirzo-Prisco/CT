@@ -125,6 +125,14 @@ function UserRow({ user, isStaff }) {
                 )}
             </td>
 
+            {/* Icona grado di gilda — colonna separata dal mestiere: le gilde giocatore
+                riusano la stessa struttura dati dei mestieri, ma sono concettualmente diverse */}
+            <td style={{ textAlign: 'center' }}>
+                {user.gilda_img && (
+                    <img width="25" height="25" src={user.gilda_img} alt={user.gilda_nome} title={user.gilda_nome} />
+                )}
+            </td>
+
             {/* Nome e cognome con link alla scheda */}
             <td>
                 {morto && <i className="fa-solid fa-skull pg-morto-icon" title="Morto" />}
@@ -225,7 +233,7 @@ export default function PresentiEstesi({ isStaff = false }) {
                 <thead>
                     <tr>
                         {/* Header con conteggio — si aggiorna automaticamente ad ogni evento socket */}
-                        <th colSpan="9" className={styles.schedaSerial}>
+                        <th colSpan="10" className={styles.schedaSerial}>
                             PRESENTI: {total}
                         </th>
                     </tr>
@@ -240,6 +248,7 @@ export default function PresentiEstesi({ isStaff = false }) {
                         <td style={{ display: 'none' }}>RAZZA ICO</td>
                         <td>RAZZA</td>
                         <td>LAVORO</td>
+                        <td>GILDA</td>
                         <td>NOME E COGNOME</td>
                         <td>CARICHE</td>
                     </tr>
@@ -250,7 +259,7 @@ export default function PresentiEstesi({ isStaff = false }) {
 
                             {/* Header mappa */}
                             <tr className="mappa">
-                                <td colSpan="9" className={styles.schedaUpper}>{mappa}</td>
+                                <td colSpan="10" className={styles.schedaUpper}>{mappa}</td>
                             </tr>
 
                             {/* Iterazione per stanza — Fragment con key, obbligatorio per liste React */}
@@ -264,7 +273,7 @@ export default function PresentiEstesi({ isStaff = false }) {
                                       */}
                                     {stanza && (
                                         <tr className="third_header">
-                                            <td colSpan="9" className={styles.schedaUpper}>
+                                            <td colSpan="10" className={styles.schedaUpper}>
                                                 <a href={`main.php?dir=${utenti[0].ultimo_luogo}`}>
                                                     {stanza}
                                                 </a>
@@ -284,7 +293,7 @@ export default function PresentiEstesi({ isStaff = false }) {
                     {/* Messaggio quando non ci sono utenti online */}
                     {users.length === 0 && (
                         <tr>
-                            <td colSpan="8" style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
+                            <td colSpan="9" style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
                                 Nessun utente online
                             </td>
                         </tr>
