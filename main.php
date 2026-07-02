@@ -35,7 +35,7 @@ const MIGRATED_PAGES = [
     'scheda_skills', 'scheda_trans', 'scheda_modifica', 'scheda_affetti',
     'scheda_equip', 'scheda_oggetti',
     'scheda_px', 'scheda_px_shin', 'scheda_px_mestiere',
-    'gestione', 'uffici',
+    'gestione', 'uffici', 'mia_gilda',
     'role_recap', 'elenco_staff', 'elenco_volti', 'anagrafe',
     'user_cambio_pass', 'scegli_mestiere', 'mercato_abilita_atarashi',
     'incremento_parametri', 'servizi_prenotazioni_prova',

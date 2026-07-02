@@ -36,6 +36,7 @@ const SECTIONS = [
             { label: 'Albergo',          icon: 'fa-bed',      url: 'main.php?page=servizi_prenotazioni_prova' },
             { label: 'Patrocinio Volti', icon: 'fa-portrait', url: 'main.php?page=elenco_volti'               },
             { label: 'Elenco Staff',     icon: 'fa-users',    url: 'main.php?page=elenco_staff'               },
+            { label: 'Gilde',            icon: 'fa-shield-halved', url: 'main.php?page=servizi_mestieri&solo_gilde=1' },
         ],
     },
     {

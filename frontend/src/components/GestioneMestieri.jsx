@@ -250,7 +250,7 @@ function MestiereModal({ mestiere, ruoli, tipi, onClose, onSaved, onRuoliChange 
 
                         <div className="form-row">
                             <div className="form-group gp-checkbox-field">
-                                <input id="m-visibile" type="checkbox" checked={!!form.visibile}
+                                <input id="m-visibile" type="checkbox" checked={form.visibile == 1}
                                        onChange={e => setForm({ ...form, visibile: e.target.checked })} />
                                 <label htmlFor="m-visibile">Visibile <span className="gp-label-note">— il mestiere sarà visibile ai giocatori</span></label>
                             </div>

@@ -27,11 +27,14 @@ $back_label   = $from === 'servizi_gilde'
     </div>
 
     <?php
+    // Filtro opzionale: quando si arriva dalla voce "Gilde" di Uffici, mostra solo
+    // le gilde create dai giocatori (tipo != 1), non i mestieri globali fissi
+    $solo_gilde = !empty($_REQUEST['solo_gilde']);
     $result = gdrcd_query(
         "SELECT m.nome, m.id_mestiere, m.tipo, m.url_sito, c.descrizione
            FROM mestiere m
            JOIN codtipomestiere c ON m.tipo = c.cod_tipo
-          WHERE m.visibile = 1
+          WHERE m.visibile = 1" . ($solo_gilde ? " AND m.tipo != 1" : "") . "
           ORDER BY m.tipo, m.nome",
         'result'
     );

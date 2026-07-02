@@ -78,21 +78,47 @@ switch ($op) {
             $menu[] = ['key' => 'gestione_pg', 'label' => 'Gestione pg', 'icon' => 'fa-user-gear', 'voci' => $voci];
         }
 
-        // GILDE
+        // GILDE (ex famiglie, oggi "razze" narrative — tabella gilda)
         if ($perms['admin'] || $perms['capogilda']) {
-            $voci = [['label' => 'Gilde e gradi', 'url' => 'gestione.php?page=gestione_gilde']];
-            if ($perms['admin']) {
-                $voci[] = ['label' => 'Famiglie indipendenti', 'url' => 'gestione.php?page=gestione_gilde&op=edit&id_record=-1'];
-                $voci[] = ['label' => 'Correnti',              'url' => 'gestione.php?page=gestione_tipi&types=guilds'];
-                $voci[] = ['label' => 'Reliquie',              'url' => 'gestione.php?page=punti_png'];
-            }
-            $menu[] = ['key' => 'gilde', 'label' => 'Gilde', 'icon' => 'fa-users', 'voci' => $voci];
+            $menu[] = ['key' => 'gilde', 'label' => 'Nuove razze', 'icon' => 'fa-users', 'voci' => [
+                ['label' => 'Nuove razze', 'url' => 'gestione.php?page=gestione_gilde'],
+            ]];
         }
 
-        // RAZZE
+        // OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
+        // tenute solo per interventi occasionali dello staff
         if ($perms['admin']) {
-            $menu[] = ['key' => 'razze', 'label' => 'Razze', 'icon' => 'fa-users', 'voci' => [
-                ['label' => 'Razze e spiriti', 'url' => 'gestione.php?page=gestione_razze'],
+            $menu[] = ['key' => 'old', 'label' => 'OLD', 'icon' => 'fa-box-archive', 'voci' => [
+                ['label' => 'Famiglie indipendenti', 'url' => 'gestione.php?page=gestione_gilde&op=edit&id_record=-1'],
+                ['label' => 'Correnti',              'url' => 'gestione.php?page=gestione_tipi&types=guilds'],
+                ['label' => 'Reliquie',              'url' => 'gestione.php?page=punti_png'],
+                ['label' => 'Razze e spiriti',       'url' => 'gestione.php?page=gestione_razze'],
+            ]];
+        }
+
+        // GILDA (giocatore) — chiunque non abbia già una gilda (jobs_limit permettendo)
+        // o sia capo=1 di quella che ha già, non solo lo staff
+        $login_esc = gdrcd_filter('in', $_SESSION['login']);
+        $mia_gilda_row = gdrcd_query(
+            "SELECT rm.capo FROM clgpersonaggiomestiere cpm
+             JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+             JOIN mestiere m ON rm.mestiere = m.id_mestiere
+             WHERE cpm.personaggio = '$login_esc' AND m.tipo != 1 LIMIT 1"
+        );
+        $voce_mia_gilda = null;
+        if ($mia_gilda_row) {
+            if ((int)$mia_gilda_row['capo'] === 1) {
+                $voce_mia_gilda = 'Gestisci la tua gilda';
+            }
+        } else {
+            $affiliazioni = (int)gdrcd_query("SELECT COUNT(*) AS n FROM clgpersonaggiomestiere WHERE personaggio = '$login_esc'")['n'];
+            if ($affiliazioni < (int)$PARAMETERS['settings']['jobs_limit']) {
+                $voce_mia_gilda = 'Crea una gilda';
+            }
+        }
+        if ($voce_mia_gilda !== null) {
+            $menu[] = ['key' => 'mia_gilda', 'label' => 'Gilda', 'icon' => 'fa-shield-halved', 'voci' => [
+                ['label' => $voce_mia_gilda, 'url' => 'main.php?page=mia_gilda'],
             ]];
         }
 
