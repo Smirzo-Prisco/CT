@@ -179,7 +179,7 @@ function CreaGilda({ onCreata }) {
                     <textarea id="cg-statuto" rows={6} value={statuto} onChange={e => setStatuto(e.target.value)} />
                 </div>
                 {error && <p className="gm-feedback gm-feedback--error">{error}</p>}
-                <button type="submit" className="btn btn--primary" disabled={saving}>
+                <button type="submit" disabled={saving}>
                     <i className="fa-solid fa-plus"></i>&nbsp; {saving ? 'Creazione…' : 'Crea gilda'}
                 </button>
             </form>
@@ -330,7 +330,7 @@ function GildaEsistente({ stato, onChange }) {
                     <textarea id="mg-statuto" rows={6} value={form.statuto ?? ''} onChange={e => setForm({ ...form, statuto: e.target.value })} />
                 </div>
                 {error && <p className="gm-feedback gm-feedback--error">{error}</p>}
-                <button type="submit" className="btn btn--primary" disabled={saving}>
+                <button type="submit" disabled={saving}>
                     <i className="fa-solid fa-floppy-disk"></i>&nbsp; {saving ? 'Salvataggio…' : 'Salva modifiche'}
                 </button>
             </form>

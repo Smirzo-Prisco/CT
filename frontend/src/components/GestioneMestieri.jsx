@@ -317,7 +317,7 @@ function MestiereModal({ mestiere, ruoli, tipi, onClose, onSaved, onRuoliChange 
                 <div className="gp-modal-footer">
                     <button type="button" className="btn btn--ghost" onClick={onClose}>Annulla</button>
                     {!isIndipendenti && (
-                        <button type="submit" form="formSaveMestiere" className="btn btn--primary" disabled={saving}>
+                        <button type="submit" form="formSaveMestiere" disabled={saving}>
                             <i className="fa-solid fa-floppy-disk"></i>&nbsp; {saving ? 'Salvataggio…' : (isEdit ? 'Salva modifiche' : 'Crea mestiere')}
                         </button>
                     )}

@@ -151,6 +151,13 @@ button {
     text-align: center;
 }
 
+// Le icone dentro un bottone (submit incluso, stesso tag <button>) ereditano
+// sempre la dimensione del testo del bottone, mai quella di un contenitore
+// esterno (es. un'icona di card che finisce dentro un bottone annidato)
+button i {
+    font-size: 1em;
+}
+
 // ── Tipi speciali ─────────────────────────────────────────────
 
 input[type='checkbox'],
