@@ -45,7 +45,7 @@ function ImageField({ id, currentUrl, onFileChange, label }) {
                     src={preview ?? (currentUrl ? `imgs/mestieri/${currentUrl}` : 'imgs/mestieri/standard_mestiere.png')}
                     alt=""
                     className="gm-image-thumb"
-                    onError={e => { e.target.style.visibility = 'hidden' }}
+                    onError={e => { e.target.style.display = 'none' }}
                 />
                 <input id={id} type="file" accept="image/jpeg,image/png,image/gif,image/webp" onChange={handleChange} />
             </div>
@@ -104,7 +104,7 @@ function RuoloRow({ ruolo, onSaved, onDeleted }) {
                 src={`imgs/mestieri/${ruolo.immagine}`}
                 alt=""
                 className="gm-image-thumb gm-image-thumb--sm"
-                onError={e => { e.target.style.visibility = 'hidden' }}
+                onError={e => { e.target.style.display = 'none' }}
             />
             <div className="form-row gm-role-fields">
                 <div className="form-group form-column">

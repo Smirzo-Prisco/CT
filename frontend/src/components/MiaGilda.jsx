@@ -43,7 +43,7 @@ function ImageField({ id, currentUrl, onFileChange, label }) {
                     src={preview ?? (currentUrl ? `imgs/mestieri/${currentUrl}` : 'imgs/mestieri/standard_mestiere.png')}
                     alt=""
                     className="gm-image-thumb"
-                    onError={e => { e.target.style.visibility = 'hidden' }}
+                    onError={e => { e.target.style.display = 'none' }}
                 />
                 <input id={id} type="file" accept="image/jpeg,image/png,image/gif,image/webp" onChange={handleChange} />
             </div>
@@ -99,7 +99,7 @@ function GradoRow({ ruolo, onSaved, onDeleted }) {
                 src={`imgs/mestieri/${ruolo.immagine}`}
                 alt=""
                 className="gm-image-thumb gm-image-thumb--sm"
-                onError={e => { e.target.style.visibility = 'hidden' }}
+                onError={e => { e.target.style.display = 'none' }}
             />
             <div className="form-row gm-role-fields">
                 <div className="form-group form-column">
@@ -297,7 +297,7 @@ function GildaEsistente({ stato, onChange }) {
             <div className="card gm-card">
                 <div className="gm-image-field" style={{ marginBottom: 16 }}>
                     <img src={`imgs/mestieri/${mestiere.immagine}`} alt="" className="gm-image-thumb"
-                         onError={e => { e.target.style.visibility = 'hidden' }} />
+                         onError={e => { e.target.style.display = 'none' }} />
                     <h3 style={{ margin: 0 }}>{mestiere.nome}</h3>
                 </div>
                 {mestiere.statuto && <p style={{ whiteSpace: 'pre-wrap' }}>{mestiere.statuto}</p>}

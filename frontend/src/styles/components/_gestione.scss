@@ -424,7 +424,7 @@ header {
     .card {
         padding: 15px;
 
-        i {
+        > i {
             font-size: 32px;
         }
 
@@ -438,7 +438,7 @@ header {
             grid-template-columns: 1fr;
         }
 
-        .card i {
+        .card > i {
             font-size: 28px;
             margin-right: $space-2 + 2;
         }
