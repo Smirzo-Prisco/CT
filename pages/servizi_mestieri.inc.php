@@ -87,22 +87,24 @@ $back_label   = $from === 'servizi_gilde'
     </section>
     <?php endforeach; ?>
 
-    <!-- Lavori Liberi -->
+    <!-- Lavori Liberi (mestiere = -1): non sono gilde, si mostrano solo nella vista generale -->
     <?php
-    $rFree = gdrcd_query(
-        "SELECT rm.id_ruolo, rm.nome_ruolo, COUNT(p.nome) AS n
-           FROM ruolo_mestiere rm
-           JOIN clgpersonaggiolavoro cpl ON rm.id_ruolo = cpl.id_ruolo
-           JOIN personaggio p ON cpl.personaggio = p.nome
-          WHERE rm.mestiere = -1
-            AND p.esperienza > 9
-          GROUP BY rm.id_ruolo, rm.nome_ruolo
-          ORDER BY rm.nome_ruolo ASC",
-        'result'
-    );
     $freelance = [];
-    while ($r = gdrcd_query($rFree, 'fetch')) $freelance[] = $r;
-    gdrcd_query($rFree, 'free');
+    if (!$solo_gilde) {
+        $rFree = gdrcd_query(
+            "SELECT rm.id_ruolo, rm.nome_ruolo, COUNT(p.nome) AS n
+               FROM ruolo_mestiere rm
+               JOIN clgpersonaggiolavoro cpl ON rm.id_ruolo = cpl.id_ruolo
+               JOIN personaggio p ON cpl.personaggio = p.nome
+              WHERE rm.mestiere = -1
+                AND p.esperienza > 9
+              GROUP BY rm.id_ruolo, rm.nome_ruolo
+              ORDER BY rm.nome_ruolo ASC",
+            'result'
+        );
+        while ($r = gdrcd_query($rFree, 'fetch')) $freelance[] = $r;
+        gdrcd_query($rFree, 'free');
+    }
 
     if (!empty($freelance)):
     ?>
