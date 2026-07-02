@@ -16,6 +16,18 @@
 
 import { useState, useEffect } from 'react'
 
+/**
+ * Naviga senza reload quando la pagina di destinazione è già migrata alla SPA
+ * (window.CT.navigate lo capisce da solo confrontando MIGRATED_PAGES); per
+ * tutto il resto (es. gestione.php, tool di staff non ancora migrati) fa comunque
+ * il reload tradizionale — nessuna regressione, ma da qui in avanti ogni nuova
+ * pagina migrata smette automaticamente di ricaricare, senza toccare questo file.
+ */
+function navigate(url) {
+    if (window.CT?.navigate) window.CT.navigate(url)
+    else window.top.location.href = url
+}
+
 // ---------------------------------------------------------------------------
 // SOTTO-COMPONENTI
 // ---------------------------------------------------------------------------
@@ -33,7 +45,7 @@ function GestioneCard({ card }) {
                     <li key={i}>
                         {voce.url === '#'
                             ? <span>{voce.label}</span>
-                            : <a href={voce.url}>{voce.label}</a>
+                            : <a href={voce.url} onClick={e => { e.preventDefault(); navigate(voce.url) }}>{voce.label}</a>
                         }
                     </li>
                 ))}
