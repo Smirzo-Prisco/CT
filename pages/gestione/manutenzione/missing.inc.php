@@ -1,27 +1,57 @@
 <?php
+/*Controllo permessi utente: se non admin, redirect alla mappa*/
+if($_SESSION['admin']!=1) {
+    $redirect = 'main.php?page=mappaclick&map_id=' . (int)($_SESSION['mappa'] ?? 1);
+    echo '<script>window.location.href="' . $redirect . '";</script>';
+    echo '<noscript><meta http-equiv="refresh" content="0;url=' . $redirect . '"></noscript>';
+    exit;
+}
+
 if((is_numeric($_POST['mesi']) === true) && ($_POST['mesi'] >= 1) && ($_POST['mesi'] <= 12)) {
-    /*Eseguo l'aggiornamento*/
-    gdrcd_query("DELETE FROM clgpersonaggiooggetto WHERE nome IN (SELECT nome FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL ".gdrcd_filter('num', $_POST['mesi'])." MONTH) > ora_entrata)");
-    gdrcd_query("OPTIMIZE TABLE clgpersonaggiooggetto");
+    $mesi = gdrcd_filter('num', $_POST['mesi']);
 
-    gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE nome IN (SELECT nome FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL ".gdrcd_filter('num', $_POST['mesi'])." MONTH) > ora_entrata)");
-    gdrcd_query("OPTIMIZE TABLE clgpersonaggioabilita");
+    if(gdrcd_filter_get($_POST['conferma']) !== '1') {
+        /*Step 1: mostro il conteggio dei personaggi interessati e chiedo conferma*/
+        $count = gdrcd_query("SELECT COUNT(*) AS n FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > ora_entrata")['n'];
+        ?>
+        <div class="warning">
+            <?php echo sprintf(gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['confirm_warning']), $count); ?>
+        </div>
+        <form action="main.php?page=gestione_manutenzione" method="post" class="form_gestione">
+            <input type="hidden" name="op" value="missing">
+            <input type="hidden" name="mesi" value="<?php echo $mesi; ?>">
+            <input type="hidden" name="conferma" value="1">
+            <div class='form_submit'>
+                <input type="submit" value="<?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['confirm_button']); ?>" />
+                <a href="main.php?page=gestione_manutenzione"><?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['cancel_button']); ?></a>
+            </div>
+        </form>
+        <?php
+    } else {
+        /*Step 2: eseguo l'aggiornamento*/
+        gdrcd_query("DELETE FROM clgpersonaggiooggetto WHERE nome IN (SELECT nome FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > ora_entrata)");
+        gdrcd_query("OPTIMIZE TABLE clgpersonaggiooggetto");
 
-    gdrcd_query("DELETE FROM clgpersonaggiomostrine WHERE nome IN (SELECT nome FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL ".gdrcd_filter('num', $_POST['mesi'])." MONTH) > ora_entrata)");
-    gdrcd_query("OPTIMIZE TABLE clgpersonaggiomostrine");
+        gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE nome IN (SELECT nome FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > ora_entrata)");
+        gdrcd_query("OPTIMIZE TABLE clgpersonaggioabilita");
 
-    gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio IN (SELECT nome AS personaggio FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL ".gdrcd_filter('num', $_POST['mesi'])." MONTH) > ora_entrata)");
-    gdrcd_query("OPTIMIZE TABLE clgpersonaggioruolo");
+        gdrcd_query("DELETE FROM clgpersonaggiomostrine WHERE nome IN (SELECT nome FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > ora_entrata)");
+        gdrcd_query("OPTIMIZE TABLE clgpersonaggiomostrine");
 
-    gdrcd_query("DELETE FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL ".gdrcd_filter('num', $_POST['mesi'])." MONTH) > ora_entrata");
-    gdrcd_query("OPTIMIZE TABLE personaggio");
+        gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio IN (SELECT nome AS personaggio FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > ora_entrata)");
+        gdrcd_query("OPTIMIZE TABLE clgpersonaggioruolo");
+
+        gdrcd_query("DELETE FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > ora_entrata");
+        gdrcd_query("OPTIMIZE TABLE personaggio");
+        ?>
+        <!-- Conferma -->
+        <div class="warning">
+            <?php echo gdrcd_filter('out', $MESSAGE['warning']['modified']); ?>
+        </div>
+        <?php
+    }
+} else {
     ?>
-    <!-- Conferma -->
-    <div class="warning">
-        <?php echo gdrcd_filter('out', $MESSAGE['warning']['modified']); ?>
-    </div>
-    <?php
-} else {  ?>
     <div class="error">
         <?php echo gdrcd_filter('out', $MESSAGE['warning']['cant_do']); ?>
     </div>

@@ -791,6 +791,11 @@ $MESSAGE['interface']['administration']['maintenance']['deleted_info'] = 'Non sa
 $MESSAGE['interface']['administration']['maintenance']['blacklisted'] = 'Cancella la blacklist';
 $MESSAGE['interface']['administration']['maintenance']['blacklisted_info'] = '';
 $MESSAGE['interface']['administration']['maintenance']['months'] = 'mesi';
+$MESSAGE['interface']['administration']['maintenance']['missing_soft'] = 'Marca come cancellati i personaggi che non effettuano il login da più di';
+$MESSAGE['interface']['administration']['maintenance']['missing_soft_info'] = 'Il personaggio non viene cancellato fisicamente, solo marcato come tale (staff esclusi). Potrà essere ripulito definitivamente in seguito con "Elimina i personaggi provvisoriamente cancellati".';
+$MESSAGE['interface']['administration']['maintenance']['confirm_warning'] = 'Operazione irreversibile. Verranno interessate %d riga/righe.';
+$MESSAGE['interface']['administration']['maintenance']['confirm_button'] = 'Conferma';
+$MESSAGE['interface']['administration']['maintenance']['cancel_button'] = 'Annulla';
 /*Log*/
 $MESSAGE['interface']['administration']['log']['events']['page_name'] = 'Log eventi';
 $MESSAGE['interface']['administration']['log']['events']['link']['back'] = 'Torna alla scelta del log...';

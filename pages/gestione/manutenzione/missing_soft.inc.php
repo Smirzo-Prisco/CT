@@ -7,20 +7,18 @@ if($_SESSION['admin']!=1) {
     exit;
 }
 
-if((is_numeric($_POST['mesi']) === true) && ($_POST['mesi'] >= 0) && ($_POST['mesi'] <= 12)) {
+if((is_numeric($_POST['mesi']) === true) && ($_POST['mesi'] >= 1) && ($_POST['mesi'] <= 12)) {
     $mesi = gdrcd_filter('num', $_POST['mesi']);
 
     if(gdrcd_filter_get($_POST['conferma']) !== '1') {
-        /*Step 1: mostro il conteggio delle righe interessate e chiedo conferma*/
-        $count_messaggi = gdrcd_query("SELECT COUNT(*) AS n FROM messaggi WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > spedito")['n'];
-        $count_backmessaggi = gdrcd_query("SELECT COUNT(*) AS n FROM backmessaggi WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > spedito")['n'];
-        $count = $count_messaggi + $count_backmessaggi;
+        /*Step 1: mostro il conteggio dei personaggi interessati (staff esclusi) e chiedo conferma*/
+        $count = gdrcd_query("SELECT COUNT(*) AS n FROM personaggio WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > ora_entrata AND permessi = 0")['n'];
         ?>
         <div class="warning">
             <?php echo sprintf(gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['confirm_warning']), $count); ?>
         </div>
         <form action="main.php?page=gestione_manutenzione" method="post" class="form_gestione">
-            <input type="hidden" name="op" value="old_messages">
+            <input type="hidden" name="op" value="missing_soft">
             <input type="hidden" name="mesi" value="<?php echo $mesi; ?>">
             <input type="hidden" name="conferma" value="1">
             <div class='form_submit'>
@@ -30,11 +28,8 @@ if((is_numeric($_POST['mesi']) === true) && ($_POST['mesi'] >= 0) && ($_POST['me
         </form>
         <?php
     } else {
-        /*Step 2: eseguo l'aggiornamento*/
-        gdrcd_query("DELETE FROM messaggi WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > spedito");
-        gdrcd_query("OPTIMIZE TABLE messaggi");
-        gdrcd_query("DELETE FROM backmessaggi WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > spedito");
-        gdrcd_query("OPTIMIZE TABLE backmessaggi");
+        /*Step 2: marco come cancellati (permessi = -1) i personaggi inattivi, staff esclusi*/
+        gdrcd_query("UPDATE personaggio SET permessi = -1 WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > ora_entrata AND permessi = 0");
         ?>
         <!-- Conferma -->
         <div class="warning">

@@ -1,43 +1,71 @@
 <?php
-/*Eseguo l'aggiornamento*/
-gdrcd_query("DELETE FROM clgpersonaggiooggetto WHERE nome IN (SELECT nome FROM personaggio WHERE permessi = -1)");
-gdrcd_query("OPTIMIZE TABLE clgpersonaggiooggetto");
+/*Controllo permessi utente: se non admin, redirect alla mappa*/
+if($_SESSION['admin']!=1) {
+    $redirect = 'main.php?page=mappaclick&map_id=' . (int)($_SESSION['mappa'] ?? 1);
+    echo '<script>window.location.href="' . $redirect . '";</script>';
+    echo '<noscript><meta http-equiv="refresh" content="0;url=' . $redirect . '"></noscript>';
+    exit;
+}
 
-gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE nome IN (SELECT nome FROM personaggio WHERE permessi = -1)");
-gdrcd_query("OPTIMIZE TABLE clgpersonaggioabilita");
+if(gdrcd_filter_get($_POST['conferma']) !== '1') {
+    /*Step 1: mostro il conteggio dei personaggi interessati e chiedo conferma*/
+    $count = gdrcd_query("SELECT COUNT(*) AS n FROM personaggio WHERE permessi = -1")['n'];
+    ?>
+    <div class="warning">
+        <?php echo sprintf(gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['confirm_warning']), $count); ?>
+    </div>
+    <form action="main.php?page=gestione_manutenzione" method="post" class="form_gestione">
+        <input type="hidden" name="op" value="deleted">
+        <input type="hidden" name="conferma" value="1">
+        <div class='form_submit'>
+            <input type="submit" value="<?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['confirm_button']); ?>" />
+            <a href="main.php?page=gestione_manutenzione"><?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['cancel_button']); ?></a>
+        </div>
+    </form>
+    <?php
+} else {
+    /*Step 2: eseguo l'aggiornamento*/
+    gdrcd_query("DELETE FROM clgpersonaggiooggetto WHERE nome IN (SELECT nome FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("OPTIMIZE TABLE clgpersonaggiooggetto");
 
-gdrcd_query("DELETE FROM clgpersonaggiomostrine WHERE nome IN (SELECT nome FROM personaggio WHERE permessi = -1)");
-gdrcd_query("OPTIMIZE TABLE clgpersonaggiomostrine");
+    gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE nome IN (SELECT nome FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("OPTIMIZE TABLE clgpersonaggioabilita");
 
-gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("OPTIMIZE TABLE clgpersonaggioruolo");
+    gdrcd_query("DELETE FROM clgpersonaggiomostrine WHERE nome IN (SELECT nome FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("OPTIMIZE TABLE clgpersonaggiomostrine");
 
-gdrcd_query("DELETE FROM messaggi WHERE mittente IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("DELETE FROM messaggi WHERE destinatario IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("DELETE FROM backmessaggi WHERE mittente IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("DELETE FROM backmessaggi WHERE destinatario IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("OPTIMIZE TABLE messaggi");
+    gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("OPTIMIZE TABLE clgpersonaggioruolo");
 
-gdrcd_query("DELETE FROM araldo_letto WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("OPTIMIZE TABLE araldo_letto");
+    gdrcd_query("DELETE FROM messaggi WHERE mittente IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("DELETE FROM messaggi WHERE destinatario IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("DELETE FROM backmessaggi WHERE mittente IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("DELETE FROM backmessaggi WHERE destinatario IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("OPTIMIZE TABLE messaggi");
 
-gdrcd_query("UPDATE chat SET mittente = 'Cancellato' WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("UPDATE chat SET destinatario = 'Cancellato' WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("OPTIMIZE TABLE chat");
+    gdrcd_query("DELETE FROM araldo_letto WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("OPTIMIZE TABLE araldo_letto");
 
-gdrcd_query("UPDATE log SET nome_interessato = 'Cancellato' WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("OPTIMIZE TABLE log");
+    gdrcd_query("UPDATE chat SET mittente = 'Cancellato' WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("UPDATE chat SET destinatario = 'Cancellato' WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("OPTIMIZE TABLE chat");
 
-gdrcd_query("UPDATE messaggiaraldo SET autore = 'Cancellato' WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
-gdrcd_query("OPTIMIZE TABLE messaggiaraldo");
+    gdrcd_query("UPDATE log SET nome_interessato = 'Cancellato' WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("OPTIMIZE TABLE log");
 
-gdrcd_query("DELETE FROM personaggio WHERE permessi = -1");
-gdrcd_query("OPTIMIZE TABLE personaggio");
+    gdrcd_query("UPDATE messaggiaraldo SET autore = 'Cancellato' WHERE nome IN (SELECT nome AS personaggio FROM personaggio WHERE permessi = -1)");
+    gdrcd_query("OPTIMIZE TABLE messaggiaraldo");
+
+    gdrcd_query("DELETE FROM personaggio WHERE permessi = -1");
+    gdrcd_query("OPTIMIZE TABLE personaggio");
+    ?>
+    <!-- Conferma -->
+    <div class="warning">
+        <?php echo gdrcd_filter('out', $MESSAGE['warning']['modified']); ?>
+    </div>
+    <?php
+}
 ?>
-<!-- Conferma -->
-<div class="warning">
-    <?php echo gdrcd_filter('out', $MESSAGE['warning']['modified']); ?>
-</div>
 <!-- Link di ritorno alla visualizzazione di base -->
 <div class="link_back">
     <a href="main.php?page=gestione_manutenzione">

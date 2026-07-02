@@ -1,3 +1,12 @@
+<?php
+/*Controllo permessi utente: se non admin, redirect alla mappa*/
+if($_SESSION['admin']!=1) {
+    $redirect = 'main.php?page=mappaclick&map_id=' . (int)($_SESSION['mappa'] ?? 1);
+    echo '<script>window.location.href="' . $redirect . '";</script>';
+    echo '<noscript><meta http-equiv="refresh" content="0;url=' . $redirect . '"></noscript>';
+    exit;
+}
+?>
 <!-- Log -->
 <div class="panels_box">
     <form action="main.php?page=gestione_manutenzione"
@@ -101,6 +110,32 @@
         <!-- bottoni -->
         <div class='form_submit'>
             <input type="hidden" name="op" value="missing">
+            <input type="submit" value="<?php echo gdrcd_filter('out', $MESSAGE['interface']['forms']['submit']); ?>" />
+        </div>
+    </form>
+</div>
+<!-- Assenti (cancellazione soft) -->
+<div class="panels_box">
+    <form action="main.php?page=gestione_manutenzione"
+          method="post"
+          class="form_gestione">
+        <div class='form_label'>
+            <?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['missing_soft']); ?>
+        </div>
+        <div class='form_field'>
+            <select name="mesi" ?>
+                <?php
+                for($i = 1; $i <= 12; $i++) { ?>
+                    <option value="<?php echo $i; ?>"><?php echo $i.' '.gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['months']); ?></option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class='form_info'>
+            <?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['maintenance']['missing_soft_info']); ?>
+        </div>
+        <!-- bottoni -->
+        <div class='form_submit'>
+            <input type="hidden" name="op" value="missing_soft">
             <input type="submit" value="<?php echo gdrcd_filter('out', $MESSAGE['interface']['forms']['submit']); ?>" />
         </div>
     </form>
