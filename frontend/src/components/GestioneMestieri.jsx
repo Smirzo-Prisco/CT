@@ -217,6 +217,7 @@ function MestiereModal({ mestiere, ruoli, tipi, onClose, onSaved, onRuoliChange 
                     </div>
                 </div>
 
+                <div className="gm-modal-body">
                 {!isIndipendenti && (
                 <form id="formSaveMestiere" ref={formRef} onSubmit={submit}>
                     <div className="form-section">
@@ -311,6 +312,7 @@ function MestiereModal({ mestiere, ruoli, tipi, onClose, onSaved, onRuoliChange 
                             ))}
                         </div>
                 )}
+                </div>
 
                 <div className="gp-modal-footer">
                     <button type="button" className="btn btn--ghost" onClick={onClose}>Annulla</button>

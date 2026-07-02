@@ -5,6 +5,16 @@
 // ============================================================
 @use '../tokens' as *;
 
+// Corpo scrollabile della modale — .modal-content ha max-height + overflow:hidden
+// (da _gestione.scss), lo scroll interno è legato all'id #formSavePg che qui
+// non usiamo: serve un contenitore dedicato con lo stesso comportamento.
+.gm-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding: 0 30px;
+}
+
 .gm-image-field {
     display: flex;
     align-items: center;
@@ -28,6 +38,7 @@
 
 .gm-role-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
     gap: $space-3;
     padding: $space-3 0;
@@ -42,14 +53,24 @@
         padding-bottom: $space-4;
         margin-bottom: $space-4;
         border-bottom: 2px solid $color-border;
+
+        // Il bottone "Aggiungi ruolo" va sempre su una riga propria: in linea
+        // con gli altri campi finiva per schiacciare il campo Nome ruolo
+        .btn {
+            flex: 1 0 100%;
+        }
     }
 }
 
 .gm-role-fields {
-    flex: 1;
+    flex: 1 1 480px;
     flex-wrap: wrap;
     align-items: flex-end;
     margin-bottom: 0;
+
+    .form-column {
+        min-width: 160px;
+    }
 }
 
 .gm-feedback {
