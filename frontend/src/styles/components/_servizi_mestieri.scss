@@ -343,6 +343,62 @@
         &--error i { color: #{$color-warning}; }
     }
 
+    // ── Campi editabili (self-service capo) ────────────────────
+
+    .sm-field {
+        display: flex;
+        flex-direction: column;
+        gap: $space-1;
+        margin-bottom: $space-4;
+
+        label {
+            font-size: $text-xs;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #{$color-text-secondary};
+        }
+    }
+
+    .sm-field--checkbox {
+        flex-direction: row;
+        align-items: center;
+        gap: $space-2;
+
+        label { text-transform: none; letter-spacing: normal; font-weight: 400; }
+    }
+
+    .sm-field-note {
+        font-size: $text-xs;
+        color: #{$color-text-muted};
+    }
+
+    .sm-error-text {
+        font-size: $text-sm;
+        color: #{$color-warning};
+        margin-top: $space-2;
+    }
+
+    .sm-img-box--upload {
+        cursor: pointer;
+    }
+
+    // riga grado in modalità editing: input inline + azioni testuali
+    .sm-rank-item--edit {
+        flex-wrap: wrap;
+        align-items: flex-end;
+
+        input { flex: 1; min-width: 70px; }
+    }
+
+    .sm-rank-actions {
+        display: flex;
+        gap: $space-3;
+        margin-left: auto;
+
+        button { font-size: $text-sm; }
+    }
+
     // ── Responsive ────────────────────────────────────────────
 
     @media (max-width: 480px) {
