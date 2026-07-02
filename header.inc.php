@@ -71,7 +71,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <meta name="description" content="Scopri Crystal Tokyo GDR, un GDR play by chat gratuito con combattimenti a dadi, famiglie magiche, crescita del personaggio e gioco narrativo condiviso.">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
+        <?php $favicon_v = @filemtime(__DIR__ . '/imgs/favicon.ico') ?: 0; ?>
+        <link rel="icon" type="image/x-icon" href="imgs/favicon.ico?v=<?= $favicon_v ?>">
         <?php
         $theme_path = 'themes/' . $PARAMETERS['themes']['current_theme'];
         $css_v = static function(string $file) use ($theme_path): string {

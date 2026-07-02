@@ -81,7 +81,8 @@ function public_head(
     <link rel="stylesheet" href="/public/public.css">
     <?php endif; ?>
 
-    <link rel="icon" type="image/x-icon" href="/imgs/favicon.ico">
+    <?php $favicon_v = @filemtime($_SERVER['DOCUMENT_ROOT'] . '/imgs/favicon.ico') ?: 0; ?>
+    <link rel="icon" type="image/x-icon" href="/imgs/favicon.ico?v=<?= $favicon_v ?>">
 </head>
 <?php
 }
