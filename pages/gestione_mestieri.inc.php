@@ -173,7 +173,7 @@ elseif (in_array(gdrcd_filter('get', $_REQUEST['op'] ?? ''), ['new', 'edit'])):
 <!-- ── Form mestiere ───────────────────────────────────────────────── -->
 <div class="guild-container">
     <div class="topbar">
-        <a href="javascript:history.back()" class="back">⬅️ Indietro</a>
+        <a href="main.php?page=gestione_mestieri" class="back">⬅️ Indietro</a>
         <span style="font-weight:bold;"><?= $operation == 'edit' ? 'Modifica Mestiere' : 'Nuovo Mestiere' ?></span>
     </div>
 
