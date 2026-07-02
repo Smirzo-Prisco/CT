@@ -53,14 +53,15 @@
 // ── Varianti ─────────────────────────────────────────────────
 
 .btn--primary {
+    // Sfondo azzurro chiaro: serve testo scuro per il contrasto (stesso principio di .btn--action)
     background: $color-primary;
     border-color: $color-primary;
-    color: $color-text-light;
+    color: $palette-surface-deep;
 
     &:hover:not(:disabled) {
         background: $color-primary-hover;
         border-color: $color-primary-hover;
-        color: $color-text-light;
+        color: $palette-surface-deep;
     }
 }
 

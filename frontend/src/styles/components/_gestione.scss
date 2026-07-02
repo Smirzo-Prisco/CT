@@ -95,7 +95,9 @@ header {
         background: $gestione-hover;
     }
 
-    i {
+    // Solo l'icona diretta della card (menu a icone tipo Gestione.jsx), mai le icone
+    // dentro bottoni/contenuti annidati (es. form o RuoloRow dentro una card)
+    > i {
         font-size: 40px;
         margin-bottom: $space-2 + 2;
         color: $gestione-action;

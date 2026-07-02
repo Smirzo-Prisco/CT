@@ -5,6 +5,38 @@
 // ============================================================
 @use '../tokens' as *;
 
+// .form-group/.form-row/.form-column sono definite in _gestione.scss solo dentro
+// .pg-edit-container (i modal di editing). Qui le rendiamo utilizzabili anche in
+// pagine "piatte" come MiaGilda: la specificità minore fa sì che dentro
+// .pg-edit-container continuino a vincere le regole più specifiche di sistema.
+.form-group {
+    margin-bottom: $space-4;
+
+    label {
+        display: block;
+        margin-bottom: $space-1 + 1;
+        font-weight: $font-weight-bold;
+        color: $color-text-muted;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+.form-row {
+    display: flex;
+    gap: $space-5;
+    margin-bottom: $space-4;
+}
+
+.form-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 // Corpo scrollabile della modale — .modal-content ha max-height + overflow:hidden
 // (da _gestione.scss), lo scroll interno è legato all'id #formSavePg che qui
 // non usiamo: serve un contenitore dedicato con lo stesso comportamento.

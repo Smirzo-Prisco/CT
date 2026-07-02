@@ -17,19 +17,22 @@ $back_label   = $from === 'servizi_gilde'
 ?>
 <div class="sm-page">
 
+<?php
+// Filtro opzionale: quando si arriva dalla voce "Gilde" di Uffici, mostra solo
+// le gilde create dai giocatori (tipo != 1), non i mestieri globali fissi
+$solo_gilde = !empty($_REQUEST['solo_gilde']);
+?>
+
 <?php if ($id_mestiere === null): /* ── VISTA ELENCO ─────────────────────────── */ ?>
 
     <div class="sm-header sm-header--list">
         <h2 class="sm-title">
-            <i class="fas fa-briefcase"></i>
-            <?= gdrcd_filter('out', $PARAMETERS['names']['job_name']['plur']) ?>
+            <i class="fas <?= $solo_gilde ? 'fa-shield-halved' : 'fa-briefcase' ?>"></i>
+            <?= $solo_gilde ? 'Gilde' : gdrcd_filter('out', $PARAMETERS['names']['job_name']['plur']) ?>
         </h2>
     </div>
 
     <?php
-    // Filtro opzionale: quando si arriva dalla voce "Gilde" di Uffici, mostra solo
-    // le gilde create dai giocatori (tipo != 1), non i mestieri globali fissi
-    $solo_gilde = !empty($_REQUEST['solo_gilde']);
     $result = gdrcd_query(
         "SELECT m.nome, m.id_mestiere, m.tipo, m.url_sito, c.descrizione
            FROM mestiere m

@@ -162,7 +162,7 @@ function CreaGilda({ onCreata }) {
     }
 
     return (
-        <div className="card">
+        <div className="card gm-card">
             <h3>Crea la tua gilda</h3>
             <p className="gm-description">
                 Diventerai automaticamente il capo. Potrai poi definire i gradi e, in seguito,
@@ -218,10 +218,14 @@ export default function MiaGilda() {
             <header>🛡️ La mia gilda</header>
             <div style={{ padding: 20, maxWidth: 720, margin: '0 auto' }}>
 
+                <div className="link_back" style={{ marginBottom: 16 }}>
+                    <button onClick={() => window.history.back()}>← Torna indietro</button>
+                </div>
+
                 {!stato.ha_gilda && stato.puo_creare && <CreaGilda onCreata={carica} />}
 
                 {!stato.ha_gilda && !stato.puo_creare && (
-                    <div className="card">
+                    <div className="card gm-card">
                         <p>Hai già un'affiliazione lavorativa attiva: non puoi fondare una nuova gilda finché non la lasci.</p>
                         <a href="main.php?page=servizi_adm_mestieri" className="btn btn--secondary">Gestisci le tue affiliazioni</a>
                     </div>
@@ -290,7 +294,7 @@ function GildaEsistente({ stato, onChange }) {
     if (!eCapo) {
         // Vista sola lettura per i membri semplici
         return (
-            <div className="card">
+            <div className="card gm-card">
                 <div className="gm-image-field" style={{ marginBottom: 16 }}>
                     <img src={`imgs/mestieri/${mestiere.immagine}`} alt="" className="gm-image-thumb"
                          onError={e => { e.target.style.visibility = 'hidden' }} />
@@ -308,7 +312,7 @@ function GildaEsistente({ stato, onChange }) {
 
     // Vista capo: editing completo
     return (
-        <div className="card">
+        <div className="card gm-card">
             <h3>Gestisci la tua gilda</h3>
             <form onSubmit={salvaGilda}>
                 <div className="form-group">
