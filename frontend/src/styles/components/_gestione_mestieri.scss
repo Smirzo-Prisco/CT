@@ -1,0 +1,76 @@
+// ============================================================
+// _gestione_mestieri.scss — Pannello admin mestieri e ruoli
+// Riusa .gp-topbar/.gp-list/.pg-edit-container/.form-row/.form-group
+// da _gestione.scss; qui solo le regole non già coperte.
+// ============================================================
+@use '../tokens' as *;
+
+.gm-image-field {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+}
+
+.gm-image-thumb {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+    background: $color-bg;
+    flex-shrink: 0;
+}
+
+.gm-image-thumb--sm {
+    width: 40px;
+    height: 40px;
+}
+
+.gm-role-row {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-3;
+    padding: $space-3 0;
+    border-bottom: 1px solid $color-border;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &--new {
+        align-items: flex-end;
+        padding-bottom: $space-4;
+        margin-bottom: $space-4;
+        border-bottom: 2px solid $color-border;
+    }
+}
+
+.gm-role-fields {
+    flex: 1;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-bottom: 0;
+}
+
+.gm-feedback {
+    margin-top: $space-2;
+    font-size: $text-sm;
+    border-radius: $radius-sm;
+    padding: $space-2 $space-3;
+
+    &--ok {
+        color: $color-success;
+        background: rgba($color-success, 0.12);
+    }
+
+    &--error {
+        color: $color-danger;
+        background: rgba($color-danger, 0.12);
+    }
+}
+
+@media (max-width: 700px) {
+    .gm-role-row {
+        flex-direction: column;
+    }
+}

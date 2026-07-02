@@ -396,38 +396,64 @@ function getCampiSpecificiCategoria($categoria, $post) {
     return $campi;
 }
 
+/**
+ * Valida e salva un'immagine caricata via $_FILES, con naming collision-proof.
+ * Funzione centralizzata: usata da saveImgObj(), saveImgGuild() e da qualsiasi
+ * altro modulo che debba gestire l'upload di un'immagine (es. mestieri).
+ *
+ * @param array       $file       Sotto-array $_FILES['campo'] (tmp_name, name, error, size)
+ * @param string      $folder     Cartella di destinazione relativa alla root, es. 'imgs/items/'
+ * @param string      $prefix     Prefisso del nome file generato, es. 'oggetto_'
+ * @param string|null $imgEsistente Nome file da cancellare se viene sostituito
+ * @param int         $maxBytes   Dimensione massima consentita (default 3 MB)
+ * @return string|null Nome del nuovo file salvato, o null se non è stato caricato nulla
+ * @throws Exception se il file è presente ma non valido (tipo, dimensione, errore upload)
+ */
+function saveUploadedImage(array $file, string $folder, string $prefix, ?string $imgEsistente = null, int $maxBytes = 3145728): ?string {
+    if (empty($file['tmp_name'])) {
+        return null;
+    }
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        throw new Exception('Errore durante il caricamento del file.');
+    }
+
+    if ($file['size'] > $maxBytes) {
+        throw new Exception('Immagine troppo grande (massimo ' . round($maxBytes / 1048576, 1) . ' MB).');
+    }
+
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($fileInfo, $file['tmp_name']);
+    finfo_close($fileInfo);
+
+    if (!in_array($mimeType, $allowedTypes)) {
+        throw new Exception('Tipo file non supportato. Usa JPEG, PNG, GIF o WebP.');
+    }
+
+    $img_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $nomeFile = $prefix . uniqid() . '.' . $img_ext;
+    $target_file = __DIR__ . '/../' . $folder . '/' . $nomeFile;
+
+    if (!move_uploaded_file($file['tmp_name'], $target_file)) {
+        throw new Exception('Errore nel caricamento dell\'immagine');
+    }
+
+    if ($imgEsistente && file_exists(__DIR__ . '/../' . $folder . '/' . $imgEsistente)) {
+        unlink(__DIR__ . '/../' . $folder . '/' . $imgEsistente);
+    }
+
+    return $nomeFile;
+}
+
 function saveImgObj($dati, $imgEsistente = null, $files) {
-    if (!empty($files['img_oggetto']['tmp_name']) && $files['img_oggetto']['error'] === UPLOAD_ERR_OK) {
-        // Validazione file
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($fileInfo, $files['img_oggetto']['tmp_name']);
-        finfo_close($fileInfo);
+    $nomeFile = saveUploadedImage($files['img_oggetto'] ?? [], 'imgs/items', 'oggetto_', $imgEsistente);
 
-        if (!in_array($mimeType, $allowedTypes)) {
-            throw new Exception('Tipo file non supportato. Usa JPEG, PNG, GIF o WebP.');
-        }
-
-        // Upload nuova immagine
-        $img_ext = strtolower(pathinfo($files['img_oggetto']['name'], PATHINFO_EXTENSION));
-        $nomeFile = "oggetto_".uniqid().".".$img_ext;
-        $target_file = __DIR__ . "/../imgs/items/" . $nomeFile;
-
-        if (!move_uploaded_file($files['img_oggetto']['tmp_name'], $target_file)) {
-            throw new Exception('Errore nel caricamento dell\'immagine');
-        }
-
+    if ($nomeFile !== null) {
         $dati['urlimg'] = $nomeFile;
-
-        // Elimina vecchia immagine se esiste
-        if ($imgEsistente && file_exists(__DIR__ . "/../imgs/items/" . $imgEsistente)) {
-            unlink(__DIR__ . "/../imgs/items/" . $imgEsistente);
-        }
-    } elseif ($imgEsistente && empty($files['img_oggetto']['tmp_name'])) {
-        // Mantieni immagine esistente
+    } elseif ($imgEsistente) {
         $dati['urlimg'] = $imgEsistente;
     } else {
-        // Nessuna immagine
         $dati['urlimg'] = '';
     }
 
@@ -594,39 +620,13 @@ function getLevelPg(int $totStats, array $soglie = []): int {
 
 /************* GILDA ******************************/
 function saveImgGuild($dati, $imgEsistente = null, $files) {
-    if (!empty($files['immagine']['tmp_name']) && $files['immagine']['error'] === UPLOAD_ERR_OK) {
-        $img = $files['immagine'];
+    $nomeFile = saveUploadedImage($files['immagine'] ?? [], 'imgs/guilds', 'guild_', $imgEsistente);
 
-        // Validazione file
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($fileInfo, $img['tmp_name']);
-        finfo_close($fileInfo);
-
-        if (!in_array($mimeType, $allowedTypes)) {
-            throw new Exception('Tipo file non supportato. Usa JPEG, PNG, GIF o WebP.');
-        }
-
-        // Upload nuova immagine
-        $img_ext = strtolower(pathinfo($img['name'], PATHINFO_EXTENSION));
-        $nomeFile = "guild_".uniqid().".".$img_ext;
-        $target_file = __DIR__ . "/../imgs/guilds/" . $nomeFile;
-
-        if (!move_uploaded_file($img['tmp_name'], $target_file)) {
-            throw new Exception('Errore nel caricamento dell\'immagine');
-        }
-
+    if ($nomeFile !== null) {
         $dati['immagine'] = $nomeFile;
-
-        // Elimina vecchia immagine se esiste
-        if ($imgEsistente && file_exists(__DIR__ . "/../imgs/guilds/" . $imgEsistente)) {
-            unlink(__DIR__ . "/../imgs/guilds/" . $imgEsistente);
-        }
-    } elseif ($imgEsistente && empty($img['tmp_name'])) {
-        // Mantieni immagine esistente
+    } elseif ($imgEsistente) {
         $dati['immagine'] = $imgEsistente;
     } else {
-        // Nessuna immagine
         $dati['immagine'] = '';
     }
 

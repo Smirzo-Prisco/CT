@@ -65,6 +65,7 @@ import Meteo           from './components/Meteo'
 import ChatbotWidget   from './components/ChatbotWidget'
 import GestioneBot    from './components/GestioneBot'
 import GestioneManutenzione from './components/GestioneManutenzione'
+import GestioneMestieri from './components/GestioneMestieri'
 import ContattaModerazione from './components/ContattaModerazione'
 
 /**
@@ -169,6 +170,9 @@ window.CT.register('GestioneBot', GestioneBot)
 
 /** Pannello admin manutenzione DB: pulizia log/chat/messaggi, personaggi assenti/cancellati, blacklist */
 window.CT.register('GestioneManutenzione', GestioneManutenzione)
+
+/** Pannello admin gestione mestieri e ruoli: lista, form CRUD, upload immagini */
+window.CT.register('GestioneMestieri', GestioneMestieri)
 
 /** Form + cronologia richieste di moderazione, con pannello staff integrato */
 window.CT.register('ContattaModerazione', ContattaModerazione)
