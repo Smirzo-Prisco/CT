@@ -358,6 +358,13 @@
             text-transform: uppercase;
             color: #{$color-text-secondary};
         }
+
+        // sovrascrive il reset legacy width:80% di _forms.scss, pensato per
+        // i vecchi layout centrati (.form_gioco), non per questo flex column
+        input, select, textarea {
+            width: 100%;
+            margin-bottom: 0;
+        }
     }
 
     .sm-field--checkbox {
