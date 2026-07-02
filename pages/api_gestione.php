@@ -64,9 +64,10 @@ switch ($op) {
         };
 
         // ── Costruzione del menu filtrato ────────────────────────────────
+        // L'ordine dei blocchi sotto è l'ordine di visualizzazione delle card.
         $menu = [];
 
-        // GESTIONE PERSONAGGI
+        // 1. GESTIONE PERSONAGGI
         if ($perms['admin'] || $perms['master'] || $perms['moderatore'] || $perms['custode']) {
             $voci = [['label' => 'Personaggi', 'url' => 'gestione.php?page=gestione_personaggio']];
             if ($perms['admin'])
@@ -78,25 +79,28 @@ switch ($op) {
             $menu[] = ['key' => 'gestione_pg', 'label' => 'Gestione pg', 'icon' => 'fa-user-gear', 'voci' => $voci];
         }
 
-        // GILDE (ex famiglie, oggi "razze" narrative — tabella gilda)
+        // 2. GILDE (ex famiglie, oggi "razze" narrative — tabella gilda)
         if ($perms['admin'] || $perms['capogilda']) {
             $menu[] = ['key' => 'gilde', 'label' => 'Nuove razze', 'icon' => 'fa-users', 'voci' => [
                 ['label' => 'Nuove razze', 'url' => 'gestione.php?page=gestione_gilde'],
             ]];
         }
 
-        // OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
-        // tenute solo per interventi occasionali dello staff
-        if ($perms['admin']) {
-            $menu[] = ['key' => 'old', 'label' => 'OLD', 'icon' => 'fa-box-archive', 'voci' => [
-                ['label' => 'Famiglie indipendenti', 'url' => 'gestione.php?page=gestione_gilde&op=edit&id_record=-1'],
-                ['label' => 'Correnti',              'url' => 'gestione.php?page=gestione_tipi&types=guilds'],
-                ['label' => 'Reliquie',              'url' => 'gestione.php?page=punti_png'],
-                ['label' => 'Razze e spiriti',       'url' => 'gestione.php?page=gestione_razze'],
-            ]];
+        // 3. MESTIERI
+        if ($perms['admin'] || $perms['master'] || $perms['capogilda']) {
+            $voci = [];
+            if ($perms['admin']) {
+                $voci[] = ['label' => 'Mestieri',             'url' => 'gestione.php?page=gestione_mestieri'];
+                $voci[] = ['label' => 'Assegna mestiere',    'url' => 'gestione.php?page=gestione_mestiere'];
+                $voci[] = ['label' => 'Lavori indipendenti', 'url' => 'gestione.php?page=gestione_mestieri&op=edit&id_record=-1'];
+            }
+            if ($perms['admin'] || $perms['capogilda'])
+                $voci[] = ['label' => 'Statuti', 'url' => 'gestione.php?page=gestione_statuti_new'];
+            if (!empty($voci))
+                $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri', 'icon' => 'fa-briefcase', 'voci' => $voci];
         }
 
-        // GILDA (giocatore) — chiunque non abbia già una gilda (jobs_limit permettendo)
+        // 4. GILDA (giocatore) — chiunque non abbia già una gilda (jobs_limit permettendo)
         // o sia capo=1 di quella che ha già, non solo lo staff
         $login_esc = gdrcd_filter('in', $_SESSION['login']);
         $mia_gilda_row = gdrcd_query(
@@ -122,33 +126,7 @@ switch ($op) {
             ]];
         }
 
-        // MESTIERI
-        if ($perms['admin'] || $perms['master'] || $perms['capogilda']) {
-            $voci = [];
-            if ($perms['admin']) {
-                $voci[] = ['label' => 'Mestieri',             'url' => 'gestione.php?page=gestione_mestieri'];
-                $voci[] = ['label' => 'Assegna mestiere',    'url' => 'gestione.php?page=gestione_mestiere'];
-                $voci[] = ['label' => 'Lavori indipendenti', 'url' => 'gestione.php?page=gestione_mestieri&op=edit&id_record=-1'];
-            }
-            if ($perms['admin'] || $perms['capogilda'])
-                $voci[] = ['label' => 'Statuti', 'url' => 'gestione.php?page=gestione_statuti_new'];
-            if (!empty($voci))
-                $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri', 'icon' => 'fa-briefcase', 'voci' => $voci];
-        }
-
-        // OGGETTI
-        /*
-        if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic']) {
-            $voci = [['label' => 'Oggetti', 'url' => 'gestione.php?page=gestione_oggetti']];
-            if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic'])
-                $voci[] = ['label' => 'Ricarica oggetto', 'url' => 'gestione.php?page=oggetto_ricarica'];
-            if ($perms['admin'])
-                $voci[] = ['label' => 'Tipi di oggetto', 'url' => 'gestione.php?page=gestione_tipi&types=items'];
-            $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
-        }
-        */
-
-        // STRUMENTI (solo admin)
+        // 5. STRUMENTI (solo admin)
         if ($perms['admin']) {
             $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => [
                 ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'],
@@ -160,7 +138,7 @@ switch ($op) {
             ]];
         }
 
-        // LOG
+        // 6. LOG
         if ($perms['admin'] || $perms['master'] || $perms['capomestiere'] || $perms['moderatore']) {
             $voci = [];
             if ($perms['admin'])                              $voci[] = ['label' => 'Tutti i log',        'url' => 'gestione.php?page=log'];
@@ -170,7 +148,7 @@ switch ($op) {
                 $menu[] = ['key' => 'log', 'label' => 'Log', 'icon' => 'fa-file-lines', 'voci' => $voci];
         }
 
-        // ── Statistiche sito (visibili a tutti) ──────────────────────────
+        // 7. Statistiche sito (visibili a tutti)
         $iscritti    = (int)gdrcd_query("SELECT COUNT(nome) AS num FROM personaggio WHERE permessi >= 0 AND sesso != 'b'")['num'];
         $bacheca     = (int)gdrcd_query("SELECT COUNT(id_messaggio) AS num FROM messaggioaraldo")['num'];
         $azioni_sett = (int)gdrcd_query("SELECT COUNT(id) AS num FROM chat WHERE ora > DATE_SUB(NOW(), INTERVAL 7 DAY) AND (tipo = 'P' OR tipo = 'A')")['num'];
@@ -182,7 +160,7 @@ switch ($op) {
             ['label' => "Azioni settimana: $azioni_sett", 'url' => '#'],
         ]];
 
-        // Ultimi iscritti (admin, master, moderatore)
+        // 8. Ultimi iscritti (admin, master, moderatore)
         if ($perms['admin'] || $perms['master'] || $perms['moderatore']) {
             $ultimi_res    = gdrcd_query(
                 "SELECT nome, data_iscrizione FROM personaggio
@@ -202,6 +180,29 @@ switch ($op) {
                 $menu[] = ['key' => 'ultimi_iscritti', 'label' => 'Ultimi iscritti', 'icon' => 'fa-user-plus', 'voci' => $voci_iscritti];
             }
         }
+
+        // 9. OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
+        // tenute solo per interventi occasionali dello staff
+        if ($perms['admin']) {
+            $menu[] = ['key' => 'old', 'label' => 'OLD', 'icon' => 'fa-box-archive', 'voci' => [
+                ['label' => 'Famiglie indipendenti', 'url' => 'gestione.php?page=gestione_gilde&op=edit&id_record=-1'],
+                ['label' => 'Correnti',              'url' => 'gestione.php?page=gestione_tipi&types=guilds'],
+                ['label' => 'Reliquie',              'url' => 'gestione.php?page=punti_png'],
+                ['label' => 'Razze e spiriti',       'url' => 'gestione.php?page=gestione_razze'],
+            ]];
+        }
+
+        // OGGETTI
+        /*
+        if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic']) {
+            $voci = [['label' => 'Oggetti', 'url' => 'gestione.php?page=gestione_oggetti']];
+            if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic'])
+                $voci[] = ['label' => 'Ricarica oggetto', 'url' => 'gestione.php?page=oggetto_ricarica'];
+            if ($perms['admin'])
+                $voci[] = ['label' => 'Tipi di oggetto', 'url' => 'gestione.php?page=gestione_tipi&types=items'];
+            $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
+        }
+        */
 
         echo json_encode([
             'success'   => true,
