@@ -26,6 +26,16 @@ if ($PARAMETERS['settings']['protection'] == 'ON') {
     require 'protezione.php';
 }
 
+/* ── Statistiche live per la homepage ───────────────────────────────── */
+require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/functions.inc.php';
+$_db_home = gdrcd_connect();
+$stat_iscritti    = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE permessi >= 0 AND sesso != 'b'")['n'] ?? 0);
+$stat_online      = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM personaggio WHERE ora_entrata > ora_uscita AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW() AND is_invisible = 0")['n'] ?? 0);
+$stat_azioni_oggi = (int)(gdrcd_query("SELECT COUNT(id) AS n FROM chat WHERE DATE(ora) = CURDATE() AND tipo IN ('P','A')")['n'] ?? 0);
+$_mesi = ['','gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+$_data_iso  = date('Y-m-d');
+$_data_it   = (int)date('j') . ' ' . $_mesi[(int)date('n')] . ' ' . date('Y');
+
 /* ── Include componenti condivisi da /public/ ───────────────────────── */
 /* Percorso assoluto: questa pagina è inclusa dalla root del sito */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/public/_head.php';
@@ -111,6 +121,35 @@ public_head(
     </div>
 </section>
 
+
+<!-- ── STATISTICHE LIVE ──────────────────────────────────────────────────── -->
+<section class="pub-stat-strip">
+    <div class="pub-section-inner pub-center">
+        <p class="pub-stat-strip-date">Crystal Tokyo oggi &mdash; <time datetime="<?= $_data_iso ?>"><?= $_data_it ?></time></p>
+        <div class="pub-stats-grid pub-stats-grid--4">
+            <div class="pub-stat-item">
+                <span class="pub-stat-value"><?= number_format($stat_iscritti, 0, ',', '.') ?></span>
+                <span class="pub-stat-label">Personaggi</span>
+                <span class="pub-stat-desc">iscritti al gioco</span>
+            </div>
+            <div class="pub-stat-item">
+                <span class="pub-stat-value"><?= $stat_online ?></span>
+                <span class="pub-stat-label">Online ora</span>
+                <span class="pub-stat-desc">giocatori connessi</span>
+            </div>
+            <div class="pub-stat-item">
+                <span class="pub-stat-value"><?= number_format($stat_azioni_oggi, 0, ',', '.') ?></span>
+                <span class="pub-stat-label">Azioni oggi</span>
+                <span class="pub-stat-desc">narrativa scritta</span>
+            </div>
+            <div class="pub-stat-item">
+                <span class="pub-stat-value">20+</span>
+                <span class="pub-stat-label">Anni attivi</span>
+                <span class="pub-stat-desc">comunità online</span>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- ── SEZIONE: COSA TI ASPETTA ──────────────────────────────────────────── -->
 <section class="pub-section pub-section--dark">
@@ -310,7 +349,7 @@ public_head(
 -->
 
 </main>
-<?php public_footer(); ?>
+<?php public_footer(); gdrcd_close_connection($_db_home); ?>
 
 <!-- Apertura modali dai bottoni CTA della homepage -->
 <script>
