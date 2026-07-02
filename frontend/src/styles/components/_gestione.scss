@@ -98,7 +98,7 @@ header {
     // Solo l'icona diretta della card (menu a icone tipo Gestione.jsx), mai le icone
     // dentro bottoni/contenuti annidati (es. form o RuoloRow dentro una card)
     > i {
-        font-size: 40px;
+        font-size: 12px;
         margin-bottom: $space-2 + 2;
         color: $gestione-action;
     }
@@ -425,7 +425,7 @@ header {
         padding: 15px;
 
         > i {
-            font-size: 32px;
+            font-size: 12px;
         }
 
         h3 {
@@ -439,7 +439,7 @@ header {
         }
 
         .card > i {
-            font-size: 28px;
+            font-size: 12px;
             margin-right: $space-2 + 2;
         }
 

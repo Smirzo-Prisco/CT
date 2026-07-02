@@ -227,7 +227,7 @@ export default function MiaGilda() {
                 {!stato.ha_gilda && !stato.puo_creare && (
                     <div className="card gm-card">
                         <p>Hai già un'affiliazione lavorativa attiva: non puoi fondare una nuova gilda finché non la lasci.</p>
-                        <a href="main.php?page=servizi_adm_mestieri" className="btn btn--secondary">Gestisci le tue affiliazioni</a>
+                        <a href="main.php?page=servizi_adm_mestieri">Gestisci le tue affiliazioni</a>
                     </div>
                 )}
 
@@ -305,7 +305,7 @@ function GildaEsistente({ stato, onChange }) {
                 <ul>
                     {ruoliLocali.map(r => <li key={r.id_ruolo}>{r.nome_ruolo}{r.capo == 1 ? ' (capo)' : ''}</li>)}
                 </ul>
-                <a href={`main.php?page=servizi_adm_mestieri&id_mestiere=${mestiere.id_mestiere}`} className="btn btn--secondary">Abbandona / gestisci affiliazione</a>
+                <a href={`main.php?page=servizi_adm_mestieri&id_mestiere=${mestiere.id_mestiere}`}>Abbandona / gestisci affiliazione</a>
             </div>
         )
     }
@@ -354,8 +354,8 @@ function GildaEsistente({ stato, onChange }) {
                                onChange={e => setNuovoGrado({ ...nuovoGrado, stipendio: e.target.value })} />
                     </div>
                 </div>
-                <button type="button" className="btn btn--success" onClick={aggiungiGrado} disabled={nuovoGradoSaving}>
-                    <i className="fa-solid fa-plus"></i>&nbsp; Aggiungi grado
+                <button type="button" onClick={aggiungiGrado} disabled={nuovoGradoSaving}>
+                    Aggiungi grado
                 </button>
             </div>
 
