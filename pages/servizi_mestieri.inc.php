@@ -6,22 +6,27 @@
 
 $id_mestiere = isset($_REQUEST['id_mestiere']) ? (int)gdrcd_filter('num', $_REQUEST['id_mestiere']) : null;
 
+// Filtro opzionale: quando si arriva dalla voce "Gilde" di Uffici, mostra solo
+// le gilde create dai giocatori (tipo != 1), non i mestieri globali fissi
+$solo_gilde = !empty($_REQUEST['solo_gilde']);
+
 $allowed_from = ['servizi_mestieri', 'servizi_gilde'];
 $from         = isset($_REQUEST['from']) && in_array($_REQUEST['from'], $allowed_from, true)
     ? $_REQUEST['from']
     : 'servizi_mestieri';
-$back_url     = 'main.php?page=' . $from;
-$back_label   = $from === 'servizi_gilde'
-    ? 'Razze e Mestieri'
-    : gdrcd_filter('out', $PARAMETERS['names']['job_name']['plur']);
+
+if ($solo_gilde) {
+    // Si arriva dalla vetrina gilde di Uffici: si torna lì, non alla lista mestieri generale
+    $back_url   = 'main.php?page=servizi_mestieri&solo_gilde=1';
+    $back_label = 'Indietro';
+} else {
+    $back_url   = 'main.php?page=' . $from;
+    $back_label = $from === 'servizi_gilde'
+        ? 'Razze e Mestieri'
+        : gdrcd_filter('out', $PARAMETERS['names']['job_name']['plur']);
+}
 ?>
 <div class="sm-page">
-
-<?php
-// Filtro opzionale: quando si arriva dalla voce "Gilde" di Uffici, mostra solo
-// le gilde create dai giocatori (tipo != 1), non i mestieri globali fissi
-$solo_gilde = !empty($_REQUEST['solo_gilde']);
-?>
 
 <?php if ($id_mestiere === null): /* ── VISTA ELENCO ─────────────────────────── */ ?>
 
@@ -73,7 +78,7 @@ $solo_gilde = !empty($_REQUEST['solo_gilde']);
         <div class="sm-list">
             <?php foreach ($section['items'] as $item): ?>
             <div class="sm-list-item">
-                <a href="main.php?page=servizi_mestieri&id_mestiere=<?= $item['id'] ?>" class="sm-list-link">
+                <a href="main.php?page=servizi_mestieri&id_mestiere=<?= $item['id'] ?><?= $solo_gilde ? '&solo_gilde=1' : '' ?>" class="sm-list-link">
                     <i class="fas fa-briefcase sm-list-icon"></i>
                     <span class="sm-list-name"><?= gdrcd_filter('out', $item['nome']) ?></span>
                 </a>
