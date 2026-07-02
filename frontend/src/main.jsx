@@ -64,6 +64,7 @@ import ChattingOff     from './components/ChattingOff'
 import Meteo           from './components/Meteo'
 import ChatbotWidget   from './components/ChatbotWidget'
 import GestioneBot    from './components/GestioneBot'
+import GestioneManutenzione from './components/GestioneManutenzione'
 import ContattaModerazione from './components/ContattaModerazione'
 
 /**
@@ -165,6 +166,9 @@ window.CT.register('ChatbotWidget', ChatbotWidget)
 
 /** Pannello admin gestione bot (sesso='b'): lista, schedule, DM */
 window.CT.register('GestioneBot', GestioneBot)
+
+/** Pannello admin manutenzione DB: pulizia log/chat/messaggi, personaggi assenti/cancellati, blacklist */
+window.CT.register('GestioneManutenzione', GestioneManutenzione)
 
 /** Form + cronologia richieste di moderazione, con pannello staff integrato */
 window.CT.register('ContattaModerazione', ContattaModerazione)

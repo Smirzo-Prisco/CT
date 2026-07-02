@@ -1,0 +1,163 @@
+// ============================================================
+// _gestione_manutenzione.scss — Pannello admin manutenzione DB
+// Riusa .dashboard/.card, .btn--*, .gp-modal-* da _gestione.scss
+// e _buttons.scss; qui solo le regole non già coperte.
+// ============================================================
+@use '../tokens' as *;
+
+.gm-dashboard {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    align-items: start;
+}
+
+.gm-card {
+    text-align: left;
+
+    &:hover {
+        transform: none; // le card qui contengono form/select, l'hover lift è fastidioso
+    }
+}
+
+.gm-description {
+    color: $color-text-muted;
+    font-size: $text-md;
+    margin: $space-2 0 $space-4;
+}
+
+.gm-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+    margin-bottom: $space-4;
+
+    label {
+        font-size: $text-sm;
+        color: $color-text-muted;
+    }
+
+    select {
+        background: $color-bg;
+        border: 1px solid $color-border;
+        border-radius: $radius-md;
+        color: $color-text;
+        padding: $space-1 $space-2;
+    }
+}
+
+.gm-run-btn {
+    width: 100%;
+}
+
+.gm-feedback {
+    margin-top: $space-3;
+    font-size: $text-sm;
+    border-radius: $radius-sm;
+    padding: $space-2 $space-3;
+
+    &--ok {
+        color: $color-success;
+        background: rgba($color-success, 0.12);
+    }
+
+    &--error {
+        color: $color-danger;
+        background: rgba($color-danger, 0.12);
+    }
+}
+
+// ── Modal di conferma ─────────────────────────────────────────
+
+.gm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1500;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: $space-10 $space-5;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.gm-modal {
+    width: 100%;
+    max-width: 560px;
+    padding: 0;
+    text-align: left;
+
+    &:hover {
+        transform: none;
+    }
+}
+
+.gm-modal-body {
+    padding: $space-4 $space-5;
+}
+
+.gm-warning {
+    color: $color-danger;
+    font-weight: 600;
+    margin: 0 0 $space-4;
+}
+
+.gm-items {
+    list-style: none;
+    margin: 0 0 $space-3;
+    padding: 0;
+}
+
+.gm-item {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: $space-2;
+    padding: $space-2 0;
+    border-bottom: 1px solid $color-border;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.gm-item-label {
+    color: $color-text;
+}
+
+.gm-item-count {
+    font-weight: 700;
+    color: $color-text-title;
+}
+
+.gm-sample {
+    flex-basis: 100%;
+    font-size: $text-sm;
+    color: $color-text-muted;
+    max-height: 90px;
+    overflow-y: auto;
+}
+
+.gm-notes {
+    font-size: $text-sm;
+    color: $color-text-muted;
+    margin: $space-3 0 0;
+    padding-left: $space-4;
+
+    li {
+        margin-bottom: $space-1;
+    }
+}
+
+// ── Responsività ──────────────────────────────────────────────
+
+@media (max-width: 600px) {
+    .gm-overlay {
+        padding: $space-4 $space-2;
+    }
+
+    .gm-field {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

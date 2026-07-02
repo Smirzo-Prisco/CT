@@ -777,25 +777,6 @@ $MESSAGE['manuale']['tipo'][4] = 'Ambientazione';
 $MESSAGE['manuale']['tipo'][5] = 'Regole di gioco';
 $MESSAGE['manuale']['tipo'][6] = 'Primi passi';
 $MESSAGE['manuale']['tipo_info'] = 'Tipo di manuale';
-/*Manutenzione*/
-$MESSAGE['interface']['administration']['maintenance']['page_name'] = 'Manutenzione';
-$MESSAGE['interface']['administration']['maintenance']['link']['back'] = 'Indietro...';
-$MESSAGE['interface']['administration']['maintenance']['old_log'] = 'Elimina log più vecchi di';
-$MESSAGE['interface']['administration']['maintenance']['old_chat'] = 'Elimina log di chat più vecchi di';
-$MESSAGE['interface']['administration']['maintenance']['old_messages'] = 'Elimina messaggi più vecchi di';
-$MESSAGE['interface']['administration']['maintenance']['old_messages_info'] = 'Saranno cancellati anche i backup dei messaggi.';
-$MESSAGE['interface']['administration']['maintenance']['missing'] = 'Elimina i personaggi che non effettuano il login da più di';
-$MESSAGE['interface']['administration']['maintenance']['missing_info'] = 'Non sarà possibile ripristinarli.';
-$MESSAGE['interface']['administration']['maintenance']['deleted'] = 'Elimina i personaggi provvisoriamente cancellati';
-$MESSAGE['interface']['administration']['maintenance']['deleted_info'] = 'Non sarà più possibile ripristinarli.';
-$MESSAGE['interface']['administration']['maintenance']['blacklisted'] = 'Cancella la blacklist';
-$MESSAGE['interface']['administration']['maintenance']['blacklisted_info'] = '';
-$MESSAGE['interface']['administration']['maintenance']['months'] = 'mesi';
-$MESSAGE['interface']['administration']['maintenance']['missing_soft'] = 'Marca come cancellati i personaggi che non effettuano il login da più di';
-$MESSAGE['interface']['administration']['maintenance']['missing_soft_info'] = 'Il personaggio non viene cancellato fisicamente, solo marcato come tale (staff esclusi). Potrà essere ripulito definitivamente in seguito con "Elimina i personaggi provvisoriamente cancellati".';
-$MESSAGE['interface']['administration']['maintenance']['confirm_warning'] = 'Operazione irreversibile. Verranno interessate %d riga/righe.';
-$MESSAGE['interface']['administration']['maintenance']['confirm_button'] = 'Conferma';
-$MESSAGE['interface']['administration']['maintenance']['cancel_button'] = 'Annulla';
 /*Log*/
 $MESSAGE['interface']['administration']['log']['events']['page_name'] = 'Log eventi';
 $MESSAGE['interface']['administration']['log']['events']['link']['back'] = 'Torna alla scelta del log...';
