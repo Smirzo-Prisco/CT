@@ -124,6 +124,19 @@ $back_label   = $from === 'servizi_gilde'
     </section>
     <?php endif; ?>
 
+    <?php if (empty($sections) && empty($freelance)): ?>
+    <div class="sm-section">
+        <p style="text-align:center; padding:20px; font-style:italic; color:var(--color-text-muted);">
+            <?= $solo_gilde ? 'Nessuna gilda è stata ancora creata.' : 'Nessun mestiere disponibile al momento.' ?>
+        </p>
+        <?php if ($solo_gilde): ?>
+        <p style="text-align:center;">
+            <a href="main.php?page=mia_gilda" class="sm-list-link">Crea la tua gilda</a>
+        </p>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
 <?php else: /* ── VISTA DETTAGLIO ─────────────────────────────────────────── */
 
     $mestiere_info = gdrcd_query("SELECT nome FROM mestiere WHERE id_mestiere = $id_mestiere");
