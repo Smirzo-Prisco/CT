@@ -30,7 +30,7 @@ if ($PARAMETERS['settings']['protection'] == 'ON') {
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/functions.inc.php';
 $_db_home = gdrcd_connect();
 $stat_iscritti       = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE permessi >= 0 AND sesso != 'b'")['n'] ?? 0);
-$stat_online         = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM personaggio WHERE ora_entrata > ora_uscita AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW()")['n'] ?? 0);
+$stat_online         = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM personaggio p LEFT JOIN bot_status bs ON bs.bot_nome = p.nome WHERE p.ora_entrata > p.ora_uscita AND ((p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW()) OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0))")['n'] ?? 0);
 $stat_azioni_oggi    = (int)(gdrcd_query("SELECT COUNT(id) AS n FROM chat WHERE DATE(ora) = CURDATE() AND tipo IN ('P','A')")['n'] ?? 0);
 $stat_nuovi_settimana = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE permessi >= 0 AND sesso != 'b' AND data_iscrizione >= DATE_SUB(NOW(), INTERVAL 7 DAY)")['n'] ?? 0);
 $_mesi = ['','gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
