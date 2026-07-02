@@ -294,7 +294,9 @@ switch ($op) {
             gdrcd_query("INSERT INTO ruolo_mestiere (nome_ruolo, mestiere, immagine, stipendio, capo, livello_mestiere) VALUES ('Capo', $id_mestiere, 'standard_gilda.png', 0, 1, 1)");
             $id_ruolo = (int)gdrcd_query("SELECT LAST_INSERT_ID() AS id")['id'];
 
-            gdrcd_query("INSERT INTO clgpersonaggiomestiere (personaggio, id_ruolo, scadenza) VALUES ('$login', $id_ruolo, NOW())");
+            // conferma_mestiere=1 subito: per le gilde giocatore l'affiliazione è diretta
+            // (hire/fondazione), non passa mai dal flusso di conferma dei mestieri globali
+            gdrcd_query("INSERT INTO clgpersonaggiomestiere (personaggio, id_ruolo, conferma_mestiere, scadenza) VALUES ('$login', $id_ruolo, 1, NOW())");
             gdrcd_query("UPDATE personaggio SET id_mestiere=$id_mestiere, id_ruolo_mestiere=$id_ruolo WHERE nome='$login'");
 
             echo json_encode(['success' => true, 'message' => 'Gilda creata.', 'mestiere' => carica_mestiere($id_mestiere), 'ruoli' => carica_ruoli($id_mestiere)]);

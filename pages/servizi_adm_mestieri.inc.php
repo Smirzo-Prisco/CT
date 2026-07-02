@@ -178,7 +178,7 @@
             $id_ruolo_scelto  = (int)$subject[0];
 
             // Il ruolo scelto deve appartenere davvero al mestiere autorizzato (il form non basta: qualcuno potrebbe forgiare il POST)
-            $ruolo_check = gdrcd_query("SELECT mestiere FROM ruolo_mestiere WHERE id_ruolo = $id_ruolo_scelto");
+            $ruolo_check = gdrcd_query("SELECT rm.mestiere, m.tipo FROM ruolo_mestiere rm LEFT JOIN mestiere m ON rm.mestiere = m.id_mestiere WHERE rm.id_ruolo = $id_ruolo_scelto");
             if (!$ruolo_check || (int)$ruolo_check['mestiere'] !== $id_mestiere_post || !puo_gestire_mestiere($id_mestiere_post, $is_admin, $is_staff_capomestiere, $login_esc)) {
                 echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['not_allowed']).'</div>';
             } else {
@@ -190,7 +190,12 @@
                     echo '<div class="warning">'.gdrcd_filter('out', $_POST['nome'].' '.$MESSAGE['interface']['adm_guilds']['cannot_hire']).'</div>';
                 } else {
                     /*Opero l'affiliazione*/
-                    gdrcd_query("INSERT INTO clgpersonaggiomestiere  (personaggio, id_ruolo, scadenza) VALUES ('".gdrcd_filter('in', $_POST['nome'])."', ".$subject[0].", NOW())");
+                    // Per le gilde giocatore (tipo != 1) l'affiliazione è confermata subito: l'assunzione
+                    // è diretta da parte del capo, non passa dal flusso di conferma dei mestieri globali
+                    $e_gilda_giocatore = $ruolo_check['tipo'] !== null && (int)$ruolo_check['tipo'] !== 1;
+                    $conferma_sql      = $e_gilda_giocatore ? ', conferma_mestiere' : '';
+                    $conferma_valori   = $e_gilda_giocatore ? ', 1' : '';
+                    gdrcd_query("INSERT INTO clgpersonaggiomestiere (personaggio, id_ruolo$conferma_sql, scadenza) VALUES ('".gdrcd_filter('in', $_POST['nome'])."', ".$subject[0]."$conferma_valori, NOW())");
                     $mestiere        = "SELECT mestiere FROM ruolo_mestiere WHERE id_ruolo = ".$subject[0]."";
                     $mestiere_result = gdrcd_query($mestiere, 'result');
                     $mestiere        = gdrcd_query($mestiere_result, 'fetch');
