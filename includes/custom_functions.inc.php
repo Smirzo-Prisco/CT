@@ -633,4 +633,37 @@ function saveImgGuild($dati, $imgEsistente = null, $files) {
     return $dati;
 }
 /************* FINE GILDA ******************************/
+
+/************* MESTIERI / GILDE GIOCATORE ******************************/
+
+/**
+ * Vero se il personaggio occupa, tramite un suo ruolo, la posizione di capo
+ * su questo mestiere (mestiere.tipo != 1, cioè una gilda giocatore, non un
+ * mestiere globale). Centralizzata qui perché usata sia da pages/api_mestieri.php
+ * che da pages/servizi_adm_mestieri.inc.php.
+ */
+function mestiere_e_capo_di($login, $id_mestiere) {
+    if ($id_mestiere <= 0) return false;
+    $r = gdrcd_query(
+        "SELECT COUNT(*) AS n FROM clgpersonaggiomestiere cpm
+         JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+         WHERE cpm.personaggio = '" . gdrcd_filter('in', $login) . "' AND rm.mestiere = " . (int)$id_mestiere . " AND rm.capo = 1"
+    );
+    return ((int)($r['n'] ?? 0)) > 0;
+}
+
+/**
+ * Vero se il personaggio ha una qualunque affiliazione (anche non da capo)
+ * su questo mestiere, tramite clgpersonaggiomestiere.
+ */
+function mestiere_e_membro_di($login, $id_mestiere) {
+    if ($id_mestiere <= 0 && $id_mestiere !== -1) return false;
+    $r = gdrcd_query(
+        "SELECT COUNT(*) AS n FROM clgpersonaggiomestiere cpm
+         JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+         WHERE cpm.personaggio = '" . gdrcd_filter('in', $login) . "' AND rm.mestiere = " . (int)$id_mestiere
+    );
+    return ((int)($r['n'] ?? 0)) > 0;
+}
+/************* FINE MESTIERI / GILDE GIOCATORE ******************************/
 ?>

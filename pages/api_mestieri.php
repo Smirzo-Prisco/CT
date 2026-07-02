@@ -12,7 +12,7 @@
  *
  * save / save_ruolo / delete_ruolo accettano anche il capo di una gilda
  * (mestiere.tipo != 1), non solo l'admin: l'autorizzazione è verificata
- * riga per riga tramite e_capo_di(), mai tramite $_SESSION['capomestiere']
+ * riga per riga tramite mestiere_e_capo_di(), mai tramite $_SESSION['capomestiere']
  * (quella è una nomina di staff su TUTTI i mestieri, cosa diversa).
  *
  * Letture (list/get/tipi/mia_gilda) via GET, scritture via POST (multipart
@@ -23,6 +23,7 @@ session_start();
 header('Content-Type: application/json');
 
 require_once(__DIR__ . '/../includes/required.php');
+require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 $handleDBConnection = gdrcd_connect();
 
 if (empty($_SESSION['login'])) {
@@ -58,16 +59,8 @@ function carica_ruoli($id_mestiere) {
     return $ruoli;
 }
 
-/** Vero se il personaggio occupa, tramite un suo ruolo, la posizione di capo su questo mestiere */
-function e_capo_di($login, $id_mestiere) {
-    if ($id_mestiere <= 0) return false;
-    $r = gdrcd_query(
-        "SELECT COUNT(*) AS n FROM clgpersonaggiomestiere cpm
-         JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
-         WHERE cpm.personaggio = '$login' AND rm.mestiere = " . (int)$id_mestiere . " AND rm.capo = 1"
-    );
-    return ((int)($r['n'] ?? 0)) > 0;
-}
+// e_capo_di() -> mestiere_e_capo_di(), centralizzata in includes/custom_functions.inc.php
+// (riusata anche da pages/servizi_adm_mestieri.inc.php)
 
 /** cod_tipo dedicato alle gilde create dai giocatori — get-or-create, mai il cod_tipo=1 dei mestieri globali */
 function tipo_gilda_id() {
@@ -325,7 +318,7 @@ switch ($op) {
             }
 
             if (!$is_admin) {
-                if (!$isEdit || !e_capo_di($login, $id)) {
+                if (!$isEdit || !mestiere_e_capo_di($login, $id)) {
                     http_response_code(403);
                     echo json_encode(['success' => false, 'message' => 'Accesso negato']);
                     exit;
@@ -386,7 +379,7 @@ switch ($op) {
             $mestiere = $isEdit ? (int)$esistente['mestiere'] : $mestiere_post;
 
             if (!$is_admin) {
-                if (!e_capo_di($login, $mestiere)) {
+                if (!mestiere_e_capo_di($login, $mestiere)) {
                     http_response_code(403);
                     echo json_encode(['success' => false, 'message' => 'Accesso negato']);
                     exit;
@@ -452,7 +445,7 @@ switch ($op) {
         $mestiere = (int)$ruolo['mestiere'];
 
         if (!$is_admin) {
-            if (!e_capo_di($login, $mestiere)) {
+            if (!mestiere_e_capo_di($login, $mestiere)) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'Accesso negato']);
                 exit;

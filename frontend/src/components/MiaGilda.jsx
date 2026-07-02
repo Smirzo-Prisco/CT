@@ -305,7 +305,7 @@ function GildaEsistente({ stato, onChange }) {
                 <ul>
                     {ruoliLocali.map(r => <li key={r.id_ruolo}>{r.nome_ruolo}{r.capo == 1 ? ' (capo)' : ''}</li>)}
                 </ul>
-                <a href="main.php?page=servizi_adm_mestieri" className="btn btn--secondary">Abbandona / gestisci affiliazione</a>
+                <a href={`main.php?page=servizi_adm_mestieri&id_mestiere=${mestiere.id_mestiere}`} className="btn btn--secondary">Abbandona / gestisci affiliazione</a>
             </div>
         )
     }
@@ -365,7 +365,7 @@ function GildaEsistente({ stato, onChange }) {
                 <GradoRow key={r.id_ruolo} ruolo={r} onSaved={setRuoliLocali} onDeleted={setRuoliLocali} />
             ))}
 
-            <a href="main.php?page=servizi_adm_mestieri" className="btn btn--secondary" style={{ marginTop: 16, display: 'inline-block' }}>
+            <a href={`main.php?page=servizi_adm_mestieri&id_mestiere=${mestiere.id_mestiere}`} className="btn btn--secondary" style={{ marginTop: 16, display: 'inline-block' }}>
                 Assumi / espelli membri
             </a>
         </div>
