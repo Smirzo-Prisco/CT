@@ -61,6 +61,7 @@ function GradoRow({ ruolo, onSaved, onDeleted }) {
         livello_mestiere: ruolo.livello_mestiere,
         stipendio: ruolo.stipendio,
     })
+    const [file, setFile] = useState(null)
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState(null)
 
@@ -73,6 +74,7 @@ function GradoRow({ ruolo, onSaved, onDeleted }) {
         fd.append('nome', form.nome)
         fd.append('livello_mestiere', form.livello_mestiere)
         fd.append('stipendio', form.stipendio)
+        if (file) fd.append('immagine', file)
 
         const r = await fetch(`${API}?op=save_ruolo`, { method: 'POST', body: fd })
         if (r.status === 403) { window.CT.navigate('main.php?page=mappaclick'); return }
@@ -95,6 +97,7 @@ function GradoRow({ ruolo, onSaved, onDeleted }) {
 
     return (
         <div className="sm-rank-item sm-rank-item--edit">
+            <EditableImage currentUrl={ruolo.immagine} fallbackIcon="fa-medal" onFileChange={setFile} alt={ruolo.nome_ruolo} />
             <input value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} placeholder="Nome grado" />
             <input type="number" min="1" max="3" style={{ maxWidth: 60 }} title="Livello (1 = più alto, 3 = più basso)"
                    value={form.livello_mestiere} onChange={e => setForm({ ...form, livello_mestiere: e.target.value })} />
@@ -104,6 +107,43 @@ function GradoRow({ ruolo, onSaved, onDeleted }) {
                 <button type="button" onClick={save} disabled={saving}>Salva</button>
                 <button type="button" onClick={remove} disabled={saving}>Elimina</button>
             </div>
+            {error && <p className="sm-error-text">{error}</p>}
+        </div>
+    )
+}
+
+// ── Riga del ruolo di comando — qui il capo può cambiare solo l'immagine
+// (nome/livello/stipendio sono bloccati anche lato server, vedi api_mestieri.php) ──
+
+function CapoRow({ ruolo, onSaved }) {
+    const [saving, setSaving] = useState(false)
+    const [error, setError] = useState(null)
+
+    const salvaImmagine = async (file) => {
+        if (!file) return
+        setSaving(true)
+        setError(null)
+        const fd = new FormData()
+        fd.append('id_ruolo', ruolo.id_ruolo)
+        fd.append('mestiere', ruolo.mestiere)
+        fd.append('nome', ruolo.nome_ruolo)
+        fd.append('livello_mestiere', ruolo.livello_mestiere)
+        fd.append('stipendio', ruolo.stipendio)
+        fd.append('immagine', file)
+
+        const r = await fetch(`${API}?op=save_ruolo`, { method: 'POST', body: fd })
+        if (r.status === 403) { window.CT.navigate('main.php?page=mappaclick'); return }
+        const d = await r.json()
+        setSaving(false)
+        if (d.success) onSaved(d.ruoli)
+        else setError(d.message ?? 'Errore nel salvataggio dell\'immagine')
+    }
+
+    return (
+        <div className="sm-rank-item sm-rank-item--top">
+            <EditableImage currentUrl={ruolo.immagine} fallbackIcon="fa-crown" onFileChange={salvaImmagine} alt={ruolo.nome_ruolo} />
+            <span className="sm-rank-name">{ruolo.nome_ruolo}{saving ? ' — salvataggio…' : ''}</span>
+            <i className="fas fa-crown sm-rank-crown" />
             {error && <p className="sm-error-text">{error}</p>}
         </div>
     )
@@ -241,7 +281,9 @@ function GildaEsistente({ stato, onChange }) {
     const [error, setError] = useState(null)
     const [ruoliLocali, setRuoliLocali] = useState(ruoli)
     const [nuovoGrado, setNuovoGrado] = useState({ nome: '', livello_mestiere: 3, stipendio: 0 })
+    const [nuovoGradoFile, setNuovoGradoFile] = useState(null)
     const [nuovoGradoSaving, setNuovoGradoSaving] = useState(false)
+    const capoRole = ruoliLocali.find(r => r.capo == 1)
 
     const salvaGilda = async (e) => {
         e.preventDefault()
@@ -272,6 +314,7 @@ function GildaEsistente({ stato, onChange }) {
         fd.append('nome', nuovoGrado.nome)
         fd.append('livello_mestiere', nuovoGrado.livello_mestiere)
         fd.append('stipendio', nuovoGrado.stipendio)
+        if (nuovoGradoFile) fd.append('immagine', nuovoGradoFile)
 
         const r = await fetch(`${API}?op=save_ruolo`, { method: 'POST', body: fd })
         if (r.status === 403) { window.CT.navigate('main.php?page=mappaclick'); return }
@@ -280,6 +323,7 @@ function GildaEsistente({ stato, onChange }) {
         if (d.success) {
             setRuoliLocali(d.ruoli)
             setNuovoGrado({ nome: '', livello_mestiere: 3, stipendio: 0 })
+            setNuovoGradoFile(null)
         }
     }
 
@@ -306,6 +350,12 @@ function GildaEsistente({ stato, onChange }) {
                             {ruoliLocali.map((r, i) => (
                                 <div key={r.id_ruolo} className={`sm-rank-item${r.capo == 1 ? ' sm-rank-item--top' : ''}`}>
                                     <span className="sm-rank-badge">{i + 1}</span>
+                                    <div className="sm-img-box">
+                                        {r.immagine
+                                            ? <img src={`imgs/mestieri/${r.immagine}`} alt={r.nome_ruolo} />
+                                            : <i className="fas fa-medal" />
+                                        }
+                                    </div>
                                     <span className="sm-rank-name">{r.nome_ruolo}</span>
                                     {r.capo == 1 && <i className="fas fa-crown sm-rank-crown" />}
                                 </div>
@@ -352,6 +402,8 @@ function GildaEsistente({ stato, onChange }) {
                 <p className="sm-field-note" style={{ marginBottom: 8 }}>Livello 1 = più alto, 3 = più basso.</p>
 
                 <div className="sm-rank-list">
+                    {capoRole && <CapoRow ruolo={capoRole} onSaved={setRuoliLocali} />}
+
                     {ruoliLocali.filter(r => r.capo != 1).length === 0 && (
                         <p className="sm-field-note">Nessun grado oltre a "Capo" definito per ora.</p>
                     )}
@@ -360,6 +412,7 @@ function GildaEsistente({ stato, onChange }) {
                     ))}
 
                     <div className="sm-rank-item sm-rank-item--edit">
+                        <EditableImage key={ruoliLocali.length} fallbackIcon="fa-medal" onFileChange={setNuovoGradoFile} alt="" />
                         <input placeholder="Nuovo grado…" value={nuovoGrado.nome}
                                onChange={e => setNuovoGrado({ ...nuovoGrado, nome: e.target.value })} />
                         <input type="number" min="1" max="3" style={{ maxWidth: 60 }} title="Livello"

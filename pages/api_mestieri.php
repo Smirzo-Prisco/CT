@@ -378,7 +378,8 @@ switch ($op) {
                 exit;
             }
             // Il mestiere di riferimento per l'autorizzazione è sempre quello reale, non quanto dichiarato dal client
-            $mestiere = $isEdit ? (int)$esistente['mestiere'] : $mestiere_post;
+            $mestiere     = $isEdit ? (int)$esistente['mestiere'] : $mestiere_post;
+            $e_ruolo_capo = $isEdit && (int)$esistente['capo'] === 1;
 
             if (!$is_admin) {
                 if (!mestiere_e_capo_di($login, $mestiere)) {
@@ -392,13 +393,13 @@ switch ($op) {
                     echo json_encode(['success' => false, 'message' => 'I mestieri globali sono gestiti solo dagli admin']);
                     exit;
                 }
-                if ($isEdit && (int)$esistente['capo'] === 1) {
-                    http_response_code(403);
-                    echo json_encode(['success' => false, 'message' => 'Il ruolo di comando non è modificabile da qui']);
-                    exit;
-                }
                 // un capo non può spostare un ruolo verso un altro mestiere
                 $mestiere_post = $mestiere;
+                // sul proprio ruolo di comando il capo può cambiare solo l'immagine:
+                // nome/livello/stipendio/flag restano quelli esistenti, non modificabili da qui
+                if ($e_ruolo_capo) {
+                    $nome_ruolo = $esistente['nome_ruolo'];
+                }
             }
 
             // mestiere = -1 è il contenitore "virtuale" dei ruoli/lavori indipendenti (solo admin, sopra)
@@ -407,11 +408,17 @@ switch ($op) {
                 exit;
             }
 
-            $livello   = max(1, min(3, (int)($_POST['livello_mestiere'] ?? 3)));
-            $stipendio = (int)($_POST['stipendio'] ?? 0);
-            $capo      = (isset($_POST['capo']) && $_POST['capo'] == '1') ? 1 : 0;
-            // un capo non può crearsi un altro ruolo di comando: solo "riassegna capo" (admin) tocca quel flag
-            if (!$is_admin) { $capo = 0; }
+            if (!$is_admin && $e_ruolo_capo) {
+                $livello   = (int)$esistente['livello_mestiere'];
+                $stipendio = (int)$esistente['stipendio'];
+            } else {
+                $livello   = max(1, min(3, (int)($_POST['livello_mestiere'] ?? 3)));
+                $stipendio = (int)($_POST['stipendio'] ?? 0);
+            }
+            $capo = (isset($_POST['capo']) && $_POST['capo'] == '1') ? 1 : 0;
+            // un capo non può crearsi un altro ruolo di comando: solo "riassegna capo" (admin) tocca quel flag,
+            // ma se sta editando il proprio ruolo di comando il flag capo=1 va preservato
+            if (!$is_admin) { $capo = $e_ruolo_capo ? 1 : 0; }
             $nome_esc  = gdrcd_filter('in', $nome_ruolo);
 
             $immagine = saveUploadedImage($_FILES['immagine'] ?? [], 'imgs/mestieri', 'ruolo_', $esistente['immagine'] ?? null);
