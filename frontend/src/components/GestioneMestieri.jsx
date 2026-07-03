@@ -64,11 +64,13 @@ function RuoloRow({ ruolo, onSaved, onDeleted }) {
     })
     const [file, setFile] = useState(null)
     const [saving, setSaving] = useState(false)
+    const [saved, setSaved] = useState(false)
     const [error, setError] = useState(null)
 
     const save = async () => {
         setSaving(true)
         setError(null)
+        setSaved(false)
         const fd = new FormData()
         fd.append('id_ruolo', ruolo.id_ruolo)
         fd.append('mestiere', ruolo.mestiere)
@@ -82,8 +84,13 @@ function RuoloRow({ ruolo, onSaved, onDeleted }) {
         if (r.status === 403) { window.CT.navigate('main.php?page=mappaclick'); return }
         const d = await r.json()
         setSaving(false)
-        if (d.success) onSaved(d.ruoli)
-        else setError(d.message ?? 'Errore nel salvataggio del ruolo')
+        if (d.success) {
+            onSaved(d.ruoli)
+            setSaved(true)
+            setTimeout(() => setSaved(false), 2500)
+        } else {
+            setError(d.message ?? 'Errore nel salvataggio del ruolo')
+        }
     }
 
     const remove = async () => {
@@ -134,12 +141,13 @@ function RuoloRow({ ruolo, onSaved, onDeleted }) {
             </div>
             <div className="gp-actions">
                 <button className="btn-action btn-action--edit btn-action--icon" title="Salva" onClick={save} disabled={saving}>
-                    <i className="fa-solid fa-floppy-disk"></i>
+                    <i className={`fa-solid ${saved ? 'fa-check' : 'fa-floppy-disk'}`}></i>
                 </button>
                 <button className="btn-action btn-action--delete btn-action--icon" title="Elimina" onClick={remove} disabled={saving}>
                     <i className="fa-solid fa-trash"></i>
                 </button>
             </div>
+            {saved && <p className="gm-feedback gm-feedback--ok">Ruolo salvato.</p>}
             {error && <p className="gm-feedback gm-feedback--error">{error}</p>}
         </div>
     )

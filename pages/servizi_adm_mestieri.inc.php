@@ -38,9 +38,9 @@ if ($id_mestiere === null && !$is_admin) {
 
 $autorizzato = puo_gestire_mestiere($id_mestiere, $is_admin, $is_staff_capomestiere, $login_esc);
 
-// L'admin torna sempre al selettore, tutti gli altri (capo gilda, staff capomestiere)
+// L'admin torna alla dashboard di Gestione, tutti gli altri (capo gilda, staff capomestiere)
 // tornano alla loro pagina di gestione — è l'unico punto d'ingresso reale a questo tool
-$panel_url  = $is_admin ? 'main.php?page=servizi_adm_mestieri' : 'main.php?page=mia_gilda';
+$panel_url  = $is_admin ? 'main.php?page=gestione' : 'main.php?page=mia_gilda';
 $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
 ?>
 <div class="sm-page">
@@ -200,8 +200,6 @@ $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
         gdrcd_query($affiliazioni_result, 'free');
         ?>
 
-        <p><a href="<?php echo $panel_url; ?>" class="sm-back"><i class="fas fa-arrow-left"></i> <?php echo $back_label; ?></a></p>
-
     <?php elseif (gdrcd_filter('get', $_POST['op']) == 'hire'):
         /* ── Affiliazione ─────────────────────────────────────────────────── */
         $id_mestiere_post = (int)($_POST['id_mestiere'] ?? 0);
@@ -245,7 +243,6 @@ $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
         <section class="sm-section">
             <p class="<?php echo $esito_ok ? 'sm-field-note' : 'sm-error-text'; ?>"><?php echo $esito_msg; ?></p>
         </section>
-        <p><a href="<?php echo $panel_url; ?>" class="sm-back"><i class="fas fa-arrow-left"></i> <?php echo $back_label; ?></a></p>
 
     <?php elseif ($_POST['op'] == 'fire'):
         /* ── Espulsione ───────────────────────────────────────────────────── */
@@ -275,7 +272,6 @@ $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
         <section class="sm-section">
             <p class="<?php echo $esito_ok ? 'sm-field-note' : 'sm-error-text'; ?>"><?php echo $esito_msg; ?></p>
         </section>
-        <p><a href="<?php echo $panel_url; ?>" class="sm-back"><i class="fas fa-arrow-left"></i> <?php echo $back_label; ?></a></p>
     <?php endif; ?>
 
 <?php endif; ?>
