@@ -28,10 +28,9 @@ function apriRegolamentoForm(articolo) {
                 return;
             }
             const a = data.articolo;
-            document.getElementById('reg-articolo').value = a.articolo;
-            document.getElementById('reg-titolo').value   = a.titolo;
-            document.getElementById('reg-testo').value    = a.testo;
-            document.getElementById('reg-tipo').value     = a.tipo;
+            document.getElementById('reg-titolo').value = a.titolo;
+            document.getElementById('reg-testo').value  = a.testo;
+            document.getElementById('reg-tipo').value   = a.tipo;
 
             // Valori "originali" per il calcolo del diff lato server al salvataggio
             document.getElementById('reg-art-originale').value = a.articolo;

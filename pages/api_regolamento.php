@@ -54,13 +54,12 @@ switch ($op) {
     // -------------------------------------------------------------------------
     case 'save':
         $art_originale = (isset($_POST['art']) && $_POST['art'] !== '') ? (int)$_POST['art'] : null;
-        $articolo      = (int)($_POST['articolo'] ?? 0);
         $titolo        = trim($_POST['titolo'] ?? '');
         $testo         = $_POST['testo'] ?? '';
         $tipo          = $_POST['tipo'] ?? '';
 
-        if ($articolo <= 0 || $titolo === '') {
-            echo json_encode(['success' => false, 'message' => 'Numero articolo e titolo sono obbligatori']);
+        if ($titolo === '') {
+            echo json_encode(['success' => false, 'message' => 'Il titolo è obbligatorio']);
             exit;
         }
 
@@ -69,14 +68,18 @@ switch ($op) {
         $tipo_esc   = gdrcd_filter('in', $tipo);
 
         if ($art_originale === null) {
-            // Inserimento
+            // Inserimento — il numero articolo non è più scelto dall'utente:
+            // il sistema assegna automaticamente il primo libero dopo l'ultimo esistente
+            $max_articolo = (int)(gdrcd_query("SELECT MAX(articolo) AS n FROM regolamento")['n'] ?? 0);
+            $articolo     = $max_articolo + 1;
             gdrcd_query("INSERT INTO regolamento (articolo, titolo, testo, tipo) VALUES ($articolo, '$titolo_esc', '$testo_esc', '$tipo_esc')");
             echo json_encode(['success' => true, 'message' => 'Articolo inserito.']);
             break;
         }
 
-        // Modifica — logica di diff/notifica in bacheca invariata rispetto alla versione precedente
-        gdrcd_query("UPDATE regolamento SET titolo='$titolo_esc', testo='$testo_esc', tipo='$tipo_esc', articolo=$articolo WHERE articolo=$art_originale LIMIT 1");
+        // Modifica — il numero articolo resta invariato; logica di diff/notifica
+        // in bacheca invariata rispetto alla versione precedente
+        gdrcd_query("UPDATE regolamento SET titolo='$titolo_esc', testo='$testo_esc', tipo='$tipo_esc' WHERE articolo=$art_originale LIMIT 1");
 
         $old_titolo = $_POST['old_titolo'] ?? '';
         $old_testo  = $_POST['old_testo'] ?? '';

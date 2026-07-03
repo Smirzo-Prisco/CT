@@ -134,19 +134,13 @@ $tipo_label = [
 
         <form id="formSaveRegolamento">
             <div class="form-section">
-                <div class="form-row">
-                    <div class="form-group form-column">
-                        <label for="reg-articolo">Numero articolo</label>
-                        <input type="number" id="reg-articolo" name="articolo" required>
-                    </div>
-                    <div class="form-group form-column">
-                        <label for="reg-tipo"><?= gdrcd_filter('out', $MESSAGE['manuale']['tipo_info']) ?></label>
-                        <select id="reg-tipo" name="tipo">
-                            <?php foreach ($valid_tipi as $t): ?>
-                            <option value="<?= $t ?>"><?= $tipo_label[$t] ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="reg-tipo"><?= gdrcd_filter('out', $MESSAGE['manuale']['tipo_info']) ?></label>
+                    <select id="reg-tipo" name="tipo">
+                        <?php foreach ($valid_tipi as $t): ?>
+                        <option value="<?= $t ?>"><?= $tipo_label[$t] ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="reg-titolo"><?= gdrcd_filter('out', $MESSAGE['interface']['administration']['rules']['title']) ?></label>
