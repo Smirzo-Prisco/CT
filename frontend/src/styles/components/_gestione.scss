@@ -715,6 +715,8 @@ span[style*="position:relative"]:hover .tooltip-bottom {
     justify-content: center;
     width: 32px;
     height: 32px;
+    padding: 0;
+    border: none;
     border-radius: $radius-md;
     background: $gestione-hover;
     color: $color-text-muted;

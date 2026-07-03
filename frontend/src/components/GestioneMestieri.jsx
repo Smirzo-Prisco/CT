@@ -460,9 +460,9 @@ export default function GestioneMestieri() {
         <div className="pagina_gestione_gilde">
             <div className="gp-topbar">
                 <div className="gp-topbar__left">
-                    <a href="javascript:history.back()" className="gp-back" title="Indietro">
+                    <button type="button" onClick={() => window.history.back()} className="gp-back" title="Indietro">
                         <i className="fa-solid fa-chevron-left"></i>
-                    </a>
+                    </button>
                 </div>
                 <div className="gp-topbar__center">
                     <span className="gp-title">Gestione Mestieri</span>
