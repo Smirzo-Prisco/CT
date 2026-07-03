@@ -22,23 +22,17 @@ if (!hasPermesso($_SESSION, ['admin', 'guida'])) {
 
 $is_admin = ($_SESSION['admin'] == 1);
 
-// ── Filtro per tipo + paginazione (invariati rispetto alla versione precedente) ──
+// ── Filtro per tipo (nessuna paginazione: mostra sempre tutti i record) ──
 $valid_tipi  = ['ambientazione', 'primipassi', 'regolamento', 'regolegioco', 'manuali', 'combattimento', 'staff'];
 $tipo_filter = (isset($_GET['tipo_filter']) && in_array($_GET['tipo_filter'], $valid_tipi)) ? $_GET['tipo_filter'] : '';
 
-$pagebegin = (int)($_REQUEST['offset'] ?? 0) * $PARAMETERS['settings']['records_per_page'];
-$pageend   = $PARAMETERS['settings']['records_per_page'];
-
 if ($is_admin) {
-    $count_where = $tipo_filter ? "WHERE tipo = '$tipo_filter'" : '';
-    $where       = $count_where;
+    $where = $tipo_filter ? "WHERE tipo = '$tipo_filter'" : '';
 } else {
-    $count_where = $tipo_filter ? "WHERE tipo != 'ambientazione' AND tipo = '$tipo_filter'" : "WHERE tipo != 'ambientazione'";
-    $where       = $count_where;
+    $where = $tipo_filter ? "WHERE tipo != 'ambientazione' AND tipo = '$tipo_filter'" : "WHERE tipo != 'ambientazione'";
 }
 
-$totaleresults = (int)gdrcd_query("SELECT COUNT(*) AS n FROM regolamento $count_where")['n'];
-$result        = gdrcd_query("SELECT articolo, titolo, tipo, testo FROM regolamento $where ORDER BY articolo LIMIT $pagebegin, $pageend", 'result');
+$result = gdrcd_query("SELECT articolo, titolo, tipo, testo FROM regolamento $where ORDER BY articolo", 'result');
 
 $articoli = [];
 while ($row = gdrcd_query($result, 'fetch')) $articoli[] = $row;
@@ -123,21 +117,6 @@ $tipo_label = [
         </tbody>
     </table>
 </div>
-
-<!-- ── Paginatore ─────────────────────────────────────────────── -->
-<?php if ($totaleresults > $PARAMETERS['settings']['records_per_page']): ?>
-<div class="pager">
-    <?php
-    $tipo_qs = $tipo_filter ? '&tipo_filter=' . urlencode($tipo_filter) : '';
-    for ($i = 0; $i <= floor($totaleresults / $PARAMETERS['settings']['records_per_page']); $i++):
-        if ($i != (int)($_REQUEST['offset'] ?? 0)): ?>
-        <a href="main.php?page=gestione_regolamento&offset=<?= $i ?><?= $tipo_qs ?>"><?= $i + 1 ?></a>
-        <?php else: ?>
-        <strong> <?= $i + 1 ?> </strong>
-        <?php endif;
-    endfor; ?>
-</div>
-<?php endif; ?>
 
 <!-- ── Modale inserimento/modifica articolo ─────────────────────── -->
 <div class="pg-edit-container" id="regolamento_edit_container" role="dialog" aria-modal="true">
