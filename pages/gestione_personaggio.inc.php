@@ -52,9 +52,9 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
 <div class="gp-topbar">
 
     <div class="gp-topbar__left">
-        <a href="javascript:history.back()" class="gp-back" title="Indietro">
+        <button type="button" class="gp-back" title="Indietro" onclick="history.back()">
             <i class="fa-solid fa-chevron-left"></i>
-        </a>
+        </button>
     </div>
 
     <div class="gp-topbar__center">
