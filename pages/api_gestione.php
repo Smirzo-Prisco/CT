@@ -111,9 +111,9 @@ switch ($op) {
         );
         $voce_mia_gilda = null;
         if ($mia_gilda_row) {
-            if ((int)$mia_gilda_row['capo'] === 1) {
-                $voce_mia_gilda = 'Gestisci la tua gilda';
-            }
+            // Capo: editor completo. Membro semplice: vista di sola lettura
+            // (MiaGilda.jsx la supporta già, mancava solo il punto d'ingresso da qui)
+            $voce_mia_gilda = ((int)$mia_gilda_row['capo'] === 1) ? 'Gestisci la tua gilda' : 'La mia gilda';
         } else {
             $affiliazioni = (int)gdrcd_query("SELECT COUNT(*) AS n FROM clgpersonaggiomestiere WHERE personaggio = '$login_esc'")['n'];
             if ($affiliazioni < (int)$PARAMETERS['settings']['jobs_limit']) {
