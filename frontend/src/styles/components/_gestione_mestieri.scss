@@ -37,15 +37,8 @@
     flex-direction: column;
 }
 
-// Corpo scrollabile della modale — .modal-content ha max-height + overflow:hidden
-// (da _gestione.scss), lo scroll interno è legato all'id #formSavePg che qui
-// non usiamo: serve un contenitore dedicato con lo stesso comportamento.
-.gm-modal-body {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-    padding: 0 30px;
-}
+// .gm-modal-body: scroll/padding ora definiti genericamente in _gestione.scss
+// (vale per qualunque modale con lo scheletro .pg-edit-container/.modal-content)
 
 .gm-image-field {
     display: flex;

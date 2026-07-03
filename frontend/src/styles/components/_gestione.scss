@@ -304,12 +304,19 @@ header {
         overflow: hidden;
     }
 
-    // Il form è il container scrollabile; header e footer restano fissi
-    #formSavePg {
+    // Il contenuto centrale diventa l'area scrollabile: header e footer, essendo
+    // elementi separati con flex-shrink:0 (.gp-modal-header/.gp-modal-footer),
+    // restano sempre visibili. Vale per ogni modale con questo scheletro — non è
+    // più legato a un id specifico (era solo #formSavePg): un <form> diretto va
+    // già bene, un wrapper .gm-modal-body serve solo quando ci sono più blocchi
+    // da scrollare insieme (es. form + lista ruoli in GestioneMestieri.jsx).
+    form,
+    .gm-modal-body {
         flex: 1;
         overflow-y: auto;
         min-height: 0;
         padding: 0 30px;
+        box-sizing: border-box;
     }
 
     label {
@@ -395,7 +402,8 @@ header {
 
         .modal-content { max-height: calc(100vh - 32px); }
 
-        #formSavePg { padding: 0 $space-3; }
+        form,
+        .gm-modal-body { padding: 0 $space-3; }
 
         input,
         select,
