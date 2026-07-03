@@ -145,6 +145,48 @@ function RuoloRow({ ruolo, onSaved, onDeleted }) {
     )
 }
 
+// ── MestieriTable ────────────────────────────────────────────────────────────
+// Tabella riusata sia per i mestieri veri che per le gilde giocatore: stessa
+// struttura, righe diverse.
+
+function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide }) {
+    return (
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Visibile</th>
+                    <th className="gp-th-actions">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loading ? (
+                    <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20 }}>Caricamento…</td></tr>
+                ) : rows.length === 0 ? (
+                    <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>{emptyLabel}</td></tr>
+                ) : rows.map(m => (
+                    <tr key={m.id_mestiere}>
+                        <td className="gp-cell--name">{m.nome}</td>
+                        <td className="gp-cell--meta">{m.tipo_descrizione ?? '—'}</td>
+                        <td>{m.visibile == 1 ? 'Sì' : 'No'}</td>
+                        <td className="gp-cell--actions">
+                            <div className="gp-actions">
+                                <button className="btn-action btn-action--edit btn-action--icon" title="Modifica" onClick={() => onEdit(m.id_mestiere)}>
+                                    <i className="fa-solid fa-pencil"></i>
+                                </button>
+                                <button className="btn-action btn-action--delete btn-action--icon" title="Nascondi" onClick={() => onHide(m.id_mestiere, m.nome)}>
+                                    <i className="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    )
+}
+
 // ── MestiereModal ─────────────────────────────────────────────────────────────
 
 function MestiereModal({ mestiere, ruoli, tipi, onClose, onSaved, onRuoliChange }) {
@@ -330,14 +372,15 @@ function MestiereModal({ mestiere, ruoli, tipi, onClose, onSaved, onRuoliChange 
 // ── GestioneMestieri ─────────────────────────────────────────────────────────
 
 export default function GestioneMestieri() {
-    const [mestieri, setMestieri] = useState([])
-    const [totale, setTotale]     = useState(0)
-    const [perPage, setPerPage]   = useState(20)
-    const [page, setPage]         = useState(0)
-    const [loading, setLoading]   = useState(true)
-    const [error, setError]       = useState(null)
-    const [editing, setEditing]   = useState(null) // { mestiere, ruoli, tipi } oppure null
-    const [hideMsg, setHideMsg]   = useState(null)
+    const [mestieri, setMestieri]       = useState([]) // tipo = 1, sempre tutti, mai paginati
+    const [gilde, setGilde]             = useState([]) // tipo != 1, paginate
+    const [totaleGilde, setTotaleGilde] = useState(0)
+    const [perPage, setPerPage]         = useState(20)
+    const [page, setPage]               = useState(0)
+    const [loading, setLoading]         = useState(true)
+    const [error, setError]             = useState(null)
+    const [editing, setEditing]         = useState(null) // { mestiere, ruoli, tipi } oppure null
+    const [hideMsg, setHideMsg]         = useState(null)
 
     const loadList = useCallback(async (offset = 0) => {
         setLoading(true)
@@ -348,7 +391,8 @@ export default function GestioneMestieri() {
             setLoading(false)
             if (d.success) {
                 setMestieri(d.mestieri)
-                setTotale(d.totale)
+                setGilde(d.gilde)
+                setTotaleGilde(d.totale_gilde)
                 setPerPage(d.per_page)
                 setPage(offset)
             } else {
@@ -410,7 +454,7 @@ export default function GestioneMestieri() {
         loadList(page)
     }
 
-    const totalPages = Math.max(1, Math.ceil(totale / (perPage || 1)))
+    const totalPages = Math.max(1, Math.ceil(totaleGilde / (perPage || 1)))
 
     return (
         <div className="pagina_gestione_gilde">
@@ -437,40 +481,26 @@ export default function GestioneMestieri() {
             {error && <div className="gm-feedback gm-feedback--error" style={{ margin: '12px' }}>{error}</div>}
             {hideMsg && <div className="gm-feedback gm-feedback--ok" style={{ margin: '12px' }}>{hideMsg}</div>}
 
+            <h3 className="section-title" style={{ margin: '12px' }}>Mestieri</h3>
             <div className="gp-list">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Tipo</th>
-                            <th>Visibile</th>
-                            <th className="gp-th-actions">Azioni</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20 }}>Caricamento…</td></tr>
-                        ) : mestieri.length === 0 ? (
-                            <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Nessun mestiere trovato.</td></tr>
-                        ) : mestieri.map(m => (
-                            <tr key={m.id_mestiere}>
-                                <td className="gp-cell--name">{m.nome}</td>
-                                <td className="gp-cell--meta">{m.tipo_descrizione ?? '—'}</td>
-                                <td>{m.visibile == 1 ? 'Sì' : 'No'}</td>
-                                <td className="gp-cell--actions">
-                                    <div className="gp-actions">
-                                        <button className="btn-action btn-action--edit btn-action--icon" title="Modifica" onClick={() => apriModifica(m.id_mestiere)}>
-                                            <i className="fa-solid fa-pencil"></i>
-                                        </button>
-                                        <button className="btn-action btn-action--delete btn-action--icon" title="Nascondi" onClick={() => nascondi(m.id_mestiere, m.nome)}>
-                                            <i className="fa-solid fa-eye-slash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <MestieriTable
+                    rows={mestieri}
+                    loading={loading}
+                    emptyLabel="Nessun mestiere trovato."
+                    onEdit={apriModifica}
+                    onHide={nascondi}
+                />
+            </div>
+
+            <h3 className="section-title" style={{ margin: '24px 12px 12px' }}>Gilde</h3>
+            <div className="gp-list">
+                <MestieriTable
+                    rows={gilde}
+                    loading={loading}
+                    emptyLabel="Nessuna gilda creata dai giocatori."
+                    onEdit={apriModifica}
+                    onHide={nascondi}
+                />
             </div>
 
             {totalPages > 1 && (

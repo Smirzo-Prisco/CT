@@ -84,11 +84,12 @@ switch ($op) {
         $per_page = (int)$PARAMETERS['settings']['records_per_page'];
         $offset   = max(0, (int)($_GET['offset'] ?? 0)) * $per_page;
 
-        $totale = (int)gdrcd_query("SELECT COUNT(*) AS n FROM mestiere")['n'];
+        // Mestieri veri (tipo = 1): pochi e fissi, si mostrano tutti in un'unica tabella, senza paginazione
         $result = gdrcd_query(
             "SELECT m.id_mestiere, m.nome, m.visibile, m.tipo, c.descrizione AS tipo_descrizione
              FROM mestiere m LEFT JOIN codtipomestiere c ON m.tipo = c.cod_tipo
-             ORDER BY m.nome LIMIT $offset, $per_page",
+             WHERE m.tipo = 1
+             ORDER BY m.nome",
             'result'
         );
         $mestieri = [];
@@ -97,7 +98,28 @@ switch ($op) {
         }
         gdrcd_query($result, 'free');
 
-        echo json_encode(['success' => true, 'mestieri' => $mestieri, 'totale' => $totale, 'per_page' => $per_page]);
+        // Gilde giocatore (tipo != 1): potenzialmente molte, tabella separata con paginazione propria
+        $totale_gilde = (int)gdrcd_query("SELECT COUNT(*) AS n FROM mestiere WHERE tipo != 1")['n'];
+        $result = gdrcd_query(
+            "SELECT m.id_mestiere, m.nome, m.visibile, m.tipo, c.descrizione AS tipo_descrizione
+             FROM mestiere m LEFT JOIN codtipomestiere c ON m.tipo = c.cod_tipo
+             WHERE m.tipo != 1
+             ORDER BY m.nome LIMIT $offset, $per_page",
+            'result'
+        );
+        $gilde = [];
+        while ($row = gdrcd_query($result, 'fetch')) {
+            $gilde[] = $row;
+        }
+        gdrcd_query($result, 'free');
+
+        echo json_encode([
+            'success'      => true,
+            'mestieri'     => $mestieri,
+            'gilde'        => $gilde,
+            'totale_gilde' => $totale_gilde,
+            'per_page'     => $per_page,
+        ]);
         break;
 
     case 'tipi':
