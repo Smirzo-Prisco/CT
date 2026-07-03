@@ -100,11 +100,12 @@ switch ($op) {
                 $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri', 'icon' => 'fa-briefcase', 'voci' => $voci];
         }
 
-        // 4. GILDA (giocatore) — chiunque non abbia già una gilda (jobs_limit permettendo)
-        // o sia capo=1 di quella che ha già, non solo lo staff
+        // 4. GILDA (giocatore) — chiunque non abbia già una gilda (gilda_giocatore_limit permettendo)
+        // o sia capo=1 di quella che ha già, non solo lo staff. Tabella dedicata
+        // clgpersonaggioaffiliazione: scollegata dal mestiere vero, un personaggio può avere entrambi
         $login_esc = gdrcd_filter('in', $_SESSION['login']);
         $mia_gilda_row = gdrcd_query(
-            "SELECT rm.capo FROM clgpersonaggiomestiere cpm
+            "SELECT rm.capo FROM clgpersonaggioaffiliazione cpm
              JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
              JOIN mestiere m ON rm.mestiere = m.id_mestiere
              WHERE cpm.personaggio = '$login_esc' AND m.tipo != 1 LIMIT 1"
@@ -115,8 +116,8 @@ switch ($op) {
             // (MiaGilda.jsx la supporta già, mancava solo il punto d'ingresso da qui)
             $voce_mia_gilda = ((int)$mia_gilda_row['capo'] === 1) ? 'Gestisci la tua gilda' : 'La mia gilda';
         } else {
-            $affiliazioni = (int)gdrcd_query("SELECT COUNT(*) AS n FROM clgpersonaggiomestiere WHERE personaggio = '$login_esc'")['n'];
-            if ($affiliazioni < (int)$PARAMETERS['settings']['jobs_limit']) {
+            $affiliazioni = (int)gdrcd_query("SELECT COUNT(*) AS n FROM clgpersonaggioaffiliazione WHERE personaggio = '$login_esc'")['n'];
+            if ($affiliazioni < (int)$PARAMETERS['settings']['gilda_giocatore_limit']) {
                 $voce_mia_gilda = 'Crea una gilda';
             }
         }

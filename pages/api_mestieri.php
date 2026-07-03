@@ -197,8 +197,7 @@ switch ($op) {
             exit;
         }
 
-        gdrcd_query("UPDATE personaggio SET id_mestiere=0, id_ruolo_mestiere=1 WHERE nome IN (SELECT personaggio FROM clgpersonaggiomestiere WHERE id_ruolo IN (SELECT id_ruolo FROM ruolo_mestiere WHERE mestiere=$id))");
-        gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE id_ruolo IN (SELECT id_ruolo FROM ruolo_mestiere WHERE mestiere=$id)");
+        gdrcd_query("DELETE FROM clgpersonaggioaffiliazione WHERE id_ruolo IN (SELECT id_ruolo FROM ruolo_mestiere WHERE mestiere=$id)");
         gdrcd_query("DELETE FROM ruolo_mestiere WHERE mestiere=$id");
         gdrcd_query("DELETE FROM mestiere WHERE id_mestiere=$id");
         echo json_encode(['success' => true, 'message' => 'Gilda sciolta.']);
@@ -222,30 +221,29 @@ switch ($op) {
         }
         $id_ruolo_capo = (int)$ruolo_capo['id_ruolo'];
 
-        $membro = gdrcd_query("SELECT cpm.id_ruolo FROM clgpersonaggiomestiere cpm JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo WHERE cpm.personaggio='$nuovo_capo' AND rm.mestiere=$id_mestiere");
+        $membro = gdrcd_query("SELECT cpm.id_ruolo FROM clgpersonaggioaffiliazione cpm JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo WHERE cpm.personaggio='$nuovo_capo' AND rm.mestiere=$id_mestiere");
         if (!$membro) {
             echo json_encode(['success' => false, 'message' => 'Il personaggio scelto non è membro di questa gilda']);
             exit;
         }
 
         // Retrocede l'eventuale vecchio capo (se diverso dal nuovo) al grado più basso disponibile,
-        // o lo rimuove dalla gilda se non esiste nessun altro ruolo
-        $vecchio_capo = gdrcd_query("SELECT personaggio FROM clgpersonaggiomestiere WHERE id_ruolo=$id_ruolo_capo AND personaggio != '$nuovo_capo' LIMIT 1");
+        // o lo rimuove dalla gilda se non esiste nessun altro ruolo.
+        // clgpersonaggioaffiliazione è dedicata alle gilde: personaggio.id_mestiere/id_ruolo_mestiere
+        // (riservate al mestiere vero) non si toccano qui.
+        $vecchio_capo = gdrcd_query("SELECT personaggio FROM clgpersonaggioaffiliazione WHERE id_ruolo=$id_ruolo_capo AND personaggio != '$nuovo_capo' LIMIT 1");
         if ($vecchio_capo) {
             $nome_vecchio = gdrcd_filter('in', $vecchio_capo['personaggio']);
             $ruolo_base   = gdrcd_query("SELECT id_ruolo FROM ruolo_mestiere WHERE mestiere=$id_mestiere AND capo=0 ORDER BY livello_mestiere DESC LIMIT 1");
             if ($ruolo_base) {
                 $id_ruolo_base = (int)$ruolo_base['id_ruolo'];
-                gdrcd_query("UPDATE clgpersonaggiomestiere SET id_ruolo=$id_ruolo_base WHERE personaggio='$nome_vecchio'");
-                gdrcd_query("UPDATE personaggio SET id_ruolo_mestiere=$id_ruolo_base WHERE nome='$nome_vecchio'");
+                gdrcd_query("UPDATE clgpersonaggioaffiliazione SET id_ruolo=$id_ruolo_base WHERE personaggio='$nome_vecchio'");
             } else {
-                gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE personaggio='$nome_vecchio'");
-                gdrcd_query("UPDATE personaggio SET id_mestiere=0, id_ruolo_mestiere=1 WHERE nome='$nome_vecchio'");
+                gdrcd_query("DELETE FROM clgpersonaggioaffiliazione WHERE personaggio='$nome_vecchio'");
             }
         }
 
-        gdrcd_query("UPDATE clgpersonaggiomestiere SET id_ruolo=$id_ruolo_capo WHERE personaggio='$nuovo_capo'");
-        gdrcd_query("UPDATE personaggio SET id_mestiere=$id_mestiere, id_ruolo_mestiere=$id_ruolo_capo WHERE nome='$nuovo_capo'");
+        gdrcd_query("UPDATE clgpersonaggioaffiliazione SET id_ruolo=$id_ruolo_capo WHERE personaggio='$nuovo_capo'");
 
         echo json_encode(['success' => true, 'message' => 'Capo riassegnato.', 'ruoli' => carica_ruoli($id_mestiere)]);
         break;
@@ -254,11 +252,12 @@ switch ($op) {
     // AUTO-GESTIONE GILDA GIOCATORE — chiunque sia loggato
     // ===========================================================================
 
-    // La gilda del personaggio loggato, se ne ha una (mestiere.tipo != 1)
+    // La gilda del personaggio loggato, se ne ha una (tabella dedicata clgpersonaggioaffiliazione,
+    // separata dai mestieri veri: un personaggio può avere entrambi insieme)
     case 'mia_gilda':
         $row = gdrcd_query(
             "SELECT m.id_mestiere, rm.capo
-             FROM clgpersonaggiomestiere cpm
+             FROM clgpersonaggioaffiliazione cpm
              JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
              JOIN mestiere m ON rm.mestiere = m.id_mestiere
              WHERE cpm.personaggio = '$login' AND m.tipo != 1
@@ -275,8 +274,8 @@ switch ($op) {
                 'ruoli'    => carica_ruoli($id),
             ]);
         } else {
-            $affiliazioni = (int)gdrcd_query("SELECT COUNT(*) AS n FROM clgpersonaggiomestiere WHERE personaggio = '$login'")['n'];
-            $puo_creare   = $affiliazioni < (int)$PARAMETERS['settings']['jobs_limit'];
+            $affiliazioni = (int)gdrcd_query("SELECT COUNT(*) AS n FROM clgpersonaggioaffiliazione WHERE personaggio = '$login'")['n'];
+            $puo_creare   = $affiliazioni < (int)$PARAMETERS['settings']['gilda_giocatore_limit'];
             echo json_encode(['success' => true, 'ha_gilda' => false, 'puo_creare' => $puo_creare]);
         }
         break;
@@ -290,9 +289,9 @@ switch ($op) {
                 exit;
             }
 
-            $affiliazioni = (int)gdrcd_query("SELECT COUNT(*) AS n FROM clgpersonaggiomestiere WHERE personaggio = '$login'")['n'];
-            if ($affiliazioni >= (int)$PARAMETERS['settings']['jobs_limit']) {
-                echo json_encode(['success' => false, 'message' => 'Hai già raggiunto il limite di affiliazioni consentite']);
+            $affiliazioni = (int)gdrcd_query("SELECT COUNT(*) AS n FROM clgpersonaggioaffiliazione WHERE personaggio = '$login'")['n'];
+            if ($affiliazioni >= (int)$PARAMETERS['settings']['gilda_giocatore_limit']) {
+                echo json_encode(['success' => false, 'message' => 'Hai già raggiunto il limite di gilde consentite']);
                 exit;
             }
 
@@ -317,9 +316,10 @@ switch ($op) {
             $id_ruolo = (int)gdrcd_query("SELECT LAST_INSERT_ID() AS id")['id'];
 
             // conferma_mestiere=1 subito: per le gilde giocatore l'affiliazione è diretta
-            // (hire/fondazione), non passa mai dal flusso di conferma dei mestieri globali
-            gdrcd_query("INSERT INTO clgpersonaggiomestiere (personaggio, id_ruolo, conferma_mestiere, scadenza) VALUES ('$login', $id_ruolo, 1, NOW())");
-            gdrcd_query("UPDATE personaggio SET id_mestiere=$id_mestiere, id_ruolo_mestiere=$id_ruolo WHERE nome='$login'");
+            // (hire/fondazione), non passa mai dal flusso di conferma dei mestieri globali.
+            // Tabella dedicata clgpersonaggioaffiliazione: personaggio.id_mestiere/id_ruolo_mestiere
+            // restano riservate al mestiere vero, non si toccano qui.
+            gdrcd_query("INSERT INTO clgpersonaggioaffiliazione (personaggio, id_ruolo, conferma_mestiere, scadenza) VALUES ('$login', $id_ruolo, 1, NOW())");
 
             echo json_encode(['success' => true, 'message' => 'Gilda creata.', 'mestiere' => carica_mestiere($id_mestiere), 'ruoli' => carica_ruoli($id_mestiere)]);
         } catch (Exception $e) {
@@ -494,7 +494,10 @@ switch ($op) {
             }
         }
 
+        // Un id_ruolo appartiene sempre a una sola delle due tabelle: il DELETE
+        // sull'altra è a costo zero, evita di dover determinare il tipo qui
         gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE id_ruolo=$id_ruolo");
+        gdrcd_query("DELETE FROM clgpersonaggioaffiliazione WHERE id_ruolo=$id_ruolo");
         gdrcd_query("DELETE FROM ruolo_mestiere WHERE id_ruolo=$id_ruolo LIMIT 1");
         echo json_encode(['success' => true, 'message' => 'Ruolo eliminato.', 'ruoli' => carica_ruoli($mestiere)]);
         break;

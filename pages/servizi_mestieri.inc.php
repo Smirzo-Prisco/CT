@@ -51,12 +51,19 @@ if ($solo_gilde) {
     $last_tipo = null;
 
     while ($row = gdrcd_query($result, 'fetch')) {
+        // Un id_mestiere ha righe solo su una delle due tabelle (mestiere vero
+        // o gilda giocatore): la UNION ALL copre entrambi i casi senza dover
+        // determinare il tipo qui
         $numb = gdrcd_query(
-            "SELECT COUNT(*) AS n
-               FROM clgpersonaggiomestiere cpm
-               JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
-              WHERE rm.mestiere = " . (int)$row['id_mestiere'] . "
-                AND cpm.conferma_mestiere = 1"
+            "SELECT COUNT(*) AS n FROM (
+                SELECT cpm.personaggio FROM clgpersonaggiomestiere cpm
+                 JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+                WHERE rm.mestiere = " . (int)$row['id_mestiere'] . " AND cpm.conferma_mestiere = 1
+                UNION ALL
+                SELECT cpm.personaggio FROM clgpersonaggioaffiliazione cpm
+                 JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+                WHERE rm.mestiere = " . (int)$row['id_mestiere'] . " AND cpm.conferma_mestiere = 1
+             ) t"
         );
         if ($row['tipo'] !== $last_tipo) {
             $last_tipo  = $row['tipo'];
@@ -205,7 +212,11 @@ if ($solo_gilde) {
     $rAff = gdrcd_query(
         "SELECT cpm.personaggio, p.cognome, rm.immagine, rm.nome_ruolo, rm.capo
            FROM ruolo_mestiere rm
-           JOIN clgpersonaggiomestiere cpm ON cpm.id_ruolo = rm.id_ruolo
+           JOIN (
+                SELECT personaggio, id_ruolo, conferma_mestiere FROM clgpersonaggiomestiere
+                UNION ALL
+                SELECT personaggio, id_ruolo, conferma_mestiere FROM clgpersonaggioaffiliazione
+           ) cpm ON cpm.id_ruolo = rm.id_ruolo
            JOIN personaggio p ON p.nome = cpm.personaggio
           WHERE rm.mestiere = $id_mestiere
             AND cpm.conferma_mestiere = 1

@@ -64,7 +64,9 @@ switch ($op) {
         }
         gdrcd_query($resG, 'free');
 
-        // Mestieri — conteggio confermati via JOIN su ruolo_mestiere
+        // Mestieri — conteggio confermati via JOIN su ruolo_mestiere. Include sia i mestieri
+        // veri (clgpersonaggiomestiere) che le gilde giocatore (tabella dedicata
+        // clgpersonaggioaffiliazione): un dato mestiere ha righe solo su una delle due
         $resM = gdrcd_query("
             SELECT m.id_mestiere, m.nome, m.tipo, m.url_sito,
                    ctm.descrizione AS tipo_desc,
@@ -72,8 +74,11 @@ switch ($op) {
             FROM mestiere m
             JOIN  codtipomestiere      ctm ON ctm.cod_tipo   = m.tipo
             LEFT JOIN ruolo_mestiere   rm  ON rm.mestiere    = m.id_mestiere
-            LEFT JOIN clgpersonaggiomestiere cpm
-                   ON cpm.id_ruolo = rm.id_ruolo AND cpm.conferma_mestiere = 1
+            LEFT JOIN (
+                SELECT personaggio, id_ruolo, conferma_mestiere FROM clgpersonaggiomestiere
+                UNION ALL
+                SELECT personaggio, id_ruolo, conferma_mestiere FROM clgpersonaggioaffiliazione
+            ) cpm ON cpm.id_ruolo = rm.id_ruolo AND cpm.conferma_mestiere = 1
             WHERE m.visibile = 1
             GROUP BY m.id_mestiere
             ORDER BY m.tipo, m.nome

@@ -42,6 +42,15 @@ $autorizzato = puo_gestire_mestiere($id_mestiere, $is_admin, $is_staff_capomesti
 // tornano alla loro pagina di gestione — è l'unico punto d'ingresso reale a questo tool
 $panel_url  = $is_admin ? 'main.php?page=gestione' : 'main.php?page=mia_gilda';
 $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
+
+// Tabella di affiliazione da usare per QUESTO specifico mestiere/gilda: i mestieri
+// veri (tipo=1) e i lavori indipendenti (-1) restano su clgpersonaggiomestiere, le
+// gilde giocatore (tipo!=1) sono sulla tabella dedicata clgpersonaggioaffiliazione
+$tabella_affiliazione = 'clgpersonaggiomestiere';
+if ($id_mestiere !== null && $id_mestiere !== -1) {
+    $tipo_row = gdrcd_query("SELECT tipo FROM mestiere WHERE id_mestiere = $id_mestiere");
+    if ($tipo_row && (int)$tipo_row['tipo'] !== 1) $tabella_affiliazione = 'clgpersonaggioaffiliazione';
+}
 ?>
 <div class="sm-page">
 
@@ -92,9 +101,9 @@ $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
 
     <?php if (isset($_POST['op']) === false):
         /* ── Elenco lavori ────────────────────────────────────────────────── */
-        $people  = "SELECT nome, cognome FROM personaggio WHERE permessi > -1 AND nome NOT IN (SELECT personaggio FROM clgpersonaggiomestiere) ORDER BY nome";
+        $people  = "SELECT nome, cognome FROM personaggio WHERE permessi > -1 AND nome NOT IN (SELECT personaggio FROM $tabella_affiliazione) ORDER BY nome";
         $query   = "SELECT id_ruolo, nome_ruolo FROM ruolo_mestiere WHERE mestiere = $id_mestiere ORDER BY capo DESC, stipendio DESC, nome_ruolo";
-        $members = "SELECT cpm.personaggio, cpm.id_ruolo, rm.nome_ruolo FROM clgpersonaggiomestiere cpm JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo WHERE rm.mestiere = $id_mestiere ORDER BY rm.capo DESC, rm.stipendio DESC";
+        $members = "SELECT cpm.personaggio, cpm.id_ruolo, rm.nome_ruolo FROM $tabella_affiliazione cpm JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo WHERE rm.mestiere = $id_mestiere ORDER BY rm.capo DESC, rm.stipendio DESC";
 
         $result         = gdrcd_query($query, 'result');
         $people_result  = gdrcd_query($people, 'result');
@@ -171,8 +180,13 @@ $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
         </section>
         <?php endif; //else (ruoli definiti)
 
-        /*Dimissioni: affiliazioni scadute del login corrente (self-quit) — logica invariata*/
-        $affiliazioni        = "SELECT mestiere.id_mestiere, ruolo_mestiere.nome_ruolo, mestiere.nome, ruolo_mestiere.id_ruolo FROM ruolo_mestiere LEFT JOIN mestiere ON mestiere.id_mestiere = ruolo_mestiere.mestiere WHERE ruolo_mestiere.id_ruolo IN (SELECT id_ruolo FROM clgpersonaggiomestiere WHERE personaggio = '".$_SESSION['login']."' AND scadenza < NOW()) ";
+        /*Dimissioni: affiliazioni scadute del login corrente (self-quit) — ora su entrambe
+          le tabelle, un utente può avere sia un mestiere che una gilda scaduti insieme*/
+        $affiliazioni        = "SELECT mestiere.id_mestiere, ruolo_mestiere.nome_ruolo, mestiere.nome, ruolo_mestiere.id_ruolo FROM ruolo_mestiere LEFT JOIN mestiere ON mestiere.id_mestiere = ruolo_mestiere.mestiere WHERE ruolo_mestiere.id_ruolo IN (
+            SELECT id_ruolo FROM clgpersonaggiomestiere WHERE personaggio = '".$_SESSION['login']."' AND scadenza < NOW()
+            UNION
+            SELECT id_ruolo FROM clgpersonaggioaffiliazione WHERE personaggio = '".$_SESSION['login']."' AND scadenza < NOW()
+        ) ";
         $affiliazioni_result = gdrcd_query($affiliazioni, 'result');
 
         if (gdrcd_query($affiliazioni_result, 'num_rows') > 0): ?>
@@ -212,24 +226,32 @@ $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
         if (!$ruolo_check || (int)$ruolo_check['mestiere'] !== $id_mestiere_post || !puo_gestire_mestiere($id_mestiere_post, $is_admin, $is_staff_capomestiere, $login_esc)) {
             $esito_msg = gdrcd_filter('out', $MESSAGE['error']['not_allowed']);
         } else {
-            /*Controllo il numero di affiliazioni correnti del personaggio*/
-            $jobs = gdrcd_query("SELECT COUNT(*) FROM clgpersonaggiomestiere WHERE personaggio = '".gdrcd_filter('in', $_POST['nome'])."'");
+            // Per le gilde giocatore (tipo != 1) l'affiliazione è confermata subito (assunzione
+            // diretta dal capo) e va sulla tabella dedicata clgpersonaggioaffiliazione, con il
+            // suo limite separato; i mestieri veri restano su clgpersonaggiomestiere/jobs_limit
+            $e_gilda_giocatore = $ruolo_check['tipo'] !== null && (int)$ruolo_check['tipo'] !== 1;
+            $tabella_hire      = $e_gilda_giocatore ? 'clgpersonaggioaffiliazione' : 'clgpersonaggiomestiere';
+            $limite_hire       = $e_gilda_giocatore ? (int)$PARAMETERS['settings']['gilda_giocatore_limit'] : (int)$PARAMETERS['settings']['jobs_limit'];
+
+            /*Controllo il numero di affiliazioni correnti del personaggio (sulla tabella pertinente)*/
+            $jobs = gdrcd_query("SELECT COUNT(*) FROM $tabella_hire WHERE personaggio = '".gdrcd_filter('in', $_POST['nome'])."'");
 
             /*Se il personaggio ha raggiunto il limite*/
-            if ($jobs['COUNT(*)'] >= $PARAMETERS['settings']['jobs_limit']) {
+            if ($jobs['COUNT(*)'] >= $limite_hire) {
                 $esito_msg = gdrcd_filter('out', $_POST['nome'].' '.$MESSAGE['interface']['adm_guilds']['cannot_hire']);
             } else {
                 /*Opero l'affiliazione*/
-                // Per le gilde giocatore (tipo != 1) l'affiliazione è confermata subito: l'assunzione
-                // è diretta da parte del capo, non passa dal flusso di conferma dei mestieri globali
-                $e_gilda_giocatore = $ruolo_check['tipo'] !== null && (int)$ruolo_check['tipo'] !== 1;
-                $conferma_sql      = $e_gilda_giocatore ? ', conferma_mestiere' : '';
-                $conferma_valori   = $e_gilda_giocatore ? ', 1' : '';
-                gdrcd_query("INSERT INTO clgpersonaggiomestiere (personaggio, id_ruolo$conferma_sql, scadenza) VALUES ('".gdrcd_filter('in', $_POST['nome'])."', ".$subject[0]."$conferma_valori, NOW())");
-                $mestiere        = "SELECT mestiere FROM ruolo_mestiere WHERE id_ruolo = ".$subject[0]."";
-                $mestiere_result = gdrcd_query($mestiere, 'result');
-                $mestiere        = gdrcd_query($mestiere_result, 'fetch');
-                gdrcd_query("UPDATE personaggio SET id_mestiere = ".$mestiere['mestiere'].", id_ruolo_mestiere = ".$subject[0]." WHERE nome = '".$_POST['nome']."'");
+                $conferma_sql    = $e_gilda_giocatore ? ', conferma_mestiere' : '';
+                $conferma_valori = $e_gilda_giocatore ? ', 1' : '';
+                gdrcd_query("INSERT INTO $tabella_hire (personaggio, id_ruolo$conferma_sql, scadenza) VALUES ('".gdrcd_filter('in', $_POST['nome'])."', ".$subject[0]."$conferma_valori, NOW())");
+                // personaggio.id_mestiere/id_ruolo_mestiere restano riservate al mestiere vero:
+                // per una gilda giocatore non si toccano, l'affiliazione si legge sempre dalla tabella dedicata
+                if (!$e_gilda_giocatore) {
+                    $mestiere        = "SELECT mestiere FROM ruolo_mestiere WHERE id_ruolo = ".$subject[0]."";
+                    $mestiere_result = gdrcd_query($mestiere, 'result');
+                    $mestiere        = gdrcd_query($mestiere_result, 'fetch');
+                    gdrcd_query("UPDATE personaggio SET id_mestiere = ".$mestiere['mestiere'].", id_ruolo_mestiere = ".$subject[0]." WHERE nome = '".$_POST['nome']."'");
+                }
                 /*Confermo l'operazione*/
                 $esito_ok  = true;
                 $esito_msg = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['ok_hire']);
@@ -249,7 +271,7 @@ $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
         $subject = explode('-', gdrcd_filter('in', $_POST['ruolo_mestiere']));
 
         // Chiunque può dimettersi da sé stesso; altrimenti serve essere autorizzati sul mestiere del ruolo
-        $ruolo_check      = gdrcd_query("SELECT mestiere FROM ruolo_mestiere WHERE id_ruolo = ".(int)$subject[1]);
+        $ruolo_check      = gdrcd_query("SELECT rm.mestiere, m.tipo FROM ruolo_mestiere rm LEFT JOIN mestiere m ON rm.mestiere = m.id_mestiere WHERE rm.id_ruolo = ".(int)$subject[1]);
         $e_se_stesso      = ($subject[0] === $_SESSION['login']);
         $autorizzato_fire = $e_se_stesso || ($ruolo_check && puo_gestire_mestiere((int)$ruolo_check['mestiere'], $is_admin, $is_staff_capomestiere, $login_esc));
 
@@ -257,9 +279,16 @@ $back_label = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['back']);
         if (!$autorizzato_fire) {
             $esito_msg = gdrcd_filter('out', $MESSAGE['error']['not_allowed']);
         } else {
-            gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE personaggio='".$subject[0]."' AND id_ruolo = ".gdrcd_filter('num', $subject[1])." LIMIT 1");
-            gdrcd_query("UPDATE personaggio SET id_mestiere=0 WHERE nome = '".$subject[0]."'");
-            gdrcd_query("UPDATE personaggio SET id_ruolo_mestiere=1 WHERE nome = '".$subject[0]."'");
+            // Gilda giocatore (tipo != 1) → tabella dedicata, personaggio.id_mestiere/id_ruolo_mestiere
+            // non toccate (riservate al mestiere vero); mestiere vero → comportamento invariato
+            $e_gilda_giocatore = $ruolo_check && $ruolo_check['tipo'] !== null && (int)$ruolo_check['tipo'] !== 1;
+            $tabella_fire      = $e_gilda_giocatore ? 'clgpersonaggioaffiliazione' : 'clgpersonaggiomestiere';
+
+            gdrcd_query("DELETE FROM $tabella_fire WHERE personaggio='".$subject[0]."' AND id_ruolo = ".gdrcd_filter('num', $subject[1])." LIMIT 1");
+            if (!$e_gilda_giocatore) {
+                gdrcd_query("UPDATE personaggio SET id_mestiere=0 WHERE nome = '".$subject[0]."'");
+                gdrcd_query("UPDATE personaggio SET id_ruolo_mestiere=1 WHERE nome = '".$subject[0]."'");
+            }
             /*Confermo l'operazione*/
             $esito_ok  = true;
             $esito_msg = gdrcd_filter('out', $MESSAGE['interface']['adm_guilds']['ok_fire']);
