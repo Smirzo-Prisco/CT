@@ -340,7 +340,6 @@ switch ($op) {
              LEFT JOIN mappa       m    ON p.ultimo_luogo   = m.id
              LEFT JOIN ruolo       ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
              LEFT JOIN bot_status  bs   ON bs.bot_nome = p.nome
-             LEFT JOIN privilegi   pr   ON pr.nome = p.nome
              WHERE $condizione_online
                AND p.ultimo_luogo = $luogo
                AND p.ultima_mappa = $mappa

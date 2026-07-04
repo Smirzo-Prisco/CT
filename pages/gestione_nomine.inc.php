@@ -39,9 +39,7 @@ if(isset($_POST["edit_pg"]) && $_POST["edit_pg"] != '') {
 
         while($row = gdrcd_query($privilegi, 'fetch')) {
             // Se la colonna è tra i ruoli che devo portare a uno, altrimenti lo riporto a zero
-            // sempre_online non è un ruolo/nomina gestito da questa pagina: escluso per non
-            // farlo azzerare inavvertitamente ogni volta che si modifica un altro privilegio
-            if($row['COLUMN_NAME'] != 'nome' && $row['COLUMN_NAME'] != 'sempre_online') $ruolo[] = in_array($row['COLUMN_NAME'], $_POST["privilegi"][$pg_to_edit]) ? $row['COLUMN_NAME'].'= 1' : $row['COLUMN_NAME'].'= 0';
+            if($row['COLUMN_NAME'] != 'nome') $ruolo[] = in_array($row['COLUMN_NAME'], $_POST["privilegi"][$pg_to_edit]) ? $row['COLUMN_NAME'].'= 1' : $row['COLUMN_NAME'].'= 0';
         }
 
         gdrcd_query("UPDATE privilegi SET " . implode(", ", $ruolo) . " WHERE nome = '".gdrcd_filter('in', $pg_to_edit)."'");
@@ -134,7 +132,7 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
                         while ($row = gdrcd_query($privilegi, 'fetch')):
                             $ruolo = $row['COLUMN_NAME'];
 
-                            if ($ruolo != 'nome' && $ruolo != 'capogilda' && $ruolo != 'capomestiere' && $ruolo != 'sempre_online' && hasPermesso($_SESSION, $azioni_permessi[$ruolo])) {
+                            if ($ruolo != 'nome' && $ruolo != 'capogilda' && $ruolo != 'capomestiere' && hasPermesso($_SESSION, $azioni_permessi[$ruolo])) {
                                 $checked = $row_pri[$ruolo] == 1 ? 'checked' : '';
 
                                 echo '<input type="hidden" name="edit_pg" value="'.$pg['nome'].'">';
@@ -161,7 +159,7 @@ $personaggi = gdrcd_query("SELECT privilegi.nome, personaggio.url_img_chat FROM 
                         $privilegi = gdrcd_query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$PARAMETERS['database']['database_name']."' AND TABLE_NAME = 'privilegi'", 'result');
 
                         while ($row = gdrcd_query($privilegi, 'fetch')):
-                            echo ($row['COLUMN_NAME'] != 'nome' && $row['COLUMN_NAME'] != 'sempre_online') ? '<option value="'.$row['COLUMN_NAME'].'">'.$row['COLUMN_NAME'].'</option>' : '';
+                            echo $row['COLUMN_NAME'] != 'nome' ? '<option value="'.$row['COLUMN_NAME'].'">'.$row['COLUMN_NAME'].'</option>' : '';
                         endwhile; ?>
                     </select>
                 </td>

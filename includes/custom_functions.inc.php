@@ -693,11 +693,12 @@ function mestiere_e_membro_di($login, $id_mestiere) {
  *
  * Richiede che la query chiamante usi l'alias "p" per personaggio e includa:
  *   LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
- *   LEFT JOIN privilegi  pr ON pr.nome    = p.nome
  *
  * Un personaggio è online se: ha una sessione aperta (ora_entrata > ora_uscita)
  * con attività recente (o, per i bot, non in pausa) — oppure, a prescindere
- * dalla sessione, se privilegi.sempre_online è attivo.
+ * dalla sessione, se personaggio.sempre_online è attivo. Il flag vive
+ * direttamente su personaggio (non su privilegi, che si è rivelata più
+ * fragile: gestione_nomine.inc.php itera dinamicamente ogni sua colonna).
  */
 function gdrcd_condizione_online() {
     return "(
@@ -708,7 +709,7 @@ function gdrcd_condizione_online() {
                 OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
             )
         )
-        OR COALESCE(pr.sempre_online, 0) = 1
+        OR COALESCE(p.sempre_online, 0) = 1
     )";
 }
 ?>
