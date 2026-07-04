@@ -84,7 +84,7 @@ if (!empty($post_id) && !empty($action) && !empty($login)) {
 
     // Aggiorna la notorietà solo se c'è un cambiamento e il post/commento è pubblico e non ha alias
     // Includiamo la verifica su `id_messaggio_padre` per considerare anche i commenti
-    if ($notorieta_change != 0 && $post_details['alias'] == 0 && in_array($post_details['tipo'], ['pagina_personale', 'crystal_news', 'tokyobook'])) {
+    if ($notorieta_change != 0 && $post_details['alias'] == 0 && $post_details['tipo'] == 'tokyobook') {
         $update_notorieta_query = "
             UPDATE personaggio 
             SET notorieta = notorieta + " . gdrcd_filter('num', $notorieta_change) . " 
