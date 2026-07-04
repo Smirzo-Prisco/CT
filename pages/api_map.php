@@ -338,16 +338,10 @@ switch ($op) {
              LEFT JOIN mappa       m    ON p.ultimo_luogo   = m.id
              LEFT JOIN ruolo       ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
              LEFT JOIN bot_status  bs   ON bs.bot_nome = p.nome
-             LEFT JOIN privilegi   pr   ON pr.nome = p.nome
-             WHERE (
-                 (
-                   p.ora_entrata > p.ora_uscita
-                   AND (
-                     (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
-                     OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
-                   )
-                 )
-                 OR COALESCE(pr.sempre_online, 0) = 1
+             WHERE p.ora_entrata > p.ora_uscita
+               AND (
+                 (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
+                 OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
                )
                AND p.ultimo_luogo = $luogo
                AND p.ultima_mappa = $mappa
@@ -445,15 +439,10 @@ switch ($op) {
             LEFT JOIN ruolo          ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
             LEFT JOIN privilegi      pr   ON pr.nome            = p.nome
             LEFT JOIN bot_status     bs   ON bs.bot_nome        = p.nome
-            WHERE (
-                (
-                  p.ora_entrata > p.ora_uscita
-                  AND (
-                    (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
-                    OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
-                  )
-                )
-                OR COALESCE(pr.sempre_online, 0) = 1
+            WHERE p.ora_entrata > p.ora_uscita
+              AND (
+                (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
+                OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
               )
               $exclude
             ORDER BY p.is_invisible, mc.nome, m.nome, p.nome
