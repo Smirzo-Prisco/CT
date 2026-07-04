@@ -19,7 +19,7 @@ function narrazione_abilitata_per(string $pg_name): bool {
 }
 
 /** Chiamata HTTP al server llama.cpp locale. Ritorna null in caso di errore. */
-function narrazione_llm_call(string $prompt, int $max_tokens = 150): ?string {
+function narrazione_llm_call(string $prompt, int $max_tokens = 300): ?string {
     $payload = json_encode([
         'messages'   => [['role' => 'user', 'content' => $prompt]],
         'max_tokens' => $max_tokens,
@@ -40,8 +40,18 @@ function narrazione_llm_call(string $prompt, int $max_tokens = 150): ?string {
     curl_close($ch);
     if ($response === false || $http_code !== 200) return null;
 
-    $data = json_decode($response, true);
-    return $data['choices'][0]['message']['content'] ?? null;
+    $data    = json_decode($response, true);
+    $content = $data['choices'][0]['message']['content'] ?? null;
+    if ($content === null || trim($content) === '') return null;
+
+    // Se il modello è stato interrotto da max_tokens a metà frase, tronchiamo
+    // all'ultimo punto di fine frase per non salvare un riassunto spezzato.
+    if (($data['choices'][0]['finish_reason'] ?? null) === 'length') {
+        $fine_frase = array_filter([strrpos($content, '.'), strrpos($content, '!'), strrpos($content, '?')], fn($p) => $p !== false);
+        if ($fine_frase) $content = substr($content, 0, max($fine_frase) + 1);
+    }
+
+    return $content;
 }
 
 /**
@@ -57,8 +67,8 @@ function narrazione_trascrizione_giocata(int $id_role, int $max_chars = 6000): s
     gdrcd_query($result, 'free');
 
     $trascrizione = implode("\n", $righe);
-    if (strlen($trascrizione) > $max_chars) {
-        $trascrizione = '[...]' . substr($trascrizione, -$max_chars);
+    if (mb_strlen($trascrizione) > $max_chars) {
+        $trascrizione = '[...]' . mb_substr($trascrizione, -$max_chars);
     }
     return $trascrizione;
 }
@@ -78,7 +88,7 @@ function narrazione_riassunto_giocata(int $id_role, string $pg_name): ?string {
         "dal punto di vista del personaggio \"$pg_name\": cosa gli è successo o cosa ha fatto in questa scena.\n\n" .
         "Trascrizione:\n$trascrizione";
 
-    return narrazione_llm_call($prompt, 150);
+    return narrazione_llm_call($prompt, 300);
 }
 
 /**
