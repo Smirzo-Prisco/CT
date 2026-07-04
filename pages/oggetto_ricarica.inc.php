@@ -38,19 +38,10 @@
                         // Magic Shop
                         elseif ($mestiere['id_mestiere'] == 3) {
                             $pg_list = gdrcd_query("
-                                SELECT DISTINCT c.nome 
+                                SELECT DISTINCT c.nome
                                 FROM clgpersonaggiooggetto c
                                 JOIN oggetto o ON c.id_oggetto = o.id_oggetto
                                 WHERE o.tipo = 8
-                            ", 'result');
-                        }
-                        // Secret Pandora
-                        elseif ($mestiere['id_mestiere'] == 4) {
-                            $pg_list = gdrcd_query("
-                                SELECT DISTINCT c.nome 
-                                FROM clgpersonaggiooggetto c
-                                JOIN oggetto o ON c.id_oggetto = o.id_oggetto
-                                WHERE o.tipo = 9
                             ", 'result');
                         }
 
@@ -149,20 +140,6 @@ if(isset($_POST['ricarica'])) {
             FROM chat 
             WHERE mittente = '".$login."' 
               AND stanza = 24 
-              AND tipo = 'P' 
-              AND ora >= DATE_SUB(NOW(), INTERVAL 3 HOUR)
-        ");
-        if ($check_azioni['azioni'] >= 2) {
-            $permesso = true;
-        }
-    }
-    // Caso 4: Secret Pandora
-    elseif ($mestiere['id_mestiere'] == 4) {
-        $check_azioni = gdrcd_query("
-            SELECT COUNT(*) as azioni 
-            FROM chat 
-            WHERE mittente = '".$login."' 
-              AND stanza = 14 
               AND tipo = 'P' 
               AND ora >= DATE_SUB(NOW(), INTERVAL 3 HOUR)
         ");

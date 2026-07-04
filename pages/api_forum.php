@@ -330,12 +330,6 @@ switch ($op) {
             gdrcd_query("DELETE FROM araldo_letto WHERE thread_id = $padre AND nome != '" . gdrcd_filter('in', $login) . "'");
         }
 
-        // Punti mestiere per bacheche specifiche
-        $check_m = gdrcd_query("SELECT id_mestiere, esperienza_mestiere FROM personaggio WHERE nome = '" . gdrcd_filter('in', $login) . "'");
-        if (($check_m['id_mestiere'] == 1 && $araldo_id == 131) ||
-            ($check_m['id_mestiere'] == 2 && in_array($araldo_id, [17, 140]))) {
-            gdrcd_query("UPDATE personaggio SET esperienza_mestiere = esperienza_mestiere + 0.5, last_date_mestiere = NOW() WHERE nome = '" . gdrcd_filter('in', $login) . "'");
-        }
 
         $resp_thread_id = $padre == -1 ? $new_id : $padre;
         notifyForumUpdate($araldo_id, $resp_thread_id);

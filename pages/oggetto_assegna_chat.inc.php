@@ -7,12 +7,9 @@
     /*Controllo permessi*/
     $mestiere = gdrcd_query("SELECT * FROM personaggio WHERE nome ='".$_SESSION['login']."'");
     
-    if ($mestiere['id_mestiere'] != 3 && $mestiere['id_mestiere'] != 4) {
+    if ($mestiere['id_mestiere'] != 3) {
     echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['not_allowed']).'</div>';
-    } else if (
-                                 ($mestiere['id_mestiere'] == 3 && $_SESSION['luogo'] == 24) ||
-                                 ($mestiere['id_mestiere'] == 4 && $_SESSION['luogo'] == 14)
-              ) {
+    } else if ($mestiere['id_mestiere'] == 3 && $_SESSION['luogo'] == 24) {
                
     //controllo che ci siano minimo 2 azioni
                             
@@ -75,8 +72,6 @@
           
         $elenco_oggetti = gdrcd_query("SELECT id_oggetto, nome FROM oggetto ORDER BY nome", 'result');
         $elenco_magic = gdrcd_query("SELECT id_oggetto, nome, tipo FROM oggetto WHERE tipo = 8 ORDER BY nome", 'result');
-        $elenco_pandora = gdrcd_query("SELECT id_oggetto, nome, tipo FROM oggetto WHERE tipo = 9 ORDER BY nome", 'result');
-        $elenco_police = gdrcd_query("SELECT id_oggetto, nome, tipo FROM oggetto WHERE tipo = 10 ORDER BY nome", 'result');
         $elenco_gilda = gdrcd_query("SELECT id_oggetto, nome, tipo FROM oggetto WHERE tipo = 15 ORDER BY nome", 'result');
         $tipi_oggetto = gdrcd_query("SELECT * FROM codtipooggetto ORDER BY descrizione", 'result');
     
@@ -95,26 +90,12 @@
                         <?php if(gdrcd_query($elenco_oggetti, 'num_rows') > 0) { ?>
                             <select name="load_item">
                              <?php                            
-                            //facciamo visualizzare a magic e pandora solo la loro categoria//
-                            
-                            if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $mestiere['id_mestiere'] == 3) { 
-                            
-                            
+                            //facciamo visualizzare a magic solo la sua categoria//
+
+                            if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $mestiere['id_mestiere'] == 3) {
+
+
                                 while($option = gdrcd_query($elenco_magic, 'fetch')) { ?>
-                                    <option value="<?php echo $option['id_oggetto']; ?>">
-                                        <?php echo gdrcd_filter('out', $option['nome']); ?>
-                                    </option>
-                                <?php } 
-                                } else if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $mestiere['id_mestiere'] == 4) {
-                                
-                                while($option = gdrcd_query($elenco_pandora, 'fetch')) { ?>
-                                    <option value="<?php echo $option['id_oggetto']; ?>">
-                                        <?php echo gdrcd_filter('out', $option['nome']); ?>
-                                    </option>
-                                <?php }
-                                } else if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $mestiere['id_mestiere'] == 1) {
-                                
-                                while($option = gdrcd_query($elenco_police, 'fetch')) { ?>
                                     <option value="<?php echo $option['id_oggetto']; ?>">
                                         <?php echo gdrcd_filter('out', $option['nome']); ?>
                                     </option>
@@ -137,8 +118,6 @@
                                 }//fine if
                                 gdrcd_query($elenco_oggetti, 'free');
                                 gdrcd_query($elenco_magic, 'free');
-                                gdrcd_query($elenco_pandora, 'free');
-                                gdrcd_query($elenco_police, 'free');
                                 gdrcd_query($elenco_gilda, 'free');
                                 ?>
                             </select>

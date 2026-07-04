@@ -124,52 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['post-textarea'])) {
     }
 }
 
-// Verifica se il personaggio attualmente fa parte della TAE
-$query_tae_corrente = "
-    SELECT 
-        r.mestiere 
-    FROM 
-        personaggio AS p 
-    JOIN 
-        ruolo_mestiere AS r ON p.id_ruolo_mestiere = r.id_ruolo 
-    WHERE 
-        p.nome = '" . gdrcd_filter('in', $nome_pg) . "' 
-        AND r.mestiere = 2";
-
-// Esegui la query e verifica se ritorna righe
-$result_tae = gdrcd_query($query_tae_corrente, 'result');
-$fa_parte_tae_corrente = (gdrcd_query($result_tae, 'num_rows') > 0);
-
-// Se il personaggio non fa parte della TAE, verifica se ha mai avuto post nella categoria `pagina_personale`
-$ha_post_storici = false;
-if ($tipo == 'pagina_personale' && !$fa_parte_tae_corrente) { // Verifica solo se è la pagina personale
-    $query_post_storici = "
-        SELECT COUNT(*) AS conteggio_post 
-        FROM tokyobook_bacheca 
-        WHERE autore = '" . gdrcd_filter('in', $nome_pg) . "' 
-        AND tipo = 'pagina_personale'";
-    $result_post_storici = gdrcd_query($query_post_storici, 'result');
-    $row_post_storici = gdrcd_query($result_post_storici, 'fetch');
-    $conteggio_post_storici = $row_post_storici['conteggio_post'];
-    $ha_post_storici = ($conteggio_post_storici > 0);
-}
-
-// Logica di visualizzazione pagina personale
-$mostra_pagina_personale = false; // Impostazione predefinita
-
-if ($fa_parte_tae_corrente) {
-    // Se fa parte della TAE, mostra sempre la pagina personale
-    $mostra_pagina_personale = true;
-} elseif ($tipo == 'pagina_personale' && !$fa_parte_tae_corrente && $ha_post_storici) {
-    // Se è una pagina personale, non fa parte della TAE ma ha post storici, mostra la pagina
-    $mostra_pagina_personale = true;
-} elseif ($tipo != 'pagina_personale') {
-    // Se la pagina non è 'pagina_personale', mostra comunque il contenuto
-    $mostra_pagina_personale = true;
-}
-
-// Imposta il filtro per autore solo se stiamo visualizzando la pagina personale e la pagina personale è visibile
-$filtro_autore = ($tipo == 'pagina_personale' && $mostra_pagina_personale) ? "AND p.autore = '" . gdrcd_filter('in', $nome_pg) . "'" : "";
+$filtro_autore = "";
 
 // Se è stato passato un `post_id`, modifica la query per caricare i commenti del post specifico
 if ($post_id) {
@@ -242,60 +197,8 @@ if ($post_id) {
 }
 
 
-// Query per vedere se il pg è della TAE attualmente
-//$query_tae_old = gdrcd_query($query_tae_corrente, 'result');
-
-/*Query per vedere se il pg è della TAE e mi serve per il link*/
-$query_tae = gdrcd_query("
-    SELECT 
-        r.mestiere, 
-        r.livello_mestiere 
-    FROM 
-        personaggio AS p
-    JOIN 
-        ruolo_mestiere AS r ON p.id_ruolo_mestiere = r.id_ruolo
-    WHERE 
-        p.nome = '" . gdrcd_filter('in', $login) . "'
-        AND r.mestiere = 2
-        AND r.livello_mestiere < 3
-", 'result');
-$tae_check = gdrcd_query($query_tae, 'fetch');
-
-// Controllo se il personaggio è nella TAE per la visualizzazione della textarea (usiamo una variabile separata)
-$fa_parte_tae_textarea = !empty($tae_check);
-
-// Condizioni per mostrare la textarea e i pulsanti in base alla tipologia
-$mostra_textarea = false;
-
-// Controllo della tipologia
-if ($tipo == 'tokyobook') {
-    // Visibile a tutti
-    $mostra_textarea = true;
-} elseif ($tipo == 'corte' && $row['id_mestiere'] == 6) {
-    // Visibile solo agli utenti con id_mestiere = 6 (Corte)
-    $mostra_textarea = true;
-} elseif ($tipo == 'icc' && $row['id_mestiere'] == 1) {
-    // Visibile solo agli utenti con id_mestiere = 1 (ICC)
-    $mostra_textarea = true;
-} elseif ($tipo == 'crystal_news' && $row['id_mestiere'] == 2) {
-    // Visibile solo agli utenti con id_mestiere = 2 (TAE)
-    $mostra_textarea = true;
-} elseif ($tipo == 'pagina_personale') {
-    // Caso a: Se la pagina è di LOGIN e fa parte della TAE con livello inferiore a 3
-    if ($nome_pg == $login && $fa_parte_tae_textarea) {
-        $mostra_textarea = true;
-    }
-
-    // Caso b: Se la pagina NON è di LOGIN, non mostrare
-    if ($nome_pg != $login) {
-        $mostra_textarea = false;
-    }
-
-    // Caso c: Se la pagina è di LOGIN ma non fa più parte della TAE, non mostrare
-    if ($nome_pg == $login && !$fa_parte_tae_textarea) {
-        $mostra_textarea = false;
-    }
-}
+// Condizioni per mostrare la textarea in base alla tipologia (unica categoria rimasta: tokyobook)
+$mostra_textarea = ($tipo == 'tokyobook');
 
 // Verifica se il personaggio ha un alias nella tabella 'tokyobook'
 $query_alias = "SELECT nickname FROM tokyobook WHERE personaggio = '" . gdrcd_filter('in', $nome_pg) . "'";
@@ -406,20 +309,17 @@ if (gdrcd_query($result_check_user, 'num_rows') == 0) {
 
 // Recupera le date di ultimo accesso dell'utente dalla tabella `tokyobook_lettura`
 $query_get_last_dates = "
-    SELECT tokyobook, icc, corte, crystal_news 
-    FROM tokyobook_lettura 
+    SELECT tokyobook
+    FROM tokyobook_lettura
     WHERE login = '" . gdrcd_filter('in', $login) . "'";
 $result_last_dates = gdrcd_query($query_get_last_dates, 'result');
 $last_dates = gdrcd_query($result_last_dates, 'fetch');
 
-// Calcola i nuovi post/commenti rispetto alle ultime date di accesso per ogni categoria
+// Calcola i nuovi post/commenti rispetto all'ultima data di accesso
 $query_new_posts = "
-    SELECT tipo, COUNT(*) AS new_count 
-    FROM tokyobook_bacheca 
-    WHERE (data > '" . $last_dates['tokyobook'] . "' AND tipo = 'tokyobook') 
-       OR (data > '" . $last_dates['icc'] . "' AND tipo = 'icc') 
-       OR (data > '" . $last_dates['corte'] . "' AND tipo = 'corte') 
-       OR (data > '" . $last_dates['crystal_news'] . "' AND tipo = 'crystal_news')
+    SELECT tipo, COUNT(*) AS new_count
+    FROM tokyobook_bacheca
+    WHERE data > '" . $last_dates['tokyobook'] . "' AND tipo = 'tokyobook'
        AND autore != '" . gdrcd_filter('in', $login) . "'
     GROUP BY tipo";
 $result_new_posts = gdrcd_query($query_new_posts, 'result');
@@ -451,10 +351,6 @@ while ($row = gdrcd_query($result_new_posts, 'fetch')) {
         <div class="title">
             <img src="../themes/crystal/imgs/tokyobook/tokyobook_logo.png" alt="TokyoBook Logo">
         </div>
-        <div class="search-container">
-            <input type="text" id="search-box" name="search" placeholder="Cerca personaggi della TAE..." value="">
-            <div class="search-results" id="search-results"></div>
-        </div>
     </div>
 
     <!-- Contenitore principale -->
@@ -466,12 +362,9 @@ while ($row = gdrcd_query($result_new_posts, 'fetch')) {
             </div>
             <div class="menu-container">
 <?php
-// Definisci l'elenco delle categorie principali (escludendo pagina_personale)
+// Definisci l'elenco delle categorie principali
 $categories = [
     'tokyobook' => 'Tokyobook',
-    'corte' => 'Comunicati Corte',
-    'icc' => 'Comunicati ICC',
-    'crystal_news' => 'Crystal News'
 ];
 
 // Loop attraverso le categorie e mostra il link con l'indicatore delle nuove notizie
@@ -486,68 +379,18 @@ foreach ($categories as $category_key => $category_name) {
     echo '<div class="menu-item"><a href="' . $category_link . '">' . $category_name . $new_indicator . '</a></div>';
 }
 
-// Mostra la pagina personale solo se il PG fa parte della TAE
-if (gdrcd_query($query_tae, 'num_rows') > 0) {
-    $category_key = 'pagina_personale';
-    $category_name = 'Pagina personale';
-    // Controlla se la categoria ha nuove notizie
-    $new_indicator = isset($new_posts[$category_key]) ? '<span class="new-indicator">&#9679;</span>' : '';
-
-    // Costruisci il link della pagina personale con il parametro del personaggio
-    $category_link = "tokyobook_mobile.php?tipo=" . $category_key . "&pg=" . $nome_pg;
-
-    // Stampa l'elemento di menu della pagina personale
-    echo '<div class="menu-item"><a href="' . $category_link . '">' . $category_name . '</a></div>';
-}
 
 
 
 // Quando l'utente accede a una categoria, aggiorna solo la data di quella categoria
 if (isset($_GET['tipo'])) {
     $categoria_corrente = gdrcd_filter('in', $_GET['tipo']);
-    if (in_array($categoria_corrente, ['tokyobook', 'icc', 'corte', 'crystal_news'])) {
+    if (in_array($categoria_corrente, ['tokyobook'])) {
         $update_last_access_query = "
-            UPDATE tokyobook_lettura 
-            SET " . $categoria_corrente . " = NOW() 
+            UPDATE tokyobook_lettura
+            SET " . $categoria_corrente . " = NOW()
             WHERE login = '" . gdrcd_filter('in', $login) . "'";
         gdrcd_query($update_last_access_query);
-    }
-}
-
-
-// Verifica se l'utente sta accedendo a una pagina personale
-if (isset($_GET['tipo']) && $_GET['tipo'] == 'pagina_personale') {
-    // Recupera il nome del personaggio la cui pagina personale viene visitata
-    $pg_visitato = gdrcd_filter('in', $_GET['pg']);
-
-    // Controlla se il PG visitato è diverso dall'utente corrente
-    if ($pg_visitato != $login) {
-        // Recupera la data di ultimo accesso del campo `pagina_personale` per l'utente corrente
-        $query_get_last_access_pagina_personale = "
-            SELECT pagina_personale 
-            FROM tokyobook_lettura 
-            WHERE login = '" . gdrcd_filter('in', $login) . "'";
-        $result_last_access = gdrcd_query($query_get_last_access_pagina_personale, 'result');
-        $last_access = gdrcd_query($result_last_access, 'fetch')['pagina_personale'];
-
-        // Recupera la data dell'ultimo post/commento nella pagina personale del personaggio visitato
-        $query_get_new_posts_pagina_personale = "
-            SELECT MAX(data) AS last_post_date 
-            FROM tokyobook_bacheca 
-            WHERE tipo = 'pagina_personale' 
-            AND autore = '" . gdrcd_filter('in', $pg_visitato) . "'
-            AND data > '" . $last_access . "'";
-        $result_new_posts = gdrcd_query($query_get_new_posts_pagina_personale, 'result');
-        $last_post_date = gdrcd_query($result_new_posts, 'fetch')['last_post_date'];
-
-        // Se esistono nuovi post/commenti rispetto all'ultimo accesso, aggiorna `pagina_personale`
-        if ($last_post_date) {
-            $update_last_access_query = "
-                UPDATE tokyobook_lettura 
-                SET pagina_personale = NOW() 
-                WHERE login = '" . gdrcd_filter('in', $login) . "'";
-            gdrcd_query($update_last_access_query);
-        }
     }
 }
 ?>
@@ -773,9 +616,6 @@ if ($post_originale) {
     
 
     <!-- MESSAGGI PADRE -->
-    <!-- Verifica se ci sono risultati e mostra la pagina personale -->
-    <?php if ($tipo != 'pagina_personale' || $mostra_pagina_personale) { ?>
-    
         <?php if ($mostra_textarea) { ?>
         <!-- Textarea per scrivere un post -->
         <form method="POST" action="">
@@ -905,72 +745,12 @@ if ($numero_pagine > 1) {
 ?>
 
 
-    <?php } else { ?>
-        <!-- Mostra il messaggio se non ci sono risultati e si sta visualizzando la pagina personale -->
-        <div class="no-posts-message">
-            Questo personaggio non fa più parte (o non ha mai fatto parte) della TAE.
-        </div>
-    <?php } ?>
+
 </div>
 <?php } ?>
 </div>
     
     <script>
-    document.getElementById('search-box').addEventListener('input', function() {
-        let searchTerm = this.value;
-
-        // Se il campo di ricerca è vuoto, nascondi i risultati
-        if (searchTerm.length === 0) {
-            document.getElementById('search-results').style.display = 'none';
-            return;
-        }
-
-        // Creazione della richiesta AJAX
-        let xhr = new XMLHttpRequest();
-        xhr.open('POST', '../pages/ricerca_tokyobook.php', true); // Assicurati che il percorso di 'ricerca.php' sia corretto
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-        // Invio della richiesta con il termine di ricerca
-        xhr.send('termine=' + encodeURIComponent(searchTerm));
-
-        // Gestione della risposta
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                let results = JSON.parse(xhr.responseText);
-
-                // Pulisci i risultati precedenti
-                let resultsContainer = document.getElementById('search-results');
-                resultsContainer.innerHTML = '';
-
-                // Mostra i nuovi risultati
-                if (results.length > 0) {
-                    results.forEach(function(result) {
-                        let item = document.createElement('div');
-                        item.classList.add('search-item');
-                        item.innerHTML = '<div class="search-avatar">' +
-                    '<img src="' + result.url_img_chat + '" alt="Avatar">' +
-                 '</div>' +
-                 '<div class="search-info">' +
-                    '<div class="search-name">' + result.nome + ' ' + result.cognome + '</div>' +
-                    '<a href="tokyobook_mobile.php?tipo=pagina_personale&pg=' + result.nome + '" class="search-link">Visita Profilo</a>' +
-                 '</div>';
-
-                        resultsContainer.appendChild(item);
-                    });
-                } else {
-                    resultsContainer.innerHTML = '<div class="no-results">Nessun personaggio trovato.</div>';
-                }
-
-                // Mostra il contenitore dei risultati
-                resultsContainer.style.display = 'block';
-            }
-        };
-    });
-    
-    
-    
-    
-    
     // Funzione per gestire il like/unlike
     function toggleLike(postId) {
         // Ottieni lo stato attuale dell'icona del like

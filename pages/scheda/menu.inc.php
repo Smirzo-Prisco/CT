@@ -61,10 +61,6 @@
                         <li class="subMenuItem"><a href="main.php?page=scheda_oggetti&op=visit&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>&what=8" style="letter-spacing: 0px; line-height: 20px;">
     <?php echo "Inventario Magic Shop"; ?>
     </a></li>
-<?php } else if ($magic['id_mestiere'] == 4 && $_REQUEST['pg'] != $_SESSION['login']) { ?>
-    <li class="subMenuItem"><a href="main.php?page=scheda_oggetti&op=visit&pg=<?php echo gdrcd_filter('url', $_REQUEST['pg']); ?>&what=9" style="letter-spacing: 0px; line-height: 20px;">
-    <?php echo "Inventario Secret Pandora"; ?>
-    </a></li>
     <?php } ?>
     
                     </p></ul>

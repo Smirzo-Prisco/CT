@@ -41,8 +41,6 @@
                                 $query = "SELECT id_oggetto, nome FROM oggetto ORDER BY nome";
                             } elseif ($mestiere['id_mestiere'] == 3) { // Magic Shop
                                 $query = "SELECT id_oggetto, nome FROM oggetto WHERE tipo = 8 ORDER BY nome";
-                            } elseif ($mestiere['id_mestiere'] == 4) { // Secret Pandora
-                                $query = "SELECT id_oggetto, nome FROM oggetto WHERE tipo = 9 ORDER BY nome";
                             } else {
                                 echo "<option value=''>Nessun oggetto disponibile</option>";
                                 $query = null;

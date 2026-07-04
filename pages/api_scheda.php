@@ -605,12 +605,12 @@ switch ($op) {
     // -------------------------------------------------------------------------
     case 'oggetti':
         if (!$is_own && !$is_admin) {
-            // Permesso speciale per shop keeper (mestiere 3=Magic, 4=Pandora)
+            // Permesso speciale per shop keeper (mestiere 3=Magic)
             $pg_login = gdrcd_filter('in', $_SESSION['login']);
             $tm = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome = '$pg_login'");
             $id_mestiere = $tm ? (int)$tm['id_mestiere'] : 0;
             $what_check  = (int)($_GET['what'] ?? 0);
-            if (!(($id_mestiere == 3 && $what_check == 8) || ($id_mestiere == 4 && $what_check == 9))) {
+            if (!($id_mestiere == 3 && $what_check == 8)) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'Accesso non autorizzato']);
                 exit;

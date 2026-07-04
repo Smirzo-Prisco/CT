@@ -35,8 +35,8 @@ $numresults = gdrcd_query($result, 'num_rows');
 	<?php
 	while($row = gdrcd_query($result, 'fetch')) {
 		$obj_posseduti = gdrcd_query("SELECT * FROM clgpersonaggiooggetto WHERE nome = '".$_SESSION['login']."' AND id_oggetto = ".$row['id_oggetto'])['numero'];
-		// Secret e Magic hanno sconto del 30%
-		$costo = $pg['id_mestiere'] == 3 || $pg['id_mestiere'] == 4 ? (($row['costo'] * 70) / 100) : $row['costo']; // Sconto per Magic e Pandora
+		// Magic ha sconto del 30%
+		$costo = $pg['id_mestiere'] == 3 ? (($row['costo'] * 70) / 100) : $row['costo'];
 		$maxQty = ($budget / $costo) > 0 ? floor($budget / $costo) : 0; // Calcolo la quantità massima di oggetti acquistabili
 	?>
 	<div class="prodotto" id="prodotto-<?= $row['id'] ?>">

@@ -173,11 +173,8 @@ if (gdrcd_filter('get',$_POST['op'])=='take_action')
             }
             
             //2.1) Valorizzo master e permessi
-            
-            $avviso_jpa = "SELECT * FROM personaggio WHERE id_mestiere = 1 AND ora_entrata > ora_uscita AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW()"; 
-            $result_jpa = gdrcd_query($avviso_jpa, 'result');
-            
-            $avviso_utenti = "SELECT * FROM personaggio JOIN privilegi ON personaggio.nome = privilegi.nome WHERE personaggio.ora_entrata > personaggio.ora_uscita AND DATE_ADD(personaggio.ultimo_refresh, INTERVAL 4 MINUTE) > NOW() AND (privilegi.master = 1 OR privilegi.admin = 1)"; 
+
+            $avviso_utenti = "SELECT * FROM personaggio JOIN privilegi ON personaggio.nome = privilegi.nome WHERE personaggio.ora_entrata > personaggio.ora_uscita AND DATE_ADD(personaggio.ultimo_refresh, INTERVAL 4 MINUTE) > NOW() AND (privilegi.master = 1 OR privilegi.admin = 1)";
             $result_avviso = gdrcd_query($avviso_utenti, 'result');
             
             //2)Verifichiamo prima che ci siano almeno 2 skill di attacco o due armi
@@ -196,11 +193,6 @@ if (gdrcd_filter('get',$_POST['op'])=='take_action')
             include ('invio_segnalazione_staff.php');
             }
             
-            while ($notifica_jpa = gdrcd_query($result_jpa, 'fetch')) {
-            $nome = $notifica_jpa['nome']; 
-            include ('invio_segnalazione_jpa.php');            
-            }
-            
             } else if(($zona['id_mappa'] == 7 || $zona['id_mappa'] == 9 || $zona['id_mappa'] == 11) && (gdrcd_query($check_skill_attacco, 'num_rows') == 3) && (gdrcd_query($check_master_nope, 'num_rows') == 0)) {
             $responso = 'A seguito di ripetuti attacchi, alcuni cittadini hanno avvisato la polizia. <b>Tempo di arrivo della pattuglia:</b> ' . $turni . '.';
             $arrivo_polizia = gdrcd_query("INSERT INTO chat (stanza, mittente, ora, tipo, testo) VALUES (".$_SESSION['luogo'].", 'Sistema automatico', NOW(), 'M', '$responso')");
@@ -210,11 +202,6 @@ if (gdrcd_filter('get',$_POST['op'])=='take_action')
             while ($notifica_staff = gdrcd_query($result_avviso, 'fetch')) {
             $nome = $notifica_staff['nome']; 
             include ('invio_segnalazione_staff.php');
-            }
-            
-            while ($notifica_jpa = gdrcd_query($result_jpa, 'fetch')) {
-            $nome = $notifica_jpa['nome']; 
-            include ('invio_segnalazione_jpa.php');            
             }
             
             } else if(($zona['id_mappa'] == 3 || $zona['id_mappa'] == 8 || $zona['id_mappa'] == 10) && (gdrcd_query($check_skill_attacco, 'num_rows') == 4) && (gdrcd_query($check_master_nope, 'num_rows') == 0)) {
@@ -228,10 +215,6 @@ if (gdrcd_filter('get',$_POST['op'])=='take_action')
             include ('invio_segnalazione_staff.php');
             }
             
-            while ($notifica_jpa = gdrcd_query($result_jpa, 'fetch')) {
-            $nome = $notifica_jpa['nome']; 
-            include ('invio_segnalazione_jpa.php');            
-            } 
             }
             
             

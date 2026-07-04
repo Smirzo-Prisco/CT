@@ -11,25 +11,21 @@
         // Recupero il mestiere del pg
         $mestiere = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome ='".$_SESSION['login']."'");
         
-        // Master vede solo oggetti creati da lui + Magic/Secret/ICC se fa parte del mestiere
+        // Master vede solo oggetti creati da lui + Magic se fa parte del mestiere
         $tipi_extra = [];
 
         if ($mestiere['id_mestiere'] == 3) { $tipi_extra[] = 8; }   // Magic Shop
-        if ($mestiere['id_mestiere'] == 4) { $tipi_extra[] = 9; }   // Secret Pandora
-        if ($mestiere['id_mestiere'] == 1) { $tipi_extra[] = 10; }  // ICC
 
         if (!empty($tipi_extra)) $query_oggetti .= " OR tipo IN (".implode(',', $tipi_extra).")";
-        
+
         $query_oggetti .= " ORDER BY nome";
     } else {
         // Recupero il mestiere del pg
         $mestiere = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome ='".$_SESSION['login']."'");
-        
-        // Altri utenti: solo Magic, Secret o ICC
+
+        // Altri utenti: solo Magic
         switch ($mestiere['id_mestiere']) {
             case 3: $query_oggetti = "SELECT id_oggetto, nome FROM oggetto WHERE tipo = 8 ORDER BY nome"; break;
-            case 4: $query_oggetti = "SELECT id_oggetto, nome FROM oggetto WHERE tipo = 9 ORDER BY nome"; break;
-            case 1: $query_oggetti = "SELECT id_oggetto, nome FROM oggetto WHERE tipo = 10 ORDER BY nome"; break;
             default: echo "<div class='error'>Non hai i permessi per assegnare oggetti.</div>"; exit;
         }
     }

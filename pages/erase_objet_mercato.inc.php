@@ -6,7 +6,7 @@
     /*Controllo permessi*/
     $mestiere = gdrcd_query("SELECT * FROM personaggio WHERE nome ='".$_SESSION['login']."'");
     
-    if($_SESSION['admin'] != 1 && ($mestiere['id_mestiere'] != 3 && $mestiere['id_mestiere'] != 4)) {
+    if($_SESSION['admin'] != 1 && $mestiere['id_mestiere'] != 3) {
         echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['not_allowed']).'</div>';
     } else {
 
@@ -39,7 +39,6 @@
     
      $tutti_pg = gdrcd_query("SELECT codtipooggetto.*, mercato.*, oggetto.* FROM oggetto JOIN mercato ON oggetto.id_oggetto=mercato.id_oggetto JOIN codtipooggetto ON codtipooggetto.cod_tipo=oggetto.tipo ORDER BY oggetto.nome, oggetto.tipo ASC", 'result');
      $elenco_magic = gdrcd_query("SELECT codtipooggetto.*, mercato.*, oggetto.* FROM oggetto JOIN mercato ON oggetto.id_oggetto=mercato.id_oggetto JOIN codtipooggetto ON codtipooggetto.cod_tipo=oggetto.tipo WHERE oggetto.tipo = '8' ORDER BY oggetto.nome, oggetto.tipo ASC", 'result');
-     $elenco_pandora = gdrcd_query("SELECT codtipooggetto.*, mercato.*, oggetto.* FROM oggetto JOIN mercato ON oggetto.id_oggetto=mercato.id_oggetto JOIN codtipooggetto ON codtipooggetto.cod_tipo=oggetto.tipo WHERE oggetto.tipo = '9' ORDER BY oggetto.nome, oggetto.tipo ASC", 'result');
 
 ?>
 <form action="main.php?page=erase_objet_mercato" method="post" name="cancellaselezione">
@@ -70,25 +69,6 @@ while ($row = mysqli_fetch_array($elenco_magic)){ ?>
 </tr>
 <?php } 
 } //FINE MAGIC
-
-if ($mestiere['id_mestiere'] == 4) {
-
-//MAGIC
-
-while ($row = mysqli_fetch_array($elenco_secret)){ ?>
-<tr>
-<td>
-<?php echo $row['nome']; ?>
-</td>
-<td>
-<?php echo 'Secret Pandora'; ?>
-</td>
-<td>
-<input type="checkbox" name="checkbox[]" value="<?= $row['id_oggetto'] ?>">
-</td>
-</tr>
-<?php } 
-} //FINE SECRET
 
 if ($_SESSION['admin'] == 1) {
 

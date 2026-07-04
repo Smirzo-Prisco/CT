@@ -14,8 +14,6 @@ $azioni_permessi = [
 // Ognuno di questi mestieri corrisponde a un tipo di oggetto
 switch ($_SESSION['mestiere']) {
   case 3: $mestiere = 8; break; // Magic
-  case 4: $mestiere = 9; break; // Secret
-  case 1: $mestiere = 10; break; // ICC
   default: $mestiere = -1; break; // Nessun mestiere
 }
 
