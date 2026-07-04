@@ -41,7 +41,9 @@ switch ($op) {
         $step           = $hasConferma ? 3 : 2;
 
         if ($step === 2) {
-            $res      = gdrcd_query("SELECT id_ruolo, nome_ruolo, immagine, mestiere FROM ruolo_mestiere WHERE livello_mestiere = 3 ORDER BY nome_ruolo", 'result');
+            // Solo i mestieri veri (tipo=1): esclude le gilde giocatore, che condividono
+            // la stessa tabella ruolo_mestiere ma non sono scelte in questa pagina
+            $res      = gdrcd_query("SELECT rm.id_ruolo, rm.nome_ruolo, rm.immagine, rm.mestiere FROM ruolo_mestiere rm JOIN mestiere m ON rm.mestiere = m.id_mestiere WHERE rm.livello_mestiere = 3 AND m.tipo = 1 ORDER BY rm.nome_ruolo", 'result');
             $mestieri = [];
             while ($row = gdrcd_query($res, 'fetch')) {
                 $mestieri[] = [
