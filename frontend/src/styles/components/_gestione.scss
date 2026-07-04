@@ -786,7 +786,7 @@ span[style*="position:relative"]:hover .tooltip-bottom {
         background: $gestione-surface;
         border-radius: $radius-lg;
         overflow: hidden;
-        table-layout: auto;
+        table-layout: fixed;
     }
 
     th,
@@ -796,6 +796,13 @@ span[style*="position:relative"]:hover .tooltip-bottom {
         border-bottom: 1px solid $gestione-hover;
         font-size: $text-sm;
     }
+
+    // Con table-layout: fixed le larghezze sono determinate qui (non più dal
+    // contenuto): tabelle diverse con la stessa struttura restano allineate
+    // invece di calcolare colonne diverse in base al proprio testo.
+    th:nth-child(2), td:nth-child(2) { width: 160px; }
+    th:nth-child(3), td:nth-child(3) { width: 90px; }
+    th:nth-child(4), td:nth-child(4) { width: 140px; }
 
     th {
         background: $gestione-hover;
