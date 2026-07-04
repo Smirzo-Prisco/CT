@@ -32,16 +32,56 @@ if (!$is_admin) {
 
 $op = $_GET['op'] ?? '';
 
+/**
+ * Stima (grezza) del tempo di elaborazione per la rigenerazione completa di
+ * un personaggio: una chiamata LLM per ogni giocata conclusa, con la
+ * trascrizione troncata a 6000 caratteri (stesso limite del worker, vedi
+ * narrazione_trascrizione_giocata()). Velocità basate sui test effettuati
+ * sull'LLM locale (llama.cpp, CPUQuota 50%): ~3 token/sec in lettura del
+ * prompt, ~1 token/sec in generazione (max_tokens=150 per riassunto).
+ */
+function narrazione_stima_durata(string $pg_name): array {
+    // Nota: niente `const` qui dentro — in PHP un const dichiarato dentro una
+    // funzione diventa globale al primo run e fa fallire le chiamate successive.
+    $prompt_tokens_per_sec    = 3;
+    $gen_tokens_per_sec       = 1;
+    $gen_tokens_per_riassunto = 150;
+    $chars_per_token          = 4;
+    $overhead_prompt_chars    = 400; // istruzioni fisse del prompt, vedi narrazione_riassunto_giocata()
+    $max_chars_trascrizione   = 6000;
+
+    $pg_esc  = gdrcd_filter('in', $pg_name);
+    $giocate = gdrcd_query("SELECT rs.id_role FROM role_sessions rs
+        JOIN role_session_players rsp ON rsp.id_role = rs.id_role
+        WHERE rsp.pg_name = '$pg_esc' AND rsp.png = 0 AND rs.end IS NOT NULL", 'result');
+
+    $n_giocate      = 0;
+    $secondi_totali = 0.0;
+    while ($g = gdrcd_query($giocate, 'fetch')) {
+        $n_giocate++;
+        $len_row = gdrcd_query("SELECT SUM(CHAR_LENGTH(testo)) AS len FROM chat WHERE id_role = " . (int)$g['id_role'] . " AND testo IS NOT NULL");
+        $chars         = min((int)($len_row['len'] ?? 0), $max_chars_trascrizione) + $overhead_prompt_chars;
+        $prompt_tokens = $chars / $chars_per_token;
+        $secondi_totali += ($prompt_tokens / $prompt_tokens_per_sec) + ($gen_tokens_per_riassunto / $gen_tokens_per_sec);
+    }
+    gdrcd_query($giocate, 'free');
+
+    return ['n_giocate' => $n_giocate, 'secondi_stimati' => (int)round($secondi_totali)];
+}
+
 switch ($op) {
 
     // -------------------------------------------------------------------------
-    // LIST — tutte le richieste, più recenti prima
+    // LIST — tutte le richieste, più recenti prima, con stima durata elaborazione
     // -------------------------------------------------------------------------
     case 'list':
         $result = gdrcd_query("SELECT id, pg_name, stato, creato_il, approvato_da, approvato_il, completato_il, errore
             FROM narrazione_richieste ORDER BY creato_il DESC", 'result');
         $richieste = [];
         while ($row = gdrcd_query($result, 'fetch')) {
+            $stima = narrazione_stima_durata($row['pg_name']);
+            $row['n_giocate']       = $stima['n_giocate'];
+            $row['secondi_stimati'] = $stima['secondi_stimati'];
             $richieste[] = $row;
         }
         gdrcd_query($result, 'free');

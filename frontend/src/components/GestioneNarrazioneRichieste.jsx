@@ -18,6 +18,17 @@ const STATO_LABEL = {
     rifiutata:        'Rifiutata',
 }
 
+// Stima grezza calcolata lato server (pages/api_narrazione_admin.php) in base
+// al numero di giocate concluse e alla lunghezza dei messaggi da riassumere.
+function formattaDurata(secondi, nGiocate) {
+    if (!nGiocate) return 'Nessuna giocata'
+    if (secondi < 60) return '< 1 min'
+    const ore = Math.floor(secondi / 3600)
+    const min = Math.round((secondi % 3600) / 60)
+    const testo = ore > 0 ? `~${ore}h ${min}min` : `~${min} min`
+    return `${testo} (${nGiocate} giocat${nGiocate === 1 ? 'a' : 'e'})`
+}
+
 export default function GestioneNarrazioneRichieste() {
     const [richieste, setRichieste] = useState([])
     const [loading, setLoading]     = useState(true)
@@ -81,18 +92,20 @@ export default function GestioneNarrazioneRichieste() {
                         <tr>
                             <th>Personaggio</th>
                             <th>Richiesta il</th>
+                            <th>Durata stimata elaborazione</th>
                             <th className="gp-th-actions">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={3} style={{ textAlign: 'center', padding: 20 }}>Caricamento…</td></tr>
+                            <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20 }}>Caricamento…</td></tr>
                         ) : pendenti.length === 0 ? (
-                            <tr><td colSpan={3} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Nessuna richiesta in attesa.</td></tr>
+                            <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Nessuna richiesta in attesa.</td></tr>
                         ) : pendenti.map(r => (
                             <tr key={r.id}>
                                 <td className="gp-cell--name">{r.pg_name}</td>
                                 <td className="gp-cell--meta">{r.creato_il}</td>
+                                <td className="gp-cell--meta">{formattaDurata(r.secondi_stimati, r.n_giocate)}</td>
                                 <td className="gp-cell--actions">
                                     <div className="gp-actions">
                                         <button className="btn-action btn-action--edit btn-action--icon" title="Approva"
@@ -119,17 +132,19 @@ export default function GestioneNarrazioneRichieste() {
                             <th>Personaggio</th>
                             <th>Stato</th>
                             <th>Richiesta il</th>
+                            <th>Durata stimata elaborazione</th>
                             <th>Gestita da</th>
                         </tr>
                     </thead>
                     <tbody>
                         {altre.length === 0 ? (
-                            <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Nessuna richiesta ancora gestita.</td></tr>
+                            <tr><td colSpan={5} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Nessuna richiesta ancora gestita.</td></tr>
                         ) : altre.map(r => (
                             <tr key={r.id}>
                                 <td className="gp-cell--name">{r.pg_name}</td>
                                 <td className="gp-cell--meta">{STATO_LABEL[r.stato] ?? r.stato}</td>
                                 <td className="gp-cell--meta">{r.creato_il}</td>
+                                <td className="gp-cell--meta">{formattaDurata(r.secondi_stimati, r.n_giocate)}</td>
                                 <td className="gp-cell--meta">{r.approvato_da ?? '—'}</td>
                             </tr>
                         ))}
