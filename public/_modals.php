@@ -77,9 +77,8 @@ function public_modals(): void {
 
         <h2 class="pub-modal-title">Crea il tuo personaggio</h2>
 
-        <!-- Form di registrazione — invia a iscrizione.php (step 2 del GDRCD) -->
-        <form class="pub-form" id="pubRegForm" method="post" action="/iscrizione.php">
-            <input type="hidden" name="fase"   value="2">
+        <!-- Form di registrazione — inviato via fetch da public.js a api_iscrizione.php?op=register -->
+        <form class="pub-form" id="pubRegForm">
             <input type="hidden" name="genere" value="m">
 
             <div class="pub-form-group">
@@ -142,8 +141,23 @@ function public_modals(): void {
                 </label>
             </div>
 
-            <button type="submit" class="pub-btn pub-btn--gold pub-btn--full">Avanti &rsaquo;</button>
+            <div class="pub-form-error" id="pubRegError" style="display:none;" role="alert"></div>
+
+            <button type="submit" class="pub-btn pub-btn--gold pub-btn--full">Crea personaggio</button>
         </form>
+
+        <!-- Riepilogo post-creazione (nascosto inizialmente, sostituisce il form) -->
+        <div id="pubRegSuccess" style="display:none;">
+            <p class="pub-form-hint">Personaggio creato con successo!</p>
+            <table class="pub-form-summary">
+                <tr><td>Nome personaggio</td><td id="pubRegSuccessNome"></td></tr>
+                <tr id="pubRegSuccessGildaRow"><td>Gilda</td><td id="pubRegSuccessGilda"></td></tr>
+                <tr><td>Mestiere</td><td id="pubRegSuccessMestiere"></td></tr>
+                <tr><td>Password</td><td id="pubRegSuccessPassword"></td></tr>
+            </table>
+            <p class="pub-form-hint" id="pubRegSuccessEmailNote" style="display:none;">Le credenziali sono state inviate anche via email.</p>
+            <p class="pub-form-hint">Ti invitiamo a cambiare la password al primo accesso.</p>
+        </div>
 
         <p class="pub-modal-switch">
             Hai già un personaggio?
