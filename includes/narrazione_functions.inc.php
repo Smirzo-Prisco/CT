@@ -30,7 +30,10 @@ function narrazione_llm_call(string $prompt, int $max_tokens = 150): ?string {
         CURLOPT_POSTFIELDS     => $payload,
         CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 300,
+        // Generoso: l'LLM locale è lento (~1-3 token/sec) e girando in background
+        // non c'è nessuna richiesta HTTP utente in attesa — meglio un timeout
+        // ampio che troncare un riassunto a metà per giocate con molti messaggi.
+        CURLOPT_TIMEOUT        => 1200,
     ]);
     $response  = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
