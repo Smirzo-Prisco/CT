@@ -106,6 +106,29 @@ function narrazione_enqueue_giocata_chiusa(int $id_role): void {
     gdrcd_query($result, 'free');
 }
 
+/**
+ * Accoda nella coda automatica (narrazione_queue) le ultime N giocate
+ * concluse di un personaggio, in ordine cronologico. Usata dal pannello
+ * admin per un test rapido di qualità: riusa la stessa coda già gestita dal
+ * worker in produzione (priorità 1), quindi non richiede alcuna azione
+ * manuale sul server. Ritorna il numero di giocate accodate.
+ */
+function narrazione_enqueue_test(string $pg_name, int $limite = 4): int {
+    $pg_esc = gdrcd_filter('in', $pg_name);
+    $result = gdrcd_query("SELECT rs.id_role FROM role_sessions rs
+        JOIN role_session_players rsp ON rsp.id_role = rs.id_role
+        WHERE rsp.pg_name = '$pg_esc' AND rsp.png = 0 AND rs.end IS NOT NULL
+        ORDER BY rs.start DESC LIMIT $limite", 'result');
+    $id_roles = [];
+    while ($row = gdrcd_query($result, 'fetch')) $id_roles[] = (int)$row['id_role'];
+    gdrcd_query($result, 'free');
+
+    foreach (array_reverse($id_roles) as $id_role) {
+        gdrcd_query("INSERT INTO narrazione_queue (id_role, pg_name) VALUES ($id_role, '$pg_esc')");
+    }
+    return count($id_roles);
+}
+
 /** True se pg_name ha già una richiesta di rigenerazione non conclusa. */
 function narrazione_richiesta_pendente(string $pg_name): bool {
     $pg_esc = gdrcd_filter('in', $pg_name);

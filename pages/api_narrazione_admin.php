@@ -2,10 +2,14 @@
 /**
  * api_narrazione_admin.php — API JSON per il pannello admin "Narrazioni IA"
  *
- * op = list    (GET, admin)  — elenco richieste di rigenerazione completa
- * op = approva (POST, admin) — approva una richiesta (verrà elaborata dal
- *                               worker cron/narrazione_worker.php)
- * op = rifiuta (POST, admin) — rifiuta una richiesta
+ * op = list       (GET, admin)  — elenco richieste di rigenerazione completa
+ * op = approva    (POST, admin) — approva una richiesta (verrà elaborata dal
+ *                                  worker cron/narrazione_worker.php)
+ * op = rifiuta    (POST, admin) — rifiuta una richiesta
+ * op = test_rapido(POST, admin) — accoda nella coda automatica solo le
+ *                                  ultime 4 giocate concluse, per validare
+ *                                  rapidamente la qualità senza attendere
+ *                                  una rigenerazione completa
  *
  * Non gestisce narrazione_queue (riassunti automatici silenziosi): quella
  * coda non richiede approvazione, vedi includes/narrazione_functions.inc.php.
@@ -15,6 +19,7 @@ header('Content-Type: application/json');
 
 require_once(__DIR__ . '/../includes/required.php');
 require_once(__DIR__ . '/../includes/custom_functions.inc.php');
+require_once(__DIR__ . '/../includes/narrazione_functions.inc.php');
 $handleDBConnection = gdrcd_connect();
 
 if (empty($_SESSION['login'])) {
@@ -112,6 +117,21 @@ switch ($op) {
             SET stato = 'rifiutata', approvato_da = '$admin_esc', approvato_il = NOW()
             WHERE id = $id AND stato = 'richiesta'");
         echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // TEST_RAPIDO — accoda le ultime 4 giocate concluse nella coda automatica
+    // (narrazione_queue), già gestita dal worker in produzione senza bisogno
+    // di alcuna azione manuale sul server
+    // -------------------------------------------------------------------------
+    case 'test_rapido':
+        $pg_name = trim($_POST['pg_name'] ?? '');
+        if ($pg_name === '' || !narrazione_abilitata_per($pg_name)) {
+            echo json_encode(['success' => false, 'message' => 'Personaggio non valido o narrazione IA non abilitata']);
+            exit;
+        }
+        $n = narrazione_enqueue_test($pg_name, 4);
+        echo json_encode(['success' => true, 'n_accodate' => $n]);
         break;
 
     default:

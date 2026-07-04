@@ -66,6 +66,21 @@ export default function GestioneNarrazioneRichieste() {
         load()
     }
 
+    const testRapido = async (id, pgName) => {
+        if (!window.confirm(
+            `Accodare un test rapido per «${pgName}»?\n` +
+            `Il worker riassumerà le ultime 4 giocate concluse e le aggiungerà in fondo a "Dice di sé" (senza sovrascrivere il testo esistente).`
+        )) return
+        setBusyId(id)
+        const fd = new FormData()
+        fd.append('pg_name', pgName)
+        const r = await fetch(`${API}?op=test_rapido`, { method: 'POST', body: fd })
+        if (r.status === 403) { window.CT.navigate('main.php?page=mappaclick'); return }
+        const d = await r.json()
+        setBusyId(null)
+        alert(d.success ? `Accodate ${d.n_accodate} giocate: il worker le elaborerà a breve.` : (d.message ?? 'Errore'))
+    }
+
     const pendenti = richieste.filter(r => r.stato === 'richiesta')
     const altre     = richieste.filter(r => r.stato !== 'richiesta')
 
@@ -115,6 +130,10 @@ export default function GestioneNarrazioneRichieste() {
                                         <button className="btn-action btn-action--delete btn-action--icon" title="Rifiuta"
                                             disabled={busyId === r.id} onClick={() => agisci(r.id, 'rifiuta', r.pg_name)}>
                                             <i className="fa-solid fa-xmark"></i>
+                                        </button>
+                                        <button className="btn-action btn-action--icon" title="Test rapido (ultime 4 giocate)"
+                                            disabled={busyId === r.id} onClick={() => testRapido(r.id, r.pg_name)}>
+                                            <i className="fa-solid fa-flask"></i>
                                         </button>
                                     </div>
                                 </td>
