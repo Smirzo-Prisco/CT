@@ -2,17 +2,25 @@
 /**
  * narrazione_worker.php — Worker in background per la narrazione IA
  *
- * Processo persistente (gestito da systemd, unit narrazione-worker.service),
- * NON un cron classico: interroga in loop due code, una riga alla volta,
- * per non sovraccaricare l'LLM locale (llama.cpp, già limitato via
- * CPUQuota in llama-server.service — vedi memoria "project_local_llm"):
+ * Processo persistente (systemd, unit narrazione-worker.service). Ogni
+ * iterazione del loop elabora AL PIÙ UNA giocata — mai un'intera richiesta
+ * di rigenerazione in blocco — per poter dare sempre precedenza ai job più
+ * urgenti quando le risorse (LLM locale, CPUQuota limitata) scarseggiano:
  *
- *  - narrazione_queue: riassunto breve automatico di una giocata appena
- *    conclusa, accodato a personaggio.descrizione (silenzioso)
- *  - narrazione_richieste (stato='approvata'): rigenerazione COMPLETA di
- *    descrizione a partire da tutte le giocate concluse del personaggio
- *    (sovrascrive tutto, richiesta esplicita del giocatore + approvazione
- *    admin — vedi pages/api_scheda.php e pages/api_narrazione_admin.php)
+ *  1. narrazione_queue — riassunto automatico di una giocata appena
+ *     conclusa (silenzioso): un solo passo, un solo personaggio coinvolto
+ *  2. narrazione_richieste (approvata/in_elaborazione) — rigenerazione
+ *     COMPLETA di descrizione: elaborata UNA giocata alla volta, con
+ *     progresso salvato in narrazione_richieste_progresso. Priorità più
+ *     bassa: avanza di un passo solo se non c'è nulla in (1) da fare,
+ *     così un job automatico può sempre intromettersi tra un passo e
+ *     l'altro di una rigenerazione lunga (anche ore), invece di aspettarne
+ *     la fine.
+ *
+ * Il progresso persiste su DB, non in memoria: se il worker si riavvia a
+ * metà di una rigenerazione, riprende dall'ultima giocata già riassunta.
+ * La sovrascrittura finale di descrizione avviene solo quando tutte le
+ * giocate di una richiesta sono state elaborate.
  */
 
 define('NARRAZIONE_WORKER', true);
@@ -25,7 +33,7 @@ function narrazione_html_paragrafo(string $testo): string {
     return '<p>' . nl2br(htmlspecialchars(trim($testo), ENT_QUOTES, 'UTF-8')) . '</p>';
 }
 
-/** Processa al più una riga pending di narrazione_queue. Ritorna true se ha lavorato. */
+/** PRIORITÀ 1 — job automatico (una giocata). Ritorna true se ha lavorato. */
 function processa_coda_automatica(): bool {
     $row = gdrcd_query("SELECT id, id_role, pg_name FROM narrazione_queue WHERE stato = 'pending' ORDER BY creato_il ASC LIMIT 1");
     if (!$row) return false;
@@ -47,38 +55,65 @@ function processa_coda_automatica(): bool {
     return true;
 }
 
-/** Processa al più una richiesta approvata di rigenerazione completa. Ritorna true se ha lavorato. */
-function processa_richiesta_completa(): bool {
-    $req = gdrcd_query("SELECT id, pg_name FROM narrazione_richieste WHERE stato = 'approvata' ORDER BY creato_il ASC LIMIT 1");
-    if (!$req) return false;
-
-    gdrcd_query("UPDATE narrazione_richieste SET stato = 'in_elaborazione' WHERE id = " . (int)$req['id']);
-
-    $pg_name = $req['pg_name'];
-    $pg_esc  = gdrcd_filter('in', $pg_name);
-
-    // Tutte le giocate concluse a cui ha partecipato, in ordine cronologico
-    $giocate = gdrcd_query("SELECT rs.id_role
+/** Prossima giocata (in ordine cronologico) non ancora riassunta per questa richiesta. */
+function prossima_giocata_da_fare(int $richiesta_id, string $pg_name): ?int {
+    $pg_esc = gdrcd_filter('in', $pg_name);
+    $row = gdrcd_query("SELECT rs.id_role
         FROM role_sessions rs
         JOIN role_session_players rsp ON rsp.id_role = rs.id_role
-        WHERE rsp.pg_name = '$pg_esc' AND rsp.png = 0 AND rs.end IS NOT NULL
-        ORDER BY rs.start ASC", 'result');
+        LEFT JOIN narrazione_richieste_progresso p ON p.richiesta_id = $richiesta_id AND p.id_role = rs.id_role
+        WHERE rsp.pg_name = '$pg_esc' AND rsp.png = 0 AND rs.end IS NOT NULL AND p.id IS NULL
+        ORDER BY rs.start ASC LIMIT 1");
+    return $row ? (int)$row['id_role'] : null;
+}
+
+/** Concatena il progresso salvato e sovrascrive descrizione — chiamata solo a fine richiesta. */
+function finalizza_richiesta_completa(int $richiesta_id, string $pg_name): int {
+    $result = gdrcd_query("SELECT p.riassunto FROM narrazione_richieste_progresso p
+        JOIN role_sessions rs ON rs.id_role = p.id_role
+        WHERE p.richiesta_id = $richiesta_id ORDER BY rs.start ASC", 'result');
 
     $paragrafi = [];
-    while ($g = gdrcd_query($giocate, 'fetch')) {
-        $riassunto = narrazione_riassunto_giocata((int)$g['id_role'], $pg_name);
-        if ($riassunto !== null) $paragrafi[] = narrazione_html_paragrafo($riassunto);
+    while ($r = gdrcd_query($result, 'fetch')) {
+        if (trim($r['riassunto']) !== '') $paragrafi[] = narrazione_html_paragrafo($r['riassunto']);
     }
-    gdrcd_query($giocate, 'free');
+    gdrcd_query($result, 'free');
 
     $testo_finale = $paragrafi
         ? implode('', $paragrafi)
         : '<p>Nessuna giocata conclusa trovata per generare una narrazione.</p>';
 
+    $pg_esc = gdrcd_filter('in', $pg_name);
     gdrcd_query("UPDATE personaggio SET descrizione = '" . gdrcd_filter('in', $testo_finale) . "' WHERE nome = '$pg_esc'");
-    gdrcd_query("UPDATE narrazione_richieste SET stato = 'completata', completato_il = NOW() WHERE id = " . (int)$req['id']);
+    gdrcd_query("UPDATE narrazione_richieste SET stato = 'completata', completato_il = NOW() WHERE id = $richiesta_id");
 
-    echo date('Y-m-d H:i:s') . " [rigenerazione] completata per $pg_name (" . count($paragrafi) . " giocate riassunte)\n";
+    return count($paragrafi);
+}
+
+/** PRIORITÀ 2 — un solo passo (una giocata) di una rigenerazione completa. Ritorna true se ha lavorato. */
+function processa_un_passo_richiesta_completa(): bool {
+    $req = gdrcd_query("SELECT id, pg_name FROM narrazione_richieste
+        WHERE stato IN ('approvata', 'in_elaborazione') ORDER BY creato_il ASC LIMIT 1");
+    if (!$req) return false;
+
+    $richiesta_id = (int)$req['id'];
+    $pg_name      = $req['pg_name'];
+
+    gdrcd_query("UPDATE narrazione_richieste SET stato = 'in_elaborazione' WHERE id = $richiesta_id AND stato = 'approvata'");
+
+    $id_role = prossima_giocata_da_fare($richiesta_id, $pg_name);
+
+    if ($id_role === null) {
+        $n_giocate = finalizza_richiesta_completa($richiesta_id, $pg_name);
+        echo date('Y-m-d H:i:s') . " [rigenerazione] completata per $pg_name ($n_giocate giocate riassunte)\n";
+        return true;
+    }
+
+    $riassunto     = narrazione_riassunto_giocata($id_role, $pg_name) ?? '';
+    $riassunto_esc = gdrcd_filter('in', $riassunto);
+    gdrcd_query("INSERT INTO narrazione_richieste_progresso (richiesta_id, id_role, riassunto) VALUES ($richiesta_id, $id_role, '$riassunto_esc')");
+
+    echo date('Y-m-d H:i:s') . " [rigenerazione] passo completato per $pg_name (id_role=$id_role)\n";
     return true;
 }
 
@@ -86,7 +121,7 @@ echo date('Y-m-d H:i:s') . " — narrazione_worker avviato\n";
 
 while (true) {
     $ha_lavorato = processa_coda_automatica();
-    $ha_lavorato = processa_richiesta_completa() || $ha_lavorato;
+    if (!$ha_lavorato) $ha_lavorato = processa_un_passo_richiesta_completa();
 
     if (!$ha_lavorato) sleep(5);
 }
