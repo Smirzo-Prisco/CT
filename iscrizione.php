@@ -497,6 +497,10 @@ MESTIERE (<a style="font-size: 18px; color: #8f8f8f; font-family: DejaVu Serif; 
                 }
                 gdrcd_query($admin_list, 'free');
 
+                // DM di benvenuto al nuovo iscritto
+                $testo_benvenuto = gdrcd_filter('in', "Benvenut* su Crystal Tokyo! Se hai bisogno di aiuto o hai delle curiosità sul sistema, puoi contattare qualsiasi membro dello staff online oppure chiedere al nostro Crystal Bot. Grazie per esserti iscritt* e buon divertimento.");
+                send_sms('System', $new_pg_name, '', $testo_benvenuto, 0);
+
             echo '<div class="page_title_finale"</div><img src="themes/crystal/imgs/iscrizione/iscrizione_completata.png"></div><br>';
 
             if ($PARAMETERS['mode']['emailconfirmation'] == 'ON') {
