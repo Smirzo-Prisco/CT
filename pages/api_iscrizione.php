@@ -85,18 +85,28 @@ if ($op === 'options') {
     }
     gdrcd_query($result, 'free');
 
-    $ruolo = gdrcd_query("SELECT rm.id_ruolo, rm.nome_ruolo FROM ruolo_mestiere rm JOIN mestiere m ON rm.mestiere = m.id_mestiere WHERE rm.id_ruolo = " . $mestiere_id . " AND rm.livello_mestiere = 3 AND m.tipo = 1 LIMIT 1");
-    if (!$ruolo) {
-        echo json_encode(['success' => false, 'message' => 'Mestiere non valido.']);
-        gdrcd_close_connection($handleDBConnection);
-        exit;
-    }
-    $mestiere_nome = $ruolo['nome_ruolo'];
+    // mestiere = 0 ("Decidi poi"): il personaggio nasce senza legame a un mestiere,
+    // stesso stato di "Disoccupato" già usato altrove (es. licenziamento in
+    // gestione_mestiere.inc.php: id_mestiere=0, id_ruolo_mestiere=1)
+    if ($mestiere_id === 0) {
+        $mestiere_nome     = null;
+        $lavoro             = 0;
+        $id_ruolo_mestiere = 1;
+    } else {
+        $ruolo = gdrcd_query("SELECT rm.id_ruolo, rm.nome_ruolo FROM ruolo_mestiere rm JOIN mestiere m ON rm.mestiere = m.id_mestiere WHERE rm.id_ruolo = " . $mestiere_id . " AND rm.livello_mestiere = 3 AND m.tipo = 1 LIMIT 1");
+        if (!$ruolo) {
+            echo json_encode(['success' => false, 'message' => 'Mestiere non valido.']);
+            gdrcd_close_connection($handleDBConnection);
+            exit;
+        }
+        $mestiere_nome = $ruolo['nome_ruolo'];
 
-    // Famiglia numerica di personaggio.id_mestiere: mappatura storica per id_ruolo,
-    // invariata da iscrizione.php (i valori corrispondono a ruolo_mestiere specifici)
-    $mappa_lavoro = [1 => 0, 38 => 1, 76 => 2, 64 => 3, 83 => 4, 90 => 6, 12 => 6];
-    $lavoro = $mappa_lavoro[$mestiere_id] ?? 0;
+        // Famiglia numerica di personaggio.id_mestiere: mappatura storica per id_ruolo,
+        // invariata da iscrizione.php (i valori corrispondono a ruolo_mestiere specifici)
+        $mappa_lavoro = [1 => 0, 38 => 1, 76 => 2, 64 => 3, 83 => 4, 90 => 6, 12 => 6];
+        $lavoro             = $mappa_lavoro[$mestiere_id] ?? 0;
+        $id_ruolo_mestiere = $mestiere_id;
+    }
 
     $gilda_nome = null;
     if ($razza_id !== 0) {
@@ -119,9 +129,11 @@ if ($op === 'options') {
         $lastpasschange_value = ", NOW()";
     }
 
-    gdrcd_query("INSERT INTO personaggio (nome, cognome, pass, data_iscrizione, email, sesso, id_razza, id_mestiere, id_ruolo_mestiere, url_img, url_img_chat, car0, car1, car2, car3, car4, car5, car6, car7, car8, car9, shin, salute, salute_max, integrita, integrita_max, soldi, punto_razza, esperienza_mestiere, esperienza $lastpasschange_field) VALUES ('" . $nome . "', '" . $cognome . "', '" . gdrcd_encript($pass) . "', NOW(), '" . gdrcd_filter('in', $email) . "', '" . gdrcd_filter('in', $genere) . "', " . $id_razza_default . ", " . $lavoro . ", " . $mestiere_id . ", 'http://crystaltokyogdr.altervista.org/imgs/avatars/avatar_empty.png', 'http://crystaltokyogdr.altervista.org/imgs/avatars/avatar_mini_empty.png', '10.0', '0', '10.0', '0', '10.0', '0', '10.0', '0', '10.0', '0', '0', " . gdrcd_filter('num', $PARAMETERS['settings']['max_hp']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['max_hp']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['max_integrita']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['max_integrita']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['first_money']) . ", '0.0', " . gdrcd_filter('num', $PARAMETERS['settings']['first_px_job']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['first_px']) . " $lastpasschange_value)");
+    gdrcd_query("INSERT INTO personaggio (nome, cognome, pass, data_iscrizione, email, sesso, id_razza, id_mestiere, id_ruolo_mestiere, url_img, url_img_chat, car0, car1, car2, car3, car4, car5, car6, car7, car8, car9, shin, salute, salute_max, integrita, integrita_max, soldi, punto_razza, esperienza_mestiere, esperienza $lastpasschange_field) VALUES ('" . $nome . "', '" . $cognome . "', '" . gdrcd_encript($pass) . "', NOW(), '" . gdrcd_filter('in', $email) . "', '" . gdrcd_filter('in', $genere) . "', " . $id_razza_default . ", " . $lavoro . ", " . $id_ruolo_mestiere . ", 'http://crystaltokyogdr.altervista.org/imgs/avatars/avatar_empty.png', 'http://crystaltokyogdr.altervista.org/imgs/avatars/avatar_mini_empty.png', '10.0', '0', '10.0', '0', '10.0', '0', '10.0', '0', '10.0', '0', '0', " . gdrcd_filter('num', $PARAMETERS['settings']['max_hp']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['max_hp']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['max_integrita']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['max_integrita']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['first_money']) . ", '0.0', " . gdrcd_filter('num', $PARAMETERS['settings']['first_px_job']) . ", " . gdrcd_filter('num', $PARAMETERS['settings']['first_px']) . " $lastpasschange_value)");
 
-    gdrcd_query("INSERT INTO clgpersonaggiomestiere (personaggio, id_ruolo) VALUES ('" . $nome . "', " . $mestiere_id . ")");
+    if ($mestiere_id !== 0) {
+        gdrcd_query("INSERT INTO clgpersonaggiomestiere (personaggio, id_ruolo) VALUES ('" . $nome . "', " . $mestiere_id . ")");
+    }
 
     // DM di notifica a tutti gli admin — nuovo personaggio iscritto
     $testo_dm   = gdrcd_filter('in', 'Nuovo personaggio iscritto il ' . date('d/m/Y') . ' alle ' . date('H:i') . ': ' . $nome);
