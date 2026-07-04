@@ -71,7 +71,10 @@ switch ($op) {
                 'cognome'       => $row['cognome'],
                 'nome_razza'    => $row['nome_razza']    ?? '—',
                 'nome_mestiere' => $row['nome_mestiere'] ?? '—',
-                'online'        => !empty($row['ultimo_refresh']) && strtotime($row['ultimo_refresh']) + 240 > time(),
+                // Un bot è online se non in pausa (coerente con gdrcd_condizione_online()):
+                // non ha un heartbeat continuo come i giocatori reali, quindi ultimo_refresh
+                // da solo diventerebbe stantio pochi minuti dopo l'attivazione
+                'online'        => (int)$row['paused'] === 0,
                 'paused'        => (int)$row['paused'],
                 'unread_conv'   => (int)$row['unread_conv'],
                 'schedule'      => $schedules[$row['nome']] ?? [],

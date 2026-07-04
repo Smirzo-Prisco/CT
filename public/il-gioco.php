@@ -194,13 +194,15 @@ public_head(
         <p>
             La struttura, il regolamento, le mansioni e gli obiettivi sono decisi interamente
             dai giocatori che la compongono. Per fondarne una sono necessari almeno
-            <strong>3 personaggi</strong>. Ogni Gilda ha a disposizione uno spazio dedicato
-            nel forum per presentarsi alla comunità.
+            <strong>3 personaggi</strong>.
         </p>
         <p>
-            Tutto ciò che riguarda le Gilde — nascita, attività, conflitti — si svolge
-            esclusivamente <em>on game</em>. Non esistono meccaniche tecniche legate ad esse:
-            sono uno strumento narrativo nelle mani dei giocatori.
+            A renderla possibile è un sistema di gestione che lo staff ha messo per la prima
+            volta nelle mani della community: fondazione autonoma, gerarchia interna
+            configurabile, statuto e immagine personalizzabili, piena libertà di decidere chi
+            accogliere e chi allontanare. Nessuna approvazione preventiva, nessun'infrastruttura
+            calata dall'alto — solo un nucleo di almeno tre personaggi disposti a scrivere
+            insieme la propria storia.
         </p>
     </section>
 
