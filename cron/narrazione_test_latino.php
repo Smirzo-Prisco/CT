@@ -7,8 +7,9 @@
  *
  * Uso: php cron/narrazione_test_latino.php [N]
  *
- * Non tocca narrazione_queue / narrazione_richieste: scrive direttamente
- * personaggio.descrizione con il riassunto delle sole ultime N giocate.
+ * Non tocca narrazione_queue / narrazione_richieste: accoda in fondo a
+ * personaggio.descrizione (dopo un separatore <hr>) il riassunto delle sole
+ * ultime N giocate, senza toccare il testo già presente.
  */
 require_once(__DIR__ . '/../includes/required.php');
 require_once(__DIR__ . '/../includes/custom_functions.inc.php');
@@ -58,7 +59,7 @@ if (!$paragrafi) {
 }
 
 $pg_esc = gdrcd_filter('in', $pg_name);
-$html   = implode('', $paragrafi);
-gdrcd_query("UPDATE personaggio SET descrizione = '" . gdrcd_filter('in', $html) . "' WHERE nome = '$pg_esc'");
+$html   = '<hr>' . implode('', $paragrafi);
+gdrcd_query("UPDATE personaggio SET descrizione = CONCAT(COALESCE(descrizione, ''), '" . gdrcd_filter('in', $html) . "') WHERE nome = '$pg_esc'");
 
-echo "Fatto: personaggio.descrizione di $pg_name sovrascritta con " . count($paragrafi) . " riassunti.\n";
+echo "Fatto: accodati " . count($paragrafi) . " riassunti in coda a personaggio.descrizione di $pg_name (dopo <hr>).\n";
