@@ -127,7 +127,7 @@ export default function SchedaSub() {
                             type="button"
                             className="btn btn--ghost btn-sm"
                             disabled={narrazione_pendente}
-                            onClick={() => setShowModal(true)}
+                            onClick={() => { alert('DEBUG: click ricevuto, narrazione_pendente=' + narrazione_pendente); setShowModal(true) }}
                         >
                             {narrazione_pendente ? 'Richiesta in attesa di approvazione…' : 'Richiedi narrazione generata dalle tue giocate'}
                         </button>
