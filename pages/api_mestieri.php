@@ -3,12 +3,17 @@
  * api_mestieri.php — Endpoint JSON per il pannello React "Gestione mestieri"
  * e per l'auto-gestione delle gilde giocatore (mestiere.tipo != 1)
  *
- * op = list | get | tipi | save | hide | save_ruolo | delete_ruolo
+ * op = list | get | tipi | save | hide | save_ruolo | delete_ruolo | delete_mestiere
  *      (solo admin — pannello di sistema, tutti i mestieri inclusi i globali)
  * op = mia_gilda | crea_gilda
  *      (chiunque sia loggato — riguardano solo la propria eventuale gilda)
  * op = dismetti_gilda | riassegna_capo
  *      (solo admin — interventi su una gilda giocatore)
+ *
+ * delete_mestiere elimina definitivamente un mestiere/gilda e tutte le sue
+ * dipendenze (ruoli, affiliazioni, bacheche, statuto); a differenza di
+ * dismetti_gilda funziona anche sui mestieri veri, tranne i pochi con
+ * funzionalità hardcoded nel codice (vedi commento nel case).
  *
  * save / save_ruolo / delete_ruolo accettano anche il capo di una gilda
  * (mestiere.tipo != 1), non solo l'admin: l'autorizzazione è verificata
@@ -201,6 +206,77 @@ switch ($op) {
         gdrcd_query("DELETE FROM ruolo_mestiere WHERE mestiere=$id");
         gdrcd_query("DELETE FROM mestiere WHERE id_mestiere=$id");
         echo json_encode(['success' => true, 'message' => 'Gilda sciolta.']);
+        break;
+
+    // Elimina definitivamente un mestiere vero o una gilda giocatore, ripulendo
+    // tutte le dipendenze (a differenza di dismetti_gilda, funziona anche sui
+    // mestieri veri e resetta i riferimenti su personaggio/privilegi).
+    case 'delete_mestiere':
+        if (!$is_admin) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+
+        $id = (int)($_POST['id_mestiere'] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Mestiere non specificato']);
+            exit;
+        }
+
+        // Mestieri con funzionalità hardcoded nel codice (sconti mercato, cura in
+        // ospedale, permessi chat, dispacci Crystal News: pages/api_chat.php,
+        // tokyobook.inc.php, scheda/menu.inc.php, oggetto_*.inc.php, api_admin.php,
+        // api_bot.php). Eliminarli non lascerebbe righe orfane (le dipendenze
+        // vengono comunque ripulite) ma romperebbe silenziosamente quelle
+        // funzionalità: restano gestibili solo con "Nascondi".
+        if (in_array($id, [1, 2, 3, 4, 6, 10], true)) {
+            echo json_encode(['success' => false, 'message' => 'Questo mestiere ha funzionalità collegate nel codice (mercato, ospedale, chat, Crystal News) e non può essere eliminato definitivamente. Usa "Nascondi" per rimuoverlo dalla vista.']);
+            exit;
+        }
+
+        $mestiere = carica_mestiere($id);
+        if (!$mestiere) {
+            echo json_encode(['success' => false, 'message' => 'Mestiere non trovato']);
+            exit;
+        }
+        $e_mestiere_vero = ((int)$mestiere['tipo'] === 1);
+
+        // Solo per i mestieri veri: personaggio.id_mestiere/id_ruolo_mestiere/esperienza_mestiere
+        // e privilegi.capomestiere vanno resettati. Le gilde giocatore non toccano mai questi
+        // campi (clgpersonaggioaffiliazione è la fonte di verità per l'affiliazione a una
+        // gilda), quindi non c'è nulla da resettare in quel caso.
+        if ($e_mestiere_vero) {
+            $affetti = [];
+            $res = gdrcd_query(
+                "SELECT DISTINCT cpm.personaggio FROM clgpersonaggiomestiere cpm
+                 JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+                 WHERE rm.mestiere = $id",
+                'result'
+            );
+            while ($row = gdrcd_query($res, 'fetch')) { $affetti[] = $row['personaggio']; }
+            gdrcd_query($res, 'free');
+
+            foreach ($affetti as $nome_pg) {
+                $nome_esc = gdrcd_filter('in', $nome_pg);
+                gdrcd_query("UPDATE personaggio SET id_mestiere=0, id_ruolo_mestiere=1, esperienza_mestiere=0 WHERE nome='$nome_esc'");
+                gdrcd_query("UPDATE privilegi SET capomestiere=0 WHERE nome='$nome_esc'");
+            }
+        }
+
+        // Un id_ruolo appartiene sempre a una sola delle due tabelle di affiliazione:
+        // il DELETE sull'altra è a costo zero (stesso pattern di op=delete_ruolo)
+        gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE id_ruolo IN (SELECT id_ruolo FROM ruolo_mestiere WHERE mestiere=$id)");
+        gdrcd_query("DELETE FROM clgpersonaggioaffiliazione WHERE id_ruolo IN (SELECT id_ruolo FROM ruolo_mestiere WHERE mestiere=$id)");
+
+        // Bacheca dedicata (araldo/messaggioaraldo/araldo_letto, SOLOMESTIERE in api_forum.php)
+        gdrcd_query("DELETE FROM araldo_letto WHERE araldo_id IN (SELECT id_araldo FROM araldo WHERE tipo=" . SOLOMESTIERE . " AND proprietari=$id)");
+        gdrcd_query("DELETE FROM messaggioaraldo WHERE id_araldo IN (SELECT id_araldo FROM araldo WHERE tipo=" . SOLOMESTIERE . " AND proprietari=$id)");
+        gdrcd_query("DELETE FROM araldo WHERE tipo=" . SOLOMESTIERE . " AND proprietari=$id");
+
+        // Articoli di statuto/lore dedicati (Statuto.jsx via api_statuto.php)
+        gdrcd_query("DELETE FROM statuti WHERE id_mestiere=$id");
+
+        gdrcd_query("DELETE FROM ruolo_mestiere WHERE mestiere=$id");
+        gdrcd_query("DELETE FROM mestiere WHERE id_mestiere=$id");
+
+        echo json_encode(['success' => true, 'message' => ($e_mestiere_vero ? 'Mestiere' : 'Gilda') . ' eliminat' . ($e_mestiere_vero ? 'o' : 'a') . ' definitivamente.']);
         break;
 
     // Trasferisce il ruolo di capo di una gilda a un altro membro già affiliato

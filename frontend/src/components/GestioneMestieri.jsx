@@ -157,7 +157,7 @@ function RuoloRow({ ruolo, onSaved, onDeleted }) {
 // Tabella riusata sia per i mestieri veri che per le gilde giocatore: stessa
 // struttura, righe diverse.
 
-function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide }) {
+function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide, onDelete }) {
     return (
         <table>
             <thead>
@@ -185,6 +185,9 @@ function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide }) {
                                 </button>
                                 <button className="btn-action btn-action--delete btn-action--icon" title="Nascondi" onClick={() => onHide(m.id_mestiere, m.nome)}>
                                     <i className="fa-solid fa-eye-slash"></i>
+                                </button>
+                                <button className="btn-action btn-action--delete btn-action--icon" title="Elimina definitivamente" onClick={() => onDelete(m.id_mestiere, m.nome)}>
+                                    <i className="fa-solid fa-trash-can"></i>
                                 </button>
                             </div>
                         </td>
@@ -388,7 +391,7 @@ export default function GestioneMestieri() {
     const [loading, setLoading]         = useState(true)
     const [error, setError]             = useState(null)
     const [editing, setEditing]         = useState(null) // { mestiere, ruoli, tipi } oppure null
-    const [hideMsg, setHideMsg]         = useState(null)
+    const [hideMsg, setHideMsg]         = useState(null) // { ok: bool, text: string } oppure null
 
     const loadList = useCallback(async (offset = 0) => {
         setLoading(true)
@@ -452,8 +455,25 @@ export default function GestioneMestieri() {
         const r = await fetch(`${API}?op=hide`, { method: 'POST', body: fd })
         if (r.status === 403) { window.CT.navigate('main.php?page=mappaclick'); return }
         const d = await r.json()
-        setHideMsg(d.message ?? null)
+        setHideMsg(d.message ? { ok: d.success, text: d.message } : null)
         setTimeout(() => setHideMsg(null), 3000)
+        loadList(page)
+    }
+
+    const eliminaDefinitivamente = async (id, nome) => {
+        if (!window.confirm(
+            `Eliminare DEFINITIVAMENTE «${nome}»?\n\n` +
+            `Verranno cancellati anche: tutti i ruoli, le affiliazioni dei personaggi, ` +
+            `le bacheche e lo statuto collegati. I personaggi che lo avevano come mestiere ` +
+            `torneranno disoccupati.\n\nQuesta azione non è reversibile.`
+        )) return
+        const fd = new FormData()
+        fd.append('id_mestiere', id)
+        const r = await fetch(`${API}?op=delete_mestiere`, { method: 'POST', body: fd })
+        if (r.status === 403) { window.CT.navigate('main.php?page=mappaclick'); return }
+        const d = await r.json()
+        setHideMsg(d.message ? { ok: d.success, text: d.message } : null)
+        setTimeout(() => setHideMsg(null), 4000)
         loadList(page)
     }
 
@@ -487,7 +507,7 @@ export default function GestioneMestieri() {
             </div>
 
             {error && <div className="gm-feedback gm-feedback--error" style={{ margin: '12px' }}>{error}</div>}
-            {hideMsg && <div className="gm-feedback gm-feedback--ok" style={{ margin: '12px' }}>{hideMsg}</div>}
+            {hideMsg && <div className={`gm-feedback gm-feedback--${hideMsg.ok ? 'ok' : 'error'}`} style={{ margin: '12px' }}>{hideMsg.text}</div>}
 
             <h3 className="section-title" style={{ margin: '12px' }}>Mestieri</h3>
             <div className="gp-list">
@@ -497,6 +517,7 @@ export default function GestioneMestieri() {
                     emptyLabel="Nessun mestiere trovato."
                     onEdit={apriModifica}
                     onHide={nascondi}
+                    onDelete={eliminaDefinitivamente}
                 />
             </div>
 
@@ -508,6 +529,7 @@ export default function GestioneMestieri() {
                     emptyLabel="Nessuna gilda creata dai giocatori."
                     onEdit={apriModifica}
                     onHide={nascondi}
+                    onDelete={eliminaDefinitivamente}
                 />
             </div>
 
