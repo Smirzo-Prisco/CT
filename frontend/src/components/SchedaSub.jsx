@@ -71,6 +71,15 @@ export default function SchedaSub() {
         return () => { if (scopedStyleEl.current) scopedStyleEl.current.remove() }
     }, [profile, field])
 
+    useEffect(() => {
+        if (!showModal) return
+        const el = document.querySelector('.pg-edit-container')
+        if (!el) { alert('DEBUG: showModal=true ma .pg-edit-container non è nel DOM'); return }
+        const cs = getComputedStyle(el)
+        const r  = el.getBoundingClientRect()
+        alert(`DEBUG: modale trovata nel DOM.\ndisplay=${cs.display} visibility=${cs.visibility} opacity=${cs.opacity} zIndex=${cs.zIndex}\nrect=${Math.round(r.width)}x${Math.round(r.height)} @ (${Math.round(r.left)},${Math.round(r.top)})`)
+    }, [showModal])
+
     if (error)    return <div className="pagina_scheda"><div className="error">{error}</div></div>
     if (!profile) return <div className="pagina_scheda"><div>Caricamento…</div></div>
 
