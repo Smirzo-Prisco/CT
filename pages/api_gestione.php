@@ -136,6 +136,7 @@ switch ($op) {
                 ['label' => 'Mappa',                 'url' => 'gestione.php?page=gestione_mappe'],
                 ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'],
                 ['label' => 'Manutenzione',          'url' => 'gestione.php?page=gestione_manutenzione'],
+                ['label' => 'Narrazioni IA',          'url' => 'gestione.php?page=gestione_narrazione'],
             ]];
         }
 

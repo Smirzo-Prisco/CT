@@ -38,9 +38,12 @@ export default function SchedaSub() {
 
     const { field, title } = PAGE_MAP[page] ?? { field: 'storia', title: '' }
 
-    const [profile, setProfile] = useState(null)
-    const [error,   setError]   = useState(null)
-    const scopedStyleEl         = useRef(null)
+    const [profile, setProfile]           = useState(null)
+    const [error,   setError]             = useState(null)
+    const [showModal, setShowModal]       = useState(false)
+    const [inviando, setInviando]         = useState(false)
+    const [richiestaMsg, setRichiestaMsg] = useState(null) // { ok, text } oppure null
+    const scopedStyleEl                   = useRef(null)
 
     useEffect(() => {
         if (!pg) { setError('Personaggio non specificato'); return }
@@ -71,8 +74,27 @@ export default function SchedaSub() {
     if (error)    return <div className="pagina_scheda"><div className="error">{error}</div></div>
     if (!profile) return <div className="pagina_scheda"><div>Caricamento…</div></div>
 
-    const { nome, cognome, is_own, is_admin, is_staff, is_master } = profile
+    const { nome, cognome, is_own, is_admin, is_staff, is_master, narrazione_disponibile, narrazione_pendente } = profile
     const { html: fieldHtml } = extractAndScopeStyles(profile[field] ?? '')
+
+    const mostraRichiestaNarrazione = page === 'scheda_dice' && is_own && narrazione_disponibile
+
+    const richiediNarrazione = async () => {
+        setInviando(true)
+        try {
+            const r = await fetch(`/pages/api_scheda.php?op=narrazione_richiedi&pg=${encodeURIComponent(pg)}`, { method: 'POST' })
+            const d = await r.json()
+            setRichiestaMsg({ ok: d.success, text: d.message ?? (d.success ? 'Richiesta inviata.' : 'Errore nell\'invio della richiesta.') })
+            if (d.success) {
+                setProfile({ ...profile, narrazione_pendente: true })
+                setShowModal(false)
+            }
+        } catch {
+            setRichiestaMsg({ ok: false, text: 'Errore di rete' })
+        } finally {
+            setInviando(false)
+        }
+    }
 
     return (
         <div className="pagina_scheda">
@@ -95,6 +117,53 @@ export default function SchedaSub() {
                     <div className="body_box"
                         dangerouslySetInnerHTML={{ __html: fieldHtml }} />
                 </div>
+
+                {mostraRichiestaNarrazione && (
+                    <div className="narrazione-ia-box">
+                        {richiestaMsg && (
+                            <p className={`gm-feedback gm-feedback--${richiestaMsg.ok ? 'ok' : 'error'}`}>{richiestaMsg.text}</p>
+                        )}
+                        <button
+                            type="button"
+                            className="btn btn--ghost btn-sm"
+                            disabled={narrazione_pendente}
+                            onClick={() => setShowModal(true)}
+                        >
+                            {narrazione_pendente ? 'Richiesta in attesa di approvazione…' : 'Richiedi narrazione generata dalle tue giocate'}
+                        </button>
+                    </div>
+                )}
+
+                {showModal && (
+                    <div className="pg-edit-container" style={{ display: 'flex' }} role="dialog" aria-modal="true">
+                        <div className="modal-content">
+                            <div className="gp-modal-header">
+                                <h2 className="gp-modal-title">Richiedi narrazione IA</h2>
+                                <div className="gp-modal-header-actions">
+                                    <button type="button" className="gp-modal-close" onClick={() => setShowModal(false)} aria-label="Chiudi">✕</button>
+                                </div>
+                            </div>
+                            <div className="gm-modal-body">
+                                <p>
+                                    Un'intelligenza artificiale genererà una narrazione a partire da tutte le tue giocate concluse.
+                                </p>
+                                <p>
+                                    <strong>Attenzione:</strong> questa azione, una volta approvata da uno staff, sovrascriverà
+                                    interamente il testo attuale di "Dice di sé" con il nuovo testo generato.
+                                </p>
+                                <p>
+                                    La richiesta dovrà essere approvata da un admin, che potrebbe contattarti per conferma prima di procedere.
+                                </p>
+                            </div>
+                            <div className="gp-modal-footer">
+                                <button type="button" className="btn btn--ghost" onClick={() => setShowModal(false)}>Annulla</button>
+                                <button type="button" onClick={richiediNarrazione} disabled={inviando}>
+                                    {inviando ? 'Invio…' : 'Conferma richiesta'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )

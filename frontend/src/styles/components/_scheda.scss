@@ -812,3 +812,11 @@ div.pagina_scheda_oggetti {
         &:hover { background: rgb(77 166 255 / 20%); }
     }
 }
+
+// ── Richiesta narrazione IA (page=scheda_dice) ────────────────
+.narrazione-ia-box {
+    margin-top: 16px;
+    text-align: center;
+
+    p { margin-bottom: 8px; }
+}

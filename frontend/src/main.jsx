@@ -66,6 +66,7 @@ import ChatbotWidget   from './components/ChatbotWidget'
 import GestioneBot    from './components/GestioneBot'
 import GestioneManutenzione from './components/GestioneManutenzione'
 import GestioneMestieri from './components/GestioneMestieri'
+import GestioneNarrazioneRichieste from './components/GestioneNarrazioneRichieste'
 import ContattaModerazione from './components/ContattaModerazione'
 
 /**
@@ -173,6 +174,9 @@ window.CT.register('GestioneManutenzione', GestioneManutenzione)
 
 /** Pannello admin gestione mestieri e ruoli: lista, form CRUD, upload immagini */
 window.CT.register('GestioneMestieri', GestioneMestieri)
+
+/** Pannello admin richieste narrazione IA: approvazione rigenerazione "Dice di sé" */
+window.CT.register('GestioneNarrazioneRichieste', GestioneNarrazioneRichieste)
 
 /** Form + cronologia richieste di moderazione, con pannello staff integrato */
 window.CT.register('ContattaModerazione', ContattaModerazione)

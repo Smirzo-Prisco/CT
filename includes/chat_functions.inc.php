@@ -1,4 +1,6 @@
 <?php
+require_once(__DIR__ . '/narrazione_functions.inc.php');
+
 /************* CHAT di gioco ******************************/
 /************* Inserimento azione ******************************/
 /** Configura il sistema esperienza  */
@@ -886,6 +888,10 @@ function endRoleSession($location) {
     }
 
     gdrcd_query("UPDATE role_sessions SET `end` = NOW() WHERE `location` = $location");
+
+    // Accoda il riassunto IA della giocata (silenzioso, elaborato in background
+    // da cron/narrazione_worker.php — non deve rallentare la chiusura).
+    if (isset($rid)) narrazione_enqueue_giocata_chiusa($rid);
 
     chatInsertMessage($location, 'System', null, 'Role conclusa!', 'N');
 }
