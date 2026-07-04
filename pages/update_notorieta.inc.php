@@ -56,7 +56,7 @@
 <?php
     //richiamo tutti pg
     
-     $tutti_pg = gdrcd_query("SELECT * FROM personaggio WHERE notorieta > 0 AND (id_ruolo_mestiere != 4 AND id_ruolo_mestiere != 3 AND id_ruolo_mestiere != 10 AND id_ruolo_mestiere != 71 AND id_ruolo_mestiere != 72) ORDER BY nome", 'result');
+     $tutti_pg = gdrcd_query("SELECT * FROM personaggio WHERE notorieta > 0 ORDER BY nome", 'result');
 ?>
 <form action="main.php?page=update_notorieta" method="post" name="cancellaselezione">
 <table class="customTable">
