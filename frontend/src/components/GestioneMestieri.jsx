@@ -159,7 +159,7 @@ function RuoloRow({ ruolo, onSaved, onDeleted }) {
 
 function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide, onDelete }) {
     return (
-        <table>
+        <table className="gp-table--mestieri">
             <thead>
                 <tr>
                     <th>Nome</th>

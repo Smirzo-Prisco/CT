@@ -779,6 +779,11 @@ span[style*="position:relative"]:hover .tooltip-bottom {
 
 .gp-list {
     padding: $space-3;
+    // Rete di sicurezza su mobile: se il contenuto della tabella non ci sta,
+    // scorre in orizzontale invece di schiacciare/sovrapporre le colonne
+    // (table-layout: fixed da solo non basta su viewport stretti).
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 
     table {
         width: 100%;
@@ -795,14 +800,8 @@ span[style*="position:relative"]:hover .tooltip-bottom {
         text-align: left;
         border-bottom: 1px solid $gestione-hover;
         font-size: $text-sm;
+        overflow-wrap: break-word;
     }
-
-    // Con table-layout: fixed le larghezze sono determinate qui (non più dal
-    // contenuto): tabelle diverse con la stessa struttura restano allineate
-    // invece di calcolare colonne diverse in base al proprio testo.
-    th:nth-child(2), td:nth-child(2) { width: 160px; }
-    th:nth-child(3), td:nth-child(3) { width: 90px; }
-    th:nth-child(4), td:nth-child(4) { width: 140px; }
 
     th {
         background: $gestione-hover;
