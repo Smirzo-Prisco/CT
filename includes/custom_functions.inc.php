@@ -684,4 +684,31 @@ function mestiere_e_membro_di($login, $id_mestiere) {
     return ((int)($r['n'] ?? 0)) > 0;
 }
 /************* FINE MESTIERI / GILDE GIOCATORE ******************************/
+
+/**
+ * Frammento SQL condiviso: vero se il personaggio è da considerarsi online.
+ * Centralizza una condizione che prima era duplicata testualmente in tre punti
+ * (api_map.php op=presenti, op=presenti_estesi, themes/crystal/home/index.php)
+ * — tenerle sincronizzate a mano è stata la causa di un blocco del sito.
+ *
+ * Richiede che la query chiamante usi l'alias "p" per personaggio e includa:
+ *   LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
+ *   LEFT JOIN privilegi  pr ON pr.nome    = p.nome
+ *
+ * Un personaggio è online se: ha una sessione aperta (ora_entrata > ora_uscita)
+ * con attività recente (o, per i bot, non in pausa) — oppure, a prescindere
+ * dalla sessione, se privilegi.sempre_online è attivo.
+ */
+function gdrcd_condizione_online() {
+    return "(
+        (
+            p.ora_entrata > p.ora_uscita
+            AND (
+                (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
+                OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
+            )
+        )
+        OR COALESCE(pr.sempre_online, 0) = 1
+    )";
+}
 ?>
