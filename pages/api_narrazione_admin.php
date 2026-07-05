@@ -7,7 +7,7 @@
  *                                  worker cron/narrazione_worker.php)
  * op = rifiuta    (POST, admin) — rifiuta una richiesta
  * op = test_rapido(POST, admin) — accoda nella coda automatica solo le
- *                                  ultime 4 giocate concluse, per validare
+ *                                  ultime 2 giocate concluse, per validare
  *                                  rapidamente la qualità senza attendere
  *                                  una rigenerazione completa
  *
@@ -39,21 +39,24 @@ $op = $_GET['op'] ?? '';
 
 /**
  * Stima (grezza) del tempo di elaborazione per la rigenerazione completa di
- * un personaggio: una chiamata LLM per ogni giocata conclusa, con la
- * trascrizione troncata a 6000 caratteri (stesso limite del worker, vedi
- * narrazione_trascrizione_giocata()). Velocità basate sui test effettuati
- * sull'LLM locale (llama.cpp, CPUQuota 50%): ~3 token/sec in lettura del
- * prompt, ~1 token/sec in generazione (max_tokens=300 per riassunto).
+ * un personaggio. Le giocate che stanno in un blocco (context window) usano
+ * una sola chiamata LLM; quelle più lunghe vengono divise in blocchi da
+ * narrazione_suddividi_in_blocchi() e riassunte blocco per blocco (map) più
+ * una chiamata finale di fusione (reduce) — vedi narrazione_riassunto_giocata()
+ * in includes/narrazione_functions.inc.php. Velocità basate sui test
+ * effettuati sull'LLM locale (llama.cpp, CPUQuota 50%): ~3 token/sec in
+ * lettura del prompt, ~1 token/sec in generazione.
  */
 function narrazione_stima_durata(string $pg_name): array {
     // Nota: niente `const` qui dentro — in PHP un const dichiarato dentro una
     // funzione diventa globale al primo run e fa fallire le chiamate successive.
-    $prompt_tokens_per_sec    = 3;
-    $gen_tokens_per_sec       = 1;
-    $gen_tokens_per_riassunto = 300;
-    $chars_per_token          = 4;
-    $overhead_prompt_chars    = 400; // istruzioni fisse del prompt, vedi narrazione_riassunto_giocata()
-    $max_chars_trascrizione   = 6000;
+    $prompt_tokens_per_sec  = 3;
+    $gen_tokens_per_sec     = 1;
+    $gen_tokens_finale      = 300; // narrazione_riassunto_da_testo()
+    $gen_tokens_per_blocco  = 150; // mini-riassunto fattuale di un blocco (map)
+    $chars_per_token        = 4;
+    $overhead_prompt_chars  = 400; // istruzioni fisse del prompt
+    $max_chars_blocco       = 5000; // narrazione_suddividi_in_blocchi()
 
     $pg_esc  = gdrcd_filter('in', $pg_name);
     $giocate = gdrcd_query("SELECT rs.id_role FROM role_sessions rs
@@ -64,10 +67,22 @@ function narrazione_stima_durata(string $pg_name): array {
     $secondi_totali = 0.0;
     while ($g = gdrcd_query($giocate, 'fetch')) {
         $n_giocate++;
-        $len_row = gdrcd_query("SELECT SUM(CHAR_LENGTH(testo)) AS len FROM chat WHERE id_role = " . (int)$g['id_role'] . " AND testo IS NOT NULL");
-        $chars         = min((int)($len_row['len'] ?? 0), $max_chars_trascrizione) + $overhead_prompt_chars;
-        $prompt_tokens = $chars / $chars_per_token;
-        $secondi_totali += ($prompt_tokens / $prompt_tokens_per_sec) + ($gen_tokens_per_riassunto / $gen_tokens_per_sec);
+        $len_row   = gdrcd_query("SELECT SUM(CHAR_LENGTH(testo)) AS len FROM chat WHERE id_role = " . (int)$g['id_role'] . " AND testo IS NOT NULL");
+        $chars     = (int)($len_row['len'] ?? 0);
+        $n_blocchi = max(1, (int)ceil($chars / $max_chars_blocco));
+
+        if ($n_blocchi === 1) {
+            $prompt_tokens   = ($chars + $overhead_prompt_chars) / $chars_per_token;
+            $secondi_totali += ($prompt_tokens / $prompt_tokens_per_sec) + ($gen_tokens_finale / $gen_tokens_per_sec);
+        } else {
+            // Map: una chiamata per blocco (lettura blocco + mini-riassunto).
+            $prompt_tokens_blocco = ($max_chars_blocco + $overhead_prompt_chars) / $chars_per_token;
+            $secondi_totali += $n_blocchi * (($prompt_tokens_blocco / $prompt_tokens_per_sec) + ($gen_tokens_per_blocco / $gen_tokens_per_sec));
+            // Reduce: chiamata finale sui mini-riassunti concatenati (molto più corti della trascrizione originale).
+            $chars_riassunti      = $n_blocchi * $gen_tokens_per_blocco * $chars_per_token;
+            $prompt_tokens_finale = ($chars_riassunti + $overhead_prompt_chars) / $chars_per_token;
+            $secondi_totali      += ($prompt_tokens_finale / $prompt_tokens_per_sec) + ($gen_tokens_finale / $gen_tokens_per_sec);
+        }
     }
     gdrcd_query($giocate, 'free');
 
@@ -120,7 +135,7 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
-    // TEST_RAPIDO — accoda le ultime 4 giocate concluse nella coda automatica
+    // TEST_RAPIDO — accoda le ultime 2 giocate concluse nella coda automatica
     // (narrazione_queue), già gestita dal worker in produzione senza bisogno
     // di alcuna azione manuale sul server
     // -------------------------------------------------------------------------
@@ -130,7 +145,7 @@ switch ($op) {
             echo json_encode(['success' => false, 'message' => 'Personaggio non valido o narrazione IA non abilitata']);
             exit;
         }
-        $n = narrazione_enqueue_test($pg_name, 4);
+        $n = narrazione_enqueue_test($pg_name, 2);
         echo json_encode(['success' => true, 'n_accodate' => $n]);
         break;
 

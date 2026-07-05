@@ -59,43 +59,89 @@ function narrazione_llm_call(string $prompt, int $max_tokens = 300): ?string {
 }
 
 /**
- * Trascrizione testuale di una giocata, troncata per stare nella context
- * window del modello (--ctx-size 4096 in llama-server.service).
+ * Trascrizione COMPLETA di una giocata (una riga per messaggio, ordine
+ * cronologico), senza alcun troncamento.
  */
-function narrazione_trascrizione_giocata(int $id_role, int $max_chars = 6000): string {
+function narrazione_righe_giocata(int $id_role): array {
     $result = gdrcd_query("SELECT mittente, testo FROM chat WHERE id_role = $id_role AND testo IS NOT NULL ORDER BY ora ASC", 'result');
     $righe = [];
     while ($row = gdrcd_query($result, 'fetch')) {
         $righe[] = $row['mittente'] . ': ' . strip_tags($row['testo']);
     }
     gdrcd_query($result, 'free');
+    return $righe;
+}
 
-    $trascrizione = implode("\n", $righe);
-    if (mb_strlen($trascrizione) > $max_chars) {
-        $trascrizione = '[...]' . mb_substr($trascrizione, -$max_chars);
+/**
+ * Divide le righe di una trascrizione in blocchi che stanno nella context
+ * window del modello (--ctx-size 4096 in llama-server.service), senza mai
+ * spezzare un messaggio a metà.
+ */
+function narrazione_suddividi_in_blocchi(array $righe, int $max_chars_blocco = 5000): array {
+    $blocchi   = [];
+    $corrente  = '';
+    foreach ($righe as $riga) {
+        $candidato = $corrente === '' ? $riga : $corrente . "\n" . $riga;
+        if (mb_strlen($candidato) > $max_chars_blocco && $corrente !== '') {
+            $blocchi[]= $corrente;
+            $corrente = $riga;
+        } else {
+            $corrente = $candidato;
+        }
     }
-    return $trascrizione;
+    if ($corrente !== '') $blocchi[] = $corrente;
+    return $blocchi;
+}
+
+/** Riassunto finale (2-3 frasi) a partire da una trascrizione (o da una fusione di mini-riassunti) che sta nel contesto. */
+function narrazione_riassunto_da_testo(string $testo, string $pg_name): ?string {
+    $prompt = "Sei un narratore per un gioco di ruolo testuale ambientato in una città cyberpunk. " .
+        "Di seguito la trascrizione (o un elenco di fatti già estratti) di una scena di gioco di ruolo (giocata) conclusa.\n\n" .
+        "Prima di rispondere, individua internamente: chi è presente nella scena, cosa fa concretamente " .
+        "\"$pg_name\" (azioni, decisioni, eventi che gli accadono) e come si conclude la scena. " .
+        "Basati SOLO su quello che è scritto, senza inventare dettagli assenti.\n\n" .
+        "Poi scrivi un brevissimo riassunto (massimo 2-3 frasi, in italiano, senza markdown, in terza persona) " .
+        "dal punto di vista di \"$pg_name\", riportando solo il riassunto finale (non l'analisi).\n\n" .
+        "Testo:\n$testo";
+
+    return narrazione_llm_call($prompt, 300);
 }
 
 /**
  * Riassunto breve (2-3 frasi) di una giocata dal punto di vista di un
  * singolo personaggio. Ritorna null se la giocata non ha messaggi o l'LLM
  * non risponde correttamente.
+ *
+ * Le giocate che stanno in un solo blocco (context window) vengono
+ * riassunte con una sola chiamata. Quelle più lunghe vengono prima divise
+ * in blocchi e riassunte fattualmente blocco per blocco (map), poi i
+ * mini-riassunti vengono fusi in un'unica chiamata finale (reduce): così
+ * nessuna parte della giocata viene troncata/ignorata, a costo di qualche
+ * chiamata in più all'LLM per le giocate lunghe.
  */
 function narrazione_riassunto_giocata(int $id_role, string $pg_name): ?string {
-    $trascrizione = narrazione_trascrizione_giocata($id_role);
-    if (trim($trascrizione) === '') return null;
+    $righe = narrazione_righe_giocata($id_role);
+    if (!$righe) return null;
 
-    $prompt = "Sei un narratore per un gioco di ruolo testuale ambientato in una città cyberpunk. " .
-        "Di seguito la trascrizione di una scena di gioco di ruolo (giocata) conclusa.\n\n" .
-        "Prima di rispondere, individua internamente: chi è presente nella scena, cosa fa concretamente " .
-        "\"$pg_name\" (azioni, decisioni, eventi che gli accadono) e come si conclude la scena. " .
-        "Basati SOLO su quello che è scritto nella trascrizione, senza inventare dettagli assenti.\n\n" .
-        "Poi scrivi un brevissimo riassunto (massimo 2-3 frasi, in italiano, senza markdown, in terza persona) " .
-        "dal punto di vista di \"$pg_name\", riportando solo il riassunto finale (non l'analisi).\n\n" .
-        "Trascrizione:\n$trascrizione";
+    $blocchi = narrazione_suddividi_in_blocchi($righe);
 
-    return narrazione_llm_call($prompt, 300);
+    if (count($blocchi) === 1) {
+        return narrazione_riassunto_da_testo($blocchi[0], $pg_name);
+    }
+
+    $mini_riassunti = [];
+    foreach ($blocchi as $i => $blocco) {
+        $prompt = "Sei un narratore per un gioco di ruolo testuale ambientato in una città cyberpunk. " .
+            "Di seguito la parte " . ($i + 1) . " di " . count($blocchi) . " della trascrizione di una scena di gioco di ruolo (le altre parti seguono/precedono cronologicamente). " .
+            "Elenca in modo sintetico e fattuale (poche righe, senza markdown, in italiano) solo ciò che succede in questa parte " .
+            "riguardo al personaggio \"$pg_name\": azioni, decisioni, eventi. Basati SOLO su questo testo, senza inventare nulla.\n\n" .
+            "Trascrizione (parte " . ($i + 1) . "):\n$blocco";
+        $mini = narrazione_llm_call($prompt, 150);
+        if ($mini !== null) $mini_riassunti[] = trim($mini);
+    }
+    if (!$mini_riassunti) return null;
+
+    return narrazione_riassunto_da_testo(implode("\n", $mini_riassunti), $pg_name);
 }
 
 /**
@@ -120,7 +166,7 @@ function narrazione_enqueue_giocata_chiusa(int $id_role): void {
  * worker in produzione (priorità 1), quindi non richiede alcuna azione
  * manuale sul server. Ritorna il numero di giocate accodate.
  */
-function narrazione_enqueue_test(string $pg_name, int $limite = 4): int {
+function narrazione_enqueue_test(string $pg_name, int $limite = 2): int {
     $pg_esc = gdrcd_filter('in', $pg_name);
     $result = gdrcd_query("SELECT rs.id_role FROM role_sessions rs
         JOIN role_session_players rsp ON rsp.id_role = rs.id_role

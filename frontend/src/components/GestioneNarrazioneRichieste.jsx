@@ -69,7 +69,7 @@ export default function GestioneNarrazioneRichieste() {
     const testRapido = async (id, pgName) => {
         if (!window.confirm(
             `Accodare un test rapido per «${pgName}»?\n` +
-            `Il worker riassumerà le ultime 4 giocate concluse e le aggiungerà in fondo a "Dice di sé" (senza sovrascrivere il testo esistente).`
+            `Il worker riassumerà le ultime 2 giocate concluse e le aggiungerà in fondo a "Dice di sé" (senza sovrascrivere il testo esistente).`
         )) return
         setBusyId(id)
         const fd = new FormData()
@@ -131,7 +131,7 @@ export default function GestioneNarrazioneRichieste() {
                                             disabled={busyId === r.id} onClick={() => agisci(r.id, 'rifiuta', r.pg_name)}>
                                             <i className="fa-solid fa-xmark"></i>
                                         </button>
-                                        <button className="btn-action btn-action--icon" title="Test rapido (ultime 4 giocate)"
+                                        <button className="btn-action btn-action--icon" title="Test rapido (ultime 2 giocate)"
                                             disabled={busyId === r.id} onClick={() => testRapido(r.id, r.pg_name)}>
                                             <i className="fa-solid fa-flask"></i>
                                         </button>
