@@ -209,7 +209,6 @@ function tiraSkillChat() {
     // Legge i bersagli selezionati da TargetSelector.jsx
     const target = window.getSelectedNamesCallback ? window.getSelectedNamesCallback() : [];
     const id_role = document.getElementById('id_role').value;
-    const bonus_abilita = document.getElementById('skill_bonus_abilita')?.checked ?? false;
 
     // Controllo che ci sia la skill e il bersaglio
     if (chat_skill == 0 || target.length > 0) {
@@ -221,8 +220,7 @@ function tiraSkillChat() {
                 chat_skill,
                 livello_skill,
                 target,
-                id_role,
-                bonus_abilita
+                id_role
             }),
             credentials: "same-origin"
         })

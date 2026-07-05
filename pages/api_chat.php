@@ -126,9 +126,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $messaggio .= "$login usa la skill generica ".$skill_info['nome']." di livello $livello";
                     $car = 'generica';
                     $dice = mt_rand(1, 20);
-                    $bonus_abilita = !empty($data['bonus_abilita']);
-                    if ($bonus_abilita) $dice = applicaBonusAbilita($dice, getTotStatsPg($login));
-                    $tiro = " con un tiro totale di $dice/20" . ($bonus_abilita ? ' (bonus abilità)' : '');
+                    $tiro = " con un tiro totale di $dice/20";
                     break;
                 case 'Difensiva':
                     $car = 'difesa';
