@@ -123,6 +123,12 @@ function narrazione_enqueue_test(string $pg_name, int $limite = 4): int {
     while ($row = gdrcd_query($result, 'fetch')) $id_roles[] = (int)$row['id_role'];
     gdrcd_query($result, 'free');
 
+    if (!$id_roles) return 0;
+
+    // Separatore visivo: segna dove inizia il blocco di test rispetto al testo
+    // già presente (il worker non lo aggiunge per i riassunti automatici normali).
+    gdrcd_query("UPDATE personaggio SET descrizione = CONCAT(COALESCE(descrizione, ''), '<hr>') WHERE nome = '$pg_esc'");
+
     foreach (array_reverse($id_roles) as $id_role) {
         gdrcd_query("INSERT INTO narrazione_queue (id_role, pg_name) VALUES ($id_role, '$pg_esc')");
     }
