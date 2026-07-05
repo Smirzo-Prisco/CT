@@ -209,6 +209,7 @@ function tiraSkillChat() {
     // Legge i bersagli selezionati da TargetSelector.jsx
     const target = window.getSelectedNamesCallback ? window.getSelectedNamesCallback() : [];
     const id_role = document.getElementById('id_role').value;
+    const bonus_abilita = document.getElementById('skill_bonus_abilita')?.checked ?? false;
 
     // Controllo che ci sia la skill e il bersaglio
     if (chat_skill == 0 || target.length > 0) {
@@ -220,7 +221,8 @@ function tiraSkillChat() {
                 chat_skill,
                 livello_skill,
                 target,
-                id_role
+                id_role,
+                bonus_abilita
             }),
             credentials: "same-origin"
         })
@@ -334,6 +336,7 @@ function usaOggettoChat() {
 // Tiro dado generico in chat
 function tiraDadoGenericoChat() {
     const dado = document.getElementById('dado').value;
+    const bonus_abilita = document.getElementById('dado_bonus_abilita')?.checked ?? false;
 
     if (dado == 0) {
         showNotification('Attenzione! Devi selezionare un dado.', 'warning');
@@ -343,7 +346,7 @@ function tiraDadoGenericoChat() {
     fetch(ns_chat.api_file + '?' + ns_chat.param + '=tiraDadoGenericoChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dado })
+        body: JSON.stringify({ dado, bonus_abilita })
     })
         .then(res => res.json())
         .then(data => {

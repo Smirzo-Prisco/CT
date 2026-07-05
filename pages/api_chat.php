@@ -126,7 +126,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $messaggio .= "$login usa la skill generica ".$skill_info['nome']." di livello $livello";
                     $car = 'generica';
                     $dice = mt_rand(1, 20);
-                    $tiro = " con un tiro totale di $dice/20";
+                    $bonus_abilita = !empty($data['bonus_abilita']);
+                    if ($bonus_abilita) $dice = applicaBonusAbilita($dice, getTotStatsPg($login));
+                    $tiro = " con un tiro totale di $dice/20" . ($bonus_abilita ? ' (bonus abilità)' : '');
                     break;
                 case 'Difensiva':
                     $car = 'difesa';
@@ -644,7 +646,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             if ($dado_selezionato > 0) {
                 $num = mt_rand(1, $dado_selezionato);
-                $messaggio = "$login esegue un tiro totale di $num/$dado_selezionato";
+                $bonus_abilita = !empty($data['bonus_abilita']);
+                if ($bonus_abilita) $num = applicaBonusAbilita($num, getTotStatsPg($login));
+                $messaggio = "$login esegue un tiro totale di $num/$dado_selezionato" . ($bonus_abilita ? ' (bonus abilità)' : '');
 
                 chatInsertMessage($luogo, $login, null, $messaggio, 'C', $sussurro);
                 /*

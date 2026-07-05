@@ -1196,6 +1196,12 @@ export default function ChatShell() {
                                                 ))}
                                             </select>
                                         </div>
+                                        <div className="gdr-form-group gdr-checkbox-group">
+                                            <input type="checkbox" id="dado_bonus_abilita" name="bonus_abilita" defaultChecked={false} />
+                                            <label className="gdr-label" htmlFor="dado_bonus_abilita" title="Determina il successo di un'azione basata sulle abilità del personaggio, non sulla fortuna. Non causa danni a salute o integrità.">
+                                                Tiro d&apos;abilità (no danni a salute/integrità)
+                                            </label>
+                                        </div>
                                         <button className="gdr-button" onClick={() => window.tiraDadoGenericoChat?.()}>Tira Dado Generico</button>
                                     </div>
 
@@ -1263,6 +1269,12 @@ export default function ChatShell() {
                                             <select className="gdr-select" id="livello_skill" name="livello">
                                                 <option value="0">0</option>
                                             </select>
+                                        </div>
+                                        <div className="gdr-form-group gdr-checkbox-group">
+                                            <input type="checkbox" id="skill_bonus_abilita" name="bonus_abilita" defaultChecked={false} />
+                                            <label className="gdr-label" htmlFor="skill_bonus_abilita" title="Determina il successo di un'azione basata sulle abilità del personaggio, non sulla fortuna. Non causa danni a salute o integrità. Si applica solo alle skill generiche.">
+                                                Tiro d&apos;abilità (no danni a salute/integrità)
+                                            </label>
                                         </div>
                                         <button className="gdr-button" onClick={() => window.tiraSkillChat?.()}>Usa Abilità</button>
                                     </div>

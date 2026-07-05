@@ -244,6 +244,22 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
     margin-bottom: 15px;
 }
 
+.gdr-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+
+    input[type="checkbox"] {
+        width: auto;
+        accent-color: var(--accent-color);
+    }
+
+    .gdr-label {
+        margin-bottom: 0;
+        cursor: pointer;
+    }
+}
+
 .gdr-label {
     display: block;
     margin-bottom: $space-1 + 1;

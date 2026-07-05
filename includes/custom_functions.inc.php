@@ -596,6 +596,28 @@ function getTotStatsPg($pg) {
 }
 
 /**
+ * Bonus percentuale di abilità per i tiri "non basati sulla fortuna" (dado generico, skill generiche).
+ * Pari alla media delle quattro caratteristiche (car2+car4+car6+car8), divisa per 10 e poi per 2, arrotondata per difetto.
+ *
+ * @param int $totStats Somma di car2+car4+car6+car8 del personaggio (vedi getTotStatsPg()).
+ */
+function getBonusPercentualeAbilita(int $totStats): int {
+    return (int) floor(($totStats / 4 / 10) / 2);
+}
+
+/**
+ * Applica il bonus percentuale di abilità all'esito di un dado, arrotondando per difetto il risultato finale.
+ *
+ * @param int $dado     Esito grezzo del dado (es. mt_rand(1, 20)).
+ * @param int $totStats Somma di car2+car4+car6+car8 del personaggio (vedi getTotStatsPg()).
+ */
+function applicaBonusAbilita(int $dado, int $totStats): int {
+    $bonus = getBonusPercentualeAbilita($totStats);
+
+    return (int) floor($dado + $dado * $bonus / 100);
+}
+
+/**
  * Calcola il livello di un personaggio in base al totale delle sue caratteristiche.
  *
  * @param int   $totStats Somma di car2+car4+car6+car8 del personaggio.
