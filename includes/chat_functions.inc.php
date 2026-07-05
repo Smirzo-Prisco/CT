@@ -810,6 +810,10 @@ function ensureQuestSchema() {
         gdrcd_query("ALTER TABLE role_sessions ADD COLUMN turn_mode ENUM('liberi','fissi') NOT NULL DEFAULT 'liberi'");
     if (!in_array('turn_order_idx', $existing))
         gdrcd_query("ALTER TABLE role_sessions ADD COLUMN turn_order_idx INT NOT NULL DEFAULT 0");
+    if (!in_array('audio_video_id', $existing))
+        gdrcd_query("ALTER TABLE role_sessions ADD COLUMN audio_video_id VARCHAR(20) NULL DEFAULT NULL");
+    if (!in_array('audio_started_at', $existing))
+        gdrcd_query("ALTER TABLE role_sessions ADD COLUMN audio_started_at BIGINT NULL DEFAULT NULL");
     gdrcd_query("CREATE TABLE IF NOT EXISTS quest_turn_order (
         id INT AUTO_INCREMENT PRIMARY KEY,
         id_role INT NOT NULL,
@@ -817,6 +821,14 @@ function ensureQuestSchema() {
         position INT NOT NULL DEFAULT 0,
         UNIQUE KEY uk_role_pg (id_role, pg_name)
     )");
+}
+
+// Estrae l'ID video (11 caratteri) da un URL YouTube in uno dei formati comuni
+// (watch?v=, youtu.be/, embed/, shorts/). Restituisce false se non riconosciuto.
+function extractYoutubeId($url) {
+    if (preg_match('/(?:youtube(?:-nocookie)?\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/', $url, $m))
+        return $m[1];
+    return false;
 }
 
 function questCheckTimerAndOrder($id_role, $login, $is_roll = false) {
@@ -886,6 +898,7 @@ function endRoleSession($location) {
     }
 
     gdrcd_query("UPDATE role_sessions SET `end` = NOW() WHERE `location` = $location");
+    notifySocketServer('quest:audio_stop', 'loc:' . $location, []);
 
     chatInsertMessage($location, 'System', null, 'Role conclusa!', 'N');
 }

@@ -1957,18 +1957,20 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 echo json_encode(['success' => true, 'active' => false]);
                 exit;
             }
-            $role = gdrcd_query("SELECT timer_end, turn_mode, turn_order_idx FROM role_sessions WHERE id_role = $id_role");
+            $role = gdrcd_query("SELECT timer_end, turn_mode, turn_order_idx, audio_video_id, audio_started_at FROM role_sessions WHERE id_role = $id_role");
             $res_order = gdrcd_query("SELECT pg_name FROM quest_turn_order WHERE id_role = $id_role ORDER BY position ASC", 'result');
             $turn_order = [];
             while ($r = gdrcd_query($res_order, 'fetch')) $turn_order[] = $r['pg_name'];
             echo json_encode([
-                'success'       => true,
-                'active'        => true,
-                'id_role'       => (int)$id_role,
-                'timer_end'     => $role['timer_end'] !== null ? (int)$role['timer_end'] : null,
-                'turn_mode'     => $role['turn_mode'] ?? 'liberi',
-                'turn_order'    => $turn_order,
-                'turn_order_idx'=> (int)($role['turn_order_idx'] ?? 0),
+                'success'        => true,
+                'active'         => true,
+                'id_role'        => (int)$id_role,
+                'timer_end'      => $role['timer_end'] !== null ? (int)$role['timer_end'] : null,
+                'turn_mode'      => $role['turn_mode'] ?? 'liberi',
+                'turn_order'     => $turn_order,
+                'turn_order_idx' => (int)($role['turn_order_idx'] ?? 0),
+                'audio_video_id'   => $role['audio_video_id'] ?: null,
+                'audio_started_at' => $role['audio_started_at'] !== null ? (int)$role['audio_started_at'] : null,
             ]);
             break;
 
@@ -2022,6 +2024,31 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             }
             gdrcd_query("UPDATE role_sessions SET turn_order_idx = 0 WHERE id_role = $id_role");
             notifySocketServer('quest:turn_order', 'loc:' . $luogo, ['order' => $order, 'current_idx' => 0]);
+            echo json_encode(['success' => true]);
+            break;
+
+        case 'setQuestAudio':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            ensureQuestSchema();
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+            $video_id = extractYoutubeId(trim($data['url'] ?? ''));
+            if (!$video_id) { echo json_encode(['success' => false, 'message' => 'Link YouTube non valido']); exit; }
+            $started_at = (int)(microtime(true) * 1000);
+            gdrcd_query("UPDATE role_sessions SET audio_video_id = '$video_id', audio_started_at = $started_at WHERE id_role = $id_role");
+            notifySocketServer('quest:audio_set', 'loc:' . $luogo, ['video_id' => $video_id, 'started_at' => $started_at]);
+            echo json_encode(['success' => true, 'video_id' => $video_id, 'started_at' => $started_at]);
+            break;
+
+        case 'stopQuestAudio':
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            ensureQuestSchema();
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+            gdrcd_query("UPDATE role_sessions SET audio_video_id = NULL, audio_started_at = NULL WHERE id_role = $id_role");
+            notifySocketServer('quest:audio_stop', 'loc:' . $luogo, []);
             echo json_encode(['success' => true]);
             break;
 

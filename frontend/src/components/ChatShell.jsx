@@ -366,6 +366,113 @@ function QuestTimerDisplay({ timerEnd, timerExpiredCalledRef }) {
 }
 
 // ---------------------------------------------------------------------------
+// AUDIO QUEST (YouTube) — riproduzione sincronizzata per tutti i giocatori
+// ---------------------------------------------------------------------------
+
+/** Carica l'IFrame API di YouTube una sola volta per pagina. */
+let youtubeApiPromise = null
+function loadYoutubeApi() {
+    if (window.YT && window.YT.Player) return Promise.resolve(window.YT)
+    if (youtubeApiPromise) return youtubeApiPromise
+    youtubeApiPromise = new Promise((resolve) => {
+        const prevCallback = window.onYouTubeIframeAPIReady
+        window.onYouTubeIframeAPIReady = () => { prevCallback?.(); resolve(window.YT) }
+        const tag = document.createElement('script')
+        tag.src = 'https://www.youtube.com/iframe_api'
+        document.head.appendChild(tag)
+    })
+    return youtubeApiPromise
+}
+
+/**
+ * Player YouTube nascosto (solo audio) che riproduce la musica impostata dal
+ * master nel tab Quest. Sincronizzato per tutti tramite startedAt: chi entra
+ * a metà brano fa un seek all'offset corretto. Il div target dell'IFrame API
+ * viene renderizzato una volta sola e mai più toccato da React, perché la
+ * libreria sostituisce quel nodo con l'iframe reale al di fuori di React.
+ * Il player resta vivo tra un brano e l'altro (loadVideoById), così il mute
+ * locale del giocatore non viene perso ai cambi/stop imposti dal master.
+ */
+function QuestAudioWidget({ videoId, startedAt }) {
+    const containerRef = useRef(null)
+    const playerRef = useRef(null)
+    const mutedRef = useRef(localStorage.getItem('ct_quest_audio_muted') === '1')
+    const [muted, setMuted] = useState(mutedRef.current)
+    const [title, setTitle] = useState('')
+
+    useEffect(() => {
+        if (!videoId) {
+            playerRef.current?.stopVideo?.()
+            setTitle('')
+            return
+        }
+
+        let cancelled = false
+        let clickHandler = null
+
+        loadYoutubeApi().then(YT => {
+            if (cancelled) return
+            const offsetSeconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000))
+
+            if (playerRef.current) {
+                playerRef.current.loadVideoById({ videoId, startSeconds: offsetSeconds })
+                return
+            }
+
+            playerRef.current = new YT.Player(containerRef.current, {
+                videoId,
+                width: '1',
+                height: '1',
+                playerVars: { autoplay: 1, start: offsetSeconds, controls: 0, disablekb: 1 },
+                events: {
+                    onReady: (e) => {
+                        if (mutedRef.current) e.target.mute()
+                        e.target.playVideo()
+                        // Fallback se il browser blocca l'autoplay con audio: riprova al primo click sulla pagina
+                        clickHandler = () => e.target.playVideo()
+                        document.addEventListener('click', clickHandler, { once: true })
+                    },
+                    onStateChange: (e) => {
+                        const data = e.target.getVideoData?.()
+                        if (data?.title) setTitle(data.title)
+                    },
+                },
+            })
+        })
+
+        return () => {
+            cancelled = true
+            if (clickHandler) document.removeEventListener('click', clickHandler)
+        }
+    }, [videoId, startedAt])
+
+    function toggleMute() {
+        setMuted(m => {
+            const next = !m
+            mutedRef.current = next
+            localStorage.setItem('ct_quest_audio_muted', next ? '1' : '0')
+            if (playerRef.current) next ? playerRef.current.mute() : playerRef.current.unMute()
+            return next
+        })
+    }
+
+    return (
+        <>
+            <div ref={containerRef} style={{ position: 'fixed', width: 1, height: 1, top: '-100px', left: '-100px', opacity: 0, pointerEvents: 'none' }} />
+            {videoId && (
+                <div className="quest-audio-bar">
+                    <span className="quest-audio-bar__icon">🎵</span>
+                    <span className="quest-audio-bar__title">{title || 'Musica quest in corso'}</span>
+                    <button type="button" className="quest-audio-bar__mute" onClick={toggleMute} title={muted ? 'Riattiva audio' : 'Silenzia'}>
+                        {muted ? '🔇' : '🔊'}
+                    </button>
+                </div>
+            )}
+        </>
+    )
+}
+
+// ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
 
@@ -418,8 +525,8 @@ export default function ChatShell() {
      */
     const [closeTurnPrompt, setCloseTurnPrompt] = useState(null)
 
-    /** Stato quest: timer, modalità turno, ordine turni */
-    const [questState, setQuestState] = useState({ timerEnd: null, turnMode: 'liberi', turnOrder: [], currentIdx: 0 })
+    /** Stato quest: timer, modalità turno, ordine turni, audio in riproduzione */
+    const [questState, setQuestState] = useState({ timerEnd: null, turnMode: 'liberi', turnOrder: [], currentIdx: 0, audioVideoId: null, audioStartedAt: null })
 
     /** Ref per evitare chiamate multiple a timerExpired */
     const timerExpiredCalledRef = useRef(false)
@@ -529,10 +636,12 @@ export default function ChatShell() {
             .then(d => {
                 if (d.success && d.active) {
                     setQuestState({
-                        timerEnd:   d.timer_end ?? null,
-                        turnMode:   d.turn_mode ?? 'liberi',
-                        turnOrder:  d.turn_order ?? [],
-                        currentIdx: d.turn_order_idx ?? 0,
+                        timerEnd:       d.timer_end ?? null,
+                        turnMode:       d.turn_mode ?? 'liberi',
+                        turnOrder:      d.turn_order ?? [],
+                        currentIdx:     d.turn_order_idx ?? 0,
+                        audioVideoId:   d.audio_video_id ?? null,
+                        audioStartedAt: d.audio_started_at ?? null,
                     })
                     timerExpiredCalledRef.current = false
                 }
@@ -551,12 +660,16 @@ export default function ChatShell() {
         const onTurnMode  = (data) => setQuestState(q => ({ ...q, turnMode: data.mode }))
         const onTurnOrder = (data) => setQuestState(q => ({ ...q, turnOrder: data.order, currentIdx: data.current_idx ?? 0 }))
         const onTurnAdv   = (data) => setQuestState(q => ({ ...q, currentIdx: data.current_idx, turnOrder: data.order ?? q.turnOrder }))
+        const onAudioSet  = (data) => setQuestState(q => ({ ...q, audioVideoId: data.video_id, audioStartedAt: data.started_at }))
+        const onAudioStop = ()     => setQuestState(q => ({ ...q, audioVideoId: null, audioStartedAt: null }))
 
         sock.on('quest:timer_set',   onTimerSet)
         sock.on('quest:timer_stop',  onTimerStop)
         sock.on('quest:turn_mode',   onTurnMode)
         sock.on('quest:turn_order',  onTurnOrder)
         sock.on('quest:turn_advance',onTurnAdv)
+        sock.on('quest:audio_set',   onAudioSet)
+        sock.on('quest:audio_stop',  onAudioStop)
 
         return () => {
             sock.off('quest:timer_set',   onTimerSet)
@@ -564,6 +677,8 @@ export default function ChatShell() {
             sock.off('quest:turn_mode',   onTurnMode)
             sock.off('quest:turn_order',  onTurnOrder)
             sock.off('quest:turn_advance',onTurnAdv)
+            sock.off('quest:audio_set',   onAudioSet)
+            sock.off('quest:audio_stop',  onAudioStop)
         }
     }, [shell])
 
@@ -860,6 +975,11 @@ export default function ChatShell() {
                     {questState.timerEnd && (
                         <QuestTimerDisplay timerEnd={questState.timerEnd} timerExpiredCalledRef={timerExpiredCalledRef} />
                     )}
+
+                    {/* ============================================================ */}
+                    {/* AUDIO QUEST — musica YouTube impostata dal master (sync)     */}
+                    {/* ============================================================ */}
+                    <QuestAudioWidget videoId={questState.audioVideoId} startedAt={questState.audioStartedAt} />
 
                     {/* ============================================================ */}
                     {/* FORM INSERIMENTO AZIONE                                      */}

@@ -388,6 +388,9 @@ function QuestPanel({ questState, luogo }) {
     const [pgListLocal, setPgListLocal] = useState([])
     const [localOrder, setLocalOrder]   = useState([])
     const [orderMsg, setOrderMsg]       = useState('')
+    const [audioUrl, setAudioUrl]       = useState('')
+    const [audioSaving, setAudioSaving] = useState(false)
+    const [audioMsg, setAudioMsg]       = useState('')
 
     // Countdown locale
     useEffect(() => {
@@ -472,6 +475,34 @@ function QuestPanel({ questState, luogo }) {
         return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`
     }
 
+    function avviaAudio() {
+        if (!audioUrl.trim()) return
+        setAudioSaving(true)
+        setAudioMsg('')
+        fetch('/pages/api_chat.php?op=setQuestAudio', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: audioUrl.trim() }),
+        })
+            .then(r => r.json())
+            .then(d => {
+                setAudioMsg(d.success ? 'Audio avviato per tutti i giocatori.' : (d.message ?? 'Errore'))
+                if (d.success) setAudioUrl('')
+            })
+            .catch(() => setAudioMsg('Errore di rete'))
+            .finally(() => setAudioSaving(false))
+    }
+
+    function rimuoviAudio() {
+        setAudioSaving(true)
+        setAudioMsg('')
+        fetch('/pages/api_chat.php?op=stopQuestAudio', { method: 'POST' })
+            .then(r => r.json())
+            .then(d => setAudioMsg(d.success ? 'Audio rimosso.' : (d.message ?? 'Errore')))
+            .catch(() => setAudioMsg('Errore di rete'))
+            .finally(() => setAudioSaving(false))
+    }
+
     return (
         <div className="gdr-grid">
             {/* Timer */}
@@ -550,6 +581,36 @@ function QuestPanel({ questState, luogo }) {
                     </>
                 )}
             </div>
+
+            {/* Audio quest */}
+            <div className="gdr-card">
+                <div className="gdr-card-title">Audio Quest</div>
+                {questState.audioVideoId ? (
+                    <p style={{ fontSize: '12px', color: '#8cba8c', marginBottom: '10px' }}>
+                        🎵 In riproduzione per tutti i giocatori.
+                    </p>
+                ) : (
+                    <p style={{ fontSize: '12px', color: '#8f8f8f', marginBottom: '10px' }}>
+                        Nessun audio attivo.
+                    </p>
+                )}
+                <div className="gdr-form-group" style={{ display: 'flex', gap: '8px' }}>
+                    <input className="gdr-input" type="text" placeholder="Link YouTube"
+                        value={audioUrl} onChange={e => setAudioUrl(e.target.value)}
+                        style={{ flex: 1 }} />
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                    <button className="gdr-button" onClick={avviaAudio} disabled={audioSaving || !audioUrl.trim()}>
+                        {questState.audioVideoId ? 'Cambia' : 'Avvia'}
+                    </button>
+                    {questState.audioVideoId && (
+                        <button className="gdr-button" onClick={rimuoviAudio} disabled={audioSaving}>
+                            Rimuovi
+                        </button>
+                    )}
+                </div>
+                {audioMsg && <p style={{ color: '#8cba8c', fontSize: '12px', marginTop: '6px' }}>{audioMsg}</p>}
+            </div>
         </div>
     )
 }
@@ -560,7 +621,7 @@ function QuestPanel({ questState, luogo }) {
  * @param {boolean}  props.isOpen      - Il pannello master è visibile
  * @param {Function} props.onClose     - Callback per chiudere il pannello
  * @param {boolean}  props.showPulisci - Mostra l'icona pulisci chat (solo staff abilitato)
- * @param {object}   props.questState  - Stato quest: timerEnd, turnMode, turnOrder, currentIdx
+ * @param {object}   props.questState  - Stato quest: timerEnd, turnMode, turnOrder, currentIdx, audioVideoId, audioStartedAt
  * @param {number}   props.luogo       - ID stanza corrente
  */
 export default function MasterPanel({ isOpen, onClose, showPulisci, questState, luogo }) {

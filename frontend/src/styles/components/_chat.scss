@@ -2022,6 +2022,42 @@ img.chat_avatar_inline {
     }
 }
 
+// ── Quest audio bar ───────────────────────────────────────────────────────────
+
+.quest-audio-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: rgb(0 0 0 / 20%);
+    border-top: 1px solid #2a2f45;
+    border-bottom: 1px solid #2a2f45;
+    margin-bottom: 4px;
+
+    &__icon {
+        font-size: 14px;
+    }
+
+    &__title {
+        flex: 1;
+        font-size: 12px;
+        color: #b4b6bf;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__mute {
+        background: none;
+        border: 1px solid #3a3f5a;
+        color: #b4b6bf;
+        cursor: pointer;
+        border-radius: 3px;
+        padding: 2px 8px;
+        font-size: 13px;
+    }
+}
+
 // ── Descrizione stanza / abilità (descrizione_chat.php, skill_desc.proc.php) ──
 
 #container {
