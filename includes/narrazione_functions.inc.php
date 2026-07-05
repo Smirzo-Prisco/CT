@@ -2,9 +2,12 @@
 /**
  * narrazione_functions.inc.php — Funzioni condivise per la narrazione IA
  *
- * Genera riassunti delle giocate concluse tramite l'LLM locale (llama.cpp +
- * Qwen2.5-3B, http://127.0.0.1:8090, vedi memoria di progetto
- * "project_local_llm"). Usato sia dall'enqueue automatico in
+ * Genera riassunti delle giocate concluse tramite Claude Haiku (API
+ * Anthropic, stessa chiave/integrazione di Crystal Bot — pages/api_chatbot.php).
+ * L'LLM locale (llama.cpp + Qwen2.5-3B, vedi memoria di progetto
+ * "project_local_llm") resta disponibile sul server ma non è più usato in
+ * questa pipeline: introduceva errori fattuali nell'estrazione che si
+ * propagavano nel risultato finale. Usato sia dall'enqueue automatico in
  * endRoleSession() (includes/chat_functions.inc.php) sia dal worker
  * cron/narrazione_worker.php.
  */
@@ -18,53 +21,19 @@ function narrazione_abilitata_per(string $pg_name): bool {
     return in_array($pg_name, NARRAZIONE_PERSONAGGI_ABILITATI, true);
 }
 
-/** Chiamata HTTP al server llama.cpp locale. Ritorna null in caso di errore. */
-function narrazione_llm_call(string $prompt, int $max_tokens = 300): ?string {
-    $payload = json_encode([
-        'messages'    => [['role' => 'user', 'content' => $prompt]],
-        'max_tokens'  => $max_tokens,
-        // Bassa: per un riassunto fattuale conviene un modello piccolo poco
-        // "creativo" — riduce sia le invenzioni sia gli errori grammaticali
-        // dovuti a un campionamento troppo libero.
-        'temperature' => 0.3,
-    ]);
-    $ch = curl_init('http://127.0.0.1:8090/v1/chat/completions');
-    curl_setopt_array($ch, [
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => $payload,
-        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-        CURLOPT_RETURNTRANSFER => true,
-        // Generoso: l'LLM locale è lento (~1-3 token/sec) e girando in background
-        // non c'è nessuna richiesta HTTP utente in attesa — meglio un timeout
-        // ampio che troncare un riassunto a metà per giocate con molti messaggi.
-        CURLOPT_TIMEOUT        => 1200,
-    ]);
-    $response  = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    if ($response === false || $http_code !== 200) return null;
-
-    $data    = json_decode($response, true);
-    $content = $data['choices'][0]['message']['content'] ?? null;
-    if ($content === null || trim($content) === '') return null;
-
-    // Se il modello è stato interrotto da max_tokens a metà frase, tronchiamo
-    // all'ultimo punto di fine frase per non salvare un riassunto spezzato.
-    if (($data['choices'][0]['finish_reason'] ?? null) === 'length') {
-        $fine_frase = array_filter([strrpos($content, '.'), strrpos($content, '!'), strrpos($content, '?')], fn($p) => $p !== false);
-        if ($fine_frase) $content = substr($content, 0, max($fine_frase) + 1);
-    }
-
-    return $content;
-}
-
 /**
  * Chiamata all'API Anthropic (Claude Haiku), stesso pattern di
- * pages/api_chatbot.php. Usata SOLO per il passo di "reduce" (fusione finale
- * dei mini-riassunti in un unico testo ben scritto) — mai per il "map"
- * (lettura dei blocchi grezzi, che resta sull'LLM locale gratuito): così il
- * volume di testo mandato all'API a pagamento resta piccolo indipendentemente
- * da quanto è lunga la giocata originale. Ritorna null in caso di errore.
+ * pages/api_chatbot.php. Ritorna null in caso di errore.
+ *
+ * Nota storica: in una versione precedente un "passo di map" sull'LLM
+ * locale (llama.cpp) pre-condensava le giocate lunghe prima di questa
+ * chiamata, per contenere i costi. Rimosso il 2026-07-05: il modello
+ * locale (3B, quantizzato) introduceva errori fattuali nell'estrazione
+ * (nomi storpiati, soggetti invertiti) che Claude poi "rifiniva" in bella
+ * prosa senza sapere che erano già sbagliati — un problema di correttezza,
+ * non solo di stile. Il contesto di Claude è ampiamente sufficiente per una
+ * giocata intera in un colpo solo, e il costo resta comunque basso (vedi
+ * memoria di progetto "project_local_llm" per i conti fatti).
  */
 function narrazione_claude_call(string $prompt, int $max_tokens = 300): ?string {
     global $PARAMETERS;
@@ -126,81 +95,39 @@ function narrazione_righe_giocata(int $id_role): array {
 }
 
 /**
- * Divide le righe di una trascrizione in blocchi che stanno nella context
- * window del modello (--ctx-size 4096 in llama-server.service), senza mai
- * spezzare un messaggio a metà.
- */
-function narrazione_suddividi_in_blocchi(array $righe, int $max_chars_blocco = 5000): array {
-    $blocchi   = [];
-    $corrente  = '';
-    foreach ($righe as $riga) {
-        $candidato = $corrente === '' ? $riga : $corrente . "\n" . $riga;
-        if (mb_strlen($candidato) > $max_chars_blocco && $corrente !== '') {
-            $blocchi[]= $corrente;
-            $corrente = $riga;
-        } else {
-            $corrente = $candidato;
-        }
-    }
-    if ($corrente !== '') $blocchi[] = $corrente;
-    return $blocchi;
-}
-
-/**
- * Riassunto finale (2-3 frasi) a partire da una trascrizione (o da una
- * fusione di mini-riassunti) che sta nel contesto. Questo è il passo di
- * "reduce": chiama Claude Haiku (non l'LLM locale) perché richiede qualità
- * linguistica vera — il testo in ingresso qui è già condensato dal passo di
- * "map" locale, quindi il volume (e il costo) resta piccolo.
+ * Riassunto finale (2-3 frasi) a partire dalla trascrizione completa di una
+ * giocata. Chiama Claude Haiku direttamente sul testo grezzo: niente
+ * pre-condensazione locale, per evitare che errori di lettura di un modello
+ * più debole si propaghino nel risultato finale (vedi nota storica sopra).
  */
 function narrazione_riassunto_da_testo(string $testo, string $pg_name): ?string {
     $prompt = "Sei un narratore per un gioco di ruolo testuale ambientato in una città cyberpunk. " .
-        "Di seguito la trascrizione (o un elenco di fatti già estratti) di una scena di gioco di ruolo (giocata) conclusa.\n\n" .
-        "Prima di rispondere, individua internamente: chi è presente nella scena, cosa fa concretamente " .
-        "\"$pg_name\" (azioni, decisioni, eventi che gli accadono) e come si conclude la scena. " .
-        "Basati SOLO su quello che è scritto, senza inventare dettagli assenti.\n\n" .
-        "Poi scrivi un brevissimo riassunto (massimo 2-3 frasi, in italiano, senza markdown, in terza persona) " .
-        "dal punto di vista di \"$pg_name\", riportando solo il riassunto finale (non l'analisi).\n\n" .
-        "Testo:\n$testo";
+        "Di seguito la trascrizione completa di una scena di gioco di ruolo (giocata) conclusa.\n\n" .
+        "Individua chi è presente nella scena, cosa fa concretamente \"$pg_name\" (azioni, decisioni, eventi " .
+        "che gli accadono, chi dice cosa a chi) e come si conclude la scena. " .
+        "Basati SOLO su quello che è scritto, senza inventare dettagli assenti e senza invertire chi fa/dice cosa a chi.\n\n" .
+        "Scrivi un brevissimo riassunto narrativo (massimo 2-3 frasi, in italiano corrente, in terza persona) " .
+        "dal punto di vista di \"$pg_name\".\n\n" .
+        "IMPORTANTE — rispondi SOLO con quel riassunto, nient'altro: " .
+        "niente elenchi puntati, niente titoli o intestazioni markdown (niente \"#\" o \"**\"), " .
+        "niente analisi preliminare o ragionamento esposto, niente \"Riassunto finale:\" o frasi introduttive. " .
+        "Solo il paragrafo finale, pronto per essere pubblicato così com'è.\n\n" .
+        "Trascrizione:\n$testo";
 
     return narrazione_claude_call($prompt, 300);
 }
 
 /**
  * Riassunto breve (2-3 frasi) di una giocata dal punto di vista di un
- * singolo personaggio. Ritorna null se la giocata non ha messaggi o l'LLM
- * non risponde correttamente.
- *
- * Le giocate che stanno in un solo blocco (context window) vengono
- * riassunte con una sola chiamata. Quelle più lunghe vengono prima divise
- * in blocchi e riassunte fattualmente blocco per blocco (map), poi i
- * mini-riassunti vengono fusi in un'unica chiamata finale (reduce): così
- * nessuna parte della giocata viene troncata/ignorata, a costo di qualche
- * chiamata in più all'LLM per le giocate lunghe.
+ * singolo personaggio, a partire dalla trascrizione completa (nessun
+ * pre-condensamento). Ritorna null se la giocata non ha messaggi o la
+ * chiamata a Claude non va a buon fine.
  */
 function narrazione_riassunto_giocata(int $id_role, string $pg_name): ?string {
     $righe = narrazione_righe_giocata($id_role);
     if (!$righe) return null;
 
-    $blocchi = narrazione_suddividi_in_blocchi($righe);
-
-    if (count($blocchi) === 1) {
-        return narrazione_riassunto_da_testo($blocchi[0], $pg_name);
-    }
-
-    $mini_riassunti = [];
-    foreach ($blocchi as $i => $blocco) {
-        $prompt = "Sei un narratore per un gioco di ruolo testuale ambientato in una città cyberpunk. " .
-            "Di seguito la parte " . ($i + 1) . " di " . count($blocchi) . " della trascrizione di una scena di gioco di ruolo (le altre parti seguono/precedono cronologicamente). " .
-            "Elenca in modo sintetico e fattuale (poche righe, senza markdown, in italiano) solo ciò che succede in questa parte " .
-            "riguardo al personaggio \"$pg_name\": azioni, decisioni, eventi. Basati SOLO su questo testo, senza inventare nulla.\n\n" .
-            "Trascrizione (parte " . ($i + 1) . "):\n$blocco";
-        $mini = narrazione_llm_call($prompt, 150);
-        if ($mini !== null) $mini_riassunti[] = trim($mini);
-    }
-    if (!$mini_riassunti) return null;
-
-    return narrazione_riassunto_da_testo(implode("\n", $mini_riassunti), $pg_name);
+    return narrazione_riassunto_da_testo(implode("\n", $righe), $pg_name);
 }
 
 /**
