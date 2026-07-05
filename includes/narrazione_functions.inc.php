@@ -59,6 +59,59 @@ function narrazione_llm_call(string $prompt, int $max_tokens = 300): ?string {
 }
 
 /**
+ * Chiamata all'API Anthropic (Claude Haiku), stesso pattern di
+ * pages/api_chatbot.php. Usata SOLO per il passo di "reduce" (fusione finale
+ * dei mini-riassunti in un unico testo ben scritto) — mai per il "map"
+ * (lettura dei blocchi grezzi, che resta sull'LLM locale gratuito): così il
+ * volume di testo mandato all'API a pagamento resta piccolo indipendentemente
+ * da quanto è lunga la giocata originale. Ritorna null in caso di errore.
+ */
+function narrazione_claude_call(string $prompt, int $max_tokens = 300): ?string {
+    global $PARAMETERS;
+    $api_key = $PARAMETERS['anthropic']['api_key'] ?? '';
+    if (empty($api_key)) {
+        error_log('[narrazione] api_key Anthropic non configurata in config.inc.php');
+        return null;
+    }
+
+    $payload = json_encode([
+        'model'      => 'claude-haiku-4-5-20251001',
+        'max_tokens' => $max_tokens,
+        'messages'   => [['role' => 'user', 'content' => $prompt]],
+    ]);
+    $ch = curl_init('https://api.anthropic.com/v1/messages');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_HTTPHEADER     => [
+            'x-api-key: ' . $api_key,
+            'anthropic-version: 2023-06-01',
+            'content-type: application/json',
+        ],
+        CURLOPT_TIMEOUT        => 30,
+    ]);
+    $response = curl_exec($ch);
+    $http_code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_err  = curl_error($ch);
+    curl_close($ch);
+
+    if ($curl_err || $http_code !== 200) {
+        error_log("[narrazione] Anthropic API errore (HTTP $http_code): $curl_err $response");
+        return null;
+    }
+
+    $data     = json_decode($response, true);
+    $risposta = $data['content'][0]['text'] ?? null;
+    if ($risposta === null || trim($risposta) === '') return null;
+
+    $tokens_tot = (int)($data['usage']['input_tokens'] ?? 0) + (int)($data['usage']['output_tokens'] ?? 0);
+    error_log("[narrazione] chiamata Claude Haiku: $tokens_tot token totali");
+
+    return $risposta;
+}
+
+/**
  * Trascrizione COMPLETA di una giocata (una riga per messaggio, ordine
  * cronologico), senza alcun troncamento.
  */
@@ -93,7 +146,13 @@ function narrazione_suddividi_in_blocchi(array $righe, int $max_chars_blocco = 5
     return $blocchi;
 }
 
-/** Riassunto finale (2-3 frasi) a partire da una trascrizione (o da una fusione di mini-riassunti) che sta nel contesto. */
+/**
+ * Riassunto finale (2-3 frasi) a partire da una trascrizione (o da una
+ * fusione di mini-riassunti) che sta nel contesto. Questo è il passo di
+ * "reduce": chiama Claude Haiku (non l'LLM locale) perché richiede qualità
+ * linguistica vera — il testo in ingresso qui è già condensato dal passo di
+ * "map" locale, quindi il volume (e il costo) resta piccolo.
+ */
 function narrazione_riassunto_da_testo(string $testo, string $pg_name): ?string {
     $prompt = "Sei un narratore per un gioco di ruolo testuale ambientato in una città cyberpunk. " .
         "Di seguito la trascrizione (o un elenco di fatti già estratti) di una scena di gioco di ruolo (giocata) conclusa.\n\n" .
@@ -104,7 +163,7 @@ function narrazione_riassunto_da_testo(string $testo, string $pg_name): ?string 
         "dal punto di vista di \"$pg_name\", riportando solo il riassunto finale (non l'analisi).\n\n" .
         "Testo:\n$testo";
 
-    return narrazione_llm_call($prompt, 300);
+    return narrazione_claude_call($prompt, 300);
 }
 
 /**
