@@ -20,7 +20,6 @@ register_shutdown_function(function () {
 
 require_once(__DIR__ . '/../includes/required.php');
 require_once(__DIR__ . '/../includes/custom_functions.inc.php');
-require_once(__DIR__ . '/../includes/narrazione_functions.inc.php');
 $handleDBConnection = gdrcd_connect();
 
 if (empty($_SESSION['login'])) {
@@ -114,10 +113,6 @@ switch ($op) {
             'is_staff'      => $is_staff,
             'is_admin'      => $is_admin,
             'is_master'     => $is_master,
-            // Narrazione IA (rigenerazione completa di "descrizione" via LLM locale,
-            // vedi memoria di progetto "project_local_llm" — solo per is_own)
-            'narrazione_disponibile' => narrazione_abilitata_per($pg),
-            'narrazione_pendente'    => $is_own && narrazione_richiesta_pendente($pg),
             // Anagrafica
             'nome'          => $pg_data['nome'],
             'cognome'       => $pg_data['cognome'],
@@ -183,36 +178,6 @@ switch ($op) {
         }
 
         echo json_encode($profile);
-        break;
-
-    // -------------------------------------------------------------------------
-    // NARRAZIONE_RICHIEDI — richiede la rigenerazione completa di "descrizione"
-    // via LLM locale a partire dalle giocate concluse del personaggio (POST,
-    // solo proprio pg). Sovrascrive tutto il testo attuale — richiede
-    // approvazione admin prima di essere effettivamente elaborata.
-    // -------------------------------------------------------------------------
-    case 'narrazione_richiedi':
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode(['success' => false, 'message' => 'Metodo non consentito']);
-            exit;
-        }
-        if (!$is_own) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Non autorizzato']);
-            exit;
-        }
-        if (!narrazione_abilitata_per($pg)) {
-            echo json_encode(['success' => false, 'message' => 'Funzione non ancora disponibile per questo personaggio']);
-            exit;
-        }
-        if (narrazione_richiesta_pendente($pg)) {
-            echo json_encode(['success' => false, 'message' => 'Hai già una richiesta in corso']);
-            exit;
-        }
-        $pg_esc = gdrcd_filter('in', $pg);
-        gdrcd_query("INSERT INTO narrazione_richieste (pg_name) VALUES ('$pg_esc')");
-        echo json_encode(['success' => true, 'message' => 'Richiesta inviata. Un admin la esaminerà a breve.']);
         break;
 
     // -------------------------------------------------------------------------
