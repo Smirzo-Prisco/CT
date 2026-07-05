@@ -21,8 +21,12 @@ function narrazione_abilitata_per(string $pg_name): bool {
 /** Chiamata HTTP al server llama.cpp locale. Ritorna null in caso di errore. */
 function narrazione_llm_call(string $prompt, int $max_tokens = 300): ?string {
     $payload = json_encode([
-        'messages'   => [['role' => 'user', 'content' => $prompt]],
-        'max_tokens' => $max_tokens,
+        'messages'    => [['role' => 'user', 'content' => $prompt]],
+        'max_tokens'  => $max_tokens,
+        // Bassa: per un riassunto fattuale conviene un modello piccolo poco
+        // "creativo" — riduce sia le invenzioni sia gli errori grammaticali
+        // dovuti a un campionamento troppo libero.
+        'temperature' => 0.3,
     ]);
     $ch = curl_init('http://127.0.0.1:8090/v1/chat/completions');
     curl_setopt_array($ch, [
@@ -83,9 +87,12 @@ function narrazione_riassunto_giocata(int $id_role, string $pg_name): ?string {
     if (trim($trascrizione) === '') return null;
 
     $prompt = "Sei un narratore per un gioco di ruolo testuale ambientato in una città cyberpunk. " .
-        "Di seguito la trascrizione di una scena di gioco di ruolo (giocata) conclusa. " .
-        "Scrivi un brevissimo riassunto (massimo 2-3 frasi, in italiano, senza markdown, in terza persona) " .
-        "dal punto di vista del personaggio \"$pg_name\": cosa gli è successo o cosa ha fatto in questa scena.\n\n" .
+        "Di seguito la trascrizione di una scena di gioco di ruolo (giocata) conclusa.\n\n" .
+        "Prima di rispondere, individua internamente: chi è presente nella scena, cosa fa concretamente " .
+        "\"$pg_name\" (azioni, decisioni, eventi che gli accadono) e come si conclude la scena. " .
+        "Basati SOLO su quello che è scritto nella trascrizione, senza inventare dettagli assenti.\n\n" .
+        "Poi scrivi un brevissimo riassunto (massimo 2-3 frasi, in italiano, senza markdown, in terza persona) " .
+        "dal punto di vista di \"$pg_name\", riportando solo il riassunto finale (non l'analisi).\n\n" .
         "Trascrizione:\n$trascrizione";
 
     return narrazione_llm_call($prompt, 300);
