@@ -127,9 +127,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $car = 'generica';
                     $dado_raw_generica = mt_rand(1, 20);
                     $tot_stats_generica = getTotStatsPg($login);
-                    $bonus_stats = getBonusPercentualeAbilita($tot_stats_generica);
+                    $bonus_stats = getBonusAbilita($tot_stats_generica);
                     $dice = applicaBonusAbilita($dado_raw_generica, $tot_stats_generica);
-                    $tiro = " con un tiro totale di $dado_raw_generica + stats {$bonus_stats}% = $dice/20";
+                    $tiro = " con un tiro totale di $dado_raw_generica + stats {$bonus_stats} = $dice/20";
                     break;
                 case 'Difensiva':
                     $car = 'difesa';
@@ -651,9 +651,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
                 if ($bonus_abilita) {
                     $tot_stats_dado = getTotStatsPg($login);
-                    $bonus_stats_dado = getBonusPercentualeAbilita($tot_stats_dado);
+                    $bonus_stats_dado = getBonusAbilita($tot_stats_dado);
                     $num_finale = applicaBonusAbilita($num, $tot_stats_dado);
-                    $messaggio = "$login esegue un tiro totale di $num + stats {$bonus_stats_dado}% = $num_finale/$dado_selezionato";
+                    $messaggio = "$login esegue un tiro totale di $num + stats {$bonus_stats_dado} = $num_finale/$dado_selezionato";
                 } else {
                     $messaggio = "$login esegue un tiro totale di $num/$dado_selezionato";
                 }
