@@ -31,15 +31,27 @@ import ChatHelp from './ChatHelp'
 // ---------------------------------------------------------------------------
 
 /**
+ * Aggiunge ?v=<mtime> (da window.CT_ASSET_VERSIONS, iniettato in header.inc.php)
+ * per far capire al browser che il file è cambiato: nginx mette in cache questi
+ * script per 1 anno assumendo URL versionati, altrimenti gli aggiornamenti non
+ * arrivano mai ai client con la cache calda.
+ */
+function versionedSrc(src) {
+    const version = window.CT_ASSET_VERSIONS?.[src.split('/').pop()]
+    return version ? `${src}?v=${version}` : src
+}
+
+/**
  * Carica uno script nel DOM solo se non è già presente (src check).
  * Resolve immediatamente se già caricato, altrimenti attende onload.
  * Usato per chat.js e role_session.js — vanno caricati DOPO il mount.
  */
 function loadScriptOnce(src) {
     return new Promise((resolve) => {
-        if (document.querySelector(`script[src="${src}"]`)) { resolve(); return }
+        const finalSrc = versionedSrc(src)
+        if (document.querySelector(`script[src="${finalSrc}"]`)) { resolve(); return }
         const s = document.createElement('script')
-        s.src = src
+        s.src = finalSrc
         s.onload = resolve
         s.onerror = resolve   // non blocca il flusso in caso di errore
         document.body.appendChild(s)

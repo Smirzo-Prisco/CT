@@ -165,6 +165,23 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         };
         window.ctSocket = null;
         </script>
+
+        <!-- CT_ASSET_VERSIONS: mtime dei file includes/*.js caricati dinamicamente da React
+             (chat.js, role_session.js, ecc.) — nginx li mette in cache 1 anno assumendo
+             URL versionati con ?v=; senza questo, il browser non vede mai gli aggiornamenti. -->
+        <script>
+        window.CT_ASSET_VERSIONS = {
+            <?php
+            $assetFiles = ['chat.js', 'role_session.js', 'incremento_parametri.js', 'mercato_abilita.js'];
+            $assetVersions = [];
+            foreach ($assetFiles as $assetFile) {
+                $assetPath = __DIR__ . '/includes/' . $assetFile;
+                $assetVersions[] = json_encode($assetFile) . ': ' . (file_exists($assetPath) ? filemtime($assetPath) : 0);
+            }
+            echo implode(",\n            ", $assetVersions);
+            ?>
+        };
+        </script>
         <?php endif; ?>
 
         <!-- Bundle React — solo per utenti autenticati; type="module" è sempre deferred -->

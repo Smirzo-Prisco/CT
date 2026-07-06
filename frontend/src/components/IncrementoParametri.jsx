@@ -11,13 +11,25 @@
 
 import { useEffect } from 'react'
 
+/**
+ * Aggiunge ?v=<mtime> (da window.CT_ASSET_VERSIONS, iniettato in header.inc.php)
+ * per far capire al browser che il file è cambiato: nginx mette in cache questi
+ * script per 1 anno assumendo URL versionati, altrimenti gli aggiornamenti non
+ * arrivano mai ai client con la cache calda.
+ */
+function versionedSrc(src) {
+    const version = window.CT_ASSET_VERSIONS?.[src.split('/').pop()]
+    return version ? `${src}?v=${version}` : src
+}
+
 /** Carica uno script nel DOM; se già presente lo rimuove e ricarica per rieseguirlo. */
 function loadScriptOnce(src) {
     return new Promise((resolve) => {
-        const existing = document.querySelector(`script[src="${src}"]`)
+        const finalSrc = versionedSrc(src)
+        const existing = document.querySelector(`script[src="${finalSrc}"]`)
         if (existing) existing.remove()
         const s  = document.createElement('script')
-        s.src    = src
+        s.src    = finalSrc
         s.onload = resolve
         s.onerror = resolve
         document.body.appendChild(s)
