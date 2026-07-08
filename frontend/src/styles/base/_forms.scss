@@ -206,6 +206,17 @@ input[type='number'] {
     }
 }
 
+// Data/ora: color-scheme dice al browser di usare i controlli nativi (icona
+// calendario/orologio, popup calendario) in versione chiara — altrimenti
+// l'icona resta nera e sparisce sullo sfondo scurissimo del tema.
+input[type='date'],
+input[type='time'],
+input[type='datetime-local'],
+input[type='month'],
+input[type='week'] {
+    color-scheme: dark;
+}
+
 ::placeholder {
     color: rgb(from #{$color-text-muted} r g b / 0.5);
 }
