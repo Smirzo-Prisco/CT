@@ -13,17 +13,18 @@
 
 // ── customTable — condiviso tra famiglie.css e mestieri.css ────────────────────
 // Tabella legacy usata in ~40 pagine PHP (gestione, oggetti, schede, uffici).
-// color è sul TABLE (non su td/th) così ogni route CSS può sovrascriverla
-// caricando il proprio CSS dopo ct-styles.css (AppRouter inject).
+// Il colore/font legacy (arancione #ce846f, DejaVu Serif) veniva sovrascritto
+// identico in ogni route che la usa (_scheda.scss, _messaggi.scss...): portato
+// qui come default, niente più override sparsi da tenere allineati.
 // NB: border-top su td/th era sintassi invalida nell'originale → ignorata dal browser
 //     → non aggiungere border-top qui per mantenere compatibilità visiva.
 table.customTable {
     background-color: #181c31;
     border-collapse: collapse;
     border: 1px solid #000;
-    color: #ce846f;
+    color: $palette-text;
     font-size: 12px;
-    font-family: "DejaVu Serif";
+    font-family: $font-base;
     filter: drop-shadow(0 0 5px rgba(0,0,0,0.57));
 }
 
@@ -31,7 +32,7 @@ table.customTable td,
 table.customTable th {
     padding: 5px;
     font-size: 12px;
-    font-family: "DejaVu Serif";
+    font-family: $font-base;
 }
 
 table.customTable thead {

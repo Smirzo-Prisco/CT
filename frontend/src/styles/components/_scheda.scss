@@ -28,19 +28,9 @@ div.pagina_scheda {
 
     div.form_info { color: $color-text; }
 
-    // ── Tabella form modifica ─────────────────────────────────
-    // Override colori legacy: customTable usa #ce846f (arancione) e DejaVu Serif di default.
-    // Nelle schede usiamo palette e font del progetto.
-    table.customTable {
-        width: 100%;
-        color: $palette-text;
-        font-family: $font-base;
-    }
-
-    table.customTable td,
-    table.customTable th {
-        font-family: $font-base;
-    }
+    // Colore/font di customTable sono ora il default globale (_tables.scss):
+    // qui resta solo la larghezza, specifica di questo layout.
+    table.customTable { width: 100%; }
 
     .titoli_elenco  { color: $palette-text-title; }
     .elementi_elenco { color: $palette-text; }
@@ -691,20 +681,6 @@ span[style*="position:relative"]:hover .tooltip-animated {
     }
 }
 
-// ── Servizi gilde (pagina_servizi_gilde) ──────────────────────
-
-div.pagina_servizi_gilde {
-    table.customTable {
-        color: $palette-text;
-        font-family: $font-base;
-    }
-
-    table.customTable td,
-    table.customTable th {
-        font-family: $font-base;
-    }
-}
-
 // Banner "Ambientazione & Regolamento" — voce principale della pagina servizi gilde
 a.servizi-gilde-banner {
     display: block;
@@ -740,33 +716,8 @@ a.servizi-gilde-banner {
 // Questo wrapper non è figlio di pagina_scheda, override separato.
 
 div.pagina_scheda_oggetti {
-    table.customTable {
-        color: $palette-text;
-        font-family: $font-base;
-    }
-
-    table.customTable td,
-    table.customTable th {
-        font-family: $font-base;
-    }
-
     .titoli_elenco  { color: $palette-text-title; }
     .elementi_elenco { color: $palette-text; }
-}
-
-// ── Elenco staff ───────────────────────────────────────────────
-// Wrapper div.elenco-staff-page aggiunto in ElencoStaff.jsx.
-
-.elenco-staff-page {
-    table.customTable {
-        color: $palette-text;
-        font-family: $font-base;
-    }
-
-    table.customTable td,
-    table.customTable th {
-        font-family: $font-base;
-    }
 }
 
 // ── scheda_modifica: barra azioni sticky ─────────────────────
