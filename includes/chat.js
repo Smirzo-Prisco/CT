@@ -692,59 +692,16 @@ window.initChatListeners = function () {
     var chat_form = document.getElementById("chat_form_messages");
     if (chat_form) chat_form.onsubmit = function (event) { event.preventDefault(); sendChatMessage(); };
 
-    // Apertura funestra di scrittura libera
+    // Apertura finestra di scrittura libera.
+    // Prima si usava window.open("", ...) + document.write() per iniettare l'HTML in una
+    // finestra vuota: pattern fragile, spesso bloccato/svuotato da estensioni anti-popup
+    // (è lo stesso schema usato dai popup pubblicitari invasivi) e da document.write, ormai
+    // deprecato. Ora si naviga direttamente verso una pagina statica reale.
     var btn_scritturaLibera = document.getElementById("gdrOpenTextareaButton");
     if (btn_scritturaLibera) {
         btn_scritturaLibera.onclick = function (e) {
             e.preventDefault();
-            var popupFreeWrite = window.open("", "ScritturaLiberaPopup", "width=600,height=800,resizable=yes,scrollbars=yes");
-
-            popupFreeWrite.document.write(
-                '<!DOCTYPE html>' +
-                '<html lang="it">' +
-                '<head>' +
-                '<title>Scrittura Libera</title>' +
-                '<style>' +
-                'body {' +
-                'font-family: Arial, sans-serif;' +
-                'margin: 0;' +
-                'padding: 20px;' +
-                'background-color: #1a2240;' +
-                'color: #b4b6bf;' +
-                'height: 100vh;' +
-                '}' +
-                'textarea {' +
-                'width: 100%;' +
-                'height: 90vh;' +
-                'padding: 10px;' +
-                'border: 1px solid #070a1b;' +
-                'background-color: #161827;' +
-                'color: white;' +
-                'resize: none;' +
-                'font-size: 14px;' +
-                'box-sizing: border-box;' +
-                '}' +
-                'h3 {' +
-                'margin-top: 0;' +
-                '}' +
-                '</style>' +
-                '</head>' +
-                '<body>' +
-                '<h3>Scrittura Libera</h3>' +
-                '<textarea id="message" placeholder="Scrivi qui..." name="message"></textarea><br>' +
-                '<span class="char_count">Hai usato <span id="rimanenti">0</span> caratteri</span>' +
-                '</body>' +
-                '</html>'
-            );
-
-            // Attendi che il popup sia completamente caricato
-            popupFreeWrite.document.close();
-
-            // Funzione per il conteggio dei caratteri nel popup
-            popupFreeWrite.document.getElementById('message').onkeyup = function () {
-                var textLength = popupFreeWrite.document.getElementById('message').value.length;
-                popupFreeWrite.document.getElementById('rimanenti').textContent = textLength;
-            }
+            window.open("/themes/crystal/scrittura_libera.html", "ScritturaLiberaPopup", "width=600,height=800,resizable=yes,scrollbars=yes");
         }
     }
 

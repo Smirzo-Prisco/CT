@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Scrittura Libera</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #1a2240;
+    color: #b4b6bf;
+    height: 100vh;
+    box-sizing: border-box;
+}
+textarea {
+    width: 100%;
+    height: 90vh;
+    padding: 10px;
+    border: 1px solid #070a1b;
+    background-color: #161827;
+    color: white;
+    resize: none;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+h3 {
+    margin-top: 0;
+}
+</style>
+</head>
+<body>
+<h3>Scrittura Libera</h3>
+<textarea id="message" placeholder="Scrivi qui..." name="message"></textarea><br>
+<span class="char_count">Hai usato <span id="rimanenti">0</span> caratteri</span>
+<script>
+document.getElementById('message').onkeyup = function () {
+    document.getElementById('rimanenti').textContent = this.value.length;
+};
+</script>
+</body>
+</html>
