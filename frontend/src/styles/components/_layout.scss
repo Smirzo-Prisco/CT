@@ -376,9 +376,31 @@ img.immagine_pg {
     text-align: center;
     margin-bottom: -25px;
 
+    a {
+        position: relative;
+        display: inline-block;
+    }
+
     img {
         width: 80%;
         height: auto;
+        display: block;
+    }
+
+    .presenti_badge {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 3px;
+        border-radius: $radius-full;
+        background: $palette-blue-dark;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 18px;
+        text-align: center;
     }
 }
 

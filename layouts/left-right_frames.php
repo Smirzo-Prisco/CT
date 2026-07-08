@@ -17,11 +17,7 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 <div id="framecontentLeft">
     <div id="info-location-container"></div>
     <!-- <div id="link-menu-container"></div> -->
-    <div class="presenti_button">
-        <a href="main.php?page=presenti_estesi">
-            <img src="themes/crystal/imgs/menu/presenti.png" alt="Presenti" />
-        </a>
-    </div>
+    <div id="presenti-button-container"></div>
     <div id="online-users-container"></div>
     <div id="chattina-off-container"></div>
 </div>

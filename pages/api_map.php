@@ -388,6 +388,28 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // PRESENTI_TOTALE — solo il conteggio globale online, senza side-effect
+    // (a differenza di 'presenti' non aggiorna ultimo_refresh/disponibile: usata
+    // dal badge sull'icona "Presenti" nel menu, che non deve alterare lo stato
+    // di presenza dell'utente ad ogni evento users:update).
+    // -------------------------------------------------------------------------
+    case 'presenti_totale':
+        $tot = gdrcd_query(
+            "SELECT COUNT(*) AS n
+             FROM personaggio p
+             LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
+             WHERE p.ora_entrata > p.ora_uscita
+               AND (
+                 (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
+                 OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
+               )
+               AND p.is_invisible = 0"
+        );
+
+        echo json_encode(['success' => true, 'total_online' => (int)$tot['n']]);
+        break;
+
+    // -------------------------------------------------------------------------
     // PRESENTI_ESTESI — lista completa di tutti gli utenti online, raggruppati
     // per mappa e stanza, con avatar, razza, famiglia/inclinazione, mestiere e
     // cariche staff. Usata dalla pagina main.php?page=presenti_estesi.

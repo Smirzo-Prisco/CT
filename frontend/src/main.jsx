@@ -48,6 +48,7 @@ import { initSocket } from './socket'
 
 // Importazione di tutti i componenti registrati
 import OnlineUsers     from './components/OnlineUsers'
+import PresentiBadge   from './components/PresentiBadge'
 import ChatViewer      from './components/ChatViewer'
 import TargetSelector  from './components/TargetSelector'
 import PresentiEstesi  from './components/PresentiEstesi'
@@ -122,6 +123,7 @@ window.CT = {
 
 /** Box utenti online nella colonna laterale — si aggiorna via socket users:update */
 window.CT.register('OnlineUsers', OnlineUsers)
+window.CT.register('PresentiBadge', PresentiBadge)
 
 /** Visualizzatore messaggi chat di gioco — si aggiorna via socket chat:update */
 window.CT.register('ChatViewer', ChatViewer)
