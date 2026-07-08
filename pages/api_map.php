@@ -388,22 +388,35 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
-    // PRESENTI_TOTALE — solo il conteggio globale online, senza side-effect
-    // (a differenza di 'presenti' non aggiorna ultimo_refresh/disponibile: usata
-    // dal badge sull'icona "Presenti" nel menu, che non deve alterare lo stato
-    // di presenza dell'utente ad ogni evento users:update).
+    // PRESENTI_TOTALE — stesso conteggio di 'presenti_estesi' (identica condizione
+    // online + esclusioni + visibilità invisibili) ma con una semplice COUNT senza
+    // i JOIN pesanti, e senza il side-effect di 'presenti' (che aggiorna
+    // ultimo_refresh/disponibile ad ogni chiamata: usata dal badge sull'icona
+    // "Presenti" nel menu, che si aggiorna spesso e non deve alterare lo stato
+    // di presenza dell'utente che lo visualizza).
     // -------------------------------------------------------------------------
     case 'presenti_totale':
+        $login    = $_SESSION['login'];
+        $is_staff = ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1 || $_SESSION['master'] == 1);
+
+        if ($login === 'Mino' || $login === 'Lii') {
+            $exclude = '';
+        } elseif ($login === 'Jamal' || $login === 'Alice') {
+            $exclude = "AND p.nome NOT IN ('Megan', 'Niklaus')";
+        } else {
+            $exclude = "AND p.nome != 'Mino'";
+        }
+
+        $condizione_online = gdrcd_condizione_online();
+        $invisible_filter  = $is_staff ? '' : 'AND p.is_invisible = 0';
+
         $tot = gdrcd_query(
             "SELECT COUNT(*) AS n
              FROM personaggio p
              LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
-             WHERE p.ora_entrata > p.ora_uscita
-               AND (
-                 (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
-                 OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
-               )
-               AND p.is_invisible = 0"
+             WHERE $condizione_online
+               $exclude
+               $invisible_filter"
         );
 
         echo json_encode(['success' => true, 'total_online' => (int)$tot['n']]);
