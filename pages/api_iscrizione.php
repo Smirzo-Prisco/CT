@@ -135,8 +135,12 @@ if ($op === 'options') {
         gdrcd_query("INSERT INTO clgpersonaggiomestiere (personaggio, id_ruolo) VALUES ('" . $nome . "', " . $mestiere_id . ")");
     }
 
-    // DM di notifica a tutti gli admin — nuovo personaggio iscritto
-    $testo_dm   = gdrcd_filter('in', 'Nuovo personaggio iscritto il ' . date('d/m/Y') . ' alle ' . date('H:i') . ': ' . $nome);
+    // DM di notifica a tutti gli admin — nuovo personaggio iscritto.
+    // Il nome è un link cliccabile verso messages_center (compose diretto verso il pg,
+    // vedi MessagesInbox.jsx che gestisce ?to=NOME) — testo/dangerouslySetInnerHTML,
+    // per questo il nome visibile va comunque escapato con htmlspecialchars.
+    $nome_link  = '<a href="main.php?page=messages_center&to=' . urlencode($nome) . '">' . htmlspecialchars($nome, ENT_QUOTES, 'UTF-8') . '</a>';
+    $testo_dm   = gdrcd_filter('in', 'Nuovo personaggio iscritto il ' . date('d/m/Y') . ' alle ' . date('H:i') . ': ' . $nome_link);
     $admin_list = gdrcd_query("SELECT nome FROM privilegi WHERE admin = 1", 'result');
     while ($admin_row = gdrcd_query($admin_list, 'fetch')) {
         send_sms('System', $admin_row['nome'], '', $testo_dm, 0);
