@@ -3,7 +3,27 @@
 // ============================================================
 @use '../tokens' as *;
 
-div.pagina_messages_center {}
+// Wrapper riusato anche da agenda_center.inc.php (form "Prenotazioni Role").
+// customTable/.ares hanno un colore arancione (#ce846f) di default pensato
+// per altri contesti (link .ares, tabelle gilda) — qui invece sono usati su
+// una tabella di layout e sui controlli del form, quindi li riportiamo alla
+// palette del progetto, stesso pattern di _scheda.scss.
+div.pagina_messages_center {
+    table.customTable {
+        color: $palette-text;
+        font-family: $font-base;
+    }
+
+    table.customTable td,
+    table.customTable th {
+        font-family: $font-base;
+    }
+
+    input.ares,
+    select.ares {
+        color: $color-text;
+    }
+}
 
 div.pagina_messages_center div.elementi_elenco { height: 40px; }
 
