@@ -377,22 +377,27 @@ img.immagine_pg {
     margin-bottom: -25px;
 
     a {
-        // Niente display:inline-block: romperebbe il calcolo di width:80% sull'img
-        // (il suo containing block per le percentuali resta .presenti_button solo
-        // se l'ancora rimane inline). position:relative su un elemento inline è
-        // comunque sufficiente come riferimento per il badge assoluto.
+        // La percentuale (80%, ex-sull'img) si sposta qui: su un blocco vero,
+        // con altezza pari a quella dell'immagine (unico contenuto), l'assoluto
+        // del badge si posiziona in modo prevedibile. Su un'ancora inline
+        // l'altezza usata come riferimento per "top" non coincideva con quella
+        // dell'immagine (da cui il salto "sopra l'immagine" / "sotto l'immagine").
         position: relative;
+        display: block;
+        width: 80%;
+        margin: 0 auto;
     }
 
     img {
-        width: 80%;
+        width: 100%;
         height: auto;
+        display: block;
     }
 
     .presenti_badge {
         position: absolute;
         top: 2px;
-        right: 20px;
+        right: 28px;
         min-width: 18px;
         height: 18px;
         padding: 0 3px;
