@@ -262,7 +262,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'partecipanti' => getRolePgs($row['id_role'], false),
                     'inCorso'      => $row['end'] === null,
                     'isQuest'      => !empty($row['is_quest']),
-                    'questRecapThreadId' => $row['quest_recap_thread_id'] !== null ? (int)$row['quest_recap_thread_id'] : null,
+                    // >0 esclude sia NULL (mai generato) sia il valore sentinella -1 usato
+                    // brevemente da saveQuestRecap per "prenotare" la generazione.
+                    'questRecapThreadId' => ((int)($row['quest_recap_thread_id'] ?? 0)) > 0 ? (int)$row['quest_recap_thread_id'] : null,
                     'questRecapTitolo'   => $row['quest_titolo'] ?? '',
                     'icona'        => 'fas fa-globe',
                     'my_shin'      => 'none',
@@ -301,6 +303,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             ]);
             break;
         case 'flagRole':  // Toggle richiesta shin su una giocata
+            ensureQuestSchema();
             $login_f = gdrcd_filter('in', $_SESSION['login']);
             $id_role = isset($data['id_role']) ? (int)$data['id_role'] : 0;
             if (!$id_role) { echo json_encode(['success' => false, 'message' => 'ID mancante']); break; }
@@ -309,9 +312,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             if (!$part) { echo json_encode(['success' => false, 'message' => 'Non hai partecipato a questa giocata']); break; }
 
             // Le quest non passano dal flag/award manuale: lo shin, se previsto, lo assegna
-            // direttamente lo staff con altri strumenti.
-            $is_quest_row = gdrcd_query("SELECT is_quest FROM role_sessions WHERE id_role = $id_role");
-            if ($is_quest_row && !empty($is_quest_row['is_quest'])) {
+            // direttamente lo staff con altri strumenti. is_quest=1 blocca la richiesta anche
+            // se il resoconto non è ancora stato generato (quest_recap_thread_id ancora NULL).
+            if (getQuestRoleRow($id_role) !== null) {
                 echo json_encode(['success' => false, 'message' => 'Le giocate Quest non prevedono la richiesta shin']); break;
             }
 
@@ -346,7 +349,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 // Registra l'assegnazione in Punti (stesso pattern di awardExperience()): senza
                 // questo insert lo shin aggiornava solo il totale su personaggio, ma non compariva
                 // mai nello storico di scheda_px/scheda_px_shin, che legge solo dalla tabella Punti.
-                $nome_luogo = gdrcd_query("SELECT mappa.nome FROM role_sessions rs JOIN mappa ON mappa.id = rs.location WHERE rs.id_role = $rid")['nome'] ?? '';
+                $nome_luogo = getRoleLocationName($rid);
                 $resoconto  = 'Shin per la giocata' . ($nome_luogo !== '' ? " - $nome_luogo" : '');
                 gdrcd_query("INSERT INTO Punti (nome, shin, data_evento, commento) VALUES ('$pg', '1', NOW(), '" . gdrcd_filter('in', $resoconto) . "')");
 
@@ -436,32 +439,37 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
         case 'getQuestRecapData':  // Staff: dati precompilati per la modale "Assegna punti quest"
             if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); break; }
+            ensureQuestSchema();
             $id_role = isset($_GET['id_role']) ? (int)$_GET['id_role'] : 0;
             if (!$id_role) { echo json_encode(['success' => false, 'message' => 'ID mancante']); break; }
 
-            $role = gdrcd_query("SELECT location, is_quest, quest_recap_thread_id FROM role_sessions WHERE id_role = $id_role");
-            if (!$role || empty($role['is_quest'])) {
+            $role = getQuestRoleRow($id_role);
+            if ($role === null) {
                 echo json_encode(['success' => false, 'message' => 'Giocata non trovata o non contrassegnata come Quest']);
                 break;
             }
 
-            $luogo_row = gdrcd_query("SELECT nome FROM mappa WHERE id = " . (int)$role['location']);
+            // > 0 esclude sia NULL (mai generato) sia il valore sentinella -1 usato da
+            // saveQuestRecap per "prenotare" la generazione: per la durata di quel breve
+            // lock, la modale deve continuare a mostrare il form, non un finto thread -1.
+            $recap_thread_id = (int)($role['quest_recap_thread_id'] ?? 0);
 
             echo json_encode([
                 'success'               => true,
-                'location'              => $luogo_row['nome'] ?? '',
+                'location'              => getRoleLocationName($id_role),
                 'partecipanti'          => getRolePgs($id_role, false),
-                'quest_recap_thread_id' => $role['quest_recap_thread_id'] !== null ? (int)$role['quest_recap_thread_id'] : null,
+                'quest_recap_thread_id' => $recap_thread_id > 0 ? $recap_thread_id : null,
             ]);
             break;
 
         case 'saveQuestRecap':  // Staff: crea il post quest nel forum con riassunto generato dall'AI
             if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); break; }
+            ensureQuestSchema();
             $id_role = isset($data['id_role']) ? (int)$data['id_role'] : 0;
             if (!$id_role) { echo json_encode(['success' => false, 'message' => 'ID mancante']); break; }
 
-            $role = gdrcd_query("SELECT location, is_quest, quest_recap_thread_id FROM role_sessions WHERE id_role = $id_role");
-            if (!$role || empty($role['is_quest'])) {
+            $role = getQuestRoleRow($id_role);
+            if ($role === null) {
                 echo json_encode(['success' => false, 'message' => 'Giocata non trovata o non contrassegnata come Quest']);
                 break;
             }
@@ -479,10 +487,20 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             if ($titolo === '') { echo json_encode(['success' => false, 'message' => 'Titolo mancante']); break; }
 
+            // Blocco atomico: "prenota" subito la generazione con un valore sentinella (-1),
+            // solo se ancora NULL. Senza questo, due richieste ravvicinate (doppio click, o due
+            // finestre) potrebbero superare entrambe il controllo sopra prima che la UPDATE finale
+            // scriva il thread_id, creando due post duplicati. Da qui in poi il lavoro è "pesante"
+            // (chiamata AI + INSERT multipli), motivo per cui il lock va preso appena prima.
+            gdrcd_query("UPDATE role_sessions SET quest_recap_thread_id = -1 WHERE id_role = $id_role AND quest_recap_thread_id IS NULL");
+            if (gdrcd_query('', 'affected') === 0) {
+                echo json_encode(['success' => false, 'message' => 'Il resoconto è già stato generato per questa giocata']);
+                break;
+            }
+
             // Partecipanti e location sono campi "automatici": ricalcolati qui lato server,
             // non fidandosi di quanto arriva dal client.
-            $luogo_row    = gdrcd_query("SELECT nome FROM mappa WHERE id = " . (int)$role['location']);
-            $location     = $luogo_row['nome'] ?? '';
+            $location     = getRoleLocationName($id_role);
             $partecipanti = implode(', ', getRolePgs($id_role, false));
 
             $riassunto = generateQuestRiassunto($id_role);
@@ -490,6 +508,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Sezione fissa "Resoconti e Quest" (id_araldo=10), la stessa usata dal composer manuale nel forum
             $thread_id = createQuestPost(10, -1, $titolo, $tipologia, $partecipanti, $location, $riassunto, $cons, $note, $valu, $pg_punti, $_SESSION['login']);
             if ($thread_id === null) {
+                // Sblocca: senza questo la riga resterebbe agganciata a -1 per sempre,
+                // segnalata come "già generata" senza che esista alcun post.
+                gdrcd_query("UPDATE role_sessions SET quest_recap_thread_id = NULL WHERE id_role = $id_role");
                 echo json_encode(['success' => false, 'message' => 'Impossibile pubblicare nella bacheca Resoconti e Quest']);
                 break;
             }

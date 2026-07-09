@@ -735,6 +735,31 @@ function gdrcd_condizione_online() {
 
 /************* FORUM / QUEST ******************************/
 
+/**
+ * Recupera lo stato quest di una role_sessions, verificando che sia effettivamente
+ * una quest (is_quest=1). Centralizza il controllo ripetuto identico in
+ * getQuestRecapData e saveQuestRecap (api_roleSession.php).
+ *
+ * @return array|null ['is_quest' => 1, 'quest_recap_thread_id' => int|null], null se la
+ *                     giocata non esiste o non è una quest.
+ */
+function getQuestRoleRow(int $id_role): ?array {
+    $role = gdrcd_query("SELECT is_quest, quest_recap_thread_id FROM role_sessions WHERE id_role = $id_role");
+    return ($role && !empty($role['is_quest'])) ? $role : null;
+}
+
+/**
+ * Nome della mappa/location associata a una role_sessions. Centralizza una query
+ * ripetuta in modo leggermente diverso in tre punti (awardShin, getQuestRecapData,
+ * saveQuestRecap in api_roleSession.php).
+ *
+ * @return string Nome della location, stringa vuota se non trovata.
+ */
+function getRoleLocationName(int $id_role): string {
+    $row = gdrcd_query("SELECT mappa.nome FROM role_sessions rs JOIN mappa ON mappa.id = rs.location WHERE rs.id_role = $id_role");
+    return $row['nome'] ?? '';
+}
+
 // Helper: verifica se l'utente corrente può accedere a una sezione araldo.
 // Spostata qui da api_forum.php (era locale al file) perché ora serve anche
 // a createQuestPost(), condivisa con la generazione quest da role_recap.
