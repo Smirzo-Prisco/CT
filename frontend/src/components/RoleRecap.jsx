@@ -327,7 +327,7 @@ export default function RoleRecap() {
 
     const totalGames   = filtered.length
     const activeGames  = filtered.filter(r => r.inCorso).length
-    const totalPlayers = filtered.reduce((acc, r) => acc + r.partecipanti.length, 0)
+    const questGames   = filtered.filter(r => r.isQuest).length
     const avgTurns     = totalGames > 0 ? Math.round(filtered.reduce((acc, r) => acc + r.totTurni, 0) / totalGames) : 0
 
     // ── Render ───────────────────────────────────────────────────────────────
@@ -387,7 +387,7 @@ export default function RoleRecap() {
                 <div className="stats">
                     <StatCard icon="fas fa-gamepad"        value={totalGames}   label="Giocate totali" />
                     <StatCard icon="fas fa-play-circle"    value={activeGames}  label="In corso" />
-                    <StatCard icon="fas fa-users"          value={totalPlayers} label="Partecipazioni" />
+                    <StatCard icon="fas fa-scroll"         value={questGames}   label="Quest" />
                     <StatCard icon="fas fa-hourglass-half" value={avgTurns}     label="Turni medi" />
                 </div>
 

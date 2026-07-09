@@ -214,6 +214,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
 
         case 'getPgAllRoles':
+            ensureQuestSchema();
             $is_staff    = isAdminMasterMod($_SESSION);
             $login_f     = gdrcd_filter('in', $_SESSION['login']);
             $pg_param    = isset($_GET['pg'])    ? gdrcd_filter('in', trim($_GET['pg'])) : '';
@@ -236,7 +237,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             }
 
             $query = "SELECT role_sessions.id_role, role_sessions.location, role_sessions.start,
-                             role_sessions.end, role_sessions.turn, mappa.nome, mappa.id as luogo_id
+                             role_sessions.end, role_sessions.turn, role_sessions.is_quest, mappa.nome, mappa.id as luogo_id
                       FROM role_sessions
                       LEFT JOIN mappa ON role_sessions.location = mappa.id
                       INNER JOIN role_session_players ON role_sessions.id_role = role_session_players.id_role
@@ -257,6 +258,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'totTurni'     => (int)$row['turn'],
                     'partecipanti' => getRolePgs($row['id_role'], false),
                     'inCorso'      => $row['end'] === null,
+                    'isQuest'      => !empty($row['is_quest']),
                     'icona'        => 'fas fa-globe',
                     'my_shin'      => 'none',
                     'pending_count' => 0,
