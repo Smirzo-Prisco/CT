@@ -473,6 +473,23 @@
         i { color: var(--primary); margin-right: $space-2; }
     }
 
+    // ── Titolo quest (cliccabile, link al thread nel forum) ────
+
+    .game-quest-title {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--title);
+        cursor: pointer;
+        transition: var(--transition);
+
+        i { color: var(--primary); }
+
+        &:hover { color: var(--primary); }
+    }
+
     // ── Riga 2: pulsanti azione, spaziati in modo uniforme ─────
 
     .game-header-actions {

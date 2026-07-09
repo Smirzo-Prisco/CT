@@ -95,6 +95,15 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward, onOpenQuestRecap })
                         title={game.inCorso ? 'In corso' : 'Conclusa'}
                     ></div>
                 </div>
+                {game.isQuest && game.questRecapThreadId && game.questRecapTitolo && (
+                    <div
+                        className="game-quest-title"
+                        title="Vai al resoconto della quest"
+                        onClick={() => navigate(`main.php?page=forum&thread=${game.questRecapThreadId}`)}
+                    >
+                        <i className="fas fa-scroll"></i>{game.questRecapTitolo}
+                    </div>
+                )}
                 <div className="game-header-actions">
                     {canFlag && !game.inCorso && (
                         <button

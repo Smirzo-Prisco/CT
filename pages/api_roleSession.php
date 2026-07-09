@@ -237,9 +237,12 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             }
 
             $query = "SELECT role_sessions.id_role, role_sessions.location, role_sessions.start,
-                             role_sessions.end, role_sessions.turn, role_sessions.is_quest, mappa.nome, mappa.id as luogo_id
+                             role_sessions.end, role_sessions.turn, role_sessions.is_quest,
+                             role_sessions.quest_recap_thread_id, mq.titolo AS quest_titolo,
+                             mappa.nome, mappa.id as luogo_id
                       FROM role_sessions
                       LEFT JOIN mappa ON role_sessions.location = mappa.id
+                      LEFT JOIN messaggio_quest mq ON mq.id_messaggio = role_sessions.quest_recap_thread_id
                       INNER JOIN role_session_players ON role_sessions.id_role = role_session_players.id_role
                       $where
                       GROUP BY role_sessions.id_role
@@ -259,6 +262,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'partecipanti' => getRolePgs($row['id_role'], false),
                     'inCorso'      => $row['end'] === null,
                     'isQuest'      => !empty($row['is_quest']),
+                    'questRecapThreadId' => $row['quest_recap_thread_id'] !== null ? (int)$row['quest_recap_thread_id'] : null,
+                    'questRecapTitolo'   => $row['quest_titolo'] ?? '',
                     'icona'        => 'fas fa-globe',
                     'my_shin'      => 'none',
                     'pending_count' => 0,
