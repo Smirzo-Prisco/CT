@@ -47,9 +47,15 @@ function navigate(url) {
 
 // ── Sotto-componenti ───────────────────────────────────────────────────────────
 
-function StatCard({ icon, value, label }) {
+function StatCard({ icon, value, label, onClick, active }) {
+    const clickable = typeof onClick === 'function'
     return (
-        <div className="stat-card">
+        <div
+            className={`stat-card${clickable ? ' stat-card--clickable' : ''}${active ? ' stat-card--active' : ''}`}
+            onClick={onClick}
+            role={clickable ? 'button' : undefined}
+            tabIndex={clickable ? 0 : undefined}
+        >
             <div className="stat-icon"><i className={icon}></i></div>
             <div className="stat-content">
                 <div className="stat-value">{value}</div>
@@ -74,19 +80,12 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward }) {
     return (
         <div className={`game-card`}>
             <div className="game-header">
-                <div>
-                    <div
-                        className="game-place"
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => navigate(`main.php?dir=${game.luogo_id}`)}
-                    >
-                        <i className={game.icona}></i>{game.luogo}
-                    </div>
-                    <div className="game-date">
-                        <i className="fas fa-calendar-alt"></i>
-                        {formatDate(game.data)}
-                        {isToday && <span style={{ color: 'var(--secondary-color)', fontWeight: 'bold' }}> (Oggi)</span>}
-                    </div>
+                <div
+                    className="game-place"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate(`main.php?dir=${game.luogo_id}`)}
+                >
+                    <i className={game.icona}></i>{game.luogo}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     {canFlag && !game.inCorso && (
@@ -123,6 +122,12 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward }) {
             </div>
 
             <div className="game-body">
+                <div className="game-date">
+                    <i className="fas fa-calendar-alt"></i>
+                    {formatDate(game.data)}
+                    {isToday && <span style={{ color: 'var(--secondary-color)', fontWeight: 'bold' }}> (Oggi)</span>}
+                </div>
+
                 <div className="game-info">
                     <div className="info-item">
                         <span className="info-label"><i className="fas fa-clock"></i> Orario</span>
@@ -180,6 +185,7 @@ export default function RoleRecap() {
     const [filterLuogo, setFilterLuogo]     = useState('')
     const [filterData, setFilterData]       = useState('')
     const [filterFlagged, setFilterFlagged] = useState(false)
+    const [filterQuest, setFilterQuest]     = useState(false)
     const [msg, setMsg]                     = useState(null)
 
     // pg: nome specifico | 'all' | '' (utente corrente)
@@ -320,6 +326,7 @@ export default function RoleRecap() {
             if (isStaff) return r.pending_count > 0
             return r.my_shin !== 'none'
         }
+        if (filterQuest && !r.isQuest) return false
         return true
     })
 
@@ -387,7 +394,8 @@ export default function RoleRecap() {
                 <div className="stats">
                     <StatCard icon="fas fa-gamepad"        value={totalGames}   label="Giocate totali" />
                     <StatCard icon="fas fa-play-circle"    value={activeGames}  label="In corso" />
-                    <StatCard icon="fas fa-scroll"         value={questGames}   label="Quest" />
+                    <StatCard icon="fas fa-scroll"         value={questGames}   label="Quest"
+                        onClick={() => setFilterQuest(f => !f)} active={filterQuest} />
                     <StatCard icon="fas fa-hourglass-half" value={avgTurns}     label="Turni medi" />
                 </div>
 
@@ -432,7 +440,7 @@ export default function RoleRecap() {
 
                     <button
                         className="reset-btn"
-                        onClick={() => { setFilterLuogo(''); setFilterData(''); setFilterFlagged(false) }}
+                        onClick={() => { setFilterLuogo(''); setFilterData(''); setFilterFlagged(false); setFilterQuest(false) }}
                     >
                         <i className="fas fa-times"></i> Reset filtri
                     </button>
