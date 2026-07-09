@@ -105,6 +105,11 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
     justify-content: center;
     border-radius: $radius-full;
     transition: var(--transition);
+    // .gdr-header usa justify-content:space-between: con la tab-bar che occupa
+    // molto spazio lo scarto rispetto a .gdr-main-controls può ridursi quasi a
+    // zero (es. pannello master), attaccando il bottone "Pulisci chat" alla X —
+    // margine fisso minimo indipendente dalla distribuzione flex.
+    margin-left: $space-3;
 
     &:hover {
         background-color: rgb(255 255 255 / 10%);
