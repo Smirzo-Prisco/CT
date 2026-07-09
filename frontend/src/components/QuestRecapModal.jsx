@@ -32,11 +32,18 @@ const TIPOLOGIE_QUEST = [
 /** -5 … +10 step 0.5 (come il composer manuale del forum) */
 const puntiOpts = Array.from({ length: 31 }, (_, i) => (i - 10) / 2)
 
+/** Stessa logica di navigate() usata altrove nel progetto (es. RoleRecap.jsx) */
+function navigate(url) {
+    if (window.CT?.navigate) window.CT.navigate(url)
+    else window.top.location.href = url
+}
+
 export default function QuestRecapModal({ game, onClose }) {
     const [loading, setLoading] = useState(true)
     const [loadError, setLoadError] = useState('')
     const [location, setLocation] = useState('')
     const [pgPunti, setPgPunti] = useState([])
+    const [recapThreadId, setRecapThreadId] = useState(null)
 
     const [titolo, setTitolo]           = useState('')
     const [tipologia, setTipologia]     = useState(TIPOLOGIE_QUEST[0])
@@ -54,6 +61,7 @@ export default function QuestRecapModal({ game, onClose }) {
                 if (d.success) {
                     setLocation(d.location ?? '')
                     setPgPunti((d.partecipanti ?? []).map(nome => ({ nome, exp: 0, shin: 0, mestiere: 0 })))
+                    setRecapThreadId(d.quest_recap_thread_id ?? null)
                 } else {
                     setLoadError(d.message ?? 'Errore nel caricamento')
                 }
@@ -107,7 +115,21 @@ export default function QuestRecapModal({ game, onClose }) {
                     {loading && <p className="quest-modal-status">Caricamento…</p>}
                     {!loading && loadError && <p className="quest-modal-status quest-modal-status--error">{loadError}</p>}
 
-                    {!loading && !loadError && (
+                    {!loading && !loadError && recapThreadId && (
+                        <div className="quest-recap-done">
+                            <i className="fas fa-check-circle"></i>
+                            <p>Il resoconto di questa quest è già stato generato e non può essere rigenerato.</p>
+                            <button
+                                type="button"
+                                className="quest-btn-primary"
+                                onClick={() => { navigate(`main.php?page=forum&thread=${recapThreadId}`); onClose() }}
+                            >
+                                Vai al resoconto
+                            </button>
+                        </div>
+                    )}
+
+                    {!loading && !loadError && !recapThreadId && (
                         <>
                             <div className="quest-field">
                                 <label htmlFor="quest-titolo">Titolo quest</label>
@@ -196,10 +218,16 @@ export default function QuestRecapModal({ game, onClose }) {
                 </div>
 
                 <div className="quest-modal-footer">
-                    <button className="quest-btn-secondary" onClick={() => onClose()}>Annulla</button>
-                    <button className="quest-btn-primary" onClick={handleSave} disabled={saving || loading || !!loadError || !titolo.trim()}>
-                        {saving ? 'Salvataggio…' : 'Salva'}
-                    </button>
+                    {recapThreadId ? (
+                        <button className="quest-btn-secondary" onClick={() => onClose()}>Chiudi</button>
+                    ) : (
+                        <>
+                            <button className="quest-btn-secondary" onClick={() => onClose()}>Annulla</button>
+                            <button className="quest-btn-primary" onClick={handleSave} disabled={saving || loading || !!loadError || !titolo.trim()}>
+                                {saving ? 'Salvataggio…' : 'Salva'}
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

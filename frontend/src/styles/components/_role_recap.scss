@@ -671,6 +671,19 @@
         &--error { color: var(--warning); }
     }
 
+    .quest-recap-done {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: $space-3;
+        padding: $space-5 $space-4;
+        text-align: center;
+
+        i { font-size: 2.2rem; color: var(--success); }
+
+        p { color: var(--text-secondary); max-width: 40ch; }
+    }
+
     .quest-field {
         display: flex;
         flex-direction: column;

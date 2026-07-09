@@ -434,7 +434,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $id_role = isset($_GET['id_role']) ? (int)$_GET['id_role'] : 0;
             if (!$id_role) { echo json_encode(['success' => false, 'message' => 'ID mancante']); break; }
 
-            $role = gdrcd_query("SELECT location, is_quest FROM role_sessions WHERE id_role = $id_role");
+            $role = gdrcd_query("SELECT location, is_quest, quest_recap_thread_id FROM role_sessions WHERE id_role = $id_role");
             if (!$role || empty($role['is_quest'])) {
                 echo json_encode(['success' => false, 'message' => 'Giocata non trovata o non contrassegnata come Quest']);
                 break;
@@ -443,9 +443,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $luogo_row = gdrcd_query("SELECT nome FROM mappa WHERE id = " . (int)$role['location']);
 
             echo json_encode([
-                'success'      => true,
-                'location'     => $luogo_row['nome'] ?? '',
-                'partecipanti' => getRolePgs($id_role, false),
+                'success'               => true,
+                'location'              => $luogo_row['nome'] ?? '',
+                'partecipanti'          => getRolePgs($id_role, false),
+                'quest_recap_thread_id' => $role['quest_recap_thread_id'] !== null ? (int)$role['quest_recap_thread_id'] : null,
             ]);
             break;
 
@@ -454,9 +455,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $id_role = isset($data['id_role']) ? (int)$data['id_role'] : 0;
             if (!$id_role) { echo json_encode(['success' => false, 'message' => 'ID mancante']); break; }
 
-            $role = gdrcd_query("SELECT location, is_quest FROM role_sessions WHERE id_role = $id_role");
+            $role = gdrcd_query("SELECT location, is_quest, quest_recap_thread_id FROM role_sessions WHERE id_role = $id_role");
             if (!$role || empty($role['is_quest'])) {
                 echo json_encode(['success' => false, 'message' => 'Giocata non trovata o non contrassegnata come Quest']);
+                break;
+            }
+            if (!empty($role['quest_recap_thread_id'])) {
+                echo json_encode(['success' => false, 'message' => 'Il resoconto è già stato generato per questa giocata']);
                 break;
             }
 
@@ -483,6 +488,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 echo json_encode(['success' => false, 'message' => 'Impossibile pubblicare nella bacheca Resoconti e Quest']);
                 break;
             }
+
+            gdrcd_query("UPDATE role_sessions SET quest_recap_thread_id = $thread_id WHERE id_role = $id_role");
 
             echo json_encode(['success' => true, 'thread_id' => $thread_id]);
             break;

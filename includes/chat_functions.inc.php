@@ -816,6 +816,8 @@ function ensureQuestSchema() {
         gdrcd_query("ALTER TABLE role_sessions ADD COLUMN audio_started_at BIGINT NULL DEFAULT NULL");
     if (!in_array('is_quest', $existing))
         gdrcd_query("ALTER TABLE role_sessions ADD COLUMN is_quest TINYINT(1) NOT NULL DEFAULT 0");
+    if (!in_array('quest_recap_thread_id', $existing))
+        gdrcd_query("ALTER TABLE role_sessions ADD COLUMN quest_recap_thread_id INT NULL DEFAULT NULL");
     gdrcd_query("CREATE TABLE IF NOT EXISTS quest_turn_order (
         id INT AUTO_INCREMENT PRIMARY KEY,
         id_role INT NOT NULL,
