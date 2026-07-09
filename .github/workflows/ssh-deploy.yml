@@ -5,6 +5,14 @@ on:
     branches:
       - main
 
+# Push ravvicinati altrimenti avviano deploy in parallelo sullo stesso server:
+# il git fetch/reset del run piu' vecchio puo' collidere con quello del run
+# piu' nuovo ("cannot lock ref... is at X but expected Y"). cancel-in-progress
+# false mette i run in coda invece di cancellare un deploy a meta' script.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
