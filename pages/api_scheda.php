@@ -1054,7 +1054,8 @@ switch ($op) {
         }
         $all = [];
 
-        // Tabella Punti: ogni riga è sempre 'px'; se shin > 0 è anche 'shin'
+        // Tabella Punti: tipi/punti includono solo i valori effettivamente > 0
+        // (una riga può essere solo 'px', solo 'shin', o entrambi insieme)
         $res = gdrcd_query(
             "SELECT p.*, ma.titolo
              FROM Punti p
@@ -1065,10 +1066,12 @@ switch ($op) {
         );
         if ($res) {
             while ($row = gdrcd_query($res, 'fetch')) {
-                $tipi  = ['px'];
-                $punti = ['px' => (float)($row['esperienza'] ?? 0)];
-                $shin  = (float)($row['shin'] ?? 0);
-                if ($shin > 0) { $tipi[] = 'shin'; $punti['shin'] = $shin; }
+                $esperienza = (float)($row['esperienza'] ?? 0);
+                $shin       = (float)($row['shin'] ?? 0);
+                $tipi  = [];
+                $punti = [];
+                if ($esperienza > 0) { $tipi[] = 'px'; $punti['px'] = $esperienza; }
+                if ($shin > 0)       { $tipi[] = 'shin'; $punti['shin'] = $shin; }
                 $all[] = [
                     'data'     => $row['data_evento'] ?? '',
                     'titolo'   => !empty($row['titolo']) ? $row['titolo'] : 'Ruolata libera',

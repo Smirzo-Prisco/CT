@@ -328,6 +328,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $rid = (int)$r['id_role'];
                 gdrcd_query("UPDATE role_session_shin SET awarded_at = NOW(), awarded_by = '$login_f' WHERE id_role = $rid AND pg_name = '$pg'");
                 gdrcd_query("UPDATE personaggio SET shin = shin + 1 WHERE nome = '$pg'");
+
+                // Registra l'assegnazione in Punti (stesso pattern di awardExperience()): senza
+                // questo insert lo shin aggiornava solo il totale su personaggio, ma non compariva
+                // mai nello storico di scheda_px/scheda_px_shin, che legge solo dalla tabella Punti.
+                $nome_luogo = gdrcd_query("SELECT mappa.nome FROM role_sessions rs JOIN mappa ON mappa.id = rs.location WHERE rs.id_role = $rid")['nome'] ?? '';
+                $resoconto  = 'Shin per la giocata' . ($nome_luogo !== '' ? " - $nome_luogo" : '');
+                gdrcd_query("INSERT INTO Punti (nome, shin, data_evento, commento) VALUES ('$pg', '1', NOW(), '" . gdrcd_filter('in', $resoconto) . "')");
+
                 $awarded++;
             }
             echo json_encode(['success' => true, 'message' => "$awarded shin assegnati", 'awarded' => $awarded]);
