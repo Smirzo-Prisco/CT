@@ -81,14 +81,20 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward }) {
     return (
         <div className={`game-card`}>
             <div className="game-header">
-                <div
-                    className="game-place"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => navigate(`main.php?dir=${game.luogo_id}`)}
-                >
-                    <i className={game.icona}></i>{game.luogo}
+                <div className="game-header-top">
+                    <div
+                        className="game-place"
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => navigate(`main.php?dir=${game.luogo_id}`)}
+                    >
+                        <i className={game.icona}></i>{game.luogo}
+                    </div>
+                    <div
+                        className={`status-dot ${game.inCorso ? 'status-dot--attiva' : 'status-dot--chiusa'}`}
+                        title={game.inCorso ? 'In corso' : 'Conclusa'}
+                    ></div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="game-header-actions">
                     {canFlag && !game.inCorso && (
                         <button
                             className={`game-flag-btn game-flag-btn--${game.my_shin}`}
@@ -111,14 +117,11 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward }) {
                     )}
                     <button
                         className="game-log-btn"
-                        title="Leggi log giocata"
+                        title="Leggi la giocata"
                         onClick={() => navigate(`main.php?page=role_log&id=${game.id}`)}
                     >
                         <i className="fas fa-scroll"></i>
                     </button>
-                    <div className={`status-badge ${game.inCorso ? 'status-in-corso' : 'status-conclusa'}`}>
-                        {game.inCorso ? 'In corso' : 'Conclusa'}
-                    </div>
                 </div>
             </div>
 
