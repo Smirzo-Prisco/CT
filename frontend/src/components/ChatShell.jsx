@@ -537,8 +537,8 @@ export default function ChatShell() {
      */
     const [closeTurnPrompt, setCloseTurnPrompt] = useState(null)
 
-    /** Stato quest: timer, modalità turno, ordine turni, audio in riproduzione */
-    const [questState, setQuestState] = useState({ timerEnd: null, turnMode: 'liberi', turnOrder: [], currentIdx: 0, audioVideoId: null, audioStartedAt: null })
+    /** Stato quest: timer, modalità turno, ordine turni, audio in riproduzione, flag Quest */
+    const [questState, setQuestState] = useState({ timerEnd: null, turnMode: 'liberi', turnOrder: [], currentIdx: 0, audioVideoId: null, audioStartedAt: null, isQuest: false })
 
     /** Ref per evitare chiamate multiple a timerExpired */
     const timerExpiredCalledRef = useRef(false)
@@ -654,6 +654,7 @@ export default function ChatShell() {
                         currentIdx:     d.turn_order_idx ?? 0,
                         audioVideoId:   d.audio_video_id ?? null,
                         audioStartedAt: d.audio_started_at ?? null,
+                        isQuest:        !!d.is_quest,
                     })
                     timerExpiredCalledRef.current = false
                 }
@@ -674,6 +675,7 @@ export default function ChatShell() {
         const onTurnAdv   = (data) => setQuestState(q => ({ ...q, currentIdx: data.current_idx, turnOrder: data.order ?? q.turnOrder }))
         const onAudioSet  = (data) => setQuestState(q => ({ ...q, audioVideoId: data.video_id, audioStartedAt: data.started_at }))
         const onAudioStop = ()     => setQuestState(q => ({ ...q, audioVideoId: null, audioStartedAt: null }))
+        const onActivated = ()     => setQuestState(q => ({ ...q, isQuest: true }))
 
         sock.on('quest:timer_set',   onTimerSet)
         sock.on('quest:timer_stop',  onTimerStop)
@@ -682,6 +684,7 @@ export default function ChatShell() {
         sock.on('quest:turn_advance',onTurnAdv)
         sock.on('quest:audio_set',   onAudioSet)
         sock.on('quest:audio_stop',  onAudioStop)
+        sock.on('quest:activated',   onActivated)
 
         return () => {
             sock.off('quest:timer_set',   onTimerSet)
@@ -691,6 +694,7 @@ export default function ChatShell() {
             sock.off('quest:turn_advance',onTurnAdv)
             sock.off('quest:audio_set',   onAudioSet)
             sock.off('quest:audio_stop',  onAudioStop)
+            sock.off('quest:activated',   onActivated)
         }
     }, [shell])
 

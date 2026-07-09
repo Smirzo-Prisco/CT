@@ -391,6 +391,22 @@ function QuestPanel({ questState, luogo }) {
     const [audioUrl, setAudioUrl]       = useState('')
     const [audioSaving, setAudioSaving] = useState(false)
     const [audioMsg, setAudioMsg]       = useState('')
+    const [activating, setActivating]   = useState(false)
+    const [activateMsg, setActivateMsg] = useState('')
+
+    // Finché la quest non è attiva, tutti i campi/pulsanti del tab restano disabilitati:
+    // si abilitano solo dopo l'attivazione, che è irreversibile e richiede una giocata in corso.
+    const questLocked = !questState.isQuest
+
+    function attivaQuest() {
+        setActivating(true)
+        setActivateMsg('')
+        fetch('/pages/api_chat.php?op=activateQuest', { method: 'POST' })
+            .then(r => r.json())
+            .then(d => { if (!d.success) setActivateMsg(d.message ?? 'Errore') })
+            .catch(() => setActivateMsg('Errore di rete'))
+            .finally(() => setActivating(false))
+    }
 
     // Countdown locale
     useEffect(() => {
@@ -505,23 +521,42 @@ function QuestPanel({ questState, luogo }) {
 
     return (
         <div className="gdr-grid">
+            {/* Attivazione Quest — sblocca il resto del tab, irreversibile */}
+            <div className="gdr-card" style={{ gridColumn: '1 / -1' }}>
+                <div className="gdr-card-title">Attiva Quest</div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: questState.isQuest ? 'default' : 'pointer' }}>
+                    <input
+                        type="checkbox"
+                        checked={questState.isQuest}
+                        disabled={questState.isQuest || activating}
+                        onChange={attivaQuest}
+                    />
+                    <span style={{ fontSize: '13px', color: '#b4b6bf' }}>
+                        {questState.isQuest
+                            ? 'Quest attiva — non è più possibile disattivarla su questa giocata.'
+                            : 'Contrassegna questa giocata come Quest e abilita i controlli sotto (richiede una giocata in corso).'}
+                    </span>
+                </label>
+                {activateMsg && <p style={{ color: '#ef5350', fontSize: '12px', marginTop: '6px' }}>{activateMsg}</p>}
+            </div>
+
             {/* Timer */}
             <div className="gdr-card">
                 <div className="gdr-card-title">Timer Turno</div>
                 <div className="gdr-form-group" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <input className="gdr-input" type="number" min={0} max={59} value={mins}
+                    <input className="gdr-input" type="number" min={0} max={59} value={mins} disabled={questLocked}
                         onChange={e => setMins(Math.max(0, Math.min(59, +e.target.value)))}
                         style={{ width: '60px' }} />
                     <span style={{ color: '#b4b6bf' }}>min</span>
-                    <input className="gdr-input" type="number" min={0} max={59} value={secs}
+                    <input className="gdr-input" type="number" min={0} max={59} value={secs} disabled={questLocked}
                         onChange={e => setSecs(Math.max(0, Math.min(59, +e.target.value)))}
                         style={{ width: '60px' }} />
                     <span style={{ color: '#b4b6bf' }}>sec</span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-                    <button className="gdr-button" onClick={avviaTimer}>Avvia</button>
+                    <button className="gdr-button" onClick={avviaTimer} disabled={questLocked}>Avvia</button>
                     {questState.timerEnd && (
-                        <button className="gdr-button" onClick={fermaTimer}>Ferma</button>
+                        <button className="gdr-button" onClick={fermaTimer} disabled={questLocked}>Ferma</button>
                     )}
                 </div>
                 {timeLeft !== null && (
@@ -537,12 +572,12 @@ function QuestPanel({ questState, luogo }) {
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                         className={`gdr-button${questState.turnMode === 'liberi' ? ' gdr-tab--active' : ''}`}
-                        onClick={() => setMode('liberi')}>
+                        onClick={() => setMode('liberi')} disabled={questLocked}>
                         Turni liberi
                     </button>
                     <button
                         className={`gdr-button${questState.turnMode === 'fissi' ? ' gdr-tab--active' : ''}`}
-                        onClick={() => setMode('fissi')}>
+                        onClick={() => setMode('fissi')} disabled={questLocked}>
                         Turni fissi
                     </button>
                 </div>
@@ -551,7 +586,7 @@ function QuestPanel({ questState, luogo }) {
             {/* Ordine turni */}
             <div className="gdr-card">
                 <div className="gdr-card-title">Ordine Turni</div>
-                <button className="gdr-button" style={{ marginBottom: '10px', fontSize: '11px' }} onClick={caricaGiocatori}>
+                <button className="gdr-button" style={{ marginBottom: '10px', fontSize: '11px' }} onClick={caricaGiocatori} disabled={questLocked}>
                     Carica giocatori
                 </button>
                 {localOrder.length === 0 && (
@@ -566,15 +601,15 @@ function QuestPanel({ questState, luogo }) {
                         }}>
                             {questState.turnMode === 'fissi' && idx === questState.currentIdx ? '▶ ' : ''}{name}
                         </span>
-                        <button type="button" onClick={() => moveUp(idx)}
+                        <button type="button" onClick={() => moveUp(idx)} disabled={questLocked}
                             style={{ background: 'none', border: '1px solid #3a3f5a', color: '#b4b6bf', cursor: 'pointer', borderRadius: '3px', padding: '2px 6px' }}>↑</button>
-                        <button type="button" onClick={() => moveDown(idx)}
+                        <button type="button" onClick={() => moveDown(idx)} disabled={questLocked}
                             style={{ background: 'none', border: '1px solid #3a3f5a', color: '#b4b6bf', cursor: 'pointer', borderRadius: '3px', padding: '2px 6px' }}>↓</button>
                     </div>
                 ))}
                 {localOrder.length > 0 && (
                     <>
-                        <button className="gdr-button" onClick={salvaOrdine} style={{ marginTop: '8px' }}>
+                        <button className="gdr-button" onClick={salvaOrdine} disabled={questLocked} style={{ marginTop: '8px' }}>
                             Salva Ordine
                         </button>
                         {orderMsg && <p style={{ color: '#8cba8c', fontSize: '12px', marginTop: '6px' }}>{orderMsg}</p>}
@@ -595,16 +630,16 @@ function QuestPanel({ questState, luogo }) {
                     </p>
                 )}
                 <div className="gdr-form-group" style={{ display: 'flex', gap: '8px' }}>
-                    <input className="gdr-input" type="text" placeholder="Link YouTube"
+                    <input className="gdr-input" type="text" placeholder="Link YouTube" disabled={questLocked}
                         value={audioUrl} onChange={e => setAudioUrl(e.target.value)}
                         style={{ flex: 1 }} />
                 </div>
                 <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                    <button className="gdr-button" onClick={avviaAudio} disabled={audioSaving || !audioUrl.trim()}>
+                    <button className="gdr-button" onClick={avviaAudio} disabled={questLocked || audioSaving || !audioUrl.trim()}>
                         {questState.audioVideoId ? 'Cambia' : 'Avvia'}
                     </button>
                     {questState.audioVideoId && (
-                        <button className="gdr-button" onClick={rimuoviAudio} disabled={audioSaving}>
+                        <button className="gdr-button" onClick={rimuoviAudio} disabled={questLocked || audioSaving}>
                             Rimuovi
                         </button>
                     )}
@@ -621,7 +656,7 @@ function QuestPanel({ questState, luogo }) {
  * @param {boolean}  props.isOpen      - Il pannello master è visibile
  * @param {Function} props.onClose     - Callback per chiudere il pannello
  * @param {boolean}  props.showPulisci - Mostra l'icona pulisci chat (solo staff abilitato)
- * @param {object}   props.questState  - Stato quest: timerEnd, turnMode, turnOrder, currentIdx, audioVideoId, audioStartedAt
+ * @param {object}   props.questState  - Stato quest: timerEnd, turnMode, turnOrder, currentIdx, audioVideoId, audioStartedAt, isQuest
  * @param {number}   props.luogo       - ID stanza corrente
  */
 export default function MasterPanel({ isOpen, onClose, showPulisci, questState, luogo }) {
