@@ -73,7 +73,8 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward }) {
     const flagIcon  = game.my_shin === 'awarded' ? 'fas fa-coins'
                     : game.my_shin === 'pending'  ? 'fas fa-bookmark'
                     : 'far fa-bookmark'
-    const flagTitle = game.my_shin === 'awarded' ? 'Shin già assegnati'
+    const flagTitle = game.isQuest              ? 'Le giocate Quest non prevedono la richiesta shin'
+                    : game.my_shin === 'awarded' ? 'Shin già assegnati'
                     : game.my_shin === 'pending'  ? 'Richiesta inviata — clicca per rimuovere'
                     : 'Richiedi shin per questa giocata'
 
@@ -92,7 +93,7 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward }) {
                         <button
                             className={`game-flag-btn game-flag-btn--${game.my_shin}`}
                             title={flagTitle}
-                            disabled={game.my_shin === 'awarded'}
+                            disabled={game.my_shin === 'awarded' || game.isQuest}
                             onClick={() => onFlag(game.id)}
                         >
                             <i className={flagIcon}></i>

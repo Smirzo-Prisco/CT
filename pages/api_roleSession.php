@@ -303,6 +303,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $part = gdrcd_query("SELECT 1 FROM role_session_players WHERE id_role = $id_role AND pg_name = '$login_f' LIMIT 1");
             if (!$part) { echo json_encode(['success' => false, 'message' => 'Non hai partecipato a questa giocata']); break; }
 
+            // Le quest non passano dal flag/award manuale: lo shin, se previsto, lo assegna
+            // direttamente lo staff con altri strumenti.
+            $is_quest_row = gdrcd_query("SELECT is_quest FROM role_sessions WHERE id_role = $id_role");
+            if ($is_quest_row && !empty($is_quest_row['is_quest'])) {
+                echo json_encode(['success' => false, 'message' => 'Le giocate Quest non prevedono la richiesta shin']); break;
+            }
+
             $existing = gdrcd_query("SELECT awarded_at FROM role_session_shin WHERE id_role = $id_role AND pg_name = '$login_f'");
             if ($existing && $existing['awarded_at']) {
                 echo json_encode(['success' => false, 'message' => 'Questa giocata è già stata premiata']); break;
