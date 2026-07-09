@@ -234,6 +234,26 @@
         }
     }
 
+    // ── Pulsante "Assegna punti quest" (solo staff, solo card Quest) ──
+
+    .game-quest-recap-btn {
+        background: transparent;
+        border: 1px solid var(--border-input);
+        border-radius: $radius-md;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 4px 10px;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        line-height: 1;
+
+        &:hover {
+            border-color: var(--title);
+            color: var(--title);
+            background: rgba($color-text-title, 0.08);
+        }
+    }
+
     // ── Pulsante flag shin ────────────────────────────────────
 
     .game-flag-btn {
@@ -562,6 +582,205 @@
         &:hover { background: var(--primary-hover); }
     }
 
+    // ── Modale "Assegna punti quest" ──────────────────────────
+    // Stessa palette/token del resto della pagina (--surface, --primary, ecc.),
+    // per restare coerente col resto di #giocate-app.
+
+    .quest-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: $space-4;
+    }
+
+    .quest-modal {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-hover);
+        width: 100%;
+        max-width: 700px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .quest-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: $space-4 $space-5;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+
+        h2 {
+            font-size: 1.3rem;
+            color: var(--title);
+            display: flex;
+            align-items: center;
+            gap: $space-2;
+
+            i { color: var(--primary); }
+        }
+    }
+
+    .quest-modal-close {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: $space-1;
+        border-radius: $radius-full;
+        transition: var(--transition);
+
+        &:hover {
+            background: rgba($palette-action, 0.1);
+            color: var(--text);
+        }
+    }
+
+    .quest-modal-body {
+        padding: $space-5;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: $space-4;
+    }
+
+    .quest-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: $space-3;
+        padding: $space-4 $space-5;
+        border-top: 1px solid var(--border);
+        flex-shrink: 0;
+    }
+
+    .quest-modal-status {
+        text-align: center;
+        color: var(--text-secondary);
+        padding: $space-4;
+
+        &--error { color: var(--warning); }
+    }
+
+    .quest-field {
+        display: flex;
+        flex-direction: column;
+        gap: $space-1 + 1;
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            padding: $space-2 + 2;
+            border: 1px solid var(--border-input);
+            border-radius: $radius-md;
+            background: var(--input);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            resize: vertical;
+
+            &:focus { border-color: var(--primary); }
+        }
+    }
+
+    .quest-field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $space-4;
+    }
+
+    .quest-readonly {
+        padding: $space-2 + 2;
+        border: 1px solid var(--border);
+        border-radius: $radius-md;
+        background: var(--bg-deep);
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        min-height: 1.4em;
+    }
+
+    .quest-table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: $radius-md;
+    }
+
+    .quest-punti-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+
+        th, td {
+            padding: $space-2 $space-3;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            background: var(--bg-deep);
+        }
+
+        select {
+            padding: $space-1 $space-2;
+            border: 1px solid var(--border-input);
+            border-radius: $radius-md;
+            background: var(--input);
+            color: var(--text);
+            outline: none;
+
+            &:focus { border-color: var(--primary); }
+        }
+    }
+
+    .quest-punti-nome {
+        color: var(--title);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .quest-btn-primary, .quest-btn-secondary {
+        padding: $space-2 + 2 $space-5;
+        border-radius: $radius-md;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 1px solid transparent;
+    }
+
+    .quest-btn-primary {
+        background: var(--primary);
+        color: var(--bg-deep);
+        border-color: var(--primary);
+
+        &:hover:not(:disabled) { background: var(--primary-hover); }
+        &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+
+    .quest-btn-secondary {
+        background: transparent;
+        color: var(--text-secondary);
+        border-color: var(--border-input);
+
+        &:hover { border-color: var(--text-secondary); color: var(--text); }
+    }
+
     // ── Responsive ────────────────────────────────────────────
 
     @media (max-width: 992px) {
@@ -576,6 +795,9 @@
         .filter-group  { min-width: 100%; }
         .reset-btn     { justify-content: center; }
         .stats         { grid-template-columns: repeat(2, 1fr); }
+        .quest-field-row { grid-template-columns: 1fr; }
+        .quest-modal-overlay { padding: 0; }
+        .quest-modal   { max-height: 100vh; max-width: 100%; border-radius: 0; }
     }
 
     @media (max-width: 480px) {

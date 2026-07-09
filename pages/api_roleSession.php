@@ -429,6 +429,64 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode(['success' => true, 'role' => $role_info, 'messages' => $messages, 'login' => $_SESSION['login']]);
             break;
 
+        case 'getQuestRecapData':  // Staff: dati precompilati per la modale "Assegna punti quest"
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); break; }
+            $id_role = isset($_GET['id_role']) ? (int)$_GET['id_role'] : 0;
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'ID mancante']); break; }
+
+            $role = gdrcd_query("SELECT location, is_quest FROM role_sessions WHERE id_role = $id_role");
+            if (!$role || empty($role['is_quest'])) {
+                echo json_encode(['success' => false, 'message' => 'Giocata non trovata o non contrassegnata come Quest']);
+                break;
+            }
+
+            $luogo_row = gdrcd_query("SELECT nome FROM mappa WHERE id = " . (int)$role['location']);
+
+            echo json_encode([
+                'success'      => true,
+                'location'     => $luogo_row['nome'] ?? '',
+                'partecipanti' => getRolePgs($id_role, false),
+            ]);
+            break;
+
+        case 'saveQuestRecap':  // Staff: crea il post quest nel forum con riassunto generato dall'AI
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); break; }
+            $id_role = isset($data['id_role']) ? (int)$data['id_role'] : 0;
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'ID mancante']); break; }
+
+            $role = gdrcd_query("SELECT location, is_quest FROM role_sessions WHERE id_role = $id_role");
+            if (!$role || empty($role['is_quest'])) {
+                echo json_encode(['success' => false, 'message' => 'Giocata non trovata o non contrassegnata come Quest']);
+                break;
+            }
+
+            $titolo    = trim($data['titolo']      ?? '');
+            $tipologia = trim($data['tipologia']   ?? '');
+            $cons      = trim($data['conseguenze'] ?? '');
+            $note      = trim($data['note']        ?? '');
+            $valu      = trim($data['valutazioni'] ?? '');
+            $pg_punti  = is_array($data['partecipanti_punti'] ?? null) ? $data['partecipanti_punti'] : [];
+
+            if ($titolo === '') { echo json_encode(['success' => false, 'message' => 'Titolo mancante']); break; }
+
+            // Partecipanti e location sono campi "automatici": ricalcolati qui lato server,
+            // non fidandosi di quanto arriva dal client.
+            $luogo_row    = gdrcd_query("SELECT nome FROM mappa WHERE id = " . (int)$role['location']);
+            $location     = $luogo_row['nome'] ?? '';
+            $partecipanti = implode(', ', getRolePgs($id_role, false));
+
+            $riassunto = generateQuestRiassunto($id_role);
+
+            // Sezione fissa "Resoconti e Quest" (id_araldo=10), la stessa usata dal composer manuale nel forum
+            $thread_id = createQuestPost(10, -1, $titolo, $tipologia, $partecipanti, $location, $riassunto, $cons, $note, $valu, $pg_punti, $_SESSION['login']);
+            if ($thread_id === null) {
+                echo json_encode(['success' => false, 'message' => 'Impossibile pubblicare nella bacheca Resoconti e Quest']);
+                break;
+            }
+
+            echo json_encode(['success' => true, 'thread_id' => $thread_id]);
+            break;
+
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
 } else {

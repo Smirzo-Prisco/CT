@@ -24,36 +24,8 @@ function notifyForumUpdate(int $araldo_id, int $thread_id): void {
     @file_get_contents('http://127.0.0.1:3000/notify', false, $ctx);
 }
 
-// -------------------------------------------------------------------------
-// Helper: verifica se l'utente corrente può accedere a una sezione araldo
-// -------------------------------------------------------------------------
-function can_access_section(array $section): bool {
-    $tipo       = (int)$section['tipo'];
-    $proprietari = $section['proprietari'];
-
-    // Capo-mestiere che ha confermato il mestiere
-    $con_job = false;
-    if ($tipo == SOLOMESTIERE) {
-        $pg_m = gdrcd_query("SELECT conferma_mestiere FROM clgpersonaggiomestiere WHERE personaggio = '" . gdrcd_filter('in', $_SESSION['login']) . "' LIMIT 1");
-        $con_job = ($pg_m && $pg_m['conferma_mestiere'] == 1);
-    }
-
-    if ($_SESSION['admin'] == 1) return true;
-
-    return match($tipo) {
-        ONGAME, INFO, COMUNICAZIONI, PERTUTTI => true,
-        SOLORAZZA        => $_SESSION['id_razza'] == $proprietari,
-        SOLOGILDA        => strpos($_SESSION['gilda'] ?? '', '*' . $proprietari . '*') !== false,
-        SOLOMESTIERE     => ($_SESSION['mestiere'] == $proprietari && $con_job) || $_SESSION['capomestiere'] == 1,
-        SOLOMASTERS      => $_SESSION['master'] == 1,
-        SOLOMODERATORS   => $_SESSION['moderatore'] == 1,
-        SOLOGUIDES       => $_SESSION['guida'] == 1,
-        SOLOCAPOGILDA    => $_SESSION['capogilda'] == 1,
-        SOLOCAPOMESTIERI => $_SESSION['capomestiere'] == 1,
-        SOLOADMIN        => $_SESSION['admin'] == 1,
-        default          => false,
-    };
-}
+// can_access_section() è stata spostata in includes/custom_functions.inc.php:
+// serve anche a createQuestPost(), condivisa con la generazione quest da role_recap.
 
 // -------------------------------------------------------------------------
 // Helper: etichetta leggibile per il tipo di sezione
@@ -508,111 +480,12 @@ switch ($op) {
             exit;
         }
 
-        // Verifica accesso alla sezione
-        $section = gdrcd_query("SELECT id_araldo, tipo, proprietari, punti FROM araldo
-            WHERE id_araldo = $araldo_id AND invisibile = 0 LIMIT 1");
-        if (!$section || !can_access_section($section)) {
+        $thread_id = createQuestPost($araldo_id, $padre, $titolo, $tipologia, $partec, $location, $riassunto, $cons, $note, $valu, $pg_punti, $login);
+        if ($thread_id === null) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Accesso negato']);
             exit;
         }
-
-        // Corpo HTML formattato della quest (identico al vecchio insert_quest.inc.php)
-        $t_h  = htmlspecialchars($titolo);
-        $tp_h = htmlspecialchars($tipologia);
-        $l_h  = htmlspecialchars($location);
-        $p_h  = htmlspecialchars($partec);
-        $r_h  = htmlspecialchars($riassunto);
-        $c_h  = htmlspecialchars($cons);
-        $n_h  = htmlspecialchars($note);
-        $v_h  = htmlspecialchars($valu);
-
-        $testo_quest = "<center>
-<font color=\"#9a6353\" style=\"font-size:20px; text-transform: uppercase;\"><b>$t_h</b></font><br>
-<font color=\"#9a6353\" style=\"font-size:12px;\">$tp_h</font>
-</center><br><br>
-<font color=\"#e8967e\" style=\"font-size:12px;\">Luogo</font><br>
-<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$l_h</font><br><br>
-<font color=\"#e8967e\" style=\"font-size:12px;\">Partecipanti</font><br>
-<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$p_h</font><br><br>
-<font color=\"#e8967e\" style=\"font-size:12px;\">Riassunto</font><br>
-<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$r_h</font><br><br>
-<font color=\"#e8967e\" style=\"font-size:12px;\">Conseguenze</font><br>
-<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$c_h</font><br><br>
-<font color=\"#e8967e\" style=\"font-size:12px;\">Note</font><br>
-<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$n_h</font><br><br>
-<font color=\"#e8967e\" style=\"font-size:12px;\">Valutazioni</font><br>
-<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$v_h</font>";
-
-        $login_f = gdrcd_filter('in', $login);
-
-        // Inserisce il post nella bacheca
-        gdrcd_query("INSERT INTO messaggioaraldo
-            (id_messaggio_padre, id_araldo, titolo, messaggio, autore, data_messaggio, data_ultimo_messaggio, giornalista, anonimo)
-            VALUES ($padre, $araldo_id, '" . gdrcd_filter('in', $titolo) . "', '" . gdrcd_filter('in', $testo_quest) . "',
-            '$login_f', NOW(), NOW(), 'no', 'no')");
-
-        $new_id    = (int)gdrcd_query('', 'last_id');
-        $thread_id = ($padre == -1) ? $new_id : $padre;
-
-        if ($padre != -1) {
-            gdrcd_query("UPDATE messaggioaraldo SET data_ultimo_messaggio = NOW() WHERE id_messaggio = $padre");
-            gdrcd_query("DELETE FROM araldo_letto WHERE thread_id = $padre AND nome != '$login_f'");
-        }
-
-        // Inserisce i dati grezzi nella tabella messaggio_quest
-        gdrcd_query("INSERT INTO messaggio_quest
-            (id_messaggio, autore, titolo, location, partecipanti, riassunto, conseguenze, note, valutazioni, tipologia)
-            VALUES ($thread_id, '$login_f',
-            '" . gdrcd_filter('in', $titolo)    . "',
-            '" . gdrcd_filter('in', $location)  . "',
-            '" . gdrcd_filter('in', $partec)    . "',
-            '" . gdrcd_filter('in', $riassunto) . "',
-            '" . gdrcd_filter('in', $cons)      . "',
-            '" . gdrcd_filter('in', $note)      . "',
-            '" . gdrcd_filter('in', $valu)      . "',
-            '" . gdrcd_filter('in', $tipologia) . "')");
-
-        // XP al master in base alla tipologia
-        $master_xp = match(true) {
-            in_array($tipologia, ['Quest Singola', 'Evento']) => 2,
-            $tipologia === 'Quest di Gilda'                   => 1,
-            $tipologia === 'Assegnazione Esperienza o Notorietà' => 0,
-            default                                           => 3,
-        };
-
-        if ($master_xp > 0) {
-            gdrcd_query("INSERT INTO Punti (nome, esperienza, data_evento, id_messaggio, commento)
-                VALUES ('$login_f', '$master_xp', NOW(), '$thread_id', 'Master della quest')");
-            gdrcd_query("UPDATE personaggio SET esperienza = esperienza + $master_xp, esperienza_r = esperienza_r + $master_xp
-                WHERE nome = '$login_f'");
-        }
-
-        // Punti ai partecipanti (solo se la sezione lo prevede)
-        if ((int)$section['punti'] > 0) {
-            foreach ($pg_punti as $pg) {
-                $pg_nome = trim($pg['nome'] ?? '');
-                $pg_exp  = (float)($pg['exp']       ?? 0);
-                $pg_shin = (float)($pg['shin']      ?? 0);
-                $pg_not  = (int)($pg['notorieta']   ?? 0);
-                $pg_mest = (float)($pg['mestiere']  ?? 0);
-
-                if ($pg_nome === '' || ($pg_exp == 0 && $pg_shin == 0 && $pg_not == 0 && $pg_mest == 0)) continue;
-
-                $pg_f = gdrcd_filter('in', $pg_nome);
-                gdrcd_query("INSERT INTO Punti (nome, esperienza, notorieta, mestiere, shin, data_evento, id_messaggio, commento)
-                    VALUES ('$pg_f', '$pg_exp', '$pg_not', '$pg_mest', '$pg_shin', NOW(), '$thread_id', '')");
-                gdrcd_query("UPDATE personaggio SET
-                    esperienza = esperienza + '$pg_exp',
-                    esperienza_r = esperienza_r + '$pg_exp',
-                    notorieta = notorieta + '$pg_not',
-                    esperienza_mestiere = esperienza_mestiere + '$pg_mest',
-                    shin = shin + '$pg_shin'
-                    WHERE nome = '$pg_f'");
-            }
-        }
-
-        notifyForumUpdate($araldo_id, $thread_id);
 
         echo json_encode(['success' => true, 'thread_id' => $thread_id]);
         break;

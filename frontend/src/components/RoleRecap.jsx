@@ -14,6 +14,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import QuestRecapModal from './QuestRecapModal'
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ function StatCard({ icon, value, label, onClick, active }) {
     )
 }
 
-function GameCard({ game, canFlag, isStaff, onFlag, onAward }) {
+function GameCard({ game, canFlag, isStaff, onFlag, onAward, onOpenQuestRecap }) {
     const today = new Date().toISOString().split('T')[0]
     const isToday = game.data === today || new Date(game.data).toISOString().split('T')[0] === today
     const duration = calcDuration(game.oraInizio, game.oraFine)
@@ -122,6 +123,15 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward }) {
                     >
                         <i className="fas fa-scroll"></i>
                     </button>
+                    {isStaff && game.isQuest && (
+                        <button
+                            className="game-quest-recap-btn"
+                            title="Assegna punti quest"
+                            onClick={() => onOpenQuestRecap(game)}
+                        >
+                            <i className="fas fa-clipboard-check"></i>
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -191,6 +201,7 @@ export default function RoleRecap() {
     const [filterFlagged, setFilterFlagged] = useState(false)
     const [filterQuest, setFilterQuest]     = useState(false)
     const [msg, setMsg]                     = useState(null)
+    const [questRecapGame, setQuestRecapGame] = useState(null)
 
     // pg: nome specifico | 'all' | '' (utente corrente)
     // gilda: id numerico come stringa → carica tutte le giocate della razza
@@ -299,6 +310,11 @@ export default function RoleRecap() {
             fetchRoles(pg, gilda)
         }
     }, [selectedPg, filterGilda, fetchRoles])
+
+    const closeQuestRecap = useCallback((success) => {
+        setQuestRecapGame(null)
+        if (success) setMsg({ type: 'ok', text: 'Quest pubblicata nella bacheca Resoconti e Quest.' })
+    }, [])
 
     // ── Valori unici per filtro luogo ────────────────────────────────────────
 
@@ -505,9 +521,14 @@ export default function RoleRecap() {
                             isStaff={isStaff}
                             onFlag={toggleFlag}
                             onAward={awardShin}
+                            onOpenQuestRecap={setQuestRecapGame}
                         />
                     ))}
                     </div>
+                )}
+
+                {questRecapGame && (
+                    <QuestRecapModal game={questRecapGame} onClose={closeQuestRecap} />
                 )}
 
             </div>

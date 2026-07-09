@@ -732,4 +732,224 @@ function gdrcd_condizione_online() {
         OR COALESCE(p.sempre_online, 0) = 1
     )";
 }
+
+/************* FORUM / QUEST ******************************/
+
+// Helper: verifica se l'utente corrente può accedere a una sezione araldo.
+// Spostata qui da api_forum.php (era locale al file) perché ora serve anche
+// a createQuestPost(), condivisa con la generazione quest da role_recap.
+function can_access_section(array $section): bool {
+    $tipo        = (int)$section['tipo'];
+    $proprietari = $section['proprietari'];
+
+    // Capo-mestiere che ha confermato il mestiere
+    $con_job = false;
+    if ($tipo == SOLOMESTIERE) {
+        $pg_m = gdrcd_query("SELECT conferma_mestiere FROM clgpersonaggiomestiere WHERE personaggio = '" . gdrcd_filter('in', $_SESSION['login']) . "' LIMIT 1");
+        $con_job = ($pg_m && $pg_m['conferma_mestiere'] == 1);
+    }
+
+    if ($_SESSION['admin'] == 1) return true;
+
+    return match($tipo) {
+        ONGAME, INFO, COMUNICAZIONI, PERTUTTI => true,
+        SOLORAZZA        => $_SESSION['id_razza'] == $proprietari,
+        SOLOGILDA        => strpos($_SESSION['gilda'] ?? '', '*' . $proprietari . '*') !== false,
+        SOLOMESTIERE     => ($_SESSION['mestiere'] == $proprietari && $con_job) || $_SESSION['capomestiere'] == 1,
+        SOLOMASTERS      => $_SESSION['master'] == 1,
+        SOLOMODERATORS   => $_SESSION['moderatore'] == 1,
+        SOLOGUIDES       => $_SESSION['guida'] == 1,
+        SOLOCAPOGILDA    => $_SESSION['capogilda'] == 1,
+        SOLOCAPOMESTIERI => $_SESSION['capomestiere'] == 1,
+        SOLOADMIN        => $_SESSION['admin'] == 1,
+        default          => false,
+    };
+}
+
+/**
+ * Crea un post quest nella bacheca (araldo), inserisce i dati grezzi in
+ * messaggio_quest e assegna esperienza/shin/mestiere/notorietà al master e ai
+ * partecipanti. Stessa logica usata sia dal composer manuale nel forum
+ * (api_forum.php?op=post_quest) sia dalla generazione automatica da role_recap
+ * (api_roleSession.php?op=saveQuestRecap) — centralizzata per non doverle
+ * tenere allineate a mano in due punti diversi.
+ *
+ * @param array $pg_punti [{nome, exp, shin, notorieta, mestiere}, ...]
+ * @return int|null id del thread creato, null se la sezione non è valida/accessibile
+ */
+function createQuestPost(int $araldo_id, int $padre, string $titolo, string $tipologia, string $partec, string $location, string $riassunto, string $cons, string $note, string $valu, array $pg_punti, string $login): ?int {
+    $section = gdrcd_query("SELECT id_araldo, tipo, proprietari, punti FROM araldo WHERE id_araldo = $araldo_id AND invisibile = 0 LIMIT 1");
+    if (!$section || !can_access_section($section)) return null;
+
+    // Corpo HTML formattato della quest (identico al vecchio insert_quest.inc.php)
+    $t_h  = htmlspecialchars($titolo);
+    $tp_h = htmlspecialchars($tipologia);
+    $l_h  = htmlspecialchars($location);
+    $p_h  = htmlspecialchars($partec);
+    $r_h  = htmlspecialchars($riassunto);
+    $c_h  = htmlspecialchars($cons);
+    $n_h  = htmlspecialchars($note);
+    $v_h  = htmlspecialchars($valu);
+
+    $testo_quest = "<center>
+<font color=\"#9a6353\" style=\"font-size:20px; text-transform: uppercase;\"><b>$t_h</b></font><br>
+<font color=\"#9a6353\" style=\"font-size:12px;\">$tp_h</font>
+</center><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Luogo</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$l_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Partecipanti</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$p_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Riassunto</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$r_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Conseguenze</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$c_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Note</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$n_h</font><br><br>
+<font color=\"#e8967e\" style=\"font-size:12px;\">Valutazioni</font><br>
+<font color=\"#8f8f8f\" style=\"font-size:12px; text-align: justify;\">$v_h</font>";
+
+    $login_f = gdrcd_filter('in', $login);
+
+    // Inserisce il post nella bacheca
+    gdrcd_query("INSERT INTO messaggioaraldo
+        (id_messaggio_padre, id_araldo, titolo, messaggio, autore, data_messaggio, data_ultimo_messaggio, giornalista, anonimo)
+        VALUES ($padre, $araldo_id, '" . gdrcd_filter('in', $titolo) . "', '" . gdrcd_filter('in', $testo_quest) . "',
+        '$login_f', NOW(), NOW(), 'no', 'no')");
+
+    $new_id    = (int)gdrcd_query('', 'last_id');
+    $thread_id = ($padre == -1) ? $new_id : $padre;
+
+    if ($padre != -1) {
+        gdrcd_query("UPDATE messaggioaraldo SET data_ultimo_messaggio = NOW() WHERE id_messaggio = $padre");
+        gdrcd_query("DELETE FROM araldo_letto WHERE thread_id = $padre AND nome != '$login_f'");
+    }
+
+    // Inserisce i dati grezzi nella tabella messaggio_quest
+    gdrcd_query("INSERT INTO messaggio_quest
+        (id_messaggio, autore, titolo, location, partecipanti, riassunto, conseguenze, note, valutazioni, tipologia)
+        VALUES ($thread_id, '$login_f',
+        '" . gdrcd_filter('in', $titolo)    . "',
+        '" . gdrcd_filter('in', $location)  . "',
+        '" . gdrcd_filter('in', $partec)    . "',
+        '" . gdrcd_filter('in', $riassunto) . "',
+        '" . gdrcd_filter('in', $cons)      . "',
+        '" . gdrcd_filter('in', $note)      . "',
+        '" . gdrcd_filter('in', $valu)      . "',
+        '" . gdrcd_filter('in', $tipologia) . "')");
+
+    // XP al master in base alla tipologia
+    $master_xp = match(true) {
+        in_array($tipologia, ['Quest Singola', 'Evento']) => 2,
+        $tipologia === 'Quest di Gilda'                    => 1,
+        $tipologia === 'Assegnazione Esperienza o Notorietà' => 0,
+        default                                            => 3,
+    };
+
+    if ($master_xp > 0) {
+        gdrcd_query("INSERT INTO Punti (nome, esperienza, data_evento, id_messaggio, commento)
+            VALUES ('$login_f', '$master_xp', NOW(), '$thread_id', 'Master della quest')");
+        gdrcd_query("UPDATE personaggio SET esperienza = esperienza + $master_xp, esperienza_r = esperienza_r + $master_xp
+            WHERE nome = '$login_f'");
+    }
+
+    // Punti ai partecipanti (solo se la sezione lo prevede)
+    if ((int)$section['punti'] > 0) {
+        foreach ($pg_punti as $pg) {
+            $pg_nome = trim($pg['nome'] ?? '');
+            $pg_exp  = (float)($pg['exp']      ?? 0);
+            $pg_shin = (float)($pg['shin']     ?? 0);
+            $pg_not  = (int)($pg['notorieta']  ?? 0);
+            $pg_mest = (float)($pg['mestiere'] ?? 0);
+
+            if ($pg_nome === '' || ($pg_exp == 0 && $pg_shin == 0 && $pg_not == 0 && $pg_mest == 0)) continue;
+
+            $pg_f = gdrcd_filter('in', $pg_nome);
+            gdrcd_query("INSERT INTO Punti (nome, esperienza, notorieta, mestiere, shin, data_evento, id_messaggio, commento)
+                VALUES ('$pg_f', '$pg_exp', '$pg_not', '$pg_mest', '$pg_shin', NOW(), '$thread_id', '')");
+            gdrcd_query("UPDATE personaggio SET
+                esperienza = esperienza + '$pg_exp',
+                esperienza_r = esperienza_r + '$pg_exp',
+                notorieta = notorieta + '$pg_not',
+                esperienza_mestiere = esperienza_mestiere + '$pg_mest',
+                shin = shin + '$pg_shin'
+                WHERE nome = '$pg_f'");
+        }
+    }
+
+    notifySocketServer('forum:update', 'global', ['araldo_id' => $araldo_id, 'thread_id' => $thread_id]);
+
+    return $thread_id;
+}
+
+/**
+ * Genera un riassunto narrativo (max 800 token) chiamando Claude Haiku sui messaggi
+ * master (tipo 'M') di una giocata — stesso pattern di chiamata di api_chatbot.php.
+ * Usata da api_roleSession.php?op=saveQuestRecap al posto del campo "riassunto"
+ * libero del composer manuale nel forum.
+ *
+ * @return string Riassunto generato, stringa vuota se non ci sono messaggi master
+ *                o se la chiamata fallisce (log dell'errore, il salvataggio della
+ *                quest prosegue comunque senza bloccarsi).
+ */
+function generateQuestRiassunto(int $id_role): string {
+    $result = gdrcd_query("SELECT mittente, testo FROM chat WHERE id_role = $id_role AND tipo = 'M' ORDER BY ora ASC", 'result');
+    $azioni = [];
+    while ($row = gdrcd_query($result, 'fetch')) {
+        $azioni[] = trim($row['mittente'] . ': ' . strip_tags($row['testo']));
+    }
+    gdrcd_query($result, 'free');
+
+    if (empty($azioni)) return '';
+
+    $api_key = $GLOBALS['PARAMETERS']['anthropic']['api_key'] ?? '';
+    if (empty($api_key)) {
+        error_log('[quest_recap] api_key Anthropic non configurata in config.inc.php');
+        return '';
+    }
+
+    $system = "Sei un narratore che riassume le azioni di una giocata di ruolo (GDR) a partire dalle "
+            . "azioni testuali del master. Scrivi un riassunto narrativo in italiano, chiaro e scorrevole, "
+            . "che copra gli eventi principali nell'ordine in cui sono accaduti. Non inventare eventi non "
+            . "presenti nel testo fornito.";
+
+    $payload = json_encode([
+        'model'      => 'claude-haiku-4-5-20251001',
+        'max_tokens' => 800,
+        'system'     => $system,
+        'messages'   => [
+            ['role' => 'user', 'content' => implode("\n\n", $azioni)],
+        ],
+    ]);
+
+    $ch = curl_init('https://api.anthropic.com/v1/messages');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_HTTPHEADER     => [
+            'x-api-key: ' . $api_key,
+            'anthropic-version: 2023-06-01',
+            'content-type: application/json',
+        ],
+        CURLOPT_TIMEOUT        => 30,
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr  = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlErr) {
+        error_log("[quest_recap] curl error: $curlErr");
+        return '';
+    }
+    if ($httpCode !== 200) {
+        error_log("[quest_recap] Anthropic API HTTP $httpCode: $response");
+        return '';
+    }
+
+    $result_data = json_decode($response, true);
+    return trim($result_data['content'][0]['text'] ?? '');
+}
+/************* FINE FORUM / QUEST ******************************/
 ?>
