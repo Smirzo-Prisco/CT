@@ -1100,29 +1100,6 @@ export default function Forum({ isStaff = false, initialThread = null }) {
             .finally(() => setSending(false))
     }
 
-    /**
-     * Invia un resoconto quest nella sezione corrente.
-     * @param {Object} formData - Tutti i campi del form ComposeQuest
-     */
-    const sendNewQuest = (formData) => {
-        if (sending) return
-        setSending(true)
-        fetch('/pages/api_forum.php?op=post_quest', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ araldo: currentSection?.id, padre: -1, ...formData }),
-        })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    setView('threads')
-                    fetchThreads(currentSection.id, 1)
-                } else alert(data.message || 'Errore nell\'invio')
-            })
-            .catch(console.error)
-            .finally(() => setSending(false))
-    }
-
     // ---------------------------------------------------------------------------
     // RENDERING
     // ---------------------------------------------------------------------------
@@ -1212,9 +1189,7 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                     <span className={styles.sectionHeading}>{currentSection?.nome}</span>
                 </div>
                 <div className={styles.buttonsBar}>
-                    <button onClick={() => setView(isStaff && currentSection?.id === 10 ? 'compose_quest' : 'compose')}>
-                        {isStaff && currentSection?.id === 10 ? 'Assegna punti' : 'Nuovo Messaggio'}
-                    </button>
+                    <button onClick={() => setView('compose')}>Nuovo Messaggio</button>
                 </div>
 
                 {loadingThreads ? (
@@ -1278,19 +1253,10 @@ export default function Forum({ isStaff = false, initialThread = null }) {
         )
     }
 
-    // --- VISTA INSERIMENTO QUEST ---
-    if (view === 'compose_quest') {
-        return (
-            <ComposeQuest
-                section={currentSection}
-                sending={sending}
-                onSubmit={sendNewQuest}
-                onCancel={() => setView('threads')}
-            />
-        )
-    }
-
     // --- VISTA MODIFICA QUEST (primo messaggio di un thread in id_araldo=10) ---
+    // La creazione di nuove quest passa ora esclusivamente dalla modale "Assegna
+    // punti quest" in role_recap (RoleRecap.jsx / QuestRecapModal.jsx), non più
+    // da qui — resta solo la modifica di una quest già pubblicata.
     if (view === 'edit_quest') {
         return (
             <ComposeQuest

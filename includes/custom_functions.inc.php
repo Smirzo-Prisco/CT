@@ -910,7 +910,10 @@ function generateQuestRiassunto(int $id_role): string {
     $system = "Sei un narratore che riassume le azioni di una giocata di ruolo (GDR) a partire dalle "
             . "azioni testuali del master. Scrivi un riassunto narrativo in italiano, chiaro e scorrevole, "
             . "che copra gli eventi principali nell'ordine in cui sono accaduti. Non inventare eventi non "
-            . "presenti nel testo fornito.";
+            . "presenti nel testo fornito. Il testo verrà pubblicato in un forum che interpreta il BBCode, "
+            . "non il Markdown: per la formattazione usa ESCLUSIVAMENTE tag BBCode (es. [b]testo[/b] per il "
+            . "grassetto, [i]testo[/i] per il corsivo, [u]testo[/u] per il sottolineato) — non usare mai gli "
+            . "asterischi ** o * tipici del Markdown.";
 
     $payload = json_encode([
         'model'      => 'claude-haiku-4-5-20251001',
