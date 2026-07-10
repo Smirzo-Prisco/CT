@@ -240,6 +240,19 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             ));
             break;
         case 'savePuntiPg': // Salvo le statistiche del pg
+            // Vincolo: Tempra (car6) non può mai superare il doppio del totale assegnato a Mente (car4)
+            $tot_mente = 0;
+            $tot_tempra = 0;
+            foreach ($data['attributes'] as $stat) {
+                $tot = (float)gdrcd_filter('num', $stat['xp']) + (float)gdrcd_filter('num', $stat['shin']);
+                if ($stat['field'] === 'car4') $tot_mente = $tot;
+                if ($stat['field'] === 'car6') $tot_tempra = $tot;
+            }
+            if ($tot_tempra > $tot_mente * 2) {
+                echo json_encode(['success' => false, 'message' => 'Tempra non può superare il doppio del totale di Mente']);
+                exit;
+            }
+
             $setParts = [
                 "esperienza_r = ".$data['xpDisponibili'],
                 "shin = ".$data['shinDisponibili']

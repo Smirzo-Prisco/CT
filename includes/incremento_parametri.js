@@ -169,6 +169,39 @@ function updateUI() {
 	shinDisponibiliEl.textContent = shinDisponibili;
 }
 
+const MENTE_NAME = 'Mente';
+const TEMPRA_NAME = 'Tempra';
+
+/* totale attuale (xp + shin) di un attributo per nome */
+function getAttrTotal(name) {
+	const a = attributes.find(x => x.name === name);
+
+	return a ? (a.xp + a.shin) : 0;
+}
+
+/* totale che avrebbe l'attributo dopo il change, prima di applicarlo */
+function computeCandidateTotal(attr, type, change) {
+	if (change > 0) return attr.xp + attr.shin + change;
+
+	const base = (type === 'xp') ? (attr.baseXp || 0) : (attr.baseShin || 0);
+	const current = (type === 'xp') ? attr.xp : attr.shin;
+	const availableToRemove = Math.max(0, current - base);
+	const dec = Math.min(availableToRemove, -change);
+
+	return attr.xp + attr.shin - dec;
+}
+
+/* Tempra non può mai superare il doppio del totale di Mente */
+function wouldBreakTempraCap(attr, type, change) {
+	if (attr.name !== MENTE_NAME && attr.name !== TEMPRA_NAME) return false;
+
+	const candidateTotal = computeCandidateTotal(attr, type, change);
+
+	if (attr.name === TEMPRA_NAME) return candidateTotal > getAttrTotal(MENTE_NAME) * 2;
+
+	return getAttrTotal(TEMPRA_NAME) > candidateTotal * 2;
+}
+
 /* compute change with base limits */
 function applyChangeToAttr(attr, type, change) {
 	// change >0 add, change <0 remove
@@ -237,6 +270,11 @@ attributesContainer.addEventListener('click', (ev) => {
 	else if (cls.includes('minus')) change = -1;
 
 	if (change === 0) return;
+
+	if (wouldBreakTempraCap(attr, type, change)) {
+		alert('Tempra non può superare il doppio del totale di Mente.');
+		return;
+	}
 
 	const ok = applyChangeToAttr(attr, type, change);
 
