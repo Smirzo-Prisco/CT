@@ -400,7 +400,10 @@ export default function MapClick() {
                         onLoad={onImageLoad}
                     />
 
-                    {/* Pallini cliccabili — solo dopo il caricamento dell'immagine */}
+                    {/* Pin cliccabili — solo dopo il caricamento dell'immagine.
+                        Marker discreto (anello dorato pulsante + etichetta in hover):
+                        l'immagine ha gia' un proprio pallino disegnato per ogni zona,
+                        qui si aggiunge solo l'affordance interattiva sopra. */}
                     {ZONES.map(zone => {
                         const style = hotspotStyle(zone.cx, zone.cy)
                         if (!style) return null
@@ -408,14 +411,12 @@ export default function MapClick() {
                             <div
                                 key={zone.id}
                                 style={style}
+                                className={`map-pin${openZone === zone.id ? ' map-pin--active' : ''}`}
                                 onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
                                 title={zone.name}
                             >
-                                <div style={{
-                                    width: '23px', height: '23px',
-                                    borderRadius: '50%',
-                                    backgroundColor: 'transparent',
-                                }} />
+                                <span className="map-pin__ring" />
+                                <span className="map-pin__label">{zone.name}</span>
                             </div>
                         )
                     })}
@@ -428,66 +429,24 @@ export default function MapClick() {
             {/* mai tagliato dall'overflow né dalla dimensione del frame.         */}
             {/* ---------------------------------------------------------------- */}
             {selectedZone && (
-                <div className="menu_mappa" style={{
-                    visibility: 'visible',
-                    position: 'relative',   // flusso normale, non absolute
-                    transform: 'none',       // annulla il translate(-170%,-50%) del CSS
-                    width: '100%',
-                    maxWidth: '100%',
-                    margin: '6px 0 0 0',
-                    boxSizing: 'border-box',
-                    textAlign: 'center',
-                }}>
-                    {/* Nome zona e descrizione */}
-                    <strong style={{ display: 'block', marginBottom: '4px', fontSize: '1em' }}>
-                        {selectedZone.name}
-                    </strong>
-                    <p style={{ margin: '0 0 8px', fontSize: '0.85em', lineHeight: '1.4' }}>
-                        {selectedZone.desc}
-                    </p>
+                <div className="map-zone-panel">
+                    <div className="map-zone-panel__head">
+                        <strong>{selectedZone.name}</strong>
+                        <button className="map-zone-panel__close" onClick={() => setOpenZone(null)} aria-label="Chiudi">×</button>
+                    </div>
+                    <p>{selectedZone.desc}</p>
 
-                    {/* Stanze — griglia flex, le immagini scalano con il contenitore */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px' }}>
+                    <div className="map-zone-panel__rooms">
                         {selectedZone.rooms.map((room, i) => {
                             const count = room.dir ? (onlineCounts[room.dir] || 0) : 0
                             return (
-                                <span
-                                    key={i}
-                                    style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}
-                                    onClick={() => navigate(room)}
-                                >
-                                    <img
-                                        src={`/themes/crystal/imgs/maps/${room.img}`}
-                                        style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
-                                        alt=""
-                                        border="0"
-                                    />
-                                    {/* Badge utenti online */}
-                                    {count > 0 && (
-                                        <span style={{
-                                            position: 'absolute', top: '-4px', right: '-4px',
-                                            background: '#e74c3c', color: '#fff',
-                                            borderRadius: '50%', fontSize: '10px', fontWeight: 'bold',
-                                            minWidth: '16px', height: '16px',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            pointerEvents: 'none',
-                                        }}>
-                                            {count}
-                                        </span>
-                                    )}
+                                <span key={i} className="map-zone-room" onClick={() => navigate(room)}>
+                                    <img src={`/themes/crystal/imgs/maps/${room.img}`} alt="" />
+                                    {count > 0 && <span className="map-zone-room__badge">{count}</span>}
                                 </span>
                             )
                         })}
                     </div>
-
-                    {/* Chiudi pannello */}
-                    <span
-                        className="close-location-modal"
-                        onClick={() => setOpenZone(null)}
-                        style={{ display: 'block', marginTop: '8px', cursor: 'pointer' }}
-                    >
-                        ×
-                    </span>
                 </div>
             )}
         </div>

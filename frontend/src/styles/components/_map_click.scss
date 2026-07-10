@@ -1,0 +1,135 @@
+// ============================================================
+// _map_click.scss — Mappa di gioco (MapClick.jsx)
+// Marker interattivi sopra l'immagine mappa.giorno/notte.png (che ha gia'
+// un proprio pallino disegnato per ogni zona: qui si aggiunge solo
+// l'affordance interattiva — anello dorato pulsante + etichetta in hover),
+// e il pannello di selezione stanza.
+//
+// Palette: stessa dell'HUD (blu notte + oro, valori esatti da
+// public/critical.css), coerente con i toni caldi/dorati gia' presenti
+// nell'illustrazione reale della mappa.
+// ============================================================
+@use '../tokens' as *;
+
+.map-pin {
+    cursor: pointer;
+
+    &__ring {
+        display: block;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 2px solid rgba(218, 168, 50, .55);
+        box-shadow: 0 0 0 0 rgba(218, 168, 50, .5);
+        animation: map-pin-pulse 2.4s ease-out infinite;
+        transition: border-color .2s ease, transform .2s ease;
+    }
+
+    &__label {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%) translateY(-4px);
+        background: rgba(8, 9, 26, .85);
+        color: #e8e4da;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+        padding: 3px 9px;
+        border-radius: 999px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s ease, transform .2s ease;
+    }
+
+    &:hover .map-pin__ring { border-color: #daa832; transform: scale(1.15); }
+    &:hover .map-pin__label { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    &--active .map-pin__ring { border-color: #daa832; box-shadow: 0 0 14px 2px rgba(218, 168, 50, .5); }
+}
+
+@keyframes map-pin-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(218, 168, 50, .45); }
+    70% { box-shadow: 0 0 0 12px rgba(218, 168, 50, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(218, 168, 50, 0); }
+}
+
+// ── Pannello zona selezionata ─────────────────────────────────
+.map-zone-panel {
+    width: 100%;
+    max-width: 640px;
+    margin: 14px auto 0;
+    box-sizing: border-box;
+    text-align: center;
+    background: linear-gradient(160deg, rgba(22, 27, 53, .9), rgba(8, 9, 26, .94));
+    border: 1px solid rgba(218, 168, 50, .3);
+    border-radius: 14px;
+    padding: 16px 20px;
+    color: #e8e4da;
+
+    p {
+        margin: 4px 0 12px;
+        font-size: .85em;
+        line-height: 1.4;
+        color: #7a8499;
+    }
+}
+
+.map-zone-panel__head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 4px;
+
+    strong { font-size: 1.05em; color: #daa832; }
+}
+
+.map-zone-panel__close {
+    position: absolute;
+    right: 0;
+    background: none;
+    border: none;
+    color: #7a8499;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover { color: #e8e4da; }
+}
+
+.map-zone-panel__rooms {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.map-zone-room {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform .15s ease;
+
+    img { display: block; max-width: 100%; height: auto; }
+
+    &:hover { transform: translateY(-2px); }
+
+    &__badge {
+        position: absolute;
+        top: -4px; right: -4px;
+        background: #e74c3c;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 10px;
+        font-weight: bold;
+        min-width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+}

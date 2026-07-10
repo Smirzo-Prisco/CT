@@ -1,0 +1,285 @@
+// ============================================================
+// _hud.scss — HUD immersivo (Hud.jsx), sostituisce le colonne laterali
+// Componente standalone scopato sotto .ct-hud.
+//
+// Palette: blu notte + oro, valori ESATTI presi da public/critical.css
+// (--pub-dark/--pub-dark2/--pub-card-dark, --pub-gold/--pub-gold-h) — non
+// i token $palette-* globali (pensati per il tema ice-blue del resto del
+// gioco), perché qui si vuole la stessa identità cromatica gia' in uso
+// nella parte pubblica del sito.
+// ============================================================
+@use '../tokens' as *;
+
+.ct-hud {
+    --ink-deep: #08091a;
+    --ink: #10142a;
+    --ink-light: #161b35;
+    --gold: #daa832;
+    --gold-deep: #c4922a;
+    --gold-soft: rgba(218, 168, 50, .16);
+    --text: #e8e4da;
+    --muted: #7a8499;
+    --danger: #ff6b6b;
+    --ok: #5ce89a;
+    --radius: 16px;
+
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    pointer-events: none;
+    font-family: $font-ui;
+
+    > * { pointer-events: auto; }
+}
+
+// ── TOPBAR COMUNE ────────────────────────────────────────────
+.ct-hud__topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 86px;
+    background: linear-gradient(180deg, rgba(22, 27, 53, .85), rgba(8, 9, 26, .92));
+    border-bottom: 1px solid rgba(218, 168, 50, .35);
+    box-shadow: 0 1px 30px -2px rgba(218, 168, 50, .2);
+    backdrop-filter: blur(14px);
+}
+
+// ── ANELLI (sinistra/destra) ─────────────────────────────────
+.ct-hud__ring {
+    position: absolute;
+    top: 0;
+    width: 173px;
+    height: 173px;
+    transform-origin: top left;
+}
+.ct-hud__ring--left { left: 22px; }
+.ct-hud__ring--right { right: 22px; transform-origin: top right; }
+
+// Miniatura: 30% piu' piccola a riposo, dimensione piena da aperta
+.ct-hud__thumb {
+    position: absolute;
+    top: 0; left: 0;
+    width: 173px; height: 173px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--ink-light), var(--ink) 70%);
+    border: 2px solid rgba(218, 168, 50, .4);
+    color: var(--gold);
+    font-size: 46px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    transform: scale(.7);
+    transition: border-color .2s ease, transform .3s cubic-bezier(.34, 1.56, .64, 1);
+    z-index: 1;
+
+    img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 1px dashed rgba(218, 168, 50, .3);
+        animation: ct-hud-spin 40s linear infinite;
+    }
+    &:hover { border-color: var(--gold); }
+}
+.ct-hud__ring.is-open .ct-hud__thumb { transform: scale(1); }
+
+@keyframes ct-hud-spin { to { transform: rotate(360deg); } }
+
+// Arco delle icone: sempre visibili, scala insieme alla miniatura
+.ct-hud__arc {
+    position: absolute;
+    top: 50%; left: 50%;
+    z-index: 2;
+    transform: scale(.7);
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+}
+.ct-hud__ring.is-open .ct-hud__arc { transform: scale(1); }
+
+.ct-hud__icon {
+    position: absolute;
+    top: 0; left: 0;
+    width: 42px; height: 42px;
+    margin: -21px 0 0 -21px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 1px solid rgba(218, 168, 50, .3);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    transform: translate(var(--tx), var(--ty));
+    transition: color .2s ease, border-color .2s ease;
+
+    &:hover { color: var(--gold); border-color: var(--gold); }
+}
+
+.ct-hud__pip {
+    position: absolute;
+    top: -2px; right: -2px;
+    background: var(--danger);
+    color: #2a0a10;
+    font-size: 8px;
+    font-weight: 800;
+    padding: 0 4px;
+    border-radius: 999px;
+    min-width: 12px;
+    line-height: 1.5;
+    text-align: center;
+}
+.ct-hud__pip--dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; top: 0; right: 0; }
+
+// Pannello info: tra la miniatura e il centro, mai sopra l'arco
+.ct-hud__panel {
+    position: absolute;
+    top: 34px;
+    background: linear-gradient(160deg, rgba(22, 27, 53, .85), rgba(8, 9, 26, .85));
+    border: 1px solid rgba(218, 168, 50, .25);
+    border-radius: var(--radius);
+    backdrop-filter: blur(10px);
+    padding: 12px 16px;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity .3s ease .1s, transform .3s ease .1s;
+    color: var(--text);
+}
+.ct-hud__ring.is-open .ct-hud__panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.ct-hud__ring--left .ct-hud__panel { left: 213px; width: 260px; }
+.ct-hud__ring--right .ct-hud__panel { right: 213px; width: 220px; }
+
+.ct-hud__panel h3 { margin: 0 0 4px; font-size: 15px; color: var(--gold); }
+.ct-hud__panel p { margin: 0; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+
+.ct-hud__char-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ct-hud__char-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    i { font-size: 12px; margin-left: 6px; color: var(--muted); }
+}
+.ct-hud__char-badge {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(255, 107, 107, .15);
+    color: var(--danger);
+    border: 1px solid rgba(255, 107, 107, .4);
+
+    &.is-available { background: rgba(92, 232, 154, .15); color: var(--ok); border-color: rgba(92, 232, 154, .4); }
+}
+
+.ct-hud__extra-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(218, 168, 50, .15);
+
+    a { font-size: 11px; color: var(--muted); }
+    a:hover { color: var(--gold); }
+}
+
+// ── CENTRO: LOGO ─────────────────────────────────────────────
+.ct-hud__center {
+    position: absolute;
+    top: 57px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.ct-hud__brand {
+    position: relative;
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--ink-light), var(--ink));
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 16px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 22px -6px rgba(218, 168, 50, .5);
+    z-index: 2;
+}
+.ct-hud__brand-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 1px dashed rgba(218, 168, 50, .45);
+    animation: ct-hud-spin 16s linear infinite;
+}
+
+// ── POPOVER (presenze / meteo / chat off) ────────────────────
+// Ancorati vicino all'anello che li apre, orientati verso il centro pagina.
+.ct-hud__popover {
+    position: fixed;
+    top: 100px;
+    background: linear-gradient(160deg, rgba(22, 27, 53, .95), rgba(8, 9, 26, .96));
+    border: 1px solid rgba(218, 168, 50, .3);
+    border-radius: var(--radius);
+    backdrop-filter: blur(12px);
+    padding: 14px;
+    z-index: 20;
+    box-shadow: 0 20px 60px -12px rgba(0, 0, 0, .6);
+    color: var(--text);
+    max-height: 70vh;
+    overflow-y: auto;
+    width: 300px;
+}
+.ct-hud__popover--presence,
+.ct-hud__popover--chatoff,
+.ct-hud__popover--weather { left: 250px; }
+
+.ct-hud__popover-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--gold);
+    margin-bottom: 10px;
+
+    a { font-size: 11px; color: var(--muted); font-weight: 700; }
+    a:hover { color: var(--gold); }
+}
+
+// ── RESPONSIVE ────────────────────────────────────────────────
+// Regola permanente: l'HUD resta SEMPRE absolute/fixed sugli angoli, non
+// passa mai a static. Si degrada scalando l'intero anello (transform:scale
+// mantiene le proporzioni dell'arco senza dover ricalcolare --tx/--ty).
+@media (hover: none) {
+    // touch: nessun hover disponibile, i pannelli restano leggibili solo
+    // quando l'anello e' esplicitamente aperto (gia' gestito da is-open)
+}
+
+@media (max-width: 1080px) {
+    .ct-hud__ring { transform: scale(.82); }
+}
+
+@media (max-width: 860px) {
+    .ct-hud__ring { transform: scale(.62); }
+    .ct-hud__panel p { display: none; }
+    .ct-hud__popover { width: 240px; }
+}
+
+@media (max-width: 680px) {
+    .ct-hud__ring { top: 10px; transform: scale(.42); }
+    .ct-hud__ring--left { left: 10px; }
+    .ct-hud__ring--right { right: 10px; }
+    .ct-hud__center { top: 10px; }
+    .ct-hud__brand { width: 46px; height: 46px; font-size: 13px; }
+    .ct-hud__popover { width: calc(100vw - 20px); max-width: 260px; left: 10px !important; }
+}
+
+@media (max-width: 420px) {
+    .ct-hud__ring { transform: scale(.34); }
+    .ct-hud__brand { width: 42px; height: 42px; }
+}

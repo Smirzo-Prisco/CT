@@ -1,0 +1,294 @@
+/**
+ * Hud.jsx
+ *
+ * HUD immersivo che sostituisce le colonne laterali (framecontentLeft/Right):
+ * due cerchi agli angoli (luogo a sinistra, personaggio a destra) collegati
+ * a una topbar comune, ciascuno espandibile in un arco di icone di
+ * navigazione reale. Le icone restano sempre visibili e cliccabili — ad
+ * anello chiuso sono solo più piccole (l'intero arco si ridimensiona con un
+ * transform:scale, non sparisce).
+ *
+ * Sostituisce (montati singolarmente in precedenza): InfoLocation,
+ * PresentiBadge, OnlineUsers, ChattingOff, AnteprimaScheda, FrameMessaggi,
+ * Meteo. OnlineUsers/ChattingOff/Meteo vengono riusati cosi' come sono
+ * dentro i popover, invece di riscriverne la logica di fetch/socket.
+ *
+ * API riusate (invariate): api_map.php (current, presenti, ping, move,
+ * changemap), api_global.php (getMessages, getOpenRoles, events_today,
+ * saveSoundPrefs), api_scheda.php (profile fallback avatar).
+ *
+ * Montaggio: via ct:ready su #hud-container in header.inc.php
+ *
+ * @author Crystal Tokyo Dev
+ */
+
+import { useState, useEffect, useCallback, useRef } from 'react'
+import OnlineUsers from './OnlineUsers'
+import ChattingOff from './ChattingOff'
+import Meteo from './Meteo'
+
+export default function Hud({ isStaff }) {
+
+    const nome = window.CT_USER?.login ?? ''
+    const sesso = window.CT_USER?.sesso ?? 'm'
+    const disponibile = window.CT_USER?.disponibile ?? 1
+
+    const hudRef = useRef(null)
+    const [leftOpen, setLeftOpen] = useState(false)
+    const [rightOpen, setRightOpen] = useState(false)
+    const [openPopover, setOpenPopover] = useState(null) // 'presence' | 'weather' | 'chatoff' | null
+
+    // ── Luogo corrente (stesso pattern di InfoLocation.jsx) ────────────────
+    const [location, setLocation] = useState(null)
+
+    const fetchLocation = useCallback(() => {
+        fetch('/pages/api_map.php?op=current')
+            .then(r => r.json())
+            .then(d => { if (d.success) setLocation(d) })
+            .catch(err => console.error('[Hud] Errore luogo:', err))
+    }, [])
+
+    useEffect(() => {
+        fetchLocation()
+        const sock = window.ctSocket
+        if (sock) sock.on('users:update', fetchLocation)
+        window.addEventListener('ct:location-changed', fetchLocation)
+        return () => {
+            if (sock) sock.off('users:update', fetchLocation)
+            window.removeEventListener('ct:location-changed', fetchLocation)
+        }
+    }, [fetchLocation])
+
+    // ── Avatar personaggio (stesso pattern di AnteprimaScheda.jsx) ─────────
+    const [avatar, setAvatar] = useState(() => (window.CT_USER?.url_img_chat ?? '').trim())
+
+    useEffect(() => {
+        if (avatar || !nome) return
+        fetch(`/pages/api_scheda.php?op=profile&pg=${encodeURIComponent(nome)}`)
+            .then(r => r.json())
+            .then(d => { if (d.success && d.url_img_chat) setAvatar(d.url_img_chat.trim()) })
+            .catch(() => {})
+    }, [nome]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    // ── Badge: messaggi privati (stesso pattern di FrameMessaggi.jsx) ──────
+    const [hasNewMessages, setHasNewMessages] = useState(false)
+
+    const fetchMessages = useCallback(() => {
+        fetch('/pages/api_global.php?op=getMessages')
+            .then(r => r.json())
+            .then(d => { if (d.success) setHasNewMessages(d.hasNew) })
+            .catch(err => console.error('[Hud] Errore messaggi:', err))
+    }, [])
+
+    useEffect(() => {
+        fetchMessages()
+        const sock = window.ctSocket
+        if (sock) sock.on('dm:update', fetchMessages)
+        return () => { if (sock) sock.off('dm:update', fetchMessages) }
+    }, [fetchMessages])
+
+    // ── Badge: giocate aperte ───────────────────────────────────────────────
+    const [hasOpenRoles, setHasOpenRoles] = useState(false)
+
+    const fetchOpenRoles = useCallback(() => {
+        fetch('/pages/api_global.php?op=getOpenRoles')
+            .then(r => r.json())
+            .then(d => { if (d.success) setHasOpenRoles(d.has_open_roles) })
+            .catch(err => console.error('[Hud] Errore giocate:', err))
+    }, [])
+
+    useEffect(() => {
+        fetchOpenRoles()
+        const sock = window.ctSocket
+        if (sock) sock.on('role:update', fetchOpenRoles)
+        return () => { if (sock) sock.off('role:update', fetchOpenRoles) }
+    }, [fetchOpenRoles])
+
+    // ── Badge: eventi calendario di oggi ────────────────────────────────────
+    const [hasEvents, setHasEvents] = useState(false)
+
+    useEffect(() => {
+        fetch('/pages/api_global.php?op=events_today')
+            .then(r => r.json())
+            .then(d => { if (d.success) setHasEvents(d.has_events) })
+            .catch(err => console.error('[Hud] Errore eventi:', err))
+    }, [])
+
+    // ── Badge: presenti nel luogo attuale ───────────────────────────────────
+    const [presentiCount, setPresentiCount] = useState(0)
+
+    const fetchPresentiCount = useCallback(() => {
+        fetch('/pages/api_map.php?op=presenti')
+            .then(r => r.json())
+            .then(d => { if (d.success) setPresentiCount(d.users.length) })
+            .catch(err => console.error('[Hud] Errore presenti:', err))
+    }, [])
+
+    useEffect(() => {
+        fetchPresentiCount()
+        const sock = window.ctSocket
+        if (sock) sock.on('users:update', fetchPresentiCount)
+        window.addEventListener('ct:location-changed', fetchPresentiCount)
+        return () => {
+            if (sock) sock.off('users:update', fetchPresentiCount)
+            window.removeEventListener('ct:location-changed', fetchPresentiCount)
+        }
+    }, [fetchPresentiCount])
+
+    // ── Logout (stesso pattern di FrameMessaggi.jsx) ────────────────────────
+    const loggingOut = useRef(false)
+    const handleLogout = useCallback(async e => {
+        e.preventDefault()
+        if (loggingOut.current) return
+        loggingOut.current = true
+        try {
+            await fetch('/pages/api_auth.php?op=logout', { method: 'POST' })
+        } finally {
+            window.top.location.href = '/'
+        }
+    }, [])
+
+    // ── Click fuori: richiude anelli e popover ──────────────────────────────
+    useEffect(() => {
+        function onDocClick(e) {
+            if (hudRef.current && !hudRef.current.contains(e.target)) {
+                setLeftOpen(false)
+                setRightOpen(false)
+                setOpenPopover(null)
+            }
+        }
+        document.addEventListener('click', onDocClick)
+        return () => document.removeEventListener('click', onDocClick)
+    }, [])
+
+    const togglePopover = (name) => (e) => {
+        e.stopPropagation()
+        setOpenPopover(p => (p === name ? null : name))
+    }
+
+    const mappaId = window.CT_USER?.mappa ?? 1
+    const descrizioneTesto = (location?.descrizione ?? '').replace(/<[^>]+>/g, '')
+
+    return (
+        <div className="ct-hud" ref={hudRef}>
+            <div className="ct-hud__topbar" aria-hidden="true" />
+
+            {/* ============ ANELLO SINISTRO: LUOGO ============ */}
+            <div className={`ct-hud__ring ct-hud__ring--left${leftOpen ? ' is-open' : ''}`}>
+                <button className="ct-hud__thumb" onClick={() => setLeftOpen(v => !v)} title={location?.nome ?? 'Luogo'}>
+                    <i className="fa-solid fa-city" />
+                </button>
+
+                <div className="ct-hud__arc">
+                    <a className="ct-hud__icon" style={{ '--tx': '0px', '--ty': '122px' }}
+                        href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Vai alla mappa principale">
+                        <i className="fa-solid fa-map-location-dot" />
+                    </a>
+                    <button className="ct-hud__icon" style={{ '--tx': '47px', '--ty': '113px' }}
+                        title="Chat off" onClick={togglePopover('chatoff')}>
+                        <i className="fa-solid fa-comment-dots" />
+                    </button>
+                    <button className="ct-hud__icon" style={{ '--tx': '86px', '--ty': '86px' }}
+                        title="Presenti nel luogo" onClick={togglePopover('presence')}>
+                        <i className="fa-solid fa-users" />
+                        {presentiCount > 0 && <b className="ct-hud__pip">{presentiCount}</b>}
+                    </button>
+                    <a className="ct-hud__icon" style={{ '--tx': '113px', '--ty': '47px' }}
+                        href="main.php?page=forum" title="Forum">
+                        <i className="fa-solid fa-comments" />
+                    </a>
+                    <button className="ct-hud__icon" style={{ '--tx': '122px', '--ty': '0px' }}
+                        title="Meteo" onClick={togglePopover('weather')}>
+                        <i className="fa-solid fa-cloud-sun" />
+                    </button>
+                </div>
+
+                <div className="ct-hud__panel ct-hud__panel--location">
+                    <h3>{location?.nome ?? '…'}</h3>
+                    {descrizioneTesto && <p>{descrizioneTesto.slice(0, 100)}{descrizioneTesto.length > 100 ? '…' : ''}</p>}
+                </div>
+            </div>
+
+            {/* ============ ANELLO DESTRO: PERSONAGGIO ============ */}
+            <div className={`ct-hud__ring ct-hud__ring--right${rightOpen ? ' is-open' : ''}`}>
+                <button className="ct-hud__thumb" onClick={() => setRightOpen(v => !v)} title={nome}>
+                    {avatar ? <img src={avatar} alt={nome} /> : <i className="fa-solid fa-user" />}
+                </button>
+
+                <div className="ct-hud__arc">
+                    <a className="ct-hud__icon" style={{ '--tx': '0px', '--ty': '122px' }}
+                        href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="Vai alla scheda">
+                        <i className="fa-solid fa-id-card" />
+                    </a>
+                    <a className="ct-hud__icon" style={{ '--tx': '-61px', '--ty': '106px' }}
+                        href="main.php?page=messages_center&offset=0" title="Messaggi">
+                        <i className="fa-solid fa-envelope" />
+                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" />}
+                    </a>
+                    <a className="ct-hud__icon" style={{ '--tx': '-106px', '--ty': '61px' }}
+                        href="main.php?page=role_recap" title="Giocate personali">
+                        <i className="fa-solid fa-scroll" />
+                        {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" title="Giocata in corso" />}
+                    </a>
+                    <a className="ct-hud__icon" style={{ '--tx': '-122px', '--ty': '0px' }}
+                        href="main.php?page=agenda_center" title="Calendario">
+                        <i className="fa-solid fa-calendar-days" />
+                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" />}
+                    </a>
+                </div>
+
+                <div className="ct-hud__panel ct-hud__panel--char">
+                    <div className="ct-hud__char-row">
+                        <span className="ct-hud__char-name">
+                            {nome} <i className={`fa-solid ${sesso === 'f' ? 'fa-venus' : 'fa-mars'}`} />
+                        </span>
+                        <span className={`ct-hud__char-badge${disponibile ? ' is-available' : ''}`}>
+                            {disponibile ? 'Disponibile' : 'Occupato'}
+                        </span>
+                    </div>
+                    <div className="ct-hud__extra-links">
+                        <a href="main.php?page=servizi_gilde">Manuali</a>
+                        <a href="main.php?page=uffici">Uffici</a>
+                        {isStaff && <a href="main.php?page=gestione">Gestione</a>}
+                        <a href="#" onClick={handleLogout}>Esci</a>
+                    </div>
+                </div>
+            </div>
+
+            {/* ============ CENTRO: LOGO ============ */}
+            <div className="ct-hud__center">
+                <button className="ct-hud__brand" title="Mostra il menu" onClick={() => {
+                    const open = !(leftOpen && rightOpen)
+                    setLeftOpen(open)
+                    setRightOpen(open)
+                }}>
+                    <span className="ct-hud__brand-ring" />
+                    <span className="ct-hud__brand-mark">CT</span>
+                </button>
+            </div>
+
+            {/* ============ POPOVER ============ */}
+            {openPopover === 'presence' && (
+                <div className="ct-hud__popover ct-hud__popover--presence" onClick={e => e.stopPropagation()}>
+                    <div className="ct-hud__popover-head">
+                        <span>Presenti qui</span>
+                        <a href="main.php?page=presenti_estesi">Vedi tutti <i className="fa-solid fa-arrow-right" /></a>
+                    </div>
+                    <OnlineUsers />
+                </div>
+            )}
+
+            {openPopover === 'weather' && (
+                <div className="ct-hud__popover ct-hud__popover--weather" onClick={e => e.stopPropagation()}>
+                    <Meteo />
+                </div>
+            )}
+
+            {openPopover === 'chatoff' && (
+                <div className="ct-hud__popover ct-hud__popover--chatoff" onClick={e => e.stopPropagation()}>
+                    <ChattingOff />
+                </div>
+            )}
+        </div>
+    )
+}

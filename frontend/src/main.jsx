@@ -63,6 +63,7 @@ import AnteprimaScheda from './components/AnteprimaScheda'
 import LinkMenu        from './components/LinkMenu'
 import ChattingOff     from './components/ChattingOff'
 import Meteo           from './components/Meteo'
+import Hud             from './components/Hud'
 import ChatbotWidget   from './components/ChatbotWidget'
 import GestioneBot    from './components/GestioneBot'
 import GestioneManutenzione from './components/GestioneManutenzione'
@@ -163,6 +164,9 @@ window.CT.register('ChattingOff', ChattingOff)
 
 /** Box meteo nella colonna destra — toggle oggi/ieri */
 window.CT.register('Meteo', Meteo)
+
+/** HUD immersivo: due anelli (luogo/personaggio) + topbar, sostituisce le colonne laterali */
+window.CT.register('Hud', Hud)
 
 /** Chatbot AI floating widget — bottom-right, 5 domande/giorno, max 500 char */
 window.CT.register('ChatbotWidget', ChatbotWidget)

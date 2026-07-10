@@ -18,65 +18,17 @@ body {
     position: relative;
 }
 
-#framecontentLeft,
-#framecontentRight {
-    position: fixed;
-    width: 260px;
-    height: 100%;
-    box-sizing: border-box; // i 260px includono il padding: evita overflow orizzontale
-    overflow-x: hidden;
-    overflow-y: auto;
-    z-index: 1000;
-    transition: transform $transition-normal;
-    background-repeat: no-repeat;
-}
-
-#framecontentLeft {
-    background-image: url("imgs/colonna_sx/colonna_sinistra.png");
-    display: flex;
-    flex-direction: column;
-    gap: $space-2 + 2; // 10px di spazio uniforme tra ogni componente
-    padding-top: $space-2 + 2;
-
-    // Tutti i figli diretti: stessa larghezza, nessun margine individuale
-    >* {
-        width: 100%;
-        box-sizing: border-box;
-        flex-shrink: 0;
-    }
-}
-
-#framecontentRight {
-    left: auto;
-    right: 0;
-    color: $color-text-light;
-    background-image: url("imgs/colonna_dx/colonna_destra.png");
-    display: flex;
-    flex-direction: column;
-    gap: $space-1;
-    padding-bottom: $space-2 + 2;
-
-    >* {
-        width: 100%;
-        box-sizing: border-box;
-        flex-shrink: 0;
-    }
-
-    // Rimuove il margine del titolo nel contesto della colonna destra
-    .page_title h2 {
-        margin: 0;
-        padding: 0;
-    }
-}
-
+// Le colonne #framecontentLeft/#framecontentRight sono state sostituite
+// dall'HUD immersivo (Hud.jsx, vedi _hud.scss) — overlay fixed, non occupa
+// spazio nel flusso, quindi #maincontent torna a schermo intero.
 #maincontent {
     position: fixed;
-    top: 0;
-    left: 260px;
-    right: 260px;
+    top: 86px; // altezza della topbar dell'HUD (.ct-hud__topbar) — il contenuto non ci finisce sotto
+    left: 0;
+    right: 0;
     bottom: 0;
     overflow: auto;
-    width: calc(100% - 520px);
+    width: 100%;
     box-sizing: border-box;
 
     .output {
@@ -102,85 +54,11 @@ body {
     }
 }
 
-// ── Container diretti nelle colonne ──────────────────────────
-
-// Il container della chattina off: contenuto nella colonna su desktop,
-// nascosto su mobile per evitare problemi di layout
-#chattina-off-container {
-    overflow: hidden;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    contain: inline-size; // il contenuto non può influenzare la larghezza del container
-}
-
-// Pulsanti toggle mobile (nascosti su desktop)
-.mobile-toggle {
-    display: none;
-    position: fixed;
-    bottom: $space-2 + 2;
-    z-index: 1001;
-    background: rgb(0 0 0 / 70%);
-    color: $color-text-light;
-    border: none;
-    padding: $space-2 + 2 15px;
-    cursor: pointer;
-    border-radius: $radius-lg - 3;
-    font-size: $text-lg;
-}
-
-#toggleLeft {
-    left: $space-2 + 2;
-}
-
-#toggleRight {
-    right: $space-2 + 2;
-}
-
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgb(0 0 0 / 50%);
-    z-index: 999;
-
-    &.active {
-        display: block;
-    }
-}
-
 @media screen and (max-width: 768px) {
-    :root {
-        // Su mobile le sidebar sono nascoste: le modali occupano l'intera larghezza
-        --sidebar-modal-offset: 0px;
-    }
-
     body {
         overflow-x: hidden !important;
         width: 100% !important;
         position: relative !important;
-    }
-
-    #framecontentLeft,
-    #framecontentRight {
-        width: 280px;
-        transform: translateX(-100%);
-        visibility: hidden;
-        transition: transform $transition-normal, visibility $transition-normal;
-
-        &.expanded {
-            transform: translateX(0);
-            visibility: visible;
-        }
-    }
-
-    #framecontentRight {
-        transform: translateX(100%);
-        right: -30px;
-    }
-
-    #framecontentLeft {
-        left: -30px;
     }
 
     #maincontent {
@@ -188,22 +66,6 @@ body {
         right: 0 !important;
         width: 100% !important;
         overflow-x: auto !important;
-    }
-
-    .mobile-toggle {
-        display: block;
-    }
-
-    body.sidebars-closed {
-        overflow-x: hidden !important;
-        width: 100% !important;
-
-        #maincontent {
-            transform: translateX(0) !important;
-            width: 100% !important;
-            left: 0 !important;
-            right: 0 !important;
-        }
     }
 }
 
