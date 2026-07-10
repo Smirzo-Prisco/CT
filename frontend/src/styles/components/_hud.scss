@@ -238,6 +238,18 @@
 .ct-hud__popover--chatoff,
 .ct-hud__popover--weather { left: 250px; }
 
+// OnlineUsers/ChattingOff/Meteo perdono, fuori dai vecchi container con id
+// dedicato (#online-users-container ecc.), alcune regole CSS scopate su
+// quell'id (es. altezza/sfondo fisso di .iframe_online). Qui si ridanno
+// dimensioni minime sensate cosi' il contenuto e' sempre visibile anche
+// dentro il popover invece che potenzialmente collassato a zero altezza.
+.ct-hud__popover--presence {
+    .iframe_online { min-height: 120px; }
+    .contenitore_presenti { min-height: 80px; }
+}
+.ct-hud__popover--chatoff .chatoff-panel { min-height: 200px; }
+.ct-hud__popover--weather .news { min-height: 60px; }
+
 .ct-hud__popover-head {
     display: flex;
     align-items: center;

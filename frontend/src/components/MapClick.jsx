@@ -41,11 +41,19 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 // rooms  = stanze nella zona; link può essere 'dir' (ID stanza) o 'page' (pagina)
 // nightOnly = stanza visibile solo di notte (come in Chiyoda nel vecchio PHP)
 // ---------------------------------------------------------------------------
+// cx/cy: coordinate sull'immagine giorno (784x473, foto reale invariata).
+// nightCx/nightCy: coordinate sulla nuova immagine notte (1536x1024, illustrazione
+// stilizzata) — dimensioni e layout diversi dalla foto giorno, quindi le due
+// varianti hanno bisogno di coordinate separate (non una percentuale condivisa).
+// 6 zone su 9 coincidono con le etichette gia' disegnate nell'immagine
+// (Odaiba, Ueno, Shinjuku, Roppongi, Shibuya, Asakusa); le altre 3 (Monte Fuji,
+// Chiyoda, Tsukiji) non compaiono nel disegno, posizionate in punti plausibili.
 const ZONES = [
     {
         id: 'menu1',
         name: 'Odaiba',
         cx: 706, cy: 390,
+        nightCx: 1130, nightCy: 855,
         desc: 'Odaiba (お台場) è una grande isola artificiale collocata a Est della città. Meta preferita di molti turisti, è nota soprattutto per il famoso lungomare.',
         rooms: [
             { dir: 50, img: 'faro.png' },
@@ -59,6 +67,7 @@ const ZONES = [
         id: 'menu2',
         name: 'Monte Fuji',
         cx: 462, cy: 141,
+        nightCx: 850, nightCy: 60,
         desc: 'Il Monte Fuji (富士山 Fuji-san) è il vulcano più alto di tutto il Giappone. Luogo dalla bellezza paesaggistica straordinaria, è considerato uno dei luoghi sacri più importanti.',
         rooms: [
             { dir: 9, img: 'bosco.png' },
@@ -72,6 +81,7 @@ const ZONES = [
         id: 'menu3',
         name: 'Ueno',
         cx: 446, cy: 289,
+        nightCx: 1010, nightCy: 155,
         desc: 'Ueno (上野) è il quartiere in cui risiedono i più importanti musei e parchi di tutta la città. Densamente popolato soprattutto durante la fioritura dei sakura.',
         rooms: [
             // { dir: 43, img: 'giardini_dei_fiori_del_male.png' },
@@ -85,6 +95,7 @@ const ZONES = [
         id: 'menu4',
         name: 'Shinjuku',
         cx: 47, cy: 298,
+        nightCx: 400, nightCy: 275,
         desc: 'Shinjuku (新宿区) è il più importante e trafficato nodo di trasporto urbano della metropoli.',
         rooms: [
             // { dir: 27, img: 'villa_lancaster.png' },
@@ -97,6 +108,7 @@ const ZONES = [
         id: 'menu5',
         name: 'Chiyoda',
         cx: 330, cy: 365,
+        nightCx: 900, nightCy: 430,
         desc: 'Chiyoda (千代田) è il centro amministrativo di Tokyo dentro cui è possibile trovare, oltre che molte istituzioni governative, il famoso Palazzo di Cristallo.',
         rooms: [
             { dir: 36, img: 'corte.png' },
@@ -110,6 +122,7 @@ const ZONES = [
         id: 'menu6',
         name: 'Roppongi',
         cx: 161, cy: 320,
+        nightCx: 600, nightCy: 800,
         desc: 'Roppongi (六本木) è nota per l\'ingente numero di locali notturni e, per questo, meta di numerosi turisti ed espatriati occidentali.',
         rooms: [
             // { page: 'servizi_mercato', img: 'centro_commerciale.png' },
@@ -123,6 +136,7 @@ const ZONES = [
         id: 'menu7',
         name: 'Shibuya',
         cx: 80, cy: 405,
+        nightCx: 660, nightCy: 400,
         desc: 'Shibuya (渋谷) è la zona più conosciuta e affollata di tutta la capitale giapponese, perennemente illuminata da megaschermi e luci. È il quartiere preferito dai giovani.',
         rooms: [
             { dir: 23, img: 'centro.png' },
@@ -136,6 +150,7 @@ const ZONES = [
         id: 'menu8',
         name: 'Asakusa',
         cx: 581, cy: 238,
+        nightCx: 1330, nightCy: 265,
         desc: 'Asakusa (浅草) viene spesso associata alla zona spirituale. Dominata da templi e santuari shinto, è possibile notare persone vestite con abiti tradizionali.',
         rooms: [
             { dir: 34, img: 'cimitero.png' },
@@ -148,6 +163,7 @@ const ZONES = [
         id: 'menu9',
         name: 'Tsukiji',
         cx: 674, cy: 295,
+        nightCx: 1250, nightCy: 600,
         desc: 'Tsukiji (築地) deve la sua fama al celeberrimo mercato del pesce. A seguito di un terremoto non ancora compreso, molta della zona è costituita da palazzi abbandonati.',
         rooms: [
             { dir: 21, img: 'fiume.png' },
@@ -405,7 +421,9 @@ export default function MapClick() {
                         l'immagine ha gia' un proprio pallino disegnato per ogni zona,
                         qui si aggiunge solo l'affordance interattiva sopra. */}
                     {ZONES.map(zone => {
-                        const style = hotspotStyle(zone.cx, zone.cy)
+                        const zx = mapInfo?.is_notte ? zone.nightCx : zone.cx
+                        const zy = mapInfo?.is_notte ? zone.nightCy : zone.cy
+                        const style = hotspotStyle(zx, zy)
                         if (!style) return null
                         return (
                             <div

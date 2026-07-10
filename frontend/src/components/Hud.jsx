@@ -34,8 +34,28 @@ export default function Hud({ isStaff }) {
     const disponibile = window.CT_USER?.disponibile ?? 1
 
     const hudRef = useRef(null)
-    const [leftOpen, setLeftOpen] = useState(false)
-    const [rightOpen, setRightOpen] = useState(false)
+
+    // Stato aperto/chiuso degli anelli: persistito in localStorage cosi'
+    // resta com'era anche dopo un reload di pagina (non solo tra un
+    // ri-render e l'altro). Si chiude SOLO ri-cliccando l'anello stesso o
+    // il logo centrale — mai cliccando fuori.
+    const [leftOpen, setLeftOpenState] = useState(() => localStorage.getItem('ct_hud_left_open') === '1')
+    const [rightOpen, setRightOpenState] = useState(() => localStorage.getItem('ct_hud_right_open') === '1')
+    const setLeftOpen = useCallback(v => {
+        setLeftOpenState(prev => {
+            const next = typeof v === 'function' ? v(prev) : v
+            localStorage.setItem('ct_hud_left_open', next ? '1' : '0')
+            return next
+        })
+    }, [])
+    const setRightOpen = useCallback(v => {
+        setRightOpenState(prev => {
+            const next = typeof v === 'function' ? v(prev) : v
+            localStorage.setItem('ct_hud_right_open', next ? '1' : '0')
+            return next
+        })
+    }, [])
+
     const [openPopover, setOpenPopover] = useState(null) // 'presence' | 'weather' | 'chatoff' | null
 
     // ── Luogo corrente (stesso pattern di InfoLocation.jsx) ────────────────
@@ -148,12 +168,12 @@ export default function Hud({ isStaff }) {
         }
     }, [])
 
-    // ── Click fuori: richiude anelli e popover ──────────────────────────────
+    // ── Click fuori: richiude SOLO i popover, non gli anelli =====
+    // Gli anelli si chiudono esclusivamente ri-cliccando se stessi o il logo
+    // centrale (vedi toggleOwnRing/brandOrb onClick) — mai cliccando altrove.
     useEffect(() => {
         function onDocClick(e) {
             if (hudRef.current && !hudRef.current.contains(e.target)) {
-                setLeftOpen(false)
-                setRightOpen(false)
                 setOpenPopover(null)
             }
         }
@@ -169,6 +189,15 @@ export default function Hud({ isStaff }) {
     const mappaId = window.CT_USER?.mappa ?? 1
     const descrizioneTesto = (location?.descrizione ?? '').replace(/<[^>]+>/g, '')
 
+    // Immagine del luogo: in stanza usa mappa.immagine (imgs/locations/), sulla
+    // mappa generale usa l'immagine della zona (imgs/maps/) — stesso campo
+    // che InfoLocation.jsx leggeva da api_map.php?op=current.
+    const locationImg = location?.tipo === 'stanza' && location?.immagine
+        ? `themes/crystal/imgs/locations/${location.immagine}`
+        : location?.tipo === 'mappa' && location?.immagine_mappa
+            ? `themes/crystal/imgs/maps/${location.immagine_mappa}`
+            : null
+
     return (
         <div className="ct-hud" ref={hudRef}>
             <div className="ct-hud__topbar" aria-hidden="true" />
@@ -176,31 +205,31 @@ export default function Hud({ isStaff }) {
             {/* ============ ANELLO SINISTRO: LUOGO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--left${leftOpen ? ' is-open' : ''}`}>
                 <button className="ct-hud__thumb" onClick={() => setLeftOpen(v => !v)} title={location?.nome ?? 'Luogo'}>
-                    <i className="fa-solid fa-city" />
+                    {locationImg ? <img src={locationImg} alt={location?.nome ?? ''} /> : <i className="fa-solid fa-city" />}
                 </button>
 
                 <div className="ct-hud__arc">
-                    <a className="ct-hud__icon" style={{ '--tx': '0px', '--ty': '122px' }}
-                        href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Vai alla mappa principale">
-                        <i className="fa-solid fa-map-location-dot" />
-                    </a>
-                    <button className="ct-hud__icon" style={{ '--tx': '47px', '--ty': '113px' }}
-                        title="Chat off" onClick={togglePopover('chatoff')}>
-                        <i className="fa-solid fa-comment-dots" />
+                    <button className="ct-hud__icon" style={{ '--tx': '0px', '--ty': '122px' }}
+                        title="Meteo" onClick={togglePopover('weather')}>
+                        <i className="fa-solid fa-cloud-sun" />
                     </button>
+                    <a className="ct-hud__icon" style={{ '--tx': '47px', '--ty': '113px' }}
+                        href="main.php?page=forum" title="Forum">
+                        <i className="fa-solid fa-comments" />
+                    </a>
                     <button className="ct-hud__icon" style={{ '--tx': '86px', '--ty': '86px' }}
                         title="Presenti nel luogo" onClick={togglePopover('presence')}>
                         <i className="fa-solid fa-users" />
                         {presentiCount > 0 && <b className="ct-hud__pip">{presentiCount}</b>}
                     </button>
-                    <a className="ct-hud__icon" style={{ '--tx': '113px', '--ty': '47px' }}
-                        href="main.php?page=forum" title="Forum">
-                        <i className="fa-solid fa-comments" />
-                    </a>
-                    <button className="ct-hud__icon" style={{ '--tx': '122px', '--ty': '0px' }}
-                        title="Meteo" onClick={togglePopover('weather')}>
-                        <i className="fa-solid fa-cloud-sun" />
+                    <button className="ct-hud__icon" style={{ '--tx': '113px', '--ty': '47px' }}
+                        title="Chat off" onClick={togglePopover('chatoff')}>
+                        <i className="fa-solid fa-comment-dots" />
                     </button>
+                    <a className="ct-hud__icon" style={{ '--tx': '122px', '--ty': '0px' }}
+                        href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Vai alla mappa principale">
+                        <i className="fa-solid fa-map-location-dot" />
+                    </a>
                 </div>
 
                 <div className="ct-hud__panel ct-hud__panel--location">
@@ -217,23 +246,23 @@ export default function Hud({ isStaff }) {
 
                 <div className="ct-hud__arc">
                     <a className="ct-hud__icon" style={{ '--tx': '0px', '--ty': '122px' }}
-                        href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="Vai alla scheda">
-                        <i className="fa-solid fa-id-card" />
+                        href="main.php?page=agenda_center" title="Calendario">
+                        <i className="fa-solid fa-calendar-days" />
+                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" />}
                     </a>
                     <a className="ct-hud__icon" style={{ '--tx': '-61px', '--ty': '106px' }}
-                        href="main.php?page=messages_center&offset=0" title="Messaggi">
-                        <i className="fa-solid fa-envelope" />
-                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" />}
-                    </a>
-                    <a className="ct-hud__icon" style={{ '--tx': '-106px', '--ty': '61px' }}
                         href="main.php?page=role_recap" title="Giocate personali">
                         <i className="fa-solid fa-scroll" />
                         {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" title="Giocata in corso" />}
                     </a>
+                    <a className="ct-hud__icon" style={{ '--tx': '-106px', '--ty': '61px' }}
+                        href="main.php?page=messages_center&offset=0" title="Messaggi">
+                        <i className="fa-solid fa-envelope" />
+                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" />}
+                    </a>
                     <a className="ct-hud__icon" style={{ '--tx': '-122px', '--ty': '0px' }}
-                        href="main.php?page=agenda_center" title="Calendario">
-                        <i className="fa-solid fa-calendar-days" />
-                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" />}
+                        href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="Vai alla scheda">
+                        <i className="fa-solid fa-id-card" />
                     </a>
                 </div>
 
