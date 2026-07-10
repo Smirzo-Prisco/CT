@@ -155,7 +155,6 @@ switch ($op) {
         $azioni_sett = (int)gdrcd_query("SELECT COUNT(id) AS num FROM chat WHERE ora > DATE_SUB(NOW(), INTERVAL 7 DAY) AND (tipo = 'P' OR tipo = 'A')")['num'];
 
         $menu[] = ['key' => 'stats', 'label' => 'Informazioni', 'icon' => 'fa-chart-line', 'voci' => [
-            ['label' => 'Contatta la moderazione',    'url' => 'main.php?page=contatta_moderazione'],
             ['label' => "Iscritti: $iscritti",        'url' => '#'],
             ['label' => "Post in bacheca: $bacheca",  'url' => '#'],
             ['label' => "Azioni settimana: $azioni_sett", 'url' => '#'],
