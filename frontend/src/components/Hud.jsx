@@ -89,6 +89,22 @@ export default function Hud({ isStaff }) {
     // _layout.scss) — aperta cliccando il cerchio sinistro.
     const [showLocationDesc, setShowLocationDesc] = useState(false)
 
+    // Il pannello info (ring aperto) e i popover possono estendersi molto
+    // oltre l'anello (vedi _hud.scss .ct-hud__panel/.ct-hud__popover) e finire
+    // sopra il contenuto della pagina. Qui si segnala lo stato via attributo
+    // su <body>: _layout.scss restringe #maincontent sul lato interessato
+    // SOLO mentre quel pannello e' davvero aperto, cosi' il resto del tempo
+    // il contenuto resta alla sua larghezza piena (90%).
+    useEffect(() => {
+        document.body.dataset.hudLeftExpanded = (leftOpen || openPopover !== null) ? '1' : '0'
+        return () => { delete document.body.dataset.hudLeftExpanded }
+    }, [leftOpen, openPopover])
+
+    useEffect(() => {
+        document.body.dataset.hudRightExpanded = rightOpen ? '1' : '0'
+        return () => { delete document.body.dataset.hudRightExpanded }
+    }, [rightOpen])
+
     // ── Luogo corrente (stesso pattern di InfoLocation.jsx) ────────────────
     const [location, setLocation] = useState(null)
 
@@ -342,7 +358,7 @@ export default function Hud({ isStaff }) {
                         <span className="ct-hud__char-name">
                             {nome} <i className={`fa-solid ${sesso === 'f' ? 'fa-venus' : 'fa-mars'}`} />
                         </span>
-                        <span className="ct-hud__char-badge">{stats.gilda || 'Senza gilda'}</span>
+                        <span className="ct-hud__char-badge">{stats.gilda || 'Senza razza'}</span>
                     </div>
                     <div className="ct-hud__vitals">
                         <span className="ct-hud__vital ct-hud__vital--hp" title="Salute">

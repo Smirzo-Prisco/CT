@@ -47,6 +47,23 @@ body {
     &.ct-hud-map-page .output {
         width: 100%;
     }
+
+    transition: padding .25s ease;
+}
+
+// Il pannello info dell'anello sinistro puo' arrivare a 495px dal bordo, i
+// suoi popover (presenti/meteo/chat off) a 572px; il pannello dell'anello
+// destro a 455px (vedi .ct-hud__panel/.ct-hud__popover in _hud.scss). Senza
+// questo margine, quando sono aperti finiscono sopra l'intestazione/il
+// contenuto della pagina (vedi screenshot utente). L'attributo su <body> e'
+// impostato da Hud.jsx SOLO mentre il pannello/popover interessato e'
+// davvero aperto — il resto del tempo #maincontent resta al 90% pieno.
+// Serve spazio per applicarlo senza azzerare il contenuto: sotto i 1300px
+// l'overlap transitorio (solo mentre si interagisce attivamente con
+// l'anello) resta un compromesso accettato.
+@media screen and (min-width: 1300px) {
+    body[data-hud-left-expanded="1"] #maincontent { padding-left: 590px; }
+    body[data-hud-right-expanded="1"] #maincontent { padding-right: 470px; }
 }
 
 // ── Link Iubenda (colonna destra, sotto meteo) ────────────────
