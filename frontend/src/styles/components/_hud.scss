@@ -111,8 +111,18 @@
     font-size: 15px;
     transform: translate(var(--tx), var(--ty));
     transition: color .2s ease, border-color .2s ease;
+    user-select: none;
+    -webkit-user-drag: none;
+    outline: none;
 
-    &:hover { color: var(--gold); border-color: var(--gold); }
+    // Blocca la transform sulla posizione dell'arco anche a bottone premuto/
+    // focus: un :active generico su altri elementi (es. .btn) non deve mai
+    // poterla sovrascrivere e far "saltare" l'icona al centro.
+    &:hover, &:active, &:focus, &:focus-visible {
+        transform: translate(var(--tx), var(--ty));
+        color: var(--gold);
+        border-color: var(--gold);
+    }
 }
 
 .ct-hud__pip {
@@ -176,17 +186,28 @@
     &.is-available { background: rgba(92, 232, 154, .15); color: var(--ok); border-color: rgba(92, 232, 154, .4); }
 }
 
-.ct-hud__extra-links {
+.ct-hud__vitals {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px solid rgba(218, 168, 50, .15);
-
-    a { font-size: 11px; color: var(--muted); }
-    a:hover { color: var(--gold); }
 }
+.ct-hud__vital {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+
+    i { font-size: 12px; }
+}
+.ct-hud__vital--hp i { color: var(--danger); }
+.ct-hud__vital--integrity i { color: #6fb8ff; }
+.ct-hud__vital--level i { color: var(--gold); }
 
 // ── CENTRO: LOGO ─────────────────────────────────────────────
 .ct-hud__center {
@@ -215,6 +236,23 @@
     border-radius: 50%;
     border: 1px dashed rgba(218, 168, 50, .45);
     animation: ct-hud-spin 16s linear infinite;
+}
+
+// Arco rapido del logo centrale (manuali/uffici/gestione/esci): si apre al
+// hover o al click sul logo, si estende verso il basso a ventaglio.
+.ct-hud__center-arc {
+    position: absolute;
+    top: 29px; left: 50%;
+    z-index: 1;
+    transform: scale(.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), opacity .2s ease;
+}
+.ct-hud__center.is-open .ct-hud__center-arc {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
 }
 
 // ── POPOVER (presenze / meteo / chat off) ────────────────────

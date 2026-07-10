@@ -58,6 +58,10 @@ export default function Hud({ isStaff }) {
 
     const [openPopover, setOpenPopover] = useState(null) // 'presence' | 'weather' | 'chatoff' | null
 
+    // Arco centrale (uffici/manuali/gestione/esci): si apre al hover o al
+    // click sul logo — non persistito, e' solo un menu rapido.
+    const [centerOpen, setCenterOpen] = useState(false)
+
     // ── Luogo corrente (stesso pattern di InfoLocation.jsx) ────────────────
     const [location, setLocation] = useState(null)
 
@@ -79,16 +83,31 @@ export default function Hud({ isStaff }) {
         }
     }, [fetchLocation])
 
-    // ── Avatar personaggio (stesso pattern di AnteprimaScheda.jsx) ─────────
+    // ── Avatar + vitali personaggio (stesso pattern di AnteprimaScheda.jsx) ─
     const [avatar, setAvatar] = useState(() => (window.CT_USER?.url_img_chat ?? '').trim())
+    const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null })
 
-    useEffect(() => {
-        if (avatar || !nome) return
+    const fetchProfile = useCallback(() => {
+        if (!nome) return
         fetch(`/pages/api_scheda.php?op=profile&pg=${encodeURIComponent(nome)}`)
             .then(r => r.json())
-            .then(d => { if (d.success && d.url_img_chat) setAvatar(d.url_img_chat.trim()) })
-            .catch(() => {})
-    }, [nome]) // eslint-disable-line react-hooks/exhaustive-deps
+            .then(d => {
+                if (!d.success) return
+                if (d.url_img_chat) setAvatar(prev => prev || d.url_img_chat.trim())
+                setStats({
+                    salute: d.salute, salute_max: d.salute_max,
+                    integrita: d.integrita, integrita_max: d.integrita_max,
+                    livello: d.statistiche?.livello ?? null,
+                })
+            })
+            .catch(err => console.error('[Hud] Errore profilo:', err))
+    }, [nome])
+
+    useEffect(() => {
+        fetchProfile()
+        window.addEventListener('ct:location-changed', fetchProfile)
+        return () => window.removeEventListener('ct:location-changed', fetchProfile)
+    }, [fetchProfile])
 
     // ── Badge: messaggi privati (stesso pattern di FrameMessaggi.jsx) ──────
     const [hasNewMessages, setHasNewMessages] = useState(false)
@@ -204,12 +223,12 @@ export default function Hud({ isStaff }) {
 
             {/* ============ ANELLO SINISTRO: LUOGO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--left${leftOpen ? ' is-open' : ''}`}>
-                <button className="ct-hud__thumb" onClick={() => setLeftOpen(v => !v)} title={location?.nome ?? 'Luogo'}>
+                <button type="button" className="ct-hud__thumb" onClick={() => setLeftOpen(v => !v)} title={location?.nome ?? 'Luogo'}>
                     {locationImg ? <img src={locationImg} alt={location?.nome ?? ''} /> : <i className="fa-solid fa-city" />}
                 </button>
 
                 <div className="ct-hud__arc">
-                    <button className="ct-hud__icon" style={{ '--tx': '0px', '--ty': '122px' }}
+                    <button type="button" className="ct-hud__icon" style={{ '--tx': '0px', '--ty': '122px' }}
                         title="Meteo" onClick={togglePopover('weather')}>
                         <i className="fa-solid fa-cloud-sun" />
                     </button>
@@ -217,12 +236,12 @@ export default function Hud({ isStaff }) {
                         href="main.php?page=forum" title="Forum">
                         <i className="fa-solid fa-comments" />
                     </a>
-                    <button className="ct-hud__icon" style={{ '--tx': '86px', '--ty': '86px' }}
+                    <button type="button" className="ct-hud__icon" style={{ '--tx': '86px', '--ty': '86px' }}
                         title="Presenti nel luogo" onClick={togglePopover('presence')}>
                         <i className="fa-solid fa-users" />
                         {presentiCount > 0 && <b className="ct-hud__pip">{presentiCount}</b>}
                     </button>
-                    <button className="ct-hud__icon" style={{ '--tx': '113px', '--ty': '47px' }}
+                    <button type="button" className="ct-hud__icon" style={{ '--tx': '113px', '--ty': '47px' }}
                         title="Chat off" onClick={togglePopover('chatoff')}>
                         <i className="fa-solid fa-comment-dots" />
                     </button>
@@ -240,7 +259,7 @@ export default function Hud({ isStaff }) {
 
             {/* ============ ANELLO DESTRO: PERSONAGGIO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--right${rightOpen ? ' is-open' : ''}`}>
-                <button className="ct-hud__thumb" onClick={() => setRightOpen(v => !v)} title={nome}>
+                <button type="button" className="ct-hud__thumb" onClick={() => setRightOpen(v => !v)} title={nome}>
                     {avatar ? <img src={avatar} alt={nome} /> : <i className="fa-solid fa-user" />}
                 </button>
 
@@ -275,25 +294,53 @@ export default function Hud({ isStaff }) {
                             {disponibile ? 'Disponibile' : 'Occupato'}
                         </span>
                     </div>
-                    <div className="ct-hud__extra-links">
-                        <a href="main.php?page=servizi_gilde">Manuali</a>
-                        <a href="main.php?page=uffici">Uffici</a>
-                        {isStaff && <a href="main.php?page=gestione">Gestione</a>}
-                        <a href="#" onClick={handleLogout}>Esci</a>
+                    <div className="ct-hud__vitals">
+                        <span className="ct-hud__vital ct-hud__vital--hp" title="Salute">
+                            <i className="fa-solid fa-heart" /> {stats.salute ?? '-'}/{stats.salute_max ?? '-'}
+                        </span>
+                        <span className="ct-hud__vital ct-hud__vital--integrity" title="Integrità">
+                            <i className="fa-solid fa-shield-halved" /> {stats.integrita ?? '-'}/{stats.integrita_max ?? '-'}
+                        </span>
+                        <span className="ct-hud__vital ct-hud__vital--level" title="Livello">
+                            <i className="fa-solid fa-star" /> Lv. {stats.livello ?? '-'}
+                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* ============ CENTRO: LOGO ============ */}
-            <div className="ct-hud__center">
-                <button className="ct-hud__brand" title="Mostra il menu" onClick={() => {
+            {/* ============ CENTRO: LOGO + ARCO RAPIDO ============ */}
+            <div className={`ct-hud__center${centerOpen ? ' is-open' : ''}`}
+                onMouseEnter={() => setCenterOpen(true)} onMouseLeave={() => setCenterOpen(false)}>
+                <button type="button" className="ct-hud__brand" title="Mostra il menu" onClick={() => {
                     const open = !(leftOpen && rightOpen)
                     setLeftOpen(open)
                     setRightOpen(open)
+                    setCenterOpen(v => !v)
                 }}>
                     <span className="ct-hud__brand-ring" />
                     <span className="ct-hud__brand-mark">CT</span>
                 </button>
+
+                <div className="ct-hud__center-arc">
+                    <a className="ct-hud__icon" style={{ '--tx': '-100px', '--ty': '45px' }}
+                        href="main.php?page=servizi_gilde" title="Manuali">
+                        <i className="fa-solid fa-book" />
+                    </a>
+                    <a className="ct-hud__icon" style={{ '--tx': '-35px', '--ty': '85px' }}
+                        href="main.php?page=uffici" title="Uffici">
+                        <i className="fa-solid fa-building-columns" />
+                    </a>
+                    {isStaff && (
+                        <a className="ct-hud__icon" style={{ '--tx': '35px', '--ty': '85px' }}
+                            href="main.php?page=gestione" title="Gestione">
+                            <i className="fa-solid fa-screwdriver-wrench" />
+                        </a>
+                    )}
+                    <a className="ct-hud__icon" style={{ '--tx': '100px', '--ty': '45px' }}
+                        href="#" title="Esci" onClick={handleLogout}>
+                        <i className="fa-solid fa-right-from-bracket" />
+                    </a>
+                </div>
             </div>
 
             {/* ============ POPOVER ============ */}
