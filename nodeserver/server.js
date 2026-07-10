@@ -3,8 +3,8 @@
 const http = require('http');
 const { Server } = require('socket.io');
 
-const PORT = 3000;
-const HOST = '127.0.0.1';
+const PORT = process.env.CT_SOCKET_PORT || 3000;
+const HOST = process.env.CT_SOCKET_HOST || '127.0.0.1';
 
 const httpServer = http.createServer((req, res) => {
     // Le richieste /socket.io/* sono gestite da engine.io — non toccare
@@ -37,7 +37,7 @@ const httpServer = http.createServer((req, res) => {
 
 const io = new Server(httpServer, {
     cors: {
-        origin: ['https://crystaltokyo.it', 'http://crystaltokyo.it'],
+        origin: ['https://crystaltokyo.it', 'http://crystaltokyo.it', 'https://staging.crystaltokyo.it'],
         methods: ['GET', 'POST'],
         credentials: true,
     },

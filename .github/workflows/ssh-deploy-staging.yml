@@ -1,0 +1,43 @@
+name: Deploy GDRCD su Crystal Tokyo (staging)
+
+on:
+  push:
+    branches:
+      - staging
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy su server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /var/www/crystaltokyo-staging/gdrcd
+            # Preserva config.inc.php prima del reset (non è in git)
+            cp config.inc.php /tmp/ct_staging_config_backup.php 2>/dev/null || true
+            git fetch origin staging
+            git reset --hard origin/staging
+            # Ripristina config.inc.php dopo il reset
+            cp /tmp/ct_staging_config_backup.php config.inc.php 2>/dev/null || true
+            cd /var/www/crystaltokyo-staging/gdrcd/nodeserver
+            npm install --production
+            export CT_SOCKET_PORT=3001
+            pm2 restart ct-socket-staging --update-env || pm2 start server.js --name ct-socket-staging
+            cd /var/www/crystaltokyo-staging/gdrcd/frontend
+            npm install
+            npm run build:css
+            npm run build
+            chown -R www-data:www-data /var/www/crystaltokyo-staging

@@ -784,5 +784,6 @@ function notifySocketServer(string $event, string $room, array $data = []): void
             'ignore_errors' => true,
         ]
     ]);
-    @file_get_contents('http://127.0.0.1:3000/notify', false, $ctx);
+    $port = $GLOBALS['PARAMETERS']['socket']['port'] ?? 3000;
+    @file_get_contents("http://127.0.0.1:$port/notify", false, $ctx);
 }

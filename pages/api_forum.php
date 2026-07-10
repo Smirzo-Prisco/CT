@@ -21,7 +21,8 @@ $login = $_SESSION['login'];
 function notifyForumUpdate(int $araldo_id, int $thread_id): void {
     $payload = json_encode(['event' => 'forum:update', 'room' => 'global', 'data' => ['araldo_id' => $araldo_id, 'thread_id' => $thread_id]]);
     $ctx = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-Type: application/json', 'content' => $payload, 'timeout' => 1, 'ignore_errors' => true]]);
-    @file_get_contents('http://127.0.0.1:3000/notify', false, $ctx);
+    $port = $GLOBALS['PARAMETERS']['socket']['port'] ?? 3000;
+    @file_get_contents("http://127.0.0.1:$port/notify", false, $ctx);
 }
 
 // can_access_section() è stata spostata in includes/custom_functions.inc.php:
