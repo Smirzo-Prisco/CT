@@ -97,21 +97,15 @@ export default function Hud({ isStaff }) {
     // _layout.scss) — aperta cliccando il cerchio sinistro.
     const [showLocationDesc, setShowLocationDesc] = useState(false)
 
-    // Il pannello info (ring aperto) e i popover possono estendersi molto
-    // oltre l'anello (vedi _hud.scss .ct-hud__panel/.ct-hud__popover) e finire
-    // sopra il contenuto della pagina. Qui si segnala lo stato via attributo
-    // su <body>: _layout.scss restringe #maincontent sul lato interessato
-    // SOLO mentre quel pannello e' davvero aperto, cosi' il resto del tempo
-    // il contenuto resta alla sua larghezza piena (90%).
+    // Ripulisce un attributo di un tentativo precedente (restringeva
+    // #maincontent quando un pannello era aperto): riduceva il contenuto
+    // troppo drasticamente e restava "incollato" se leftOpen/rightOpen
+    // arrivavano gia' a true da localStorage. Vedi _hud.scss per la
+    // soluzione attuale (pannello/popover piu' vicini all'anello).
     useEffect(() => {
-        document.body.dataset.hudLeftExpanded = (leftOpen || openPopover !== null) ? '1' : '0'
-        return () => { delete document.body.dataset.hudLeftExpanded }
-    }, [leftOpen, openPopover])
-
-    useEffect(() => {
-        document.body.dataset.hudRightExpanded = rightOpen ? '1' : '0'
-        return () => { delete document.body.dataset.hudRightExpanded }
-    }, [rightOpen])
+        delete document.body.dataset.hudLeftExpanded
+        delete document.body.dataset.hudRightExpanded
+    }, [])
 
     // ── Luogo corrente (stesso pattern di InfoLocation.jsx) ────────────────
     const [location, setLocation] = useState(null)
@@ -303,6 +297,10 @@ export default function Hud({ isStaff }) {
                     {locationImg ? <img src={locationImg} alt={location?.nome ?? ''} /> : <i className="fa-solid fa-city" />}
                 </button>
 
+                {/* Solo mobile (vedi _hud.scss): sfondo scuro dietro la scheda a
+                    comparsa dal basso, tocca per chiuderla. */}
+                <div className="ct-hud__sheet-backdrop" onClick={() => setLeftOpen(false)} />
+
                 <div className="ct-hud__arc">
                     <button type="button" className="ct-hud__icon" style={arcIcon(0, 110)}
                         title="Meteo" onClick={togglePopover('weather')}>
@@ -338,6 +336,10 @@ export default function Hud({ isStaff }) {
                 <button type="button" className="ct-hud__thumb" onClick={goToOwnScheda} title={nome}>
                     {avatar ? <img src={avatar} alt={nome} /> : <i className="fa-solid fa-user" />}
                 </button>
+
+                {/* Solo mobile (vedi _hud.scss): sfondo scuro dietro la scheda a
+                    comparsa dal basso, tocca per chiuderla. */}
+                <div className="ct-hud__sheet-backdrop" onClick={() => setRightOpen(false)} />
 
                 <div className="ct-hud__arc">
                     <a className="ct-hud__icon" style={arcIcon(0, 110)}
