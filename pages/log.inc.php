@@ -7,14 +7,14 @@ if ($_SESSION['admin'] != 1 && $_SESSION['moderatore'] != 1) {
 
 require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 
-$currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'azioni';
+$currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
 ?>
 
 <div class="log-container">
     <h1>Logs</h1>
     <!-- TABS -->
     <div class="tabs">
-        <div class="tab <?= $currentTab == 'azioni' ? 'active' : '' ?>" onclick="changeTab('azioni')">Doppi invii</div>
+        <div class="tab <?= $currentTab == 'chatbot' ? 'active' : '' ?>" onclick="changeTab('chatbot')">Domande chatbot</div>
         <div class="tab <?= $currentTab == 'sms' ? 'active' : '' ?>" onclick="changeTab('sms')">SMS</div>
         <div class="tab <?= $currentTab == 'doppi' ? 'active' : '' ?>" onclick="changeTab('doppi')">Doppi</div>
         <div class="tab <?= $currentTab == 'punti' ? 'active' : '' ?>" onclick="changeTab('punti')">Limite punti</div>
@@ -23,7 +23,7 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'azioni';
     </div>
     <!-- FILTRI -->
     <div class="filters">
-    <?php if ($currentTab == 'azioni'): ?>
+    <?php if ($currentTab == 'chatbot'): ?>
     <?php elseif ($currentTab == 'generali'): ?>
         <select onchange="window.location.href = 'main.php?page=log&tab=<?=$currentTab?>&generaliType=' + this.value;">
             <?php
@@ -58,61 +58,26 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'azioni';
     <table id="logTable">
         <?php
         switch ($currentTab) {
-            case 'azioni': //  ******************  AZIONI ******************
-                $azioni = gdrcd_query("SELECT log.id as log_id, log.autore, log.data_evento, log.descrizione_evento, chat.stanza, chat.testo, mappa.nome as luogo FROM log
-                                        LEFT JOIN chat ON log.descrizione_evento = chat.id
-                                        LEFT JOIN mappa ON chat.stanza = mappa.id
-                                        WHERE codice_evento = 'doppia_azione' ORDER BY data_evento DESC", 'result'); ?>
+            case 'chatbot': //  ******************  DOMANDE CHATBOT ******************
+                $chatbot_log = gdrcd_query("SELECT id, nome_personaggio, domanda, risposta, tokens_usati, created_at FROM chatbot_log ORDER BY created_at DESC", 'result'); ?>
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)"><?=gdrcd_filter('out', $MESSAGE['interface']['administration']['log']['events']['author']); ?></th>
-                        <th onclick="sortTable(2)"><?=gdrcd_filter('out', $MESSAGE['interface']['administration']['log']['events']['date']); ?></th>
-                        <th onclick="sortTable(3)">Luogo</th>
-                        <th onclick="sortTable(4)">Testo (azione 1 di 2)</th>
+                        <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Personaggio</th>
+                        <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> Domanda</th>
+                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Risposta</th>
+                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> Token usati</th>
+                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Data</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php
-                $counter = []; // array vuoto per i conteggi
-
-                while ($row = gdrcd_query($azioni, 'fetch')) : // Per ogni doppia azione trovata nei log, popolo la tabella
-                    $id = 'modalChat'.$row['log_id']; ?>
-                    <tr onclick="document.getElementById('<?=$id?>').style.display = 'block';" style="cursor: pointer;">
-                        <td><?=gdrcd_filter('out', $row['autore'])?></td>
-                        <td><?=gdrcd_format_date($row['data_evento']) . ' ' . gdrcd_format_time($row['data_evento'])?></td>
-                        <td><?=gdrcd_filter('out', $row['luogo'])?></td>
-                        <td><?=gdrcd_filter('out', $row['testo'])?></td>
-                    </tr> <!-- Apro la modale con la chat relativa alla doppia azione -->
-                    <div class="modal-overlay" id="<?=$id?>">
-                        <button class="close-btn" id="closeModal" onclick="document.getElementById('<?=$id?>').style.display = 'none';">&times;</button>
-                        <div class="chat-container">
-                            <h2><?=$row['luogo']?> - Il <?=gdrcd_format_date($row['data_evento']) . ' alle ore ' . gdrcd_format_time($row['data_evento'])?> - Ho evidenziato la prima azione alla quale è succeduta la doppia</h1>
-                            <?php
-                            $chat = gdrcd_query("SELECT * FROM chat WHERE stanza = ".$row['stanza']." AND ora BETWEEN DATE_SUB('".$row['data_evento']."', INTERVAL 1 HOUR) AND DATE_ADD('".$row['data_evento']."', INTERVAL 1 HOUR) ORDER BY ora ASC", 'result');
-
-                            while ($c = gdrcd_query($chat, 'fetch')) {
-                                // Evidenzio il testo della doppia azione
-                                $testo = $c['testo'] == $row['testo'] ? '<span style="color:white;">'.$row['testo'].'</span><div><span style="color:red;font-weight:bold;tect-align:center;">E anche la successiva di '.$row['autore'].'</span></div>' : $c['testo'];
-                                // Costruisco la chat da un'ora prima fino a un'ora dopo la doppia azione
-                                
-                                $testo = str_replace('[', '«<font color=#ce846f>', $testo);
-                                $testo = str_replace(']', '</font>»', $testo);
-                                $testo = str_replace('«', '«<font color=#ce846f>', $testo);
-                                $testo = str_replace('»', '</font>»', $testo);
-                                $testo = str_replace('{', '<font color=green>', $testo);
-                                $testo = str_replace('}', '</font>', $testo);
-                                // Stampo la chat
-                                $add_chat = '<div align="justify">';
-                                $add_chat.= '<span class="chat_time">'.gdrcd_format_time($c['ora']).'</span>';
-                                $add_chat.= '<b>'.$c['mittente'].'</b>';
-                                $add_chat.= '<span class="chat_msg">'.gdrcd_chatme($_SESSION['login'], $testo, true).'</span>';
-                                $add_chat.= '</div>';
-                                
-                                echo str_replace(gdrcd_format_time($row['data_evento']), '<span style="color:red;"><u><b>'.gdrcd_format_time($row['data_evento']).'</b></u></span>', $add_chat);
-                            }
-                            ?>
-                        </div>
-                    </div>
+                <?php while ($row = gdrcd_query($chatbot_log, 'fetch')) : ?>
+                    <tr>
+                        <td><?=gdrcd_filter('out', $row['nome_personaggio'])?></td>
+                        <td><?=gdrcd_filter('out', $row['domanda'])?></td>
+                        <td><?=gdrcd_filter('out', $row['risposta'])?></td>
+                        <td style="text-align:right;"><?=$row['tokens_usati']?></td>
+                        <td><?=gdrcd_format_date($row['created_at']) . ' ' . gdrcd_format_time($row['created_at'])?></td>
+                    </tr>
                 <?php endwhile; ?>
                 </tbody>
             <?php break;
