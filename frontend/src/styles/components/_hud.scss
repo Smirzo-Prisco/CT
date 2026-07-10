@@ -219,9 +219,9 @@
     position: absolute;
     top: 57px;
     left: 50%;
-    width: 140px;
-    height: 100px;
-    margin-left: -70px;
+    width: 170px;
+    height: 110px;
+    margin-left: -85px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -315,26 +315,29 @@
 // Regola permanente: l'HUD resta SEMPRE absolute/fixed sugli angoli, non
 // passa mai a static. Si degrada scalando l'intero anello (transform:scale
 // mantiene le proporzioni dell'arco senza dover ricalcolare --tx/--ty).
+// Sotto i 680px la scala resta volutamente alta (.6+): le icone dell'arco
+// sono figlie dell'anello e si rimpiccioliscono con lui, un fattore troppo
+// basso le rende troppo piccole per essere toccate su mobile.
 @media (max-width: 1080px) {
     .ct-hud__ring { transform: scale(.82); }
 }
 
 @media (max-width: 860px) {
-    .ct-hud__ring { transform: scale(.62); }
+    .ct-hud__ring { transform: scale(.75); }
     .ct-hud__panel p { display: none; }
     .ct-hud__popover { width: 240px; }
 }
 
 @media (max-width: 680px) {
-    .ct-hud__ring { top: 10px; transform: scale(.42); }
-    .ct-hud__ring--left { left: 10px; }
-    .ct-hud__ring--right { right: 10px; }
-    .ct-hud__center { top: 10px; }
-    .ct-hud__brand { width: 46px; height: 46px; font-size: 13px; }
+    .ct-hud__ring { top: 6px; transform: scale(.65); }
+    .ct-hud__ring--left { left: 6px; }
+    .ct-hud__ring--right { right: 6px; }
+    .ct-hud__center { top: 6px; }
+    .ct-hud__brand { width: 50px; height: 50px; font-size: 14px; }
     .ct-hud__popover { width: calc(100vw - 20px); max-width: 260px; left: 10px !important; }
 }
 
 @media (max-width: 420px) {
-    .ct-hud__ring { transform: scale(.34); }
-    .ct-hud__brand { width: 42px; height: 42px; }
+    .ct-hud__ring { transform: scale(.58); }
+    .ct-hud__brand { width: 46px; height: 46px; }
 }

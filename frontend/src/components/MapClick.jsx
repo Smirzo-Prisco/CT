@@ -205,6 +205,15 @@ export default function MapClick() {
     /** Ref all'immagine mappa per leggere le dimensioni naturali reali */
     const imgRef = useRef(null)
 
+    // La mappa e' l'unica pagina che deve occupare il 100% di #maincontent
+    // (le altre restano al 90%, vedi _layout.scss) — qui aggiunge/rimuove la
+    // classe che attiva l'eccezione.
+    useEffect(() => {
+        const el = document.getElementById('maincontent')
+        el?.classList.add('ct-hud-map-page')
+        return () => el?.classList.remove('ct-hud-map-page')
+    }, [])
+
     /**
      * Dimensioni naturali REALI dell'immagine (px), lette da img.naturalWidth/Height.
      * Necessarie per calcolare le posizioni percentuali degli hotspot.

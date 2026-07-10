@@ -347,21 +347,21 @@ export default function Hud({ isStaff }) {
                 </button>
 
                 <div className="ct-hud__center-arc">
-                    <a className="ct-hud__icon" style={arcIcon(-50, 0)}
+                    <a className="ct-hud__icon" style={arcIcon(-60, 0)}
                         href="main.php?page=servizi_gilde" title="Manuali">
                         <i className="fa-solid fa-book" />
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-25, 43)}
+                    <a className="ct-hud__icon" style={arcIcon(-30, 52)}
                         href="main.php?page=uffici" title="Uffici">
                         <i className="fa-solid fa-building-columns" />
                     </a>
                     {isStaff && (
-                        <a className="ct-hud__icon" style={arcIcon(25, 43)}
+                        <a className="ct-hud__icon" style={arcIcon(30, 52)}
                             href="main.php?page=gestione" title="Gestione">
                             <i className="fa-solid fa-screwdriver-wrench" />
                         </a>
                     )}
-                    <a className="ct-hud__icon" style={arcIcon(50, 0)}
+                    <a className="ct-hud__icon" style={arcIcon(60, 0)}
                         href="#" title="Esci" onClick={handleLogout}>
                         <i className="fa-solid fa-right-from-bracket" />
                     </a>

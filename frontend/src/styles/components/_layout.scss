@@ -22,14 +22,12 @@ body {
 // dall'HUD immersivo (Hud.jsx, vedi _hud.scss) — overlay fixed, non occupa
 // spazio nel flusso, quindi #maincontent torna a schermo intero.
 //
-// Il padding laterale e' il "corridoio" riservato agli anelli dell'HUD (che
-// restano fixed sugli angoli anche ad anello aperto): senza, su schermi non
-// larghissimi il ventaglio di icone finirebbe sopra il contenuto. I valori
-// sono ricalcolati agli stessi breakpoint di .ct-hud__ring (_hud.scss), in
-// proporzione alla scala li' applicata.
-// .output ha in piu' una larghezza massima fissa: le pagine PHP legacy non
+// .output e' al 90% della larghezza su desktop (le pagine PHP legacy non
 // hanno una larghezza di progetto unica, quindi senza un tetto il contenuto
-// risulta ora stretto ora largo a seconda della pagina.
+// risulta ora stretto ora largo a seconda della pagina), tranne la mappa
+// (100%, vedi .ct-hud-map-page qui sotto — classe aggiunta/rimossa da
+// MapClick.jsx sul mount/unmount). Su mobile (@media sotto) torna sempre al
+// 100% per tutte le pagine.
 #maincontent {
     position: fixed;
     top: 86px; // altezza della topbar dell'HUD (.ct-hud__topbar) — il contenuto non ci finisce sotto
@@ -38,21 +36,18 @@ body {
     bottom: 0;
     overflow: auto;
     width: 100%;
-    padding: 0 250px;
     box-sizing: border-box;
 
     .output {
-        width: 100%;
-        max-width: 1100px;
+        width: 90%;
         margin: 0 auto;
         box-sizing: border-box;
     }
-}
 
-@media screen and (max-width: 1080px) { #maincontent { padding: 0 190px; } }
-@media screen and (max-width: 860px)  { #maincontent { padding: 0 140px; } }
-@media screen and (max-width: 680px)  { #maincontent { padding: 0 90px; } }
-@media screen and (max-width: 420px)  { #maincontent { padding: 0 50px; } }
+    &.ct-hud-map-page .output {
+        width: 100%;
+    }
+}
 
 // ── Link Iubenda (colonna destra, sotto meteo) ────────────────
 
@@ -82,6 +77,8 @@ body {
         right: 0 !important;
         width: 100% !important;
         overflow-x: auto !important;
+
+        .output { width: 100%; }
     }
 }
 
