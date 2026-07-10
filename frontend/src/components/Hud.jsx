@@ -3,10 +3,15 @@
  *
  * HUD immersivo che sostituisce le colonne laterali (framecontentLeft/Right):
  * due cerchi agli angoli (luogo a sinistra, personaggio a destra) collegati
- * a una topbar comune, ciascuno espandibile in un arco di icone di
- * navigazione reale. Le icone restano sempre visibili e cliccabili — ad
- * anello chiuso sono solo più piccole (l'intero arco si ridimensiona con un
- * transform:scale, non sparisce).
+ * a una topbar comune, ciascuno con un arco di icone di navigazione reale.
+ * Le icone restano sempre visibili e cliccabili — ad anello chiuso sono
+ * solo più piccole (l'intero arco si ridimensiona con un transform:scale,
+ * non sparisce).
+ *
+ * L'apertura/chiusura dei due anelli (arco + pannello info) e' comandata
+ * SOLO dal logo centrale, non dai cerchi stessi: cliccare il cerchio
+ * sinistro apre la modale descrizione del luogo (stessa di InfoLocation.jsx),
+ * cliccare il cerchio destro va direttamente alla propria scheda.
  *
  * Sostituisce (montati singolarmente in precedenza): InfoLocation,
  * PresentiBadge, OnlineUsers, ChattingOff, AnteprimaScheda, FrameMessaggi,
@@ -27,6 +32,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import OnlineUsers from './OnlineUsers'
 import ChattingOff from './ChattingOff'
 import Meteo from './Meteo'
@@ -74,8 +80,14 @@ export default function Hud({ isStaff }) {
     const [openPopover, setOpenPopover] = useState(null) // 'presence' | 'weather' | 'chatoff' | null
 
     // Arco centrale (uffici/manuali/gestione/esci): si apre al hover o al
-    // click sul logo — non persistito, e' solo un menu rapido.
+    // click sul logo — non persistito, e' solo un menu rapido. E' anche
+    // l'unico punto che apre/chiude gli anelli laterali (i cerchi stessi non
+    // si ingrandiscono piu' cliccandoli, vedi thumb onClick sotto).
     const [centerOpen, setCenterOpen] = useState(false)
+
+    // Modale descrizione luogo (stessa di InfoLocation.jsx, mai rimossa da
+    // _layout.scss) — aperta cliccando il cerchio sinistro.
+    const [showLocationDesc, setShowLocationDesc] = useState(false)
 
     // ── Luogo corrente (stesso pattern di InfoLocation.jsx) ────────────────
     const [location, setLocation] = useState(null)
@@ -205,6 +217,19 @@ export default function Hud({ isStaff }) {
         }
     }, [])
 
+    // ── Cerchio destro: apre direttamente la propria scheda ─────────────────
+    const goToOwnScheda = useCallback(() => {
+        const url = `main.php?page=scheda&pg=${encodeURIComponent(nome)}`
+        if (window.CT?.navigate) window.CT.navigate(url)
+        else window.top.location.href = url
+    }, [nome])
+
+    // ── Icona chatbot: apre il widget flottante (gia' montato altrove) ──────
+    const openChatbot = e => {
+        e.preventDefault()
+        window.dispatchEvent(new CustomEvent('ct:chatbot-open'))
+    }
+
     // ── Click fuori: richiude SOLO i popover, non gli anelli =====
     // Gli anelli si chiudono esclusivamente ri-cliccando se stessi o il logo
     // centrale (vedi toggleOwnRing/brandOrb onClick) — mai cliccando altrove.
@@ -250,7 +275,7 @@ export default function Hud({ isStaff }) {
 
             {/* ============ ANELLO SINISTRO: LUOGO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--left${leftOpen ? ' is-open' : ''}`}>
-                <button type="button" className="ct-hud__thumb" onClick={() => setLeftOpen(v => !v)} title={location?.nome ?? 'Luogo'}>
+                <button type="button" className="ct-hud__thumb" onClick={() => setShowLocationDesc(true)} title={location?.nome ?? 'Luogo'}>
                     {locationImg ? <img src={locationImg} alt={location?.nome ?? ''} /> : <i className="fa-solid fa-city" />}
                 </button>
 
@@ -286,7 +311,7 @@ export default function Hud({ isStaff }) {
 
             {/* ============ ANELLO DESTRO: PERSONAGGIO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--right${rightOpen ? ' is-open' : ''}`}>
-                <button type="button" className="ct-hud__thumb" onClick={() => setRightOpen(v => !v)} title={nome}>
+                <button type="button" className="ct-hud__thumb" onClick={goToOwnScheda} title={nome}>
                     {avatar ? <img src={avatar} alt={nome} /> : <i className="fa-solid fa-user" />}
                 </button>
 
@@ -307,8 +332,8 @@ export default function Hud({ isStaff }) {
                         {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-95, 55)} />}
                     </a>
                     <a className="ct-hud__icon" style={arcIcon(-110, 0)}
-                        href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="Vai alla scheda">
-                        <i className="fa-solid fa-id-card" />
+                        href="#" title="Assistente" onClick={openChatbot}>
+                        <i className="fa-solid fa-robot" />
                     </a>
                 </div>
 
@@ -333,6 +358,34 @@ export default function Hud({ isStaff }) {
                 </div>
             </div>
 
+            {/* Modale descrizione luogo (stessa di InfoLocation.jsx) — portal su
+                document.body per non restare intrappolata nello stacking
+                context fixed dell'HUD. */}
+            {showLocationDesc && location && createPortal(
+                <div className="info-location-overlay" onClick={() => setShowLocationDesc(false)}>
+                    <div className="info-location-modal" onClick={e => e.stopPropagation()}>
+                        <div className="info-location-modal-header">
+                            <span>
+                                <i className="fa-solid fa-location-dot" style={{ marginRight: 8 }} />
+                                {location.nome}
+                            </span>
+                            <button onClick={() => setShowLocationDesc(false)} aria-label="Chiudi">×</button>
+                        </div>
+                        <div className="info-location-modal-body">
+                            {location.descrizione_immagine && (
+                                <img
+                                    src={`/themes/crystal/imgs/descrizioni/${location.descrizione_immagine}`}
+                                    alt={location.nome}
+                                    className="info-location-modal-img"
+                                />
+                            )}
+                            <div dangerouslySetInnerHTML={{ __html: location.descrizione }} />
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
             {/* ============ CENTRO: LOGO + ARCO RAPIDO ============ */}
             <div className={`ct-hud__center${centerOpen ? ' is-open' : ''}`}
                 onMouseEnter={() => setCenterOpen(true)} onMouseLeave={() => setCenterOpen(false)}>
@@ -351,7 +404,9 @@ export default function Hud({ isStaff }) {
                         href="main.php?page=servizi_gilde" title="Manuali">
                         <i className="fa-solid fa-book" />
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-30, 52)}
+                    {/* Senza Gestione (non-staff) Uffici prende la posizione centrale
+                        del ventaglio, cosi' non resta uno spazio vuoto al suo posto. */}
+                    <a className="ct-hud__icon" style={isStaff ? arcIcon(-30, 52) : arcIcon(0, 60)}
                         href="main.php?page=uffici" title="Uffici">
                         <i className="fa-solid fa-building-columns" />
                     </a>

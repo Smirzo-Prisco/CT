@@ -151,6 +151,13 @@ export default function ChatbotWidget() {
         setOpen(prev => !prev)
     }
 
+    // Apertura esterna (icona "Assistente" nell'arco destro dell'HUD, vedi Hud.jsx)
+    useEffect(() => {
+        const onExternalOpen = () => setOpen(true)
+        window.addEventListener('ct:chatbot-open', onExternalOpen)
+        return () => window.removeEventListener('ct:chatbot-open', onExternalOpen)
+    }, [])
+
     // ── Logica chatbot ────────────────────────────────────────────────────────
     useEffect(() => {
         fetch(`${API_BASE}?op=status`)

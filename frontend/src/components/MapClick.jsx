@@ -398,8 +398,14 @@ export default function MapClick() {
     // RENDERING
     // ---------------------------------------------------------------------------
 
+    // Finché mapInfo non è arrivato non si sa se è giorno o notte: renderizzare
+    // subito l'immagine di giorno (default implicito di is_notte undefined) la
+    // mostrerebbe per un istante anche quando in realtà è notte, con un flash
+    // visibile al cambio immagine appena arriva la risposta.
+    if (!mapInfo) return <center><p>Caricamento mappa…</p></center>
+
     /** Sceglie l'immagine giorno o notte in base all'ora */
-    const mapImg = mapInfo?.is_notte
+    const mapImg = mapInfo.is_notte
         ? 'themes/crystal/imgs/maps/mappa_notte.png'
         : 'themes/crystal/imgs/maps/mappa_giorno.png'
 
@@ -430,8 +436,8 @@ export default function MapClick() {
                         l'immagine ha gia' un proprio pallino disegnato per ogni zona,
                         qui si aggiunge solo l'affordance interattiva sopra. */}
                     {ZONES.map(zone => {
-                        const zx = mapInfo?.is_notte ? zone.nightCx : zone.cx
-                        const zy = mapInfo?.is_notte ? zone.nightCy : zone.cy
+                        const zx = mapInfo.is_notte ? zone.nightCx : zone.cx
+                        const zy = mapInfo.is_notte ? zone.nightCy : zone.cy
                         const style = hotspotStyle(zx, zy)
                         if (!style) return null
                         return (

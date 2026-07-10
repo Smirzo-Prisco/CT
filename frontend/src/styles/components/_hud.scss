@@ -30,6 +30,11 @@
 }
 
 // ── TOPBAR COMUNE ────────────────────────────────────────────
+// Semitrasparente a riposo: e' un fixed sopra #maincontent (che inizia
+// proprio sotto, a top:86px) e non deve nascondere il contenuto della
+// pagina quando non ci si interagisce — torna piena quando il mouse e'
+// su un elemento dell'HUD (.ct-hud:hover, bubina dai figli anche con
+// pointer-events:none sull'antenato).
 .ct-hud__topbar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -38,7 +43,10 @@
     border-bottom: 1px solid rgba(218, 168, 50, .35);
     box-shadow: 0 1px 30px -2px rgba(218, 168, 50, .2);
     backdrop-filter: blur(14px);
+    opacity: .4;
+    transition: opacity .25s ease;
 }
+.ct-hud:hover .ct-hud__topbar { opacity: 1; }
 
 // ── ANELLI (sinistra/destra) ─────────────────────────────────
 .ct-hud__ring {
@@ -313,23 +321,35 @@
 
 // ── RESPONSIVE ────────────────────────────────────────────────
 // Regola permanente: l'HUD resta SEMPRE absolute/fixed sugli angoli, non
-// passa mai a static. Si degrada scalando l'intero anello (transform:scale
-// mantiene le proporzioni dell'arco senza dover ricalcolare --tx/--ty).
-// Sotto i 680px la scala resta volutamente alta (.6+): le icone dell'arco
-// sono figlie dell'anello e si rimpiccioliscono con lui, un fattore troppo
-// basso le rende troppo piccole per essere toccate su mobile.
+// passa mai a static.
+//
+// .ct-hud__ring scala la miniatura (cerchio) per liberare spazio su schermi
+// stretti. .ct-hud__arc pero' e' scalato ANCHE dal proprio transform (oltre
+// a ereditare visivamente quello del genitore, essendo transform annidati):
+// qui lo si sovrascrive con un fattore "boost" che compensa esattamente lo
+// scale dell'anello, cosi' le icone restano a dimensione reale (tap target
+// costante, ~40px aperte / ~24px a riposo) anche quando il cerchio si
+// rimpicciolisce parecchio. Senza, le icone (figlie dell'anello) si
+// sarebbero rimpicciolite insieme a lui fino a diventare impossibili da
+// toccare.
 @media (max-width: 1080px) {
     .ct-hud__ring { transform: scale(.82); }
 }
 
+// Anello .6 → boost chiuso 1 (.6/.6), aperto 1.667 (1/.6)
 @media (max-width: 860px) {
-    .ct-hud__ring { transform: scale(.75); }
+    .ct-hud__ring { transform: scale(.6); }
+    .ct-hud__arc { transform: scale(1); }
+    .ct-hud__ring.is-open .ct-hud__arc { transform: scale(1.667); }
     .ct-hud__panel p { display: none; }
     .ct-hud__popover { width: 240px; }
 }
 
+// Anello .45 → boost chiuso 1.333 (.6/.45), aperto 2.222 (1/.45)
 @media (max-width: 680px) {
-    .ct-hud__ring { top: 6px; transform: scale(.65); }
+    .ct-hud__ring { top: 6px; transform: scale(.45); }
+    .ct-hud__arc { transform: scale(1.333); }
+    .ct-hud__ring.is-open .ct-hud__arc { transform: scale(2.222); }
     .ct-hud__ring--left { left: 6px; }
     .ct-hud__ring--right { right: 6px; }
     .ct-hud__center { top: 6px; }
@@ -337,7 +357,10 @@
     .ct-hud__popover { width: calc(100vw - 20px); max-width: 260px; left: 10px !important; }
 }
 
+// Anello .35 → boost chiuso 1.714 (.6/.35), aperto 2.857 (1/.35)
 @media (max-width: 420px) {
-    .ct-hud__ring { transform: scale(.58); }
+    .ct-hud__ring { transform: scale(.35); }
+    .ct-hud__arc { transform: scale(1.714); }
+    .ct-hud__ring.is-open .ct-hud__arc { transform: scale(2.857); }
     .ct-hud__brand { width: 46px; height: 46px; }
 }
