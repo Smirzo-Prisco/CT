@@ -100,7 +100,7 @@ export default function Hud({ isStaff }) {
 
     // ── Avatar + vitali personaggio (stesso pattern di AnteprimaScheda.jsx) ─
     const [avatar, setAvatar] = useState(() => (window.CT_USER?.url_img_chat ?? '').trim())
-    const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null, razza: null })
+    const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null, gilda: null })
 
     const fetchProfile = useCallback(() => {
         if (!nome) return
@@ -113,7 +113,9 @@ export default function Hud({ isStaff }) {
                     salute: d.salute, salute_max: d.salute_max,
                     integrita: d.integrita, integrita_max: d.integrita_max,
                     livello: d.statistiche?.livello ?? null,
-                    razza: d.razza,
+                    // La "razza" del personaggio ora e' la gilda (gilda.nome), non
+                    // piu' la vecchia tabella razza.
+                    gilda: d.nome_gilda,
                 })
             })
             .catch(err => console.error('[Hud] Errore profilo:', err))
@@ -221,6 +223,15 @@ export default function Hud({ isStaff }) {
         setOpenPopover(p => (p === name ? null : name))
     }
 
+    // Click su un link dentro un popover (es. un personaggio nella lista
+    // presenti): il popover deve chiudersi, non solo lasciare che il link
+    // faccia il suo (navigazione o SPA). Gli altri click dentro il popover
+    // restano fermati qui (non devono richiuderlo tramite onDocClick).
+    const handlePopoverClick = e => {
+        e.stopPropagation()
+        if (e.target.closest('a')) setOpenPopover(null)
+    }
+
     const mappaId = window.CT_USER?.mappa ?? 1
     const descrizioneTesto = (location?.descrizione ?? '').replace(/<[^>]+>/g, '')
 
@@ -306,7 +317,7 @@ export default function Hud({ isStaff }) {
                         <span className="ct-hud__char-name">
                             {nome} <i className={`fa-solid ${sesso === 'f' ? 'fa-venus' : 'fa-mars'}`} />
                         </span>
-                        <span className="ct-hud__char-badge">{stats.razza || 'Umano'}</span>
+                        <span className="ct-hud__char-badge">{stats.gilda || 'Senza gilda'}</span>
                     </div>
                     <div className="ct-hud__vitals">
                         <span className="ct-hud__vital ct-hud__vital--hp" title="Salute">
@@ -336,21 +347,21 @@ export default function Hud({ isStaff }) {
                 </button>
 
                 <div className="ct-hud__center-arc">
-                    <a className="ct-hud__icon" style={arcIcon(-80, 42)}
+                    <a className="ct-hud__icon" style={arcIcon(-50, 0)}
                         href="main.php?page=servizi_gilde" title="Manuali">
                         <i className="fa-solid fa-book" />
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-28, 74)}
+                    <a className="ct-hud__icon" style={arcIcon(-25, 43)}
                         href="main.php?page=uffici" title="Uffici">
                         <i className="fa-solid fa-building-columns" />
                     </a>
                     {isStaff && (
-                        <a className="ct-hud__icon" style={arcIcon(28, 74)}
+                        <a className="ct-hud__icon" style={arcIcon(25, 43)}
                             href="main.php?page=gestione" title="Gestione">
                             <i className="fa-solid fa-screwdriver-wrench" />
                         </a>
                     )}
-                    <a className="ct-hud__icon" style={arcIcon(80, 42)}
+                    <a className="ct-hud__icon" style={arcIcon(50, 0)}
                         href="#" title="Esci" onClick={handleLogout}>
                         <i className="fa-solid fa-right-from-bracket" />
                     </a>
@@ -359,7 +370,7 @@ export default function Hud({ isStaff }) {
 
             {/* ============ POPOVER ============ */}
             {openPopover === 'presence' && (
-                <div className="ct-hud__popover ct-hud__popover--presence" onClick={e => e.stopPropagation()}>
+                <div className="ct-hud__popover ct-hud__popover--presence" onClick={handlePopoverClick}>
                     <div className="ct-hud__popover-head">
                         <span>Presenti qui</span>
                         <a href="main.php?page=presenti_estesi">Vedi tutti <i className="fa-solid fa-arrow-right" /></a>
@@ -369,13 +380,13 @@ export default function Hud({ isStaff }) {
             )}
 
             {openPopover === 'weather' && (
-                <div className="ct-hud__popover ct-hud__popover--weather" onClick={e => e.stopPropagation()}>
+                <div className="ct-hud__popover ct-hud__popover--weather" onClick={handlePopoverClick}>
                     <Meteo />
                 </div>
             )}
 
             {openPopover === 'chatoff' && (
-                <div className="ct-hud__popover ct-hud__popover--chatoff" onClick={e => e.stopPropagation()}>
+                <div className="ct-hud__popover ct-hud__popover--chatoff" onClick={handlePopoverClick}>
                     <ChattingOff />
                 </div>
             )}
