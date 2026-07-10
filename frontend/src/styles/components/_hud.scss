@@ -11,16 +11,13 @@
 @use '../tokens' as *;
 
 .ct-hud {
-    --ink-deep: #08091a;
     --ink: #10142a;
     --ink-light: #161b35;
     --gold: #daa832;
-    --gold-deep: #c4922a;
     --gold-soft: rgba(218, 168, 50, .16);
     --text: #e8e4da;
     --muted: #7a8499;
     --danger: #ff6b6b;
-    --ok: #5ce89a;
     --radius: 16px;
 
     position: fixed;
@@ -100,8 +97,8 @@
 .ct-hud__icon {
     position: absolute;
     top: 0; left: 0;
-    width: 42px; height: 42px;
-    margin: -21px 0 0 -21px;
+    width: 40px; height: 40px;
+    margin: -20px 0 0 -20px;
     border-radius: 50%;
     background: var(--ink);
     border: 1px solid rgba(218, 168, 50, .3);
@@ -125,9 +122,14 @@
     }
 }
 
+// Posizionato radialmente rispetto al centro dell'anello (--px/--py, calcolati
+// in Hud.jsx dalla stessa direzione di --tx/--ty dell'icona): cosi' punta
+// sempre verso l'esterno dell'arco e non finisce mai sopra l'icona vicina,
+// qualunque sia l'angolo dell'icona sull'arco.
 .ct-hud__pip {
     position: absolute;
-    top: -2px; right: -2px;
+    top: 50%; left: 50%;
+    transform: translate(calc(var(--px, 14px) - 50%), calc(var(--py, -14px) - 50%));
     background: var(--danger);
     color: #2a0a10;
     font-size: 8px;
@@ -138,7 +140,7 @@
     line-height: 1.5;
     text-align: center;
 }
-.ct-hud__pip--dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; top: 0; right: 0; }
+.ct-hud__pip--dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; }
 
 // Pannello info: tra la miniatura e il centro, mai sopra l'arco
 .ct-hud__panel {
@@ -179,11 +181,9 @@
     font-weight: 800;
     padding: 3px 9px;
     border-radius: 999px;
-    background: rgba(255, 107, 107, .15);
-    color: var(--danger);
-    border: 1px solid rgba(255, 107, 107, .4);
-
-    &.is-available { background: rgba(92, 232, 154, .15); color: var(--ok); border-color: rgba(92, 232, 154, .4); }
+    background: var(--gold-soft);
+    color: var(--gold);
+    border: 1px solid rgba(218, 168, 50, .4);
 }
 
 .ct-hud__vitals {
@@ -210,11 +210,21 @@
 .ct-hud__vital--level i { color: var(--gold); }
 
 // ── CENTRO: LOGO ─────────────────────────────────────────────
+// Larghezza/altezza esplicite: l'area cliccabile/hoverabile deve coprire
+// anche il ventaglio di .ct-hud__center-arc (posizionato in assoluto, quindi
+// altrimenti fuori dal box del contenitore) — senza, il mouse "esce" dal box
+// del solo logo mentre si sposta verso un'icona del ventaglio e l'arco si
+// richiude prima del click.
 .ct-hud__center {
     position: absolute;
     top: 57px;
     left: 50%;
-    transform: translateX(-50%);
+    width: 200px;
+    height: 130px;
+    margin-left: -100px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 .ct-hud__brand {
     position: relative;
@@ -305,11 +315,6 @@
 // Regola permanente: l'HUD resta SEMPRE absolute/fixed sugli angoli, non
 // passa mai a static. Si degrada scalando l'intero anello (transform:scale
 // mantiene le proporzioni dell'arco senza dover ricalcolare --tx/--ty).
-@media (hover: none) {
-    // touch: nessun hover disponibile, i pannelli restano leggibili solo
-    // quando l'anello e' esplicitamente aperto (gia' gestito da is-open)
-}
-
 @media (max-width: 1080px) {
     .ct-hud__ring { transform: scale(.82); }
 }

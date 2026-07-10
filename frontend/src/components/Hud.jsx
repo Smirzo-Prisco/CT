@@ -13,9 +13,13 @@
  * Meteo. OnlineUsers/ChattingOff/Meteo vengono riusati cosi' come sono
  * dentro i popover, invece di riscriverne la logica di fetch/socket.
  *
+ * Il logo centrale apre un terzo arco (manuali/uffici/gestione/esci) al
+ * hover o al click — vedi .ct-hud__center-arc.
+ *
  * API riusate (invariate): api_map.php (current, presenti, ping, move,
  * changemap), api_global.php (getMessages, getOpenRoles, events_today,
- * saveSoundPrefs), api_scheda.php (profile fallback avatar).
+ * saveSoundPrefs), api_scheda.php (profile: avatar, salute/integrita/
+ * livello/razza per il pannello del personaggio).
  *
  * Montaggio: via ct:ready su #hud-container in header.inc.php
  *
@@ -27,11 +31,22 @@ import OnlineUsers from './OnlineUsers'
 import ChattingOff from './ChattingOff'
 import Meteo from './Meteo'
 
+// Posiziona un'icona sull'arco: tx/ty sono le coordinate (px) rispetto al
+// centro dell'anello/logo.
+const arcIcon = (tx, ty) => ({ '--tx': `${tx}px`, '--ty': `${ty}px` })
+
+// Sposta il badge di notifica verso l'esterno dell'arco, nella stessa
+// direzione radiale dell'icona (tx/ty) invece che in un angolo fisso: cosi'
+// non finisce mai sopra l'icona vicina, qualunque sia la sua posizione.
+const pipOffset = (tx, ty, dist = 24) => {
+    const mag = Math.hypot(tx, ty) || 1
+    return { '--px': `${(tx / mag) * dist}px`, '--py': `${(ty / mag) * dist}px` }
+}
+
 export default function Hud({ isStaff }) {
 
     const nome = window.CT_USER?.login ?? ''
     const sesso = window.CT_USER?.sesso ?? 'm'
-    const disponibile = window.CT_USER?.disponibile ?? 1
 
     const hudRef = useRef(null)
 
@@ -85,7 +100,7 @@ export default function Hud({ isStaff }) {
 
     // ── Avatar + vitali personaggio (stesso pattern di AnteprimaScheda.jsx) ─
     const [avatar, setAvatar] = useState(() => (window.CT_USER?.url_img_chat ?? '').trim())
-    const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null })
+    const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null, razza: null })
 
     const fetchProfile = useCallback(() => {
         if (!nome) return
@@ -98,6 +113,7 @@ export default function Hud({ isStaff }) {
                     salute: d.salute, salute_max: d.salute_max,
                     integrita: d.integrita, integrita_max: d.integrita_max,
                     livello: d.statistiche?.livello ?? null,
+                    razza: d.razza,
                 })
             })
             .catch(err => console.error('[Hud] Errore profilo:', err))
@@ -228,24 +244,24 @@ export default function Hud({ isStaff }) {
                 </button>
 
                 <div className="ct-hud__arc">
-                    <button type="button" className="ct-hud__icon" style={{ '--tx': '0px', '--ty': '122px' }}
+                    <button type="button" className="ct-hud__icon" style={arcIcon(0, 110)}
                         title="Meteo" onClick={togglePopover('weather')}>
                         <i className="fa-solid fa-cloud-sun" />
                     </button>
-                    <a className="ct-hud__icon" style={{ '--tx': '47px', '--ty': '113px' }}
+                    <a className="ct-hud__icon" style={arcIcon(42, 102)}
                         href="main.php?page=forum" title="Forum">
                         <i className="fa-solid fa-comments" />
                     </a>
-                    <button type="button" className="ct-hud__icon" style={{ '--tx': '86px', '--ty': '86px' }}
+                    <button type="button" className="ct-hud__icon" style={arcIcon(78, 78)}
                         title="Presenti nel luogo" onClick={togglePopover('presence')}>
                         <i className="fa-solid fa-users" />
-                        {presentiCount > 0 && <b className="ct-hud__pip">{presentiCount}</b>}
+                        {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(78, 78)}>{presentiCount}</b>}
                     </button>
-                    <button type="button" className="ct-hud__icon" style={{ '--tx': '113px', '--ty': '47px' }}
+                    <button type="button" className="ct-hud__icon" style={arcIcon(102, 42)}
                         title="Chat off" onClick={togglePopover('chatoff')}>
                         <i className="fa-solid fa-comment-dots" />
                     </button>
-                    <a className="ct-hud__icon" style={{ '--tx': '122px', '--ty': '0px' }}
+                    <a className="ct-hud__icon" style={arcIcon(110, 0)}
                         href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Vai alla mappa principale">
                         <i className="fa-solid fa-map-location-dot" />
                     </a>
@@ -264,22 +280,22 @@ export default function Hud({ isStaff }) {
                 </button>
 
                 <div className="ct-hud__arc">
-                    <a className="ct-hud__icon" style={{ '--tx': '0px', '--ty': '122px' }}
+                    <a className="ct-hud__icon" style={arcIcon(0, 110)}
                         href="main.php?page=agenda_center" title="Calendario">
                         <i className="fa-solid fa-calendar-days" />
-                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" />}
+                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 110)} />}
                     </a>
-                    <a className="ct-hud__icon" style={{ '--tx': '-61px', '--ty': '106px' }}
+                    <a className="ct-hud__icon" style={arcIcon(-55, 95)}
                         href="main.php?page=role_recap" title="Giocate personali">
                         <i className="fa-solid fa-scroll" />
-                        {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" title="Giocata in corso" />}
+                        {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-55, 95)} title="Giocata in corso" />}
                     </a>
-                    <a className="ct-hud__icon" style={{ '--tx': '-106px', '--ty': '61px' }}
+                    <a className="ct-hud__icon" style={arcIcon(-95, 55)}
                         href="main.php?page=messages_center&offset=0" title="Messaggi">
                         <i className="fa-solid fa-envelope" />
-                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" />}
+                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-95, 55)} />}
                     </a>
-                    <a className="ct-hud__icon" style={{ '--tx': '-122px', '--ty': '0px' }}
+                    <a className="ct-hud__icon" style={arcIcon(-110, 0)}
                         href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="Vai alla scheda">
                         <i className="fa-solid fa-id-card" />
                     </a>
@@ -290,9 +306,7 @@ export default function Hud({ isStaff }) {
                         <span className="ct-hud__char-name">
                             {nome} <i className={`fa-solid ${sesso === 'f' ? 'fa-venus' : 'fa-mars'}`} />
                         </span>
-                        <span className={`ct-hud__char-badge${disponibile ? ' is-available' : ''}`}>
-                            {disponibile ? 'Disponibile' : 'Occupato'}
-                        </span>
+                        <span className="ct-hud__char-badge">{stats.razza || 'Umano'}</span>
                     </div>
                     <div className="ct-hud__vitals">
                         <span className="ct-hud__vital ct-hud__vital--hp" title="Salute">
@@ -322,21 +336,21 @@ export default function Hud({ isStaff }) {
                 </button>
 
                 <div className="ct-hud__center-arc">
-                    <a className="ct-hud__icon" style={{ '--tx': '-100px', '--ty': '45px' }}
+                    <a className="ct-hud__icon" style={arcIcon(-80, 42)}
                         href="main.php?page=servizi_gilde" title="Manuali">
                         <i className="fa-solid fa-book" />
                     </a>
-                    <a className="ct-hud__icon" style={{ '--tx': '-35px', '--ty': '85px' }}
+                    <a className="ct-hud__icon" style={arcIcon(-28, 74)}
                         href="main.php?page=uffici" title="Uffici">
                         <i className="fa-solid fa-building-columns" />
                     </a>
                     {isStaff && (
-                        <a className="ct-hud__icon" style={{ '--tx': '35px', '--ty': '85px' }}
+                        <a className="ct-hud__icon" style={arcIcon(28, 74)}
                             href="main.php?page=gestione" title="Gestione">
                             <i className="fa-solid fa-screwdriver-wrench" />
                         </a>
                     )}
-                    <a className="ct-hud__icon" style={{ '--tx': '100px', '--ty': '45px' }}
+                    <a className="ct-hud__icon" style={arcIcon(80, 42)}
                         href="#" title="Esci" onClick={handleLogout}>
                         <i className="fa-solid fa-right-from-bracket" />
                     </a>
