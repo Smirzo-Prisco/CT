@@ -6,15 +6,22 @@
 // (--pub-dark/--pub-dark2/--pub-card-dark, --pub-gold/--pub-gold-h) — non
 // i token $palette-* globali (pensati per il tema ice-blue del resto del
 // gioco), perché qui si vuole la stessa identità cromatica gia' in uso
-// nella parte pubblica del sito.
+// nella parte pubblica del sito. E' la palette di default ("public" qui
+// sotto), scelta anche in Preferenze.jsx > Colori land.
+//
+// Tutti gli accenti oro/ink sono in color-mix(var(--gold)/--ink-*) invece
+// che rgba hardcoded: cosi' seguono la palette attiva (vedi le varianti
+// body[data-palette] sotto) invece di restare fissi al blu notte.
 // ============================================================
 @use '../tokens' as *;
 
 .ct-hud {
+    --ink-deep: #08091a;
     --ink: #10142a;
     --ink-light: #161b35;
     --gold: #daa832;
-    --gold-soft: rgba(218, 168, 50, .16);
+    --gold-deep: #c4922a;
+    --gold-soft: color-mix(in srgb, var(--gold) calc(.16 * 100%), transparent);
     --text: #e8e4da;
     --muted: #7a8499;
     --danger: #ff6b6b;
@@ -29,6 +36,45 @@
     > * { pointer-events: auto; }
 }
 
+// ── VARIANTI PALETTE ("Colori land", vedi Preferenze.jsx) ─────
+// Applicate come body[data-palette="X"]: Hud.jsx legge la scelta salvata in
+// localStorage al mount e la riapplica su <body> ad ogni pagina. Solo ink/
+// gold cambiano — struttura, layout e testo restano identici.
+body[data-palette="obsidian"] .ct-hud {
+    --ink-deep: #07070a; --ink: #111116; --ink-light: #1c1c24;
+    --gold: #c9a45c; --gold-deep: #8f6e34;
+}
+body[data-palette="petrol"] .ct-hud {
+    --ink-deep: #0c262c; --ink: #123339; --ink-light: #1d4750;
+    --gold: #d8b26a; --gold-deep: #a9793a;
+}
+body[data-palette="indigo"] .ct-hud {
+    --ink-deep: #17102b; --ink: #241a3f; --ink-light: #362958;
+    --gold: #e6b49c; --gold-deep: #b97f5f;
+}
+body[data-palette="cyan"] .ct-hud {
+    --ink-deep: #061c30; --ink: #0c2a4a; --ink-light: #163f6c;
+    --gold: #2fe0d1; --gold-deep: #16a394;
+}
+body[data-palette="emerald"] .ct-hud {
+    --ink-deep: #082620; --ink: #0d3a2f; --ink-light: #155a48;
+    --gold: #d8b26a; --gold-deep: #a9793a;
+}
+body[data-palette="forest"] .ct-hud {
+    --ink-deep: #0d2216; --ink: #14301f; --ink-light: #1d4530;
+    --gold: #f2e9d8; --gold-deep: #cbb98e;
+}
+body[data-palette="navy-mustard"] .ct-hud {
+    --ink-deep: #081527; --ink: #0d1f3a; --ink-light: #16305a;
+    --gold: #c99a3d; --gold-deep: #96701f;
+}
+// "public" e' anche il default (--ink/--gold su .ct-hud sopra) — presente
+// qui solo per poterla riselezionare esplicitamente tornando da un'altra.
+body[data-palette="public"] .ct-hud {
+    --ink-deep: #08091a; --ink: #10142a; --ink-light: #161b35;
+    --gold: #daa832; --gold-deep: #c4922a;
+}
+
 // ── TOPBAR COMUNE ────────────────────────────────────────────
 // Semitrasparente a riposo: e' un fixed sopra #maincontent (che inizia
 // proprio sotto, a top:86px) e non deve nascondere il contenuto della
@@ -39,9 +85,11 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     height: 86px;
-    background: linear-gradient(180deg, rgba(22, 27, 53, .85), rgba(8, 9, 26, .92));
-    border-bottom: 1px solid rgba(218, 168, 50, .35);
-    box-shadow: 0 1px 30px -2px rgba(218, 168, 50, .2);
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--ink-light) calc(.85 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.92 * 100%), transparent));
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
+    box-shadow: 0 1px 30px -2px color-mix(in srgb, var(--gold) calc(.2 * 100%), transparent);
     backdrop-filter: blur(14px);
     opacity: .4;
     transition: opacity .25s ease;
@@ -66,7 +114,7 @@
     width: 173px; height: 173px;
     border-radius: 50%;
     background: radial-gradient(circle, var(--ink-light), var(--ink) 70%);
-    border: 2px solid rgba(218, 168, 50, .4);
+    border: 2px solid color-mix(in srgb, var(--gold) calc(.4 * 100%), transparent);
     color: var(--gold);
     font-size: 46px;
     display: grid;
@@ -83,7 +131,7 @@
         position: absolute;
         inset: -8px;
         border-radius: 50%;
-        border: 1px dashed rgba(218, 168, 50, .3);
+        border: 1px dashed color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
         animation: ct-hud-spin 40s linear infinite;
     }
     &:hover { border-color: var(--gold); }
@@ -109,7 +157,7 @@
     margin: -20px 0 0 -20px;
     border-radius: 50%;
     background: var(--ink);
-    border: 1px solid rgba(218, 168, 50, .3);
+    border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
     color: var(--text);
     display: grid;
     place-items: center;
@@ -154,8 +202,10 @@
 .ct-hud__panel {
     position: absolute;
     top: 34px;
-    background: linear-gradient(160deg, rgba(22, 27, 53, .85), rgba(8, 9, 26, .85));
-    border: 1px solid rgba(218, 168, 50, .25);
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--ink-light) calc(.85 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.85 * 100%), transparent));
+    border: 1px solid color-mix(in srgb, var(--gold) calc(.25 * 100%), transparent);
     border-radius: var(--radius);
     backdrop-filter: blur(10px);
     padding: 12px 16px;
@@ -191,7 +241,7 @@
     border-radius: 999px;
     background: var(--gold-soft);
     color: var(--gold);
-    border: 1px solid rgba(218, 168, 50, .4);
+    border: 1px solid color-mix(in srgb, var(--gold) calc(.4 * 100%), transparent);
 }
 
 .ct-hud__vitals {
@@ -200,7 +250,7 @@
     gap: 10px;
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px solid rgba(218, 168, 50, .15);
+    border-top: 1px solid color-mix(in srgb, var(--gold) calc(.15 * 100%), transparent);
 }
 .ct-hud__vital {
     display: flex;
@@ -245,14 +295,14 @@
     font-size: 16px;
     display: grid;
     place-items: center;
-    box-shadow: 0 6px 22px -6px rgba(218, 168, 50, .5);
+    box-shadow: 0 6px 22px -6px color-mix(in srgb, var(--gold) calc(.5 * 100%), transparent);
     z-index: 2;
 }
 .ct-hud__brand-ring {
     position: absolute;
     inset: -8px;
     border-radius: 50%;
-    border: 1px dashed rgba(218, 168, 50, .45);
+    border: 1px dashed color-mix(in srgb, var(--gold) calc(.45 * 100%), transparent);
     animation: ct-hud-spin 16s linear infinite;
 }
 
@@ -278,8 +328,10 @@
 .ct-hud__popover {
     position: fixed;
     top: 100px;
-    background: linear-gradient(160deg, rgba(22, 27, 53, .95), rgba(8, 9, 26, .96));
-    border: 1px solid rgba(218, 168, 50, .3);
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--ink-light) calc(.95 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.96 * 100%), transparent));
+    border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
     border-radius: var(--radius);
     backdrop-filter: blur(12px);
     padding: 14px;

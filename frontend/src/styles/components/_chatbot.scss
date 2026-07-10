@@ -1,6 +1,7 @@
 // ============================================================
 // _chatbot.scss — Widget chatbot AI Crystal Tokyo
-// Floating button + pannello chat (bottom-right).
+// Solo il pannello (bottom-right): l'apertura e' affidata all'icona
+// "Assistente" nell'arco destro dell'HUD (Hud.jsx), non ha piu' un FAB suo.
 // ============================================================
 @use '../tokens' as *;
 
@@ -16,39 +17,6 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
-}
-
-// ── FAB (Floating Action Button) ─────────────────────────
-
-.chatbot-fab {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: none;
-    background: $palette-warning;
-    color: $palette-bg;
-    font-size: 20px;
-    cursor: grab;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
-    transition: background 0.2s;   // rimosso transform: lag visibile durante il drag
-    flex-shrink: 0;
-    user-select: none;             // evita selezione testo accidentale durante il drag
-    touch-action: none;            // cede il controllo dei touch ai listener JS
-
-    &:hover {
-        background: darken($palette-warning, 12%);
-    }
-
-    &:active {
-        cursor: grabbing;
-    }
-
-    &--open {
-        background: $palette-surface-hover;
-    }
 }
 
 // ── Pannello ─────────────────────────────────────────────

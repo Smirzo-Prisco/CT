@@ -56,6 +56,14 @@ export default function Hud({ isStaff }) {
 
     const hudRef = useRef(null)
 
+    // Palette scelta in Preferenze.jsx > Colori land (localStorage, solo
+    // client) — riapplicata qui ad ogni pagina perche' Hud.jsx e' l'unico
+    // componente sempre montato; senza, tornerebbe al default a ogni reload.
+    useEffect(() => {
+        const saved = localStorage.getItem('ct_hud_palette')
+        if (saved) document.body.dataset.palette = saved
+    }, [])
+
     // Stato aperto/chiuso degli anelli: persistito in localStorage cosi'
     // resta com'era anche dopo un reload di pagina (non solo tra un
     // ri-render e l'altro). Si chiude SOLO ri-cliccando l'anello stesso o

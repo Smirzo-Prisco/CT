@@ -422,12 +422,16 @@ export default function MapClick() {
             {/* Il popup NON è dentro questo container per evitare overflow/clip  */}
             {/* ---------------------------------------------------------------- */}
             <center>
-                <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%' }}>
+                {/* width:100% (non maxWidth) — deve riempire tutta la larghezza
+                    disponibile (.ct-hud-map-page porta .output al 100%), non
+                    solo arrivare fino alla dimensione naturale dell'immagine
+                    (inline-block+maxWidth la lasciava piccola su schermi larghi). */}
+                <div style={{ position: 'relative', width: '100%' }}>
                     <img
                         ref={imgRef}
                         src={mapImg}
                         alt="Mappa di Crystal Tokyo"
-                        style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
+                        style={{ width: '100%', height: 'auto', display: 'block' }}
                         onLoad={onImageLoad}
                     />
 
