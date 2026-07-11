@@ -188,6 +188,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
                 'mercato_abilita.js' => 'includes/mercato_abilita.js',
                 'mappa_giorno.png' => 'themes/crystal/imgs/maps/mappa_giorno.png',
                 'mappa_notte.png' => 'themes/crystal/imgs/maps/mappa_notte.png',
+                'map-pin.jpg' => 'themes/crystal/imgs/maps/map-pin.jpg',
             ];
             $assetVersions = [];
             foreach ($assetFiles as $assetKey => $assetRelPath) {

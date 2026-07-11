@@ -464,7 +464,7 @@ export default function MapClick() {
                                 onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
                                 title={zone.name}
                             >
-                                <span className="map-pin__ring" />
+                                <img className="map-pin__ring" src={`themes/crystal/imgs/maps/map-pin.jpg?v=${window.CT_ASSET_VERSIONS?.['map-pin.jpg'] ?? ''}`} alt="" />
                                 <span className="map-pin__label">{zone.name}</span>
                             </div>
                         )

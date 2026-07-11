@@ -16,18 +16,22 @@
 
     &__ring {
         display: block;
-        width: 26px;
-        height: 26px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, .55);
-        border: 2px solid rgba(255, 255, 255, .75);
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, .5);
+        object-fit: cover;
+        // Il file (map-pin.jpg) ha uno sfondo nero pieno attorno al
+        // medaglione: screen tratta il nero come "trasparente" (non
+        // contribuisce al blend) e lascia risaltare solo oro/gemma/bagliori,
+        // senza dover ritagliare l'immagine.
+        mix-blend-mode: screen;
+        filter: drop-shadow(0 0 0 rgba(255, 255, 255, .5));
         // Pulsazione + galleggiamento su/giu' asincrono (--float-delay
         // impostato per pin in MapClick.jsx) cosi' i pin non si muovono
         // tutti in sincrono, un effetto piu' vivo sulla mappa illustrata.
         animation: map-pin-pulse 2.4s ease-out infinite, map-pin-float 3.2s ease-in-out infinite;
         animation-delay: 0s, var(--float-delay, 0s);
-        transition: border-color .2s ease, background .2s ease, transform .2s ease;
+        transition: transform .2s ease, filter .2s ease;
     }
 
     &__label {
@@ -47,10 +51,10 @@
         transition: opacity .2s ease, transform .2s ease;
     }
 
-    &:hover .map-pin__ring { background: rgba(255, 255, 255, .95); border-color: #fff; transform: scale(1.15); }
+    &:hover .map-pin__ring { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(255, 255, 255, .8)); }
     &:hover .map-pin__label { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    &--active .map-pin__ring { background: #fff; border-color: #fff; box-shadow: 0 0 14px 3px rgba(255, 255, 255, .6); }
+    &--active .map-pin__ring { filter: drop-shadow(0 0 10px rgba(255, 255, 255, .9)); }
 }
 
 @keyframes map-pin-pulse {
