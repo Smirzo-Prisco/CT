@@ -422,28 +422,31 @@ export default function Hud({ isStaff }) {
 
                 <HudArcSheet isMobile={isMobile} isOpen={rightOpen} onClose={() => setRightOpen(false)}>
                     <div className="ct-hud__arc">
-                        {/* "La mia scheda": su desktop il tap sul cerchio stesso ci
-                            porta gia' direttamente (goToOwnScheda), ma su mobile
-                            il tap apre questo menu — senza questa icona non c'era
-                            piu' alcun modo di raggiungere la propria scheda da li'. */}
-                        <a className="ct-hud__icon" style={arcIcon(0, 87)}
-                            href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="La mia scheda">
-                            <i className="fa-solid fa-id-card" />
-                        </a>
-                        <a className="ct-hud__icon" style={arcIcon(-33, 80)}
+                        {/* "La mia scheda" solo su mobile: su desktop il tap sul
+                            cerchio stesso ci porta gia' direttamente
+                            (goToOwnScheda), ma su mobile il tap apre questo menu
+                            — senza questa icona non ci sarebbe alcun modo di
+                            raggiungere la propria scheda da li'. */}
+                        {isMobile && (
+                            <a className="ct-hud__icon" style={arcIcon(0, 87)}
+                                href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="La mia scheda">
+                                <i className="fa-solid fa-id-card" />
+                            </a>
+                        )}
+                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-33, 80] : [0, 87]))}
                             href="main.php?page=agenda_center" title="Calendario">
                             <i className="fa-solid fa-calendar-days" />
-                            {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-33, 80)} />}
+                            {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-33, 80] : [0, 87]))} />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(-62, 62)}
+                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-62, 62] : [-43, 75]))}
                             href="main.php?page=role_recap" title="Giocate">
                             <i className="fa-solid fa-scroll" />
-                            {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-62, 62)} title="Giocata in corso" />}
+                            {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-62, 62] : [-43, 75]))} title="Giocata in corso" />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(-80, 33)}
+                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-80, 33] : [-75, 43]))}
                             href="main.php?page=messages_center&offset=0" title="Messaggi">
                             <i className="fa-solid fa-envelope" />
-                            {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-80, 33)} />}
+                            {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-80, 33] : [-75, 43]))} />}
                         </a>
                         <a className="ct-hud__icon" style={arcIcon(-87, 0)}
                             href="#" title="Assistente" onClick={openChatbot}>
