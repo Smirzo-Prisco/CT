@@ -100,37 +100,33 @@
         background: linear-gradient(160deg, rgba(22, 27, 53, .92), rgba(8, 9, 26, .95));
     }
 
-    // Nastro a zigzag "cristallino" lungo il bordo superiore, al posto di
-    // una linea piatta — stessa tecnica delle onde CSS (due gradient a 45°
-    // affiancati e sfasati di meta' tile), tinta oro come il resto
-    // dell'accento dell'HUD/mappa. top:0 (non negativo): il pannello scrolla
-    // (overflow-y:auto), un offset negativo verrebbe tagliato dallo stesso
-    // clipping — il padding-top maggiorato tiene il contenuto sotto libero.
+    // Divisorio elegante e sottile lungo il bordo superiore, al posto del
+    // nastro a zigzag (troppo marcato): una linea di 1px che sfuma ai lati
+    // con un piccolo diamante dorato al centro — motivo classico, delicato.
+    // top positivo (non negativo): il pannello scrolla (overflow-y:auto),
+    // un offset negativo verrebbe tagliato dallo stesso clipping.
     &::before {
         content: '';
         position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 10px;
-        background:
-            linear-gradient(135deg, transparent 50%, rgba(218, 168, 50, .65) 50%) 0 0 / 22px 20px repeat-x,
-            linear-gradient(-135deg, rgba(218, 168, 50, .65) 50%, transparent 50%) 11px 0 / 22px 20px repeat-x;
-        filter: drop-shadow(0 0 4px rgba(218, 168, 50, .35));
-        animation: map-zone-shimmer 6s linear infinite;
+        top: 5px; left: 12%; right: 12%;
+        height: 1px;
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(218, 168, 50, .5) 25%,
+            rgba(218, 168, 50, .5) 75%,
+            transparent);
         pointer-events: none;
     }
 
-    // Parentesi dorate agli angoli superiori, come un mirino — richiamano i
-    // raggi decorativi disegnati negli angoli dell'illustrazione della mappa.
     &::after {
         content: '';
         position: absolute;
-        top: 4px; left: 16px; right: 16px;
-        height: 18px;
-        background:
-            linear-gradient(rgba(218, 168, 50, .8), rgba(218, 168, 50, .8)) left top / 2px 18px no-repeat,
-            linear-gradient(rgba(218, 168, 50, .8), rgba(218, 168, 50, .8)) left top / 18px 2px no-repeat,
-            linear-gradient(rgba(218, 168, 50, .8), rgba(218, 168, 50, .8)) right top / 2px 18px no-repeat,
-            linear-gradient(rgba(218, 168, 50, .8), rgba(218, 168, 50, .8)) right top / 18px 2px no-repeat;
+        top: 2px; left: 50%;
+        width: 7px; height: 7px;
+        margin-left: -3.5px;
+        background: rgba(218, 168, 50, .75);
+        transform: rotate(45deg);
+        box-shadow: 0 0 5px rgba(218, 168, 50, .3);
         pointer-events: none;
     }
 
@@ -140,11 +136,6 @@
         line-height: 1.4;
         color: #7a8499;
     }
-}
-
-@keyframes map-zone-shimmer {
-    0%   { background-position: 0 0, 11px 0; }
-    100% { background-position: 220px 0, 231px 0; }
 }
 
 .map-zone-panel__head {
@@ -188,8 +179,10 @@
     width: 190px;
     padding: 6px 12px 6px 6px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, .04);
-    border: 1px solid rgba(218, 168, 50, .2);
+    // Colori pieni (niente rgba/trasparenza): la card non deve lasciar
+    // trasparire la mappa sotto.
+    background: #171c34;
+    border: 1px solid #4a3d22;
     cursor: pointer;
     transition: border-color .15s ease, background .15s ease;
 
@@ -203,7 +196,7 @@
         height: 30px;
         border-radius: 8px;
         overflow: hidden;
-        border: 1px solid rgba(218, 168, 50, .4);
+        border: 1px solid #5c4a26;
         transition: border-color .15s ease;
 
         img { display: block; width: auto; height: 100%; }
@@ -218,8 +211,8 @@
     }
 
     &:hover {
-        border-color: rgba(218, 168, 50, .5);
-        background: rgba(255, 255, 255, .08);
+        border-color: #c4922a;
+        background: #1f2540;
     }
     &:hover .map-zone-room__avatar { border-color: #daa832; }
 
