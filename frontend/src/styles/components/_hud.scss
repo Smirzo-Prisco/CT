@@ -96,7 +96,13 @@ body[data-palette="public"] {
 .ct-hud__topbar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 86px;
+    // 60px a riposo (86 - 26): il bordo inferiore (la linea dorata) segue
+    // il centro della miniatura chiusa, che ora si rimpicciolisce verso
+    // l'angolo dell'anello invece che verso il proprio centro (vedi
+    // .ct-hud__thumb sopra) — di ~26px piu' in alto rispetto ad aperta.
+    // Solo la topbar si sposta: il contenuto della pagina (#maincontent,
+    // altezza fissa in _layout.scss) resta dov'e', non e' legato a questo.
+    height: 60px;
     background: linear-gradient(180deg,
         color-mix(in srgb, var(--ink-light) calc(.85 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.92 * 100%), transparent));
@@ -104,9 +110,13 @@ body[data-palette="public"] {
     box-shadow: 0 1px 30px -2px color-mix(in srgb, var(--gold) calc(.2 * 100%), transparent);
     backdrop-filter: blur(14px);
     opacity: .4;
-    transition: opacity .25s ease;
+    transition: opacity .25s ease, height .3s cubic-bezier(.34, 1.56, .64, 1);
 }
 .ct-hud:hover .ct-hud__topbar { opacity: 1; }
+// Anelli aperti dal cerchio centrale (unico caso in cui leftOpen e
+// rightOpen sono veri insieme): la miniatura torna a piena dimensione
+// centrata nell'anello, quindi la linea torna alla posizione originale.
+.ct-hud__topbar--expanded { height: 86px; }
 
 // ── ANELLI (sinistra/destra) ─────────────────────────────────
 .ct-hud__ring {
@@ -119,7 +129,12 @@ body[data-palette="public"] {
 .ct-hud__ring--left { left: 5px; }
 .ct-hud__ring--right { right: 5px; transform-origin: top right; }
 
-// Miniatura: 30% piu' piccola a riposo, dimensione piena da aperta
+// Miniatura: 30% piu' piccola a riposo, dimensione piena da aperta.
+// transform-origin sullo stesso angolo di .ct-hud__ring (non il default
+// "center"): da chiusa si rimpicciolisce VERSO l'angolo dell'anello invece
+// che verso il proprio centro, restando cosi' a sfiorare i bordi della
+// pagina come da aperta invece di restringersi staccandosene di ~26px
+// (173px * .3 / 2) su tutti i lati.
 .ct-hud__thumb {
     position: absolute;
     top: 0; left: 0;
@@ -133,6 +148,7 @@ body[data-palette="public"] {
     place-items: center;
     overflow: hidden;
     transform: scale(.7);
+    transform-origin: top left;
     transition: border-color .2s ease, transform .3s cubic-bezier(.34, 1.56, .64, 1);
     z-index: 1;
 
@@ -148,6 +164,7 @@ body[data-palette="public"] {
     }
     &:hover { border-color: var(--gold); }
 }
+.ct-hud__ring--right .ct-hud__thumb { transform-origin: top right; }
 .ct-hud__ring.is-open .ct-hud__thumb { transform: scale(1); }
 
 @keyframes ct-hud-spin { to { transform: rotate(360deg); } }

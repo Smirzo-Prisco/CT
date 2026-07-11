@@ -357,7 +357,11 @@ export default function Hud({ isStaff }) {
 
     return (
         <div className="ct-hud" ref={hudRef}>
-            <div className="ct-hud__topbar" aria-hidden="true" />
+            {/* --expanded quando entrambi gli anelli sono aperti dal cerchio
+                centrale (unico modo in cui leftOpen/rightOpen sono veri
+                insieme su desktop): la linea segue la miniatura tornata a
+                piena dimensione. Solo la topbar si muove, non il contenuto. */}
+            <div className={`ct-hud__topbar${leftOpen && rightOpen ? ' ct-hud__topbar--expanded' : ''}`} aria-hidden="true" />
 
             {/* ============ ANELLO SINISTRO: LUOGO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--left${leftOpen ? ' is-open' : ''}`}>
