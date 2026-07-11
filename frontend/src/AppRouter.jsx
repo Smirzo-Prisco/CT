@@ -46,6 +46,7 @@ import SchedaPunti    from './components/SchedaPunti'
 import SchedaOggetti  from './components/SchedaOggetti'
 import Gestione             from './components/Gestione'
 import Uffici               from './components/Uffici'
+import Preferenze            from './components/Preferenze'
 import MiaGilda              from './components/MiaGilda'
 import RoleRecap            from './components/RoleRecap'
 import RoleLog              from './components/RoleLog'
@@ -138,6 +139,10 @@ const ROUTES = {
     },
     uffici: {
         component: Uffici,
+        css: [],
+    },
+    preferenze: {
+        component: Preferenze,
         css: [],
     },
     mia_gilda: {

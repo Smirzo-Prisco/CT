@@ -139,6 +139,72 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // ZONES — zone/pin della mappa cliccabile overview + stanze di ciascuna,
+    // per il pannello di MapClick.jsx. Sostituisce l'ex costante statica
+    // ZONES nel frontend: le zone sono righe di mappa_click diverse dalla
+    // mappa corrente (map_id) con coordinate assegnate (larghezza/altezza,
+    // qui riusate come cx/cy del pin — non sono piu' servite come width/
+    // height reali da quando esiste una sola coppia di coordinate condivisa
+    // fra le illustrazioni giorno/notte), le stanze sono le righe di mappa
+    // con id_mappa = id_click della zona.
+    // -------------------------------------------------------------------------
+    case 'zones':
+        $mainMapId = (int)($_GET['map_id'] ?? $_SESSION['mappa'] ?? 1);
+
+        $result = gdrcd_query("SELECT id_click, nome, larghezza AS cx, altezza AS cy, descrizione
+            FROM mappa_click
+            WHERE id_click != $mainMapId AND larghezza > 0
+            ORDER BY nome ASC", 'result');
+
+        $zones = [];
+        while ($row = gdrcd_query($result, 'fetch')) {
+            $zones[(int)$row['id_click']] = [
+                'id'    => (int)$row['id_click'],
+                'nome'  => $row['nome'],
+                'cx'    => (int)$row['cx'],
+                'cy'    => (int)$row['cy'],
+                'desc'  => $row['descrizione'] ?? '',
+                'rooms' => [],
+            ];
+        }
+        gdrcd_query($result, 'free');
+
+        if (!empty($zones)) {
+            $ids = implode(',', array_keys($zones));
+            $rresult = gdrcd_query("SELECT id, nome, immagine, chat, pagina, id_mappa, id_mappa_collegata
+                FROM mappa WHERE id_mappa IN ($ids) ORDER BY nome ASC", 'result');
+
+            while ($row = gdrcd_query($rresult, 'fetch')) {
+                $online = gdrcd_query("SELECT COUNT(*) AS n FROM personaggio
+                    WHERE ultimo_luogo = {$row['id']}
+                    AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
+                    AND is_invisible = 0
+                    AND ora_entrata > ora_uscita");
+
+                // Stessa logica di risoluzione url di 'gotomap' sopra.
+                if ($row['chat'] != 0) {
+                    $link = ['type' => 'dir', 'value' => (int)$row['id']];
+                } elseif ($row['id_mappa_collegata'] != 0) {
+                    $link = ['type' => 'map', 'value' => (int)$row['id_mappa_collegata']];
+                } else {
+                    $link = ['type' => 'page', 'value' => $row['pagina']];
+                }
+
+                $zones[(int)$row['id_mappa']]['rooms'][] = [
+                    'id'    => (int)$row['id'],
+                    'nome'  => $row['nome'],
+                    'img'   => $row['immagine'] ?: 'ingresso.png',
+                    'link'  => $link,
+                    'count' => (int)$online['n'],
+                ];
+            }
+            gdrcd_query($rresult, 'free');
+        }
+
+        echo json_encode(['success' => true, 'zones' => array_values($zones)]);
+        break;
+
+    // -------------------------------------------------------------------------
     // MAPS — lista mappe disponibili (per la navigazione inter-mappa)
     // -------------------------------------------------------------------------
     case 'maps':

@@ -1,0 +1,281 @@
+// ============================================================
+// _map_click.scss — Mappa di gioco (MapClick.jsx)
+// Marker interattivi sopra l'immagine mappa.giorno/notte.png (che ha gia'
+// un proprio pallino disegnato per ogni zona: qui si aggiunge solo
+// l'affordance interattiva — anello bianco pulsante/fluttuante + etichetta
+// in hover), e il pannello di selezione stanza (fisso in basso, con blur).
+//
+// Palette: stessa dell'HUD (blu notte + oro, valori esatti da
+// public/critical.css). I pin sono bianchi (non oro) per risaltare meglio
+// sull'illustrazione notturna scura della mappa.
+// ============================================================
+@use '../tokens' as *;
+
+.map-pin {
+    cursor: pointer;
+
+    &__ring {
+        display: block;
+        // clamp invece di un px fisso: la mappa si ridimensiona con la
+        // larghezza dello schermo (width:100% della propria immagine), ma un
+        // pin a dimensione fissa no — su mobile risultava sproporzionato
+        // (troppo grande rispetto a una mappa molto piu' piccola). vw lo
+        // lega alla larghezza dello schermo, min/max evitano che diventi
+        // illeggibile o eccessivo ai due estremi.
+        width: clamp(24px, 4vw, 40px);
+        height: clamp(24px, 4vw, 40px);
+        border-radius: 50%;
+        object-fit: cover;
+        // Il file (map-pin.jpg) ha uno sfondo nero pieno attorno al
+        // medaglione: screen tratta il nero come "trasparente" (non
+        // contribuisce al blend) e lascia risaltare solo oro/gemma/bagliori,
+        // senza dover ritagliare l'immagine.
+        mix-blend-mode: screen;
+        filter: drop-shadow(0 0 0 rgba(255, 255, 255, .5));
+        // Pulsazione + galleggiamento su/giu' asincrono (--float-delay
+        // impostato per pin in MapClick.jsx) cosi' i pin non si muovono
+        // tutti in sincrono, un effetto piu' vivo sulla mappa illustrata.
+        animation: map-pin-pulse 2.4s ease-out infinite, map-pin-float 3.2s ease-in-out infinite;
+        animation-delay: 0s, var(--float-delay, 0s);
+        transition: transform .2s ease, filter .2s ease;
+
+        // Pin custom per zona (SVG, gia' con sfondo trasparente e una
+        // sagoma propria a goccia con punta) — niente screen (servirebbe
+        // solo a "smacchiare" lo sfondo nero del jpg generico) ne' il
+        // ritaglio circolare/cover, che taglierebbe via la punta inferiore.
+        // Piu' grande e con bagliore permanente (non solo in hover): sulla
+        // mappa, densa di dettagli disegnati, un pin piccolo e spento si
+        // perde e il kanji diventa illeggibile.
+        &--custom {
+            width: clamp(38px, 8vw, 84px);
+            height: auto;
+            // border-radius (non overflow:hidden, che ritaglierebbe la punta
+            // inferiore) solo per dare forma circolare alla pulsazione
+            // (box-shadow segue il border-radius del box): senza, l'animazione
+            // map-pin-pulse appariva come un'ombra quadrata invece che un
+            // cerchio che si espande dal medaglione.
+            border-radius: 50%;
+            object-fit: contain;
+            mix-blend-mode: normal;
+            filter: drop-shadow(0 0 6px rgba(255, 210, 120, .75)) drop-shadow(0 2px 4px rgba(0, 0, 0, .6));
+        }
+    }
+
+    &__label {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%) translateY(-4px);
+        background: rgba(8, 9, 26, .85);
+        color: #e8e4da;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+        padding: 3px 9px;
+        border-radius: 999px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s ease, transform .2s ease;
+    }
+
+    &:hover .map-pin__ring { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(255, 255, 255, .8)); }
+    &:hover .map-pin__label { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    &--active .map-pin__ring { filter: drop-shadow(0 0 10px rgba(255, 255, 255, .9)); }
+
+    // Pin custom: bagliore oro (non bianco) in hover/attivo, coerente col
+    // bagliore permanente a riposo definito sopra.
+    &:hover .map-pin__ring--custom {
+        filter: drop-shadow(0 0 10px rgba(255, 210, 120, .9)) drop-shadow(0 2px 4px rgba(0, 0, 0, .6));
+    }
+    &--active .map-pin__ring--custom {
+        filter: drop-shadow(0 0 14px rgba(255, 210, 120, 1)) drop-shadow(0 2px 4px rgba(0, 0, 0, .6));
+    }
+}
+
+@keyframes map-pin-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, .45); }
+    70% { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+@keyframes map-pin-float {
+    0%, 100% { margin-top: 0; }
+    50% { margin-top: -14px; }
+}
+
+// ── Pannello zona selezionata ─────────────────────────────────
+// Fisso in basso su un blur, non piu' in flusso sotto la mappa: sulla
+// mappa (spesso piu' alta della viewport) restava fuori vista finche' non
+// si scrollava la pagina.
+//
+// Molto trasparente/sfocato a riposo (si legge la mappa sotto), diventa
+// piu' leggibile al hover/focus (:focus-within copre anche il click su una
+// stanza, che sposta il focus su quell'elemento).
+.map-zone-panel {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 50;
+    max-height: 46vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    text-align: center;
+    background: linear-gradient(160deg, rgba(22, 27, 53, .7), rgba(8, 9, 26, .7));
+    // Arco ampio (non angoli arrotondati) lungo tutto il bordo superiore —
+    // richiama la sagoma di un torii/arco di tempio, in tema con Crystal
+    // Tokyo, invece del solito rettangolo. Sintassi border-radius ellittica
+    // (raggio-x 50% / raggio-y fisso): niente clip-path, quindi nessun
+    // rischio di tagliare il contenuto — e' solo la forma del bordo/sfondo.
+    border-radius: 50% 50% 0 0 / 30px 30px 0 0;
+    padding: 30px 20px calc(18px + env(safe-area-inset-bottom, 0px));
+    box-shadow:
+        0 -14px 40px -8px rgba(0, 0, 0, .55),
+        inset 0 1px 0 rgba(218, 168, 50, .15);
+    color: #e8e4da;
+    transition: background .25s ease;
+
+    &:hover, &:focus-within {
+        background: linear-gradient(160deg, rgba(22, 27, 53, .92), rgba(8, 9, 26, .95));
+    }
+
+    // Divisorio elegante e sottile lungo il bordo superiore, al posto del
+    // nastro a zigzag (troppo marcato): una linea di 1px che sfuma ai lati
+    // con un piccolo diamante dorato al centro — motivo classico, delicato.
+    // top positivo (non negativo): il pannello scrolla (overflow-y:auto),
+    // un offset negativo verrebbe tagliato dallo stesso clipping.
+    &::before {
+        content: '';
+        position: absolute;
+        top: 5px; left: 12%; right: 12%;
+        height: 1px;
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(218, 168, 50, .5) 25%,
+            rgba(218, 168, 50, .5) 75%,
+            transparent);
+        pointer-events: none;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 2px; left: 50%;
+        width: 7px; height: 7px;
+        margin-left: -3.5px;
+        background: rgba(218, 168, 50, .75);
+        transform: rotate(45deg);
+        box-shadow: 0 0 5px rgba(218, 168, 50, .3);
+        pointer-events: none;
+    }
+
+    p {
+        margin: 4px 0 14px;
+        font-size: .85em;
+        line-height: 1.4;
+        color: #7a8499;
+    }
+}
+
+.map-zone-panel__head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 4px;
+
+    strong { font-size: 1.05em; color: #daa832; }
+}
+
+.map-zone-panel__close {
+    position: absolute;
+    right: 0;
+    background: none;
+    border: none;
+    color: #7a8499;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover { color: #e8e4da; }
+}
+
+.map-zone-panel__rooms {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+// Voce larga (immagine + nome affiancati), non piu' una colonna stretta con
+// avatar cerchiato: immagine a meta' dimensione (30px, era 60px) e angoli
+// smussati invece che tonda.
+.map-zone-room {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 190px;
+    padding: 6px 12px 6px 6px;
+    border-radius: 10px;
+    // Colori pieni (niente rgba/trasparenza): la card non deve lasciar
+    // trasparire la mappa sotto.
+    background: #171c34;
+    border: 1px solid #4a3d22;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+
+    // Larghezza automatica: segue quella reale dell'immagine (a parita' di
+    // altezza 30px) invece di forzare un quadrato che la ritaglia/deforma.
+    // position:relative ma NIENTE overflow:hidden qui: serve solo da
+    // contenitore per il badge, che deve sporgere oltre l'angolo — il
+    // ritaglio (arrotondato) dell'immagine e' sul wrapper interno
+    // __avatar-img, cosi' non taglia piu' anche il badge.
+    &__avatar {
+        position: relative;
+        display: block;
+        flex-shrink: 0;
+
+        &-img {
+            display: block;
+            width: auto;
+            height: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #5c4a26;
+            transition: border-color .15s ease;
+
+            img { display: block; width: auto; height: 100%; }
+        }
+    }
+
+    &__name {
+        font-size: 11.5px;
+        line-height: 1.25;
+        color: #e8e4da;
+        white-space: normal;
+        text-align: left;
+    }
+
+    &:hover {
+        border-color: #c4922a;
+        background: #1f2540;
+    }
+    &:hover .map-zone-room__avatar-img { border-color: #daa832; }
+
+    &__badge {
+        position: absolute;
+        top: -5px; right: -5px;
+        background: #e74c3c;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 10px;
+        font-weight: bold;
+        min-width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        border: 1px solid rgba(8, 9, 26, .9);
+    }
+}

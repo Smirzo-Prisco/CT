@@ -11,6 +11,11 @@ import { useState, useEffect, useCallback, Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import styles from './ContattaModerazione.module.css'
 
+function navigate(url) {
+    if (window.CT?.navigate) window.CT.navigate(url)
+    else window.top.location.href = url
+}
+
 // ── RispondiModal ─────────────────────────────────────────────────────────────
 
 /**
@@ -435,6 +440,10 @@ export default function ContattaModerazione() {
 
     return (
         <div className={styles.wrap}>
+            <div className="link_back">
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
+            </div>
+
             <h2 className={styles.title}>Contatta la Moderazione</h2>
 
             {/* Sezione A: form */}

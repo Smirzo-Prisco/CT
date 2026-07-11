@@ -249,7 +249,7 @@ export default function PresentiEstesi({ isStaff = false }) {
                         <td>RAZZA</td>
                         <td>LAVORO</td>
                         <td>GILDA</td>
-                        <td>NOME E COGNOME</td>
+                        <td>NOME</td>
                         <td>CARICHE</td>
                     </tr>
 

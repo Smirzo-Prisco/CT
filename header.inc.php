@@ -148,8 +148,14 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <?php if (!empty($_SESSION['login'])): ?>
         <?php
         $pg_avatar = '';
-        $r_avatar = gdrcd_query("SELECT url_img_chat FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "' LIMIT 1");
-        if ($r_avatar) $pg_avatar = trim($r_avatar['url_img_chat'] ?? '');
+        $pg_sesso = 'm';
+        $pg_disponibile = 1;
+        $r_avatar = gdrcd_query("SELECT url_img_chat, sesso, disponibile FROM personaggio WHERE nome='" . gdrcd_filter('in', $_SESSION['login']) . "' LIMIT 1");
+        if ($r_avatar) {
+            $pg_avatar = trim($r_avatar['url_img_chat'] ?? '');
+            $pg_sesso = $r_avatar['sesso'] ?? 'm';
+            $pg_disponibile = (int)($r_avatar['disponibile'] ?? 1);
+        }
         ?>
         <script>
         window.CT_USER = {
@@ -157,6 +163,8 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
             luogo:        <?=(int)($_SESSION['luogo'] ?? 0)?>,
             mappa:        <?=(int)($_SESSION['mappa'] ?? 0)?>,
             url_img_chat: <?=json_encode($pg_avatar)?>,
+            sesso:        <?=json_encode($pg_sesso)?>,
+            disponibile:  <?=$pg_disponibile?>,
             soundPrefs: {
                 dm:     <?=(int)($_SESSION['suono_dm']     ?? 1)?>,
                 chat:   <?=(int)($_SESSION['suono_chat']   ?? 1)?>,
@@ -166,17 +174,26 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         window.ctSocket = null;
         </script>
 
-        <!-- CT_ASSET_VERSIONS: mtime dei file includes/*.js caricati dinamicamente da React
-             (chat.js, role_session.js, ecc.) — nginx li mette in cache 1 anno assumendo
-             URL versionati con ?v=; senza questo, il browser non vede mai gli aggiornamenti. -->
+        <!-- CT_ASSET_VERSIONS: mtime di file statici caricati dinamicamente da React
+             (chat.js, role_session.js, ecc. + le immagini mappa giorno/notte) — nginx
+             li mette in cache 1 anno assumendo URL versionati con ?v=; senza questo,
+             il browser non vede mai gli aggiornamenti (serviva "svuota cache" a mano). -->
         <script>
         window.CT_ASSET_VERSIONS = {
             <?php
-            $assetFiles = ['chat.js', 'role_session.js', 'incremento_parametri.js', 'mercato_abilita.js'];
+            $assetFiles = [
+                'chat.js' => 'includes/chat.js',
+                'role_session.js' => 'includes/role_session.js',
+                'incremento_parametri.js' => 'includes/incremento_parametri.js',
+                'mercato_abilita.js' => 'includes/mercato_abilita.js',
+                'mappa_giorno.png' => 'themes/crystal/imgs/maps/mappa_giorno.png',
+                'mappa_notte.png' => 'themes/crystal/imgs/maps/mappa_notte.png',
+                'map-pin.jpg' => 'themes/crystal/imgs/maps/map-pin.jpg',
+            ];
             $assetVersions = [];
-            foreach ($assetFiles as $assetFile) {
-                $assetPath = __DIR__ . '/includes/' . $assetFile;
-                $assetVersions[] = json_encode($assetFile) . ': ' . (file_exists($assetPath) ? filemtime($assetPath) : 0);
+            foreach ($assetFiles as $assetKey => $assetRelPath) {
+                $assetPath = __DIR__ . '/' . $assetRelPath;
+                $assetVersions[] = json_encode($assetKey) . ': ' . (file_exists($assetPath) ? filemtime($assetPath) : 0);
             }
             echo implode(",\n            ", $assetVersions);
             ?>
@@ -198,57 +215,17 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <?php if (!empty($_SESSION['login'])): ?>
         <?php
         $isStaff = (($_SESSION['admin'] ?? 0) == 1 || ($_SESSION['moderatore'] ?? 0) == 1 || ($_SESSION['master'] ?? 0) == 1) ? 'true' : 'false';
-        $lm_items = [];
-        if (!empty($PARAMETERS['menu'])) {
-            foreach ($PARAMETERS['menu'] as $key => $item) {
-                if (!empty($item['url'])) {
-                    $lm_items[] = [
-                        'key'                => $key,
-                        'url'                => $item['url'],
-                        'text'               => $item['text']               ?? '',
-                        'image_file'         => $item['image_file']         ?? '',
-                        'image_file_onclick' => $item['image_file_onclick'] ?? '',
-                    ];
-                }
-            }
-        }
-        $lm_title       = $PARAMETERS['names']['gamemenu']['menu'] ?? '';
-        $lm_theme       = $PARAMETERS['themes']['current_theme'];
-        $lm_showGotomap = ($PARAMETERS['mode']['gotomap_list'] === 'ON') ? 'true' : 'false';
         ?>
         <script>
         document.addEventListener('ct:ready', function() {
             var el = document.getElementById('ct-app-content');
             if (el) CT.mount('AppRouter', 'ct-app-content', { isStaff: <?= $isStaff ?> });
 
-            if (document.getElementById('info-location-container'))
-                CT.mount('InfoLocation', 'info-location-container', {});
-
-            if (document.getElementById('link-menu-container'))
-                CT.mount('LinkMenu', 'link-menu-container', {
-                    menuItems:   <?= json_encode($lm_items) ?>,
-                    menuTitle:   <?= json_encode($lm_title) ?>,
-                    theme:       <?= json_encode($lm_theme) ?>,
-                    showGotomap: <?= $lm_showGotomap ?>
-                });
-
-            if (document.getElementById('frame-messaggi-container'))
-                CT.mount('FrameMessaggi', 'frame-messaggi-container', {});
-
-            if (document.getElementById('chattina-off-container'))
-                CT.mount('ChattingOff', 'chattina-off-container', {});
-
-            if (document.getElementById('anteprima-scheda-container'))
-                CT.mount('AnteprimaScheda', 'anteprima-scheda-container', {});
-
-            if (document.getElementById('online-users-container'))
-                CT.mount('OnlineUsers', 'online-users-container', {});
-
-            if (document.getElementById('presenti-button-container'))
-                CT.mount('PresentiBadge', 'presenti-button-container', {});
-
-            if (document.getElementById('meteo-container'))
-                CT.mount('Meteo', 'meteo-container', {});
+            // HUD immersivo: sostituisce InfoLocation/PresentiBadge/OnlineUsers/
+            // ChattingOff/AnteprimaScheda/FrameMessaggi/Meteo (montati singolarmente
+            // in precedenza) con i due anelli + topbar in un unico componente.
+            if (document.getElementById('hud-container'))
+                CT.mount('Hud', 'hud-container', { isStaff: <?= $isStaff ?> });
 
             if (document.getElementById('chatbot-widget-container'))
                 CT.mount('ChatbotWidget', 'chatbot-widget-container', {});

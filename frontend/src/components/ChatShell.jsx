@@ -1087,7 +1087,7 @@ export default function ChatShell() {
                     {/* ================================================================ */}
                     <div id="userSearchPopup" className="user-search-popup__overlay"
                         style={{
-                            position: 'fixed', top: 0, left: 'var(--sidebar-modal-offset, 260px)', right: 'var(--sidebar-modal-offset, 260px)', bottom: 0,
+                            position: 'fixed', top: 0, left: 'var(--sidebar-modal-offset, 5%)', right: 'var(--sidebar-modal-offset, 5%)', bottom: 0,
                             width: 'auto', display: 'none', justifyContent: 'center',
                             alignItems: 'center', zIndex: 10000
                         }}>
@@ -1119,7 +1119,7 @@ export default function ChatShell() {
                     {/* ================================================================ */}
                     <div id="pgRolePlayingPanel" className="user-search-popup__overlay"
                         style={{
-                            position: 'fixed', top: 0, left: 'var(--sidebar-modal-offset, 260px)', right: 'var(--sidebar-modal-offset, 260px)', bottom: 0,
+                            position: 'fixed', top: 0, left: 'var(--sidebar-modal-offset, 5%)', right: 'var(--sidebar-modal-offset, 5%)', bottom: 0,
                             width: 'auto', display: 'none', justifyContent: 'center',
                             alignItems: 'center', zIndex: 10000
                         }}>
@@ -1150,7 +1150,7 @@ export default function ChatShell() {
                     <div className="gdr-modal-overlay" id="chatPanel"
                         style={{
                             display: panelOpen ? 'flex' : 'none', position: 'fixed', top: 0,
-                            left: 'var(--sidebar-modal-offset, 260px)', right: 'var(--sidebar-modal-offset, 260px)', bottom: 0
+                            left: 'var(--sidebar-modal-offset, 5%)', right: 'var(--sidebar-modal-offset, 5%)', bottom: 0
                         }}>
                         <div className="gdr-panel-container">
 

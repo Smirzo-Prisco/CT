@@ -11,6 +11,9 @@ div.presenti_estesi {
     table {
         table-layout: auto; // sovrascrive fullTable (fixed): le colonne si adattano
         width: 100%;
+        // Bordo/angoli in stile con il resto della land: ora nella regola
+        // globale table.customTable (_tables.scss), vale per tutte le
+        // pagine che la condividono, non serve piu' ripeterlo qui.
     }
 
     // Limita tutte le immagini nella tabella per evitare overflow

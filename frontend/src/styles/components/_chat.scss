@@ -506,13 +506,35 @@ span.look {
 
 // ── Layout chat: flex column per far terminare chat_box dove inizia panels_box ──
 
+// --sidebar-modal-offset: usata da ChatShell.jsx/MasterPanel.jsx per i
+// margini left/right delle modali full-screen (ricerca utenti, personaggi
+// in role, pannello GDR...) che vanno in portal su document.body — per
+// questo la variabile e' su body, non su .pagina_frame_chat (le modali
+// portate non ne sarebbero piu' discendenti). Il valore corrisponde
+// sempre agli stessi margini di .pagina_frame_chat sotto, cosi' le
+// modali coprono esattamente la stessa area del contenuto chat.
+// Prima non era definita da nessuna parte: il fallback hardcoded nel JS
+// (260px, residuo delle vecchie colonne laterali rimosse col redesign
+// HUD) lasciava ancora spazio su desktop ma su mobile consumava quasi
+// tutta la larghezza, riducendo le modali a una sottile striscia verticale.
+body {
+    --sidebar-modal-offset: 5%;
+}
+@media screen and (width <=768px) {
+    body {
+        --sidebar-modal-offset: 0px;
+    }
+}
+
 div.pagina_frame_chat {
-    // Si posiziona esattamente come #maincontent: stesso left/right/top/bottom,
-    // stessa area visiva ma display:flex per gestire chat_box + panels_box.
+    // Stessa area visiva di #maincontent .output (90% centrato, sotto la
+    // topbar dell'HUD), ma display:flex per gestire chat_box + panels_box —
+    // per questo non puo' semplicemente ereditare da .output ed e' un fixed
+    // a se stante con gli stessi margini percentuali.
     position: fixed;
-    top: 0;
-    left: 260px;
-    right: 260px;
+    top: 136px; // 86px topbar + 50px extra, stessa ragione di #maincontent in _layout.scss
+    left: 5%;
+    right: 5%;
     bottom: 0;
     display: flex;
     flex-direction: column;
@@ -1540,6 +1562,7 @@ button.chat_button {
 
 @media screen and (width <=768px) {
     div.pagina_frame_chat {
+        top: 86px;
         left: 0;
         right: 0;
     }

@@ -5,18 +5,24 @@
  *
  * Funzionalità:
  *   - Mostra l'immagine della mappa (giorno/notte in base all'ora)
- *   - Overlay di 9 hotspot cliccabili posizionati in percentuale sull'immagine
- *     (le coordinate derivano dai valori <area> del vecchio PHP, scalate alle
- *     dimensioni naturali dell'immagine restituite da api_map.php?op=current)
+ *   - Overlay di hotspot cliccabili posizionati in percentuale sull'immagine
+ *     (coordinate cx/cy in pixel dell'immagine naturale, da api_map.php?op=zones)
  *   - Click su un hotspot → popup con stanze della zona + conteggio utenti online
  *   - Click su una stanza → navigazione via main.php?dir=X (target _top)
  *   - Aggiornamento real-time del conteggio utenti tramite socket 'users:update'
  *   - Chiusura popup cliccando fuori o premendo il tasto ×
  *
  * Dati delle zone:
- *   Le 9 zone (nome, descrizione, stanze) sono hardcoded come costante ZONES,
- *   equivalente ai 9 div.menu_mappa del vecchio PHP. Le dimensioni naturali
- *   dell'immagine vengono lette dall'API e usate per scalare i hotspot.
+ *   Zone (nome, descrizione, coordinate pin, stanze) arrivano da
+ *   api_map.php?op=zones, che legge mappa_click (una riga per zona, con
+ *   larghezza/altezza riusate come cx/cy del pin e descrizione in un campo
+ *   dedicato) e mappa (le stanze, via mappa.id_mappa = mappa_click.id_click).
+ *   Prima erano una costante statica hardcoded qui (ZONES) — rimossa perché
+ *   duplicava una relazione che il DB aveva già, ed era andata fuori sync
+ *   (stanze in zona sbagliata, filename immagine non più validi, stanze
+ *   mancanti). L'unica eccezione è ROPPONGI_EXTRA_ROOM sotto: un link a una
+ *   pagina di servizio, non una stanza `mappa`, quindi non recuperabile dal
+ *   DB con la stessa query.
  *
  * Montaggio: via AppRouter su #ct-app-content (Phase 4)
  *
@@ -32,131 +38,30 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 
-// ---------------------------------------------------------------------------
-// DATI STATICI DELLE ZONE
-// Equivalente ai 9 div.menu_mappa del vecchio PHP.
-//
-// cx, cy = coordinate del centro dell'<area> nell'immagine naturale
-//          (calcolate come media di x1,x2 e y1,y2 dei vecchi <area> coords)
-// rooms  = stanze nella zona; link può essere 'dir' (ID stanza) o 'page' (pagina)
-// nightOnly = stanza visibile solo di notte (come in Chiyoda nel vecchio PHP)
-// ---------------------------------------------------------------------------
-const ZONES = [
-    {
-        id: 'menu1',
-        name: 'Odaiba',
-        cx: 706, cy: 390,
-        desc: 'Odaiba (お台場) è una grande isola artificiale collocata a Est della città. Meta preferita di molti turisti, è nota soprattutto per il famoso lungomare.',
-        rooms: [
-            { dir: 50, img: 'faro.png' },
-            { dir: 2, img: 'porto.png' },
-            { dir: 3, img: 'ponte.png' },
-            { dir: 22, img: 'spiaggia.png' },
-            // { dir: 32, img: 'regno_di_caos.png' },
-        ],
-    },
-    {
-        id: 'menu2',
-        name: 'Monte Fuji',
-        cx: 462, cy: 141,
-        desc: 'Il Monte Fuji (富士山 Fuji-san) è il vulcano più alto di tutto il Giappone. Luogo dalla bellezza paesaggistica straordinaria, è considerato uno dei luoghi sacri più importanti.',
-        rooms: [
-            { dir: 9, img: 'bosco.png' },
-            { dir: 28, img: 'terme.png' },
-            // { dir: 11, img: 'stella_prima.png' },
-            { dir: 428, img: 'nikigori.png' },
-            { dir: 10, img: 'altri_luoghi.png' },
-        ],
-    },
-    {
-        id: 'menu3',
-        name: 'Ueno',
-        cx: 446, cy: 289,
-        desc: 'Ueno (上野) è il quartiere in cui risiedono i più importanti musei e parchi di tutta la città. Densamente popolato soprattutto durante la fioritura dei sakura.',
-        rooms: [
-            // { dir: 43, img: 'giardini_dei_fiori_del_male.png' },
-            { dir: 16, img: 'luna_park.png' },
-            { dir: 4, img: 'parco_di_ueno.png' },
-            { dir: 12, img: 'periferia_nord.png' },
-            { dir: 7, img: 'zoo.png' },
-        ],
-    },
-    {
-        id: 'menu4',
-        name: 'Shinjuku',
-        cx: 47, cy: 298,
-        desc: 'Shinjuku (新宿区) è il più importante e trafficato nodo di trasporto urbano della metropoli.',
-        rooms: [
-            // { dir: 27, img: 'villa_lancaster.png' },
-            { dir: 14, img: 'secret_pandora.png' },
-            { dir: 38, img: 'stazione.png' },
-            { dir: 18, img: 'zona_malfamata.png' },
-        ],
-    },
-    {
-        id: 'menu5',
-        name: 'Chiyoda',
-        cx: 330, cy: 365,
-        desc: 'Chiyoda (千代田) è il centro amministrativo di Tokyo dentro cui è possibile trovare, oltre che molte istituzioni governative, il famoso Palazzo di Cristallo.',
-        rooms: [
-            { dir: 36, img: 'corte.png' },
-            { dir: 25, img: 'ospedale.png' },
-            // { dir: 17, img: 'palazzo_di_cristallo.png' },
-            // Chitoku Academy: compare solo di notte nel vecchio PHP (mostrata per prima di notte)
-            { dir: 26, img: 'chitoku_academy.png', nightOnly: false },
-        ],
-    },
-    {
-        id: 'menu6',
-        name: 'Roppongi',
-        cx: 161, cy: 320,
-        desc: 'Roppongi (六本木) è nota per l\'ingente numero di locali notturni e, per questo, meta di numerosi turisti ed espatriati occidentali.',
-        rooms: [
-            // { page: 'servizi_mercato', img: 'centro_commerciale.png' },
-            { dir: 13, img: 'gatto_nero.png' },
-            { page: 'servizi_prenotazioni_prova', img: 'hotel_inn.png' },
-            { dir: 47, img: 'terrazza_panoramica.png' },
-            { dir: 35, img: 'tokyo_tower.png' },
-        ],
-    },
-    {
-        id: 'menu7',
-        name: 'Shibuya',
-        cx: 80, cy: 405,
-        desc: 'Shibuya (渋谷) è la zona più conosciuta e affollata di tutta la capitale giapponese, perennemente illuminata da megaschermi e luci. È il quartiere preferito dai giovani.',
-        rooms: [
-            { dir: 23, img: 'centro.png' },
-            { dir: 24, img: 'magic_shop.png' },
-            { dir: 30, img: 'Tae.png' },
-            { dir: 33, img: 'harajuku.png' },
-            { dir: 8, img: 'zona_residenziale_ovest.png' },
-        ],
-    },
-    {
-        id: 'menu8',
-        name: 'Asakusa',
-        cx: 581, cy: 238,
-        desc: 'Asakusa (浅草) viene spesso associata alla zona spirituale. Dominata da templi e santuari shinto, è possibile notare persone vestite con abiti tradizionali.',
-        rooms: [
-            { dir: 34, img: 'cimitero.png' },
-            // { dir: 19, img: 'santuario_di_cosmos.png' },
-            // { dir: 31, img: 'reggia_lunare.png' },
-            { dir: 48, img: 'zona_residenziale_est.png' },
-        ],
-    },
-    {
-        id: 'menu9',
-        name: 'Tsukiji',
-        cx: 674, cy: 295,
-        desc: 'Tsukiji (築地) deve la sua fama al celeberrimo mercato del pesce. A seguito di un terremoto non ancora compreso, molta della zona è costituita da palazzi abbandonati.',
-        rooms: [
-            { dir: 21, img: 'fiume.png' },
-            { dir: 49, img: 'palazzo_abbandonato.png' },
-            { dir: 37, img: 'periferia_sud.png' },
-            { dir: 20, img: 'quartier_generale.png' },
-        ],
-    },
-]
+// Unica voce non presente in mappa_click/mappa: un link diretto a una pagina
+// di servizio (non una stanza/chat), aggiunto lato client alla zona Roppongi
+// dopo il fetch di api_map.php?op=zones.
+const ROPPONGI_EXTRA_ROOM = {
+    id: 'prenotazioni',
+    nome: 'Prenotazioni',
+    img: 'hotel_inn.png',
+    link: { type: 'page', value: 'servizi_prenotazioni_prova' },
+    count: 0,
+}
+
+// Pin dedicati per zona (SVG, sfondo gia' trasparente) al posto del
+// medaglione generico map-pin.jpg. Chiave = zone.nome da api_map.php?op=zones.
+const ZONE_PIN_IMAGES = {
+    Shibuya: 'pin-shibuya.svg',
+    Odaiba: 'pin-odaiba.svg',
+    Fuji: 'pin-fuji.svg',
+    Ueno: 'pin-ueno.svg',
+    Shinjuku: 'pin-shinjuku.svg',
+    Chiyoda: 'pin-chiyoda.svg',
+    Roppongi: 'pin-roppongi.svg',
+    Asakusa: 'pin-asakusa.svg',
+    Tsukiji: 'pin-tsukiji.svg',
+}
 
 // ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
@@ -177,23 +82,29 @@ export default function MapClick() {
     /** Info sulla posizione corrente (is_notte) */
     const [mapInfo, setMapInfo] = useState(null)
 
-    /**
-     * Conteggio utenti online per stanza: { [dir]: numero }
-     * Popolato da api_map.php?op=rooms e aggiornato via socket 'users:update'.
-     */
-    const [onlineCounts, setOnlineCounts] = useState({})
+    /** Zone della mappa corrente (pin + stanze), da api_map.php?op=zones. */
+    const [zones, setZones] = useState([])
 
-    /** ID zona con popup aperto, es. 'menu1'. null = nessun popup. */
+    /** ID zona con popup aperto (mappa_click.id_click). null = nessun popup. */
     const [openZone, setOpenZone] = useState(null)
 
     /** Ref all'immagine mappa per leggere le dimensioni naturali reali */
     const imgRef = useRef(null)
 
+    // La mappa e' l'unica pagina che deve occupare il 100% di #maincontent
+    // (le altre restano al 90%, vedi _layout.scss) — qui aggiunge/rimuove la
+    // classe che attiva l'eccezione.
+    useEffect(() => {
+        const el = document.getElementById('maincontent')
+        el?.classList.add('ct-hud-map-page')
+        return () => el?.classList.remove('ct-hud-map-page')
+    }, [])
+
     /**
      * Dimensioni naturali REALI dell'immagine (px), lette da img.naturalWidth/Height.
      * Necessarie per calcolare le posizioni percentuali degli hotspot.
-     * Non si usa il DB (larghezza/altezza) perché il valore del DB potrebbe essere
-     * il default errato (500×330) invece delle dimensioni effettive dell'immagine.
+     * Non si usa il DB (larghezza/altezza) perché su mappa_click quei campi
+     * sono adesso le coordinate cx/cy dei pin, non le dimensioni dell'immagine.
      */
     const [naturalSize, setNaturalSize] = useState({ w: 0, h: 0 })
 
@@ -202,8 +113,7 @@ export default function MapClick() {
     // ---------------------------------------------------------------------------
 
     /**
-     * Recupera info mappa (is_notte, larghezza, altezza) da op=current.
-     * Le dimensioni naturali servono per scalare i hotspot correttamente.
+     * Recupera info mappa (is_notte) da op=current.
      */
     const fetchMapInfo = useCallback(() => {
         fetch('/pages/api_map.php?op=current')
@@ -213,19 +123,20 @@ export default function MapClick() {
     }, [])
 
     /**
-     * Recupera il conteggio utenti online per ogni stanza della mappa corrente.
-     * Usa effectiveMapId (URL → CT_USER.mappa) per essere corretto anche in
-     * navigazione SPA dove CT_USER.mappa potrebbe essere stale.
-     * Chiamato al mount e ad ogni evento socket 'users:update'.
+     * Recupera zone + stanze (con nome/immagine/link/conteggio online) della
+     * mappa corrente. Usa effectiveMapId (URL → CT_USER.mappa) per essere
+     * corretto anche in navigazione SPA dove CT_USER.mappa potrebbe essere
+     * stale. Chiamato al mount e ad ogni evento socket 'users:update' (il
+     * conteggio online e' l'unica parte che cambia in tempo reale).
      */
-    const fetchRoomCounts = useCallback(() => {
-        fetch(`/pages/api_map.php?op=rooms&map_id=${effectiveMapId}`)
+    const fetchZones = useCallback(() => {
+        fetch(`/pages/api_map.php?op=zones&map_id=${effectiveMapId}`)
             .then(r => r.json())
             .then(data => {
                 if (!data.success) return
-                const counts = {}
-                data.rooms.forEach(r => { counts[r.id] = r.utenti_online })
-                setOnlineCounts(counts)
+                setZones(data.zones.map(z =>
+                    z.nome === 'Roppongi' ? { ...z, rooms: [...z.rooms, ROPPONGI_EXTRA_ROOM] } : z
+                ))
             })
             .catch(console.error)
     }, [effectiveMapId])
@@ -254,14 +165,14 @@ export default function MapClick() {
     useEffect(() => {
         // Caricamento iniziale
         fetchMapInfo()
-        fetchRoomCounts()
+        fetchZones()
 
         // Aggiorna conteggi ad ogni spostamento di utenti nella mappa
         const sock = window.ctSocket
-        if (sock) sock.on('users:update', fetchRoomCounts)
+        if (sock) sock.on('users:update', fetchZones)
 
-        return () => { if (sock) sock.off('users:update', fetchRoomCounts) }
-    }, [fetchMapInfo, fetchRoomCounts])
+        return () => { if (sock) sock.off('users:update', fetchZones) }
+    }, [fetchMapInfo, fetchZones])
 
     /**
      * Cambio mappa in navigazione SPA.
@@ -309,35 +220,42 @@ export default function MapClick() {
     // ---------------------------------------------------------------------------
 
     /**
-     * Naviga verso una stanza (dir=X) o una pagina (page=X).
+     * Naviga verso una stanza (dir=X), una pagina di servizio (page=X) o
+     * un'altra mappa (map_id=X, stessa risoluzione url di 'gotomap' in
+     * api_map.php).
      *
      * In SPA mode (window.CT.navigate disponibile), PHP non gira:
      * per le stanze con dir chiama prima op=move via AJAX per aggiornare
      * DB, sessione e socket (stesso pattern usato da op=changemap al mount).
      * In full-page-reload, main.php?dir=X gestisce tutto lato PHP.
      *
-     * @param {Object} room - Oggetto stanza dalla costante ZONES
+     * @param {Object} room - Oggetto stanza da api_map.php?op=zones (o ROPPONGI_EXTRA_ROOM)
      */
     const navigate = useCallback(async (room) => {
-        if (room.dir !== undefined) {
-            const url = `main.php?dir=${room.dir}`
+        const { type, value } = room.link
+
+        if (type === 'dir') {
+            const url = `main.php?dir=${value}`
             if (window.CT?.navigate) {
                 try {
                     await fetch('/pages/api_map.php?op=move', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ dir: room.dir }),
+                        body: JSON.stringify({ dir: value }),
                     })
                 } catch { /* ignora errori di rete */ }
                 window.CT.navigate(url)
             } else {
                 window.top.location.href = url
             }
-        } else if (room.page) {
-            const url = `main.php?page=${room.page}`
-            if (window.CT?.navigate) window.CT.navigate(url)
-            else window.top.location.href = url
+            return
         }
+
+        const url = type === 'map'
+            ? `main.php?page=mappaclick&map_id=${value}`
+            : `main.php?page=${value}`
+        if (window.CT?.navigate) window.CT.navigate(url)
+        else window.top.location.href = url
     }, [])
 
     // ---------------------------------------------------------------------------
@@ -373,16 +291,24 @@ export default function MapClick() {
     // RENDERING
     // ---------------------------------------------------------------------------
 
-    /** Sceglie l'immagine giorno o notte in base all'ora */
-    const mapImg = mapInfo?.is_notte
-        ? 'themes/crystal/imgs/maps/mappa_notte.png'
-        : 'themes/crystal/imgs/maps/mappa_giorno.png'
+    // Finché mapInfo non è arrivato non si sa se è giorno o notte: renderizzare
+    // subito l'immagine di giorno (default implicito di is_notte undefined) la
+    // mostrerebbe per un istante anche quando in realtà è notte, con un flash
+    // visibile al cambio immagine appena arriva la risposta.
+    if (!mapInfo) return <center><p>Caricamento mappa…</p></center>
+
+    /** Sceglie l'immagine giorno o notte in base all'ora.
+     *  ?v=mtime (da CT_ASSET_VERSIONS, vedi header.inc.php) forza il refresh
+     *  della cache del browser/nginx quando il file viene sostituito — senza,
+     *  l'immagine restava vecchia finche' non si svuotava la cache a mano. */
+    const mapImgName = mapInfo.is_notte ? 'mappa_notte.png' : 'mappa_giorno.png'
+    const mapImg = `themes/crystal/imgs/maps/${mapImgName}?v=${window.CT_ASSET_VERSIONS?.[mapImgName] ?? ''}`
 
     /**
      * Zona attualmente selezionata (se c'è un openZone).
      * Usata sia per evidenziare il pallino che per il pannello sotto.
      */
-    const selectedZone = openZone ? ZONES.find(z => z.id === openZone) : null
+    const selectedZone = openZone ? zones.find(z => z.id === openZone) : null
 
     return (
         <div>
@@ -391,31 +317,45 @@ export default function MapClick() {
             {/* Il popup NON è dentro questo container per evitare overflow/clip  */}
             {/* ---------------------------------------------------------------- */}
             <center>
-                <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%' }}>
+                {/* width:100% (non maxWidth) — deve riempire tutta la larghezza
+                    disponibile (.ct-hud-map-page porta .output al 100%), non
+                    solo arrivare fino alla dimensione naturale dell'immagine
+                    (inline-block+maxWidth la lasciava piccola su schermi larghi). */}
+                <div style={{ position: 'relative', width: '100%' }}>
                     <img
                         ref={imgRef}
                         src={mapImg}
                         alt="Mappa di Crystal Tokyo"
-                        style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
+                        style={{ width: '100%', height: 'auto', display: 'block' }}
                         onLoad={onImageLoad}
                     />
 
-                    {/* Pallini cliccabili — solo dopo il caricamento dell'immagine */}
-                    {ZONES.map(zone => {
+                    {/* Pin cliccabili — solo dopo il caricamento dell'immagine.
+                        Marker discreto (anello bianco pulsante/fluttuante +
+                        etichetta in hover): l'immagine ha gia' un proprio
+                        pallino disegnato per ogni zona, qui si aggiunge solo
+                        l'affordance interattiva sopra. --float-delay sfasa il
+                        galleggiamento cosi' i pin non si muovono in sincrono. */}
+                    {zones.map((zone, i) => {
                         const style = hotspotStyle(zone.cx, zone.cy)
                         if (!style) return null
+                        // Pin custom (SVG, gia' trasparente): niente mix-blend-mode:screen,
+                        // quel trucco serve solo al medaglione generico (map-pin.jpg) per
+                        // "rimuovere" il suo sfondo nero pieno.
+                        const customPin = ZONE_PIN_IMAGES[zone.nome]
+                        const pinSrc = customPin
+                            ? `themes/crystal/imgs/maps/${customPin}`
+                            : `themes/crystal/imgs/maps/map-pin.jpg?v=${window.CT_ASSET_VERSIONS?.['map-pin.jpg'] ?? ''}`
                         return (
                             <div
                                 key={zone.id}
-                                style={style}
+                                style={{ ...style, '--float-delay': `${(i % 5) * 0.5}s` }}
+                                className={`map-pin${openZone === zone.id ? ' map-pin--active' : ''}`}
                                 onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
-                                title={zone.name}
+                                title={zone.nome}
                             >
-                                <div style={{
-                                    width: '23px', height: '23px',
-                                    borderRadius: '50%',
-                                    backgroundColor: 'transparent',
-                                }} />
+                                <img className={`map-pin__ring${customPin ? ' map-pin__ring--custom' : ''}`} src={pinSrc} alt="" />
+                                <span className="map-pin__label">{zone.nome}</span>
                             </div>
                         )
                     })}
@@ -423,71 +363,29 @@ export default function MapClick() {
             </center>
 
             {/* ---------------------------------------------------------------- */}
-            {/* PANNELLO ZONA — appare SOTTO la mappa in flusso normale.          */}
-            {/* Non usa position:absolute dentro il container, quindi non viene   */}
-            {/* mai tagliato dall'overflow né dalla dimensione del frame.         */}
+            {/* PANNELLO ZONA — fisso in basso, sopra un blur (vedi _map_click.scss) */}
             {/* ---------------------------------------------------------------- */}
             {selectedZone && (
-                <div className="menu_mappa" style={{
-                    visibility: 'visible',
-                    position: 'relative',   // flusso normale, non absolute
-                    transform: 'none',       // annulla il translate(-170%,-50%) del CSS
-                    width: '100%',
-                    maxWidth: '100%',
-                    margin: '6px 0 0 0',
-                    boxSizing: 'border-box',
-                    textAlign: 'center',
-                }}>
-                    {/* Nome zona e descrizione */}
-                    <strong style={{ display: 'block', marginBottom: '4px', fontSize: '1em' }}>
-                        {selectedZone.name}
-                    </strong>
-                    <p style={{ margin: '0 0 8px', fontSize: '0.85em', lineHeight: '1.4' }}>
-                        {selectedZone.desc}
-                    </p>
-
-                    {/* Stanze — griglia flex, le immagini scalano con il contenitore */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px' }}>
-                        {selectedZone.rooms.map((room, i) => {
-                            const count = room.dir ? (onlineCounts[room.dir] || 0) : 0
-                            return (
-                                <span
-                                    key={i}
-                                    style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}
-                                    onClick={() => navigate(room)}
-                                >
-                                    <img
-                                        src={`/themes/crystal/imgs/maps/${room.img}`}
-                                        style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
-                                        alt=""
-                                        border="0"
-                                    />
-                                    {/* Badge utenti online */}
-                                    {count > 0 && (
-                                        <span style={{
-                                            position: 'absolute', top: '-4px', right: '-4px',
-                                            background: '#e74c3c', color: '#fff',
-                                            borderRadius: '50%', fontSize: '10px', fontWeight: 'bold',
-                                            minWidth: '16px', height: '16px',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            pointerEvents: 'none',
-                                        }}>
-                                            {count}
-                                        </span>
-                                    )}
-                                </span>
-                            )
-                        })}
+                <div className="map-zone-panel">
+                    <div className="map-zone-panel__head">
+                        <strong>{selectedZone.nome}</strong>
+                        <button className="map-zone-panel__close" onClick={() => setOpenZone(null)} aria-label="Chiudi">×</button>
                     </div>
+                    <p>{selectedZone.desc}</p>
 
-                    {/* Chiudi pannello */}
-                    <span
-                        className="close-location-modal"
-                        onClick={() => setOpenZone(null)}
-                        style={{ display: 'block', marginTop: '8px', cursor: 'pointer' }}
-                    >
-                        ×
-                    </span>
+                    <div className="map-zone-panel__rooms">
+                        {selectedZone.rooms.map(room => (
+                            <span key={room.id} className="map-zone-room" onClick={() => navigate(room)}>
+                                <span className="map-zone-room__avatar">
+                                    <span className="map-zone-room__avatar-img">
+                                        <img src={`/themes/crystal/imgs/maps/${room.img}`} alt="" />
+                                    </span>
+                                    {room.count > 0 && <span className="map-zone-room__badge">{room.count}</span>}
+                                </span>
+                                <span className="map-zone-room__name">{room.nome}</span>
+                            </span>
+                        ))}
+                    </div>
                 </div>
             )}
         </div>

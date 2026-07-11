@@ -1,0 +1,697 @@
+// ============================================================
+// _hud.scss — HUD immersivo (Hud.jsx), sostituisce le colonne laterali
+// Componente standalone scopato sotto .ct-hud.
+//
+// Palette: blu notte + oro, valori ESATTI presi da public/critical.css
+// (--pub-dark/--pub-dark2/--pub-card-dark, --pub-gold/--pub-gold-h) — non
+// i token $palette-* globali (pensati per il tema ice-blue del resto del
+// gioco), perché qui si vuole la stessa identità cromatica gia' in uso
+// nella parte pubblica del sito. E' la palette di default ("public" qui
+// sotto), scelta anche in Preferenze.jsx > Colori land.
+//
+// Tutti gli accenti oro/ink sono in color-mix(var(--gold)/--ink-*) invece
+// che rgba hardcoded: cosi' seguono la palette attiva (vedi le varianti
+// body[data-palette] sotto) invece di restare fissi al blu notte.
+// ============================================================
+@use '../tokens' as *;
+
+// Le custom property vivono su body (non su .ct-hud): l'arco dei due
+// anelli laterali, su mobile, viene portato via React su document.body
+// quando aperto (vedi HudArcSheet in Hud.jsx, e il commento sul containing
+// block piu' sotto in RESPONSIVE) — un discendente diretto di <body>, non
+// piu' di .ct-hud. Se le variabili restassero scopate a .ct-hud, quel
+// contenuto portato non le erediterebbe piu' (var(--ink-light) ecc.
+// risolverebbero a niente), lasciando la card della scheda mobile senza
+// sfondo/bordo — esattamente il bug osservato (il centro, mai portato,
+// funzionava; sinistra/destra no).
+body {
+    --ink-deep: #08091a;
+    --ink: #10142a;
+    --ink-light: #161b35;
+    --gold: #daa832;
+    --gold-deep: #c4922a;
+    --gold-soft: color-mix(in srgb, var(--gold) calc(.16 * 100%), transparent);
+    --text: #e8e4da;
+    --muted: #7a8499;
+    --danger: #ff6b6b;
+    --radius: 16px;
+}
+
+.ct-hud {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    pointer-events: none;
+    font-family: $font-ui;
+
+    > * { pointer-events: auto; }
+}
+
+// ── VARIANTI PALETTE ("Colori land", vedi Preferenze.jsx) ─────
+// Applicate come body[data-palette="X"]: Hud.jsx legge la scelta salvata in
+// localStorage al mount e la riapplica su <body> ad ogni pagina. Solo ink/
+// gold cambiano — struttura, layout e testo restano identici. Scopate
+// direttamente su body (vedi sopra), non su .ct-hud, per lo stesso motivo.
+body[data-palette="obsidian"] {
+    --ink-deep: #07070a; --ink: #111116; --ink-light: #1c1c24;
+    --gold: #c9a45c; --gold-deep: #8f6e34;
+}
+body[data-palette="petrol"] {
+    --ink-deep: #0c262c; --ink: #123339; --ink-light: #1d4750;
+    --gold: #d8b26a; --gold-deep: #a9793a;
+}
+body[data-palette="indigo"] {
+    --ink-deep: #17102b; --ink: #241a3f; --ink-light: #362958;
+    --gold: #e6b49c; --gold-deep: #b97f5f;
+}
+body[data-palette="cyan"] {
+    --ink-deep: #061c30; --ink: #0c2a4a; --ink-light: #163f6c;
+    --gold: #2fe0d1; --gold-deep: #16a394;
+}
+body[data-palette="emerald"] {
+    --ink-deep: #082620; --ink: #0d3a2f; --ink-light: #155a48;
+    --gold: #d8b26a; --gold-deep: #a9793a;
+}
+body[data-palette="forest"] {
+    --ink-deep: #0d2216; --ink: #14301f; --ink-light: #1d4530;
+    --gold: #f2e9d8; --gold-deep: #cbb98e;
+}
+body[data-palette="navy-mustard"] {
+    --ink-deep: #081527; --ink: #0d1f3a; --ink-light: #16305a;
+    --gold: #c99a3d; --gold-deep: #96701f;
+}
+// "public" e' anche il default (--ink/--gold su body sopra) — presente
+// qui solo per poterla riselezionare esplicitamente tornando da un'altra.
+body[data-palette="public"] {
+    --ink-deep: #08091a; --ink: #10142a; --ink-light: #161b35;
+    --gold: #daa832; --gold-deep: #c4922a;
+}
+
+// ── TOPBAR COMUNE ────────────────────────────────────────────
+// Semitrasparente a riposo: e' un fixed sopra #maincontent (che inizia
+// proprio sotto, a top:86px) e non deve nascondere il contenuto della
+// pagina quando non ci si interagisce — torna piena quando il mouse e'
+// su un elemento dell'HUD (.ct-hud:hover, bubina dai figli anche con
+// pointer-events:none sull'antenato).
+.ct-hud__topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    // 60px a riposo (86 - 26): il bordo inferiore (la linea dorata) segue
+    // il centro della miniatura chiusa, che ora si rimpicciolisce verso
+    // l'angolo dell'anello invece che verso il proprio centro (vedi
+    // .ct-hud__thumb sopra) — di ~26px piu' in alto rispetto ad aperta.
+    // Solo la topbar si sposta: il contenuto della pagina (#maincontent,
+    // altezza fissa in _layout.scss) resta dov'e', non e' legato a questo.
+    height: 60px;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--ink-light) calc(.85 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.92 * 100%), transparent));
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
+    box-shadow: 0 1px 30px -2px color-mix(in srgb, var(--gold) calc(.2 * 100%), transparent);
+    backdrop-filter: blur(14px);
+    opacity: .4;
+    transition: opacity .25s ease, height .3s cubic-bezier(.34, 1.56, .64, 1);
+}
+.ct-hud:hover .ct-hud__topbar { opacity: 1; }
+// Anelli aperti dal cerchio centrale (unico caso in cui leftOpen e
+// rightOpen sono veri insieme): la miniatura torna a piena dimensione
+// centrata nell'anello, quindi la linea torna alla posizione originale.
+.ct-hud__topbar--expanded { height: 86px; }
+
+// ── ANELLI (sinistra/destra) ─────────────────────────────────
+.ct-hud__ring {
+    position: absolute;
+    top: 5px;
+    width: 173px;
+    height: 173px;
+    transform-origin: top left;
+}
+.ct-hud__ring--left { left: 5px; }
+.ct-hud__ring--right { right: 5px; transform-origin: top right; }
+
+// Miniatura: 30% piu' piccola a riposo, dimensione piena da aperta.
+// transform-origin sullo stesso angolo di .ct-hud__ring (non il default
+// "center"): da chiusa si rimpicciolisce VERSO l'angolo dell'anello invece
+// che verso il proprio centro, restando cosi' a sfiorare i bordi della
+// pagina come da aperta invece di restringersi staccandosene di ~26px
+// (173px * .3 / 2) su tutti i lati.
+.ct-hud__thumb {
+    position: absolute;
+    top: 0; left: 0;
+    width: 173px; height: 173px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--ink-light), var(--ink) 70%);
+    border: 2px solid color-mix(in srgb, var(--gold) calc(.4 * 100%), transparent);
+    color: var(--gold);
+    font-size: 46px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    transform: scale(.7);
+    transform-origin: top left;
+    transition: border-color .2s ease, transform .3s cubic-bezier(.34, 1.56, .64, 1);
+    z-index: 1;
+
+    img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 1px dashed color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
+        animation: ct-hud-spin 40s linear infinite;
+    }
+    &:hover { border-color: var(--gold); }
+}
+.ct-hud__ring--right .ct-hud__thumb { transform-origin: top right; }
+.ct-hud__ring.is-open .ct-hud__thumb { transform: scale(1); }
+
+@keyframes ct-hud-spin { to { transform: rotate(360deg); } }
+
+// Arco delle icone: sempre visibili, scala insieme alla miniatura.
+// z-index piu' alto di .ct-hud__thumb (1): il pannello (vedi sotto) sta
+// invece dietro a entrambi (z-index:auto) — non compete piu' per lo spazio,
+// ha semplicemente un padding sul lato dell'anello cosi' il suo contenuto
+// non ci finisce mai sotto.
+//
+// Stesso box (173x173, angolo in alto a sinistra/destra) e stesso
+// transform-origin di .ct-hud__ring/.ct-hud__thumb, non piu' un punto a
+// top/left:50% (centro dell'anello): da chiusa (scale .7) l'arco si
+// rimpiccioliva verso il PROPRIO centro (fisso, sempre al centro
+// dell'anello) invece di seguire la miniatura, che ora invece si
+// rimpicciolisce verso l'angolo — le icone restavano "indietro" invece
+// di stringersi intorno al cerchio spostato. Le icone (sotto,
+// .ct-hud__icon) sono centrate al 50%/50% di QUESTO box, che alla
+// dimensione piena (173px) coincide col vecchio centro: nessuna
+// differenza da aperta, cambia solo da chiusa.
+.ct-hud__arc {
+    position: absolute;
+    top: 0; left: 0;
+    width: 173px; height: 173px;
+    transform-origin: top left;
+    z-index: 2;
+    transform: scale(.7);
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+}
+.ct-hud__ring--right .ct-hud__arc { transform-origin: top right; }
+.ct-hud__ring.is-open .ct-hud__arc { transform: scale(1); }
+
+// Sfondo dietro la scheda a comparsa dal basso: esiste solo sotto i 680px
+// (vedi RESPONSIVE), su desktop questo elemento non deve avere alcun effetto.
+.ct-hud__sheet-backdrop { display: none; }
+
+// &:link/&:visited (non solo la classe piatta): le icone-link (Forum, Vai
+// alla mappa, Manuali, Uffici, Esci...) sono <a>, e le regole globali
+// a, a:visited / a:link in _typography.scss (colore $color-action, stessa
+// specificita' 0,1,1) altrimenti vincono sul colore qui sotto (0,1,0),
+// facendo apparire icona+etichetta ciano invece che text/gold.
+// top/left:50% (non 0): il centro di .ct-hud__arc, che ora e' un box
+// 173x173 come l'anello (vedi sopra), non piu' un punto — 50% di 173px
+// e' lo stesso identico punto pagina del vecchio centro quando l'arco e'
+// a dimensione piena (aperto), quindi nessuna differenza li'; cambia solo
+// da chiuso, dove l'arco si e' gia' rimpicciolito verso l'angolo.
+// Su .ct-hud__center-arc (nessuna dimensione esplicita, quindi 0x0) 50%
+// resta comunque 0 come prima: nessun effetto sul centro.
+.ct-hud__icon,
+.ct-hud__icon:link,
+.ct-hud__icon:visited {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 40px; height: 40px;
+    margin: -20px 0 0 -20px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    text-align: center;
+    letter-spacing: normal;
+    transform: translate(var(--tx), var(--ty));
+    transition: color .2s ease, border-color .2s ease;
+    user-select: none;
+    -webkit-user-drag: none;
+    outline: none;
+
+    // Blocca la transform sulla posizione dell'arco anche a bottone premuto/
+    // focus: un :active generico su altri elementi (es. .btn) non deve mai
+    // poterla sovrascrivere e far "saltare" l'icona al centro.
+    &:hover, &:active, &:focus, &:focus-visible {
+        transform: translate(var(--tx), var(--ty));
+        color: var(--gold);
+        border-color: var(--gold);
+    }
+}
+
+// Posizionato radialmente rispetto al centro dell'anello (--px/--py, calcolati
+// in Hud.jsx dalla stessa direzione di --tx/--ty dell'icona): cosi' punta
+// sempre verso l'esterno dell'arco e non finisce mai sopra l'icona vicina,
+// qualunque sia l'angolo dell'icona sull'arco.
+.ct-hud__pip {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(calc(var(--px, 14px) - 50%), calc(var(--py, -14px) - 50%));
+    background: var(--danger);
+    color: #2a0a10;
+    font-size: 8px;
+    font-weight: 800;
+    padding: 0 4px;
+    border-radius: 999px;
+    min-width: 12px;
+    line-height: 1.5;
+    text-align: center;
+}
+.ct-hud__pip--dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; }
+
+// Pannello info: tra la miniatura e il centro, mai sopra l'arco.
+// Nessun z-index esplicito: resta dietro sia a .ct-hud__thumb (1) sia a
+// .ct-hud__arc (2), che quindi restano sempre visibili/cliccabili anche
+// dove il pannello (vicino all'anello, vedi sotto) ci si sovrappone
+// fisicamente — il suo contenuto pero' non ci finisce mai sotto grazie al
+// padding-left/right aggiunto piu' sotto, che lo tiene oltre la portata
+// dell'arco invece di competere per lo spazio.
+.ct-hud__panel {
+    position: absolute;
+    top: 34px;
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--ink-light) calc(.85 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.85 * 100%), transparent));
+    border: 1px solid color-mix(in srgb, var(--gold) calc(.25 * 100%), transparent);
+    border-radius: var(--radius);
+    backdrop-filter: blur(10px);
+    padding: 12px 16px;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity .3s ease .1s, transform .3s ease .1s;
+    color: var(--text);
+}
+.ct-hud__ring.is-open .ct-hud__panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
+// Vicino all'anello (non piu' a 213px): riduce quanto il pannello arriva
+// a invadere il contenuto della pagina quando e' aperto. Il padding extra
+// sul lato dell'anello (sinistro qui, destro sotto) tiene il CONTENUTO
+// oltre la portata massima dell'arco (raggio 86.5px + 18px di icona =
+// 104.5px dal centro anello), anche se il box del pannello ci si sovrappone.
+.ct-hud__ring--left .ct-hud__panel { left: 140px; width: 270px; padding-left: 52px; }
+.ct-hud__ring--right .ct-hud__panel { right: 140px; width: 270px; padding-right: 74px; }
+
+// Meteo.jsx: sostituisce nome/descrizione nel pannello sinistro quando si e'
+// sulla mappa generale (location.tipo === 'mappa', vedi Hud.jsx).
+.ct-meteo__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--gold);
+    margin-bottom: 8px;
+}
+.ct-meteo__toggle {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px;
+    transition: color .15s ease;
+
+    &:hover { color: var(--gold); }
+}
+.ct-meteo__row {
+    display: flex;
+    gap: 14px;
+}
+.ct-meteo__col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+.ct-meteo__icon { font-size: 22px; color: var(--gold); margin-bottom: 2px; }
+.ct-meteo__temp { font-size: 15px; font-weight: 700; color: var(--text); }
+.ct-meteo__wind {
+    font-size: 10px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ct-hud__char-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ct-hud__char-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    i { font-size: 12px; margin-left: 6px; color: var(--muted); }
+}
+.ct-hud__char-badge {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--gold-soft);
+    color: var(--gold);
+    border: 1px solid color-mix(in srgb, var(--gold) calc(.4 * 100%), transparent);
+}
+
+.ct-hud__vitals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid color-mix(in srgb, var(--gold) calc(.15 * 100%), transparent);
+}
+.ct-hud__vital {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+
+    i { font-size: 12px; }
+}
+.ct-hud__vital--hp i { color: var(--danger); }
+.ct-hud__vital--integrity i { color: #6fb8ff; }
+.ct-hud__vital--level i { color: var(--gold); }
+
+// ── CENTRO: LOGO ─────────────────────────────────────────────
+// Larghezza/altezza esplicite: l'area cliccabile/hoverabile deve coprire
+// anche il ventaglio di .ct-hud__center-arc (posizionato in assoluto, quindi
+// altrimenti fuori dal box del contenitore) — senza, il mouse "esce" dal box
+// del solo logo mentre si sposta verso un'icona del ventaglio e l'arco si
+// richiude prima del click.
+// top:31px a riposo (57-26): segue lo stesso spostamento della topbar
+// (altezza 60px invece di 86, vedi sopra) cosi' la linea dorata continua
+// a tagliare il logo centrale a meta' anche a cerchi compressi — torna a
+// 57px con --expanded, quando la linea torna anch'essa alla posizione
+// originale (86px).
+.ct-hud__center {
+    position: absolute;
+    top: 31px;
+    left: 50%;
+    width: 170px;
+    height: 110px;
+    margin-left: -85px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    transition: top .3s cubic-bezier(.34, 1.56, .64, 1);
+}
+.ct-hud__center--expanded { top: 57px; }
+.ct-hud__brand {
+    position: relative;
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--ink-light), var(--ink));
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 16px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 22px -6px color-mix(in srgb, var(--gold) calc(.5 * 100%), transparent);
+    z-index: 2;
+}
+.ct-hud__brand-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 1px dashed color-mix(in srgb, var(--gold) calc(.45 * 100%), transparent);
+    animation: ct-hud-spin 16s linear infinite;
+}
+// Favicon del progetto al posto della scritta "CT" — quasi a filo del
+// bordo del cerchio (92%), che resta della sua dimensione (58px) invariata.
+.ct-hud__brand-mark {
+    width: 92%;
+    height: 92%;
+    object-fit: contain;
+}
+
+// Arco rapido del logo centrale (manuali/uffici/gestione/esci): si apre al
+// hover o al click sul logo, si estende verso il basso a ventaglio.
+.ct-hud__center-arc {
+    position: absolute;
+    top: 29px; left: 50%;
+    z-index: 1;
+    transform: scale(.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), opacity .2s ease;
+}
+.ct-hud__center.is-open .ct-hud__center-arc {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+// ── POPOVER (presenze / meteo / chat off) ────────────────────
+// Ancorati vicino all'anello che li apre, orientati verso il centro pagina.
+.ct-hud__popover {
+    position: fixed;
+    top: 100px;
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--ink-light) calc(.95 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.96 * 100%), transparent));
+    border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
+    border-radius: var(--radius);
+    backdrop-filter: blur(12px);
+    padding: 14px;
+    z-index: 20;
+    box-shadow: 0 20px 60px -12px rgba(0, 0, 0, .6);
+    color: var(--text);
+    max-height: 70vh;
+    overflow-y: auto;
+    width: 260px;
+}
+// Vicino all'anello (non piu' a 250px): riduce quanto il popover arriva a
+// invadere il contenuto della pagina quando e' aperto.
+.ct-hud__popover--presence,
+.ct-hud__popover--chatoff { left: 140px; }
+
+// OnlineUsers/ChattingOff perdono, fuori dai vecchi container con id
+// dedicato (#online-users-container ecc.), alcune regole CSS scopate su
+// quell'id (es. altezza/sfondo fisso di .iframe_online). Qui si ridanno
+// dimensioni minime sensate cosi' il contenuto e' sempre visibile anche
+// dentro il popover invece che potenzialmente collassato a zero altezza.
+.ct-hud__popover--presence {
+    .iframe_online { min-height: 120px; }
+    .contenitore_presenti { min-height: 80px; }
+}
+.ct-hud__popover--chatoff .chatoff-panel { min-height: 200px; }
+
+// Molto piu' trasparente della regola base (che e' quasi opaca): si legge
+// la pagina sfocata sotto invece dello sfondo pieno navy.
+.ct-hud__popover--chatoff {
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
+    backdrop-filter: blur(18px);
+}
+
+.ct-hud__popover-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--gold);
+    margin-bottom: 10px;
+
+    a { font-size: 11px; color: var(--muted); font-weight: 700; }
+    a:hover { color: var(--gold); }
+}
+
+// ── RESPONSIVE ────────────────────────────────────────────────
+// Regola permanente: l'HUD resta SEMPRE absolute/fixed sugli angoli, non
+// passa mai a static.
+//
+// Nessun "boost" di compensazione sull'arco in questi due breakpoint (a
+// differenza di un tentativo precedente): un fattore diverso da quello
+// dell'anello sposta la posizione delle icone, non solo la loro
+// dimensione, facendole "scattare" via dal bordo del cerchio a ogni
+// cambio soglia. .ct-hud__arc eredita quindi solo lo scale di
+// .ct-hud__ring (transform annidati), che tiene le icone sempre
+// esattamente sul bordo — a costo di rimpicciolirle un po' insieme al
+// cerchio. Il tocco resta comunque garantito sotto i 680px, dove le
+// icone diventano una scheda a griglia indipendente dallo scale
+// dell'anello (vedi sotto).
+@media (max-width: 1080px) {
+    .ct-hud__ring { transform: scale(.82); }
+}
+
+@media (max-width: 860px) {
+    .ct-hud__ring { transform: scale(.68); }
+    .ct-hud__popover { width: 240px; left: 100px; }
+}
+
+// ── MOBILE (≤680px): scheda a comparsa dal basso con pulsanti in griglia ──
+// Un ventaglio radiale (anche "gonfiato" con un boost di scala) resta
+// troppo affollato per toccare le singole icone senza errori sotto i
+// 680px (feedback utente: "groviglio impossibile da cliccare"). Qui
+// l'arco smette di essere un ventaglio e diventa una scheda ancorata in
+// basso a tutta larghezza, con le icone in griglia (icona sopra,
+// etichetta sotto in ciascun pulsante) — stessa identica cosa per tutti e
+// tre i cerchi (sinistro, centrale, destro). L'etichetta riusa
+// l'attributo title gia' presente per il tooltip via content:attr(title)
+// — nessun markup duplicato.
+//
+// Un solo cerchio alla volta puo' essere aperto (mutua esclusivita'
+// gestita in Hud.jsx: toggleMobileMenu chiude gli altri due quando se ne
+// apre uno), quindi le tre schede condividono la stessa posizione fissa
+// in basso senza mai sovrapporsi davvero.
+//
+// Il pannello info (nome/descrizione) viene nascosto: e' un supplemento,
+// non essenziale alla navigazione.
+@media (max-width: 680px) {
+    // I tre cerchi allineati sullo stesso asse centrale verticale:
+    // l'anello (scale .5 di un box 173px, ancorato in alto a top:6px) ha
+    // il centro a 6+173*.5/2=49px — il logo (58px scalato a 50px, box
+    // proprio) viene spostato con lo stesso centro (24+50/2=49px).
+    .ct-hud__ring { top: 6px; transform: scale(.5); }
+    .ct-hud__ring--left { left: 6px; }
+    .ct-hud__ring--right { right: 6px; }
+    // width/height/margin-left ridotti alla sola area del cerchio (50px +
+    // un margine per il tocco), non piu' 170x110 come su desktop (pensato
+    // per coprire il ventaglio radiale in hover, che su mobile non esiste
+    // piu' — c'e' la scheda a griglia in basso): quell'area invisibile ma
+    // cliccabile (pointer-events:auto sui figli diretti di .ct-hud)
+    // altrimenti si sovrapponeva ai pin Fuji/Ueno della mappa sottostante,
+    // vicini in alto, bloccandone il tap.
+    .ct-hud__center { top: 24px; width: 60px; height: 60px; margin-left: -30px; }
+    .ct-hud__brand { width: 50px; height: 50px; font-size: 14px; }
+
+    // left:140px (impostato sopra per desktop) sfonderebbe a destra su
+    // schermi stretti insieme alla larghezza fissa del popover.
+    .ct-hud__popover { width: calc(100vw - 20px); max-width: 300px; left: 10px !important; }
+
+    .ct-hud__panel { display: none; }
+
+    // Cerchio centrale: .ct-hud__center non ha alcun transform sul proprio
+    // contenitore, quindi i figli position:fixed risolvono gia' correttamente
+    // contro il viewport — restano montati in-place e li governa .is-open.
+    .ct-hud__center.is-open .ct-hud__sheet-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .55);
+        z-index: 598;
+    }
+    .ct-hud__center-arc { display: none; }
+    .ct-hud__center.is-open .ct-hud__center-arc {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+        gap: 12px;
+        position: fixed;
+        bottom: 0; top: auto; left: 0; right: 0;
+        transform: none;
+        z-index: 600;
+        max-height: 55vh;
+        overflow-y: auto;
+        background: linear-gradient(160deg, var(--ink-light), var(--ink-deep));
+        border-top: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
+        border-radius: 20px 20px 0 0;
+        padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -12px 40px rgba(0, 0, 0, .5);
+    }
+
+    // Cerchi sinistro/destro: .ct-hud__ring ha transform:scale() (sopra),
+    // che crea un containing block per i figli position:fixed — un arco
+    // "fixed" dentro l'anello si ancorerebbe al SUO box (scalato, minuscolo)
+    // invece che al viewport. Per questo arco/sfondo di questi due anelli
+    // vengono montati via portal su document.body quando aperti (vedi
+    // HudArcSheet in Hud.jsx) ed esistono nel DOM solo quando visibili:
+    // bastano quindi regole "piatte", senza ancestor .is-open.
+    .ct-hud__sheet-backdrop--standalone {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .55);
+        z-index: 598;
+    }
+    .ct-hud__arc {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+        gap: 12px;
+        position: fixed;
+        bottom: 0; top: auto; left: 0; right: 0;
+        // width/height:173px nella base (vedi sopra) altrimenti "vincono" su
+        // left+right (left/width/right tutti specificati → il browser
+        // ignora right e usa width fisso), riducendo la scheda a un box
+        // piccolo invece di tutta la larghezza.
+        width: auto; height: auto;
+        transform: none;
+        z-index: 600;
+        max-height: 55vh;
+        overflow-y: auto;
+        background: linear-gradient(160deg, var(--ink-light), var(--ink-deep));
+        border-top: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
+        border-radius: 20px 20px 0 0;
+        padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -12px 40px rgba(0, 0, 0, .5);
+    }
+
+    // Pulsante quadrato/arrotondato: icona sopra, etichetta sotto — stesso
+    // aspetto per tutti e tre i cerchi. Nessun ancestor .is-open richiesto:
+    // l'icona esiste nel DOM solo quando il suo arco (portato o in-place)
+    // esiste/e' visibile.
+    //
+    // :link/:visited ripetuti anche qui: la regola base (sopra) li include
+    // per lo stesso motivo (vincere sul colore di a:link globale), il che
+    // le da' specificita' (0,2,0) — una .ct-hud__icon piatta qui (0,1,0)
+    // perderebbe quindi contro la base per le icone-link, facendo tornare
+    // il posizionamento assoluto/radiale da desktop invece della griglia
+    // mobile (bug reale gia' capitato: rompeva il menu su TUTTE le icone
+    // che sono <a>, cioe' l'intero arco centrale).
+    .ct-hud__icon,
+    .ct-hud__icon:link,
+    .ct-hud__icon:visited {
+        // position:relative ancora .ct-hud__pip (altrimenti, senza un
+        // antenato posizionato piu' vicino, si ancorerebbe alla scheda fixed)
+        position: relative;
+        // Reset esplicito: la base (desktop) e' top/left:50% (centro
+        // dell'arco 173x173) — su un position:relative quei valori
+        // sposterebbero comunque l'icona, serve azzerarli qui.
+        top: 0; left: 0;
+        width: auto; height: auto;
+        margin: 0;
+        padding: 14px 4px 10px;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 20px;
+        letter-spacing: normal;
+
+        &, &:hover, &:active, &:focus, &:focus-visible {
+            transform: none !important;
+        }
+
+        &::after {
+            content: attr(title);
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 1.15;
+            text-align: center;
+            color: var(--text);
+        }
+    }
+    .ct-hud__pip {
+        top: 6px; right: 6px;
+        transform: none;
+    }
+}
