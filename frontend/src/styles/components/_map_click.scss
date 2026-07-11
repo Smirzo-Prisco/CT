@@ -37,12 +37,16 @@
         // sagoma propria a goccia con punta) — niente screen (servirebbe
         // solo a "smacchiare" lo sfondo nero del jpg generico) ne' il
         // ritaglio circolare/cover, che taglierebbe via la punta inferiore.
+        // Piu' grande e con bagliore permanente (non solo in hover): sulla
+        // mappa, densa di dettagli disegnati, un pin piccolo e spento si
+        // perde e il kanji diventa illeggibile.
         &--custom {
-            width: 52px;
+            width: 84px;
             height: auto;
             border-radius: 0;
             object-fit: contain;
             mix-blend-mode: normal;
+            filter: drop-shadow(0 0 6px rgba(255, 210, 120, .75)) drop-shadow(0 2px 4px rgba(0, 0, 0, .6));
         }
     }
 
@@ -67,6 +71,15 @@
     &:hover .map-pin__label { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     &--active .map-pin__ring { filter: drop-shadow(0 0 10px rgba(255, 255, 255, .9)); }
+
+    // Pin custom: bagliore oro (non bianco) in hover/attivo, coerente col
+    // bagliore permanente a riposo definito sopra.
+    &:hover .map-pin__ring--custom {
+        filter: drop-shadow(0 0 10px rgba(255, 210, 120, .9)) drop-shadow(0 2px 4px rgba(0, 0, 0, .6));
+    }
+    &--active .map-pin__ring--custom {
+        filter: drop-shadow(0 0 14px rgba(255, 210, 120, 1)) drop-shadow(0 2px 4px rgba(0, 0, 0, .6));
+    }
 }
 
 @keyframes map-pin-pulse {
