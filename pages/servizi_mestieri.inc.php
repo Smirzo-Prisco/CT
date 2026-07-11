@@ -31,6 +31,10 @@ if ($solo_gilde) {
 <?php if ($id_mestiere === null): /* ── VISTA ELENCO ─────────────────────────── */ ?>
 
     <div class="sm-header sm-header--list">
+        <a href="main.php?page=uffici" class="sm-back">
+            <i class="fas fa-arrow-left"></i>
+            Uffici
+        </a>
         <h2 class="sm-title">
             <i class="fas <?= $solo_gilde ? 'fa-shield-halved' : 'fa-briefcase' ?>"></i>
             <?= $solo_gilde ? 'Gilde' : gdrcd_filter('out', $PARAMETERS['names']['job_name']['plur']) ?>
