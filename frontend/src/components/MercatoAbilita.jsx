@@ -69,7 +69,7 @@ export default function MercatoAbilita() {
                 </div>
                 <div className="skill-accordion">
                     <div className="accordion-item">
-                        <button className="accordion-header">🛡️ Default / Difensiva</button>
+                        <button className="accordion-header">🛡️ Difensiva</button>
                         <div className="accordion-body" data-cat="Default"></div>
                     </div>
                     <div className="accordion-item">
