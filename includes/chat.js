@@ -103,7 +103,13 @@ async function sendChatMessage() {
 
             // Rimuove l'altezza inline impostata da autoGrow: la textarea torna alle dimensioni CSS di default
             const ta = form.elements["message"]
-            if (ta) ta.style.height = ''
+            if (ta) {
+                ta.style.height = ''
+                // form.reset() non emette 'keyup'/'input', quindi conta() non viene
+                // richiamata da sola: senza questa chiamata esplicita il contatore
+                // caratteri resta fermo all'ultimo valore invece di tornare a 0.
+                if (typeof conta === 'function') conta(ta)
+            }
 
             // Ripristina il tag salvato in sessione, se necessario
             if (form.elements["tag"]) form.elements["tag"].value = result.tag ?? "";

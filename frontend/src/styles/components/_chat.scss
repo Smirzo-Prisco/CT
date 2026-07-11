@@ -998,6 +998,55 @@ textarea.chat_textarea {
     margin-right: $space-2 + 2;
 }
 
+// ── Wrapper textarea + menu menzione @ ─────────────────────────
+
+.chat-textarea-wrap {
+    flex-grow: 1;
+    margin-right: $space-2 + 2;
+
+    textarea.chat_textarea {
+        margin-right: 0;
+    }
+}
+
+// position:fixed + portal su document.body invece di absolute nel flusso:
+// .form_chat ha "overflow:hidden" sotto i 1024px (vedi media query piu'
+// sotto), che taglierebbe un menu absolute ancorato alla textarea.
+.chat-mention-menu {
+    position: fixed;
+    margin-bottom: $space-1;
+    max-height: 180px;
+    overflow-y: auto;
+    background: $palette-surface-raised;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    border-radius: $radius-md;
+    box-shadow: $shadow-lg;
+    z-index: 10050;
+}
+
+.chat-mention-menu__item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: $space-2 $space-3;
+    background: none;
+    border: none;
+    color: $color-text-light;
+    font-size: $text-sm;
+    cursor: pointer;
+
+    &:hover, &:focus {
+        background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+    }
+}
+
+.chat-mention-menu__empty {
+    padding: $space-2 $space-3;
+    color: $color-text-secondary;
+    font-size: $text-sm;
+    font-style: italic;
+}
+
 div.casella_chat_info {
     display: flex;
     justify-content: space-between;
@@ -1776,13 +1825,110 @@ button.chat_button {
 // ── Avatar inline nella riga chat ────────────────────────────
 
 img.chat_avatar_inline {
-    width: 22px;
-    height: 22px;
+    width: 36px;
+    height: 36px;
     border-radius: $radius-full;
     object-fit: cover;
     vertical-align: middle;
     margin: 0 4px;
     display: inline-block;
+    cursor: pointer;
+    // Nessun line-height esplicito sulla riga (chat_row_P/A): il browser
+    // espande da solo la sola linea che contiene l'avatar per fargli
+    // spazio, senza toccare l'interlinea delle righe di testo successive
+    // quando il messaggio va a capo.
+    transition: transform .15s ease;
+
+    &:hover {
+        transform: scale(1.08);
+    }
+}
+
+// ── Popover statistiche personaggio (click su avatar in chat) ─
+.pg-popover-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgb(0 0 0 / 55%);
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $space-4;
+}
+
+.pg-popover {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    background: linear-gradient(160deg, $palette-surface-raised, $color-bg);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+    border-radius: $radius-lg;
+    box-shadow: $shadow-lg;
+    padding: $space-5;
+    color: $color-text-light;
+}
+
+.pg-popover__close {
+    position: absolute;
+    top: $space-2;
+    right: $space-2;
+    background: none;
+    border: none;
+    color: $color-text-secondary;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+        color: $color-text-light;
+    }
+}
+
+.pg-popover__nome {
+    margin: 0 0 $space-4;
+    font-size: $text-2xl;
+    font-weight: $font-weight-bold;
+    padding-right: $space-6;
+}
+
+.pg-popover__stat {
+    margin-bottom: $space-3;
+}
+
+.pg-popover__stat-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: $text-sm;
+    color: $color-text-secondary;
+    margin-bottom: $space-1;
+}
+
+.pg-popover__track {
+    width: 100%;
+    height: 10px;
+    background: $color-surface-input;
+    border-radius: $radius-full;
+    overflow: hidden;
+}
+
+.pg-popover__fill {
+    height: 100%;
+    border-radius: $radius-full;
+    transition: width .3s ease;
+
+    &--salute { background: $color-danger; }
+    &--integrita { background: $color-info; }
+}
+
+.pg-popover__livello {
+    display: inline-block;
+    margin-top: $space-2;
+    padding: $space-1 $space-3;
+    border-radius: $radius-full;
+    background: color-mix(in srgb, var(--color-warning) 25%, transparent);
+    color: $color-warning;
+    font-weight: $font-weight-bold;
+    font-size: $text-sm;
 }
 
 // ── Status text e bordo animato sessione ──────────────────────

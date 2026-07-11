@@ -1,10 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
+
+/** Percentuale (0-100) di value/max, sicura contro max<=0 e valori fuori range. */
+const pct = (value, max) => max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0
 
 export default function ChatViewer() {
   const [messages, setMessages] = useState([])
   const lastIdRef = useRef(0)
   const bottomRef = useRef(null)
   const chatRef   = useRef(null)
+
+  /** Popover statistiche pg aperto cliccando sull'avatar in chat: { nome, loading, data, error } */
+  const [pgPopup, setPgPopup] = useState(null)
 
   /** true quando c'è una role attiva — nasconde la descrizione stanza */
   const [hasRole,  setHasRole]  = useState(false)
@@ -71,10 +78,28 @@ export default function ChatViewer() {
   }, [messages])
 
   // Event delegation: click su qualsiasi [data-editable].chat_editable--active apre il modale
+  // oppure sull'avatar circolare di un pg (data-pg, iniettato da api_chat.php) per il
+  // popover salute/integrità/livello. I messaggi arrivano come HTML grezzo (dangerouslySetInnerHTML),
+  // quindi non è possibile mettere onClick sui singoli elementi: serve delegation sul contenitore.
   const handleChatClick = useCallback((e) => {
-    const target = e.target.closest('[data-editable].chat_editable--active')
-    if (!target) return
-    if (typeof window.editAction === 'function') window.editAction(target.dataset.raw ?? '', target.id)
+    const editTarget = e.target.closest('[data-editable].chat_editable--active')
+    if (editTarget) {
+      if (typeof window.editAction === 'function') window.editAction(editTarget.dataset.raw ?? '', editTarget.id)
+      return
+    }
+
+    const avatarTarget = e.target.closest('.chat_avatar_inline, .chat_avatar')
+    const nome = avatarTarget?.dataset.pg
+    if (!nome) return
+
+    setPgPopup({ nome, loading: true, data: null, error: null })
+    fetch(`pages/api_scheda.php?op=profile&pg=${encodeURIComponent(nome)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) setPgPopup({ nome, loading: false, data: d, error: null })
+        else setPgPopup({ nome, loading: false, data: null, error: d.message || 'Personaggio non trovato' })
+      })
+      .catch(() => setPgPopup({ nome, loading: false, data: null, error: 'Errore di rete' }))
   }, [])
 
   useEffect(() => {
@@ -138,6 +163,54 @@ export default function ChatViewer() {
         <div key={msg.id ?? i} dangerouslySetInnerHTML={{ __html: msg.html }} />
       ))}
       <div ref={bottomRef} />
+
+      {pgPopup && createPortal(
+        <div className="pg-popover-overlay" onClick={() => setPgPopup(null)}>
+          <div className="pg-popover" onClick={e => e.stopPropagation()}>
+            <button type="button" className="pg-popover__close" onClick={() => setPgPopup(null)}>×</button>
+
+            {pgPopup.loading && <p>Caricamento…</p>}
+            {pgPopup.error && <p>{pgPopup.error}</p>}
+
+            {pgPopup.data && (() => {
+              const d = pgPopup.data
+              const labels = d.config?.stat_names ?? {}
+              const livello = d.statistiche?.livello
+              return (
+                <>
+                  <h4 className="pg-popover__nome">{d.nome} {d.cognome}</h4>
+
+                  <div className="pg-popover__stat">
+                    <div className="pg-popover__stat-label">
+                      <span>{labels.hitpoints ?? 'Salute'}</span>
+                      <span>{d.salute}/{d.salute_max}</span>
+                    </div>
+                    <div className="pg-popover__track">
+                      <div className="pg-popover__fill pg-popover__fill--salute" style={{ width: `${pct(d.salute, d.salute_max)}%` }} />
+                    </div>
+                  </div>
+
+                  <div className="pg-popover__stat">
+                    <div className="pg-popover__stat-label">
+                      <span>{labels.integrita ?? 'Integrità'}</span>
+                      <span>{d.integrita}/{d.integrita_max}</span>
+                    </div>
+                    <div className="pg-popover__track">
+                      <div className="pg-popover__fill pg-popover__fill--integrita" style={{ width: `${pct(d.integrita, d.integrita_max)}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Il livello è visibile solo per il proprio pg o allo staff (stessa
+                      regola di privacy di Scheda.jsx/api_scheda.php): per gli altri
+                      personaggi l'endpoint non lo restituisce affatto. */}
+                  {livello != null && <span className="pg-popover__livello">Livello {livello}</span>}
+                </>
+              )
+            })()}
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   )
 }
