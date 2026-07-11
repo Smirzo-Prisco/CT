@@ -17,6 +17,16 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
+
+    // right:25% + translateX(50%) e' pensato per il desktop (vicino
+    // all'icona "Assistente" nell'anello destro dell'HUD): su schermi
+    // stretti spinge il pannello oltre il bordo destro, tagliandolo.
+    // Centrato in orizzontale invece di ancorato a destra.
+    @media (max-width: 680px) {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+    }
 }
 
 // ── Pannello ─────────────────────────────────────────────
