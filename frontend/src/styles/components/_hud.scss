@@ -563,7 +563,14 @@ body[data-palette="public"] {
     .ct-hud__ring { top: 6px; transform: scale(.5); }
     .ct-hud__ring--left { left: 6px; }
     .ct-hud__ring--right { right: 6px; }
-    .ct-hud__center { top: 24px; }
+    // width/height/margin-left ridotti alla sola area del cerchio (50px +
+    // un margine per il tocco), non piu' 170x110 come su desktop (pensato
+    // per coprire il ventaglio radiale in hover, che su mobile non esiste
+    // piu' — c'e' la scheda a griglia in basso): quell'area invisibile ma
+    // cliccabile (pointer-events:auto sui figli diretti di .ct-hud)
+    // altrimenti si sovrapponeva ai pin Fuji/Ueno della mappa sottostante,
+    // vicini in alto, bloccandone il tap.
+    .ct-hud__center { top: 24px; width: 60px; height: 60px; margin-left: -30px; }
     .ct-hud__brand { width: 50px; height: 50px; font-size: 14px; }
 
     // left:140px (impostato sopra per desktop) sfonderebbe a destra su
