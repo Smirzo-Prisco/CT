@@ -52,6 +52,34 @@ const pipOffset = (tx, ty, dist = 24) => {
     return { '--px': `${(tx / mag) * dist}px`, '--py': `${(ty / mag) * dist}px` }
 }
 
+// Su mobile .ct-hud__ring ha un transform:scale() (per rimpicciolire il
+// cerchio a riposo) — un transform su un antenato crea un nuovo containing
+// block per i figli position:fixed, che quindi si ancorano al box (minuscolo,
+// scalato) dell'anello invece che al viewport: la scheda a comparsa dal
+// basso finiva cosi' schiacciata vicino al cerchio invece di coprire tutto
+// lo schermo. .ct-hud__center non ha questo problema (nessun transform sul
+// suo contenitore), per questo il menu centrale ha sempre funzionato mentre
+// quelli laterali no. Fix: portal su document.body, fuori dal contenitore
+// trasformato, quando aperto su mobile (stessa tecnica di showLocationDesc).
+function HudArcSheet({ isMobile, isOpen, onClose, children }) {
+    if (!isMobile) {
+        return (
+            <>
+                <div className="ct-hud__sheet-backdrop" onClick={onClose} />
+                {children}
+            </>
+        )
+    }
+    if (!isOpen) return null
+    return createPortal(
+        <>
+            <div className="ct-hud__sheet-backdrop ct-hud__sheet-backdrop--standalone" onClick={onClose} />
+            {children}
+        </>,
+        document.body
+    )
+}
+
 export default function Hud({ isStaff }) {
 
     const nome = window.CT_USER?.login ?? ''
@@ -335,29 +363,27 @@ export default function Hud({ isStaff }) {
                     }
                 </button>
 
-                {/* Solo mobile (vedi _hud.scss): sfondo scuro dietro la scheda a
-                    comparsa dal basso, tocca per chiuderla. */}
-                <div className="ct-hud__sheet-backdrop" onClick={() => setLeftOpen(false)} />
-
-                <div className="ct-hud__arc">
-                    <a className="ct-hud__icon" style={arcIcon(0, 87)}
-                        href="main.php?page=forum" title="Forum">
-                        <i className="fa-solid fa-comments" />
-                    </a>
-                    <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)}
-                        title="Presenti nel luogo" onClick={togglePopover('presence')}>
-                        <i className="fa-solid fa-users" />
-                        {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(43, 75)}>{presentiCount}</b>}
-                    </button>
-                    <button type="button" className="ct-hud__icon" style={arcIcon(75, 43)}
-                        title="Chat off" onClick={togglePopover('chatoff')}>
-                        <i className="fa-solid fa-comment-dots" />
-                    </button>
-                    <a className="ct-hud__icon" style={arcIcon(87, 0)}
-                        href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Vai alla mappa principale">
-                        <i className="fa-solid fa-map-location-dot" />
-                    </a>
-                </div>
+                <HudArcSheet isMobile={isMobile} isOpen={leftOpen} onClose={() => setLeftOpen(false)}>
+                    <div className="ct-hud__arc">
+                        <a className="ct-hud__icon" style={arcIcon(0, 87)}
+                            href="main.php?page=forum" title="Forum">
+                            <i className="fa-solid fa-comments" />
+                        </a>
+                        <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)}
+                            title="Presenti nel luogo" onClick={togglePopover('presence')}>
+                            <i className="fa-solid fa-users" />
+                            {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(43, 75)}>{presentiCount}</b>}
+                        </button>
+                        <button type="button" className="ct-hud__icon" style={arcIcon(75, 43)}
+                            title="Chat off" onClick={togglePopover('chatoff')}>
+                            <i className="fa-solid fa-comment-dots" />
+                        </button>
+                        <a className="ct-hud__icon" style={arcIcon(87, 0)}
+                            href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Vai alla mappa principale">
+                            <i className="fa-solid fa-map-location-dot" />
+                        </a>
+                    </div>
+                </HudArcSheet>
 
                 {/* Sempre il meteo, in stanza o sulla mappa generale — non piu'
                     condizionato al tipo di luogo (prima, entrando in una
@@ -373,31 +399,29 @@ export default function Hud({ isStaff }) {
                     {avatar ? <img src={avatar} alt={nome} /> : <i className="fa-solid fa-user" />}
                 </button>
 
-                {/* Solo mobile (vedi _hud.scss): sfondo scuro dietro la scheda a
-                    comparsa dal basso, tocca per chiuderla. */}
-                <div className="ct-hud__sheet-backdrop" onClick={() => setRightOpen(false)} />
-
-                <div className="ct-hud__arc">
-                    <a className="ct-hud__icon" style={arcIcon(0, 87)}
-                        href="main.php?page=agenda_center" title="Calendario">
-                        <i className="fa-solid fa-calendar-days" />
-                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
-                    </a>
-                    <a className="ct-hud__icon" style={arcIcon(-43, 75)}
-                        href="main.php?page=role_recap" title="Giocate personali">
-                        <i className="fa-solid fa-scroll" />
-                        {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-43, 75)} title="Giocata in corso" />}
-                    </a>
-                    <a className="ct-hud__icon" style={arcIcon(-75, 43)}
-                        href="main.php?page=messages_center&offset=0" title="Messaggi">
-                        <i className="fa-solid fa-envelope" />
-                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-75, 43)} />}
-                    </a>
-                    <a className="ct-hud__icon" style={arcIcon(-87, 0)}
-                        href="#" title="Assistente" onClick={openChatbot}>
-                        <i className="fa-solid fa-robot" />
-                    </a>
-                </div>
+                <HudArcSheet isMobile={isMobile} isOpen={rightOpen} onClose={() => setRightOpen(false)}>
+                    <div className="ct-hud__arc">
+                        <a className="ct-hud__icon" style={arcIcon(0, 87)}
+                            href="main.php?page=agenda_center" title="Calendario">
+                            <i className="fa-solid fa-calendar-days" />
+                            {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
+                        </a>
+                        <a className="ct-hud__icon" style={arcIcon(-43, 75)}
+                            href="main.php?page=role_recap" title="Giocate personali">
+                            <i className="fa-solid fa-scroll" />
+                            {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-43, 75)} title="Giocata in corso" />}
+                        </a>
+                        <a className="ct-hud__icon" style={arcIcon(-75, 43)}
+                            href="main.php?page=messages_center&offset=0" title="Messaggi">
+                            <i className="fa-solid fa-envelope" />
+                            {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-75, 43)} />}
+                        </a>
+                        <a className="ct-hud__icon" style={arcIcon(-87, 0)}
+                            href="#" title="Assistente" onClick={openChatbot}>
+                            <i className="fa-solid fa-robot" />
+                        </a>
+                    </div>
+                </HudArcSheet>
 
                 <div className="ct-hud__panel ct-hud__panel--char">
                     <div className="ct-hud__char-row">

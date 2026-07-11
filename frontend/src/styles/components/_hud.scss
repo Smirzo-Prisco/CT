@@ -497,7 +497,9 @@ body[data-palette="public"] .ct-hud {
 
     .ct-hud__panel { display: none; }
 
-    .ct-hud__ring.is-open .ct-hud__sheet-backdrop,
+    // Cerchio centrale: .ct-hud__center non ha alcun transform sul proprio
+    // contenitore, quindi i figli position:fixed risolvono gia' correttamente
+    // contro il viewport — restano montati in-place e li governa .is-open.
     .ct-hud__center.is-open .ct-hud__sheet-backdrop {
         display: block;
         position: fixed;
@@ -505,13 +507,7 @@ body[data-palette="public"] .ct-hud {
         background: rgba(0, 0, 0, .55);
         z-index: 598;
     }
-
-    // A riposo non serve renderizzarli: sono comunque invisibili/inerti,
-    // evita solo di occupare lo stacking context.
-    .ct-hud__arc, .ct-hud__center-arc { display: none; }
-
-    .ct-hud__ring--left.is-open .ct-hud__arc,
-    .ct-hud__ring--right.is-open .ct-hud__arc,
+    .ct-hud__center-arc { display: none; }
     .ct-hud__center.is-open .ct-hud__center-arc {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
@@ -529,10 +525,42 @@ body[data-palette="public"] .ct-hud {
         box-shadow: 0 -12px 40px rgba(0, 0, 0, .5);
     }
 
+    // Cerchi sinistro/destro: .ct-hud__ring ha transform:scale() (sopra),
+    // che crea un containing block per i figli position:fixed — un arco
+    // "fixed" dentro l'anello si ancorerebbe al SUO box (scalato, minuscolo)
+    // invece che al viewport. Per questo arco/sfondo di questi due anelli
+    // vengono montati via portal su document.body quando aperti (vedi
+    // HudArcSheet in Hud.jsx) ed esistono nel DOM solo quando visibili:
+    // bastano quindi regole "piatte", senza ancestor .is-open.
+    .ct-hud__sheet-backdrop--standalone {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .55);
+        z-index: 598;
+    }
+    .ct-hud__arc {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+        gap: 12px;
+        position: fixed;
+        bottom: 0; top: auto; left: 0; right: 0;
+        transform: none;
+        z-index: 600;
+        max-height: 55vh;
+        overflow-y: auto;
+        background: linear-gradient(160deg, var(--ink-light), var(--ink-deep));
+        border-top: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
+        border-radius: 20px 20px 0 0;
+        padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -12px 40px rgba(0, 0, 0, .5);
+    }
+
     // Pulsante quadrato/arrotondato: icona sopra, etichetta sotto — stesso
-    // aspetto per tutti e tre i cerchi.
-    .ct-hud__ring.is-open .ct-hud__icon,
-    .ct-hud__center.is-open .ct-hud__icon {
+    // aspetto per tutti e tre i cerchi. Nessun ancestor .is-open richiesto:
+    // l'icona esiste nel DOM solo quando il suo arco (portato o in-place)
+    // esiste/e' visibile.
+    .ct-hud__icon {
         // position:relative ancora .ct-hud__pip (altrimenti, senza un
         // antenato posizionato piu' vicino, si ancorerebbe alla scheda fixed)
         position: relative;
@@ -560,7 +588,7 @@ body[data-palette="public"] .ct-hud {
             color: var(--text);
         }
     }
-    .ct-hud__ring.is-open .ct-hud__pip {
+    .ct-hud__pip {
         top: 6px; right: 6px;
         transform: none;
     }
