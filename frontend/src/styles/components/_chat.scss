@@ -512,7 +512,7 @@ div.pagina_frame_chat {
     // per questo non puo' semplicemente ereditare da .output ed e' un fixed
     // a se stante con gli stessi margini percentuali.
     position: fixed;
-    top: 86px;
+    top: 136px; // 86px topbar + 50px extra, stessa ragione di #maincontent in _layout.scss
     left: 5%;
     right: 5%;
     bottom: 0;
@@ -1542,6 +1542,7 @@ button.chat_button {
 
 @media screen and (width <=768px) {
     div.pagina_frame_chat {
+        top: 86px;
         left: 0;
         right: 0;
     }

@@ -2,12 +2,12 @@
 // _map_click.scss — Mappa di gioco (MapClick.jsx)
 // Marker interattivi sopra l'immagine mappa.giorno/notte.png (che ha gia'
 // un proprio pallino disegnato per ogni zona: qui si aggiunge solo
-// l'affordance interattiva — anello dorato pulsante + etichetta in hover),
-// e il pannello di selezione stanza.
+// l'affordance interattiva — anello bianco pulsante/fluttuante + etichetta
+// in hover), e il pannello di selezione stanza (fisso in basso, con blur).
 //
 // Palette: stessa dell'HUD (blu notte + oro, valori esatti da
-// public/critical.css), coerente con i toni caldi/dorati gia' presenti
-// nell'illustrazione reale della mappa.
+// public/critical.css). I pin sono bianchi (non oro) per risaltare meglio
+// sull'illustrazione notturna scura della mappa.
 // ============================================================
 @use '../tokens' as *;
 
@@ -19,10 +19,15 @@
         width: 26px;
         height: 26px;
         border-radius: 50%;
-        border: 2px solid rgba(218, 168, 50, .55);
-        box-shadow: 0 0 0 0 rgba(218, 168, 50, .5);
-        animation: map-pin-pulse 2.4s ease-out infinite;
-        transition: border-color .2s ease, transform .2s ease;
+        background: rgba(255, 255, 255, .55);
+        border: 2px solid rgba(255, 255, 255, .75);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, .5);
+        // Pulsazione + galleggiamento su/giu' asincrono (--float-delay
+        // impostato per pin in MapClick.jsx) cosi' i pin non si muovono
+        // tutti in sincrono, un effetto piu' vivo sulla mappa illustrata.
+        animation: map-pin-pulse 2.4s ease-out infinite, map-pin-float 3.2s ease-in-out infinite;
+        animation-delay: 0s, var(--float-delay, 0s);
+        transition: border-color .2s ease, background .2s ease, transform .2s ease;
     }
 
     &__label {
@@ -42,33 +47,45 @@
         transition: opacity .2s ease, transform .2s ease;
     }
 
-    &:hover .map-pin__ring { border-color: #daa832; transform: scale(1.15); }
+    &:hover .map-pin__ring { background: rgba(255, 255, 255, .95); border-color: #fff; transform: scale(1.15); }
     &:hover .map-pin__label { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    &--active .map-pin__ring { border-color: #daa832; box-shadow: 0 0 14px 2px rgba(218, 168, 50, .5); }
+    &--active .map-pin__ring { background: #fff; border-color: #fff; box-shadow: 0 0 14px 3px rgba(255, 255, 255, .6); }
 }
 
 @keyframes map-pin-pulse {
-    0% { box-shadow: 0 0 0 0 rgba(218, 168, 50, .45); }
-    70% { box-shadow: 0 0 0 12px rgba(218, 168, 50, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(218, 168, 50, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, .45); }
+    70% { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+@keyframes map-pin-float {
+    0%, 100% { margin-top: 0; }
+    50% { margin-top: -6px; }
 }
 
 // ── Pannello zona selezionata ─────────────────────────────────
+// Fisso in basso su un blur, non piu' in flusso sotto la mappa: sulla
+// mappa (spesso piu' alta della viewport) restava fuori vista finche' non
+// si scrollava la pagina.
 .map-zone-panel {
-    width: 100%;
-    max-width: 640px;
-    margin: 14px auto 0;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 50;
+    max-height: 46vh;
+    overflow-y: auto;
     box-sizing: border-box;
     text-align: center;
-    background: linear-gradient(160deg, rgba(22, 27, 53, .9), rgba(8, 9, 26, .94));
-    border: 1px solid rgba(218, 168, 50, .3);
-    border-radius: 14px;
-    padding: 16px 20px;
+    background: linear-gradient(160deg, rgba(22, 27, 53, .88), rgba(8, 9, 26, .93));
+    backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(218, 168, 50, .3);
+    border-radius: 20px 20px 0 0;
+    padding: 18px 20px calc(18px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -14px 40px -8px rgba(0, 0, 0, .55);
     color: #e8e4da;
 
     p {
-        margin: 4px 0 12px;
+        margin: 4px 0 14px;
         font-size: .85em;
         line-height: 1.4;
         color: #7a8499;
@@ -102,24 +119,43 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
+    gap: 16px;
 }
 
+// Immagine cerchiata + nome sotto, invece del vecchio rettangolo senza etichetta.
 .map-zone-room {
-    position: relative;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 76px;
     cursor: pointer;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform .15s ease;
 
-    img { display: block; max-width: 100%; height: auto; }
+    &__avatar {
+        position: relative;
+        display: block;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid rgba(218, 168, 50, .4);
+        transition: border-color .15s ease, transform .15s ease;
 
-    &:hover { transform: translateY(-2px); }
+        img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    &__name {
+        font-size: 10.5px;
+        line-height: 1.2;
+        color: #e8e4da;
+        white-space: normal;
+    }
+
+    &:hover .map-zone-room__avatar { border-color: #daa832; transform: translateY(-3px); }
 
     &__badge {
         position: absolute;
-        top: -4px; right: -4px;
+        top: -3px; right: -3px;
         background: #e74c3c;
         color: #fff;
         border-radius: 50%;
@@ -131,5 +167,6 @@
         align-items: center;
         justify-content: center;
         pointer-events: none;
+        border: 1px solid rgba(8, 9, 26, .9);
     }
 }

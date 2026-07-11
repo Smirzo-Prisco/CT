@@ -1,41 +1,35 @@
 /**
  * Meteo.jsx
  *
- * Box meteo nella colonna destra — estratto da FrameMessaggi.jsx.
- *
- * Contenuto:
- *   - Icone giorno/notte con temperature e vento
- *   - Toggle "oggi/ieri" tramite freccia
+ * Meteo compatto per il pannello del cerchio sinistro dell'HUD (Hud.jsx):
+ * sostituisce nome/descrizione quando il personaggio e' sulla mappa generale
+ * (non in una stanza specifica). Icone Font Awesome invece delle vecchie
+ * immagini bitmap, in linea con lo stile navy+oro dell'HUD (usa le stesse
+ * custom property --gold/--text/--muted, ereditate da .ct-hud in _hud.scss).
  *
  * API: GET pages/api_global.php?op=meteo
- *
- * Montaggio: via ct:ready su #meteo-container in left-right_frames.php
  *
  * @author Crystal Tokyo Dev
  */
 
 import { useState, useEffect } from 'react'
 
-function MeteoBox({ data }) {
-    if (!data) return null
-    return (
-        <>
-            <div className="meteo_colonna_sx">
-                <div className="meteo_img">
-                    <img src={`../themes/crystal/imgs/meteo/${data.giorno_img}.png`} alt="Giorno" className="meteo_immagine" />
-                </div>
-                <div className="meteo_temp">Max: <span className="temp_max">{data.temp_max}°C</span></div>
-                <div className="meteo_vento">Vento: <span>{data.vento_giorno}</span></div>
-            </div>
-            <div className="meteo_colonna_dx">
-                <div className="meteo_img">
-                    <img src={`../themes/crystal/imgs/meteo/${data.notte_img}.png`} alt="Notte" className="meteo_immagine" />
-                </div>
-                <div className="meteo_temp">Min: <span className="temp_min">{data.temp_min}°C</span></div>
-                <div className="meteo_vento">Vento: <span>{data.vento_notte}</span></div>
-            </div>
-        </>
-    )
+// Condizione (giorno_img/notte_img restituiti da api_global.php) → icona Font Awesome
+const WEATHER_ICONS = {
+    sole: 'fa-sun',
+    nuvoloso: 'fa-cloud',
+    sole_nuvoloso: 'fa-cloud-sun',
+    pioggia: 'fa-cloud-rain',
+    temporale: 'fa-cloud-bolt',
+    neve: 'fa-snowflake',
+    sole_nebbia: 'fa-smog',
+    mezza_luna: 'fa-moon',
+    luna_nuvoloso: 'fa-cloud-moon',
+    luna_nebbia: 'fa-smog',
+}
+
+function weatherIcon(cond) {
+    return WEATHER_ICONS[cond] ?? 'fa-cloud-sun'
 }
 
 export default function Meteo() {
@@ -52,27 +46,33 @@ export default function Meteo() {
 
     if (!meteo) return null
 
+    const data = showYesterday ? meteo.precedente : meteo.attuale
+
     return (
-        <div className="news">
-            <div id="meteo_titolo" className="meteo_titolo">
-                {showYesterday ? 'METEO DI IERI' : 'METEO OGGI'}
-            </div>
-
-            <div className="meteo_box meteo_attuale" style={{ display: showYesterday ? 'none' : 'flex' }}>
-                <MeteoBox data={meteo.attuale} />
-            </div>
-
-            <div className="meteo_box meteo_precedente" style={{ display: showYesterday ? 'flex' : 'none' }}>
-                <MeteoBox data={meteo.precedente} />
-            </div>
-
-            <div className="meteo_freccia">
-                <img
-                    src="../themes/crystal/imgs/forum/freccia_giu.png"
-                    alt="Switch Meteo"
-                    className="switch_meteo"
+        <div className="ct-meteo">
+            <div className="ct-meteo__head">
+                <span>{showYesterday ? 'Meteo di ieri' : 'Meteo oggi'}</span>
+                <button
+                    type="button"
+                    className="ct-meteo__toggle"
                     onClick={() => setShowYesterday(v => !v)}
-                />
+                    title={showYesterday ? 'Mostra oggi' : 'Mostra ieri'}
+                >
+                    <i className="fa-solid fa-clock-rotate-left" />
+                </button>
+            </div>
+
+            <div className="ct-meteo__row">
+                <div className="ct-meteo__col">
+                    <i className={`fa-solid ${weatherIcon(data.giorno_img)} ct-meteo__icon`} />
+                    <span className="ct-meteo__temp">{data.temp_max}°</span>
+                    <span className="ct-meteo__wind"><i className="fa-solid fa-wind" /> {data.vento_giorno}</span>
+                </div>
+                <div className="ct-meteo__col">
+                    <i className={`fa-solid ${weatherIcon(data.notte_img)} ct-meteo__icon`} />
+                    <span className="ct-meteo__temp">{data.temp_min}°</span>
+                    <span className="ct-meteo__wind"><i className="fa-solid fa-wind" /> {data.vento_notte}</span>
+                </div>
             </div>
         </div>
     )

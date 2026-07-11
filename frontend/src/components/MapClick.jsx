@@ -199,6 +199,11 @@ export default function MapClick() {
      */
     const [onlineCounts, setOnlineCounts] = useState({})
 
+    /** Nome reale di ogni stanza: { [dir]: nome } — stessa fetch di onlineCounts,
+     *  serve per mostrare il nome sotto l'immagine cerchiata nel pannello zona
+     *  (ZONES non lo contiene, e' hardcoded solo con l'immagine). */
+    const [roomNames, setRoomNames] = useState({})
+
     /** ID zona con popup aperto, es. 'menu1'. null = nessun popup. */
     const [openZone, setOpenZone] = useState(null)
 
@@ -249,8 +254,10 @@ export default function MapClick() {
             .then(data => {
                 if (!data.success) return
                 const counts = {}
-                data.rooms.forEach(r => { counts[r.id] = r.utenti_online })
+                const names = {}
+                data.rooms.forEach(r => { counts[r.id] = r.utenti_online; names[r.id] = r.nome })
                 setOnlineCounts(counts)
+                setRoomNames(names)
             })
             .catch(console.error)
     }, [effectiveMapId])
@@ -436,10 +443,12 @@ export default function MapClick() {
                     />
 
                     {/* Pin cliccabili — solo dopo il caricamento dell'immagine.
-                        Marker discreto (anello dorato pulsante + etichetta in hover):
-                        l'immagine ha gia' un proprio pallino disegnato per ogni zona,
-                        qui si aggiunge solo l'affordance interattiva sopra. */}
-                    {ZONES.map(zone => {
+                        Marker discreto (anello bianco pulsante/fluttuante +
+                        etichetta in hover): l'immagine ha gia' un proprio
+                        pallino disegnato per ogni zona, qui si aggiunge solo
+                        l'affordance interattiva sopra. --float-delay sfasa il
+                        galleggiamento cosi' i pin non si muovono in sincrono. */}
+                    {ZONES.map((zone, i) => {
                         const zx = mapInfo.is_notte ? zone.nightCx : zone.cx
                         const zy = mapInfo.is_notte ? zone.nightCy : zone.cy
                         const style = hotspotStyle(zx, zy)
@@ -447,7 +456,7 @@ export default function MapClick() {
                         return (
                             <div
                                 key={zone.id}
-                                style={style}
+                                style={{ ...style, '--float-delay': `${(i % 5) * 0.5}s` }}
                                 className={`map-pin${openZone === zone.id ? ' map-pin--active' : ''}`}
                                 onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
                                 title={zone.name}
@@ -461,9 +470,7 @@ export default function MapClick() {
             </center>
 
             {/* ---------------------------------------------------------------- */}
-            {/* PANNELLO ZONA — appare SOTTO la mappa in flusso normale.          */}
-            {/* Non usa position:absolute dentro il container, quindi non viene   */}
-            {/* mai tagliato dall'overflow né dalla dimensione del frame.         */}
+            {/* PANNELLO ZONA — fisso in basso, sopra un blur (vedi _map_click.scss) */}
             {/* ---------------------------------------------------------------- */}
             {selectedZone && (
                 <div className="map-zone-panel">
@@ -476,10 +483,18 @@ export default function MapClick() {
                     <div className="map-zone-panel__rooms">
                         {selectedZone.rooms.map((room, i) => {
                             const count = room.dir ? (onlineCounts[room.dir] || 0) : 0
+                            // Le stanze reali (room.dir) hanno un nome vero da api_map.php?op=rooms;
+                            // le voci verso pagine di servizio (room.page) no — si ricava dal file immagine.
+                            const name = room.dir
+                                ? (roomNames[room.dir] || '…')
+                                : room.img.replace(/\.[a-z]+$/i, '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
                             return (
                                 <span key={i} className="map-zone-room" onClick={() => navigate(room)}>
-                                    <img src={`/themes/crystal/imgs/maps/${room.img}`} alt="" />
-                                    {count > 0 && <span className="map-zone-room__badge">{count}</span>}
+                                    <span className="map-zone-room__avatar">
+                                        <img src={`/themes/crystal/imgs/maps/${room.img}`} alt="" />
+                                        {count > 0 && <span className="map-zone-room__badge">{count}</span>}
+                                    </span>
+                                    <span className="map-zone-room__name">{name}</span>
                                 </span>
                             )
                         })}

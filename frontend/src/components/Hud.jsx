@@ -15,8 +15,10 @@
  *
  * Sostituisce (montati singolarmente in precedenza): InfoLocation,
  * PresentiBadge, OnlineUsers, ChattingOff, AnteprimaScheda, FrameMessaggi,
- * Meteo. OnlineUsers/ChattingOff/Meteo vengono riusati cosi' come sono
- * dentro i popover, invece di riscriverne la logica di fetch/socket.
+ * Meteo. OnlineUsers/ChattingOff vengono riusati cosi' come sono dentro i
+ * popover, invece di riscriverne la logica di fetch/socket. Meteo invece e'
+ * incorporato direttamente nel pannello sinistro (non piu' in un popover):
+ * sostituisce nome/descrizione quando si e' sulla mappa generale.
  *
  * Il logo centrale apre un terzo arco (manuali/uffici/gestione/esci) al
  * hover o al click — vedi .ct-hud__center-arc.
@@ -85,7 +87,7 @@ export default function Hud({ isStaff }) {
         })
     }, [])
 
-    const [openPopover, setOpenPopover] = useState(null) // 'presence' | 'weather' | 'chatoff' | null
+    const [openPopover, setOpenPopover] = useState(null) // 'presence' | 'chatoff' | null
 
     // Arco centrale (uffici/manuali/gestione/esci): si apre al hover o al
     // click sul logo — non persistito, e' solo un menu rapido. E' anche
@@ -96,6 +98,11 @@ export default function Hud({ isStaff }) {
     // Modale descrizione luogo (stessa di InfoLocation.jsx, mai rimossa da
     // _layout.scss) — aperta cliccando il cerchio sinistro.
     const [showLocationDesc, setShowLocationDesc] = useState(false)
+
+    // Fallback se il file dell'immagine del cerchio sinistro non esiste
+    // (il campo DB puo' puntare a un file mancante): senza, il browser
+    // mostra il testo alt a piena dimensione dentro il cerchio.
+    const [locationImgFailed, setLocationImgFailed] = useState(false)
 
     // Ripulisce un attributo di un tentativo precedente (restringeva
     // #maincontent quando un pannello era aperto): riduceva il contenuto
@@ -278,14 +285,19 @@ export default function Hud({ isStaff }) {
     const mappaId = window.CT_USER?.mappa ?? 1
     const descrizioneTesto = (location?.descrizione ?? '').replace(/<[^>]+>/g, '')
 
-    // Immagine del luogo: in stanza usa mappa.immagine (imgs/locations/), sulla
-    // mappa generale usa l'immagine della zona (imgs/maps/) — stesso campo
-    // che InfoLocation.jsx leggeva da api_map.php?op=current.
+    // Immagine del luogo: in stanza usa mappa.immagine (imgs/locations/).
+    // Sulla mappa generale usa sempre l'illustrazione giorno/notte vera e
+    // propria (la stessa di MapClick.jsx) invece del campo mappa_click.immagine
+    // (location.immagine_mappa): quel campo puo' non essere popolato/valido a
+    // seconda della riga di mappa_click associata alla mappa corrente, e
+    // un'immagine mancante mostrava il testo alt enorme al posto del cerchio.
     const locationImg = location?.tipo === 'stanza' && location?.immagine
         ? `themes/crystal/imgs/locations/${location.immagine}`
-        : location?.tipo === 'mappa' && location?.immagine_mappa
-            ? `themes/crystal/imgs/maps/${location.immagine_mappa}`
+        : location?.tipo === 'mappa'
+            ? `themes/crystal/imgs/maps/${location.is_notte ? 'mappa_notte.png' : 'mappa_giorno.png'}`
             : null
+
+    useEffect(() => { setLocationImgFailed(false) }, [locationImg])
 
     return (
         <div className="ct-hud" ref={hudRef}>
@@ -294,7 +306,10 @@ export default function Hud({ isStaff }) {
             {/* ============ ANELLO SINISTRO: LUOGO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--left${leftOpen ? ' is-open' : ''}`}>
                 <button type="button" className="ct-hud__thumb" onClick={() => setShowLocationDesc(true)} title={location?.nome ?? 'Luogo'}>
-                    {locationImg ? <img src={locationImg} alt={location?.nome ?? ''} /> : <i className="fa-solid fa-city" />}
+                    {locationImg && !locationImgFailed
+                        ? <img src={locationImg} alt={location?.nome ?? ''} onError={() => setLocationImgFailed(true)} />
+                        : <i className="fa-solid fa-city" />
+                    }
                 </button>
 
                 {/* Solo mobile (vedi _hud.scss): sfondo scuro dietro la scheda a
@@ -302,32 +317,35 @@ export default function Hud({ isStaff }) {
                 <div className="ct-hud__sheet-backdrop" onClick={() => setLeftOpen(false)} />
 
                 <div className="ct-hud__arc">
-                    <button type="button" className="ct-hud__icon" style={arcIcon(0, 110)}
-                        title="Meteo" onClick={togglePopover('weather')}>
-                        <i className="fa-solid fa-cloud-sun" />
-                    </button>
-                    <a className="ct-hud__icon" style={arcIcon(42, 102)}
+                    <a className="ct-hud__icon" style={arcIcon(0, 100)}
                         href="main.php?page=forum" title="Forum">
                         <i className="fa-solid fa-comments" />
                     </a>
-                    <button type="button" className="ct-hud__icon" style={arcIcon(78, 78)}
+                    <button type="button" className="ct-hud__icon" style={arcIcon(50, 87)}
                         title="Presenti nel luogo" onClick={togglePopover('presence')}>
                         <i className="fa-solid fa-users" />
-                        {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(78, 78)}>{presentiCount}</b>}
+                        {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(50, 87)}>{presentiCount}</b>}
                     </button>
-                    <button type="button" className="ct-hud__icon" style={arcIcon(102, 42)}
+                    <button type="button" className="ct-hud__icon" style={arcIcon(87, 50)}
                         title="Chat off" onClick={togglePopover('chatoff')}>
                         <i className="fa-solid fa-comment-dots" />
                     </button>
-                    <a className="ct-hud__icon" style={arcIcon(110, 0)}
+                    <a className="ct-hud__icon" style={arcIcon(100, 0)}
                         href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Vai alla mappa principale">
                         <i className="fa-solid fa-map-location-dot" />
                     </a>
                 </div>
 
                 <div className="ct-hud__panel ct-hud__panel--location">
-                    <h3>{location?.nome ?? '…'}</h3>
-                    {descrizioneTesto && <p>{descrizioneTesto.slice(0, 100)}{descrizioneTesto.length > 100 ? '…' : ''}</p>}
+                    {location?.tipo === 'mappa'
+                        ? <Meteo />
+                        : (
+                            <>
+                                <h3>{location?.nome ?? '…'}</h3>
+                                {descrizioneTesto && <p>{descrizioneTesto.slice(0, 100)}{descrizioneTesto.length > 100 ? '…' : ''}</p>}
+                            </>
+                        )
+                    }
                 </div>
             </div>
 
@@ -342,22 +360,22 @@ export default function Hud({ isStaff }) {
                 <div className="ct-hud__sheet-backdrop" onClick={() => setRightOpen(false)} />
 
                 <div className="ct-hud__arc">
-                    <a className="ct-hud__icon" style={arcIcon(0, 110)}
+                    <a className="ct-hud__icon" style={arcIcon(0, 100)}
                         href="main.php?page=agenda_center" title="Calendario">
                         <i className="fa-solid fa-calendar-days" />
-                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 110)} />}
+                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 100)} />}
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-55, 95)}
+                    <a className="ct-hud__icon" style={arcIcon(-50, 87)}
                         href="main.php?page=role_recap" title="Giocate personali">
                         <i className="fa-solid fa-scroll" />
-                        {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-55, 95)} title="Giocata in corso" />}
+                        {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-50, 87)} title="Giocata in corso" />}
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-95, 55)}
+                    <a className="ct-hud__icon" style={arcIcon(-87, 50)}
                         href="main.php?page=messages_center&offset=0" title="Messaggi">
                         <i className="fa-solid fa-envelope" />
-                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-95, 55)} />}
+                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-87, 50)} />}
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-110, 0)}
+                    <a className="ct-hud__icon" style={arcIcon(-100, 0)}
                         href="#" title="Assistente" onClick={openChatbot}>
                         <i className="fa-solid fa-robot" />
                     </a>
@@ -422,7 +440,7 @@ export default function Hud({ isStaff }) {
                     setCenterOpen(v => !v)
                 }}>
                     <span className="ct-hud__brand-ring" />
-                    <span className="ct-hud__brand-mark">CT</span>
+                    <img className="ct-hud__brand-mark" src="/imgs/favicon.ico" alt="Crystal Tokyo" />
                 </button>
 
                 <div className="ct-hud__center-arc">
@@ -457,12 +475,6 @@ export default function Hud({ isStaff }) {
                         <a href="main.php?page=presenti_estesi">Vedi tutti <i className="fa-solid fa-arrow-right" /></a>
                     </div>
                     <OnlineUsers />
-                </div>
-            )}
-
-            {openPopover === 'weather' && (
-                <div className="ct-hud__popover ct-hud__popover--weather" onClick={handlePopoverClick}>
-                    <Meteo />
                 </div>
             )}
 
