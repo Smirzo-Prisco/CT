@@ -998,6 +998,55 @@ textarea.chat_textarea {
     margin-right: $space-2 + 2;
 }
 
+// ── Wrapper textarea + menu menzione @ ─────────────────────────
+
+.chat-textarea-wrap {
+    flex-grow: 1;
+    margin-right: $space-2 + 2;
+
+    textarea.chat_textarea {
+        margin-right: 0;
+    }
+}
+
+// position:fixed + portal su document.body invece di absolute nel flusso:
+// .form_chat ha "overflow:hidden" sotto i 1024px (vedi media query piu'
+// sotto), che taglierebbe un menu absolute ancorato alla textarea.
+.chat-mention-menu {
+    position: fixed;
+    margin-bottom: $space-1;
+    max-height: 180px;
+    overflow-y: auto;
+    background: $palette-surface-raised;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    border-radius: $radius-md;
+    box-shadow: $shadow-lg;
+    z-index: 10050;
+}
+
+.chat-mention-menu__item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: $space-2 $space-3;
+    background: none;
+    border: none;
+    color: $color-text-light;
+    font-size: $text-sm;
+    cursor: pointer;
+
+    &:hover, &:focus {
+        background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+    }
+}
+
+.chat-mention-menu__empty {
+    padding: $space-2 $space-3;
+    color: $color-text-secondary;
+    font-size: $text-sm;
+    font-style: italic;
+}
+
 div.casella_chat_info {
     display: flex;
     justify-content: space-between;
@@ -1776,13 +1825,120 @@ button.chat_button {
 // ── Avatar inline nella riga chat ────────────────────────────
 
 img.chat_avatar_inline {
-    width: 22px;
-    height: 22px;
+    // float, non inline-block: con inline-block l'immagine si comporta come
+    // un carattere gigante dentro la SUA riga, che quindi diventa piu' alta
+    // delle righe di testo successive quando il messaggio va a capo (grosso
+    // "salto" fra la prima riga e la seconda). Con float il testo (nome,
+    // orario, messaggio) gli scorre invece attorno per tutta la sua altezza
+    // — righe piu' strette finche' non superano il fondo dell'immagine, poi
+    // tornano a piena larghezza — mantenendo l'interlinea normale ovunque.
+    //
+    // NIENTE shape-outside: un cerchio e' strettissimo (quasi 0px di
+    // larghezza disponibile) proprio in cima e in fondo alla sua altezza —
+    // il testo che ci si affianca li' (l'header ora/nome, essendo il primo
+    // contenuto dopo il float) finisce schiacciato in una fascia minuscola,
+    // sembrando "scontrarsi" con la circle. Senza shape-outside il testo
+    // segue il riquadro quadrato dell'immagine: larghezza disponibile
+    // costante fin dalla prima riga, nessuna fascia stretta.
+    float: left;
+    width: 72px;
+    height: 72px;
     border-radius: $radius-full;
     object-fit: cover;
-    vertical-align: middle;
-    margin: 0 4px;
+    margin: 0 $space-2 $space-1 0;
+    cursor: pointer;
+}
+
+// ── Popover statistiche personaggio (hover/tap su avatar in chat) ─
+// position:fixed, non un overlay a schermo intero: si apre accanto
+// all'avatar (coordinate calcolate in JS via getBoundingClientRect) e si
+// chiude da solo su mouseout (desktop) o tap fuori (mobile, via listener
+// su document — vedi ChatViewer.jsx).
+.pg-popover {
+    position: fixed;
+    width: 210px;
+    max-width: calc(100vw - #{$space-4} * 2);
+    background: linear-gradient(160deg, $palette-surface-raised, $color-bg);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+    border-radius: $radius-md;
+    box-shadow: $shadow-lg;
+    padding: $space-3;
+    color: $color-text-light;
+    z-index: 10050;
+}
+
+.pg-popover__close {
+    position: absolute;
+    top: $space-1;
+    right: $space-1;
+    background: none;
+    border: none;
+    color: $color-text-secondary;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+        color: $color-text-light;
+    }
+}
+
+.pg-popover__nome {
+    margin: 0 0 $space-2;
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
+    padding-right: $space-4;
+}
+
+.pg-popover__stat {
+    margin-bottom: $space-2;
+
+    &:last-of-type {
+        margin-bottom: 0;
+    }
+}
+
+.pg-popover__stat-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: $text-sm;
+    color: $color-text-secondary;
+    margin-bottom: 2px;
+}
+
+.pg-popover__track {
+    width: 100%;
+    height: 6px;
+    background: $color-surface-input;
+    // $radius-full e' 50% — corretto per un cerchio (lato = lato), ma su
+    // una barra larga e bassa i due raggi non sono uguali: border-radius:50%
+    // viene calcolato separatamente su larghezza e altezza, quindi ogni
+    // angolo diventa un'ellisse enorme che si fonde con quella opposta,
+    // deformando l'intera barra in una lente ovale. Un valore fisso e
+    // generoso in px da invece il classico effetto "pillola" a prescindere
+    // da quanto la barra sia larga.
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.pg-popover__fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width .3s ease;
+
+    &--salute { background: $color-danger; }
+    &--integrita { background: $color-info; }
+}
+
+.pg-popover__livello {
     display: inline-block;
+    margin-top: $space-1;
+    padding: 2px $space-2;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-warning) 25%, transparent);
+    color: $color-warning;
+    font-weight: $font-weight-bold;
+    font-size: $text-sm;
 }
 
 // ── Status text e bordo animato sessione ──────────────────────

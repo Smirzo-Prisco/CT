@@ -894,6 +894,106 @@ export default function ChatShell() {
     }
 
     // -----------------------------------------------------------------------
+    // MENZIONI @ — autocompletamento presenti in stanza per sussurri rapidi
+    // -----------------------------------------------------------------------
+
+    /** Ref alla textarea del messaggio, per leggere/scrivere valore e cursore. */
+    const messageRef = useRef(null)
+
+    /** Presenti nella stanza corrente — fonte della lista di menzione @. */
+    const [presentiStanza, setPresentiStanza] = useState([])
+
+    const fetchPresentiStanza = useCallback(() => {
+        fetch('/pages/api_map.php?op=presenti')
+            .then(r => r.json())
+            .then(d => { if (d.success) setPresentiStanza(d.users) })
+            .catch(err => console.error('[ChatShell] Errore presenti:', err))
+    }, [])
+
+    useEffect(() => {
+        if (!shell) return
+        fetchPresentiStanza()
+        const sock = window.ctSocket
+        if (sock) sock.on('users:update', fetchPresentiStanza)
+        return () => { if (sock) sock.off('users:update', fetchPresentiStanza) }
+    }, [shell, fetchPresentiStanza])
+
+    /**
+     * Testo digitato dopo la "@" iniziale (filtro) e visibilità del menu:
+     * aperto solo quando "@" e' il PRIMO carattere del messaggio — la stessa
+     * condizione che il parser server-side usa per riconoscere un sussurro
+     * (determineMessageType: first_char === '@', chat_functions.inc.php) — e
+     * finche' non compare un secondo "@" (destinatario gia' scelto a mano).
+     */
+    const [mentionOpen, setMentionOpen] = useState(false)
+    const [mentionFilter, setMentionFilter] = useState('')
+
+    /**
+     * Coordinate (viewport) per il menu in position:fixed, portato su
+     * document.body invece che absolute nel flusso: .form_chat ha
+     * overflow:hidden sotto i 1024px, che lo taglierebbe.
+     */
+    const [mentionRect, setMentionRect] = useState(null)
+
+    useEffect(() => {
+        if (!mentionOpen) return
+        const updateRect = () => {
+            const ta = messageRef.current
+            if (!ta) return
+            const r = ta.getBoundingClientRect()
+            setMentionRect({ left: r.left, width: r.width, bottom: window.innerHeight - r.top })
+        }
+        updateRect()
+        window.addEventListener('resize', updateRect)
+        window.addEventListener('scroll', updateRect, true)
+        return () => {
+            window.removeEventListener('resize', updateRect)
+            window.removeEventListener('scroll', updateRect, true)
+        }
+    }, [mentionOpen])
+
+    const handleMessageInput = (e) => {
+        const val = e.target.value
+        if (val.startsWith('@')) {
+            const rest = val.slice(1)
+            const secondAt = rest.indexOf('@')
+            if (secondAt === -1) {
+                setMentionFilter(rest)
+                setMentionOpen(true)
+                return
+            }
+        }
+        setMentionOpen(false)
+    }
+
+    /** Presenti selezionabili nel menu, filtrati per prefisso e senza il pg loggato. */
+    const mentionCandidates = shell
+        ? presentiStanza.filter(u =>
+            u.nome !== shell.login &&
+            u.nome.toLowerCase().startsWith(mentionFilter.toLowerCase()))
+        : []
+
+    /**
+     * Applica il formato realmente riconosciuto dal parser dei sussurri —
+     * "@Nome@testo" (vedi handleWhisperMessage in chat_functions.inc.php),
+     * non un tag con parentesi quadre: il server non lo interpreterebbe.
+     */
+    const selectMention = (nome) => {
+        const ta = messageRef.current
+        if (!ta) return
+        ta.value = `@${nome}@`
+        // Un input impostato via JS non emette naturalmente 'input': lo simuliamo
+        // per far scattare autoGrow (main.jsx, delegation su document) e conta()
+        // esattamente come se l'utente avesse digitato il testo a mano.
+        ta.dispatchEvent(new Event('input', { bubbles: true }))
+        window.conta?.(ta)
+        setMentionOpen(false)
+        ta.focus()
+        const len = ta.value.length
+        ta.setSelectionRange(len, len)
+    }
+
+    // -----------------------------------------------------------------------
     // GUARD: CARICAMENTO / ERRORE
     // -----------------------------------------------------------------------
 
@@ -1061,17 +1161,49 @@ export default function ChatShell() {
                                 </div>
 
                                 {/* Riga 2: textarea */}
-                                <textarea
-                                    className="chat_textarea"
-                                    name="message"
-                                    id="message"
-                                    placeholder="Scrivi la tua azione"
-                                    maxLength={maxlength}
-                                    onKeyUp={(e) => {
-                                        window.conta?.(e.target)
-                                        if (pulsanti.can_master_msg) window.masterMessageLength?.(e.target, maxlength)
-                                    }}
-                                />
+                                <div className="chat-textarea-wrap">
+                                    <textarea
+                                        ref={messageRef}
+                                        className="chat_textarea"
+                                        name="message"
+                                        id="message"
+                                        placeholder="Scrivi la tua azione"
+                                        maxLength={maxlength}
+                                        onInput={handleMessageInput}
+                                        onKeyUp={(e) => {
+                                            window.conta?.(e.target)
+                                            if (pulsanti.can_master_msg) window.masterMessageLength?.(e.target, maxlength)
+                                        }}
+                                        onKeyDown={e => { if (e.key === 'Escape') setMentionOpen(false) }}
+                                        onBlur={() => setMentionOpen(false)}
+                                    />
+
+                                    {/* Menu menzione @: presenti in stanza, per comporre sussurri
+                                        rapidi nel formato "@Nome@testo" riconosciuto dal server.
+                                        Portato su document.body (position:fixed) per non finire
+                                        tagliato dall'overflow:hidden di .form_chat sotto i 1024px. */}
+                                    {mentionOpen && mentionRect && createPortal(
+                                        <div
+                                            className="chat-mention-menu"
+                                            style={{ left: mentionRect.left, width: mentionRect.width, bottom: mentionRect.bottom }}
+                                        >
+                                            {mentionCandidates.length === 0 && (
+                                                <div className="chat-mention-menu__empty">Nessun presente trovato</div>
+                                            )}
+                                            {mentionCandidates.map(u => (
+                                                <button
+                                                    type="button"
+                                                    key={u.nome}
+                                                    className="chat-mention-menu__item"
+                                                    onMouseDown={e => { e.preventDefault(); selectMention(u.nome) }}
+                                                >
+                                                    {u.nome} {u.cognome}
+                                                </button>
+                                            ))}
+                                        </div>,
+                                        document.body
+                                    )}
+                                </div>
                             </form>
                         </div>
                     </div>

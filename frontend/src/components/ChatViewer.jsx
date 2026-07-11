@@ -1,10 +1,32 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
+
+/** Percentuale (0-100) di value/max, sicura contro max<=0 e valori fuori range. */
+const pct = (value, max) => max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0
+
+/** Calcola la posizione fissa del popover accanto all'avatar che l'ha aperto, restando nel viewport. */
+function computePopoverPos(rect) {
+  const margin = 8
+  const width = 210
+  const estHeight = 140
+  let left = rect.left
+  if (left + width + margin > window.innerWidth) left = Math.max(margin, window.innerWidth - width - margin)
+  let top = rect.bottom + margin
+  if (top + estHeight > window.innerHeight) top = Math.max(margin, rect.top - estHeight - margin)
+  return { left, top }
+}
 
 export default function ChatViewer() {
   const [messages, setMessages] = useState([])
   const lastIdRef = useRef(0)
   const bottomRef = useRef(null)
   const chatRef   = useRef(null)
+
+  /** Popover statistiche pg: { nome, pos, loading, data, error }. Aperto su hover (desktop) o tap (mobile). */
+  const [pgPopup, setPgPopup] = useState(null)
+  const closeTimerRef = useRef(null)
+  // Calcolato una sola volta: (hover:hover) e' falso su touch, dove l'hover non esiste davvero.
+  const hoverCapableRef = useRef(typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches)
 
   /** true quando c'è una role attiva — nasconde la descrizione stanza */
   const [hasRole,  setHasRole]  = useState(false)
@@ -70,12 +92,80 @@ export default function ChatViewer() {
     if (editables.length > 0) editables[editables.length - 1].classList.add('chat_editable--active')
   }, [messages])
 
-  // Event delegation: click su qualsiasi [data-editable].chat_editable--active apre il modale
-  const handleChatClick = useCallback((e) => {
-    const target = e.target.closest('[data-editable].chat_editable--active')
-    if (!target) return
-    if (typeof window.editAction === 'function') window.editAction(target.dataset.raw ?? '', target.id)
+  /** Apre il popover per "nome" e carica le sue statistiche da api_scheda.php. */
+  const openPgPopup = useCallback((nome, rect) => {
+    const pos = computePopoverPos(rect)
+    setPgPopup({ nome, pos, loading: true, data: null, error: null })
+    fetch(`pages/api_scheda.php?op=profile&pg=${encodeURIComponent(nome)}`)
+      .then(r => r.json())
+      .then(d => {
+        setPgPopup(prev => prev && prev.nome === nome
+          ? { ...prev, loading: false, data: d.success ? d : null, error: d.success ? null : (d.message || 'Personaggio non trovato') }
+          : prev)
+      })
+      .catch(() => setPgPopup(prev => prev && prev.nome === nome ? { ...prev, loading: false, error: 'Errore di rete' } : prev))
   }, [])
+
+  const cancelClose = useCallback(() => clearTimeout(closeTimerRef.current), [])
+  const scheduleClose = useCallback(() => {
+    clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = setTimeout(() => setPgPopup(null), 200)
+  }, [])
+
+  // Event delegation: click su qualsiasi [data-editable].chat_editable--active apre il modale
+  // di modifica azione. Su desktop il popover pg e' gestito da hover (sotto), quindi il click
+  // sull'avatar non fa nulla; su mobile (niente hover reale) il tap apre/chiude il popover.
+  // I messaggi arrivano come HTML grezzo (dangerouslySetInnerHTML), quindi non e' possibile
+  // mettere onClick sui singoli elementi: serve delegation sul contenitore.
+  const handleChatClick = useCallback((e) => {
+    const editTarget = e.target.closest('[data-editable].chat_editable--active')
+    if (editTarget) {
+      if (typeof window.editAction === 'function') window.editAction(editTarget.dataset.raw ?? '', editTarget.id)
+      return
+    }
+
+    if (hoverCapableRef.current) return // desktop: gestito da mouseover/mouseout
+
+    const avatarTarget = e.target.closest('.chat_avatar_inline, .chat_avatar')
+    const nome = avatarTarget?.dataset.pg
+    if (!nome) return
+
+    if (pgPopup?.nome === nome) { setPgPopup(null); return } // tap di nuovo sullo stesso avatar: chiude
+    openPgPopup(nome, avatarTarget.getBoundingClientRect())
+  }, [pgPopup, openPgPopup])
+
+  // Hover reale (solo desktop/mouse): mouseover/mouseout bubblano e supportano delegation,
+  // a differenza di mouseenter/mouseleave.
+  const handleChatMouseOver = useCallback((e) => {
+    if (!hoverCapableRef.current) return
+    const avatarTarget = e.target.closest('.chat_avatar_inline, .chat_avatar')
+    const nome = avatarTarget?.dataset.pg
+    if (!nome) return
+    cancelClose()
+    if (pgPopup?.nome === nome) return // gia' aperto/in caricamento per lo stesso pg
+    openPgPopup(nome, avatarTarget.getBoundingClientRect())
+  }, [pgPopup, openPgPopup, cancelClose])
+
+  const handleChatMouseOut = useCallback((e) => {
+    if (!hoverCapableRef.current) return
+    if (!e.target.closest('.chat_avatar_inline, .chat_avatar')) return
+    // Se il mouse sta andando verso il popover stesso, non chiudere: l'utente
+    // potrebbe volerci scorrere sopra o semplicemente attraversarlo.
+    if (e.relatedTarget?.closest?.('.pg-popover')) return
+    scheduleClose()
+  }, [scheduleClose])
+
+  // Mobile (nessun hover reale): un tap fuori dal popover o dall'avatar che l'ha aperto lo chiude,
+  // dato che non c'e' piu' un overlay a schermo intero a intercettare il tap.
+  useEffect(() => {
+    if (!pgPopup || hoverCapableRef.current) return
+    const onDocClick = (e) => {
+      if (e.target.closest('.pg-popover, .chat_avatar_inline, .chat_avatar')) return
+      setPgPopup(null)
+    }
+    document.addEventListener('click', onDocClick)
+    return () => document.removeEventListener('click', onDocClick)
+  }, [pgPopup])
 
   useEffect(() => {
     fetchMessages()
@@ -111,7 +201,13 @@ export default function ChatViewer() {
   }, [messages])
 
   return (
-    <div className="chat_inner" ref={chatRef} onClick={handleChatClick}>
+    <div
+      className="chat_inner"
+      ref={chatRef}
+      onClick={handleChatClick}
+      onMouseOver={handleChatMouseOver}
+      onMouseOut={handleChatMouseOut}
+    >
 
       {/* Descrizione stanza — visibile solo quando la chat è vuota e nessuna role è attiva */}
       {messages.length === 0 && !hasRole && roomDesc && (
@@ -138,6 +234,58 @@ export default function ChatViewer() {
         <div key={msg.id ?? i} dangerouslySetInnerHTML={{ __html: msg.html }} />
       ))}
       <div ref={bottomRef} />
+
+      {pgPopup && createPortal(
+        <div
+          className="pg-popover"
+          style={{ left: pgPopup.pos.left, top: pgPopup.pos.top }}
+          onClick={e => e.stopPropagation()}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+        >
+            <button type="button" className="pg-popover__close" onClick={() => setPgPopup(null)}>×</button>
+
+            {pgPopup.loading && <p>Caricamento…</p>}
+            {pgPopup.error && <p>{pgPopup.error}</p>}
+
+            {pgPopup.data && (() => {
+              const d = pgPopup.data
+              const labels = d.config?.stat_names ?? {}
+              const livello = d.statistiche?.livello
+              return (
+                <>
+                  <h4 className="pg-popover__nome">{d.nome} {d.cognome}</h4>
+
+                  <div className="pg-popover__stat">
+                    <div className="pg-popover__stat-label">
+                      <span>{labels.hitpoints ?? 'Salute'}</span>
+                      <span>{d.salute}/{d.salute_max}</span>
+                    </div>
+                    <div className="pg-popover__track">
+                      <div className="pg-popover__fill pg-popover__fill--salute" style={{ width: `${pct(d.salute, d.salute_max)}%` }} />
+                    </div>
+                  </div>
+
+                  <div className="pg-popover__stat">
+                    <div className="pg-popover__stat-label">
+                      <span>{labels.integrita ?? 'Integrità'}</span>
+                      <span>{d.integrita}/{d.integrita_max}</span>
+                    </div>
+                    <div className="pg-popover__track">
+                      <div className="pg-popover__fill pg-popover__fill--integrita" style={{ width: `${pct(d.integrita, d.integrita_max)}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Il livello è visibile solo per il proprio pg o allo staff (stessa
+                      regola di privacy di Scheda.jsx/api_scheda.php): per gli altri
+                      personaggi l'endpoint non lo restituisce affatto. */}
+                  {livello != null && <span className="pg-popover__livello">Livello {livello}</span>}
+                </>
+              )
+            })()}
+        </div>,
+        document.body
+      )}
     </div>
   )
 }
