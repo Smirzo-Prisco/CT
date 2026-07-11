@@ -238,9 +238,6 @@ body[data-palette="public"] .ct-hud {
 .ct-hud__ring--left .ct-hud__panel { left: 140px; width: 270px; padding-left: 52px; }
 .ct-hud__ring--right .ct-hud__panel { right: 140px; width: 270px; padding-right: 74px; }
 
-.ct-hud__panel h3 { margin: 0 0 4px; font-size: 15px; color: var(--gold); }
-.ct-hud__panel p { margin: 0; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
-
 // Meteo.jsx: sostituisce nome/descrizione nel pannello sinistro quando si e'
 // sulla mappa generale (location.tipo === 'mappa', vedi Hud.jsx).
 .ct-meteo__head {
@@ -463,26 +460,24 @@ body[data-palette="public"] .ct-hud {
     .ct-hud__ring { transform: scale(.68); }
     .ct-hud__arc { transform: scale(1.03); } // .7/.68
     .ct-hud__ring.is-open .ct-hud__arc { transform: scale(1.47); } // 1/.68
-    .ct-hud__panel p { display: none; }
     .ct-hud__popover { width: 240px; left: 100px; }
 }
 
-// ── MOBILE (≤680px): colonna di icone circolari che scende sul contenuto ──
+// ── MOBILE (≤680px): scheda a comparsa dal basso con pulsanti in griglia ──
 // Un ventaglio radiale (anche "gonfiato" con un boost di scala) resta
 // troppo affollato per toccare le singole icone senza errori sotto i
 // 680px (feedback utente: "groviglio impossibile da cliccare"). Qui
-// l'arco smette di essere un ventaglio e diventa una colonna verticale di
-// icone circolari — stesso stile tondo di quelle desktop, solo piu'
-// grandi per il tocco — che scende dal cerchio verso il basso, sopra il
-// contenuto della pagina (non piu' una scheda a tutto schermo ancorata in
-// fondo). L'etichetta accanto a ciascuna riusa l'attributo title gia'
-// presente per il tooltip via content:attr(title) — nessun markup
-// duplicato.
+// l'arco smette di essere un ventaglio e diventa una scheda ancorata in
+// basso a tutta larghezza, con le icone in griglia (icona sopra,
+// etichetta sotto in ciascun pulsante) — stessa identica cosa per tutti e
+// tre i cerchi (sinistro, centrale, destro). L'etichetta riusa
+// l'attributo title gia' presente per il tooltip via content:attr(title)
+// — nessun markup duplicato.
 //
 // Un solo cerchio alla volta puo' essere aperto (mutua esclusivita'
 // gestita in Hud.jsx: toggleMobileMenu chiude gli altri due quando se ne
-// apre uno), quindi le tre colonne condividono la stessa fascia di
-// schermo senza mai sovrapporsi davvero.
+// apre uno), quindi le tre schede condividono la stessa posizione fissa
+// in basso senza mai sovrapporsi davvero.
 //
 // Il pannello info (nome/descrizione) viene nascosto: e' un supplemento,
 // non essenziale alla navigazione.
@@ -508,7 +503,7 @@ body[data-palette="public"] .ct-hud {
         display: block;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, .45);
+        background: rgba(0, 0, 0, .55);
         z-index: 598;
     }
 
@@ -519,26 +514,38 @@ body[data-palette="public"] .ct-hud {
     .ct-hud__ring--left.is-open .ct-hud__arc,
     .ct-hud__ring--right.is-open .ct-hud__arc,
     .ct-hud__center.is-open .ct-hud__center-arc {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+        gap: 12px;
         position: fixed;
-        top: 100px;
+        bottom: 0; top: auto; left: 0; right: 0;
         transform: none;
         z-index: 600;
+        max-height: 55vh;
+        overflow-y: auto;
+        background: linear-gradient(160deg, var(--ink-light), var(--ink-deep));
+        border-top: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
+        border-radius: 20px 20px 0 0;
+        padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -12px 40px rgba(0, 0, 0, .5);
     }
-    .ct-hud__ring--left.is-open .ct-hud__arc { left: 16px; align-items: flex-start; }
-    .ct-hud__ring--right.is-open .ct-hud__arc { right: 16px; align-items: flex-end; }
-    .ct-hud__center.is-open .ct-hud__center-arc { left: 50%; transform: translateX(-50%); align-items: center; }
 
-    // Icona circolare (stesso stile del cerchio desktop, un po' piu'
-    // grande per il tocco) + etichetta accanto, non piu' sotto/dentro.
+    // Pulsante quadrato/arrotondato: icona sopra, etichetta sotto — stesso
+    // aspetto per tutti e tre i cerchi.
     .ct-hud__ring.is-open .ct-hud__icon,
     .ct-hud__center.is-open .ct-hud__icon {
+        // position:relative ancora .ct-hud__pip (altrimenti, senza un
+        // antenato posizionato piu' vicino, si ancorerebbe alla scheda fixed)
         position: relative;
-        top: auto; left: auto;
-        width: 48px; height: 48px;
+        width: auto; height: auto;
         margin: 0;
+        padding: 14px 4px 10px;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
         font-size: 20px;
 
         &, &:hover, &:active, &:focus, &:focus-visible {
@@ -547,30 +554,15 @@ body[data-palette="public"] .ct-hud {
 
         &::after {
             content: attr(title);
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 13px;
+            font-size: 10px;
             font-weight: 600;
+            line-height: 1.15;
+            text-align: center;
             color: var(--text);
-            white-space: nowrap;
-            background: rgba(8, 9, 26, .75);
-            padding: 4px 10px;
-            border-radius: 999px;
         }
     }
-    // Etichetta a destra del cerchio (sinistro/centrale) o a sinistra
-    // (destro, altrimenti sforerebbe fuori schermo).
-    .ct-hud__ring--left.is-open .ct-hud__icon::after,
-    .ct-hud__center.is-open .ct-hud__icon::after {
-        left: calc(100% + 12px);
-    }
-    .ct-hud__ring--right.is-open .ct-hud__icon::after {
-        right: calc(100% + 12px);
-    }
-
     .ct-hud__ring.is-open .ct-hud__pip {
-        top: -4px; right: -4px; left: auto;
+        top: 6px; right: 6px;
         transform: none;
     }
 }

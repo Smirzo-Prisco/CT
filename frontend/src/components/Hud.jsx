@@ -17,8 +17,9 @@
  * PresentiBadge, OnlineUsers, ChattingOff, AnteprimaScheda, FrameMessaggi,
  * Meteo. OnlineUsers/ChattingOff vengono riusati cosi' come sono dentro i
  * popover, invece di riscriverne la logica di fetch/socket. Meteo invece e'
- * incorporato direttamente nel pannello sinistro (non piu' in un popover):
- * sostituisce nome/descrizione quando si e' sulla mappa generale.
+ * incorporato direttamente nel pannello sinistro (non piu' in un popover) e
+ * mostrato sempre, in stanza o sulla mappa generale — il nome/descrizione
+ * del luogo restano invece nella modale (vedi showLocationDesc sotto).
  *
  * Il logo centrale apre un terzo arco (manuali/uffici/gestione/esci) al
  * hover o al click — vedi .ct-hud__center-arc.
@@ -306,7 +307,6 @@ export default function Hud({ isStaff }) {
     }
 
     const mappaId = window.CT_USER?.mappa ?? 1
-    const descrizioneTesto = (location?.descrizione ?? '').replace(/<[^>]+>/g, '')
 
     // Immagine del luogo: in stanza usa mappa.immagine (imgs/locations/).
     // Sulla mappa generale usa sempre l'illustrazione giorno/notte vera e
@@ -359,16 +359,11 @@ export default function Hud({ isStaff }) {
                     </a>
                 </div>
 
+                {/* Sempre il meteo, in stanza o sulla mappa generale — non piu'
+                    condizionato al tipo di luogo (prima, entrando in una
+                    stanza/chat, veniva sostituito da nome+descrizione). */}
                 <div className="ct-hud__panel ct-hud__panel--location">
-                    {location?.tipo === 'mappa'
-                        ? <Meteo />
-                        : (
-                            <>
-                                <h3>{location?.nome ?? '…'}</h3>
-                                {descrizioneTesto && <p>{descrizioneTesto.slice(0, 100)}{descrizioneTesto.length > 100 ? '…' : ''}</p>}
-                            </>
-                        )
-                    }
+                    <Meteo />
                 </div>
             </div>
 

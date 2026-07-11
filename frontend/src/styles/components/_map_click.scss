@@ -80,8 +80,7 @@
     overflow-y: auto;
     box-sizing: border-box;
     text-align: center;
-    background: linear-gradient(160deg, rgba(22, 27, 53, .12), rgba(8, 9, 26, .15));
-    backdrop-filter: blur(55px);
+    background: linear-gradient(160deg, rgba(22, 27, 53, .7), rgba(8, 9, 26, .7));
     border-top: 1px solid rgba(218, 168, 50, .3);
     border-radius: 20px 20px 0 0;
     padding: 18px 20px calc(18px + env(safe-area-inset-bottom, 0px));
