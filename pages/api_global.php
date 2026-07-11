@@ -274,6 +274,24 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             ));
 
             break;
+        case 'getForumUnread': // Icona forum: si illumina se c'e' almeno un thread non letto in una sezione accessibile
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+            $result = gdrcd_query("SELECT id_araldo, tipo, proprietari FROM araldo WHERE invisibile = 0", 'result');
+            $hasUnread = false;
+            while ($row = gdrcd_query($result, 'fetch')) {
+                if (!can_access_section($row)) continue;
+                $unread = gdrcd_query("SELECT COUNT(*) AS n
+                    FROM messaggioaraldo ma
+                    WHERE ma.id_araldo = {$row['id_araldo']}
+                    AND ma.id_messaggio_padre = -1
+                    AND ma.id_messaggio NOT IN (
+                        SELECT thread_id FROM araldo_letto WHERE nome = '$login_f'
+                    )");
+                if ((int)$unread['n'] > 0) { $hasUnread = true; break; }
+            }
+            gdrcd_query($result, 'free');
+            echo json_encode(['success' => true, 'has_unread' => $hasUnread]);
+            break;
         // UTENTI
         case 'getUsr':  // Recupero i dati dell'utente
             if(!isset($_GET['name'])) {

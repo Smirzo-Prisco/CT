@@ -26,8 +26,8 @@
  *
  * API riusate (invariate): api_map.php (current, presenti, ping, move,
  * changemap), api_global.php (getMessages, getOpenRoles, events_today,
- * saveSoundPrefs), api_scheda.php (profile: avatar, salute/integrita/
- * livello/razza per il pannello del personaggio).
+ * getChatOff, getForumUnread, saveSoundPrefs), api_scheda.php (profile:
+ * avatar, salute/integrita/livello/razza per il pannello del personaggio).
  *
  * Montaggio: via ct:ready su #hud-container in header.inc.php
  *
@@ -223,6 +223,48 @@ export default function Hud({ isStaff }) {
         return () => { if (sock) sock.off('dm:update', fetchMessages) }
     }, [fetchMessages])
 
+    // ── Badge: chat off non letta ────────────────────────────────────────────
+    const [hasNewChatOff, setHasNewChatOff] = useState(false)
+
+    const fetchChatOff = useCallback(() => {
+        fetch('/pages/api_global.php?op=getChatOff')
+            .then(r => r.json())
+            .then(d => { if (d.success) setHasNewChatOff(d.hasNew) })
+            .catch(err => console.error('[Hud] Errore chat off:', err))
+    }, [])
+
+    useEffect(() => {
+        fetchChatOff()
+        const sock = window.ctSocket
+        if (sock) sock.on('chatoff:update', fetchChatOff)
+        return () => { if (sock) sock.off('chatoff:update', fetchChatOff) }
+    }, [fetchChatOff])
+
+    // ── Badge: post forum non letti ──────────────────────────────────────────
+    const [hasNewForum, setHasNewForum] = useState(false)
+
+    const fetchForumUnread = useCallback(() => {
+        fetch('/pages/api_global.php?op=getForumUnread')
+            .then(r => r.json())
+            .then(d => { if (d.success) setHasNewForum(d.has_unread) })
+            .catch(err => console.error('[Hud] Errore forum:', err))
+    }, [])
+
+    useEffect(() => {
+        fetchForumUnread()
+        const sock = window.ctSocket
+        if (sock) sock.on('forum:update', fetchForumUnread)
+        // Il forum e' una pagina SPA separata (non un popover come chat off):
+        // quando l'utente ci naviga e segna dei thread come letti, Hud resta
+        // montato ma non lo sa finche' non torna indietro — 'ct:location-changed'
+        // (stesso evento usato per presenti/luogo) copre anche questo caso.
+        window.addEventListener('ct:location-changed', fetchForumUnread)
+        return () => {
+            if (sock) sock.off('forum:update', fetchForumUnread)
+            window.removeEventListener('ct:location-changed', fetchForumUnread)
+        }
+    }, [fetchForumUnread])
+
     // ── Badge: giocate aperte ───────────────────────────────────────────────
     const [hasOpenRoles, setHasOpenRoles] = useState(false)
 
@@ -323,6 +365,12 @@ export default function Hud({ isStaff }) {
     const togglePopover = (name) => (e) => {
         e.stopPropagation()
         setOpenPopover(p => (p === name ? null : name))
+        // Aprire il popover monta <ChattingOff/>, che chiama subito
+        // ?op=messages e cancella chat_letta lato server — riflettiamo lo
+        // stesso "letto" anche sul badge dell'icona senza aspettare un
+        // giro di socket (che qui non arriverebbe comunque, essendo
+        // un'azione locale e non un nuovo messaggio da altri).
+        if (name === 'chatoff') setHasNewChatOff(false)
         // Su mobile l'arco/lo sfondo scuro dell'anello aperto sono in
         // portal su document.body con z-index molto alto (598, vedi
         // _hud.scss) per stare sopra la scheda a griglia — ma questo li
@@ -389,6 +437,7 @@ export default function Hud({ isStaff }) {
                         <a className="ct-hud__icon" style={arcIcon(0, 87)}
                             href="main.php?page=forum" title="Forum">
                             <i className="fa-solid fa-comments" />
+                            {hasNewForum && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
                         </a>
                         <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)}
                             title="Presenti" onClick={togglePopover('presence')}>
@@ -398,6 +447,7 @@ export default function Hud({ isStaff }) {
                         <button type="button" className="ct-hud__icon" style={arcIcon(75, 43)}
                             title="Chat off" onClick={togglePopover('chatoff')}>
                             <i className="fa-solid fa-comment-dots" />
+                            {hasNewChatOff && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(75, 43)} />}
                         </button>
                         <a className="ct-hud__icon" style={arcIcon(87, 0)}
                             href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Mappa">
