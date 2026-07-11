@@ -140,7 +140,11 @@ body[data-palette="public"] .ct-hud {
 
 @keyframes ct-hud-spin { to { transform: rotate(360deg); } }
 
-// Arco delle icone: sempre visibili, scala insieme alla miniatura
+// Arco delle icone: sempre visibili, scala insieme alla miniatura.
+// z-index piu' alto di .ct-hud__thumb (1): il pannello (vedi sotto) sta
+// invece dietro a entrambi (z-index:auto) — non compete piu' per lo spazio,
+// ha semplicemente un padding sul lato dell'anello cosi' il suo contenuto
+// non ci finisce mai sotto.
 .ct-hud__arc {
     position: absolute;
     top: 50%; left: 50%;
@@ -202,15 +206,16 @@ body[data-palette="public"] .ct-hud {
 }
 .ct-hud__pip--dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; }
 
-// Pannello info: tra la miniatura e il centro, mai sopra l'arco
+// Pannello info: tra la miniatura e il centro, mai sopra l'arco.
+// Nessun z-index esplicito: resta dietro sia a .ct-hud__thumb (1) sia a
+// .ct-hud__arc (2), che quindi restano sempre visibili/cliccabili anche
+// dove il pannello (vicino all'anello, vedi sotto) ci si sovrappone
+// fisicamente — il suo contenuto pero' non ci finisce mai sotto grazie al
+// padding-left/right aggiunto piu' sotto, che lo tiene oltre la portata
+// dell'arco invece di competere per lo spazio.
 .ct-hud__panel {
     position: absolute;
     top: 34px;
-    // Piu' alto di .ct-hud__thumb (1) e .ct-hud__arc (2): essendo vicino
-    // all'anello (140px, non piu' 213px) il pannello arriva a sovrapporsi
-    // fisicamente alla miniatura — senza questo z-index il suo contenuto
-    // finiva dietro l'immagine del profilo/luogo, tagliato a meta'.
-    z-index: 3;
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.85 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.85 * 100%), transparent));
@@ -226,9 +231,12 @@ body[data-palette="public"] .ct-hud {
 }
 .ct-hud__ring.is-open .ct-hud__panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
 // Vicino all'anello (non piu' a 213px): riduce quanto il pannello arriva
-// a invadere il contenuto della pagina quando e' aperto.
-.ct-hud__ring--left .ct-hud__panel { left: 140px; width: 220px; }
-.ct-hud__ring--right .ct-hud__panel { right: 140px; width: 200px; }
+// a invadere il contenuto della pagina quando e' aperto. Il padding extra
+// sul lato dell'anello (sinistro qui, destro sotto) tiene il CONTENUTO
+// oltre la portata massima dell'arco (raggio 100px + 18px di icona = 118px
+// dal centro anello), anche se il box del pannello ci si sovrappone.
+.ct-hud__ring--left .ct-hud__panel { left: 140px; width: 220px; padding-left: 74px; }
+.ct-hud__ring--right .ct-hud__panel { right: 140px; width: 200px; padding-right: 92px; }
 
 .ct-hud__panel h3 { margin: 0 0 4px; font-size: 15px; color: var(--gold); }
 .ct-hud__panel p { margin: 0; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
@@ -361,10 +369,12 @@ body[data-palette="public"] .ct-hud {
     border: 1px dashed color-mix(in srgb, var(--gold) calc(.45 * 100%), transparent);
     animation: ct-hud-spin 16s linear infinite;
 }
-// Favicon del progetto al posto della scritta "CT".
+// Favicon del progetto al posto della scritta "CT" — piu' grande possibile
+// (82%) lasciando solo un piccolo margine dal bordo del cerchio, che resta
+// della sua dimensione (58px) invariata.
 .ct-hud__brand-mark {
-    width: 60%;
-    height: 60%;
+    width: 82%;
+    height: 82%;
     object-fit: contain;
 }
 
@@ -483,7 +493,12 @@ body[data-palette="public"] .ct-hud {
 
     .ct-hud__panel { display: none; }
 
-    .ct-hud__ring.is-open .ct-hud__sheet-backdrop {
+    // Un solo cerchio alla volta puo' essere aperto su mobile (mutua
+    // esclusivita' gestita in Hud.jsx: toggleMobileMenu chiude gli altri
+    // due quando se ne apre uno), quindi le tre schede possono condividere
+    // la stessa posizione fissa in basso senza mai sovrapporsi davvero.
+    .ct-hud__ring.is-open .ct-hud__sheet-backdrop,
+    .ct-hud__center.is-open .ct-hud__sheet-backdrop {
         display: block;
         position: fixed;
         inset: 0;
@@ -491,26 +506,21 @@ body[data-palette="public"] .ct-hud {
         z-index: 598;
     }
 
-    // A riposo (anello chiuso) non serve renderizzarlo: e' comunque
-    // invisibile/inerte, evita solo di occupare lo stacking context.
-    .ct-hud__arc { display: none; }
+    // A riposo non serve renderizzarli: sono comunque invisibili/inerti,
+    // evita solo di occupare lo stacking context.
+    .ct-hud__arc, .ct-hud__center-arc { display: none; }
 
-    .ct-hud__ring--left.is-open .ct-hud__arc {
-        bottom: 0;
-    }
-    .ct-hud__ring--right.is-open .ct-hud__arc {
-        bottom: 42vh;
-    }
     .ct-hud__ring--left.is-open .ct-hud__arc,
-    .ct-hud__ring--right.is-open .ct-hud__arc {
+    .ct-hud__ring--right.is-open .ct-hud__arc,
+    .ct-hud__center.is-open .ct-hud__center-arc {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
         gap: 12px;
         position: fixed;
-        top: auto; left: 0; right: 0;
+        bottom: 0; top: auto; left: 0; right: 0;
         transform: none;
         z-index: 600;
-        max-height: 42vh;
+        max-height: 55vh;
         overflow-y: auto;
         background: linear-gradient(160deg, var(--ink-light), var(--ink-deep));
         border-top: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
@@ -519,7 +529,8 @@ body[data-palette="public"] .ct-hud {
         box-shadow: 0 -12px 40px rgba(0, 0, 0, .5);
     }
 
-    .ct-hud__ring.is-open .ct-hud__icon {
+    .ct-hud__ring.is-open .ct-hud__icon,
+    .ct-hud__center.is-open .ct-hud__icon {
         // position:relative ancora .ct-hud__pip (altrimenti, senza un
         // antenato posizionato piu' vicino, si ancorerebbe alla scheda fixed)
         position: relative;

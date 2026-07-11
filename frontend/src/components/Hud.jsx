@@ -58,6 +58,19 @@ export default function Hud({ isStaff }) {
 
     const hudRef = useRef(null)
 
+    // Sotto i 680px gli anelli diventano schede a comparsa (vedi _hud.scss):
+    // stessa soglia qui, per far si' che cliccare i CERCHI stessi (non solo
+    // il logo centrale) apra/chiuda la propria scheda in modo indipendente
+    // — su desktop i cerchi restano invece dedicati a modale luogo/scheda
+    // personaggio (vedi thumb onClick sotto).
+    const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 680px)').matches)
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 680px)')
+        const onChange = e => setIsMobile(e.matches)
+        mq.addEventListener('change', onChange)
+        return () => mq.removeEventListener('change', onChange)
+    }, [])
+
     // Palette scelta in Preferenze.jsx > Colori land (localStorage, solo
     // client) — riapplicata qui ad ogni pagina perche' Hud.jsx e' l'unico
     // componente sempre montato; senza, tornerebbe al default a ogni reload.
@@ -249,6 +262,16 @@ export default function Hud({ isStaff }) {
         else window.top.location.href = url
     }, [nome])
 
+    // ── Mobile: ogni cerchio apre/chiude la propria scheda in modo indipendente,
+    // a discapito delle altre due (solo una alla volta, come un accordion) —
+    // su desktop i tre cerchi restano dedicati a modale luogo/scheda/arco
+    // rapido invece di aprire un menu proprio.
+    const toggleMobileMenu = which => {
+        setLeftOpen(which === 'left' && !leftOpen)
+        setRightOpen(which === 'right' && !rightOpen)
+        setCenterOpen(which === 'center' && !centerOpen)
+    }
+
     // ── Icona chatbot: apre il widget flottante (gia' montato altrove) ──────
     const openChatbot = e => {
         e.preventDefault()
@@ -305,7 +328,7 @@ export default function Hud({ isStaff }) {
 
             {/* ============ ANELLO SINISTRO: LUOGO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--left${leftOpen ? ' is-open' : ''}`}>
-                <button type="button" className="ct-hud__thumb" onClick={() => setShowLocationDesc(true)} title={location?.nome ?? 'Luogo'}>
+                <button type="button" className="ct-hud__thumb" onClick={() => isMobile ? toggleMobileMenu('left') : setShowLocationDesc(true)} title={location?.nome ?? 'Luogo'}>
                     {locationImg && !locationImgFailed
                         ? <img src={locationImg} alt={location?.nome ?? ''} onError={() => setLocationImgFailed(true)} />
                         : <i className="fa-solid fa-city" />
@@ -351,7 +374,7 @@ export default function Hud({ isStaff }) {
 
             {/* ============ ANELLO DESTRO: PERSONAGGIO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--right${rightOpen ? ' is-open' : ''}`}>
-                <button type="button" className="ct-hud__thumb" onClick={goToOwnScheda} title={nome}>
+                <button type="button" className="ct-hud__thumb" onClick={() => isMobile ? toggleMobileMenu('right') : goToOwnScheda()} title={nome}>
                     {avatar ? <img src={avatar} alt={nome} /> : <i className="fa-solid fa-user" />}
                 </button>
 
@@ -434,6 +457,7 @@ export default function Hud({ isStaff }) {
             <div className={`ct-hud__center${centerOpen ? ' is-open' : ''}`}
                 onMouseEnter={() => setCenterOpen(true)} onMouseLeave={() => setCenterOpen(false)}>
                 <button type="button" className="ct-hud__brand" title="Mostra il menu" onClick={() => {
+                    if (isMobile) { toggleMobileMenu('center'); return }
                     const open = !(leftOpen && rightOpen)
                     setLeftOpen(open)
                     setRightOpen(open)
@@ -442,6 +466,10 @@ export default function Hud({ isStaff }) {
                     <span className="ct-hud__brand-ring" />
                     <img className="ct-hud__brand-mark" src="/imgs/favicon.ico" alt="Crystal Tokyo" />
                 </button>
+
+                {/* Solo mobile (vedi _hud.scss): sfondo scuro dietro la scheda a
+                    comparsa dal basso, tocca per chiuderla. */}
+                <div className="ct-hud__sheet-backdrop" onClick={() => setCenterOpen(false)} />
 
                 <div className="ct-hud__center-arc">
                     <a className="ct-hud__icon" style={arcIcon(-60, 0)}
