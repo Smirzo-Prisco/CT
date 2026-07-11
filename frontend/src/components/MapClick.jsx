@@ -356,7 +356,9 @@ export default function MapClick() {
                         {selectedZone.rooms.map(room => (
                             <span key={room.id} className="map-zone-room" onClick={() => navigate(room)}>
                                 <span className="map-zone-room__avatar">
-                                    <img src={`/themes/crystal/imgs/maps/${room.img}`} alt="" />
+                                    <span className="map-zone-room__avatar-img">
+                                        <img src={`/themes/crystal/imgs/maps/${room.img}`} alt="" />
+                                    </span>
                                     {room.count > 0 && <span className="map-zone-room__badge">{room.count}</span>}
                                 </span>
                                 <span className="map-zone-room__name">{room.nome}</span>

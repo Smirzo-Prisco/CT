@@ -190,18 +190,26 @@
 
     // Larghezza automatica: segue quella reale dell'immagine (a parita' di
     // altezza 30px) invece di forzare un quadrato che la ritaglia/deforma.
+    // position:relative ma NIENTE overflow:hidden qui: serve solo da
+    // contenitore per il badge, che deve sporgere oltre l'angolo — il
+    // ritaglio (arrotondato) dell'immagine e' sul wrapper interno
+    // __avatar-img, cosi' non taglia piu' anche il badge.
     &__avatar {
         position: relative;
         display: block;
         flex-shrink: 0;
-        width: auto;
-        height: 30px;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid #5c4a26;
-        transition: border-color .15s ease;
 
-        img { display: block; width: auto; height: 100%; }
+        &-img {
+            display: block;
+            width: auto;
+            height: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #5c4a26;
+            transition: border-color .15s ease;
+
+            img { display: block; width: auto; height: 100%; }
+        }
     }
 
     &__name {
@@ -216,7 +224,7 @@
         border-color: #c4922a;
         background: #1f2540;
     }
-    &:hover .map-zone-room__avatar { border-color: #daa832; }
+    &:hover .map-zone-room__avatar-img { border-color: #daa832; }
 
     &__badge {
         position: absolute;
