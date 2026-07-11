@@ -50,11 +50,17 @@ const ROPPONGI_EXTRA_ROOM = {
 }
 
 // Pin dedicati per zona (SVG, sfondo gia' trasparente) al posto del
-// medaglione generico map-pin.jpg — solo per le zone elencate qui, le
-// altre restano sul pin generico. Chiave = zone.nome da api_map.php?op=zones.
+// medaglione generico map-pin.jpg. Chiave = zone.nome da api_map.php?op=zones.
 const ZONE_PIN_IMAGES = {
     Shibuya: 'pin-shibuya.svg',
     Odaiba: 'pin-odaiba.svg',
+    Fuji: 'pin-fuji.svg',
+    Ueno: 'pin-ueno.svg',
+    Shinjuku: 'pin-shinjuku.svg',
+    Chiyoda: 'pin-chiyoda.svg',
+    Roppongi: 'pin-roppongi.svg',
+    Asakusa: 'pin-asakusa.svg',
+    Tsukiji: 'pin-tsukiji.svg',
 }
 
 // ---------------------------------------------------------------------------

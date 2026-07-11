@@ -1,5 +1,5 @@
 <svg width="100%" viewBox="0 0 680 660" xmlns="http://www.w3.org/2000/svg" role="img">
-<title>Pin Odaiba, versione ad alto contrasto per uso in miniatura</title>
+<title>Pin Fuji, versione ad alto contrasto per uso in miniatura</title>
 <desc>Un'icona pin circolare con anello dorato spesso, bordo scuro esterno per contrasto, interno beige chiaro, kanji grande al centro, punta inferiore, su sfondo trasparente.</desc>
 <defs>
 <linearGradient id="goldGradB" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -35,7 +35,7 @@
 <line x1="468" y1="230" x2="498" y2="230"/>
 </g>
 
-<text x="340" y="266" text-anchor="middle" font-size="120" fill="#241a08" font-family="'Noto Sans JP','Hiragino Sans',sans-serif" font-weight="700">台場</text>
+<text x="340" y="266" text-anchor="middle" font-size="120" fill="#241a08" font-family="'Noto Sans JP','Hiragino Sans',sans-serif" font-weight="700">富士</text>
 
 <circle cx="340" cy="230" r="158" fill="none" stroke="#5c440f" stroke-width="2"/>
 </svg>
