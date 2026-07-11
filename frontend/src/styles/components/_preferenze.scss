@@ -21,6 +21,11 @@ $pref-muted:   #7a8499;
     color: $pref-text;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
+    // .link_back e' centrato di default (regola globale in _layout.scss,
+    // condivisa con decine di altre pagine PHP legacy) — qui va invece in
+    // alto a sinistra, override scoped a questa sola pagina.
+    .link_back { text-align: left; }
+
     &__title {
         font-family: 'Cinzel', 'Georgia', serif;
         font-size: 16px;
