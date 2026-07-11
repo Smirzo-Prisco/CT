@@ -99,13 +99,13 @@ body[data-palette="public"] .ct-hud {
 // ── ANELLI (sinistra/destra) ─────────────────────────────────
 .ct-hud__ring {
     position: absolute;
-    top: 0;
+    top: 5px;
     width: 173px;
     height: 173px;
     transform-origin: top left;
 }
-.ct-hud__ring--left { left: 22px; }
-.ct-hud__ring--right { right: 22px; transform-origin: top right; }
+.ct-hud__ring--left { left: 5px; }
+.ct-hud__ring--right { right: 5px; transform-origin: top right; }
 
 // Miniatura: 30% piu' piccola a riposo, dimensione piena da aperta
 .ct-hud__thumb {
