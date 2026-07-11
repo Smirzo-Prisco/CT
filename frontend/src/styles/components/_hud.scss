@@ -15,7 +15,16 @@
 // ============================================================
 @use '../tokens' as *;
 
-.ct-hud {
+// Le custom property vivono su body (non su .ct-hud): l'arco dei due
+// anelli laterali, su mobile, viene portato via React su document.body
+// quando aperto (vedi HudArcSheet in Hud.jsx, e il commento sul containing
+// block piu' sotto in RESPONSIVE) — un discendente diretto di <body>, non
+// piu' di .ct-hud. Se le variabili restassero scopate a .ct-hud, quel
+// contenuto portato non le erediterebbe piu' (var(--ink-light) ecc.
+// risolverebbero a niente), lasciando la card della scheda mobile senza
+// sfondo/bordo — esattamente il bug osservato (il centro, mai portato,
+// funzionava; sinistra/destra no).
+body {
     --ink-deep: #08091a;
     --ink: #10142a;
     --ink-light: #161b35;
@@ -26,7 +35,9 @@
     --muted: #7a8499;
     --danger: #ff6b6b;
     --radius: 16px;
+}
 
+.ct-hud {
     position: fixed;
     inset: 0;
     z-index: 500;
@@ -39,38 +50,39 @@
 // ── VARIANTI PALETTE ("Colori land", vedi Preferenze.jsx) ─────
 // Applicate come body[data-palette="X"]: Hud.jsx legge la scelta salvata in
 // localStorage al mount e la riapplica su <body> ad ogni pagina. Solo ink/
-// gold cambiano — struttura, layout e testo restano identici.
-body[data-palette="obsidian"] .ct-hud {
+// gold cambiano — struttura, layout e testo restano identici. Scopate
+// direttamente su body (vedi sopra), non su .ct-hud, per lo stesso motivo.
+body[data-palette="obsidian"] {
     --ink-deep: #07070a; --ink: #111116; --ink-light: #1c1c24;
     --gold: #c9a45c; --gold-deep: #8f6e34;
 }
-body[data-palette="petrol"] .ct-hud {
+body[data-palette="petrol"] {
     --ink-deep: #0c262c; --ink: #123339; --ink-light: #1d4750;
     --gold: #d8b26a; --gold-deep: #a9793a;
 }
-body[data-palette="indigo"] .ct-hud {
+body[data-palette="indigo"] {
     --ink-deep: #17102b; --ink: #241a3f; --ink-light: #362958;
     --gold: #e6b49c; --gold-deep: #b97f5f;
 }
-body[data-palette="cyan"] .ct-hud {
+body[data-palette="cyan"] {
     --ink-deep: #061c30; --ink: #0c2a4a; --ink-light: #163f6c;
     --gold: #2fe0d1; --gold-deep: #16a394;
 }
-body[data-palette="emerald"] .ct-hud {
+body[data-palette="emerald"] {
     --ink-deep: #082620; --ink: #0d3a2f; --ink-light: #155a48;
     --gold: #d8b26a; --gold-deep: #a9793a;
 }
-body[data-palette="forest"] .ct-hud {
+body[data-palette="forest"] {
     --ink-deep: #0d2216; --ink: #14301f; --ink-light: #1d4530;
     --gold: #f2e9d8; --gold-deep: #cbb98e;
 }
-body[data-palette="navy-mustard"] .ct-hud {
+body[data-palette="navy-mustard"] {
     --ink-deep: #081527; --ink: #0d1f3a; --ink-light: #16305a;
     --gold: #c99a3d; --gold-deep: #96701f;
 }
-// "public" e' anche il default (--ink/--gold su .ct-hud sopra) — presente
+// "public" e' anche il default (--ink/--gold su body sopra) — presente
 // qui solo per poterla riselezionare esplicitamente tornando da un'altra.
-body[data-palette="public"] .ct-hud {
+body[data-palette="public"] {
     --ink-deep: #08091a; --ink: #10142a; --ink-light: #161b35;
     --gold: #daa832; --gold-deep: #c4922a;
 }
