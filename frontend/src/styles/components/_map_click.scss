@@ -43,7 +43,12 @@
         &--custom {
             width: 84px;
             height: auto;
-            border-radius: 0;
+            // border-radius (non overflow:hidden, che ritaglierebbe la punta
+            // inferiore) solo per dare forma circolare alla pulsazione
+            // (box-shadow segue il border-radius del box): senza, l'animazione
+            // map-pin-pulse appariva come un'ombra quadrata invece che un
+            // cerchio che si espande dal medaglione.
+            border-radius: 50%;
             object-fit: contain;
             mix-blend-mode: normal;
             filter: drop-shadow(0 0 6px rgba(255, 210, 120, .75)) drop-shadow(0 2px 4px rgba(0, 0, 0, .6));
