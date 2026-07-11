@@ -161,8 +161,8 @@ body[data-palette="public"] .ct-hud {
 .ct-hud__icon {
     position: absolute;
     top: 0; left: 0;
-    width: 36px; height: 36px;
-    margin: -18px 0 0 -18px;
+    width: 40px; height: 40px;
+    margin: -20px 0 0 -20px;
     border-radius: 50%;
     background: var(--ink);
     border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
@@ -447,45 +447,56 @@ body[data-palette="public"] .ct-hud {
 // ── RESPONSIVE ────────────────────────────────────────────────
 // Regola permanente: l'HUD resta SEMPRE absolute/fixed sugli angoli, non
 // passa mai a static.
+//
+// .ct-hud__arc e' scalato ANCHE dal proprio transform (oltre a ereditare
+// visivamente quello del genitore .ct-hud__ring, essendo transform
+// annidati) — qui lo si sovrascrive con un fattore "boost" che compensa
+// esattamente lo scale dell'anello, cosi' l'effetto finale (chiuso .7,
+// aperto 1, gli STESSI valori del desktop non scalato) resta identico a
+// ogni breakpoint invece di saltare bruscamente al cambio soglia.
+// boost = target_desktop / scale_anello_di_questa_soglia.
 @media (max-width: 1080px) {
     .ct-hud__ring { transform: scale(.82); }
+    .ct-hud__arc { transform: scale(.854); } // .7/.82
+    .ct-hud__ring.is-open .ct-hud__arc { transform: scale(1.22); } // 1/.82
 }
 
-// Ancora un ventaglio radiale (schermo abbastanza largo da reggerlo): .ct-hud__arc
-// e' scalato ANCHE dal proprio transform (oltre a ereditare visivamente quello
-// del genitore, essendo transform annidati) — qui lo si sovrascrive con un
-// fattore "boost" che compensa esattamente lo scale dell'anello (.68), cosi'
-// le icone restano vicine alla dimensione reale (~40px aperte) invece di
-// rimpicciolirsi con lui.
 @media (max-width: 860px) {
     .ct-hud__ring { transform: scale(.68); }
-    .ct-hud__arc { transform: scale(1); }
-    .ct-hud__ring.is-open .ct-hud__arc { transform: scale(1.47); }
+    .ct-hud__arc { transform: scale(1.03); } // .7/.68
+    .ct-hud__ring.is-open .ct-hud__arc { transform: scale(1.47); } // 1/.68
     .ct-hud__panel p { display: none; }
     .ct-hud__popover { width: 240px; left: 100px; }
 }
 
-// ── MOBILE (≤680px): l'arco diventa una scheda ancorata in basso ──────────
-// Anche un ventaglio "gonfiato" (boost) resta troppo affollato per toccare
-// le singole icone senza errori sotto i 680px — le icone finiscono vicine
-// tra loro e ai bordi schermo (feedback utente: "groviglio impossibile da
-// cliccare"). Qui l'arco smette di essere un ventaglio radiale e diventa una
-// scheda a schermo intero con le icone in griglia, ciascuna con margini
-// generosi. L'etichetta sotto l'icona riusa l'attributo title gia' presente
-// per il tooltip via content:attr(title) — nessun markup duplicato.
+// ── MOBILE (≤680px): colonna di icone circolari che scende sul contenuto ──
+// Un ventaglio radiale (anche "gonfiato" con un boost di scala) resta
+// troppo affollato per toccare le singole icone senza errori sotto i
+// 680px (feedback utente: "groviglio impossibile da cliccare"). Qui
+// l'arco smette di essere un ventaglio e diventa una colonna verticale di
+// icone circolari — stesso stile tondo di quelle desktop, solo piu'
+// grandi per il tocco — che scende dal cerchio verso il basso, sopra il
+// contenuto della pagina (non piu' una scheda a tutto schermo ancorata in
+// fondo). L'etichetta accanto a ciascuna riusa l'attributo title gia'
+// presente per il tooltip via content:attr(title) — nessun markup
+// duplicato.
 //
-// Il logo centrale apre entrambi gli anelli insieme: le due schede si
-// impilano (sinistra in basso, destra appena sopra) invece di finire una
-// sopra l'altra nello stesso rettangolo.
+// Un solo cerchio alla volta puo' essere aperto (mutua esclusivita'
+// gestita in Hud.jsx: toggleMobileMenu chiude gli altri due quando se ne
+// apre uno), quindi le tre colonne condividono la stessa fascia di
+// schermo senza mai sovrapporsi davvero.
 //
 // Il pannello info (nome/descrizione) viene nascosto: e' un supplemento,
-// non essenziale alla navigazione, e non c'e' un modo pulito per impilarlo
-// sopra la scheda senza una misura via JS dell'altezza reale.
+// non essenziale alla navigazione.
 @media (max-width: 680px) {
+    // I tre cerchi allineati sullo stesso asse centrale verticale:
+    // l'anello (scale .5 di un box 173px, ancorato in alto a top:6px) ha
+    // il centro a 6+173*.5/2=49px — il logo (58px scalato a 50px, box
+    // proprio) viene spostato con lo stesso centro (24+50/2=49px).
     .ct-hud__ring { top: 6px; transform: scale(.5); }
     .ct-hud__ring--left { left: 6px; }
     .ct-hud__ring--right { right: 6px; }
-    .ct-hud__center { top: 6px; }
+    .ct-hud__center { top: 24px; }
     .ct-hud__brand { width: 50px; height: 50px; font-size: 14px; }
 
     // left:140px (impostato sopra per desktop) sfonderebbe a destra su
@@ -494,16 +505,12 @@ body[data-palette="public"] .ct-hud {
 
     .ct-hud__panel { display: none; }
 
-    // Un solo cerchio alla volta puo' essere aperto su mobile (mutua
-    // esclusivita' gestita in Hud.jsx: toggleMobileMenu chiude gli altri
-    // due quando se ne apre uno), quindi le tre schede possono condividere
-    // la stessa posizione fissa in basso senza mai sovrapporsi davvero.
     .ct-hud__ring.is-open .ct-hud__sheet-backdrop,
     .ct-hud__center.is-open .ct-hud__sheet-backdrop {
         display: block;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, .55);
+        background: rgba(0, 0, 0, .45);
         z-index: 598;
     }
 
@@ -511,83 +518,29 @@ body[data-palette="public"] .ct-hud {
     // evita solo di occupare lo stacking context.
     .ct-hud__arc, .ct-hud__center-arc { display: none; }
 
-    // Aspetto condiviso della scheda (fixed in basso, sfondo, ombra): il
-    // CONTENUTO invece si dispone diversamente — lista verticale per i
-    // cerchi laterali, griglia per il logo centrale (poche voci, ci sta
-    // comoda su piu' colonne senza diventare una lunga lista).
     .ct-hud__ring--left.is-open .ct-hud__arc,
     .ct-hud__ring--right.is-open .ct-hud__arc,
     .ct-hud__center.is-open .ct-hud__center-arc {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
         position: fixed;
-        bottom: 0; top: auto; left: 0; right: 0;
+        top: 100px;
         transform: none;
         z-index: 600;
-        max-height: 55vh;
-        overflow-y: auto;
-        background: linear-gradient(160deg, var(--ink-light), var(--ink-deep));
-        border-top: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
-        border-radius: 20px 20px 0 0;
-        padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
-        box-shadow: 0 -12px 40px rgba(0, 0, 0, .5);
     }
-    .ct-hud__ring--left.is-open .ct-hud__arc,
-    .ct-hud__ring--right.is-open .ct-hud__arc {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-    .ct-hud__center.is-open .ct-hud__center-arc {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-        gap: 12px;
-    }
+    .ct-hud__ring--left.is-open .ct-hud__arc { left: 16px; align-items: flex-start; }
+    .ct-hud__ring--right.is-open .ct-hud__arc { right: 16px; align-items: flex-end; }
+    .ct-hud__center.is-open .ct-hud__center-arc { left: 50%; transform: translateX(-50%); align-items: center; }
 
-    // Cerchi laterali: icona + etichetta affiancate, una per riga.
-    .ct-hud__ring.is-open .ct-hud__icon {
-        // position:relative ancora .ct-hud__pip (altrimenti, senza un
-        // antenato posizionato piu' vicino, si ancorerebbe alla scheda fixed)
-        position: relative;
-        width: auto; height: auto;
-        margin: 0;
-        padding: 12px 16px;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 14px;
-        font-size: 18px;
-
-        &, &:hover, &:active, &:focus, &:focus-visible {
-            transform: none !important;
-        }
-
-        &::after {
-            content: attr(title);
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text);
-        }
-    }
-    // Vicino all'icona (non nell'angolo della riga, ormai larga quanto lo
-    // schermo): l'icona e' sempre la prima cosa a sinistra nella riga.
-    .ct-hud__ring.is-open .ct-hud__pip {
-        top: 8px; left: 28px; right: auto;
-        transform: none;
-    }
-
-    // Logo centrale: icona sopra, etichetta sotto, piu' voci per riga.
+    // Icona circolare (stesso stile del cerchio desktop, un po' piu'
+    // grande per il tocco) + etichetta accanto, non piu' sotto/dentro.
+    .ct-hud__ring.is-open .ct-hud__icon,
     .ct-hud__center.is-open .ct-hud__icon {
         position: relative;
-        width: auto; height: auto;
+        top: auto; left: auto;
+        width: 48px; height: 48px;
         margin: 0;
-        padding: 14px 4px 10px;
-        border-radius: 14px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
         font-size: 20px;
 
         &, &:hover, &:active, &:focus, &:focus-visible {
@@ -596,11 +549,30 @@ body[data-palette="public"] .ct-hud {
 
         &::after {
             content: attr(title);
-            font-size: 10px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
             font-weight: 600;
-            line-height: 1.15;
-            text-align: center;
             color: var(--text);
+            white-space: nowrap;
+            background: rgba(8, 9, 26, .75);
+            padding: 4px 10px;
+            border-radius: 999px;
         }
+    }
+    // Etichetta a destra del cerchio (sinistro/centrale) o a sinistra
+    // (destro, altrimenti sforerebbe fuori schermo).
+    .ct-hud__ring--left.is-open .ct-hud__icon::after,
+    .ct-hud__center.is-open .ct-hud__icon::after {
+        left: calc(100% + 12px);
+    }
+    .ct-hud__ring--right.is-open .ct-hud__icon::after {
+        right: calc(100% + 12px);
+    }
+
+    .ct-hud__ring.is-open .ct-hud__pip {
+        top: -4px; right: -4px; left: auto;
+        transform: none;
     }
 }
