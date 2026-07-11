@@ -85,15 +85,53 @@
     box-sizing: border-box;
     text-align: center;
     background: linear-gradient(160deg, rgba(22, 27, 53, .7), rgba(8, 9, 26, .7));
-    border-top: 1px solid rgba(218, 168, 50, .3);
-    border-radius: 20px 20px 0 0;
-    padding: 18px 20px calc(18px + env(safe-area-inset-bottom, 0px));
-    box-shadow: 0 -14px 40px -8px rgba(0, 0, 0, .55);
+    // Forma asimmetrica (non il solito rettangolo con angoli tutti uguali) +
+    // bagliore interno sottile sul bordo, in tema con l'oro della cornice
+    // disegnata sulla mappa.
+    border-radius: 34px 14px 0 0;
+    padding: 30px 20px calc(18px + env(safe-area-inset-bottom, 0px));
+    box-shadow:
+        0 -14px 40px -8px rgba(0, 0, 0, .55),
+        inset 0 1px 0 rgba(218, 168, 50, .15);
     color: #e8e4da;
     transition: background .25s ease;
 
     &:hover, &:focus-within {
         background: linear-gradient(160deg, rgba(22, 27, 53, .92), rgba(8, 9, 26, .95));
+    }
+
+    // Nastro a zigzag "cristallino" lungo il bordo superiore, al posto di
+    // una linea piatta — stessa tecnica delle onde CSS (due gradient a 45°
+    // affiancati e sfasati di meta' tile), tinta oro come il resto
+    // dell'accento dell'HUD/mappa. top:0 (non negativo): il pannello scrolla
+    // (overflow-y:auto), un offset negativo verrebbe tagliato dallo stesso
+    // clipping — il padding-top maggiorato tiene il contenuto sotto libero.
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 10px;
+        background:
+            linear-gradient(135deg, transparent 50%, rgba(218, 168, 50, .65) 50%) 0 0 / 22px 20px repeat-x,
+            linear-gradient(-135deg, rgba(218, 168, 50, .65) 50%, transparent 50%) 11px 0 / 22px 20px repeat-x;
+        filter: drop-shadow(0 0 4px rgba(218, 168, 50, .35));
+        animation: map-zone-shimmer 6s linear infinite;
+        pointer-events: none;
+    }
+
+    // Parentesi dorate agli angoli superiori, come un mirino — richiamano i
+    // raggi decorativi disegnati negli angoli dell'illustrazione della mappa.
+    &::after {
+        content: '';
+        position: absolute;
+        top: 4px; left: 16px; right: 16px;
+        height: 18px;
+        background:
+            linear-gradient(rgba(218, 168, 50, .8), rgba(218, 168, 50, .8)) left top / 2px 18px no-repeat,
+            linear-gradient(rgba(218, 168, 50, .8), rgba(218, 168, 50, .8)) left top / 18px 2px no-repeat,
+            linear-gradient(rgba(218, 168, 50, .8), rgba(218, 168, 50, .8)) right top / 2px 18px no-repeat,
+            linear-gradient(rgba(218, 168, 50, .8), rgba(218, 168, 50, .8)) right top / 18px 2px no-repeat;
+        pointer-events: none;
     }
 
     p {
@@ -102,6 +140,11 @@
         line-height: 1.4;
         color: #7a8499;
     }
+}
+
+@keyframes map-zone-shimmer {
+    0%   { background-position: 0 0, 11px 0; }
+    100% { background-position: 220px 0, 231px 0; }
 }
 
 .map-zone-panel__head {
