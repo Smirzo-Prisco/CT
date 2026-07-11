@@ -236,7 +236,9 @@ body[data-palette="public"] .ct-hud {
 // oltre la portata massima dell'arco (raggio 86.5px + 18px di icona =
 // 104.5px dal centro anello), anche se il box del pannello ci si sovrappone.
 .ct-hud__ring--left .ct-hud__panel { left: 140px; width: 220px; padding-left: 52px; }
-.ct-hud__ring--right .ct-hud__panel { right: 140px; width: 200px; padding-right: 74px; }
+// Piu' largo (era 200px): nome+badge gilda+le tre statistiche vitali si
+// incolonnavano/andavano a capo troppo in uno spazio cosi' stretto.
+.ct-hud__ring--right .ct-hud__panel { right: 140px; width: 280px; padding-right: 74px; }
 
 .ct-hud__panel h3 { margin: 0 0 4px; font-size: 15px; color: var(--gold); }
 .ct-hud__panel p { margin: 0; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
@@ -369,12 +371,11 @@ body[data-palette="public"] .ct-hud {
     border: 1px dashed color-mix(in srgb, var(--gold) calc(.45 * 100%), transparent);
     animation: ct-hud-spin 16s linear infinite;
 }
-// Favicon del progetto al posto della scritta "CT" — piu' grande possibile
-// (82%) lasciando solo un piccolo margine dal bordo del cerchio, che resta
-// della sua dimensione (58px) invariata.
+// Favicon del progetto al posto della scritta "CT" — quasi a filo del
+// bordo del cerchio (92%), che resta della sua dimensione (58px) invariata.
 .ct-hud__brand-mark {
-    width: 82%;
-    height: 82%;
+    width: 92%;
+    height: 92%;
     object-fit: contain;
 }
 
@@ -510,12 +511,13 @@ body[data-palette="public"] .ct-hud {
     // evita solo di occupare lo stacking context.
     .ct-hud__arc, .ct-hud__center-arc { display: none; }
 
+    // Aspetto condiviso della scheda (fixed in basso, sfondo, ombra): il
+    // CONTENUTO invece si dispone diversamente — lista verticale per i
+    // cerchi laterali, griglia per il logo centrale (poche voci, ci sta
+    // comoda su piu' colonne senza diventare una lunga lista).
     .ct-hud__ring--left.is-open .ct-hud__arc,
     .ct-hud__ring--right.is-open .ct-hud__arc,
     .ct-hud__center.is-open .ct-hud__center-arc {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-        gap: 12px;
         position: fixed;
         bottom: 0; top: auto; left: 0; right: 0;
         transform: none;
@@ -528,11 +530,54 @@ body[data-palette="public"] .ct-hud {
         padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
         box-shadow: 0 -12px 40px rgba(0, 0, 0, .5);
     }
+    .ct-hud__ring--left.is-open .ct-hud__arc,
+    .ct-hud__ring--right.is-open .ct-hud__arc {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .ct-hud__center.is-open .ct-hud__center-arc {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+        gap: 12px;
+    }
 
-    .ct-hud__ring.is-open .ct-hud__icon,
-    .ct-hud__center.is-open .ct-hud__icon {
+    // Cerchi laterali: icona + etichetta affiancate, una per riga.
+    .ct-hud__ring.is-open .ct-hud__icon {
         // position:relative ancora .ct-hud__pip (altrimenti, senza un
         // antenato posizionato piu' vicino, si ancorerebbe alla scheda fixed)
+        position: relative;
+        width: auto; height: auto;
+        margin: 0;
+        padding: 12px 16px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px;
+        font-size: 18px;
+
+        &, &:hover, &:active, &:focus, &:focus-visible {
+            transform: none !important;
+        }
+
+        &::after {
+            content: attr(title);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+    }
+    // Vicino all'icona (non nell'angolo della riga, ormai larga quanto lo
+    // schermo): l'icona e' sempre la prima cosa a sinistra nella riga.
+    .ct-hud__ring.is-open .ct-hud__pip {
+        top: 8px; left: 28px; right: auto;
+        transform: none;
+    }
+
+    // Logo centrale: icona sopra, etichetta sotto, piu' voci per riga.
+    .ct-hud__center.is-open .ct-hud__icon {
         position: relative;
         width: auto; height: auto;
         margin: 0;
@@ -557,9 +602,5 @@ body[data-palette="public"] .ct-hud {
             text-align: center;
             color: var(--text);
         }
-    }
-    .ct-hud__ring.is-open .ct-hud__pip {
-        top: 6px; right: 6px;
-        transform: none;
     }
 }
