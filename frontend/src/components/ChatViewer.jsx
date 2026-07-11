@@ -7,8 +7,8 @@ const pct = (value, max) => max > 0 ? Math.max(0, Math.min(100, (value / max) * 
 /** Calcola la posizione fissa del popover accanto all'avatar che l'ha aperto, restando nel viewport. */
 function computePopoverPos(rect) {
   const margin = 8
-  const width = 300
-  const estHeight = 220
+  const width = 210
+  const estHeight = 140
   let left = rect.left
   if (left + width + margin > window.innerWidth) left = Math.max(margin, window.innerWidth - width - margin)
   let top = rect.bottom + margin
