@@ -61,13 +61,17 @@
 
 @keyframes map-pin-float {
     0%, 100% { margin-top: 0; }
-    50% { margin-top: -6px; }
+    50% { margin-top: -14px; }
 }
 
 // ── Pannello zona selezionata ─────────────────────────────────
 // Fisso in basso su un blur, non piu' in flusso sotto la mappa: sulla
 // mappa (spesso piu' alta della viewport) restava fuori vista finche' non
 // si scrollava la pagina.
+//
+// Molto trasparente/sfocato a riposo (si legge la mappa sotto), diventa
+// piu' leggibile al hover/focus (:focus-within copre anche il click su una
+// stanza, che sposta il focus su quell'elemento).
 .map-zone-panel {
     position: fixed;
     left: 0; right: 0; bottom: 0;
@@ -76,13 +80,18 @@
     overflow-y: auto;
     box-sizing: border-box;
     text-align: center;
-    background: linear-gradient(160deg, rgba(22, 27, 53, .88), rgba(8, 9, 26, .93));
-    backdrop-filter: blur(16px);
+    background: linear-gradient(160deg, rgba(22, 27, 53, .35), rgba(8, 9, 26, .4));
+    backdrop-filter: blur(34px);
     border-top: 1px solid rgba(218, 168, 50, .3);
     border-radius: 20px 20px 0 0;
     padding: 18px 20px calc(18px + env(safe-area-inset-bottom, 0px));
     box-shadow: 0 -14px 40px -8px rgba(0, 0, 0, .55);
     color: #e8e4da;
+    transition: background .25s ease;
+
+    &:hover, &:focus-within {
+        background: linear-gradient(160deg, rgba(22, 27, 53, .92), rgba(8, 9, 26, .95));
+    }
 
     p {
         margin: 4px 0 14px;
@@ -119,43 +128,56 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 16px;
+    gap: 10px;
 }
 
-// Immagine cerchiata + nome sotto, invece del vecchio rettangolo senza etichetta.
+// Voce larga (immagine + nome affiancati), non piu' una colonna stretta con
+// avatar cerchiato: immagine a meta' dimensione (30px, era 60px) e angoli
+// smussati invece che tonda.
 .map-zone-room {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 6px;
-    width: 76px;
+    gap: 10px;
+    width: 190px;
+    padding: 6px 12px 6px 6px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(218, 168, 50, .2);
     cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
 
     &__avatar {
         position: relative;
         display: block;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
         overflow: hidden;
-        border: 2px solid rgba(218, 168, 50, .4);
-        transition: border-color .15s ease, transform .15s ease;
+        border: 1px solid rgba(218, 168, 50, .4);
+        transition: border-color .15s ease;
 
         img { display: block; width: 100%; height: 100%; object-fit: cover; }
     }
 
     &__name {
-        font-size: 10.5px;
-        line-height: 1.2;
+        font-size: 11.5px;
+        line-height: 1.25;
         color: #e8e4da;
         white-space: normal;
+        text-align: left;
     }
 
-    &:hover .map-zone-room__avatar { border-color: #daa832; transform: translateY(-3px); }
+    &:hover {
+        border-color: rgba(218, 168, 50, .5);
+        background: rgba(255, 255, 255, .08);
+    }
+    &:hover .map-zone-room__avatar { border-color: #daa832; }
 
     &__badge {
         position: absolute;
-        top: -3px; right: -3px;
+        top: -5px; right: -5px;
         background: #e74c3c;
         color: #fff;
         border-radius: 50%;
