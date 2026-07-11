@@ -105,10 +105,20 @@ async function sendChatMessage() {
             const ta = form.elements["message"]
             if (ta) {
                 ta.style.height = ''
-                // form.reset() non emette 'keyup'/'input', quindi conta() non viene
-                // richiamata da sola: senza questa chiamata esplicita il contatore
-                // caratteri resta fermo all'ultimo valore invece di tornare a 0.
+                // form.reset() non emette 'keyup'/'input', quindi ne' conta() ne' il
+                // listener 'input' del blocco "Limite caratteri - Grafica" (piu' sotto
+                // in questo file) scattano da soli: senza queste chiamate esplicite
+                // restano fermi all'ultimo valore invece di tornare a 0 — sia il
+                // contatore testuale che il bordo/glow/barra colorati in base ai
+                // caratteri rimanenti.
                 if (typeof conta === 'function') conta(ta)
+                ta.style.borderColor = ''
+                ta.style.boxShadow = ''
+                if (typeof progressFill !== 'undefined' && progressFill) {
+                    progressFill.style.width = '0%'
+                    progressFill.style.background = '#4CAF50'
+                    progressFill.style.animation = ''
+                }
             }
 
             // Ripristina il tag salvato in sessione, se necessario
