@@ -231,11 +231,11 @@ public_head(
                         type="image/webp"
                         srcset="/themes/crystal/imgs/gioco_preview-700.webp 700w,
                                 /themes/crystal/imgs/gioco_preview-1400.webp 1400w,
-                                /themes/crystal/imgs/gioco_preview.webp 2857w"
+                                /themes/crystal/imgs/gioco_preview.webp 1600w"
                         sizes="(max-width: 767px) calc(100vw - 48px), calc(50vw - 54px)">
                     <img src="/themes/crystal/imgs/gioco_preview.png"
                          alt="Interfaccia di gioco di Crystal Tokyo"
-                         width="2857" height="1452"
+                         width="1600" height="813"
                          style="width:100%; border-radius:12px; display:block; object-fit:cover;">
                 </picture>
             </div>
