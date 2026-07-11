@@ -340,20 +340,20 @@ export default function Hud({ isStaff }) {
                 <div className="ct-hud__sheet-backdrop" onClick={() => setLeftOpen(false)} />
 
                 <div className="ct-hud__arc">
-                    <a className="ct-hud__icon" style={arcIcon(0, 100)}
+                    <a className="ct-hud__icon" style={arcIcon(0, 87)}
                         href="main.php?page=forum" title="Forum">
                         <i className="fa-solid fa-comments" />
                     </a>
-                    <button type="button" className="ct-hud__icon" style={arcIcon(50, 87)}
+                    <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)}
                         title="Presenti nel luogo" onClick={togglePopover('presence')}>
                         <i className="fa-solid fa-users" />
-                        {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(50, 87)}>{presentiCount}</b>}
+                        {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(43, 75)}>{presentiCount}</b>}
                     </button>
-                    <button type="button" className="ct-hud__icon" style={arcIcon(87, 50)}
+                    <button type="button" className="ct-hud__icon" style={arcIcon(75, 43)}
                         title="Chat off" onClick={togglePopover('chatoff')}>
                         <i className="fa-solid fa-comment-dots" />
                     </button>
-                    <a className="ct-hud__icon" style={arcIcon(100, 0)}
+                    <a className="ct-hud__icon" style={arcIcon(87, 0)}
                         href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Vai alla mappa principale">
                         <i className="fa-solid fa-map-location-dot" />
                     </a>
@@ -383,22 +383,22 @@ export default function Hud({ isStaff }) {
                 <div className="ct-hud__sheet-backdrop" onClick={() => setRightOpen(false)} />
 
                 <div className="ct-hud__arc">
-                    <a className="ct-hud__icon" style={arcIcon(0, 100)}
+                    <a className="ct-hud__icon" style={arcIcon(0, 87)}
                         href="main.php?page=agenda_center" title="Calendario">
                         <i className="fa-solid fa-calendar-days" />
-                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 100)} />}
+                        {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-50, 87)}
+                    <a className="ct-hud__icon" style={arcIcon(-43, 75)}
                         href="main.php?page=role_recap" title="Giocate personali">
                         <i className="fa-solid fa-scroll" />
-                        {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-50, 87)} title="Giocata in corso" />}
+                        {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-43, 75)} title="Giocata in corso" />}
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-87, 50)}
+                    <a className="ct-hud__icon" style={arcIcon(-75, 43)}
                         href="main.php?page=messages_center&offset=0" title="Messaggi">
                         <i className="fa-solid fa-envelope" />
-                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-87, 50)} />}
+                        {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-75, 43)} />}
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-100, 0)}
+                    <a className="ct-hud__icon" style={arcIcon(-87, 0)}
                         href="#" title="Assistente" onClick={openChatbot}>
                         <i className="fa-solid fa-robot" />
                     </a>
