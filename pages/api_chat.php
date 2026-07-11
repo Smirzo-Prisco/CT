@@ -787,8 +787,12 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         $add_chat .= '<span class="chat_name"><a href="main.php?page=scheda&pg='.$row['mittente'].'">'.$row['mittente'].'</a>';
                         if (!empty($row['destinatario'])) $add_chat .= '<span class="chat_tag"> [<font color=#d89d8c>'.gdrcd_filter('out',$row['destinatario']).'</font>]</span>';
                         $add_chat .= ': </span>';
+                        // Niente <br> qui: l'avatar (float) va inserito nel flusso SUBITO
+                        // dopo i ":" cosi' il messaggio continua sulla stessa riga invece
+                        // di andare a capo. L'header sopra resta comunque al sicuro dal
+                        // float perche' e' gia' stato renderizzato prima che il float
+                        // esista nel flusso (i float influenzano solo cio' che viene dopo).
                         if (!empty($row['url_img_chat'])) {
-                            $add_chat .= '<br />';
                             if ($PARAMETERS['mode']['chat_avatar']=='ON') {
                                 $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar" data-pg="'.gdrcd_filter('out',$row['mittente']).'" style="width:'.$PARAMETERS['settings']['chat_avatar']['width'].'px; height:'.$PARAMETERS['settings']['chat_avatar']['height'].'px;" />';
                             }
@@ -809,7 +813,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         if(!empty($row['destinatario'])) $add_chat .= '<span class="chat_tag"> ['.gdrcd_filter('out',$row['destinatario']).']</span>';
                         $add_chat .= '</span>';
                         if (!empty($row['url_img_chat'])) {
-                            $add_chat .= '<br />';
                             if ($PARAMETERS['mode']['chat_avatar']=='OFF') {
                                 $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar" data-pg="'.gdrcd_filter('out',$row['mittente']).'" style="width:'.$PARAMETERS['settings']['chat_avatar']['width'].'px; height:'.$PARAMETERS['settings']['chat_avatar']['height'].'px;" />';
                             }
