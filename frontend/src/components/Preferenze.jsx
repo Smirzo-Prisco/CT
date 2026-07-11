@@ -19,6 +19,11 @@
 
 import { useState, useCallback } from 'react'
 
+function navigate(url) {
+    if (window.CT?.navigate) window.CT.navigate(url)
+    else window.top.location.href = url
+}
+
 // ---------------------------------------------------------------------------
 // DATI STATICI
 // ---------------------------------------------------------------------------
@@ -75,6 +80,10 @@ export default function Preferenze() {
 
     return (
         <div className="preferenze-page">
+
+            <div className="link_back">
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
+            </div>
 
             <div className="preferenze-page__title">Preferenze</div>
 
