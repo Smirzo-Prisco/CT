@@ -1825,47 +1825,39 @@ button.chat_button {
 // ── Avatar inline nella riga chat ────────────────────────────
 
 img.chat_avatar_inline {
-    width: 36px;
-    height: 36px;
+    // float, non inline-block: con inline-block l'immagine si comporta come
+    // un carattere gigante dentro la SUA riga, che quindi diventa piu' alta
+    // delle righe di testo successive quando il messaggio va a capo (grosso
+    // "salto" fra la prima riga e la seconda). Con float il testo (nome,
+    // orario, messaggio) gli scorre invece attorno per tutta la sua altezza
+    // — righe piu' strette finche' non superano il fondo dell'immagine, poi
+    // tornano a piena larghezza — mantenendo l'interlinea normale ovunque.
+    float: left;
+    shape-outside: circle(50%);
+    width: 72px;
+    height: 72px;
     border-radius: $radius-full;
     object-fit: cover;
-    vertical-align: middle;
-    margin: 0 4px;
-    display: inline-block;
+    margin: 0 $space-2 $space-1 0;
     cursor: pointer;
-    // Nessun line-height esplicito sulla riga (chat_row_P/A): il browser
-    // espande da solo la sola linea che contiene l'avatar per fargli
-    // spazio, senza toccare l'interlinea delle righe di testo successive
-    // quando il messaggio va a capo.
-    transition: transform .15s ease;
-
-    &:hover {
-        transform: scale(1.08);
-    }
 }
 
-// ── Popover statistiche personaggio (click su avatar in chat) ─
-.pg-popover-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgb(0 0 0 / 55%);
-    z-index: 10050;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: $space-4;
-}
-
+// ── Popover statistiche personaggio (hover/tap su avatar in chat) ─
+// position:fixed, non un overlay a schermo intero: si apre accanto
+// all'avatar (coordinate calcolate in JS via getBoundingClientRect) e si
+// chiude da solo su mouseout (desktop) o tap fuori (mobile, via listener
+// su document — vedi ChatViewer.jsx).
 .pg-popover {
-    position: relative;
-    width: 100%;
-    max-width: 320px;
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - #{$space-4} * 2);
     background: linear-gradient(160deg, $palette-surface-raised, $color-bg);
     border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
     border-radius: $radius-lg;
     box-shadow: $shadow-lg;
     padding: $space-5;
     color: $color-text-light;
+    z-index: 10050;
 }
 
 .pg-popover__close {
@@ -1907,13 +1899,20 @@ img.chat_avatar_inline {
     width: 100%;
     height: 10px;
     background: $color-surface-input;
-    border-radius: $radius-full;
+    // $radius-full e' 50% — corretto per un cerchio (lato = lato), ma su
+    // una barra larga e bassa (~280x10px) i due raggi non sono uguali:
+    // border-radius:50% viene calcolato separatamente su larghezza e
+    // altezza, quindi ogni angolo diventa un'ellisse enorme che si fonde
+    // con quella opposta, deformando l'intera barra in una lente ovale.
+    // Un valore fisso e generoso in px da invece il classico effetto
+    // "pillola" a prescindere da quanto la barra sia larga.
+    border-radius: 999px;
     overflow: hidden;
 }
 
 .pg-popover__fill {
     height: 100%;
-    border-radius: $radius-full;
+    border-radius: 999px;
     transition: width .3s ease;
 
     &--salute { background: $color-danger; }
@@ -1924,7 +1923,7 @@ img.chat_avatar_inline {
     display: inline-block;
     margin-top: $space-2;
     padding: $space-1 $space-3;
-    border-radius: $radius-full;
+    border-radius: 999px;
     background: color-mix(in srgb, var(--color-warning) 25%, transparent);
     color: $color-warning;
     font-weight: $font-weight-bold;
