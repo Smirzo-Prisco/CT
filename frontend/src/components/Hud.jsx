@@ -323,6 +323,18 @@ export default function Hud({ isStaff }) {
     const togglePopover = (name) => (e) => {
         e.stopPropagation()
         setOpenPopover(p => (p === name ? null : name))
+        // Su mobile l'arco/lo sfondo scuro dell'anello aperto sono in
+        // portal su document.body con z-index molto alto (598, vedi
+        // _hud.scss) per stare sopra la scheda a griglia — ma questo li
+        // teneva sopra anche al popover (z-index piu' basso, scoped dentro
+        // .ct-hud), intercettando il tap su "Vedi tutti"/i link di
+        // ChattingOff invece di raggiungerli: il popover appariva ma non
+        // si riusciva a interagirci. Chiudendo l'anello, il portal si
+        // smonta e il popover resta l'unica cosa sopra.
+        if (isMobile) {
+            setLeftOpen(false)
+            setRightOpen(false)
+        }
     }
 
     // Click su un link dentro un popover (es. un personaggio nella lista
