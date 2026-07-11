@@ -195,7 +195,9 @@ p:last-child { margin-bottom: 0; }
 .pub-hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(160deg, rgba(8,9,26,0.88) 0%, rgba(8,9,26,0.70) 50%, rgba(8,9,26,0.92) 100%);
+    background:
+        linear-gradient(160deg, rgba(8,9,26,0.88) 0%, rgba(8,9,26,0.70) 50%, rgba(8,9,26,0.92) 100%),
+        var(--pub-hero-overlay-img, none) center / cover no-repeat;
     z-index: 0;
 }
 

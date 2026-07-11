@@ -94,8 +94,10 @@ public_head(
 <section class="pub-hero"
          style="background-image: url('/themes/crystal/imgs/homepage.png');">
 
-    <!-- Overlay sfumato per leggibilità testo -->
-    <div class="pub-hero-overlay"></div>
+    <!-- Overlay sfumato per leggibilità testo, con l'illustrazione della mappa di gioco
+         sotto (vedi --pub-hero-overlay-img in critical.css, cosi' il gradiente sopra
+         resta definito in un unico posto invece che duplicato qui). -->
+    <div class="pub-hero-overlay" style="--pub-hero-overlay-img: url('/themes/crystal/imgs/maps/mappa_notte.png');"></div>
 
     <div class="pub-hero-content">
         <!-- Eyebrow tag sopra il titolo -->
