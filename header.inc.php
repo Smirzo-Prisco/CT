@@ -174,17 +174,25 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         window.ctSocket = null;
         </script>
 
-        <!-- CT_ASSET_VERSIONS: mtime dei file includes/*.js caricati dinamicamente da React
-             (chat.js, role_session.js, ecc.) — nginx li mette in cache 1 anno assumendo
-             URL versionati con ?v=; senza questo, il browser non vede mai gli aggiornamenti. -->
+        <!-- CT_ASSET_VERSIONS: mtime di file statici caricati dinamicamente da React
+             (chat.js, role_session.js, ecc. + le immagini mappa giorno/notte) — nginx
+             li mette in cache 1 anno assumendo URL versionati con ?v=; senza questo,
+             il browser non vede mai gli aggiornamenti (serviva "svuota cache" a mano). -->
         <script>
         window.CT_ASSET_VERSIONS = {
             <?php
-            $assetFiles = ['chat.js', 'role_session.js', 'incremento_parametri.js', 'mercato_abilita.js'];
+            $assetFiles = [
+                'chat.js' => 'includes/chat.js',
+                'role_session.js' => 'includes/role_session.js',
+                'incremento_parametri.js' => 'includes/incremento_parametri.js',
+                'mercato_abilita.js' => 'includes/mercato_abilita.js',
+                'mappa_giorno.png' => 'themes/crystal/imgs/maps/mappa_giorno.png',
+                'mappa_notte.png' => 'themes/crystal/imgs/maps/mappa_notte.png',
+            ];
             $assetVersions = [];
-            foreach ($assetFiles as $assetFile) {
-                $assetPath = __DIR__ . '/includes/' . $assetFile;
-                $assetVersions[] = json_encode($assetFile) . ': ' . (file_exists($assetPath) ? filemtime($assetPath) : 0);
+            foreach ($assetFiles as $assetKey => $assetRelPath) {
+                $assetPath = __DIR__ . '/' . $assetRelPath;
+                $assetVersions[] = json_encode($assetKey) . ': ' . (file_exists($assetPath) ? filemtime($assetPath) : 0);
             }
             echo implode(",\n            ", $assetVersions);
             ?>

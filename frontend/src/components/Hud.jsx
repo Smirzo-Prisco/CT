@@ -342,10 +342,15 @@ export default function Hud({ isStaff }) {
     // (location.immagine_mappa): quel campo puo' non essere popolato/valido a
     // seconda della riga di mappa_click associata alla mappa corrente, e
     // un'immagine mancante mostrava il testo alt enorme al posto del cerchio.
+    // ?v=mtime (CT_ASSET_VERSIONS, vedi header.inc.php) forza il refresh della
+    // cache quando il file cambia — vedi stesso commento in MapClick.jsx.
     const locationImg = location?.tipo === 'stanza' && location?.immagine
         ? `themes/crystal/imgs/locations/${location.immagine}`
         : location?.tipo === 'mappa'
-            ? `themes/crystal/imgs/maps/${location.is_notte ? 'mappa_notte.png' : 'mappa_giorno.png'}`
+            ? (() => {
+                const n = location.is_notte ? 'mappa_notte.png' : 'mappa_giorno.png'
+                return `themes/crystal/imgs/maps/${n}?v=${window.CT_ASSET_VERSIONS?.[n] ?? ''}`
+            })()
             : null
 
     useEffect(() => { setLocationImgFailed(false) }, [locationImg])

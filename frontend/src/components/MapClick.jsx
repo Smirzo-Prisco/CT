@@ -412,10 +412,12 @@ export default function MapClick() {
     // visibile al cambio immagine appena arriva la risposta.
     if (!mapInfo) return <center><p>Caricamento mappa…</p></center>
 
-    /** Sceglie l'immagine giorno o notte in base all'ora */
-    const mapImg = mapInfo.is_notte
-        ? 'themes/crystal/imgs/maps/mappa_notte.png'
-        : 'themes/crystal/imgs/maps/mappa_giorno.png'
+    /** Sceglie l'immagine giorno o notte in base all'ora.
+     *  ?v=mtime (da CT_ASSET_VERSIONS, vedi header.inc.php) forza il refresh
+     *  della cache del browser/nginx quando il file viene sostituito — senza,
+     *  l'immagine restava vecchia finche' non si svuotava la cache a mano. */
+    const mapImgName = mapInfo.is_notte ? 'mappa_notte.png' : 'mappa_giorno.png'
+    const mapImg = `themes/crystal/imgs/maps/${mapImgName}?v=${window.CT_ASSET_VERSIONS?.[mapImgName] ?? ''}`
 
     /**
      * Zona attualmente selezionata (se c'è un openZone).
