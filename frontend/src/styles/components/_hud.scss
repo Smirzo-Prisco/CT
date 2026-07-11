@@ -235,10 +235,8 @@ body[data-palette="public"] .ct-hud {
 // sul lato dell'anello (sinistro qui, destro sotto) tiene il CONTENUTO
 // oltre la portata massima dell'arco (raggio 86.5px + 18px di icona =
 // 104.5px dal centro anello), anche se il box del pannello ci si sovrappone.
-.ct-hud__ring--left .ct-hud__panel { left: 140px; width: 220px; padding-left: 52px; }
-// Piu' largo (era 200px): nome+badge gilda+le tre statistiche vitali si
-// incolonnavano/andavano a capo troppo in uno spazio cosi' stretto.
-.ct-hud__ring--right .ct-hud__panel { right: 140px; width: 280px; padding-right: 74px; }
+.ct-hud__ring--left .ct-hud__panel { left: 140px; width: 270px; padding-left: 52px; }
+.ct-hud__ring--right .ct-hud__panel { right: 140px; width: 270px; padding-right: 74px; }
 
 .ct-hud__panel h3 { margin: 0 0 4px; font-size: 15px; color: var(--gold); }
 .ct-hud__panel p { margin: 0; font-size: 11.5px; color: var(--muted); line-height: 1.4; }

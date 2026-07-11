@@ -454,8 +454,13 @@ export default function Hud({ isStaff }) {
             )}
 
             {/* ============ CENTRO: LOGO + ARCO RAPIDO ============ */}
+            {/* Hover solo su desktop: su mobile deve aprirsi/chiudersi SOLO al
+                click, come i due cerchi laterali — alcuni browser touch
+                simulano comunque un mouseenter al tap, che altrimenti
+                aggirerebbe la mutua esclusivita' di toggleMobileMenu. */}
             <div className={`ct-hud__center${centerOpen ? ' is-open' : ''}`}
-                onMouseEnter={() => setCenterOpen(true)} onMouseLeave={() => setCenterOpen(false)}>
+                onMouseEnter={() => !isMobile && setCenterOpen(true)}
+                onMouseLeave={() => !isMobile && setCenterOpen(false)}>
                 <button type="button" className="ct-hud__brand" title="Mostra il menu" onClick={() => {
                     if (isMobile) { toggleMobileMenu('center'); return }
                     const open = !(leftOpen && rightOpen)
