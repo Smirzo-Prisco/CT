@@ -422,20 +422,28 @@ export default function Hud({ isStaff }) {
 
                 <HudArcSheet isMobile={isMobile} isOpen={rightOpen} onClose={() => setRightOpen(false)}>
                     <div className="ct-hud__arc">
+                        {/* "La mia scheda": su desktop il tap sul cerchio stesso ci
+                            porta gia' direttamente (goToOwnScheda), ma su mobile
+                            il tap apre questo menu — senza questa icona non c'era
+                            piu' alcun modo di raggiungere la propria scheda da li'. */}
                         <a className="ct-hud__icon" style={arcIcon(0, 87)}
+                            href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="La mia scheda">
+                            <i className="fa-solid fa-id-card" />
+                        </a>
+                        <a className="ct-hud__icon" style={arcIcon(-33, 80)}
                             href="main.php?page=agenda_center" title="Calendario">
                             <i className="fa-solid fa-calendar-days" />
-                            {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
+                            {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-33, 80)} />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(-43, 75)}
+                        <a className="ct-hud__icon" style={arcIcon(-62, 62)}
                             href="main.php?page=role_recap" title="Giocate">
                             <i className="fa-solid fa-scroll" />
-                            {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-43, 75)} title="Giocata in corso" />}
+                            {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-62, 62)} title="Giocata in corso" />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(-75, 43)}
+                        <a className="ct-hud__icon" style={arcIcon(-80, 33)}
                             href="main.php?page=messages_center&offset=0" title="Messaggi">
                             <i className="fa-solid fa-envelope" />
-                            {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-75, 43)} />}
+                            {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-80, 33)} />}
                         </a>
                         <a className="ct-hud__icon" style={arcIcon(-87, 0)}
                             href="#" title="Assistente" onClick={openChatbot}>

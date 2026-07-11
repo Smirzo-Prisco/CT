@@ -193,6 +193,13 @@ body[data-palette="public"] {
     z-index: 2;
     transform: scale(.7);
     transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+    // Prima (punto a top/left:50%, nessuna larghezza/altezza) quest'area
+    // era 0x0, non poteva intercettare nulla. Da quando ha una dimensione
+    // esplicita (sopra, per seguire la miniatura quando si rimpicciolisce)
+    // e' un box invisibile ma pieno, sopra alla miniatura (z-index:2 contro
+    // 1): senza pointer-events:none blocca il click sul cerchio ovunque
+    // tranne esattamente sopra un'icona. .ct-hud__icon lo riattiva.
+    pointer-events: none;
 }
 .ct-hud__ring--right .ct-hud__arc { transform-origin: top right; }
 .ct-hud__ring.is-open .ct-hud__arc { transform: scale(1); }
@@ -221,6 +228,9 @@ body[data-palette="public"] {
     width: 40px; height: 40px;
     margin: -20px 0 0 -20px;
     border-radius: 50%;
+    // Riattiva i click solo qui: .ct-hud__arc (il contenitore, sopra) li
+    // blocca altrove cosi' non copre piu' il click sulla miniatura sotto.
+    pointer-events: auto;
     background: var(--ink);
     border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
     color: var(--text);
