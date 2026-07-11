@@ -486,7 +486,11 @@ export default function Hud({ isStaff }) {
                 click, come i due cerchi laterali — alcuni browser touch
                 simulano comunque un mouseenter al tap, che altrimenti
                 aggirerebbe la mutua esclusivita' di toggleMobileMenu. */}
-            <div className={`ct-hud__center${centerOpen ? ' is-open' : ''}`}
+            {/* --expanded segue leftOpen/rightOpen (non centerOpen, che e'
+                solo l'hover del proprio ventaglio): stessa condizione della
+                topbar, cosi' la linea dorata continua a tagliare a meta'
+                anche il logo centrale quando i cerchi si aprono/chiudono. */}
+            <div className={`ct-hud__center${centerOpen ? ' is-open' : ''}${leftOpen && rightOpen ? ' ct-hud__center--expanded' : ''}`}
                 onMouseEnter={() => !isMobile && setCenterOpen(true)}
                 onMouseLeave={() => !isMobile && setCenterOpen(false)}>
                 <button type="button" className="ct-hud__brand" title="Mostra il menu" onClick={() => {

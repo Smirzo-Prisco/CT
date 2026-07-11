@@ -393,9 +393,14 @@ body[data-palette="public"] {
 // altrimenti fuori dal box del contenitore) — senza, il mouse "esce" dal box
 // del solo logo mentre si sposta verso un'icona del ventaglio e l'arco si
 // richiude prima del click.
+// top:31px a riposo (57-26): segue lo stesso spostamento della topbar
+// (altezza 60px invece di 86, vedi sopra) cosi' la linea dorata continua
+// a tagliare il logo centrale a meta' anche a cerchi compressi — torna a
+// 57px con --expanded, quando la linea torna anch'essa alla posizione
+// originale (86px).
 .ct-hud__center {
     position: absolute;
-    top: 57px;
+    top: 31px;
     left: 50%;
     width: 170px;
     height: 110px;
@@ -403,7 +408,9 @@ body[data-palette="public"] {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    transition: top .3s cubic-bezier(.34, 1.56, .64, 1);
 }
+.ct-hud__center--expanded { top: 57px; }
 .ct-hud__brand {
     position: relative;
     width: 58px; height: 58px;
