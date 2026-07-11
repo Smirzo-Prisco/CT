@@ -370,7 +370,7 @@ export default function Hud({ isStaff }) {
                             <i className="fa-solid fa-comments" />
                         </a>
                         <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)}
-                            title="Presenti nel luogo" onClick={togglePopover('presence')}>
+                            title="Presenti" onClick={togglePopover('presence')}>
                             <i className="fa-solid fa-users" />
                             {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(43, 75)}>{presentiCount}</b>}
                         </button>
@@ -379,7 +379,7 @@ export default function Hud({ isStaff }) {
                             <i className="fa-solid fa-comment-dots" />
                         </button>
                         <a className="ct-hud__icon" style={arcIcon(87, 0)}
-                            href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Vai alla mappa principale">
+                            href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Mappa">
                             <i className="fa-solid fa-map-location-dot" />
                         </a>
                     </div>
@@ -407,7 +407,7 @@ export default function Hud({ isStaff }) {
                             {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
                         </a>
                         <a className="ct-hud__icon" style={arcIcon(-43, 75)}
-                            href="main.php?page=role_recap" title="Giocate personali">
+                            href="main.php?page=role_recap" title="Giocate">
                             <i className="fa-solid fa-scroll" />
                             {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(-43, 75)} title="Giocata in corso" />}
                         </a>
