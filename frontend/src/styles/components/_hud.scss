@@ -443,23 +443,22 @@ body[data-palette="public"] .ct-hud {
 // Regola permanente: l'HUD resta SEMPRE absolute/fixed sugli angoli, non
 // passa mai a static.
 //
-// .ct-hud__arc e' scalato ANCHE dal proprio transform (oltre a ereditare
-// visivamente quello del genitore .ct-hud__ring, essendo transform
-// annidati) — qui lo si sovrascrive con un fattore "boost" che compensa
-// esattamente lo scale dell'anello, cosi' l'effetto finale (chiuso .7,
-// aperto 1, gli STESSI valori del desktop non scalato) resta identico a
-// ogni breakpoint invece di saltare bruscamente al cambio soglia.
-// boost = target_desktop / scale_anello_di_questa_soglia.
+// Nessun "boost" di compensazione sull'arco in questi due breakpoint (a
+// differenza di un tentativo precedente): un fattore diverso da quello
+// dell'anello sposta la posizione delle icone, non solo la loro
+// dimensione, facendole "scattare" via dal bordo del cerchio a ogni
+// cambio soglia. .ct-hud__arc eredita quindi solo lo scale di
+// .ct-hud__ring (transform annidati), che tiene le icone sempre
+// esattamente sul bordo — a costo di rimpicciolirle un po' insieme al
+// cerchio. Il tocco resta comunque garantito sotto i 680px, dove le
+// icone diventano una scheda a griglia indipendente dallo scale
+// dell'anello (vedi sotto).
 @media (max-width: 1080px) {
     .ct-hud__ring { transform: scale(.82); }
-    .ct-hud__arc { transform: scale(.854); } // .7/.82
-    .ct-hud__ring.is-open .ct-hud__arc { transform: scale(1.22); } // 1/.82
 }
 
 @media (max-width: 860px) {
     .ct-hud__ring { transform: scale(.68); }
-    .ct-hud__arc { transform: scale(1.03); } // .7/.68
-    .ct-hud__ring.is-open .ct-hud__arc { transform: scale(1.47); } // 1/.68
     .ct-hud__popover { width: 240px; left: 100px; }
 }
 
