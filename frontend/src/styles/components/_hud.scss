@@ -273,7 +273,7 @@ body[data-palette="public"] {
     line-height: 1.5;
     text-align: center;
 }
-.ct-hud__pip--dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; }
+.ct-hud__pip--dot { width: 8px; height: 8px; min-width: 0; padding: 0; border-radius: 50%; }
 
 // Pannello info: tra la miniatura e il centro, mai sopra l'arco.
 // Nessun z-index esplicito: resta dietro sia a .ct-hud__thumb (1) sia a
