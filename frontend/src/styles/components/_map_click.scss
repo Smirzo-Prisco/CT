@@ -16,8 +16,14 @@
 
     &__ring {
         display: block;
-        width: 40px;
-        height: 40px;
+        // clamp invece di un px fisso: la mappa si ridimensiona con la
+        // larghezza dello schermo (width:100% della propria immagine), ma un
+        // pin a dimensione fissa no — su mobile risultava sproporzionato
+        // (troppo grande rispetto a una mappa molto piu' piccola). vw lo
+        // lega alla larghezza dello schermo, min/max evitano che diventi
+        // illeggibile o eccessivo ai due estremi.
+        width: clamp(24px, 4vw, 40px);
+        height: clamp(24px, 4vw, 40px);
         border-radius: 50%;
         object-fit: cover;
         // Il file (map-pin.jpg) ha uno sfondo nero pieno attorno al
@@ -41,7 +47,7 @@
         // mappa, densa di dettagli disegnati, un pin piccolo e spento si
         // perde e il kanji diventa illeggibile.
         &--custom {
-            width: 84px;
+            width: clamp(38px, 8vw, 84px);
             height: auto;
             // border-radius (non overflow:hidden, che ritaglierebbe la punta
             // inferiore) solo per dare forma circolare alla pulsazione
