@@ -158,7 +158,14 @@ body[data-palette="public"] .ct-hud {
 // (vedi RESPONSIVE), su desktop questo elemento non deve avere alcun effetto.
 .ct-hud__sheet-backdrop { display: none; }
 
-.ct-hud__icon {
+// &:link/&:visited (non solo la classe piatta): le icone-link (Forum, Vai
+// alla mappa, Manuali, Uffici, Esci...) sono <a>, e le regole globali
+// a, a:visited / a:link in _typography.scss (colore $color-action, stessa
+// specificita' 0,1,1) altrimenti vincono sul colore qui sotto (0,1,0),
+// facendo apparire icona+etichetta ciano invece che text/gold.
+.ct-hud__icon,
+.ct-hud__icon:link,
+.ct-hud__icon:visited {
     position: absolute;
     top: 0; left: 0;
     width: 40px; height: 40px;
@@ -170,6 +177,8 @@ body[data-palette="public"] .ct-hud {
     display: grid;
     place-items: center;
     font-size: 14px;
+    text-align: center;
+    letter-spacing: normal;
     transform: translate(var(--tx), var(--ty));
     transition: color .2s ease, border-color .2s ease;
     user-select: none;
