@@ -569,7 +569,17 @@ body[data-palette="public"] .ct-hud {
     // aspetto per tutti e tre i cerchi. Nessun ancestor .is-open richiesto:
     // l'icona esiste nel DOM solo quando il suo arco (portato o in-place)
     // esiste/e' visibile.
-    .ct-hud__icon {
+    //
+    // :link/:visited ripetuti anche qui: la regola base (sopra) li include
+    // per lo stesso motivo (vincere sul colore di a:link globale), il che
+    // le da' specificita' (0,2,0) — una .ct-hud__icon piatta qui (0,1,0)
+    // perderebbe quindi contro la base per le icone-link, facendo tornare
+    // il posizionamento assoluto/radiale da desktop invece della griglia
+    // mobile (bug reale gia' capitato: rompeva il menu su TUTTE le icone
+    // che sono <a>, cioe' l'intero arco centrale).
+    .ct-hud__icon,
+    .ct-hud__icon:link,
+    .ct-hud__icon:visited {
         // position:relative ancora .ct-hud__pip (altrimenti, senza un
         // antenato posizionato piu' vicino, si ancorerebbe alla scheda fixed)
         position: relative;
@@ -583,6 +593,7 @@ body[data-palette="public"] .ct-hud {
         justify-content: center;
         gap: 6px;
         font-size: 20px;
+        letter-spacing: normal;
 
         &, &:hover, &:active, &:focus, &:focus-visible {
             transform: none !important;
