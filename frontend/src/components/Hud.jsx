@@ -491,10 +491,12 @@ export default function Hud({ isStaff }) {
                 onMouseLeave={() => !isMobile && setCenterOpen(false)}>
                 <button type="button" className="ct-hud__brand" title="Mostra il menu" onClick={() => {
                     if (isMobile) { toggleMobileMenu('center'); return }
+                    // Solo gli anelli laterali si aprono/chiudono al click: le
+                    // icone del cerchio centrale restano un fatto di hover
+                    // (vedi onMouseEnter/Leave sopra), il click non le tocca.
                     const open = !(leftOpen && rightOpen)
                     setLeftOpen(open)
                     setRightOpen(open)
-                    setCenterOpen(v => !v)
                 }}>
                     <span className="ct-hud__brand-ring" />
                     <img className="ct-hud__brand-mark" src="/imgs/favicon.ico" alt="Crystal Tokyo" />

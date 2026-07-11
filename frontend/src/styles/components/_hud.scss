@@ -174,13 +174,27 @@ body[data-palette="public"] {
 // invece dietro a entrambi (z-index:auto) — non compete piu' per lo spazio,
 // ha semplicemente un padding sul lato dell'anello cosi' il suo contenuto
 // non ci finisce mai sotto.
+//
+// Stesso box (173x173, angolo in alto a sinistra/destra) e stesso
+// transform-origin di .ct-hud__ring/.ct-hud__thumb, non piu' un punto a
+// top/left:50% (centro dell'anello): da chiusa (scale .7) l'arco si
+// rimpiccioliva verso il PROPRIO centro (fisso, sempre al centro
+// dell'anello) invece di seguire la miniatura, che ora invece si
+// rimpicciolisce verso l'angolo — le icone restavano "indietro" invece
+// di stringersi intorno al cerchio spostato. Le icone (sotto,
+// .ct-hud__icon) sono centrate al 50%/50% di QUESTO box, che alla
+// dimensione piena (173px) coincide col vecchio centro: nessuna
+// differenza da aperta, cambia solo da chiusa.
 .ct-hud__arc {
     position: absolute;
-    top: 50%; left: 50%;
+    top: 0; left: 0;
+    width: 173px; height: 173px;
+    transform-origin: top left;
     z-index: 2;
     transform: scale(.7);
     transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
 }
+.ct-hud__ring--right .ct-hud__arc { transform-origin: top right; }
 .ct-hud__ring.is-open .ct-hud__arc { transform: scale(1); }
 
 // Sfondo dietro la scheda a comparsa dal basso: esiste solo sotto i 680px
@@ -192,11 +206,18 @@ body[data-palette="public"] {
 // a, a:visited / a:link in _typography.scss (colore $color-action, stessa
 // specificita' 0,1,1) altrimenti vincono sul colore qui sotto (0,1,0),
 // facendo apparire icona+etichetta ciano invece che text/gold.
+// top/left:50% (non 0): il centro di .ct-hud__arc, che ora e' un box
+// 173x173 come l'anello (vedi sopra), non piu' un punto — 50% di 173px
+// e' lo stesso identico punto pagina del vecchio centro quando l'arco e'
+// a dimensione piena (aperto), quindi nessuna differenza li'; cambia solo
+// da chiuso, dove l'arco si e' gia' rimpicciolito verso l'angolo.
+// Su .ct-hud__center-arc (nessuna dimensione esplicita, quindi 0x0) 50%
+// resta comunque 0 come prima: nessun effetto sul centro.
 .ct-hud__icon,
 .ct-hud__icon:link,
 .ct-hud__icon:visited {
     position: absolute;
-    top: 0; left: 0;
+    top: 50%; left: 50%;
     width: 40px; height: 40px;
     margin: -20px 0 0 -20px;
     border-radius: 50%;
@@ -621,6 +642,10 @@ body[data-palette="public"] {
         // position:relative ancora .ct-hud__pip (altrimenti, senza un
         // antenato posizionato piu' vicino, si ancorerebbe alla scheda fixed)
         position: relative;
+        // Reset esplicito: la base (desktop) e' top/left:50% (centro
+        // dell'arco 173x173) — su un position:relative quei valori
+        // sposterebbero comunque l'icona, serve azzerarli qui.
+        top: 0; left: 0;
         width: auto; height: auto;
         margin: 0;
         padding: 14px 4px 10px;
