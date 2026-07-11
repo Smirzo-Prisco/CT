@@ -447,6 +447,15 @@ body[data-palette="public"] {
 }
 .ct-hud__popover--chatoff .chatoff-panel { min-height: 200px; }
 
+// Molto piu' trasparente della regola base (che e' quasi opaca): si legge
+// la pagina sfocata sotto invece dello sfondo pieno navy.
+.ct-hud__popover--chatoff {
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
+    backdrop-filter: blur(18px);
+}
+
 .ct-hud__popover-head {
     display: flex;
     align-items: center;
