@@ -104,9 +104,12 @@ body[data-palette="public"] {
     box-shadow: 0 1px 30px -2px color-mix(in srgb, var(--gold) calc(.2 * 100%), transparent);
     backdrop-filter: blur(14px);
     opacity: .4;
-    transition: opacity .25s ease;
+    transition: opacity .25s ease, top .25s ease;
 }
 .ct-hud:hover .ct-hud__topbar { opacity: 1; }
+// Anelli aperti dal cerchio centrale: la topbar scende di 20px (torna a 0,
+// cioe' "sale" di 20px, quando si richiude comprimendo di nuovo le icone).
+.ct-hud__topbar--expanded { top: 20px; }
 
 // ── ANELLI (sinistra/destra) ─────────────────────────────────
 .ct-hud__ring {
