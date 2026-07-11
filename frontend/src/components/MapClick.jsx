@@ -49,6 +49,14 @@ const ROPPONGI_EXTRA_ROOM = {
     count: 0,
 }
 
+// Pin dedicati per zona (SVG, sfondo gia' trasparente) al posto del
+// medaglione generico map-pin.jpg — solo per le zone elencate qui, le
+// altre restano sul pin generico. Chiave = zone.nome da api_map.php?op=zones.
+const ZONE_PIN_IMAGES = {
+    Shibuya: 'pin-shibuya.svg',
+    Odaiba: 'pin-odaiba.svg',
+}
+
 // ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
@@ -325,6 +333,13 @@ export default function MapClick() {
                     {zones.map((zone, i) => {
                         const style = hotspotStyle(zone.cx, zone.cy)
                         if (!style) return null
+                        // Pin custom (SVG, gia' trasparente): niente mix-blend-mode:screen,
+                        // quel trucco serve solo al medaglione generico (map-pin.jpg) per
+                        // "rimuovere" il suo sfondo nero pieno.
+                        const customPin = ZONE_PIN_IMAGES[zone.nome]
+                        const pinSrc = customPin
+                            ? `themes/crystal/imgs/maps/${customPin}`
+                            : `themes/crystal/imgs/maps/map-pin.jpg?v=${window.CT_ASSET_VERSIONS?.['map-pin.jpg'] ?? ''}`
                         return (
                             <div
                                 key={zone.id}
@@ -333,7 +348,7 @@ export default function MapClick() {
                                 onClick={e => { e.stopPropagation(); setOpenZone(openZone === zone.id ? null : zone.id) }}
                                 title={zone.nome}
                             >
-                                <img className="map-pin__ring" src={`themes/crystal/imgs/maps/map-pin.jpg?v=${window.CT_ASSET_VERSIONS?.['map-pin.jpg'] ?? ''}`} alt="" />
+                                <img className={`map-pin__ring${customPin ? ' map-pin__ring--custom' : ''}`} src={pinSrc} alt="" />
                                 <span className="map-pin__label">{zone.nome}</span>
                             </div>
                         )

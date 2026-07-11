@@ -32,6 +32,18 @@
         animation: map-pin-pulse 2.4s ease-out infinite, map-pin-float 3.2s ease-in-out infinite;
         animation-delay: 0s, var(--float-delay, 0s);
         transition: transform .2s ease, filter .2s ease;
+
+        // Pin custom per zona (SVG, gia' con sfondo trasparente e una
+        // sagoma propria a goccia con punta) — niente screen (servirebbe
+        // solo a "smacchiare" lo sfondo nero del jpg generico) ne' il
+        // ritaglio circolare/cover, che taglierebbe via la punta inferiore.
+        &--custom {
+            width: 52px;
+            height: auto;
+            border-radius: 0;
+            object-fit: contain;
+            mix-blend-mode: normal;
+        }
     }
 
     &__label {
