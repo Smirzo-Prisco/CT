@@ -613,6 +613,11 @@ body[data-palette="public"] {
         gap: 12px;
         position: fixed;
         bottom: 0; top: auto; left: 0; right: 0;
+        // width/height:173px nella base (vedi sopra) altrimenti "vincono" su
+        // left+right (left/width/right tutti specificati → il browser
+        // ignora right e usa width fisso), riducendo la scheda a un box
+        // piccolo invece di tutta la larghezza.
+        width: auto; height: auto;
         transform: none;
         z-index: 600;
         max-height: 55vh;
