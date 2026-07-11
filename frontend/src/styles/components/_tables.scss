@@ -21,7 +21,13 @@
 table.customTable {
     background-color: #181c31;
     border-collapse: collapse;
-    border: 1px solid #000;
+    // Bordo/angoli in stile con il resto della land (navy + oro, angoli
+    // arrotondati) invece del vecchio bordo nero piatto — vale per tutte le
+    // ~40 pagine che condividono questa classe, non serve piu' ripeterlo
+    // per singola pagina (era scoped su div.presenti_estesi, rimosso da li').
+    border: 1px solid rgba(196, 148, 48, .25);
+    border-radius: 10px;
+    overflow: hidden; // arrotonda anche gli angoli di thead/celle interne
     color: $palette-text;
     font-size: 12px;
     font-family: $font-base;
