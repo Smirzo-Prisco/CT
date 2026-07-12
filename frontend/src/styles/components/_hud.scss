@@ -199,13 +199,12 @@ body[data-palette="public"] {
 .ct-hud__ring-badge__btn:visited {
     position: absolute;
     // In cima (top:0) restava troppo vicino al bordo pagina/topbar, con
-    // rischio di essere tagliata. L'anello e' ancorato all'angolo alto
-    // sinistro (transform-origin: top left) — spostandola sul punto
-    // diagonalmente opposto a quell'angolo (~45°, verso il basso a
-    // destra del cerchio) resta sul bordo del cerchio ma nel punto con
-    // piu' spazio libero attorno, lontano sia dal bordo alto che da
-    // quello sinistro della pagina.
-    top: 85.4%; left: 85.4%;
+    // rischio di essere tagliata. Spostata esattamente sul lato opposto
+    // del cerchio (in basso, 180° dalla posizione di partenza) — massima
+    // distanza dal bordo alto/sinistro della pagina dove l'anello e'
+    // ancorato, e nessuna sovrapposizione con .ct-hud__panel (che si apre
+    // di lato, non sotto).
+    top: 100%; left: 50%;
     transform: translate(-50%, -50%);
     width: 26px; height: 26px;
     border-radius: 50%;
