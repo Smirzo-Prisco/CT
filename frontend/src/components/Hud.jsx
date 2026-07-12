@@ -458,7 +458,7 @@ export default function Hud({ isStaff }) {
                 {location?.tipo === 'stanza' && (
                     <div className="ct-hud__ring-badge">
                         <a className="ct-hud__ring-badge__btn" href={`main.php?dir=${location.luogo}`} title="Torna alla tua chat">
-                            <i className="fa-solid fa-comment" />
+                            <i className="fa-solid fa-location-arrow" />
                         </a>
                     </div>
                 )}
@@ -467,7 +467,7 @@ export default function Hud({ isStaff }) {
                     <div className="ct-hud__arc">
                         <a className="ct-hud__icon" style={arcIcon(0, 87)}
                             href="main.php?page=forum" title="Forum">
-                            <i className="fa-solid fa-comments" />
+                            <i className="fa-solid fa-list-ul" />
                             {hasNewForum && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
                         </a>
                         <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)}
