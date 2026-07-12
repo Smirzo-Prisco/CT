@@ -198,13 +198,10 @@ body[data-palette="public"] {
 .ct-hud__ring-badge__btn:link,
 .ct-hud__ring-badge__btn:visited {
     position: absolute;
-    // In cima (top:0) restava troppo vicino al bordo pagina/topbar, con
-    // rischio di essere tagliata. Spostata esattamente sul lato opposto
-    // del cerchio (in basso, 180° dalla posizione di partenza) — massima
-    // distanza dal bordo alto/sinistro della pagina dove l'anello e'
-    // ancorato, e nessuna sovrapposizione con .ct-hud__panel (che si apre
-    // di lato, non sotto).
-    top: 100%; left: 50%;
+    // Bordo del cerchio a 315° (nord-ovest in convenzione bussola,
+    // clockwise da nord): top/left ricavati da centro + raggio *
+    // (sin315°, -cos315°) = centro + raggio * (-.707, -.707).
+    top: 14.6%; left: 14.6%;
     transform: translate(-50%, -50%);
     width: 26px; height: 26px;
     border-radius: 50%;
