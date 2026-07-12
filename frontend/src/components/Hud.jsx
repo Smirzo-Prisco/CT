@@ -450,11 +450,24 @@ export default function Hud({ isStaff }) {
                     }
                 </button>
 
+                {/* Sempre visibile (non fa parte del ventaglio): torna rapidamente
+                    alla propria stanza da qualunque pagina della SPA (es. dal
+                    forum) senza dover navigare a mano. Solo se si e' in una
+                    stanza specifica — sulla mappa generale non c'e' una chat a
+                    cui tornare (li' c'e' gia' l'icona Mappa nel ventaglio). */}
+                {location?.tipo === 'stanza' && (
+                    <div className="ct-hud__ring-badge">
+                        <a className="ct-hud__ring-badge__btn" href={`main.php?dir=${location.luogo}`} title="Torna alla tua chat">
+                            <i className="fa-solid fa-location-arrow" />
+                        </a>
+                    </div>
+                )}
+
                 <HudArcSheet isMobile={isMobile} isOpen={leftOpen} onClose={() => setLeftOpen(false)}>
                     <div className="ct-hud__arc">
                         <a className="ct-hud__icon" style={arcIcon(0, 87)}
                             href="main.php?page=forum" title="Forum">
-                            <i className="fa-solid fa-comments" />
+                            <i className="fa-solid fa-list-ul" />
                             {hasNewForum && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
                         </a>
                         <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)}
