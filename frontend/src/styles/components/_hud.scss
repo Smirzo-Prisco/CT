@@ -169,6 +169,57 @@ body[data-palette="public"] {
 
 @keyframes ct-hud-spin { to { transform: rotate(360deg); } }
 
+// Badge "torna alla tua chat": stesso box/transform-origin/scala di
+// .ct-hud__thumb (vedi sopra) cosi' segue esattamente il bordo della
+// miniatura sia compressa che espansa, invece di restare fisso in un
+// punto che coinciderebbe col cerchio solo in uno dei due stati. Sempre
+// visibile (non fa parte del ventaglio a comparsa): serve proprio per
+// tornare rapidamente alla propria stanza mentre si e' altrove nella SPA
+// (es. nel forum), senza dover aprire il ventaglio.
+.ct-hud__ring-badge {
+    position: absolute;
+    top: 0; left: 0;
+    width: 173px; height: 173px;
+    transform-origin: top left;
+    z-index: 3;
+    transform: scale(.7);
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+    // Stesso motivo di .ct-hud__arc: un box pieno sopra alla miniatura
+    // bloccherebbe il click sul cerchio ovunque tranne che sul bottone.
+    pointer-events: none;
+}
+.ct-hud__ring.is-open .ct-hud__ring-badge { transform: scale(1); }
+
+// &:link/&:visited ripetuti: e' un <a>, e le regole globali a, a:visited /
+// a:link in _typography.scss (colore $color-action, stessa specificita'
+// 0,1,1) vincerebbero altrimenti sul colore/dimensioni qui sotto (0,1,0)
+// — stesso identico problema gia' risolto per .ct-hud__icon.
+.ct-hud__ring-badge__btn,
+.ct-hud__ring-badge__btn:link,
+.ct-hud__ring-badge__btn:visited {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--ink-light);
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    letter-spacing: normal;
+    pointer-events: auto;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 40%);
+    transition: transform .15s ease, background .15s ease;
+}
+.ct-hud__ring-badge__btn:hover {
+    background: var(--gold);
+    color: var(--ink-deep);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
 // Arco delle icone: sempre visibili, scala insieme alla miniatura.
 // z-index piu' alto di .ct-hud__thumb (1): il pannello (vedi sotto) sta
 // invece dietro a entrambi (z-index:auto) — non compete piu' per lo spazio,
