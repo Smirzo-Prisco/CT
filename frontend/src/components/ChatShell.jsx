@@ -894,11 +894,58 @@ export default function ChatShell() {
     }
 
     // -----------------------------------------------------------------------
-    // MENZIONI @ — autocompletamento presenti in stanza per sussurri rapidi
+    // BOZZA MESSAGGIO — recupero testo perso per refresh accidentale
     // -----------------------------------------------------------------------
 
     /** Ref alla textarea del messaggio, per leggere/scrivere valore e cursore. */
     const messageRef = useRef(null)
+
+    /** Timer di debounce per il salvataggio della bozza (non ad ogni keystroke). */
+    const draftTimerRef = useRef(null)
+
+    /**
+     * Ripristina la bozza salvata per QUESTA stanza, se presente e se il
+     * campo e' ancora vuoto (non sovrascrive un testo gia' digitato in
+     * questo mount). Chiave per-stanza (shell.luogo) cosi' la bozza di una
+     * chat non compare in un'altra. La pulizia in caso di invio riuscito
+     * avviene in sendChatMessage (includes/chat.js), l'unico posto che sa
+     * con certezza che l'azione e' stata registrata dal server.
+     */
+    useEffect(() => {
+        if (!shell) return
+        const ta = messageRef.current
+        if (!ta) return
+        const saved = localStorage.getItem(`chat_draft_${shell.luogo}`)
+        if (saved && !ta.value) {
+            ta.value = saved
+            ta.dispatchEvent(new Event('input', { bubbles: true }))
+            window.conta?.(ta)
+        }
+    }, [shell])
+
+    /**
+     * Salva la bozza con un debounce: scrivere in localStorage ad ogni
+     * singolo carattere digitato aggiungerebbe un piccolo lavoro sincrono
+     * sul thread principale ad ogni keystroke — impercettibile per un
+     * singolo carattere, ma con testi lunghi e digitazione veloce puo'
+     * accumularsi. Aspettare una breve pausa nella digitazione elimina il
+     * problema del tutto senza perdere praticamente nulla in tempestivita'
+     * (nello scenario che contiamo di coprire — un refresh accidentale —
+     * mezzo secondo di ritardo sul salvataggio e' irrilevante).
+     */
+    const saveDraft = useCallback((value) => {
+        if (!shell) return
+        clearTimeout(draftTimerRef.current)
+        draftTimerRef.current = setTimeout(() => {
+            const key = `chat_draft_${shell.luogo}`
+            if (value.trim()) localStorage.setItem(key, value)
+            else localStorage.removeItem(key)
+        }, 400)
+    }, [shell])
+
+    // -----------------------------------------------------------------------
+    // MENZIONI @ — autocompletamento presenti in stanza per sussurri rapidi
+    // -----------------------------------------------------------------------
 
     /** Presenti nella stanza corrente — fonte della lista di menzione @. */
     const [presentiStanza, setPresentiStanza] = useState([])
@@ -954,6 +1001,7 @@ export default function ChatShell() {
 
     const handleMessageInput = (e) => {
         const val = e.target.value
+        saveDraft(val)
         if (val.startsWith('@')) {
             const rest = val.slice(1)
             const secondAt = rest.indexOf('@')

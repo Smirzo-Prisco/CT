@@ -124,6 +124,11 @@ async function sendChatMessage() {
             // Ripristina il tag salvato in sessione, se necessario
             if (form.elements["tag"]) form.elements["tag"].value = result.tag ?? "";
 
+            // Azione registrata con successo dal server: la bozza salvata da
+            // ChatShell.jsx (recupero testo perso per refresh accidentale)
+            // non serve piu' per questa stanza.
+            localStorage.removeItem('chat_draft_' + (window.CT_USER?.luogo ?? ''));
+
         } else showNotification(result.message, 'error');
     } catch (err) {
         console.error("💥 Errore nell’invio del messaggio:", err);
