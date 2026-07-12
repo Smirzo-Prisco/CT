@@ -812,6 +812,12 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                 if (data.success) {
                     setMessages(data.messages)
                     setPuntiList(data.punti_list ?? [])
+                    // L'HUD (icona Forum) non ha altro modo di sapere che un thread e'
+                    // stato letto: 'forum:update' via socket arriva solo per i NUOVI
+                    // post, e 'ct:location-changed' non scatta per la navigazione fra
+                    // pagine (solo per i movimenti sulla mappa) — senza questo evento
+                    // il badge restava acceso anche dopo aver letto tutto.
+                    window.dispatchEvent(new CustomEvent('ct:forum-read'))
                 }
                 setLoadingRead(false)
             })
@@ -838,6 +844,7 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                         chiuso: data.messages[0]?.chiuso ?? false,
                     })
                     setView('read')
+                    window.dispatchEvent(new CustomEvent('ct:forum-read'))
                 }
                 setLoadingRead(false)
             })
@@ -924,7 +931,12 @@ export default function Forum({ isStaff = false, initialThread = null }) {
             body:    JSON.stringify({ araldo: 0 }),
         })
             .then(r => r.json())
-            .then(data => { if (data.success) fetchSections() })
+            .then(data => {
+                if (data.success) {
+                    fetchSections()
+                    window.dispatchEvent(new CustomEvent('ct:forum-read'))
+                }
+            })
             .catch(console.error)
     }
 

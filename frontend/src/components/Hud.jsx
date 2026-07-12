@@ -212,7 +212,23 @@ export default function Hud({ isStaff }) {
     const fetchMessages = useCallback(() => {
         fetch('/pages/api_global.php?op=getMessages')
             .then(r => r.json())
-            .then(d => { if (d.success) setHasNewMessages(d.hasNew) })
+            .then(d => {
+                if (!d.success) return
+                setHasNewMessages(d.hasNew)
+
+                // Suono sms.wav al nuovo messaggio: presente in FrameMessaggi.jsx
+                // (il componente sostituito da questo Hud) ma mai riportato qui
+                // durante il redesign — throttle 10 min via localStorage, rispetta
+                // la preferenza utente soundPrefs.dm.
+                if (d.hasNew && d.allowAudio && (window.CT_USER?.soundPrefs?.dm ?? 1)) {
+                    const now = Date.now()
+                    const last = parseInt(localStorage.getItem('last_audio_play') || '0', 10)
+                    if (now - last > 600_000) {
+                        new Audio('../sounds/sms.wav').play().catch(() => { })
+                        localStorage.setItem('last_audio_play', String(now))
+                    }
+                }
+            })
             .catch(err => console.error('[Hud] Errore messaggi:', err))
     }, [])
 
@@ -254,14 +270,16 @@ export default function Hud({ isStaff }) {
         fetchForumUnread()
         const sock = window.ctSocket
         if (sock) sock.on('forum:update', fetchForumUnread)
-        // Il forum e' una pagina SPA separata (non un popover come chat off):
-        // quando l'utente ci naviga e segna dei thread come letti, Hud resta
-        // montato ma non lo sa finche' non torna indietro — 'ct:location-changed'
-        // (stesso evento usato per presenti/luogo) copre anche questo caso.
+        // 'ct:location-changed' scatta solo per i movimenti sulla mappa, MAI per
+        // la navigazione fra pagine (forum incluso) — non basta a rilevare che
+        // l'utente ha letto dei thread. Il vero segnale e' 'ct:forum-read',
+        // emesso da Forum.jsx dopo ogni op=read/readall riuscito.
         window.addEventListener('ct:location-changed', fetchForumUnread)
+        window.addEventListener('ct:forum-read', fetchForumUnread)
         return () => {
             if (sock) sock.off('forum:update', fetchForumUnread)
             window.removeEventListener('ct:location-changed', fetchForumUnread)
+            window.removeEventListener('ct:forum-read', fetchForumUnread)
         }
     }, [fetchForumUnread])
 
