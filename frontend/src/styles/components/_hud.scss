@@ -204,45 +204,68 @@ body[data-palette="public"] {
 }
 // Primo tentativo: mix-blend-mode:multiply con colori chiari — quasi
 // un'identita' su un pixel scuro, invisibile. Secondo tentativo: un velo
-// grigio SEMPRE presente — visibile ma leggeva come "nebbia fissa", non
-// "nuvoloso" (niente di riconoscibile in movimento). Ora: due forme di
-// nuvola vere (piu' chiazze radial-gradient sovrapposte, non un'unica
-// ellisse) dentro un tile molto piu' largo del cerchio, cosi' attraversano
-// il cerchio e ne escono invece di ripetersi a tappeto — sfasate fra loro
-// (animation-delay negativo sulla seconda) cosi' non passano mai insieme.
+// grigio SEMPRE presente — leggeva come "nebbia fissa", non "nuvoloso".
+// Terzo tentativo: due nuvole non-repeat dentro un tile piu' largo del
+// cerchio — attraversavano il cerchio ma con lunghe pause vuote fra un
+// passaggio e l'altro, tutte sulla stessa fascia orizzontale centrale.
+// Ora: tre bande verticali indipendenti (alta/centrale/bassa — prima,
+// terza banda, riusa lo stesso elemento DOM .ct-hud__weather-fx-mid gia'
+// creato per la pioggia, vedi Hud.jsx) con background-repeat:repeat e
+// tile solo di poco piu' largo del cerchio: sempre almeno una nuvola in
+// vista su ciascuna banda, nessuna pausa vuota.
 .ct-hud__weather-fx--cloud {
+    // Banda alta
     &::before {
         content: '';
         position: absolute;
         inset: -10%;
         background-image:
-            radial-gradient(ellipse 55px 35px at 160px 50%, rgb(225 230 242 / 60%), transparent 70%),
-            radial-gradient(ellipse 65px 42px at 230px 44%, rgb(225 230 242 / 58%), transparent 70%),
-            radial-gradient(ellipse 50px 32px at 290px 56%, rgb(225 230 242 / 52%), transparent 70%);
-        background-size: 420px 100%;
-        background-repeat: no-repeat;
-        animation: ct-hud-weather-cloud-pass-a 9s linear infinite;
+            radial-gradient(ellipse 45px 26px at 60px 20%, rgb(225 230 242 / 55%), transparent 70%),
+            radial-gradient(ellipse 55px 30px at 110px 16%, rgb(225 230 242 / 50%), transparent 70%);
+        background-size: 240px 100%;
+        background-repeat: repeat;
+        animation: ct-hud-weather-cloud-pass-a 7s linear infinite;
     }
+    // Banda bassa
     &::after {
         content: '';
         position: absolute;
         inset: -10%;
         background-image:
-            radial-gradient(ellipse 45px 28px at 130px 55%, rgb(215 222 238 / 46%), transparent 70%),
-            radial-gradient(ellipse 52px 32px at 185px 46%, rgb(215 222 238 / 44%), transparent 70%);
-        background-size: 340px 100%;
-        background-repeat: no-repeat;
-        animation: ct-hud-weather-cloud-pass-b 13s linear infinite;
-        animation-delay: -6s;
+            radial-gradient(ellipse 42px 24px at 90px 82%, rgb(215 222 238 / 48%), transparent 70%),
+            radial-gradient(ellipse 50px 28px at 150px 86%, rgb(215 222 238 / 44%), transparent 70%);
+        background-size: 210px 100%;
+        background-repeat: repeat;
+        animation: ct-hud-weather-cloud-pass-b 10s linear infinite;
+        animation-delay: -4s;
+    }
+    // Banda centrale (.ct-hud__weather-fx-mid, vero elemento DOM)
+    .ct-hud__weather-fx-mid {
+        position: absolute;
+        inset: -10%;
+        background-image:
+            radial-gradient(ellipse 48px 28px at 100px 50%, rgb(220 226 240 / 50%), transparent 70%),
+            radial-gradient(ellipse 40px 24px at 150px 46%, rgb(220 226 240 / 45%), transparent 70%);
+        background-size: 260px 100%;
+        background-repeat: repeat;
+        animation: ct-hud-weather-cloud-pass-c 12s linear infinite;
+        animation-delay: -7s;
     }
 }
+// Spostamento = esattamente la larghezza del tile: loop senza scatti,
+// nessuna pausa perche' background-repeat:repeat tiene sempre una nuvola
+// (o il bordo di quella successiva) in vista.
 @keyframes ct-hud-weather-cloud-pass-a {
-    from { background-position: 300px 0; }
-    to   { background-position: -450px 0; }
+    from { background-position: 0 0; }
+    to   { background-position: -240px 0; }
 }
 @keyframes ct-hud-weather-cloud-pass-b {
-    from { background-position: 260px 0; }
-    to   { background-position: -370px 0; }
+    from { background-position: 0 0; }
+    to   { background-position: -210px 0; }
+}
+@keyframes ct-hud-weather-cloud-pass-c {
+    from { background-position: 0 0; }
+    to   { background-position: -260px 0; }
 }
 .ct-hud__weather-fx--fog {
     background: linear-gradient(rgb(230 235 245 / 55%), rgb(230 235 245 / 30%));
