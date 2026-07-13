@@ -224,16 +224,15 @@ body[data-palette="public"] {
         content: '';
         position: absolute;
         inset: -15%;
-        // Chiazze alla dimensione "grande" di prima (non piu' rimpicciolite
-        // insieme al tile — quello le rendeva minuscole): solo il tile si
-        // restringe, quindi le chiazze si accavallano di piu' fra loro
-        // invece di occupare meno spazio a testa.
+        // Chiazze raddoppiate (raggi x2) rispetto al giro precedente: ora
+        // si accavallano parecchio col tile invariato, dando nuvole molto
+        // piu' grandi e una copertura piu' piena invece di piu' rada.
         background-image:
-            radial-gradient(ellipse 20px 13px at 17px 20%, rgb(225 230 242 / 55%), transparent 70%),
-            radial-gradient(ellipse 24px 14px at 37px 16%, rgb(225 230 242 / 50%), transparent 70%);
+            radial-gradient(ellipse 40px 26px at 17px 20%, rgb(225 230 242 / 55%), transparent 70%),
+            radial-gradient(ellipse 48px 28px at 37px 16%, rgb(225 230 242 / 50%), transparent 70%);
         background-size: 60px 100%;
         background-repeat: repeat;
-        animation: ct-hud-weather-cloud-pass-a 3.5s linear infinite;
+        animation: ct-hud-weather-cloud-pass-a 2.6s linear infinite;
     }
     // Banda bassa
     &::after {
@@ -241,11 +240,11 @@ body[data-palette="public"] {
         position: absolute;
         inset: -15%;
         background-image:
-            radial-gradient(ellipse 18px 11px at 15px 82%, rgb(215 222 238 / 48%), transparent 70%),
-            radial-gradient(ellipse 21px 12px at 33px 86%, rgb(215 222 238 / 44%), transparent 70%);
+            radial-gradient(ellipse 36px 22px at 15px 82%, rgb(215 222 238 / 48%), transparent 70%),
+            radial-gradient(ellipse 42px 24px at 33px 86%, rgb(215 222 238 / 44%), transparent 70%);
         background-size: 54px 100%;
         background-repeat: repeat;
-        animation: ct-hud-weather-cloud-pass-b 5s linear infinite;
+        animation: ct-hud-weather-cloud-pass-b 3.7s linear infinite;
         animation-delay: -2s;
     }
     // Banda centrale (.ct-hud__weather-fx-mid, vero elemento DOM)
@@ -253,11 +252,11 @@ body[data-palette="public"] {
         position: absolute;
         inset: -15%;
         background-image:
-            radial-gradient(ellipse 21px 13px at 19px 50%, rgb(220 226 240 / 50%), transparent 70%),
-            radial-gradient(ellipse 18px 11px at 40px 46%, rgb(220 226 240 / 45%), transparent 70%);
+            radial-gradient(ellipse 42px 26px at 19px 50%, rgb(220 226 240 / 50%), transparent 70%),
+            radial-gradient(ellipse 36px 22px at 40px 46%, rgb(220 226 240 / 45%), transparent 70%);
         background-size: 68px 100%;
         background-repeat: repeat;
-        animation: ct-hud-weather-cloud-pass-c 6s linear infinite;
+        animation: ct-hud-weather-cloud-pass-c 4.5s linear infinite;
         animation-delay: -3.5s;
     }
 }
