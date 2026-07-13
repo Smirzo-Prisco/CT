@@ -111,6 +111,13 @@ body[data-palette="public"] {
     backdrop-filter: blur(14px);
     opacity: .4;
     transition: opacity .25s ease, height .3s cubic-bezier(.34, 1.56, .64, 1);
+    // E' un <div> vuoto puramente decorativo (aria-hidden, vedi Hud.jsx):
+    // senza questo, la sua striscia piena larga tutto lo schermo (60-86px
+    // di altezza) intercetta hover/click di qualunque bottone/modale ci
+    // finisca sotto — stesso identico bug gia' risolto per .ct-hud__ring.
+    // .ct-hud:hover resta comunque raggiungibile da thumb/badge/icone/centro
+    // (tutti pointer-events:auto), che restano hoverabili.
+    pointer-events: none;
 }
 .ct-hud:hover .ct-hud__topbar { opacity: 1; }
 // Anelli aperti dal cerchio centrale (unico caso in cui leftOpen e
