@@ -253,10 +253,10 @@ switch ($op) {
             while ($row = gdrcd_query($res, 'fetch')) { $affetti[] = $row['personaggio']; }
             gdrcd_query($res, 'free');
 
-            foreach ($affetti as $nome_pg) {
-                $nome_esc = gdrcd_filter('in', $nome_pg);
-                gdrcd_query("UPDATE personaggio SET id_mestiere=0, id_ruolo_mestiere=1, esperienza_mestiere=0 WHERE nome='$nome_esc'");
-                gdrcd_query("UPDATE privilegi SET capomestiere=0 WHERE nome='$nome_esc'");
+            if ($affetti) {
+                $nomi_in = implode(',', array_map(fn($n) => "'" . gdrcd_filter('in', $n) . "'", $affetti));
+                gdrcd_query("UPDATE personaggio SET id_mestiere=0, id_ruolo_mestiere=1, esperienza_mestiere=0 WHERE nome IN ($nomi_in)");
+                gdrcd_query("UPDATE privilegi SET capomestiere=0 WHERE nome IN ($nomi_in)");
             }
         }
 

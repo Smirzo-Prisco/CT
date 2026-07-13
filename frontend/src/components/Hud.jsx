@@ -39,6 +39,7 @@ import { createPortal } from 'react-dom'
 import OnlineUsers from './OnlineUsers'
 import ChattingOff from './ChattingOff'
 import Meteo from './Meteo'
+import useHudBadges from '../hooks/useHudBadges'
 
 // Posiziona un'icona sull'arco: tx/ty sono le coordinate (px) rispetto al
 // centro dell'anello/logo.
@@ -50,6 +51,22 @@ const arcIcon = (tx, ty) => ({ '--tx': `${tx}px`, '--ty': `${ty}px` })
 const pipOffset = (tx, ty, dist = 24) => {
     const mag = Math.hypot(tx, ty) || 1
     return { '--px': `${(tx / mag) * dist}px`, '--py': `${(ty / mag) * dist}px` }
+}
+
+// Effetto grafico da sovrapporre al cerchio-luogo in base alla condizione
+// restituita da api_global.php?op=meteo (stesse chiavi di WEATHER_ICONS in
+// Meteo.jsx). Solo le condizioni con un effetto visivo distintivo hanno una
+// voce: cielo sereno notturno resta senza overlay, l'immagine da sola basta.
+const WEATHER_EFFECTS = {
+    sole: 'sun',
+    sole_nuvoloso: 'cloud',
+    nuvoloso: 'cloud',
+    pioggia: 'rain',
+    temporale: 'storm',
+    neve: 'snow',
+    sole_nebbia: 'fog',
+    luna_nuvoloso: 'cloud',
+    luna_nebbia: 'fog',
 }
 
 // Su mobile .ct-hud__ring ha un transform:scale() (per rimpicciolire il
@@ -177,6 +194,16 @@ export default function Hud({ isStaff }) {
         }
     }, [fetchLocation])
 
+    // Stesso endpoint di Meteo.jsx (giornaliero, richiesta separata per non
+    // accoppiare i due componenti: Meteo e' montato anche da solo altrove).
+    const [meteoData, setMeteoData] = useState(null)
+    useEffect(() => {
+        fetch('/pages/api_global.php?op=meteo')
+            .then(r => r.json())
+            .then(d => { if (d.success) setMeteoData(d) })
+            .catch(() => { })
+    }, [])
+
     // ── Avatar + vitali personaggio (stesso pattern di AnteprimaScheda.jsx) ─
     const [avatar, setAvatar] = useState(() => (window.CT_USER?.url_img_chat ?? '').trim())
     const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null, gilda: null })
@@ -206,130 +233,50 @@ export default function Hud({ isStaff }) {
         return () => window.removeEventListener('ct:location-changed', fetchProfile)
     }, [fetchProfile])
 
-    // ── Badge: messaggi privati (stesso pattern di FrameMessaggi.jsx) ──────
-    const [hasNewMessages, setHasNewMessages] = useState(false)
+    // ── Badge: messaggi privati, chat off, forum, giocate, eventi ───────────
+    const { hasNewMessages, hasNewChatOff, hasNewForum, hasOpenRoles, hasEvents, clearChatOff } = useHudBadges()
 
-    const fetchMessages = useCallback(() => {
-        fetch('/pages/api_global.php?op=getMessages')
+    // ── Presenti nel luogo attuale: badge conteggio + lista nel popover ─────
+    // Un'unica fetch condivisa (props a OnlineUsers) invece delle due fetch
+    // indipendenti di prima verso lo stesso op=presenti — una per il badge
+    // qui, una per la lista dentro OnlineUsers.jsx quando il popover si apre.
+    const [presentiUsers, setPresentiUsers] = useState([])
+    const [presentiIsStaff, setPresentiIsStaff] = useState(false)
+    const presentiIdleRef = useRef(false)
+
+    const fetchPresenti = useCallback(() => {
+        fetch('/pages/api_map.php?op=presenti')
             .then(r => r.json())
             .then(d => {
                 if (!d.success) return
-                setHasNewMessages(d.hasNew)
-
-                // Suono sms.wav al nuovo messaggio: presente in FrameMessaggi.jsx
-                // (il componente sostituito da questo Hud) ma mai riportato qui
-                // durante il redesign — throttle 10 min via localStorage, rispetta
-                // la preferenza utente soundPrefs.dm.
-                if (d.hasNew && d.allowAudio && (window.CT_USER?.soundPrefs?.dm ?? 1)) {
-                    const now = Date.now()
-                    const last = parseInt(localStorage.getItem('last_audio_play') || '0', 10)
-                    if (now - last > 600_000) {
-                        new Audio('../sounds/sms.wav').play().catch(() => { })
-                        localStorage.setItem('last_audio_play', String(now))
-                    }
-                }
+                setPresentiUsers(d.users)
+                setPresentiIsStaff(!!d.is_staff)
             })
-            .catch(err => console.error('[Hud] Errore messaggi:', err))
-    }, [])
-
-    useEffect(() => {
-        fetchMessages()
-        const sock = window.ctSocket
-        if (sock) sock.on('dm:update', fetchMessages)
-        return () => { if (sock) sock.off('dm:update', fetchMessages) }
-    }, [fetchMessages])
-
-    // ── Badge: chat off non letta ────────────────────────────────────────────
-    const [hasNewChatOff, setHasNewChatOff] = useState(false)
-
-    const fetchChatOff = useCallback(() => {
-        fetch('/pages/api_global.php?op=getChatOff')
-            .then(r => r.json())
-            .then(d => { if (d.success) setHasNewChatOff(d.hasNew) })
-            .catch(err => console.error('[Hud] Errore chat off:', err))
-    }, [])
-
-    useEffect(() => {
-        fetchChatOff()
-        const sock = window.ctSocket
-        if (sock) sock.on('chatoff:update', fetchChatOff)
-        return () => { if (sock) sock.off('chatoff:update', fetchChatOff) }
-    }, [fetchChatOff])
-
-    // ── Badge: post forum non letti ──────────────────────────────────────────
-    const [hasNewForum, setHasNewForum] = useState(false)
-
-    const fetchForumUnread = useCallback(() => {
-        fetch('/pages/api_global.php?op=getForumUnread')
-            .then(r => r.json())
-            .then(d => { if (d.success) setHasNewForum(d.has_unread) })
-            .catch(err => console.error('[Hud] Errore forum:', err))
-    }, [])
-
-    useEffect(() => {
-        fetchForumUnread()
-        const sock = window.ctSocket
-        if (sock) sock.on('forum:update', fetchForumUnread)
-        // 'ct:location-changed' scatta solo per i movimenti sulla mappa, MAI per
-        // la navigazione fra pagine (forum incluso) — non basta a rilevare che
-        // l'utente ha letto dei thread. Il vero segnale e' 'ct:forum-read',
-        // emesso da Forum.jsx dopo ogni op=read/readall riuscito.
-        window.addEventListener('ct:location-changed', fetchForumUnread)
-        window.addEventListener('ct:forum-read', fetchForumUnread)
-        return () => {
-            if (sock) sock.off('forum:update', fetchForumUnread)
-            window.removeEventListener('ct:location-changed', fetchForumUnread)
-            window.removeEventListener('ct:forum-read', fetchForumUnread)
-        }
-    }, [fetchForumUnread])
-
-    // ── Badge: giocate aperte ───────────────────────────────────────────────
-    const [hasOpenRoles, setHasOpenRoles] = useState(false)
-
-    const fetchOpenRoles = useCallback(() => {
-        fetch('/pages/api_global.php?op=getOpenRoles')
-            .then(r => r.json())
-            .then(d => { if (d.success) setHasOpenRoles(d.has_open_roles) })
-            .catch(err => console.error('[Hud] Errore giocate:', err))
-    }, [])
-
-    useEffect(() => {
-        fetchOpenRoles()
-        const sock = window.ctSocket
-        if (sock) sock.on('role:update', fetchOpenRoles)
-        return () => { if (sock) sock.off('role:update', fetchOpenRoles) }
-    }, [fetchOpenRoles])
-
-    // ── Badge: eventi calendario di oggi ────────────────────────────────────
-    const [hasEvents, setHasEvents] = useState(false)
-
-    useEffect(() => {
-        fetch('/pages/api_global.php?op=events_today')
-            .then(r => r.json())
-            .then(d => { if (d.success) setHasEvents(d.has_events) })
-            .catch(err => console.error('[Hud] Errore eventi:', err))
-    }, [])
-
-    // ── Badge: presenti nel luogo attuale ───────────────────────────────────
-    const [presentiCount, setPresentiCount] = useState(0)
-
-    const fetchPresentiCount = useCallback(() => {
-        fetch('/pages/api_map.php?op=presenti')
-            .then(r => r.json())
-            .then(d => { if (d.success) setPresentiCount(d.users.length) })
             .catch(err => console.error('[Hud] Errore presenti:', err))
     }, [])
 
     useEffect(() => {
-        fetchPresentiCount()
+        fetchPresenti()
         const sock = window.ctSocket
-        if (sock) sock.on('users:update', fetchPresentiCount)
-        window.addEventListener('ct:location-changed', fetchPresentiCount)
+        // op=presenti ha un side-effect (resetta disponibile=1 nel DB): non
+        // richiamarlo se il pg e' idle, altrimenti lo si marca per sbaglio
+        // come attivo (stesso guard prima in OnlineUsers.jsx).
+        const onUsersUpdate = () => { if (!presentiIdleRef.current) fetchPresenti() }
+        if (sock) sock.on('users:update', onUsersUpdate)
+        window.addEventListener('ct:location-changed', fetchPresenti)
+        const onIdle = () => { presentiIdleRef.current = true }
+        const onActive = () => { presentiIdleRef.current = false }
+        window.addEventListener('ct:idle', onIdle)
+        window.addEventListener('ct:active', onActive)
         return () => {
-            if (sock) sock.off('users:update', fetchPresentiCount)
-            window.removeEventListener('ct:location-changed', fetchPresentiCount)
+            if (sock) sock.off('users:update', onUsersUpdate)
+            window.removeEventListener('ct:location-changed', fetchPresenti)
+            window.removeEventListener('ct:idle', onIdle)
+            window.removeEventListener('ct:active', onActive)
         }
-    }, [fetchPresentiCount])
+    }, [fetchPresenti])
+
+    const presentiCount = presentiUsers.length
 
     // ── Logout (stesso pattern di FrameMessaggi.jsx) ────────────────────────
     const loggingOut = useRef(false)
@@ -388,7 +335,7 @@ export default function Hud({ isStaff }) {
         // stesso "letto" anche sul badge dell'icona senza aspettare un
         // giro di socket (che qui non arriverebbe comunque, essendo
         // un'azione locale e non un nuovo messaggio da altri).
-        if (name === 'chatoff') setHasNewChatOff(false)
+        if (name === 'chatoff') clearChatOff()
         // Su mobile l'arco/lo sfondo scuro dell'anello aperto sono in
         // portal su document.body con z-index molto alto (598, vedi
         // _hud.scss) per stare sopra la scheda a griglia — ma questo li
@@ -433,6 +380,12 @@ export default function Hud({ isStaff }) {
 
     useEffect(() => { setLocationImgFailed(false) }, [locationImg])
 
+    // Condizione "attuale" del giorno di gioco corrente: giorno/notte segue
+    // location.is_notte, gia' usato sopra per scegliere mappa_giorno/notte.png.
+    const weatherFx = meteoData
+        ? WEATHER_EFFECTS[location?.is_notte ? meteoData.attuale.notte_img : meteoData.attuale.giorno_img] ?? null
+        : null
+
     return (
         <div className="ct-hud" ref={hudRef}>
             {/* --expanded quando entrambi gli anelli sono aperti dal cerchio
@@ -447,6 +400,9 @@ export default function Hud({ isStaff }) {
                     {locationImg && !locationImgFailed
                         ? <img src={locationImg} alt={location?.nome ?? ''} onError={() => setLocationImgFailed(true)} />
                         : <i className="fa-solid fa-city" />
+                    }
+                    {locationImg && !locationImgFailed && weatherFx &&
+                        <span className={`ct-hud__weather-fx ct-hud__weather-fx--${weatherFx}`} aria-hidden="true" />
                     }
                 </button>
 
@@ -645,7 +601,7 @@ export default function Hud({ isStaff }) {
                         <span>Presenti qui</span>
                         <a href="main.php?page=presenti_estesi">Vedi tutti <i className="fa-solid fa-arrow-right" /></a>
                     </div>
-                    <OnlineUsers />
+                    <OnlineUsers users={presentiUsers} isStaff={presentiIsStaff} />
                 </div>
             )}
 

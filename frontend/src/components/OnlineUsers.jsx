@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 const HEARTBEAT_MS = 120_000
 
@@ -7,62 +7,34 @@ function sendPing() {
   fetch('/pages/api_map.php?op=ping').catch(() => {})
 }
 
-export default function OnlineUsers() {
-  const [users, setUsers]     = useState([])
-  const [isStaff, setIsStaff] = useState(false)
-
-  const fetchPresenti = useCallback(() => {
-    fetch('/pages/api_map.php?op=presenti')
-      .then(r  => r.json())
-      .then(data => {
-        if (data.success) {
-          setUsers(data.users)
-          setIsStaff(!!data.is_staff)
-        }
-      })
-      .catch(console.error)
-  }, [])
-
+// Lista presenti passata da Hud.jsx (fetch condivisa con il badge conteggio,
+// vedi fetchPresenti li') invece di una fetch propria verso lo stesso
+// api_map.php?op=presenti — qui restano solo l'heartbeat di sessione e il
+// rendering, unica parte non duplicata altrove.
+export default function OnlineUsers({ users = [], isStaff = false }) {
   const heartbeatRef = useRef(null)
-  const isIdleRef    = useRef(false)
 
   useEffect(() => {
-    fetchPresenti()
     heartbeatRef.current = setInterval(sendPing, HEARTBEAT_MS)
 
-    const sock = window.ctSocket
-    // Non chiamare fetchPresenti se l'utente è idle: op=presenti resetta
-    // disponibile=1 nel DB, annullando lo stato assente.
-    const onUsersUpdate = () => {
-      if (!isIdleRef.current) fetchPresenti()
-    }
-    if (sock) sock.on('users:update', onUsersUpdate)
-
-    const onLocationChanged = () => fetchPresenti()
-
-    const onIdle   = () => {
-      isIdleRef.current = true
+    const onIdle = () => {
       clearInterval(heartbeatRef.current)
       heartbeatRef.current = null
     }
     const onActive = () => {
-      isIdleRef.current = false
       if (!heartbeatRef.current) {
         heartbeatRef.current = setInterval(sendPing, HEARTBEAT_MS)
       }
     }
-    window.addEventListener('ct:location-changed', onLocationChanged)
-    window.addEventListener('ct:idle',   onIdle)
+    window.addEventListener('ct:idle', onIdle)
     window.addEventListener('ct:active', onActive)
 
     return () => {
       clearInterval(heartbeatRef.current)
-      if (sock) sock.off('users:update', onUsersUpdate)
-      window.removeEventListener('ct:location-changed', onLocationChanged)
-      window.removeEventListener('ct:idle',   onIdle)
+      window.removeEventListener('ct:idle', onIdle)
       window.removeEventListener('ct:active', onActive)
     }
-  }, [fetchPresenti])
+  }, [])
 
   const openMsg = (nome) => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(nome)}`)
 
