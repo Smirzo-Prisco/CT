@@ -292,7 +292,8 @@ switch ($op) {
 
         } elseif (!empty($destinatario)) {
             // Messaggio individuale — usa send_sms() di custom_functions
-            send_sms($_SESSION['login'], $destinatario, '', $messaggio, $ongame);
+            // notifyNewDm=true: DM reale fra due giocatori (Fase E, evento nuovo_dm)
+            send_sms($_SESSION['login'], $destinatario, '', $messaggio, $ongame, true);
             // send_sms() già chiama notifySocketServer internamente
 
             // Recupera id conversazione appena creata/aggiornata

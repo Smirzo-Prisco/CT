@@ -101,6 +101,74 @@ $pref-muted:   #7a8499;
         }
     }
 
+    // ── Notifiche ──────────────────────────────────────────────
+    // display:contents sulle righe: i loro figli (label + 2 checkbox) entrano
+    // direttamente nella grid del genitore (3 colonne), niente grid annidate.
+    &__notif-grid {
+        display: grid;
+        grid-template-columns: 1fr 64px 64px;
+        gap: 4px 8px;
+    }
+
+    &__notif-head {
+        display: contents;
+
+        span {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: $pref-muted;
+            text-align: center;
+            padding-bottom: 4px;
+        }
+    }
+
+    &__notif-row { display: contents; }
+
+    &__notif-label {
+        display: flex;
+        align-items: center;
+        padding: 8px 10px;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+    }
+
+    // Evento senza canale DM applicabile (es. nuovo_dm — notificare un DM
+    // con un altro DM sarebbe circolare): trattino al posto della checkbox.
+    &__notif-na {
+        justify-self: center;
+        align-self: center;
+        color: $pref-muted;
+    }
+
+    // Stesso toggle switch di &__row sopra (checkbox nativa ridisegnata).
+    &__notif-grid input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 34px;
+        height: 20px;
+        justify-self: center;
+        align-self: center;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid $pref-border;
+        border-radius: 999px;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.15s ease;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 1px; left: 1px;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: $pref-muted;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        &:checked { background: rgba(196, 148, 48, 0.3); }
+        &:checked::before { transform: translateX(14px); background: $pref-gold-h; }
+    }
+
     // ── Colori land ──────────────────────────────────────────
     &__palettes {
         display: grid;
