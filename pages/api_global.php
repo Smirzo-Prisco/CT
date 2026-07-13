@@ -1134,6 +1134,51 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode(['success' => true]);
             break;
 
+        // -------------------------------------------------------------------------
+        // NOTIFICHE — preferenze per evento x canale (Uffici > Preferenze)
+        // Solo i 3 eventi gia' generati dal motore fan-out (Fase C, api_forum.php):
+        // nuovo_post_sezione e nuovo_dm arrivano con le fasi F/E, quando esistera'
+        // davvero un trigger che li produce.
+        // -------------------------------------------------------------------------
+        case 'getNotificationPrefs':
+            session_start();
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+
+            $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio'];
+            $prefs  = [];
+            foreach ($eventi as $ev) $prefs[$ev] = ['dm' => 1, 'email' => 0]; // default
+
+            $res = gdrcd_query("SELECT evento, via_dm, via_email FROM preferenze_notifiche
+                WHERE nome = '$login_f'", 'result');
+            while ($row = gdrcd_query($res, 'fetch')) {
+                if (isset($prefs[$row['evento']])) {
+                    $prefs[$row['evento']] = ['dm' => (int)$row['via_dm'], 'email' => (int)$row['via_email']];
+                }
+            }
+            gdrcd_query($res, 'free');
+
+            echo json_encode(['success' => true, 'prefs' => $prefs]);
+            break;
+
+        case 'saveNotificationPrefs':
+            session_start();
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+
+            $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio'];
+            foreach (($data['prefs'] ?? []) as $evento => $canali) {
+                if (!in_array($evento, $eventi_validi, true)) continue; // ignora chiavi non valide/impreviste
+
+                $via_dm    = !empty($canali['dm'])    ? 1 : 0;
+                $via_email = !empty($canali['email']) ? 1 : 0;
+
+                gdrcd_query("INSERT INTO preferenze_notifiche (nome, evento, via_dm, via_email)
+                    VALUES ('$login_f', '$evento', $via_dm, $via_email)
+                    ON DUPLICATE KEY UPDATE via_dm = VALUES(via_dm), via_email = VALUES(via_email)");
+            }
+
+            echo json_encode(['success' => true]);
+            break;
+
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
     /*********************  FINE    Recupero i dati dell'utente che voglio modificare   */

@@ -17,7 +17,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
@@ -29,6 +29,16 @@ function navigate(url) {
 // ---------------------------------------------------------------------------
 
 const PALETTE_STORAGE_KEY = 'ct_hud_palette'
+
+// Solo i 3 eventi gia' generati dal motore fan-out (Fase C, api_forum.php):
+// nuovo_post_sezione/nuovo_dm arrivano con le fasi F/E, quando esistera'
+// davvero un trigger che li produce — mostrare il toggle ora sarebbe
+// un interruttore senza alcun effetto.
+const NOTIFICATION_EVENTS = [
+    { key: 'commento_post_seguito',    label: 'Nuovo commento sui post che seguo' },
+    { key: 'commento_post_commentato', label: 'Nuovo commento sui post che ho commentato' },
+    { key: 'commento_post_proprio',    label: 'Nuovo commento sui post che ho creato' },
+]
 
 // swatch = [ink, gold] — stessi valori esatti delle varianti body[data-palette] in _hud.scss
 const PALETTES = [
@@ -69,6 +79,31 @@ export default function Preferenze() {
         })
     }, [])
 
+    // ── Notifiche ────────────────────────────────────────────────────────
+    const [notifPrefs, setNotifPrefs] = useState(null)
+
+    useEffect(() => {
+        fetch('/pages/api_global.php?op=getNotificationPrefs')
+            .then(r => r.json())
+            .then(d => { if (d.success) setNotifPrefs(d.prefs) })
+            .catch(() => {})
+    }, [])
+
+    const handleNotifToggle = useCallback((evento, canale) => {
+        setNotifPrefs(prev => {
+            const next = {
+                ...prev,
+                [evento]: { ...prev[evento], [canale]: prev[evento][canale] ? 0 : 1 },
+            }
+            fetch('/pages/api_global.php?op=saveNotificationPrefs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prefs: next }),
+            }).catch(() => {})
+            return next
+        })
+    }, [])
+
     // ── Colori land ──────────────────────────────────────────────────────
     const [palette, setPalette] = useState(() => localStorage.getItem(PALETTE_STORAGE_KEY) || 'public')
 
@@ -103,6 +138,35 @@ export default function Preferenze() {
                     <input type="checkbox" checked={!!soundPrefs.scheda} onChange={() => handleSoundToggle('scheda')} />
                 </label>
             </div>
+
+            {notifPrefs && (
+                <div className="preferenze-page__section">
+                    <div className="preferenze-page__section-title">Notifiche</div>
+
+                    <div className="preferenze-page__notif-grid">
+                        <div className="preferenze-page__notif-head">
+                            <span />
+                            <span>Messaggio</span>
+                            <span>Email</span>
+                        </div>
+                        {NOTIFICATION_EVENTS.map(({ key, label }) => (
+                            <div key={key} className="preferenze-page__notif-row">
+                                <span className="preferenze-page__notif-label">{label}</span>
+                                <input
+                                    type="checkbox"
+                                    checked={!!notifPrefs[key]?.dm}
+                                    onChange={() => handleNotifToggle(key, 'dm')}
+                                />
+                                <input
+                                    type="checkbox"
+                                    checked={!!notifPrefs[key]?.email}
+                                    onChange={() => handleNotifToggle(key, 'email')}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="preferenze-page__section">
                 <div className="preferenze-page__section-title">Colori land</div>
