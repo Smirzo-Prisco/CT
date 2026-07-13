@@ -211,43 +211,108 @@ body[data-palette="public"] {
     backdrop-filter: blur(1.5px);
     animation: ct-hud-weather-glow 6s ease-in-out infinite;
 }
-// Gocce vere invece di un tratteggio continuo: un repeating-linear-gradient
-// con periodo piccolo (versione precedente) riempie il cerchio di righe
-// fitte edge-to-edge, perche' si ripete all'infinito senza spazi vuoti
-// lungo la propria lunghezza. Qui invece ogni "goccia" e' una banda sfumata
-// dentro un tile grande per lo piu' trasparente (background-size), ripetuto
-// da background-repeat: risultato, poche strisce staccate invece di una
-// texture piena. Due layer con tile/offset diversi (velocita' diverse nel
-// keyframe) danno un accenno di profondita': banda stretta (43-49% del
-// tile, ~1px di "core" pieno) sul layer vicino, ancora piu' stretta e
-// piu' trasparente (18-22% invece di 50-60%) sul layer lontano, per
-// leggersi come gocce sottili in lontananza invece che come il layer
-// vicino rimpicciolito. Il terzo layer (vignettatura radiale, non anima
-// posizione) suggerisce l'acqua sul fondo del cerchio.
-// Stesse dimensioni tile per rain/storm (solo colori/opacita'/durata
-// cambiano): cosi' condividono lo stesso keyframe sotto, i cui spostamenti
-// sono calcolati su misura per queste due dimensioni (loop perfettamente
-// seamless su entrambi gli assi — uno spostamento diverso dalla dimensione
-// esatta del tile lascerebbe uno "scatto" visibile ad ogni ripartenza).
+// Gocce vere invece di un tratteggio continuo. Un repeating-linear-gradient
+// (primo tentativo) riempiva il cerchio di righe fitte edge-to-edge. Un
+// linear-gradient dentro un tile per lo piu' trasparente (secondo tentativo)
+// risolveva la densita' ma non la forma: gli stop percentuali di un
+// linear-gradient controllano solo lo SPESSORE della banda — la banda si
+// estende comunque per l'intera diagonale del tile, non ha una lunghezza
+// propria regolabile (nessun modo di accorciarla senza assottigliarla).
+//
+// Ogni goccia e' quindi un'ellisse (radial-gradient con raggi X/Y diversi):
+// il raggio maggiore e' la LUNGHEZZA, quello minore lo SPESSORE — due
+// dimensioni indipendenti, a differenza del linear-gradient. L'ellisse vive
+// in un layer ::before ruotato (transform: rotate), separato dalla
+// vignettatura di fondo (sul layer principale, NON ruotata) cosi' l'una non
+// influenza l'altra. inset:-25% sul layer ruotato evita angoli vuoti visibili
+// ai bordi del cerchio dopo la rotazione (l'eccesso resta comunque tagliato
+// dall'overflow:hidden di .ct-hud__thumb, l'antenato).
+//
+// Due tile diversi (vicino/lontano, velocita' diverse nel keyframe) danno
+// profondita': il layer lontano ha raggi ed opacita' minori, per leggersi
+// come gocce sottili in lontananza invece che come il layer vicino
+// rimpicciolito. Stesse dimensioni tile per rain/storm (solo colori/opacita'/
+// durata cambiano): condividono lo stesso keyframe, i cui spostamenti sono
+// calcolati sulla dimensione esatta dei tile per un loop senza scatti.
+// ::before e ::after invece di due layer sullo stesso pseudo-elemento: un
+// solo elemento puo' avere una sola "animation", quindi i due layer erano
+// condannati a muoversi esattamente alla stessa velocita' (oltre ad avere
+// colore/opacita' troppo simili per distinguersi a colpo d'occhio). Ora sono
+// due elementi indipendenti, ciascuno con propria dimensione/colore/velocita'.
+// Terzo layer "medio": un solo elemento puo' avere solo ::before/::after
+// (gia' usati per vicino/lontano), quindi il terzo e' un vero figlio nel DOM
+// (.ct-hud__weather-fx-mid, vedi Hud.jsx) invece di un altro pseudo-elemento
+// — cosi' puo' ruotare in modo indipendente dalla vignettatura, che resta
+// sull'elemento principale (mai ruotata, altrimenti si stacca dal fondo
+// del cerchio). Ordine dimensione/velocita': vicino > medio > lontano, ma
+// vicino resta di poco (non di molto) piu' lungo del lontano — sono vicini
+// in lunghezza, si distinguono soprattutto per spessore e velocita'.
 .ct-hud__weather-fx--rain {
     background-color: rgb(10 20 40 / 12%);
-    background-image:
-        linear-gradient(115deg, transparent 43%, rgb(190 215 255 / 50%) 45%, rgb(190 215 255 / 50%) 47%, transparent 49%),
-        linear-gradient(112deg, transparent 44%, rgb(190 215 255 / 18%) 46%, rgb(190 215 255 / 18%) 47%, transparent 49%),
-        radial-gradient(ellipse at 50% 100%, rgb(10 20 40 / 40%), transparent 65%);
-    background-size: 32px 42px, 48px 60px, 100% 100%;
-    background-repeat: repeat, repeat, no-repeat;
-    animation: ct-hud-weather-rain .9s linear infinite;
+    background-image: radial-gradient(ellipse at 50% 100%, rgb(10 20 40 / 40%), transparent 65%);
+
+    // Vicino: goccia piu' grande, piu' opaca, cade piu' veloce. I valori
+    // dell'ellisse sono RAGGI (meta' della dimensione totale).
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -25%;
+        background-image: radial-gradient(ellipse 1px 8.5px, rgb(200 222 255 / 78%), transparent 75%);
+        background-size: 30px 40px;
+        transform: rotate(25deg);
+        animation: ct-hud-weather-raindrop-near .25s linear infinite;
+    }
+    // Lontano: piu' sottile e piu' lento del vicino, ma opacita' alta
+    // (altrimenti troppo debole ad occhio nudo, restava invisibile).
+    &::after {
+        content: '';
+        position: absolute;
+        inset: -25%;
+        background-image: radial-gradient(ellipse .6px 8px, rgb(210 225 245 / 85%), transparent 75%);
+        background-size: 46px 58px;
+        transform: rotate(25deg);
+        animation: ct-hud-weather-raindrop-far .55s linear infinite;
+    }
+    .ct-hud__weather-fx-mid {
+        position: absolute;
+        inset: -25%;
+        background-image: radial-gradient(ellipse .8px 8.2px, rgb(205 220 250 / 80%), transparent 75%);
+        background-size: 38px 50px;
+        transform: rotate(25deg);
+        animation: ct-hud-weather-raindrop-mid .4s linear infinite;
+    }
 }
 .ct-hud__weather-fx--storm {
     background-color: rgb(5 8 20 / 22%);
-    background-image:
-        linear-gradient(115deg, transparent 43%, rgb(190 210 255 / 60%) 45%, rgb(190 210 255 / 60%) 47%, transparent 49%),
-        linear-gradient(112deg, transparent 44%, rgb(190 210 255 / 22%) 46%, rgb(190 210 255 / 22%) 47%, transparent 49%),
-        radial-gradient(ellipse at 50% 100%, rgb(5 8 20 / 50%), transparent 65%);
-    background-size: 32px 42px, 48px 60px, 100% 100%;
-    background-repeat: repeat, repeat, no-repeat;
-    animation: ct-hud-weather-rain .5s linear infinite, ct-hud-weather-flash 5s ease-in-out infinite;
+    background-image: radial-gradient(ellipse at 50% 100%, rgb(5 8 20 / 50%), transparent 65%);
+    animation: ct-hud-weather-flash 5s ease-in-out infinite;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -25%;
+        background-image: radial-gradient(ellipse 1px 8.5px, rgb(200 218 255 / 88%), transparent 75%);
+        background-size: 30px 40px;
+        transform: rotate(25deg);
+        animation: ct-hud-weather-raindrop-near .15s linear infinite;
+    }
+    &::after {
+        content: '';
+        position: absolute;
+        inset: -25%;
+        background-image: radial-gradient(ellipse .6px 8px, rgb(210 222 245 / 90%), transparent 75%);
+        background-size: 46px 58px;
+        transform: rotate(25deg);
+        animation: ct-hud-weather-raindrop-far .325s linear infinite;
+    }
+    .ct-hud__weather-fx-mid {
+        position: absolute;
+        inset: -25%;
+        background-image: radial-gradient(ellipse .8px 8.2px, rgb(205 218 250 / 85%), transparent 75%);
+        background-size: 38px 50px;
+        transform: rotate(25deg);
+        animation: ct-hud-weather-raindrop-mid .225s linear infinite;
+    }
 }
 .ct-hud__weather-fx--snow {
     background-image:
@@ -267,9 +332,23 @@ body[data-palette="public"] {
 // Spostamento = esattamente la dimensione del tile di ciascun layer (32x42 e
 // 48x60, vedi sopra): il pattern combacia perfettamente con se stesso a fine
 // ciclo, nessuno scatto visibile alla ripartenza dell'animazione.
-@keyframes ct-hud-weather-rain {
-    from { background-position: 0 0, 0 0, 50% 100%; }
-    to   { background-position: -32px 42px, -48px 60px, 50% 100%; }
+// Spostamento = esattamente la dimensione del tile di ciascun layer (30x40 e
+// 46x58, vedi sopra): il pattern combacia con se stesso a fine ciclo, nessuno
+// scatto visibile alla ripartenza. Il layer vignettatura vive sull'elemento
+// principale (non ruotato, non animato) quindi qui restano solo le 2 gocce.
+// Uno spostamento per layer invece di uno condiviso: ciascuno pari alla
+// dimensione esatta del proprio tile (30x40 / 46x58), loop senza scatti.
+@keyframes ct-hud-weather-raindrop-near {
+    from { background-position: 0 0; }
+    to   { background-position: -30px 40px; }
+}
+@keyframes ct-hud-weather-raindrop-far {
+    from { background-position: 0 0; }
+    to   { background-position: -46px 58px; }
+}
+@keyframes ct-hud-weather-raindrop-mid {
+    from { background-position: 0 0; }
+    to   { background-position: -38px 50px; }
 }
 @keyframes ct-hud-weather-snow {
     from { background-position: 0 0, 10px 6px, 20px 14px; }
