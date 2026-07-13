@@ -1324,10 +1324,15 @@ export default function Forum({ isStaff = false, initialThread = null }) {
             <div className="pagina_forum">
                 <div className={styles.backBar}>
                     <button onClick={backToThreads}>← {currentSection?.nome}</button>
+                    {/* NON spingere questo bottone sul bordo destro (es. margin-left:
+                        auto): l'anello destro dell'HUD (avatar, 173px) e' un riquadro
+                        invisibile ancorato in alto a destra che sconfina leggermente
+                        sotto #maincontent (top:136px vs anello alto fino a 178px) —
+                        un bottone li' sotto viene "rubato" dall'anello (hover/click
+                        intercettati, la topbar HUD reagisce invece del bottone). */}
                     <button
                         type="button"
                         className="btn--ghost"
-                        style={{ marginLeft: 'auto' }}
                         onClick={toggleFollow}
                     >
                         {isFollowing ? 'Non seguire' : 'Segui'}
