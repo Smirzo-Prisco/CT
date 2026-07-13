@@ -16,6 +16,7 @@
  *   GET  ?op=read&thread=X        → thread + risposte (segna come letto)
  *   POST ?op=post                 → nuovo thread o risposta
  *   POST ?op=markread             → segna thread come letto
+ *   POST ?op=follow_thread        → toggle "Segui"/"Non seguire" sul thread
  *
  * Montaggio: via ct:ready su #forum-container in forum.inc.php
  *
@@ -755,6 +756,8 @@ export default function Forum({ isStaff = false, initialThread = null }) {
     const [puntiList,       setPuntiList]       = useState([])
     /** Dati grezzi quest precaricati per la vista edit_quest */
     const [editQuestData,   setEditQuestData]   = useState(null)
+    /** Segue il thread corrente (bottone "Segui"/"Non seguire" nella vista 'read') */
+    const [isFollowing,     setIsFollowing]     = useState(false)
 
     // --- stati UI ---
     const [loadingSections, setLoadingSections] = useState(true)
@@ -812,6 +815,7 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                 if (data.success) {
                     setMessages(data.messages)
                     setPuntiList(data.punti_list ?? [])
+                    setIsFollowing(!!data.is_following)
                     // L'HUD (icona Forum) non ha altro modo di sapere che un thread e'
                     // stato letto: 'forum:update' via socket arriva solo per i NUOVI
                     // post, e 'ct:location-changed' non scatta per la navigazione fra
@@ -837,6 +841,7 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                 if (data.success) {
                     setMessages(data.messages)
                     setPuntiList(data.punti_list ?? [])
+                    setIsFollowing(!!data.is_following)
                     if (data.sezione) setCurrentSection(data.sezione)
                     setCurrentThread({
                         id:     initialThread,
@@ -939,6 +944,19 @@ export default function Forum({ isStaff = false, initialThread = null }) {
             })
             .catch(console.error)
     }
+
+    /** Toggle "Segui"/"Non seguire" sul thread corrente */
+    const toggleFollow = useCallback(() => {
+        if (!currentThread?.id) return
+        fetch('/pages/api_forum.php?op=follow_thread', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ thread_id: currentThread.id }),
+        })
+            .then(r => r.json())
+            .then(data => { if (data.success) setIsFollowing(data.is_following) })
+            .catch(console.error)
+    }, [currentThread])
 
     /** Torna alla lista thread della sezione corrente */
     const backToThreads = () => {
@@ -1306,6 +1324,14 @@ export default function Forum({ isStaff = false, initialThread = null }) {
             <div className="pagina_forum">
                 <div className={styles.backBar}>
                     <button onClick={backToThreads}>← {currentSection?.nome}</button>
+                    <button
+                        type="button"
+                        className="btn--ghost"
+                        style={{ marginLeft: 'auto' }}
+                        onClick={toggleFollow}
+                    >
+                        {isFollowing ? 'Non seguire' : 'Segui'}
+                    </button>
                 </div>
 
                 {loadingRead ? (

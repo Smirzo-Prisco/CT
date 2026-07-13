@@ -245,14 +245,46 @@ switch ($op) {
             gdrcd_query($px_res, 'free');
         }
 
+        // Stato follow (pulsante Segui/Non seguire lato client)
+        $follow_row = gdrcd_query("SELECT 1 FROM araldo_follow
+            WHERE nome = '" . gdrcd_filter('in', $login) . "' AND tipo_oggetto = 'thread' AND riferimento_id = $thread_id");
+
         echo json_encode([
-            'success'    => true,
-            'sezione'    => $sezione,
-            'thread_id'  => $thread_id,
-            'chiuso'     => $messages[0]['chiuso'],
-            'messages'   => $messages,
-            'punti_list' => $punti_list,
+            'success'      => true,
+            'sezione'      => $sezione,
+            'thread_id'    => $thread_id,
+            'chiuso'       => $messages[0]['chiuso'],
+            'messages'     => $messages,
+            'punti_list'   => $punti_list,
+            'is_following' => (bool)$follow_row,
         ]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // FOLLOW_THREAD — toggle "Segui"/"Non seguire" manuale su un thread
+    // -------------------------------------------------------------------------
+    case 'follow_thread':
+        $thread_id = (int)($data['thread_id'] ?? 0);
+        $login_f   = gdrcd_filter('in', $login);
+
+        $already = gdrcd_query("SELECT 1 FROM araldo_follow
+            WHERE nome = '$login_f' AND tipo_oggetto = 'thread' AND riferimento_id = $thread_id");
+
+        if ($already) {
+            gdrcd_query("DELETE FROM araldo_follow
+                WHERE nome = '$login_f' AND tipo_oggetto = 'thread' AND riferimento_id = $thread_id");
+            $is_following = false;
+        } else {
+            // Non declassa mai un follow 'autore' gia' presente (caso limite:
+            // due richieste quasi simultanee, l'IGNORE di case 'post' potrebbe
+            // non aver ancora scritto la riga quando arriva questo toggle).
+            gdrcd_query("INSERT INTO araldo_follow (nome, tipo_oggetto, riferimento_id, tipo_segui)
+                VALUES ('$login_f', 'thread', $thread_id, 'manuale')
+                ON DUPLICATE KEY UPDATE tipo_segui = IF(tipo_segui = 'autore', 'autore', 'manuale')");
+            $is_following = true;
+        }
+
+        echo json_encode(['success' => true, 'is_following' => $is_following]);
         break;
 
     // -------------------------------------------------------------------------
@@ -305,6 +337,15 @@ switch ($op) {
 
 
         $resp_thread_id = $padre == -1 ? $new_id : $padre;
+
+        // Auto-follow: chi crea il thread lo segue come 'autore', chi
+        // risponde come 'commentato' — IGNORE non tocca un follow gia'
+        // esistente (es. l'autore che risponde al proprio thread resta
+        // 'autore', non viene declassato a 'commentato').
+        $follow_tipo = $padre == -1 ? 'autore' : 'commentato';
+        gdrcd_query("INSERT IGNORE INTO araldo_follow (nome, tipo_oggetto, riferimento_id, tipo_segui)
+            VALUES ('" . gdrcd_filter('in', $login) . "', 'thread', $resp_thread_id, '$follow_tipo')");
+
         notifyForumUpdate($araldo_id, $resp_thread_id);
 
         echo json_encode([
