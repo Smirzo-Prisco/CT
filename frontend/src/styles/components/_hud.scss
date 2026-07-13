@@ -204,14 +204,27 @@ body[data-palette="public"] {
     backdrop-filter: blur(1.5px);
     animation: ct-hud-weather-glow 6s ease-in-out infinite;
 }
+// Due layer di gocce invece di uno solo (angoli/spaziature leggermente
+// diversi, velocita' diverse nel keyframe sotto): da' un accenno di
+// profondita'/parallasse — gocce "vicine" piu' dense e veloci, "lontane"
+// piu' rade e lente — invece di un tratteggio piatto che si muove in
+// blocco. Terzo layer: vignettatura radiale statica verso il basso, a
+// suggerire l'acqua che si accumula sul fondo del cerchio (non anima la
+// posizione, vedi il terzo valore fisso "50% 100%" nel keyframe).
 .ct-hud__weather-fx--rain {
     background-color: rgb(10 20 40 / 20%);
-    background-image: repeating-linear-gradient(115deg, rgb(180 210 255 / 55%) 0 1px, transparent 1px 10px);
+    background-image:
+        repeating-linear-gradient(115deg, rgb(180 210 255 / 55%) 0 1px, transparent 1px 10px),
+        repeating-linear-gradient(112deg, rgb(180 210 255 / 28%) 0 1px, transparent 1px 17px),
+        radial-gradient(ellipse at 50% 100%, rgb(10 20 40 / 45%), transparent 65%);
     animation: ct-hud-weather-rain .5s linear infinite;
 }
 .ct-hud__weather-fx--storm {
     background-color: rgb(5 8 20 / 35%);
-    background-image: repeating-linear-gradient(115deg, rgb(180 200 255 / 60%) 0 1px, transparent 1px 9px);
+    background-image:
+        repeating-linear-gradient(115deg, rgb(180 200 255 / 60%) 0 1px, transparent 1px 9px),
+        repeating-linear-gradient(112deg, rgb(180 200 255 / 32%) 0 1px, transparent 1px 15px),
+        radial-gradient(ellipse at 50% 100%, rgb(5 8 20 / 55%), transparent 65%);
     animation: ct-hud-weather-rain .4s linear infinite, ct-hud-weather-flash 5s ease-in-out infinite;
 }
 .ct-hud__weather-fx--snow {
@@ -230,8 +243,8 @@ body[data-palette="public"] {
     50%      { opacity: 1; }
 }
 @keyframes ct-hud-weather-rain {
-    from { background-position: 0 0; }
-    to   { background-position: -12px 22px; }
+    from { background-position: 0 0, 0 0, 50% 100%; }
+    to   { background-position: -12px 22px, -7px 32px, 50% 100%; }
 }
 @keyframes ct-hud-weather-snow {
     from { background-position: 0 0, 10px 6px, 20px 14px; }
