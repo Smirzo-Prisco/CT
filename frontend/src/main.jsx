@@ -48,7 +48,6 @@ import { initSocket } from './socket'
 
 // Importazione di tutti i componenti registrati
 import OnlineUsers     from './components/OnlineUsers'
-import PresentiBadge   from './components/PresentiBadge'
 import ChatViewer      from './components/ChatViewer'
 import TargetSelector  from './components/TargetSelector'
 import PresentiEstesi  from './components/PresentiEstesi'
@@ -57,9 +56,6 @@ import MapClick        from './components/MapClick'
 import ChatShell       from './components/ChatShell'
 import Forum           from './components/Forum'
 import AppRouter, { MIGRATED_PAGES } from './AppRouter'
-import InfoLocation   from './components/InfoLocation'
-import FrameMessaggi   from './components/FrameMessaggi'
-import LinkMenu        from './components/LinkMenu'
 import ChattingOff     from './components/ChattingOff'
 import Meteo           from './components/Meteo'
 import Hud             from './components/Hud'
@@ -123,7 +119,6 @@ window.CT = {
 
 /** Box utenti online nella colonna laterale — si aggiorna via socket users:update */
 window.CT.register('OnlineUsers', OnlineUsers)
-window.CT.register('PresentiBadge', PresentiBadge)
 
 /** Visualizzatore messaggi chat di gioco — si aggiorna via socket chat:update */
 window.CT.register('ChatViewer', ChatViewer)
@@ -145,15 +140,6 @@ window.CT.register('ChatShell', ChatShell)
 
 /** Forum (Araldo): sezioni → thread → lettura → composizione */
 window.CT.register('Forum', Forum)
-
-/** Info luogo corrente con immagine, anno, stato e breaking news — aggiornato via users:update */
-window.CT.register('InfoLocation', InfoLocation)
-
-/** Meteo + griglia icone + notifiche messaggi/chatoff real-time via dm:update e chatoff:update */
-window.CT.register('FrameMessaggi', FrameMessaggi)
-
-/** Select gotomap aggiornato via socket + link menu con hover effect */
-window.CT.register('LinkMenu', LinkMenu)
 
 /** Chattina off integrata in fondo alla colonna sinistra — si aggiorna via socket chatoff:update */
 window.CT.register('ChattingOff', ChattingOff)
