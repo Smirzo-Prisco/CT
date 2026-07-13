@@ -1136,15 +1136,17 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
         // -------------------------------------------------------------------------
         // NOTIFICHE — preferenze per evento x canale (Uffici > Preferenze)
-        // Solo i 3 eventi gia' generati dal motore fan-out (Fase C, api_forum.php):
-        // nuovo_post_sezione e nuovo_dm arrivano con le fasi F/E, quando esistera'
-        // davvero un trigger che li produce.
+        // I 3 eventi commento_* (fan-out Fase C, api_forum.php) + nuovo_dm
+        // (Fase E, send_sms in custom_functions.inc.php — solo canale email,
+        // via_dm non applicabile: notificare un DM con un DM sarebbe circolare).
+        // nuovo_post_sezione resta fuori: arriva con la Fase F, quando esistera'
+        // davvero un trigger che lo produce.
         // -------------------------------------------------------------------------
         case 'getNotificationPrefs':
             session_start();
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
-            $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio'];
+            $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm'];
             $prefs  = [];
             foreach ($eventi as $ev) $prefs[$ev] = ['dm' => 1, 'email' => 0]; // default
 
@@ -1156,6 +1158,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 }
             }
             gdrcd_query($res, 'free');
+            $prefs['nuovo_dm']['dm'] = 0; // non applicabile (vedi commento sopra), forzato dopo il merge
 
             echo json_encode(['success' => true, 'prefs' => $prefs]);
             break;
@@ -1164,11 +1167,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             session_start();
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
-            $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio'];
+            $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm'];
             foreach (($data['prefs'] ?? []) as $evento => $canali) {
                 if (!in_array($evento, $eventi_validi, true)) continue; // ignora chiavi non valide/impreviste
 
-                $via_dm    = !empty($canali['dm'])    ? 1 : 0;
+                // nuovo_dm: via_dm non applicabile (vedi getNotificationPrefs), sempre 0
+                // indipendentemente da cosa arriva dal client.
+                $via_dm    = ($evento !== 'nuovo_dm' && !empty($canali['dm'])) ? 1 : 0;
                 $via_email = !empty($canali['email']) ? 1 : 0;
 
                 gdrcd_query("INSERT INTO preferenze_notifiche (nome, evento, via_dm, via_email)

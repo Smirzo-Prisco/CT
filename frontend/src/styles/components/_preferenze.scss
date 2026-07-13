@@ -133,6 +133,14 @@ $pref-muted:   #7a8499;
         letter-spacing: 0.03em;
     }
 
+    // Evento senza canale DM applicabile (es. nuovo_dm — notificare un DM
+    // con un altro DM sarebbe circolare): trattino al posto della checkbox.
+    &__notif-na {
+        justify-self: center;
+        align-self: center;
+        color: $pref-muted;
+    }
+
     // Stesso toggle switch di &__row sopra (checkbox nativa ridisegnata).
     &__notif-grid input[type="checkbox"] {
         appearance: none;

@@ -30,14 +30,17 @@ function navigate(url) {
 
 const PALETTE_STORAGE_KEY = 'ct_hud_palette'
 
-// Solo i 3 eventi gia' generati dal motore fan-out (Fase C, api_forum.php):
-// nuovo_post_sezione/nuovo_dm arrivano con le fasi F/E, quando esistera'
-// davvero un trigger che li produce — mostrare il toggle ora sarebbe
-// un interruttore senza alcun effetto.
+// I 3 eventi commento_* (fan-out Fase C) + nuovo_dm (Fase E, solo email: un
+// DM non puo' notificare un altro DM, non applicabile via_dm — dmOnly:false
+// nasconde la checkbox del messaggio per quella riga). nuovo_post_sezione
+// resta fuori: arrivera' con la Fase F, quando esistera' davvero un trigger
+// che lo produce — mostrare il toggle ora sarebbe un interruttore senza
+// alcun effetto.
 const NOTIFICATION_EVENTS = [
     { key: 'commento_post_seguito',    label: 'Nuovo commento sui post che seguo' },
     { key: 'commento_post_commentato', label: 'Nuovo commento sui post che ho commentato' },
     { key: 'commento_post_proprio',    label: 'Nuovo commento sui post che ho creato' },
+    { key: 'nuovo_dm',                 label: 'Nuovo messaggio privato ricevuto', emailOnly: true },
 ]
 
 // swatch = [ink, gold] — stessi valori esatti delle varianti body[data-palette] in _hud.scss
@@ -149,14 +152,18 @@ export default function Preferenze() {
                             <span>Messaggio</span>
                             <span>Email</span>
                         </div>
-                        {NOTIFICATION_EVENTS.map(({ key, label }) => (
+                        {NOTIFICATION_EVENTS.map(({ key, label, emailOnly }) => (
                             <div key={key} className="preferenze-page__notif-row">
                                 <span className="preferenze-page__notif-label">{label}</span>
-                                <input
-                                    type="checkbox"
-                                    checked={!!notifPrefs[key]?.dm}
-                                    onChange={() => handleNotifToggle(key, 'dm')}
-                                />
+                                {emailOnly
+                                    ? <span className="preferenze-page__notif-na" title="Non applicabile">—</span>
+                                    : (
+                                        <input
+                                            type="checkbox"
+                                            checked={!!notifPrefs[key]?.dm}
+                                            onChange={() => handleNotifToggle(key, 'dm')}
+                                        />
+                                    )}
                                 <input
                                     type="checkbox"
                                     checked={!!notifPrefs[key]?.email}

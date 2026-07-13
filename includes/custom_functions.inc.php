@@ -205,7 +205,13 @@ function hasPermesso(array $permessi_utente, array $permessi_richiesti) {
 
 // Manda sms interni alla land
 // On e off game usano conversazioni separate tra la stessa coppia di utenti.
-function send_sms($from, $to, $title, $text, $ongame = 0) {
+// $notifyNewDm: accoda una notifica email (evento nuovo_dm, Fase E) solo per
+// i DM realmente scambiati fra due giocatori — mai per i mittenti di sistema
+// (Notifiche, Staff, System, Segnalazione, bot...), altrimenti un DM di
+// sistema finirebbe per generare un'email "hai un nuovo messaggio" ricorsiva.
+// Va passato true esplicitamente dai soli punti dove $from e' un personaggio
+// reale che sta scrivendo a un altro giocatore (vedi api_messages.php).
+function send_sms($from, $to, $title, $text, $ongame = 0, $notifyNewDm = false) {
     $from_safe  = gdrcd_filter('in', $from);
     $to_safe    = gdrcd_filter('in', $to);
     $ongame_int = $ongame ? 1 : 0;
@@ -254,6 +260,25 @@ function send_sms($from, $to, $title, $text, $ongame = 0) {
     }
 
     notifySocketServer('dm:update', 'dm:' . $to);
+
+    if ($notifyNewDm) queueNewDmEmailNotification($to_safe);
+}
+
+// Notifiche Fase E: accoda un'email "hai un nuovo messaggio privato" per il
+// destinatario di un DM reale, se ha attivato il canale email per l'evento
+// nuovo_dm (default OFF: a differenza degli altri eventi, il DM e' gia'
+// visibile subito nell'inbox/badge, l'email qui e' un extra opt-in, non
+// una mancata notifica in-app come per forum/DM — vedi brief originale).
+// Nessun via_dm per questo evento: notificare un DM con un altro DM interno
+// sarebbe circolare, l'unico canale applicabile e' l'email.
+function queueNewDmEmailNotification(string $to_safe): void {
+    $pref = gdrcd_query("SELECT via_email FROM preferenze_notifiche
+        WHERE nome = '$to_safe' AND evento = 'nuovo_dm'");
+    $via_email = $pref ? (int)$pref['via_email'] : 0;
+    if (!$via_email) return;
+
+    gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato)
+        VALUES ('$to_safe', 'nuovo_dm', 0, 'email', 'pending')");
 }
 
 function isAdminMasterMod($session) {
