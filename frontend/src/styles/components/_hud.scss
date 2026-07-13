@@ -251,21 +251,18 @@ body[data-palette="public"] {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse .8px 4px, rgb(200 222 255 / 60%), transparent 75%);
+        background-image: radial-gradient(ellipse 1px 7px, rgb(200 222 255 / 75%), transparent 75%);
         background-size: 30px 40px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-near .5s linear infinite;
     }
-    // Lontano: goccia molto piu' piccola (raggio 0.35x1.8px = 0.7x3.6px reale,
-    // meno di meta' del layer vicino) ma opacita' alzata (era 20%, troppo
-    // debole per essere visibile — restava a schermo solo il layer vicino,
-    // letto come "un solo tipo di goccia" invece di due), tono piu'
-    // freddo/grigio (leggera prospettiva aerea), cade piu' lenta.
+    // Lontano: amplificato ancora, sia in dimensione che in opacita' (era
+    // ancora troppo debole per leggersi come "secondo tipo di goccia").
     &::after {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse .35px 1.8px, rgb(165 185 215 / 34%), transparent 75%);
+        background-image: radial-gradient(ellipse .55px 3px, rgb(165 185 215 / 55%), transparent 75%);
         background-size: 46px 58px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-far 1.1s linear infinite;
@@ -280,7 +277,7 @@ body[data-palette="public"] {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse .8px 4px, rgb(200 218 255 / 70%), transparent 75%);
+        background-image: radial-gradient(ellipse 1px 7px, rgb(200 218 255 / 85%), transparent 75%);
         background-size: 30px 40px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-near .3s linear infinite;
@@ -289,7 +286,7 @@ body[data-palette="public"] {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse .35px 1.8px, rgb(165 180 215 / 40%), transparent 75%);
+        background-image: radial-gradient(ellipse .55px 3px, rgb(165 180 215 / 60%), transparent 75%);
         background-size: 46px 58px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-far .65s linear infinite;
