@@ -202,9 +202,23 @@ body[data-palette="public"] {
     mix-blend-mode: screen;
     animation: ct-hud-weather-glow 4s ease-in-out infinite;
 }
+// Prima usava mix-blend-mode:multiply con colori chiari su uno sfondo gia'
+// scuro: moltiplicare per un colore vicino al bianco cambia pochissimo un
+// pixel scuro, quindi l'effetto era praticamente invisibile. Sostituito con
+// due "ombre di nuvola" (radial-gradient scure, blend normale) che
+// scorrono lentamente — un effetto realmente visibile invece che un
+// mix-blend-mode che dipende troppo dai colori sottostanti.
 .ct-hud__weather-fx--cloud {
-    background: linear-gradient(120deg, rgb(180 190 210 / 25%), transparent 55%, rgb(180 190 210 / 20%));
-    mix-blend-mode: multiply;
+    background-image:
+        radial-gradient(ellipse 60% 40% at 30% 20%, rgb(15 20 35 / 55%), transparent 70%),
+        radial-gradient(ellipse 50% 35% at 75% 65%, rgb(15 20 35 / 45%), transparent 70%);
+    background-repeat: no-repeat, no-repeat;
+    background-size: 100% 100%, 100% 100%;
+    animation: ct-hud-weather-cloud-drift 8s ease-in-out infinite alternate;
+}
+@keyframes ct-hud-weather-cloud-drift {
+    from { background-position: 0% 0%, 100% 100%; }
+    to   { background-position: 18% 12%, 82% 88%; }
 }
 .ct-hud__weather-fx--fog {
     background: linear-gradient(rgb(230 235 245 / 55%), rgb(230 235 245 / 30%));
