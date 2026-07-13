@@ -513,25 +513,24 @@ export default function Hud({ isStaff }) {
                 </div>
             </div>
 
-            {/* Modale descrizione luogo (stessa di InfoLocation.jsx) — portal su
-                document.body per non restare intrappolata nello stacking
-                context fixed dell'HUD. */}
+            {/* Modale descrizione luogo — portal su document.body per non
+                restare intrappolata nello stacking context fixed dell'HUD. */}
             {showLocationDesc && location && createPortal(
-                <div className="info-location-overlay" onClick={() => setShowLocationDesc(false)}>
-                    <div className="info-location-modal" onClick={e => e.stopPropagation()}>
-                        <div className="info-location-modal-header">
+                <div className="ct-hud__desc-overlay" onClick={() => setShowLocationDesc(false)}>
+                    <div className="ct-hud__desc-modal" onClick={e => e.stopPropagation()}>
+                        <div className="ct-hud__desc-modal-header">
                             <span>
                                 <i className="fa-solid fa-location-dot" style={{ marginRight: 8 }} />
                                 {location.nome}
                             </span>
                             <button onClick={() => setShowLocationDesc(false)} aria-label="Chiudi">×</button>
                         </div>
-                        <div className="info-location-modal-body">
+                        <div className="ct-hud__desc-modal-body">
                             {location.descrizione_immagine && (
                                 <img
                                     src={`/themes/crystal/imgs/descrizioni/${location.descrizione_immagine}`}
                                     alt={location.nome}
-                                    className="info-location-modal-img"
+                                    className="ct-hud__desc-modal-img"
                                 />
                             )}
                             <div dangerouslySetInnerHTML={{ __html: location.descrizione }} />

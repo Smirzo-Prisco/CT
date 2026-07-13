@@ -643,6 +643,80 @@ body[data-palette="public"] {
     a:hover { color: var(--gold); }
 }
 
+// ── Modale descrizione luogo (click sul cerchio sinistro) ────────────────
+// Prima riusava le classi .info-location-* di InfoLocation.jsx (stesso
+// contenuto, il componente e' stato sostituito da Hud.jsx tempo fa) — CSS
+// perso per errore insieme al resto di quel componente durante una pulizia
+// di codice orfano, senza accorgersi che Hud.jsx ne dipendeva ancora.
+// Riscritto qui con lo stesso stile navy+oro del resto dell'HUD invece di
+// ripristinare i vecchi token $palette-* (pensati per il tema generale del
+// sito, non per l'HUD).
+.ct-hud__desc-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .6);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ct-hud__desc-modal {
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--ink-light) calc(.97 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.98 * 100%), transparent));
+    border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
+    border-radius: var(--radius);
+    width: 420px;
+    max-width: 90vw;
+    max-height: 70vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px -12px rgba(0, 0, 0, .6);
+}
+
+.ct-hud__desc-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) calc(.25 * 100%), transparent);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--gold);
+    flex-shrink: 0;
+
+    button {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 22px;
+        line-height: 1;
+        padding: 0 4px;
+
+        &:hover { color: var(--text); }
+    }
+}
+
+.ct-hud__desc-modal-body {
+    padding: 16px 18px;
+    overflow-y: auto;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.ct-hud__desc-modal-img {
+    display: block;
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
 // ── RESPONSIVE ────────────────────────────────────────────────
 // Regola permanente: l'HUD resta SEMPRE absolute/fixed sugli angoli, non
 // passa mai a static.
