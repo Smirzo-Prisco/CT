@@ -2056,9 +2056,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
             $order = is_array($data['order'] ?? null) ? $data['order'] : [];
             gdrcd_query("DELETE FROM quest_turn_order WHERE id_role = $id_role");
-            foreach ($order as $pos => $pg_name) {
-                $pg_name_f = gdrcd_filter('in', $pg_name);
-                gdrcd_query("INSERT INTO quest_turn_order (id_role, pg_name, position) VALUES ($id_role, '$pg_name_f', $pos)");
+            if ($order) {
+                $righe = [];
+                foreach ($order as $pos => $pg_name) {
+                    $pg_name_f = gdrcd_filter('in', $pg_name);
+                    $righe[] = "($id_role, '$pg_name_f', $pos)";
+                }
+                gdrcd_query("INSERT INTO quest_turn_order (id_role, pg_name, position) VALUES " . implode(',', $righe));
             }
             gdrcd_query("UPDATE role_sessions SET turn_order_idx = 0 WHERE id_role = $id_role");
             notifySocketServer('quest:turn_order', 'loc:' . $luogo, ['order' => $order, 'current_idx' => 0]);
