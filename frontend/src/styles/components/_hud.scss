@@ -211,15 +211,43 @@ body[data-palette="public"] {
     backdrop-filter: blur(1.5px);
     animation: ct-hud-weather-glow 6s ease-in-out infinite;
 }
+// Gocce vere invece di un tratteggio continuo: un repeating-linear-gradient
+// con periodo piccolo (versione precedente) riempie il cerchio di righe
+// fitte edge-to-edge, perche' si ripete all'infinito senza spazi vuoti
+// lungo la propria lunghezza. Qui invece ogni "goccia" e' una banda sfumata
+// dentro un tile grande per lo piu' trasparente (background-size), ripetuto
+// da background-repeat: risultato, poche strisce staccate invece di una
+// texture piena. Due layer con tile/offset diversi (velocita' diverse nel
+// keyframe) danno un accenno di profondita': banda stretta (43-49% del
+// tile, ~1px di "core" pieno) sul layer vicino, ancora piu' stretta e
+// piu' trasparente (18-22% invece di 50-60%) sul layer lontano, per
+// leggersi come gocce sottili in lontananza invece che come il layer
+// vicino rimpicciolito. Il terzo layer (vignettatura radiale, non anima
+// posizione) suggerisce l'acqua sul fondo del cerchio.
+// Stesse dimensioni tile per rain/storm (solo colori/opacita'/durata
+// cambiano): cosi' condividono lo stesso keyframe sotto, i cui spostamenti
+// sono calcolati su misura per queste due dimensioni (loop perfettamente
+// seamless su entrambi gli assi — uno spostamento diverso dalla dimensione
+// esatta del tile lascerebbe uno "scatto" visibile ad ogni ripartenza).
 .ct-hud__weather-fx--rain {
-    background-color: rgb(10 20 40 / 20%);
-    background-image: repeating-linear-gradient(115deg, rgb(180 210 255 / 55%) 0 1px, transparent 1px 10px);
-    animation: ct-hud-weather-rain .5s linear infinite;
+    background-color: rgb(10 20 40 / 12%);
+    background-image:
+        linear-gradient(115deg, transparent 43%, rgb(190 215 255 / 50%) 45%, rgb(190 215 255 / 50%) 47%, transparent 49%),
+        linear-gradient(112deg, transparent 44%, rgb(190 215 255 / 18%) 46%, rgb(190 215 255 / 18%) 47%, transparent 49%),
+        radial-gradient(ellipse at 50% 100%, rgb(10 20 40 / 40%), transparent 65%);
+    background-size: 32px 42px, 48px 60px, 100% 100%;
+    background-repeat: repeat, repeat, no-repeat;
+    animation: ct-hud-weather-rain .9s linear infinite;
 }
 .ct-hud__weather-fx--storm {
-    background-color: rgb(5 8 20 / 35%);
-    background-image: repeating-linear-gradient(115deg, rgb(180 200 255 / 60%) 0 1px, transparent 1px 9px);
-    animation: ct-hud-weather-rain .4s linear infinite, ct-hud-weather-flash 5s ease-in-out infinite;
+    background-color: rgb(5 8 20 / 22%);
+    background-image:
+        linear-gradient(115deg, transparent 43%, rgb(190 210 255 / 60%) 45%, rgb(190 210 255 / 60%) 47%, transparent 49%),
+        linear-gradient(112deg, transparent 44%, rgb(190 210 255 / 22%) 46%, rgb(190 210 255 / 22%) 47%, transparent 49%),
+        radial-gradient(ellipse at 50% 100%, rgb(5 8 20 / 50%), transparent 65%);
+    background-size: 32px 42px, 48px 60px, 100% 100%;
+    background-repeat: repeat, repeat, no-repeat;
+    animation: ct-hud-weather-rain .5s linear infinite, ct-hud-weather-flash 5s ease-in-out infinite;
 }
 .ct-hud__weather-fx--snow {
     background-image:
@@ -236,9 +264,12 @@ body[data-palette="public"] {
     0%, 100% { opacity: .7; }
     50%      { opacity: 1; }
 }
+// Spostamento = esattamente la dimensione del tile di ciascun layer (32x42 e
+// 48x60, vedi sopra): il pattern combacia perfettamente con se stesso a fine
+// ciclo, nessuno scatto visibile alla ripartenza dell'animazione.
 @keyframes ct-hud-weather-rain {
-    from { background-position: 0 0; }
-    to   { background-position: -12px 22px; }
+    from { background-position: 0 0, 0 0, 50% 100%; }
+    to   { background-position: -32px 42px, -48px 60px, 50% 100%; }
 }
 @keyframes ct-hud-weather-snow {
     from { background-position: 0 0, 10px 6px, 20px 14px; }
