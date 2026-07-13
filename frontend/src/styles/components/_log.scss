@@ -190,12 +190,32 @@ $log-accent: #ce846f;
         }
     }
 
+    // Scroll orizzontale invece di schiacciare le colonne: la tabella
+    // chatbot ha testo libero (domanda/risposta) che su schermi stretti
+    // renderebbe le colonne illeggibili se costrette a stare in 100vw.
+    .log-table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 10px;
+    }
+
     table {
         width: 100%;
         border-collapse: collapse;
         background-color: #1d2038;
         border-radius: 10px;
         overflow: hidden;
+    }
+
+    @media (width <= 700px) {
+        padding: 16px 10px;
+
+        .tabs { flex-wrap: wrap; gap: 8px; }
+        .tab { padding: 8px 12px; font-size: 0.85em; }
+        .filters { flex-wrap: wrap; }
+
+        table { min-width: 640px; }
     }
 
     th,

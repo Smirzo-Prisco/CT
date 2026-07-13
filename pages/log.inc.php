@@ -55,6 +55,7 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
     <?php endif; ?>
     </div>
     <!-- TABELLA -->
+    <div class="log-table-scroll">
     <table id="logTable">
         <?php
         switch ($currentTab) {
@@ -260,6 +261,7 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
             <?php break;
             } ?>
     </table>
+    </div>
 </div>
 
 <script type="text/javascript" src="/includes/changetitle.js"></script>
