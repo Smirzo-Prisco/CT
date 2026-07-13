@@ -29,6 +29,59 @@ function notifyForumUpdate(int $araldo_id, int $thread_id): void {
 // serve anche a createQuestPost(), condivisa con la generazione quest da role_recap.
 
 // -------------------------------------------------------------------------
+// Fase C notifiche: avvisa i follower di un thread quando arriva una nuova
+// risposta. Ogni follower ha UNA sola riga in araldo_follow (unique key
+// nome+tipo_oggetto+riferimento_id), quindi tipo_segui mappa direttamente
+// sull'evento di preferenza da controllare — nessuna logica di dedup fra
+// piu' ragioni di follow simultanee, lo schema la esclude in partenza.
+// Consegna DM immediata via send_sms() (stesso sistema di MessagesInbox.jsx/
+// il badge HUD, tabelle sms + conversazioni_individuali) — non la vecchia
+// tabella "messaggi", ormai usata solo da alcuni pannelli staff legacy.
+// Canale email accodato in "notifiche" per il worker della Fase E.
+// -------------------------------------------------------------------------
+function notifyThreadFollowers(int $thread_id, string $autore_commento, string $titolo_thread): void {
+    $evento_da_tipo = [
+        'autore'     => 'commento_post_proprio',
+        'manuale'    => 'commento_post_seguito',
+        'commentato' => 'commento_post_commentato',
+    ];
+
+    $autore_f = gdrcd_filter('in', $autore_commento);
+    $follower_res = gdrcd_query("SELECT nome, tipo_segui FROM araldo_follow
+        WHERE tipo_oggetto = 'thread' AND riferimento_id = $thread_id AND nome != '$autore_f'", 'result');
+
+    while ($f = gdrcd_query($follower_res, 'fetch')) {
+        $evento = $evento_da_tipo[$f['tipo_segui']] ?? null;
+        if (!$evento) continue;
+
+        $nome_f = gdrcd_filter('in', $f['nome']);
+
+        // Riga assente in preferenze_notifiche = default (via_dm=1, via_email=0)
+        $pref      = gdrcd_query("SELECT via_dm, via_email FROM preferenze_notifiche
+            WHERE nome = '$nome_f' AND evento = '$evento'");
+        $via_dm    = $pref ? (int)$pref['via_dm']    : 1;
+        $via_email = $pref ? (int)$pref['via_email'] : 0;
+
+        if (!$via_dm && !$via_email) continue;
+
+        $testo = gdrcd_filter('in',
+            "Nuovo commento di $autore_commento su \"$titolo_thread\": main.php?page=forum&thread=$thread_id");
+
+        if ($via_dm) {
+            gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato, data_invio)
+                VALUES ('$nome_f', '$evento', $thread_id, 'dm', 'sent', NOW())");
+            send_sms('Notifiche', $f['nome'], '', $testo, 0);
+        }
+
+        if ($via_email) {
+            gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato)
+                VALUES ('$nome_f', '$evento', $thread_id, 'email', 'pending')");
+        }
+    }
+    gdrcd_query($follower_res, 'free');
+}
+
+// -------------------------------------------------------------------------
 // Helper: etichetta leggibile per il tipo di sezione
 // -------------------------------------------------------------------------
 function section_label(int $tipo): string {
@@ -345,6 +398,15 @@ switch ($op) {
         $follow_tipo = $padre == -1 ? 'autore' : 'commentato';
         gdrcd_query("INSERT IGNORE INTO araldo_follow (nome, tipo_oggetto, riferimento_id, tipo_segui)
             VALUES ('" . gdrcd_filter('in', $login) . "', 'thread', $resp_thread_id, '$follow_tipo')");
+
+        // Fan-out notifiche: solo per le risposte (un thread appena creato non
+        // ha ancora follower da avvisare, a parte l'autore stesso appena
+        // aggiunto sopra — mai notificato per la propria azione).
+        if ($padre != -1) {
+            $thread_row = gdrcd_query("SELECT titolo FROM messaggioaraldo
+                WHERE id_messaggio = $padre AND id_messaggio_padre = -1 LIMIT 1");
+            notifyThreadFollowers($padre, $login, $thread_row['titolo'] ?? '');
+        }
 
         notifyForumUpdate($araldo_id, $resp_thread_id);
 
