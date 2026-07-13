@@ -402,7 +402,16 @@ export default function Hud({ isStaff }) {
                         : <i className="fa-solid fa-city" />
                     }
                     {locationImg && !locationImgFailed && weatherFx &&
-                        <span className={`ct-hud__weather-fx ct-hud__weather-fx--${weatherFx}`} aria-hidden="true" />
+                        <span className={`ct-hud__weather-fx ct-hud__weather-fx--${weatherFx}`} aria-hidden="true">
+                            {/* Layer "medio" di pioggia/temporale: un elemento DOM vero invece
+                                di un terzo pseudo-elemento (solo ::before/::after disponibili,
+                                gia' usati per vicino/lontano) — cosi' puo' ruotare in modo
+                                indipendente dalla vignettatura sullo sfondo (che sul genitore
+                                deve restare allineata al cerchio, mai ruotata). */}
+                            {(weatherFx === 'rain' || weatherFx === 'storm') &&
+                                <span className="ct-hud__weather-fx-mid" />
+                            }
+                        </span>
                     }
                 </button>
 
