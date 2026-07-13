@@ -218,8 +218,12 @@ body[data-palette="public"] {
 // dentro un tile grande per lo piu' trasparente (background-size), ripetuto
 // da background-repeat: risultato, poche strisce staccate invece di una
 // texture piena. Due layer con tile/offset diversi (velocita' diverse nel
-// keyframe) danno un accenno di profondita'. Il terzo layer (vignettatura
-// radiale, non anima posizione) suggerisce l'acqua sul fondo del cerchio.
+// keyframe) danno un accenno di profondita': banda stretta (43-49% del
+// tile, ~1px di "core" pieno) sul layer vicino, ancora piu' stretta e
+// piu' trasparente (18-22% invece di 50-60%) sul layer lontano, per
+// leggersi come gocce sottili in lontananza invece che come il layer
+// vicino rimpicciolito. Il terzo layer (vignettatura radiale, non anima
+// posizione) suggerisce l'acqua sul fondo del cerchio.
 // Stesse dimensioni tile per rain/storm (solo colori/opacita'/durata
 // cambiano): cosi' condividono lo stesso keyframe sotto, i cui spostamenti
 // sono calcolati su misura per queste due dimensioni (loop perfettamente
@@ -228,8 +232,8 @@ body[data-palette="public"] {
 .ct-hud__weather-fx--rain {
     background-color: rgb(10 20 40 / 12%);
     background-image:
-        linear-gradient(115deg, transparent 38%, rgb(190 215 255 / 50%) 42%, rgb(190 215 255 / 50%) 46%, transparent 50%),
-        linear-gradient(112deg, transparent 38%, rgb(190 215 255 / 28%) 42%, rgb(190 215 255 / 28%) 46%, transparent 50%),
+        linear-gradient(115deg, transparent 43%, rgb(190 215 255 / 50%) 45%, rgb(190 215 255 / 50%) 47%, transparent 49%),
+        linear-gradient(112deg, transparent 44%, rgb(190 215 255 / 18%) 46%, rgb(190 215 255 / 18%) 47%, transparent 49%),
         radial-gradient(ellipse at 50% 100%, rgb(10 20 40 / 40%), transparent 65%);
     background-size: 32px 42px, 48px 60px, 100% 100%;
     background-repeat: repeat, repeat, no-repeat;
@@ -238,8 +242,8 @@ body[data-palette="public"] {
 .ct-hud__weather-fx--storm {
     background-color: rgb(5 8 20 / 22%);
     background-image:
-        linear-gradient(115deg, transparent 38%, rgb(190 210 255 / 60%) 42%, rgb(190 210 255 / 60%) 46%, transparent 50%),
-        linear-gradient(112deg, transparent 38%, rgb(190 210 255 / 34%) 42%, rgb(190 210 255 / 34%) 46%, transparent 50%),
+        linear-gradient(115deg, transparent 43%, rgb(190 210 255 / 60%) 45%, rgb(190 210 255 / 60%) 47%, transparent 49%),
+        linear-gradient(112deg, transparent 44%, rgb(190 210 255 / 22%) 46%, rgb(190 210 255 / 22%) 47%, transparent 49%),
         radial-gradient(ellipse at 50% 100%, rgb(5 8 20 / 50%), transparent 65%);
     background-size: 32px 42px, 48px 60px, 100% 100%;
     background-repeat: repeat, repeat, no-repeat;
