@@ -383,15 +383,18 @@ body[data-palette="public"] {
         animation: ct-hud-weather-raindrop-mid .225s linear infinite;
     }
 }
+// Tile raddoppiati (22/34/16 -> 44/68/32): stessa densita' di fiocchi per
+// tile, ma ciascuno copre un'area doppia, quindi meta' dei fiocchi a
+// schermo. Posizioni/spostamenti raddoppiati in proporzione.
 .ct-hud__weather-fx--snow {
     background-image:
         radial-gradient(circle, #fff 1px, transparent 1.5px),
         radial-gradient(circle, #fff 1px, transparent 1.5px),
         radial-gradient(circle, #fff 1px, transparent 1.5px);
-    background-size: 22px 22px, 34px 34px, 16px 16px;
-    background-position: 0 0, 10px 6px, 20px 14px;
+    background-size: 44px 44px, 68px 68px, 32px 32px;
+    background-position: 0 0, 20px 12px, 40px 28px;
     opacity: .85;
-    animation: ct-hud-weather-snow 3s linear infinite;
+    animation: ct-hud-weather-snow 1.5s linear infinite;
 }
 
 @keyframes ct-hud-weather-glow {
@@ -420,8 +423,8 @@ body[data-palette="public"] {
     to   { background-position: -38px 50px; }
 }
 @keyframes ct-hud-weather-snow {
-    from { background-position: 0 0, 10px 6px, 20px 14px; }
-    to   { background-position: 0 40px, 10px 56px, 20px 46px; }
+    from { background-position: 0 0, 20px 12px, 40px 28px; }
+    to   { background-position: 0 80px, 20px 112px, 40px 92px; }
 }
 @keyframes ct-hud-weather-flash {
     0%, 92%, 100% { box-shadow: none; }
