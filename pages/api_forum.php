@@ -64,8 +64,13 @@ function notifyThreadFollowers(int $thread_id, string $autore_commento, string $
 
         if (!$via_dm && !$via_email) continue;
 
+        // Il testo è salvato come HTML e renderizzato con dangerouslySetInnerHTML in
+        // MessagesInbox.jsx (stesso pattern della segnalazione staff piu' sotto):
+        // autore/titolo (dati utente) vengono escaped, l'URL e' derivato da un intero.
+        $url = 'main.php?page=forum&thread=' . $thread_id;
         $testo = gdrcd_filter('in',
-            "Nuovo commento di $autore_commento su \"$titolo_thread\": main.php?page=forum&thread=$thread_id");
+            'Nuovo commento di <b>' . htmlspecialchars($autore_commento, ENT_QUOTES, 'UTF-8') . '</b> su ' .
+            '<a href="' . $url . '">"' . htmlspecialchars($titolo_thread, ENT_QUOTES, 'UTF-8') . '"</a>');
 
         if ($via_dm) {
             gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato, data_invio)
