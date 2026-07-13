@@ -243,23 +243,29 @@ body[data-palette="public"] {
     background-color: rgb(10 20 40 / 12%);
     background-image: radial-gradient(ellipse at 50% 100%, rgb(10 20 40 / 40%), transparent 65%);
 
-    // Vicino: goccia piu' grande, piu' opaca, cade piu' veloce.
+    // Vicino: goccia piu' grande, piu' opaca, cade piu' veloce. I valori
+    // dell'ellisse sono RAGGI (meta' della dimensione totale): 0.8x4px di
+    // raggio = goccia 1.6x8px reale, non 11px come nel giro precedente
+    // (equivoco raggio/lunghezza totale — la goccia era il doppio del previsto).
     &::before {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse 1.4px 11px, rgb(200 222 255 / 55%), transparent 75%);
+        background-image: radial-gradient(ellipse .8px 4px, rgb(200 222 255 / 60%), transparent 75%);
         background-size: 30px 40px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-near .5s linear infinite;
     }
-    // Lontano: goccia piu' piccola, piu' tenue e piu' fredda/grigia (leggera
-    // prospettiva aerea), cade piu' lenta.
+    // Lontano: goccia molto piu' piccola (raggio 0.35x1.8px = 0.7x3.6px reale,
+    // meno di meta' del layer vicino) ma opacita' alzata (era 20%, troppo
+    // debole per essere visibile — restava a schermo solo il layer vicino,
+    // letto come "un solo tipo di goccia" invece di due), tono piu'
+    // freddo/grigio (leggera prospettiva aerea), cade piu' lenta.
     &::after {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse .5px 4px, rgb(165 185 215 / 20%), transparent 75%);
+        background-image: radial-gradient(ellipse .35px 1.8px, rgb(165 185 215 / 34%), transparent 75%);
         background-size: 46px 58px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-far 1.1s linear infinite;
@@ -274,7 +280,7 @@ body[data-palette="public"] {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse 1.4px 11px, rgb(200 218 255 / 65%), transparent 75%);
+        background-image: radial-gradient(ellipse .8px 4px, rgb(200 218 255 / 70%), transparent 75%);
         background-size: 30px 40px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-near .3s linear infinite;
@@ -283,7 +289,7 @@ body[data-palette="public"] {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse .5px 4px, rgb(165 180 215 / 25%), transparent 75%);
+        background-image: radial-gradient(ellipse .35px 1.8px, rgb(165 180 215 / 40%), transparent 75%);
         background-size: 46px 58px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-far .65s linear infinite;
