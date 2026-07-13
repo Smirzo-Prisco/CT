@@ -377,7 +377,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $r_start    = $role_row['start'];
             $r_end      = $role_row['end'];
             $r_location = (int)$role_row['location'];
-            $end_sql    = $r_end ? "AND ora <= '$r_end'" : "AND ora <= NOW()";
 
             $role_info = [
                 'id'           => $id_role,
@@ -391,9 +390,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 'inCorso'      => $r_end === null,
             ];
 
+            // Filtro per id_role (non più per stanza+intervallo date): due giocate diverse
+            // nello stesso luogo condividono spesso lo stesso `end` (es. chiusura batch di
+            // sessioni rimaste aperte), quindi un filtro temporale su `chat.ora` finiva per
+            // includere anche i messaggi della giocata successiva fatta nello stesso posto.
+            // Ogni riga di chat porta già l'id_role corretto (vedi chatInsertMessage()).
             $msg_result = gdrcd_query(
                 "SELECT tipo, mittente, destinatario, ora, testo FROM chat
-                 WHERE stanza = $r_location AND ora >= '$r_start' $end_sql
+                 WHERE id_role = $id_role
                  ORDER BY ora ASC",
                 'result'
             );
