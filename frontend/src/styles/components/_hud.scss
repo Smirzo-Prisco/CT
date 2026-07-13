@@ -202,16 +202,18 @@ body[data-palette="public"] {
     mix-blend-mode: screen;
     animation: ct-hud-weather-glow 4s ease-in-out infinite;
 }
-// Prima usava mix-blend-mode:multiply con colori chiari su uno sfondo gia'
-// scuro: moltiplicare per un colore vicino al bianco cambia pochissimo un
-// pixel scuro, quindi l'effetto era praticamente invisibile. Sostituito con
-// due "ombre di nuvola" (radial-gradient scure, blend normale) che
-// scorrono lentamente — un effetto realmente visibile invece che un
-// mix-blend-mode che dipende troppo dai colori sottostanti.
+// Primo tentativo: mix-blend-mode:multiply con colori chiari — quasi
+// un'identita' su un pixel scuro, invisibile. Secondo tentativo: ombre
+// scure (blu navy) su un'immagine luogo GIA' scura di suo — differenza di
+// luminosita' troppo piccola per notarsi, a prescindere dal blend mode.
+// Ora: velo grigio chiaro SEMPRE presente (background-color, contrasta con
+// qualunque sfondo scuro) + due chiazze piu' opache che scorrono per un
+// minimo di movimento/texture.
 .ct-hud__weather-fx--cloud {
+    background-color: rgb(160 168 185 / 40%);
     background-image:
-        radial-gradient(ellipse 60% 40% at 30% 20%, rgb(15 20 35 / 55%), transparent 70%),
-        radial-gradient(ellipse 50% 35% at 75% 65%, rgb(15 20 35 / 45%), transparent 70%);
+        radial-gradient(ellipse 60% 40% at 30% 20%, rgb(190 196 210 / 50%), transparent 70%),
+        radial-gradient(ellipse 50% 35% at 75% 65%, rgb(190 196 210 / 40%), transparent 70%);
     background-repeat: no-repeat, no-repeat;
     background-size: 100% 100%, 100% 100%;
     animation: ct-hud-weather-cloud-drift 8s ease-in-out infinite alternate;
