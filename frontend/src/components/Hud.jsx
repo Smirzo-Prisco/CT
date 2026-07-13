@@ -403,12 +403,13 @@ export default function Hud({ isStaff }) {
                     }
                     {locationImg && !locationImgFailed && weatherFx &&
                         <span className={`ct-hud__weather-fx ct-hud__weather-fx--${weatherFx}`} aria-hidden="true">
-                            {/* Layer "medio" di pioggia/temporale: un elemento DOM vero invece
-                                di un terzo pseudo-elemento (solo ::before/::after disponibili,
-                                gia' usati per vicino/lontano) — cosi' puo' ruotare in modo
-                                indipendente dalla vignettatura sullo sfondo (che sul genitore
-                                deve restare allineata al cerchio, mai ruotata). */}
-                            {(weatherFx === 'rain' || weatherFx === 'storm') &&
+                            {/* Layer "medio" (terza banda) per pioggia/temporale/nuvoloso: un
+                                elemento DOM vero invece di un terzo pseudo-elemento (solo
+                                ::before/::after disponibili, gia' usati per gli altri due) —
+                                per la pioggia serve a ruotare indipendentemente dalla
+                                vignettatura di sfondo, per le nuvole a dare una terza banda
+                                verticale (alta/centrale/bassa) indipendente dalle altre due. */}
+                            {(weatherFx === 'rain' || weatherFx === 'storm' || weatherFx === 'cloud') &&
                                 <span className="ct-hud__weather-fx-mid" />
                             }
                         </span>

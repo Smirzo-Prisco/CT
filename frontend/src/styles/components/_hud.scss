@@ -202,9 +202,78 @@ body[data-palette="public"] {
     mix-blend-mode: screen;
     animation: ct-hud-weather-glow 4s ease-in-out infinite;
 }
+// Primo tentativo: mix-blend-mode:multiply con colori chiari — quasi
+// un'identita' su un pixel scuro, invisibile. Secondo tentativo: un velo
+// grigio SEMPRE presente — leggeva come "nebbia fissa", non "nuvoloso".
+// Terzo tentativo: due nuvole non-repeat dentro un tile piu' largo del
+// cerchio — attraversavano il cerchio ma con lunghe pause vuote fra un
+// passaggio e l'altro, tutte sulla stessa fascia orizzontale centrale.
+// Ora: tre bande verticali indipendenti (alta/centrale/bassa — prima,
+// terza banda, riusa lo stesso elemento DOM .ct-hud__weather-fx-mid gia'
+// creato per la pioggia, vedi Hud.jsx) con background-repeat:repeat e
+// tile solo di poco piu' largo del cerchio: sempre almeno una nuvola in
+// vista su ciascuna banda, nessuna pausa vuota.
 .ct-hud__weather-fx--cloud {
-    background: linear-gradient(120deg, rgb(180 190 210 / 25%), transparent 55%, rgb(180 190 210 / 20%));
-    mix-blend-mode: multiply;
+    // Banda alta — chiazze ridimensionate per stare DENTRO il proprio tile
+    // (raggio + posizione non superano piu' il bordo del tile): il bug del
+    // giro precedente era chiazze pensate per un tile 3x piu' grande,
+    // rimaste alle stesse coordinate assolute dopo aver rimpicciolito il
+    // tile — finivano oltre il bordo e "si spezzavano" nel wraparound del
+    // repeat. inset -15% (via di mezzo) per un margine di sicurezza extra.
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -15%;
+        // Chiazze raddoppiate (raggi x2) rispetto al giro precedente: ora
+        // si accavallano parecchio col tile invariato, dando nuvole molto
+        // piu' grandi e una copertura piu' piena invece di piu' rada.
+        background-image:
+            radial-gradient(ellipse 40px 26px at 17px 20%, rgb(225 230 242 / 55%), transparent 70%),
+            radial-gradient(ellipse 48px 28px at 37px 16%, rgb(225 230 242 / 50%), transparent 70%);
+        background-size: 60px 100%;
+        background-repeat: repeat;
+        animation: ct-hud-weather-cloud-pass-a 2.6s linear infinite;
+    }
+    // Banda bassa
+    &::after {
+        content: '';
+        position: absolute;
+        inset: -15%;
+        background-image:
+            radial-gradient(ellipse 36px 22px at 15px 82%, rgb(215 222 238 / 48%), transparent 70%),
+            radial-gradient(ellipse 42px 24px at 33px 86%, rgb(215 222 238 / 44%), transparent 70%);
+        background-size: 54px 100%;
+        background-repeat: repeat;
+        animation: ct-hud-weather-cloud-pass-b 3.7s linear infinite;
+        animation-delay: -2s;
+    }
+    // Banda centrale (.ct-hud__weather-fx-mid, vero elemento DOM)
+    .ct-hud__weather-fx-mid {
+        position: absolute;
+        inset: -15%;
+        background-image:
+            radial-gradient(ellipse 42px 26px at 19px 50%, rgb(220 226 240 / 50%), transparent 70%),
+            radial-gradient(ellipse 36px 22px at 40px 46%, rgb(220 226 240 / 45%), transparent 70%);
+        background-size: 68px 100%;
+        background-repeat: repeat;
+        animation: ct-hud-weather-cloud-pass-c 4.5s linear infinite;
+        animation-delay: -3.5s;
+    }
+}
+// Spostamento = esattamente la larghezza del tile: loop senza scatti,
+// nessuna pausa perche' background-repeat:repeat tiene sempre una nuvola
+// (o il bordo di quella successiva) in vista.
+@keyframes ct-hud-weather-cloud-pass-a {
+    from { background-position: 0 0; }
+    to   { background-position: -60px 0; }
+}
+@keyframes ct-hud-weather-cloud-pass-b {
+    from { background-position: 0 0; }
+    to   { background-position: -54px 0; }
+}
+@keyframes ct-hud-weather-cloud-pass-c {
+    from { background-position: 0 0; }
+    to   { background-position: -68px 0; }
 }
 .ct-hud__weather-fx--fog {
     background: linear-gradient(rgb(230 235 245 / 55%), rgb(230 235 245 / 30%));
