@@ -263,7 +263,7 @@ body[data-palette="public"] {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse .6px 3.5px, rgb(210 225 245 / 85%), transparent 75%);
+        background-image: radial-gradient(ellipse .6px 5.5px, rgb(210 225 245 / 85%), transparent 75%);
         background-size: 46px 58px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-far 1.1s linear infinite;
@@ -287,7 +287,7 @@ body[data-palette="public"] {
         content: '';
         position: absolute;
         inset: -25%;
-        background-image: radial-gradient(ellipse .6px 3.5px, rgb(210 222 245 / 90%), transparent 75%);
+        background-image: radial-gradient(ellipse .6px 5.5px, rgb(210 222 245 / 90%), transparent 75%);
         background-size: 46px 58px;
         transform: rotate(25deg);
         animation: ct-hud-weather-raindrop-far .65s linear infinite;
