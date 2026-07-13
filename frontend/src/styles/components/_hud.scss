@@ -224,12 +224,15 @@ body[data-palette="public"] {
         content: '';
         position: absolute;
         inset: -15%;
+        // Tile e chiazze dimezzati insieme (stesso rapporto raggio/tile del
+        // giro precedente, che l'aveva risolto): densita' doppia senza
+        // reintrodurre il bug delle chiazze fuori tile.
         background-image:
-            radial-gradient(ellipse 20px 13px at 25px 20%, rgb(225 230 242 / 55%), transparent 70%),
-            radial-gradient(ellipse 24px 14px at 55px 16%, rgb(225 230 242 / 50%), transparent 70%);
-        background-size: 90px 100%;
+            radial-gradient(ellipse 10px 6.5px at 12.5px 20%, rgb(225 230 242 / 55%), transparent 70%),
+            radial-gradient(ellipse 12px 7px at 27.5px 16%, rgb(225 230 242 / 50%), transparent 70%);
+        background-size: 45px 100%;
         background-repeat: repeat;
-        animation: ct-hud-weather-cloud-pass-a 7s linear infinite;
+        animation: ct-hud-weather-cloud-pass-a 3.5s linear infinite;
     }
     // Banda bassa
     &::after {
@@ -237,24 +240,24 @@ body[data-palette="public"] {
         position: absolute;
         inset: -15%;
         background-image:
-            radial-gradient(ellipse 18px 11px at 22px 82%, rgb(215 222 238 / 48%), transparent 70%),
-            radial-gradient(ellipse 21px 12px at 48px 86%, rgb(215 222 238 / 44%), transparent 70%);
-        background-size: 78px 100%;
+            radial-gradient(ellipse 9px 5.5px at 11px 82%, rgb(215 222 238 / 48%), transparent 70%),
+            radial-gradient(ellipse 10.5px 6px at 24px 86%, rgb(215 222 238 / 44%), transparent 70%);
+        background-size: 39px 100%;
         background-repeat: repeat;
-        animation: ct-hud-weather-cloud-pass-b 10s linear infinite;
-        animation-delay: -4s;
+        animation: ct-hud-weather-cloud-pass-b 5s linear infinite;
+        animation-delay: -2s;
     }
     // Banda centrale (.ct-hud__weather-fx-mid, vero elemento DOM)
     .ct-hud__weather-fx-mid {
         position: absolute;
         inset: -15%;
         background-image:
-            radial-gradient(ellipse 21px 13px at 28px 50%, rgb(220 226 240 / 50%), transparent 70%),
-            radial-gradient(ellipse 18px 11px at 58px 46%, rgb(220 226 240 / 45%), transparent 70%);
-        background-size: 98px 100%;
+            radial-gradient(ellipse 10.5px 6.5px at 14px 50%, rgb(220 226 240 / 50%), transparent 70%),
+            radial-gradient(ellipse 9px 5.5px at 29px 46%, rgb(220 226 240 / 45%), transparent 70%);
+        background-size: 49px 100%;
         background-repeat: repeat;
-        animation: ct-hud-weather-cloud-pass-c 12s linear infinite;
-        animation-delay: -7s;
+        animation: ct-hud-weather-cloud-pass-c 6s linear infinite;
+        animation-delay: -3.5s;
     }
 }
 // Spostamento = esattamente la larghezza del tile: loop senza scatti,
@@ -262,15 +265,15 @@ body[data-palette="public"] {
 // (o il bordo di quella successiva) in vista.
 @keyframes ct-hud-weather-cloud-pass-a {
     from { background-position: 0 0; }
-    to   { background-position: -90px 0; }
+    to   { background-position: -45px 0; }
 }
 @keyframes ct-hud-weather-cloud-pass-b {
     from { background-position: 0 0; }
-    to   { background-position: -78px 0; }
+    to   { background-position: -39px 0; }
 }
 @keyframes ct-hud-weather-cloud-pass-c {
     from { background-position: 0 0; }
-    to   { background-position: -98px 0; }
+    to   { background-position: -49px 0; }
 }
 .ct-hud__weather-fx--fog {
     background: linear-gradient(rgb(230 235 245 / 55%), rgb(230 235 245 / 30%));
