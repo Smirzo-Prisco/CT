@@ -336,26 +336,47 @@ export default function Hud({ isStaff }) {
             .catch(err => console.error('[Hud] Errore eventi:', err))
     }, [])
 
-    // ── Badge: presenti nel luogo attuale ───────────────────────────────────
-    const [presentiCount, setPresentiCount] = useState(0)
+    // ── Presenti nel luogo attuale: badge conteggio + lista nel popover ─────
+    // Un'unica fetch condivisa (props a OnlineUsers) invece delle due fetch
+    // indipendenti di prima verso lo stesso op=presenti — una per il badge
+    // qui, una per la lista dentro OnlineUsers.jsx quando il popover si apre.
+    const [presentiUsers, setPresentiUsers] = useState([])
+    const [presentiIsStaff, setPresentiIsStaff] = useState(false)
+    const presentiIdleRef = useRef(false)
 
-    const fetchPresentiCount = useCallback(() => {
+    const fetchPresenti = useCallback(() => {
         fetch('/pages/api_map.php?op=presenti')
             .then(r => r.json())
-            .then(d => { if (d.success) setPresentiCount(d.users.length) })
+            .then(d => {
+                if (!d.success) return
+                setPresentiUsers(d.users)
+                setPresentiIsStaff(!!d.is_staff)
+            })
             .catch(err => console.error('[Hud] Errore presenti:', err))
     }, [])
 
     useEffect(() => {
-        fetchPresentiCount()
+        fetchPresenti()
         const sock = window.ctSocket
-        if (sock) sock.on('users:update', fetchPresentiCount)
-        window.addEventListener('ct:location-changed', fetchPresentiCount)
+        // op=presenti ha un side-effect (resetta disponibile=1 nel DB): non
+        // richiamarlo se il pg e' idle, altrimenti lo si marca per sbaglio
+        // come attivo (stesso guard prima in OnlineUsers.jsx).
+        const onUsersUpdate = () => { if (!presentiIdleRef.current) fetchPresenti() }
+        if (sock) sock.on('users:update', onUsersUpdate)
+        window.addEventListener('ct:location-changed', fetchPresenti)
+        const onIdle = () => { presentiIdleRef.current = true }
+        const onActive = () => { presentiIdleRef.current = false }
+        window.addEventListener('ct:idle', onIdle)
+        window.addEventListener('ct:active', onActive)
         return () => {
-            if (sock) sock.off('users:update', fetchPresentiCount)
-            window.removeEventListener('ct:location-changed', fetchPresentiCount)
+            if (sock) sock.off('users:update', onUsersUpdate)
+            window.removeEventListener('ct:location-changed', fetchPresenti)
+            window.removeEventListener('ct:idle', onIdle)
+            window.removeEventListener('ct:active', onActive)
         }
-    }, [fetchPresentiCount])
+    }, [fetchPresenti])
+
+    const presentiCount = presentiUsers.length
 
     // ── Logout (stesso pattern di FrameMessaggi.jsx) ────────────────────────
     const loggingOut = useRef(false)
@@ -680,7 +701,7 @@ export default function Hud({ isStaff }) {
                         <span>Presenti qui</span>
                         <a href="main.php?page=presenti_estesi">Vedi tutti <i className="fa-solid fa-arrow-right" /></a>
                     </div>
-                    <OnlineUsers />
+                    <OnlineUsers users={presentiUsers} isStaff={presentiIsStaff} />
                 </div>
             )}
 
