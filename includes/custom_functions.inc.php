@@ -471,7 +471,7 @@ function saveUploadedImage(array $file, string $folder, string $prefix, ?string 
     return $nomeFile;
 }
 
-function saveImgObj($dati, $imgEsistente = null, $files) {
+function saveImgObj($dati, $imgEsistente, $files) {
     $nomeFile = saveUploadedImage($files['img_oggetto'] ?? [], 'imgs/items', 'oggetto_', $imgEsistente);
 
     if ($nomeFile !== null) {
@@ -664,7 +664,7 @@ function getLevelPg(int $totStats, array $soglie = []): int {
 
 
 /************* GILDA ******************************/
-function saveImgGuild($dati, $imgEsistente = null, $files) {
+function saveImgGuild($dati, $imgEsistente, $files) {
     $nomeFile = saveUploadedImage($files['immagine'] ?? [], 'imgs/guilds', 'guild_', $imgEsistente);
 
     if ($nomeFile !== null) {
