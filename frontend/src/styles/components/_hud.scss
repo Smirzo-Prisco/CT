@@ -214,19 +214,20 @@ body[data-palette="public"] {
 // tile solo di poco piu' largo del cerchio: sempre almeno una nuvola in
 // vista su ciascuna banda, nessuna pausa vuota.
 .ct-hud__weather-fx--cloud {
-    // Banda alta
+    // Banda alta — chiazze ridimensionate per stare DENTRO il proprio tile
+    // (raggio + posizione non superano piu' il bordo del tile): il bug del
+    // giro precedente era chiazze pensate per un tile 3x piu' grande,
+    // rimaste alle stesse coordinate assolute dopo aver rimpicciolito il
+    // tile — finivano oltre il bordo e "si spezzavano" nel wraparound del
+    // repeat. inset -15% (via di mezzo) per un margine di sicurezza extra.
     &::before {
         content: '';
         position: absolute;
-        // -20% (era -10%): tile piu' largo del cerchio su ogni lato, cosi'
-        // il bordo destro del cerchio non mostra mai il "taglio" a meta'
-        // nuvola dove il pattern ripete — il margine extra nasconde la
-        // giunzione oltre il bordo visibile invece di farla cadere sopra.
-        inset: -20%;
+        inset: -15%;
         background-image:
-            radial-gradient(ellipse 45px 26px at 60px 20%, rgb(225 230 242 / 55%), transparent 70%),
-            radial-gradient(ellipse 55px 30px at 110px 16%, rgb(225 230 242 / 50%), transparent 70%);
-        background-size: 75px 100%;
+            radial-gradient(ellipse 20px 13px at 25px 20%, rgb(225 230 242 / 55%), transparent 70%),
+            radial-gradient(ellipse 24px 14px at 55px 16%, rgb(225 230 242 / 50%), transparent 70%);
+        background-size: 90px 100%;
         background-repeat: repeat;
         animation: ct-hud-weather-cloud-pass-a 7s linear infinite;
     }
@@ -234,11 +235,11 @@ body[data-palette="public"] {
     &::after {
         content: '';
         position: absolute;
-        inset: -20%;
+        inset: -15%;
         background-image:
-            radial-gradient(ellipse 42px 24px at 90px 82%, rgb(215 222 238 / 48%), transparent 70%),
-            radial-gradient(ellipse 50px 28px at 150px 86%, rgb(215 222 238 / 44%), transparent 70%);
-        background-size: 65px 100%;
+            radial-gradient(ellipse 18px 11px at 22px 82%, rgb(215 222 238 / 48%), transparent 70%),
+            radial-gradient(ellipse 21px 12px at 48px 86%, rgb(215 222 238 / 44%), transparent 70%);
+        background-size: 78px 100%;
         background-repeat: repeat;
         animation: ct-hud-weather-cloud-pass-b 10s linear infinite;
         animation-delay: -4s;
@@ -246,11 +247,11 @@ body[data-palette="public"] {
     // Banda centrale (.ct-hud__weather-fx-mid, vero elemento DOM)
     .ct-hud__weather-fx-mid {
         position: absolute;
-        inset: -20%;
+        inset: -15%;
         background-image:
-            radial-gradient(ellipse 48px 28px at 100px 50%, rgb(220 226 240 / 50%), transparent 70%),
-            radial-gradient(ellipse 40px 24px at 150px 46%, rgb(220 226 240 / 45%), transparent 70%);
-        background-size: 82px 100%;
+            radial-gradient(ellipse 21px 13px at 28px 50%, rgb(220 226 240 / 50%), transparent 70%),
+            radial-gradient(ellipse 18px 11px at 58px 46%, rgb(220 226 240 / 45%), transparent 70%);
+        background-size: 98px 100%;
         background-repeat: repeat;
         animation: ct-hud-weather-cloud-pass-c 12s linear infinite;
         animation-delay: -7s;
@@ -261,15 +262,15 @@ body[data-palette="public"] {
 // (o il bordo di quella successiva) in vista.
 @keyframes ct-hud-weather-cloud-pass-a {
     from { background-position: 0 0; }
-    to   { background-position: -75px 0; }
+    to   { background-position: -90px 0; }
 }
 @keyframes ct-hud-weather-cloud-pass-b {
     from { background-position: 0 0; }
-    to   { background-position: -65px 0; }
+    to   { background-position: -78px 0; }
 }
 @keyframes ct-hud-weather-cloud-pass-c {
     from { background-position: 0 0; }
-    to   { background-position: -82px 0; }
+    to   { background-position: -98px 0; }
 }
 .ct-hud__weather-fx--fog {
     background: linear-gradient(rgb(230 235 245 / 55%), rgb(230 235 245 / 30%));
