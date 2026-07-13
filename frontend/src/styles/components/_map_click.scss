@@ -279,3 +279,132 @@
         border: 1px solid rgba(8, 9, 26, .9);
     }
 }
+
+// ── Overlay meteo sulla mappa grande ──────────────────────────
+// Stessa condizione/logica del cerchio-luogo nell'HUD (useWeatherEffect,
+// vedi Hud.jsx e MapClick.jsx), ma CSS a parte: quello dell'HUD usa px
+// fissi perche' il cerchio e' sempre 173px, qui l'immagine e' width:100%
+// del contenitore quindi cambia dimensione reale con lo schermo — tutto
+// in percentuale (relativa al proprio box) cosi' l'effetto resta
+// proporzionato a qualunque larghezza mappa invece di sembrare minuscolo
+// su schermi grandi o esagerato su mobile. Prima iterazione, tarata a
+// occhio sulle proporzioni finali della versione HUD — quasi certamente
+// da rifinire una volta vista dal vivo sulla mappa reale.
+.ct-map__weather-fx {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.ct-map__weather-fx--sun {
+    background: radial-gradient(circle at 35% 30%, rgb(255 214 120 / 45%), transparent 60%);
+    mix-blend-mode: screen;
+    animation: ct-hud-weather-glow 4s ease-in-out infinite;
+}
+.ct-map__weather-fx--fog {
+    background: linear-gradient(rgb(230 235 245 / 45%), rgb(230 235 245 / 22%));
+    backdrop-filter: blur(2px);
+    animation: ct-hud-weather-glow 6s ease-in-out infinite;
+}
+
+.ct-map__weather-fx--cloud {
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        inset: -10%;
+        background-repeat: repeat;
+    }
+    &::before {
+        background-image:
+            radial-gradient(ellipse 12% 60% at 6% 20%, rgb(225 230 242 / 55%), transparent 70%),
+            radial-gradient(ellipse 14% 65% at 13% 16%, rgb(225 230 242 / 50%), transparent 70%);
+        background-size: 22% 100%;
+        animation: ct-map-weather-cloud-a 9s linear infinite;
+    }
+    &::after {
+        background-image:
+            radial-gradient(ellipse 11% 55% at 5% 82%, rgb(215 222 238 / 48%), transparent 70%),
+            radial-gradient(ellipse 13% 58% at 12% 86%, rgb(215 222 238 / 44%), transparent 70%);
+        background-size: 20% 100%;
+        animation: ct-map-weather-cloud-b 12s linear infinite;
+        animation-delay: -5s;
+    }
+}
+@keyframes ct-map-weather-cloud-a {
+    from { background-position: 0 0; }
+    to   { background-position: -22% 0; }
+}
+@keyframes ct-map-weather-cloud-b {
+    from { background-position: 0 0; }
+    to   { background-position: -20% 0; }
+}
+
+.ct-map__weather-fx--rain {
+    background-color: rgb(10 20 40 / 12%);
+    background-image: radial-gradient(ellipse 45% 25% at 50% 100%, rgb(10 20 40 / 35%), transparent 65%);
+
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        inset: -15%;
+        transform: rotate(25deg);
+        background-repeat: repeat;
+    }
+    &::before {
+        background-image: radial-gradient(ellipse .6% 5% at 50% 50%, rgb(200 222 255 / 60%), transparent 75%);
+        background-size: 7% 100%;
+        animation: ct-map-weather-rain-near .35s linear infinite;
+    }
+    &::after {
+        background-image: radial-gradient(ellipse .35% 4.5% at 50% 50%, rgb(210 225 245 / 65%), transparent 75%);
+        background-size: 11% 100%;
+        animation: ct-map-weather-rain-far .7s linear infinite;
+    }
+}
+.ct-map__weather-fx--storm {
+    background-color: rgb(5 8 20 / 22%);
+    background-image: radial-gradient(ellipse 45% 25% at 50% 100%, rgb(5 8 20 / 45%), transparent 65%);
+    animation: ct-hud-weather-flash 5s ease-in-out infinite;
+
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        inset: -15%;
+        transform: rotate(25deg);
+        background-repeat: repeat;
+    }
+    &::before {
+        background-image: radial-gradient(ellipse .6% 5% at 50% 50%, rgb(200 218 255 / 70%), transparent 75%);
+        background-size: 7% 100%;
+        animation: ct-map-weather-rain-near .2s linear infinite;
+    }
+    &::after {
+        background-image: radial-gradient(ellipse .35% 4.5% at 50% 50%, rgb(210 222 245 / 75%), transparent 75%);
+        background-size: 11% 100%;
+        animation: ct-map-weather-rain-far .42s linear infinite;
+    }
+}
+@keyframes ct-map-weather-rain-near {
+    from { background-position: 0 0; }
+    to   { background-position: -7% 100%; }
+}
+@keyframes ct-map-weather-rain-far {
+    from { background-position: 0 0; }
+    to   { background-position: -11% 100%; }
+}
+
+.ct-map__weather-fx--snow {
+    background-image:
+        radial-gradient(circle, #fff 25%, transparent 40%),
+        radial-gradient(circle, #fff 20%, transparent 32%),
+        radial-gradient(circle, #fff 30%, transparent 48%);
+    background-size: 8% 8%, 12% 12%, 6% 6%;
+    background-position: 0 0, 4% 3%, 8% 6%;
+    opacity: .85;
+    animation: ct-map-weather-snow 4s linear infinite;
+}
+@keyframes ct-map-weather-snow {
+    from { background-position: 0 0, 4% 3%, 8% 6%; }
+    to   { background-position: 0 60%, 4% 85%, 8% 70%; }
+}
