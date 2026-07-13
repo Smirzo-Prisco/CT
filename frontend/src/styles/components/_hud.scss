@@ -218,11 +218,15 @@ body[data-palette="public"] {
     &::before {
         content: '';
         position: absolute;
-        inset: -10%;
+        // -20% (era -10%): tile piu' largo del cerchio su ogni lato, cosi'
+        // il bordo destro del cerchio non mostra mai il "taglio" a meta'
+        // nuvola dove il pattern ripete — il margine extra nasconde la
+        // giunzione oltre il bordo visibile invece di farla cadere sopra.
+        inset: -20%;
         background-image:
             radial-gradient(ellipse 45px 26px at 60px 20%, rgb(225 230 242 / 55%), transparent 70%),
             radial-gradient(ellipse 55px 30px at 110px 16%, rgb(225 230 242 / 50%), transparent 70%);
-        background-size: 130px 100%;
+        background-size: 75px 100%;
         background-repeat: repeat;
         animation: ct-hud-weather-cloud-pass-a 7s linear infinite;
     }
@@ -230,11 +234,11 @@ body[data-palette="public"] {
     &::after {
         content: '';
         position: absolute;
-        inset: -10%;
+        inset: -20%;
         background-image:
             radial-gradient(ellipse 42px 24px at 90px 82%, rgb(215 222 238 / 48%), transparent 70%),
             radial-gradient(ellipse 50px 28px at 150px 86%, rgb(215 222 238 / 44%), transparent 70%);
-        background-size: 115px 100%;
+        background-size: 65px 100%;
         background-repeat: repeat;
         animation: ct-hud-weather-cloud-pass-b 10s linear infinite;
         animation-delay: -4s;
@@ -242,11 +246,11 @@ body[data-palette="public"] {
     // Banda centrale (.ct-hud__weather-fx-mid, vero elemento DOM)
     .ct-hud__weather-fx-mid {
         position: absolute;
-        inset: -10%;
+        inset: -20%;
         background-image:
             radial-gradient(ellipse 48px 28px at 100px 50%, rgb(220 226 240 / 50%), transparent 70%),
             radial-gradient(ellipse 40px 24px at 150px 46%, rgb(220 226 240 / 45%), transparent 70%);
-        background-size: 145px 100%;
+        background-size: 82px 100%;
         background-repeat: repeat;
         animation: ct-hud-weather-cloud-pass-c 12s linear infinite;
         animation-delay: -7s;
@@ -257,15 +261,15 @@ body[data-palette="public"] {
 // (o il bordo di quella successiva) in vista.
 @keyframes ct-hud-weather-cloud-pass-a {
     from { background-position: 0 0; }
-    to   { background-position: -130px 0; }
+    to   { background-position: -75px 0; }
 }
 @keyframes ct-hud-weather-cloud-pass-b {
     from { background-position: 0 0; }
-    to   { background-position: -115px 0; }
+    to   { background-position: -65px 0; }
 }
 @keyframes ct-hud-weather-cloud-pass-c {
     from { background-position: 0 0; }
-    to   { background-position: -145px 0; }
+    to   { background-position: -82px 0; }
 }
 .ct-hud__weather-fx--fog {
     background: linear-gradient(rgb(230 235 245 / 55%), rgb(230 235 245 / 30%));
