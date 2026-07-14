@@ -308,6 +308,12 @@
     animation: ct-hud-weather-glow 6s ease-in-out infinite;
 }
 
+// Fix: tile con altezza 100% (versione precedente) = un'unica fascia/banda
+// a meta' altezza, non un pattern che copre davvero tutta la mappa. Ora il
+// tile e' piccolo in ENTRAMBE le dimensioni (percentuale, per adattarsi a
+// qualunque larghezza mappa) e si ripete anche in verticale — le chiazze/
+// gocce restano invece a dimensione FISSA in px (non crescono con la
+// mappa): cosi' si espande la copertura senza ingrandire pioggia/neve.
 .ct-map__weather-fx--cloud {
     &::before, &::after {
         content: '';
@@ -317,27 +323,27 @@
     }
     &::before {
         background-image:
-            radial-gradient(ellipse 12% 60% at 6% 20%, rgb(225 230 242 / 55%), transparent 70%),
-            radial-gradient(ellipse 14% 65% at 13% 16%, rgb(225 230 242 / 50%), transparent 70%);
-        background-size: 22% 100%;
+            radial-gradient(ellipse 90px 55px at 30% 40%, rgb(225 230 242 / 55%), transparent 70%),
+            radial-gradient(ellipse 105px 60px at 55% 55%, rgb(225 230 242 / 50%), transparent 70%);
+        background-size: 22% 30%;
         animation: ct-map-weather-cloud-a 9s linear infinite;
     }
     &::after {
         background-image:
-            radial-gradient(ellipse 11% 55% at 5% 82%, rgb(215 222 238 / 48%), transparent 70%),
-            radial-gradient(ellipse 13% 58% at 12% 86%, rgb(215 222 238 / 44%), transparent 70%);
-        background-size: 20% 100%;
+            radial-gradient(ellipse 80px 48px at 25% 45%, rgb(215 222 238 / 48%), transparent 70%),
+            radial-gradient(ellipse 92px 52px at 50% 60%, rgb(215 222 238 / 44%), transparent 70%);
+        background-size: 20% 26%;
         animation: ct-map-weather-cloud-b 12s linear infinite;
         animation-delay: -5s;
     }
 }
 @keyframes ct-map-weather-cloud-a {
     from { background-position: 0 0; }
-    to   { background-position: -22% 0; }
+    to   { background-position: -22% -30%; }
 }
 @keyframes ct-map-weather-cloud-b {
     from { background-position: 0 0; }
-    to   { background-position: -20% 0; }
+    to   { background-position: -20% -26%; }
 }
 
 .ct-map__weather-fx--rain {
@@ -352,13 +358,13 @@
         background-repeat: repeat;
     }
     &::before {
-        background-image: radial-gradient(ellipse .6% 5% at 50% 50%, rgb(200 222 255 / 60%), transparent 75%);
-        background-size: 7% 100%;
+        background-image: radial-gradient(ellipse 2px 16px, rgb(200 222 255 / 60%), transparent 75%);
+        background-size: 7% 16%;
         animation: ct-map-weather-rain-near .35s linear infinite;
     }
     &::after {
-        background-image: radial-gradient(ellipse .35% 4.5% at 50% 50%, rgb(210 225 245 / 65%), transparent 75%);
-        background-size: 11% 100%;
+        background-image: radial-gradient(ellipse 1.4px 13px, rgb(210 225 245 / 65%), transparent 75%);
+        background-size: 11% 22%;
         animation: ct-map-weather-rain-far .7s linear infinite;
     }
 }
@@ -375,23 +381,23 @@
         background-repeat: repeat;
     }
     &::before {
-        background-image: radial-gradient(ellipse .6% 5% at 50% 50%, rgb(200 218 255 / 70%), transparent 75%);
-        background-size: 7% 100%;
+        background-image: radial-gradient(ellipse 2px 16px, rgb(200 218 255 / 70%), transparent 75%);
+        background-size: 7% 16%;
         animation: ct-map-weather-rain-near .2s linear infinite;
     }
     &::after {
-        background-image: radial-gradient(ellipse .35% 4.5% at 50% 50%, rgb(210 222 245 / 75%), transparent 75%);
-        background-size: 11% 100%;
+        background-image: radial-gradient(ellipse 1.4px 13px, rgb(210 222 245 / 75%), transparent 75%);
+        background-size: 11% 22%;
         animation: ct-map-weather-rain-far .42s linear infinite;
     }
 }
 @keyframes ct-map-weather-rain-near {
     from { background-position: 0 0; }
-    to   { background-position: -7% 100%; }
+    to   { background-position: -7% -16%; }
 }
 @keyframes ct-map-weather-rain-far {
     from { background-position: 0 0; }
-    to   { background-position: -11% 100%; }
+    to   { background-position: -11% -22%; }
 }
 
 .ct-map__weather-fx--snow {
