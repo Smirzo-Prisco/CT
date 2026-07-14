@@ -275,10 +275,43 @@ body[data-palette="public"] {
     from { background-position: 0 0; }
     to   { background-position: -68px 0; }
 }
+// Stessa logica della mappa grande (.ct-map__weather-fx--fog): velo leggero
+// di base + due banchi (radial-gradient sfocati) che scorrono in
+// orizzontale a velocita' diverse, invece del solo velo statico fisso —
+// altrimenti sul cerchio piccolo restava un'"immagine sfocata" immobile.
 .ct-hud__weather-fx--fog {
-    background: linear-gradient(rgb(230 235 245 / 55%), rgb(230 235 245 / 30%));
-    backdrop-filter: blur(1.5px);
-    animation: ct-hud-weather-glow 6s ease-in-out infinite;
+    background: linear-gradient(rgb(230 235 245 / 26%), rgb(230 235 245 / 12%));
+    backdrop-filter: blur(1px);
+
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        inset: -20% -30%;
+        background-repeat: repeat-x;
+        filter: blur(3px);
+    }
+    &::before {
+        background-image:
+            radial-gradient(ellipse 45px 16px at 30% 40%, rgb(238 242 250 / 85%), transparent 65%),
+            radial-gradient(ellipse 52px 18px at 75% 60%, rgb(238 242 250 / 80%), transparent 65%);
+        background-size: 90px 100%;
+        animation: ct-hud-weather-fog-a 3.2s linear infinite;
+    }
+    &::after {
+        background-image:
+            radial-gradient(ellipse 38px 14px at 40% 65%, rgb(226 234 246 / 75%), transparent 65%),
+            radial-gradient(ellipse 46px 16px at 85% 35%, rgb(226 234 246 / 70%), transparent 65%);
+        background-size: 76px 100%;
+        animation: ct-hud-weather-fog-b 4.4s linear infinite reverse;
+    }
+}
+@keyframes ct-hud-weather-fog-a {
+    from { background-position: 0 0; }
+    to   { background-position: -90px 0; }
+}
+@keyframes ct-hud-weather-fog-b {
+    from { background-position: 0 0; }
+    to   { background-position: -76px 0; }
 }
 // Gocce vere invece di un tratteggio continuo. Un repeating-linear-gradient
 // (primo tentativo) riempiva il cerchio di righe fitte edge-to-edge. Un
@@ -352,8 +385,10 @@ body[data-palette="public"] {
     }
 }
 .ct-hud__weather-fx--storm {
-    background-color: rgb(5 8 20 / 22%);
-    background-image: radial-gradient(ellipse at 50% 100%, rgb(5 8 20 / 50%), transparent 65%);
+    // Sfondo scurito per allinearsi alla stessa modifica fatta sulla mappa
+    // grande (.ct-map__weather-fx--storm): 22%/50% -> 32%/55%.
+    background-color: rgb(5 8 20 / 32%);
+    background-image: radial-gradient(ellipse at 50% 100%, rgb(5 8 20 / 55%), transparent 65%);
     animation: ct-hud-weather-flash 5s ease-in-out infinite;
 
     &::before {

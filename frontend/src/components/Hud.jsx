@@ -40,6 +40,7 @@ import OnlineUsers from './OnlineUsers'
 import ChattingOff from './ChattingOff'
 import Meteo from './Meteo'
 import useHudBadges from '../hooks/useHudBadges'
+import useWeatherEffect from '../hooks/useWeatherEffect'
 
 // Posiziona un'icona sull'arco: tx/ty sono le coordinate (px) rispetto al
 // centro dell'anello/logo.
@@ -51,22 +52,6 @@ const arcIcon = (tx, ty) => ({ '--tx': `${tx}px`, '--ty': `${ty}px` })
 const pipOffset = (tx, ty, dist = 24) => {
     const mag = Math.hypot(tx, ty) || 1
     return { '--px': `${(tx / mag) * dist}px`, '--py': `${(ty / mag) * dist}px` }
-}
-
-// Effetto grafico da sovrapporre al cerchio-luogo in base alla condizione
-// restituita da api_global.php?op=meteo (stesse chiavi di WEATHER_ICONS in
-// Meteo.jsx). Solo le condizioni con un effetto visivo distintivo hanno una
-// voce: cielo sereno notturno resta senza overlay, l'immagine da sola basta.
-const WEATHER_EFFECTS = {
-    sole: 'sun',
-    sole_nuvoloso: 'cloud',
-    nuvoloso: 'cloud',
-    pioggia: 'rain',
-    temporale: 'storm',
-    neve: 'snow',
-    sole_nebbia: 'fog',
-    luna_nuvoloso: 'cloud',
-    luna_nebbia: 'fog',
 }
 
 // Su mobile .ct-hud__ring ha un transform:scale() (per rimpicciolire il
@@ -193,16 +178,6 @@ export default function Hud({ isStaff }) {
             window.removeEventListener('ct:location-changed', fetchLocation)
         }
     }, [fetchLocation])
-
-    // Stesso endpoint di Meteo.jsx (giornaliero, richiesta separata per non
-    // accoppiare i due componenti: Meteo e' montato anche da solo altrove).
-    const [meteoData, setMeteoData] = useState(null)
-    useEffect(() => {
-        fetch('/pages/api_global.php?op=meteo')
-            .then(r => r.json())
-            .then(d => { if (d.success) setMeteoData(d) })
-            .catch(() => { })
-    }, [])
 
     // ── Avatar + vitali personaggio (stesso pattern di AnteprimaScheda.jsx) ─
     const [avatar, setAvatar] = useState(() => (window.CT_USER?.url_img_chat ?? '').trim())
@@ -380,11 +355,9 @@ export default function Hud({ isStaff }) {
 
     useEffect(() => { setLocationImgFailed(false) }, [locationImg])
 
-    // Condizione "attuale" del giorno di gioco corrente: giorno/notte segue
-    // location.is_notte, gia' usato sopra per scegliere mappa_giorno/notte.png.
-    const weatherFx = meteoData
-        ? WEATHER_EFFECTS[location?.is_notte ? meteoData.attuale.notte_img : meteoData.attuale.giorno_img] ?? null
-        : null
+    // Giorno/notte segue location.is_notte, gia' usato sopra per scegliere
+    // mappa_giorno/notte.png.
+    const weatherFx = useWeatherEffect(location?.is_notte)
 
     return (
         <div className="ct-hud" ref={hudRef}>
