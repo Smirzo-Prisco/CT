@@ -404,10 +404,12 @@
 }
 
 .ct-map__weather-fx--snow {
+    // Raggio del fiocco fisso in px (non scala con la mappa): solo lo
+    // spazio del tile resta in % per adattare la densità alla larghezza.
     background-image:
-        radial-gradient(circle, #fff 25%, transparent 40%),
-        radial-gradient(circle, #fff 20%, transparent 32%),
-        radial-gradient(circle, #fff 30%, transparent 48%);
+        radial-gradient(circle 2px, #fff 90%, transparent 100%),
+        radial-gradient(circle 1.5px, #fff 90%, transparent 100%),
+        radial-gradient(circle 2.5px, #fff 90%, transparent 100%);
     background-size: 8% 8%, 12% 12%, 6% 6%;
     background-position: 0 0, 4% 3%, 8% 6%;
     opacity: .85;
