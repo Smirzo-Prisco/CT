@@ -391,13 +391,16 @@
         animation: ct-map-weather-rain-far .42s linear infinite;
     }
 }
+// Y positivo (non negativo): un background-position Y crescente sposta il
+// pattern verso il basso, quello negativo (versione precedente, errore di
+// segno) lo faceva salire — la pioggia sembrava cadere verso l'alto.
 @keyframes ct-map-weather-rain-near {
     from { background-position: 0 0; }
-    to   { background-position: -7% -16%; }
+    to   { background-position: -7% 16%; }
 }
 @keyframes ct-map-weather-rain-far {
     from { background-position: 0 0; }
-    to   { background-position: -11% -22%; }
+    to   { background-position: -11% 22%; }
 }
 
 .ct-map__weather-fx--snow {
