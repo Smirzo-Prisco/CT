@@ -303,9 +303,42 @@
     animation: ct-hud-weather-glow 4s ease-in-out infinite;
 }
 .ct-map__weather-fx--fog {
-    background: linear-gradient(rgb(230 235 245 / 45%), rgb(230 235 245 / 22%));
-    backdrop-filter: blur(2px);
-    animation: ct-hud-weather-glow 6s ease-in-out infinite;
+    // Prima versione: solo un velo statico sfumato + blur di sfondo — leggeva
+    // come "immagine sfocata", non come nebbia che si muove. Ora un velo
+    // leggero di base + due banchi che scorrono in orizzontale a velocità
+    // e profondità diverse (vicino/lontano), ciascuno sfocato ai bordi.
+    background: linear-gradient(rgb(230 235 245 / 28%), rgb(230 235 245 / 14%));
+    backdrop-filter: blur(1px);
+
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        inset: -10% -50%;
+        background-repeat: repeat-x;
+        filter: blur(8px);
+    }
+    &::before {
+        background-image:
+            radial-gradient(ellipse 220px 70px at 20% 35%, rgb(235 240 248 / 55%), transparent 70%),
+            radial-gradient(ellipse 260px 80px at 62% 55%, rgb(235 240 248 / 50%), transparent 70%);
+        background-size: 55% 100%;
+        animation: ct-map-weather-fog-a 30s linear infinite;
+    }
+    &::after {
+        background-image:
+            radial-gradient(ellipse 190px 60px at 35% 68%, rgb(222 230 244 / 45%), transparent 70%),
+            radial-gradient(ellipse 230px 68px at 78% 42%, rgb(222 230 244 / 42%), transparent 70%);
+        background-size: 46% 100%;
+        animation: ct-map-weather-fog-b 40s linear infinite reverse;
+    }
+}
+@keyframes ct-map-weather-fog-a {
+    from { background-position: 0 0; }
+    to   { background-position: -55% 0; }
+}
+@keyframes ct-map-weather-fog-b {
+    from { background-position: 0 0; }
+    to   { background-position: -46% 0; }
 }
 
 // Fix: tile con altezza 100% (versione precedente) = un'unica fascia/banda
