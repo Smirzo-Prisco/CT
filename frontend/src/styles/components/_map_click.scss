@@ -371,7 +371,10 @@
 .ct-map__weather-fx--storm {
     background-color: rgb(5 8 20 / 22%);
     background-image: radial-gradient(ellipse 45% 25% at 50% 100%, rgb(5 8 20 / 45%), transparent 65%);
-    animation: ct-hud-weather-flash 5s ease-in-out infinite;
+    // Il box-shadow inset usato dall'HUD (ct-hud-weather-flash) è invisibile
+    // su un rettangolo grande come la mappa: qui il lampo anima il colore
+    // di sfondo dell'intero riquadro, non un bordo interno.
+    animation: ct-map-weather-flash 5s ease-in-out infinite;
 
     &::before, &::after {
         content: '';
@@ -390,6 +393,11 @@
         background-size: 11% 22%;
         animation: ct-map-weather-rain-far .42s linear infinite;
     }
+}
+@keyframes ct-map-weather-flash {
+    0%, 92%, 100% { background-color: rgb(5 8 20 / 22%); }
+    94%           { background-color: rgb(255 255 255 / 55%); }
+    96%           { background-color: rgb(5 8 20 / 22%); }
 }
 // Y positivo (non negativo): un background-position Y crescente sposta il
 // pattern verso il basso, quello negativo (versione precedente, errore di
