@@ -323,15 +323,15 @@
     }
     &::before {
         background-image:
-            radial-gradient(ellipse 90px 55px at 30% 40%, rgb(80 85 105 / 65%), transparent 70%),
-            radial-gradient(ellipse 105px 60px at 55% 55%, rgb(80 85 105 / 60%), transparent 70%);
+            radial-gradient(ellipse 90px 55px at 30% 40%, rgb(80 85 105 / 78%), transparent 70%),
+            radial-gradient(ellipse 105px 60px at 55% 55%, rgb(80 85 105 / 73%), transparent 70%);
         background-size: 22% 30%;
         animation: ct-map-weather-cloud-a 9s linear infinite;
     }
     &::after {
         background-image:
-            radial-gradient(ellipse 80px 48px at 25% 45%, rgb(65 70 90 / 58%), transparent 70%),
-            radial-gradient(ellipse 92px 52px at 50% 60%, rgb(65 70 90 / 54%), transparent 70%);
+            radial-gradient(ellipse 80px 48px at 25% 45%, rgb(65 70 90 / 70%), transparent 70%),
+            radial-gradient(ellipse 92px 52px at 50% 60%, rgb(65 70 90 / 66%), transparent 70%);
         background-size: 20% 26%;
         animation: ct-map-weather-cloud-b 12s linear infinite;
         animation-delay: -5s;
