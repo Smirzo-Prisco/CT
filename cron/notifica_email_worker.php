@@ -61,6 +61,12 @@ foreach ($gruppi as $g) {
         $subject = 'Hai un nuovo messaggio privato — Crystal Tokyo';
         $body    = 'Hai ricevuto un nuovo messaggio privato su Crystal Tokyo.<br><br>'
                  . '<a href="https://crystaltokyo.it/main.php?page=messages_center">Accedi per leggerlo</a>';
+    } elseif ($g['evento'] === 'chat_off_non_letta') {
+        // Niente URL diretto: la chattina off e' un popover della HUD, non
+        // una pagina propria — il link porta alla home.
+        $subject = 'Hai messaggi non letti nella chattina off — Crystal Tokyo';
+        $body    = 'Ci sono messaggi non letti nella chattina off su Crystal Tokyo.<br><br>'
+                 . '<a href="https://crystaltokyo.it/main.php">Accedi per leggerli</a>';
     } else {
         $thread = gdrcd_query("SELECT titolo FROM messaggioaraldo
             WHERE id_messaggio = " . $g['riferimento_id'] . " AND id_messaggio_padre = -1 LIMIT 1");

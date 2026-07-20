@@ -14,6 +14,7 @@ session_start();
 header('Content-Type: application/json');
 
 require_once(__DIR__ . '/../includes/required.php');
+require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 $handleDBConnection = gdrcd_connect();
 
 if (empty($_SESSION['login'])) {
@@ -68,7 +69,19 @@ switch ($op) {
         );
         while ($row = gdrcd_query($q, 'fetch')) {
             $nome_f = gdrcd_filter('in', $row['nome']);
-            gdrcd_query("INSERT INTO chat_letta (nome) VALUES ('$nome_f')");
+
+            // Notifica (DM/email) solo alla transizione letto -> non letto:
+            // se il pg ha gia' una riga pendente in chat_letta, ha gia'
+            // ricevuto la sua notifica per questo batch di non letti — niente
+            // insert duplicato, niente nuova notifica per ogni riga scritta
+            // da altri nel frattempo (altrimenti sarebbe una notifica per
+            // ogni singolo messaggio, troppo invasivo).
+            $gia_non_letto = gdrcd_query("SELECT COUNT(*) AS c FROM chat_letta WHERE nome = '$nome_f'")['c'] > 0;
+            if (!$gia_non_letto) {
+                gdrcd_query("INSERT INTO chat_letta (nome) VALUES ('$nome_f')");
+                queueChatOffUnreadNotification($nome_f);
+            }
+
             notifySocketServer('chatoff:update', 'chatoff:' . $row['nome']);
         }
         gdrcd_query($q, 'free');
