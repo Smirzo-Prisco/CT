@@ -26,7 +26,7 @@ const onboardingSteps = [
         id: 'mappa',
         ring: 'left',
         target: '[data-tour="hud-mappa"]',
-        text: 'Questa è la Mappa: da qui esplori i distretti di Tokyo 3060. Ogni distretto con gente dentro mostra un badge dorato con il numero di presenti, così sai subito dove trovare una chat viva.',
+        text: 'Questa è la Mappa: da qui esplori i distretti di Crystal Tokyo. Ogni distretto con gente dentro mostra un badge dorato con il numero di presenti, così sai subito dove trovare una chat viva.',
     },
     {
         id: 'presenti',
@@ -38,7 +38,7 @@ const onboardingSteps = [
         id: 'forum',
         ring: 'left',
         target: '[data-tour="hud-forum"]',
-        text: 'Il Forum è dove si discute fuori dal gioco: annunci, regolamento, richieste allo staff.',
+        text: 'Il Forum ospita sia discussioni fuori dal gioco (annunci, regolamento, richieste allo staff) sia bacheche in game — di razza, di mestiere e di eventi generali.',
     },
     {
         id: 'chatoff',
@@ -69,6 +69,18 @@ const onboardingSteps = [
         ring: 'right',
         target: '[data-tour="hud-scheda"]',
         text: 'Questo sei tu: clicca qui in qualsiasi momento per aprire la tua scheda personaggio.',
+    },
+    {
+        id: 'manuali',
+        ring: 'center',
+        target: '[data-tour="hud-manuali"]',
+        text: 'Manuali raccoglie le guide di ambientazione e le informazioni su razze, gilde e mestieri.',
+    },
+    {
+        id: 'uffici',
+        ring: 'center',
+        target: '[data-tour="hud-uffici"]',
+        text: 'Uffici è dove gestisci le pratiche del tuo personaggio: richieste, moduli e altre operazioni amministrative.',
     },
     {
         id: 'outro',

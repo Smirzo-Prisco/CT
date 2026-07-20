@@ -555,13 +555,13 @@ export default function Hud({ isStaff }) {
                 <div className="ct-hud__sheet-backdrop" onClick={() => setCenterOpen(false)} />
 
                 <div className="ct-hud__center-arc">
-                    <a className="ct-hud__icon" style={arcIcon(-60, 0)}
+                    <a className="ct-hud__icon" style={arcIcon(-60, 0)} data-tour="hud-manuali"
                         href="main.php?page=servizi_gilde" title="Manuali">
                         <i className="fa-solid fa-book" />
                     </a>
                     {/* Senza Gestione (non-staff) Uffici prende la posizione centrale
                         del ventaglio, cosi' non resta uno spazio vuoto al suo posto. */}
-                    <a className="ct-hud__icon" style={isStaff ? arcIcon(-30, 52) : arcIcon(0, 60)}
+                    <a className="ct-hud__icon" style={isStaff ? arcIcon(-30, 52) : arcIcon(0, 60)} data-tour="hud-uffici"
                         href="main.php?page=uffici" title="Uffici">
                         <i className="fa-solid fa-building-columns" />
                     </a>
@@ -599,7 +599,11 @@ export default function Hud({ isStaff }) {
                 deve vivere dentro Hud.jsx (unico posto dove esistono davvero
                 nel DOM) — riceve l'apertura degli anelli come prop invece di
                 un'API globale, essendone gia' un figlio diretto. */}
-            <OnboardingTour onOpenRing={side => side === 'left' ? setLeftOpen(true) : setRightOpen(true)} />
+            <OnboardingTour onOpenRing={side => {
+                if (side === 'left') setLeftOpen(true)
+                else if (side === 'right') setRightOpen(true)
+                else if (side === 'center') setCenterOpen(true)
+            }} />
         </div>
     )
 }
