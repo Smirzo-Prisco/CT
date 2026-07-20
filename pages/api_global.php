@@ -1184,6 +1184,27 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode(['success' => true]);
             break;
 
+        // -------------------------------------------------------------------------
+        // ONBOARDING — tour guidato (Crystal Bot) mostrato una volta ai nuovi
+        // iscritti, riapribile a comando. Vedi frontend/src/components/
+        // OnboardingTour.jsx e migrations/2026_07_20_onboarding.sql.
+        // -------------------------------------------------------------------------
+        case 'getOnboardingStatus':
+            session_start();
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+
+            $row = gdrcd_query("SELECT onboarding_visto FROM personaggio WHERE nome = '$login_f' LIMIT 1");
+            echo json_encode(['success' => true, 'done' => (int)($row['onboarding_visto'] ?? 0) === 1]);
+            break;
+
+        case 'setOnboardingDone':
+            session_start();
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+
+            gdrcd_query("UPDATE personaggio SET onboarding_visto = 1 WHERE nome = '$login_f'");
+            echo json_encode(['success' => true]);
+            break;
+
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
     /*********************  FINE    Recupero i dati dell'utente che voglio modificare   */
