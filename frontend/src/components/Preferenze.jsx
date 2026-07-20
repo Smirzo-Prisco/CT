@@ -32,15 +32,18 @@ const PALETTE_STORAGE_KEY = 'ct_hud_palette'
 
 // I 3 eventi commento_* (fan-out Fase C) + nuovo_dm (Fase E, solo email: un
 // DM non puo' notificare un altro DM, non applicabile via_dm — dmOnly:false
-// nasconde la checkbox del messaggio per quella riga). nuovo_post_sezione
-// resta fuori: arrivera' con la Fase F, quando esistera' davvero un trigger
-// che lo produce — mostrare il toggle ora sarebbe un interruttore senza
-// alcun effetto.
+// nasconde la checkbox del messaggio per quella riga) + chat_off_non_letta
+// (fan-out in api_chatoff.php, notifica solo alla transizione letto->non
+// letto — default OFF su entrambi i canali, a differenza degli altri eventi,
+// perche' la chattina off e' molto attiva). nuovo_post_sezione resta fuori:
+// arrivera' con la Fase F, quando esistera' davvero un trigger che lo
+// produce — mostrare il toggle ora sarebbe un interruttore senza alcun effetto.
 const NOTIFICATION_EVENTS = [
     { key: 'commento_post_seguito',    label: 'Nuovo commento sui post che seguo' },
     { key: 'commento_post_commentato', label: 'Nuovo commento sui post che ho commentato' },
     { key: 'commento_post_proprio',    label: 'Nuovo commento sui post che ho creato' },
     { key: 'nuovo_dm',                 label: 'Nuovo messaggio privato ricevuto', emailOnly: true },
+    { key: 'chat_off_non_letta',       label: 'Messaggi non letti nella chattina off' },
 ]
 
 // swatch = [ink, gold] — stessi valori esatti delle varianti body[data-palette] in _hud.scss

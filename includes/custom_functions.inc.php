@@ -281,6 +281,30 @@ function queueNewDmEmailNotification(string $to_safe): void {
         VALUES ('$to_safe', 'nuovo_dm', 0, 'email', 'pending')");
 }
 
+// Notifiche: "hai messaggi non letti nella chattina off" (vedi api_chatoff.php,
+// che chiama questa funzione solo alla transizione letto->non letto, non ad
+// ogni riga scritta da altri). A differenza degli altri eventi, qui il
+// default e' OFF su entrambi i canali (gestito in api_global.php::
+// getNotificationPrefs) — la chattina off e' molto attiva, un default ON
+// sarebbe troppo invasivo.
+function queueChatOffUnreadNotification(string $nome_f): void {
+    $pref = gdrcd_query("SELECT via_dm, via_email FROM preferenze_notifiche
+        WHERE nome = '$nome_f' AND evento = 'chat_off_non_letta'");
+    $via_dm    = $pref ? (int)$pref['via_dm']    : 0;
+    $via_email = $pref ? (int)$pref['via_email'] : 0;
+
+    if ($via_dm) {
+        gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato, data_invio)
+            VALUES ('$nome_f', 'chat_off_non_letta', 0, 'dm', 'sent', NOW())");
+        send_sms('Notifiche', $nome_f, '', 'Hai messaggi non letti nella chattina off.', 0);
+    }
+
+    if ($via_email) {
+        gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato)
+            VALUES ('$nome_f', 'chat_off_non_letta', 0, 'email', 'pending')");
+    }
+}
+
 function isAdminMasterMod($session) {
     return (isset($session['admin']) && $session['admin'] == 1) ||
            (isset($session['master']) && $session['master'] == 1) ||

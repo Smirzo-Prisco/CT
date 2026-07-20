@@ -1138,7 +1138,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         // NOTIFICHE — preferenze per evento x canale (Uffici > Preferenze)
         // I 3 eventi commento_* (fan-out Fase C, api_forum.php) + nuovo_dm
         // (Fase E, send_sms in custom_functions.inc.php — solo canale email,
-        // via_dm non applicabile: notificare un DM con un DM sarebbe circolare).
+        // via_dm non applicabile: notificare un DM con un DM sarebbe circolare)
+        // + chat_off_non_letta (fan-out in api_chatoff.php, default OFF su
+        // entrambi i canali: chat molto attiva, ON di default sarebbe invasivo).
         // nuovo_post_sezione resta fuori: arriva con la Fase F, quando esistera'
         // davvero un trigger che lo produce.
         // -------------------------------------------------------------------------
@@ -1146,9 +1148,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             session_start();
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
-            $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm'];
+            $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta'];
             $prefs  = [];
             foreach ($eventi as $ev) $prefs[$ev] = ['dm' => 1, 'email' => 0]; // default
+            $prefs['chat_off_non_letta'] = ['dm' => 0, 'email' => 0]; // default OFF: chat molto attiva, ON di default sarebbe invasivo
 
             $res = gdrcd_query("SELECT evento, via_dm, via_email FROM preferenze_notifiche
                 WHERE nome = '$login_f'", 'result');
@@ -1167,7 +1170,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             session_start();
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
-            $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm'];
+            $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta'];
             foreach (($data['prefs'] ?? []) as $evento => $canali) {
                 if (!in_array($evento, $eventi_validi, true)) continue; // ignora chiavi non valide/impreviste
 
