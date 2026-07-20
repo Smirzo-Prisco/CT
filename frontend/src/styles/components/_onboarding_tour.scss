@@ -1,0 +1,146 @@
+// ============================================================
+// _onboarding_tour.scss — Tour guidato "Crystal Bot" (OnboardingTour.jsx)
+// Spotlight su icone reali dell'HUD: root fixed sopra tutto (z-index oltre
+// i 500 dell'HUD), buco ritagliato via box-shadow enorme (nessun clip-path/
+// mask, niente calcoli di poligono) attorno al rect misurato dal DOM in
+// tempo reale — vedi il componente per il perché delle posizioni mai
+// hardcoded.
+// ============================================================
+@use '../tokens' as *;
+
+.ct-onboarding {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    pointer-events: auto;
+}
+
+.ct-onboarding__hole {
+    position: fixed;
+    // 50% funziona bene sia per il thumb circolare (border-radius:50% nel
+    // suo CSS) sia per le icone .ct-hud__icon: il rect misurato e' sempre
+    // circa quadrato per entrambe, quindi il buco resta un cerchio pulito.
+    border-radius: 50%;
+    box-shadow: 0 0 0 9999px rgba(5, 6, 16, .78);
+    pointer-events: none;
+    transition: top .25s ease, left .25s ease, width .25s ease, height .25s ease;
+}
+
+.ct-onboarding__card {
+    position: fixed;
+    z-index: 1;
+    width: min(300px, calc(100vw - 32px));
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--ink-light) 95%, transparent),
+        color-mix(in srgb, var(--ink-deep) 97%, transparent));
+    border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: var(--text);
+    box-shadow: 0 10px 40px -8px rgba(0, 0, 0, .6);
+    transition: top .25s ease, left .25s ease;
+
+    &--center {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.ct-onboarding__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: var(--gold);
+
+    strong { color: var(--text); font-size: .95em; }
+}
+
+.ct-onboarding__count {
+    margin-left: auto;
+    font-size: .75em;
+    color: var(--muted);
+}
+
+.ct-onboarding__card p {
+    margin: 0 0 14px;
+    font-size: .88em;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+.ct-onboarding__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ct-onboarding__skip {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: .8em;
+    cursor: pointer;
+    padding: 6px 4px;
+
+    &:hover { color: var(--text); }
+}
+
+.ct-onboarding__nav {
+    display: flex;
+    gap: 8px;
+}
+
+.ct-onboarding__back,
+.ct-onboarding__next {
+    border: none;
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: .82em;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.ct-onboarding__back {
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+    color: var(--text);
+}
+
+.ct-onboarding__next {
+    background: var(--gold);
+    color: var(--ink-deep);
+}
+
+// Pulsante "?" per riaprire il tour a comando — angolo in basso a destra,
+// libero su ogni pagina (gli anelli HUD occupano gli angoli superiori).
+.ct-onboarding__replay {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 400;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--ink-deep);
+    border: 2px solid color-mix(in srgb, var(--ink-deep) 40%, transparent);
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px -2px rgba(0, 0, 0, .5);
+
+    &:hover { filter: brightness(1.08); }
+}
+
+@media (max-width: 600px) {
+    .ct-onboarding__replay {
+        right: 10px;
+        bottom: 10px;
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+    }
+}

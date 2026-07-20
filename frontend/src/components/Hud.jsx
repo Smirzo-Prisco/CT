@@ -39,6 +39,7 @@ import { createPortal } from 'react-dom'
 import OnlineUsers from './OnlineUsers'
 import ChattingOff from './ChattingOff'
 import Meteo from './Meteo'
+import OnboardingTour from './OnboardingTour'
 import useHudBadges from '../hooks/useHudBadges'
 import useWeatherEffect from '../hooks/useWeatherEffect'
 
@@ -130,6 +131,7 @@ export default function Hud({ isStaff }) {
             return next
         })
     }, [])
+
 
     const [openPopover, setOpenPopover] = useState(null) // 'presence' | 'chatoff' | null
 
@@ -404,22 +406,22 @@ export default function Hud({ isStaff }) {
 
                 <HudArcSheet isMobile={isMobile} isOpen={leftOpen} onClose={() => setLeftOpen(false)}>
                     <div className="ct-hud__arc">
-                        <a className="ct-hud__icon" style={arcIcon(0, 87)}
+                        <a className="ct-hud__icon" style={arcIcon(0, 87)} data-tour="hud-forum"
                             href="main.php?page=forum" title="Forum">
                             <i className="fa-solid fa-list-ul" />
                             {hasNewForum && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
                         </a>
-                        <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)}
+                        <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)} data-tour="hud-presenti"
                             title="Presenti" onClick={togglePopover('presence')}>
                             <i className="fa-solid fa-users" />
                             {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(43, 75)}>{presentiCount}</b>}
                         </button>
-                        <button type="button" className="ct-hud__icon" style={arcIcon(75, 43)}
+                        <button type="button" className="ct-hud__icon" style={arcIcon(75, 43)} data-tour="hud-chatoff"
                             title="Chat off" onClick={togglePopover('chatoff')}>
                             <i className="fa-solid fa-comment-dots" />
                             {hasNewChatOff && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(75, 43)} />}
                         </button>
-                        <a className="ct-hud__icon" style={arcIcon(87, 0)}
+                        <a className="ct-hud__icon" style={arcIcon(87, 0)} data-tour="hud-mappa"
                             href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Mappa">
                             <i className="fa-solid fa-map-location-dot" />
                         </a>
@@ -436,7 +438,7 @@ export default function Hud({ isStaff }) {
 
             {/* ============ ANELLO DESTRO: PERSONAGGIO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--right${rightOpen ? ' is-open' : ''}`}>
-                <button type="button" className="ct-hud__thumb" onClick={() => isMobile ? toggleMobileMenu('right') : goToOwnScheda()} title={nome}>
+                <button type="button" className="ct-hud__thumb" data-tour="hud-scheda" onClick={() => isMobile ? toggleMobileMenu('right') : goToOwnScheda()} title={nome}>
                     {avatar ? <img src={avatar} alt={nome} /> : <i className="fa-solid fa-user" />}
                 </button>
 
@@ -453,22 +455,22 @@ export default function Hud({ isStaff }) {
                                 <i className="fa-solid fa-id-card" />
                             </a>
                         )}
-                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-33, 80] : [0, 87]))}
+                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-33, 80] : [0, 87]))} data-tour="hud-calendario"
                             href="main.php?page=agenda_center" title="Calendario">
                             <i className="fa-solid fa-calendar-days" />
                             {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-33, 80] : [0, 87]))} />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-62, 62] : [-43, 75]))}
+                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-62, 62] : [-43, 75]))} data-tour="hud-giocate"
                             href="main.php?page=role_recap" title="Giocate">
                             <i className="fa-solid fa-scroll" />
                             {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-62, 62] : [-43, 75]))} title="Giocata in corso" />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-80, 33] : [-75, 43]))}
+                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-80, 33] : [-75, 43]))} data-tour="hud-messaggi"
                             href="main.php?page=messages_center&offset=0" title="Messaggi">
                             <i className="fa-solid fa-envelope" />
                             {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-80, 33] : [-75, 43]))} />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(-87, 0)}
+                        <a className="ct-hud__icon" style={arcIcon(-87, 0)} data-tour="hud-assistente"
                             href="#" title="Assistente" onClick={openChatbot}>
                             <i className="fa-solid fa-robot" />
                         </a>
@@ -592,6 +594,12 @@ export default function Hud({ isStaff }) {
                     <ChattingOff />
                 </div>
             )}
+
+            {/* Tour guidato (Crystal Bot): evidenzia le icone qui sopra, quindi
+                deve vivere dentro Hud.jsx (unico posto dove esistono davvero
+                nel DOM) — riceve l'apertura degli anelli come prop invece di
+                un'API globale, essendone gia' un figlio diretto. */}
+            <OnboardingTour onOpenRing={side => side === 'left' ? setLeftOpen(true) : setRightOpen(true)} />
         </div>
     )
 }
