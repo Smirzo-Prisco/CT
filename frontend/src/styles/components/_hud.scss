@@ -626,6 +626,12 @@ body[data-palette="public"] {
     text-align: center;
 }
 .ct-hud__pip--dot { width: 8px; height: 8px; min-width: 0; padding: 0; border-radius: 50%; }
+// Solo per il contatore "Presenti" (conteggio, non avviso): oro invece del
+// rosso di allarme condiviso dagli altri pip (forum/chatoff/eventi/messaggi,
+// che restano rossi — sono notifiche di "nuovo/non letto", non un conteggio
+// di presenza). Stesso oro di .map-pin__badge e .map-zone-room__badge sulla
+// mappa grande, per un unico linguaggio visivo "quante persone ci sono qui".
+.ct-hud__pip--gold { background: var(--gold); color: var(--ink-deep); }
 
 // Pannello info: tra la miniatura e il centro, mai sopra l'arco.
 // Nessun z-index esplicito: resta dietro sia a .ct-hud__thumb (1) sia a

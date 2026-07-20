@@ -150,6 +150,7 @@ switch ($op) {
     // -------------------------------------------------------------------------
     case 'zones':
         $mainMapId = (int)($_GET['map_id'] ?? $_SESSION['mappa'] ?? 1);
+        $is_staff  = ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1 || $_SESSION['master'] == 1);
 
         $result = gdrcd_query("SELECT id_click, nome, larghezza AS cx, altezza AS cy, descrizione
             FROM mappa_click
@@ -174,13 +175,39 @@ switch ($op) {
             $rresult = gdrcd_query("SELECT id, nome, immagine, chat, pagina, id_mappa, id_mappa_collegata
                 FROM mappa WHERE id_mappa IN ($ids) ORDER BY nome ASC", 'result');
 
+            $rooms = [];
             while ($row = gdrcd_query($rresult, 'fetch')) {
-                $online = gdrcd_query("SELECT COUNT(*) AS n FROM personaggio
-                    WHERE ultimo_luogo = {$row['id']}
-                    AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
-                    AND is_invisible = 0
-                    AND ora_entrata > ora_uscita");
+                $rooms[] = $row;
+            }
+            gdrcd_query($rresult, 'free');
 
+            // Conteggio presenti: un'unica query aggregata invece di una
+            // COUNT(*) per ogni stanza (era N+1, con N stanze per ogni fetch
+            // delle zone — moltiplicato per ogni client con la mappa aperta,
+            // dato che il refetch e' guidato da un evento socket globale, vedi
+            // sotto). Stessa condizione online di gdrcd_condizione_online(),
+            // usata anche da 'presenti'/'presenti_estesi', per contare le
+            // stesse persone del Pannello presenti online. Gli invisibili
+            // contano solo per lo staff, stesso filtro di 'presenti_totale'.
+            $counts = [];
+            if (!empty($rooms)) {
+                $roomIds           = implode(',', array_map(fn($r) => (int)$r['id'], $rooms));
+                $condizione_online = gdrcd_condizione_online();
+                $invisible_filter  = $is_staff ? '' : 'AND p.is_invisible = 0';
+                $cresult = gdrcd_query("SELECT p.ultimo_luogo, COUNT(*) AS n
+                    FROM personaggio p
+                    LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
+                    WHERE $condizione_online
+                      $invisible_filter
+                      AND p.ultimo_luogo IN ($roomIds)
+                    GROUP BY p.ultimo_luogo", 'result');
+                while ($row = gdrcd_query($cresult, 'fetch')) {
+                    $counts[(int)$row['ultimo_luogo']] = (int)$row['n'];
+                }
+                gdrcd_query($cresult, 'free');
+            }
+
+            foreach ($rooms as $row) {
                 // Stessa logica di risoluzione url di 'gotomap' sopra.
                 if ($row['chat'] != 0) {
                     $link = ['type' => 'dir', 'value' => (int)$row['id']];
@@ -195,10 +222,9 @@ switch ($op) {
                     'nome'  => $row['nome'],
                     'img'   => $row['immagine'] ?: 'ingresso.png',
                     'link'  => $link,
-                    'count' => (int)$online['n'],
+                    'count' => $counts[(int)$row['id']] ?? 0,
                 ];
             }
-            gdrcd_query($rresult, 'free');
         }
 
         echo json_encode(['success' => true, 'zones' => array_values($zones)]);

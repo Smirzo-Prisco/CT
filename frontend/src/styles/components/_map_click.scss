@@ -61,6 +61,32 @@
         }
     }
 
+    // Totale presenti nella zona (somma stanze, vedi MapClick.jsx): oro invece
+    // che il rosso di allarme/notifica usato altrove — qui non e' un avviso,
+    // e' un invito ("c'e' gente qui"), stesso colore del badge stanza nel
+    // pannello sotto e del contatore "Presenti" nell'HUD (--ct-hud__pip--gold).
+    &__badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        min-width: clamp(15px, 3vw, 20px);
+        height: clamp(15px, 3vw, 20px);
+        padding: 0 3px;
+        border-radius: 999px;
+        background: var(--gold, #daa832);
+        color: var(--ink-deep, #08091a);
+        font-size: clamp(9px, 2.2vw, 11px);
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        border: 1px solid rgba(8, 9, 26, .85);
+        box-shadow: 0 0 4px rgba(0, 0, 0, .5);
+        pointer-events: none;
+        z-index: 1;
+    }
+
     &__label {
         position: absolute;
         top: calc(100% + 6px);
@@ -262,11 +288,15 @@
     }
     &:hover .map-zone-room__avatar-img { border-color: #daa832; }
 
+    // Oro come il badge sul pin (.map-pin__badge) e il contatore "Presenti"
+    // dell'HUD (.ct-hud__pip--gold): prima era rosso #e74c3c, colore usato
+    // altrove per gli avvisi — questo e' un conteggio di presenza, non un
+    // allarme, uniformato agli altri badge con lo stesso significato.
     &__badge {
         position: absolute;
         top: -5px; right: -5px;
-        background: #e74c3c;
-        color: #fff;
+        background: var(--gold, #daa832);
+        color: var(--ink-deep, #08091a);
         border-radius: 50%;
         font-size: 10px;
         font-weight: bold;

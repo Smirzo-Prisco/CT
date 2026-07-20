@@ -7,9 +7,14 @@
  *   - Mostra l'immagine della mappa (giorno/notte in base all'ora)
  *   - Overlay di hotspot cliccabili posizionati in percentuale sull'immagine
  *     (coordinate cx/cy in pixel dell'immagine naturale, da api_map.php?op=zones)
+ *   - Badge sul pin con il totale presenti nella zona (somma dei conteggi
+ *     stanza), per capire a colpo d'occhio quali distretti sono "vivi"
  *   - Click su un hotspot → popup con stanze della zona + conteggio utenti online
  *   - Click su una stanza → navigazione via main.php?dir=X (target _top)
- *   - Aggiornamento real-time del conteggio utenti tramite socket 'users:update'
+ *   - Aggiornamento real-time dei conteggi tramite socket: 'users:update'
+ *     (scoped alla propria room 'loc:N') + 'presenti:update' (globale, stesso
+ *     evento usato da PresentiEstesi.jsx — necessario perché da qui si vedono
+ *     TUTTE le zone, non solo la propria stanza)
  *   - Chiusura popup cliccando fuori o premendo il tasto ×
  *
  * Dati delle zone:
@@ -172,11 +177,24 @@ export default function MapClick() {
         fetchMapInfo()
         fetchZones()
 
-        // Aggiorna conteggi ad ogni spostamento di utenti nella mappa
+        // 'users:update' e' scoped alla room 'loc:N' di chi sta guardando (qui
+        // 'loc:-1', essendo sulla mappa): copre solo i propri spostamenti, non
+        // quelli altrui in zone diverse. 'presenti:update' e' invece globale
+        // (stessa room 'global' usata da PresentiEstesi.jsx) — emesso su ogni
+        // login/logout/spostamento di chiunque nel gioco: e' quello che rende
+        // i conteggi sui pin davvero realtime per chi guarda la mappa intera.
         const sock = window.ctSocket
-        if (sock) sock.on('users:update', fetchZones)
+        if (sock) {
+            sock.on('users:update', fetchZones)
+            sock.on('presenti:update', fetchZones)
+        }
 
-        return () => { if (sock) sock.off('users:update', fetchZones) }
+        return () => {
+            if (sock) {
+                sock.off('users:update', fetchZones)
+                sock.off('presenti:update', fetchZones)
+            }
+        }
     }, [fetchMapInfo, fetchZones])
 
     /**
@@ -359,6 +377,11 @@ export default function MapClick() {
                         const pinSrc = customPin
                             ? `themes/crystal/imgs/maps/${customPin}`
                             : `themes/crystal/imgs/maps/map-pin.jpg?v=${window.CT_ASSET_VERSIONS?.['map-pin.jpg'] ?? ''}`
+                        // Somma dei presenti in tutte le stanze della zona (gia'
+                        // calcolati da api_map.php?op=zones): nessuna zona vuota
+                        // mostra il badge, per distinguere a colpo d'occhio i
+                        // distretti "vivi" da quelli deserti (vedi obiettivo).
+                        const zoneCount = zone.rooms.reduce((sum, r) => sum + (r.count || 0), 0)
                         return (
                             <div
                                 key={zone.id}
@@ -368,6 +391,7 @@ export default function MapClick() {
                                 title={zone.nome}
                             >
                                 <img className={`map-pin__ring${customPin ? ' map-pin__ring--custom' : ''}`} src={pinSrc} alt="" />
+                                {zoneCount > 0 && <span className="map-pin__badge">{zoneCount}</span>}
                                 <span className="map-pin__label">{zone.nome}</span>
                             </div>
                         )
