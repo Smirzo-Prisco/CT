@@ -412,7 +412,7 @@ export default function Hud({ isStaff }) {
                         <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)}
                             title="Presenti" onClick={togglePopover('presence')}>
                             <i className="fa-solid fa-users" />
-                            {presentiCount > 0 && <b className="ct-hud__pip ct-hud__pip--gold" style={pipOffset(43, 75)}>{presentiCount}</b>}
+                            {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(43, 75)}>{presentiCount}</b>}
                         </button>
                         <button type="button" className="ct-hud__icon" style={arcIcon(75, 43)}
                             title="Chat off" onClick={togglePopover('chatoff')}>
