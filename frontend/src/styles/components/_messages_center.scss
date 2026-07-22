@@ -689,8 +689,18 @@
         }
     }
 
-    // Header sticky: torna indietro + nome interlocutore
+    // Header sticky: torna indietro + nome interlocutore. Il layout a
+    // colonna flex (.thread-container: height:100vh, .thread-messages:
+    // flex:1 overflow-y:auto) presume che il contenitore scrollabile sia
+    // .thread-messages — ma dentro #maincontent (gia' scrollabile di suo,
+    // con un top offset per la topbar HUD) i 100vh sforano l'altezza
+    // realmente visibile, e a scrollare finisce la pagina intera invece
+    // che il solo .thread-messages, portandosi via l'header. position:sticky
+    // lo tiene fermo in cima indipendentemente da quale ancestor scrolla.
     .thread-header {
+        position: sticky;
+        top: 0;
+        z-index: 5;
         flex-shrink: 0;
         display: flex;
         align-items: center;
