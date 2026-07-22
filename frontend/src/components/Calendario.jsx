@@ -65,6 +65,48 @@ function formaEventoVuoto(dataDefault) {
     }
 }
 
+/**
+ * Selettore luogo — non un <select> nativo: il popup delle opzioni e'
+ * disegnato dal sistema operativo su mobile (Android/iOS), fuori dalla
+ * portata di qualunque CSS della pagina (color-scheme non basta, verificato
+ * su schermo). Lista in-flow (non un overlay posizionato) invece che un
+ * dropdown assoluto: la modale del form ha gia' overflow-y:auto, quindi si
+ * allunga o scorre senza rischio dei bug di clipping gia' visti altrove in
+ * questa sessione (popup presenti_estesi tagliati dal contenitore).
+ */
+function LuogoPicker({ value, luoghi, onChange }) {
+    const [open, setOpen] = useState(false)
+    return (
+        <div className="calendario-page__luogo-picker">
+            <button type="button" className="calendario-page__luogo-picker-btn" onClick={() => setOpen(o => !o)}>
+                <span>{value || '— Nessuno —'}</span>
+                <i className={`fa-solid fa-chevron-${open ? 'up' : 'down'}`} />
+            </button>
+            {open && (
+                <div className="calendario-page__luogo-picker-list">
+                    <button
+                        type="button"
+                        className={!value ? 'is-active' : ''}
+                        onClick={() => { onChange(''); setOpen(false) }}
+                    >
+                        — Nessuno —
+                    </button>
+                    {luoghi.map(l => (
+                        <button
+                            key={l}
+                            type="button"
+                            className={value === l ? 'is-active' : ''}
+                            onClick={() => { onChange(l); setOpen(false) }}
+                        >
+                            {l}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    )
+}
+
 // ---------------------------------------------------------------------------
 // COMPONENTE
 // ---------------------------------------------------------------------------
@@ -322,9 +364,13 @@ export default function Calendario({ isStaff }) {
                 >
                     {giorni[hover.data].map(ev => (
                         <div key={ev.id} className="calendario-page__preview-row">
-                            <span className="calendario-page__preview-dot" style={{ background: COLORE_HEX[ev.colore] }} />
-                            {ev.ora && <b>{ev.ora}</b>} {ev.luogo || 'Luogo non specificato'}
-                            {ev.n_partecipanti > 0 && <span className="calendario-page__preview-count"> · {ev.n_partecipanti + 1} pg</span>}
+                            <div>
+                                <span className="calendario-page__preview-dot" style={{ background: COLORE_HEX[ev.colore] }} />
+                                {ev.ora && <b>{ev.ora}</b>} {ev.luogo || 'Luogo non specificato'}
+                            </div>
+                            <div className="calendario-page__preview-pg">
+                                {[ev.autore, ...ev.partecipanti].join(', ')}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -458,10 +504,11 @@ export default function Calendario({ isStaff }) {
 
                             <label className="calendario-page__field">
                                 <span>Luogo</span>
-                                <select value={form.luogo} onChange={e => setForm(f => ({ ...f, luogo: e.target.value }))}>
-                                    <option value="">— Nessuno —</option>
-                                    {luoghi.map(l => <option key={l} value={l}>{l}</option>)}
-                                </select>
+                                <LuogoPicker
+                                    value={form.luogo}
+                                    luoghi={luoghi}
+                                    onChange={l => setForm(f => ({ ...f, luogo: l }))}
+                                />
                             </label>
 
                             <div className="calendario-page__field-row">

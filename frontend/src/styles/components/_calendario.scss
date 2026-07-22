@@ -145,18 +145,28 @@ $cal-cell-bg: rgba(255, 255, 255, 0.03);
     }
 
     &__preview-row {
-        display: flex;
-        align-items: center;
-        gap: 6px;
         font-size: 11px;
         color: $cal-text;
-        padding: 2px 0;
+        padding: 4px 0;
+
+        &:not(:last-child) { border-bottom: 1px solid $cal-border; }
+
+        > div:first-child {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
         b { color: $cal-gold-h; font-weight: 600; }
     }
 
     &__preview-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    &__preview-count { color: $cal-muted; }
+
+    &__preview-pg {
+        margin-top: 2px;
+        color: $cal-muted;
+        font-size: 10px;
+    }
 
     // ── Modali (giorno / form) ──────────────────────────────────
     // Centrate via flex invece di percentuali fisse: cosi' sono responsive
@@ -301,7 +311,7 @@ $cal-cell-bg: rgba(255, 255, 255, 0.03);
             margin-bottom: 6px;
         }
 
-        input[type="text"], input[type="date"], input[type="time"], select, textarea {
+        input[type="text"], input[type="date"], input[type="time"], textarea {
             width: 100%;
             box-sizing: border-box;
             padding: 8px 10px;
@@ -311,10 +321,10 @@ $cal-cell-bg: rgba(255, 255, 255, 0.03);
             color: $cal-text;
             font-size: 12px;
             font-family: inherit;
-            // Il popup del <select> (e il calendario/orologio nativi di
-            // date/time) sono disegnati dal browser, non da questo CSS —
-            // color-scheme dice al browser di usare la sua palette scura
-            // per quei popup invece del bianco di default.
+            // Il calendario/orologio nativi di date/time sono disegnati dal
+            // browser, non da questo CSS — color-scheme dice al browser di
+            // usare la sua palette scura invece del bianco di default (il
+            // <select> Luogo non c'e' piu': vedi LuogoPicker sopra).
             color-scheme: dark;
 
             &:focus { outline: none; border-color: $cal-gold-h; }
@@ -383,6 +393,55 @@ $cal-cell-bg: rgba(255, 255, 255, 0.03);
             padding: 0 2px;
 
             &:hover { color: $cal-text; }
+        }
+    }
+
+    // Selettore luogo custom (non un <select> nativo — vedi LuogoPicker in
+    // Calendario.jsx): lista in-flow, non un overlay, per non ripetere i
+    // bug di clipping gia' visti con i popup di presenti_estesi.
+    &__luogo-picker-btn {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid $cal-border;
+        border-radius: 6px;
+        color: $cal-text;
+        font-size: 12px;
+        font-family: inherit;
+        cursor: pointer;
+        text-align: left;
+
+        &:hover { border-color: $cal-gold-h; }
+
+        i { color: $cal-muted; font-size: 10px; }
+    }
+
+    &__luogo-picker-list {
+        margin-top: 4px;
+        max-height: 180px;
+        overflow-y: auto;
+        background: #0f1226;
+        border: 1px solid $cal-border;
+        border-radius: 6px;
+
+        button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 7px 10px;
+            background: transparent;
+            border: none;
+            color: $cal-text;
+            font-size: 12px;
+            cursor: pointer;
+
+            &:hover { background: rgba(196, 148, 48, 0.12); }
+            &.is-active { color: $cal-gold-h; font-weight: 600; }
         }
     }
 

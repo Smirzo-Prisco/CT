@@ -106,16 +106,23 @@ function validaCampiEvento(array $data, bool $is_staff): ?array {
     ];
 }
 
-/** Sostituisce i partecipanti di un evento — solo nomi che esistono davvero in personaggio. */
-function salvaPartecipanti(int $evento_id, array $nomi, string $autore): void {
+/**
+ * Sostituisce i partecipanti di un evento — solo nomi che esistono davvero
+ * in personaggio. Ritorna i nomi effettivamente salvati (validati), usati
+ * da 'create' per accodare le notifiche solo a chi e' davvero coinvolto.
+ */
+function salvaPartecipanti(int $evento_id, array $nomi, string $autore): array {
     gdrcd_query("DELETE FROM calendario_partecipanti WHERE evento_id = $evento_id");
+    $salvati = [];
     foreach ($nomi as $nome) {
         if ($nome === '' || $nome === $autore) continue;
         $nome_f = gdrcd_filter('in', $nome);
         $esiste = gdrcd_query("SELECT 1 FROM personaggio WHERE nome = '$nome_f' LIMIT 1");
         if (!$esiste) continue;
         gdrcd_query("INSERT IGNORE INTO calendario_partecipanti (evento_id, nome) VALUES ($evento_id, '$nome_f')");
+        $salvati[] = $nome;
     }
+    return $salvati;
 }
 
 switch ($op) {
@@ -134,7 +141,8 @@ switch ($op) {
 
         $res = gdrcd_query("
             SELECT e.id, e.colore, e.ora, e.luogo, e.autore, e.data,
-                   (SELECT COUNT(*) FROM calendario_partecipanti p2 WHERE p2.evento_id = e.id) AS n_partecipanti
+                   (SELECT GROUP_CONCAT(p2.nome ORDER BY p2.nome SEPARATOR ',')
+                    FROM calendario_partecipanti p2 WHERE p2.evento_id = e.id) AS partecipanti_str
             FROM calendario_eventi e
             LEFT JOIN calendario_partecipanti p ON p.evento_id = e.id AND p.nome = '$login_f'
             WHERE YEAR(e.data) = $y AND MONTH(e.data) = $m
@@ -146,12 +154,12 @@ switch ($op) {
         $giorni = [];
         while ($row = gdrcd_query($res, 'fetch')) {
             $giorni[$row['data']][] = [
-                'id'             => (int)$row['id'],
-                'colore'         => $row['colore'],
-                'ora'            => $row['ora'] !== null ? substr($row['ora'], 0, 5) : null,
-                'luogo'          => $row['luogo'],
-                'autore'         => $row['autore'],
-                'n_partecipanti' => (int)$row['n_partecipanti'],
+                'id'           => (int)$row['id'],
+                'colore'       => $row['colore'],
+                'ora'          => $row['ora'] !== null ? substr($row['ora'], 0, 5) : null,
+                'luogo'        => $row['luogo'],
+                'autore'       => $row['autore'],
+                'partecipanti' => $row['partecipanti_str'] ? explode(',', $row['partecipanti_str']) : [],
             ];
         }
         gdrcd_query($res, 'free');
@@ -232,7 +240,12 @@ switch ($op) {
             VALUES ('$login_f', $titolo_sql, '{$c['colore']}', $luogo_sql, '{$c['data']}', $ora_sql, $nota_sql, {$c['pubblico']})");
 
         $evento_id = (int)gdrcd_query('SELECT LAST_INSERT_ID() AS id')['id'];
-        salvaPartecipanti($evento_id, $c['partecipanti'], $login);
+        $salvati   = salvaPartecipanti($evento_id, $c['partecipanti'], $login);
+
+        foreach ($salvati as $nome_partecipante) {
+            $nome_partecipante_f = gdrcd_filter('in', $nome_partecipante);
+            queueCalendarioEventoNotification($nome_partecipante_f, $evento_id, $login, $c['data']);
+        }
 
         echo json_encode(['success' => true, 'id' => $evento_id]);
         break;
