@@ -694,6 +694,12 @@
         bottom: 0;
         display: flex;
         flex-direction: column;
+        // Senza: in una conversazione lunga, se .thread-messages non si
+        // autolimita perfettamente via flex, il contenuto in eccesso
+        // sporgeva oltre il bordo inferiore del pannello (fisso, quindi
+        // oltre lo schermo) invece di restare contenuto/scrollabile —
+        // stessa ragione per cui c'e' anche su div.pagina_frame_chat sopra.
+        overflow: hidden;
         background: $palette-surface;
         z-index: 1;
 
