@@ -217,6 +217,7 @@ div.link_back {
 // il margin del bottone, non solo l'allineamento del testo.
 div.link_back.link_back--left {
     text-align: left;
+    margin-bottom: 12px;
 
     button { margin: 0; }
 }
