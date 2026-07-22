@@ -34,16 +34,19 @@ const PALETTE_STORAGE_KEY = 'ct_hud_palette'
 // DM non puo' notificare un altro DM, non applicabile via_dm — dmOnly:false
 // nasconde la checkbox del messaggio per quella riga) + chat_off_non_letta
 // (fan-out in api_chatoff.php, notifica solo alla transizione letto->non
-// letto — default OFF su entrambi i canali, a differenza degli altri eventi,
-// perche' la chattina off e' molto attiva). nuovo_post_sezione resta fuori:
-// arrivera' con la Fase F, quando esistera' davvero un trigger che lo
-// produce — mostrare il toggle ora sarebbe un interruttore senza alcun effetto.
+// letto) + calendario_nuovo_impegno (fan-out in api_calendario.php?op=create,
+// vedi queueCalendarioEventoNotification) — questi ultimi due default OFF su
+// entrambi i canali, a differenza degli altri eventi, perche' gia' visibili
+// nell'app (chat/calendario) senza bisogno di una notifica push. nuovo_post_sezione
+// resta fuori: arrivera' con la Fase F, quando esistera' davvero un trigger
+// che lo produce — mostrare il toggle ora sarebbe un interruttore senza alcun effetto.
 const NOTIFICATION_EVENTS = [
     { key: 'commento_post_seguito',    label: 'Nuovo commento sui post che seguo' },
     { key: 'commento_post_commentato', label: 'Nuovo commento sui post che ho commentato' },
     { key: 'commento_post_proprio',    label: 'Nuovo commento sui post che ho creato' },
     { key: 'nuovo_dm',                 label: 'Nuovo messaggio privato ricevuto', emailOnly: true },
     { key: 'chat_off_non_letta',       label: 'Messaggi non letti nella chattina off' },
+    { key: 'calendario_nuovo_impegno', label: 'Aggiunto a un impegno nel calendario' },
 ]
 
 // swatch = [ink, gold] — stessi valori esatti delle varianti body[data-palette] in _hud.scss
@@ -120,11 +123,18 @@ export default function Preferenze() {
     }, [])
 
     return (
-        <div className="preferenze-page">
-
-            <div className="link_back">
+        <>
+            {/* Fuori da .preferenze-page apposta: quella card ha un suo
+                max-width centrato (margin:auto) dentro .output (gia' al 90%
+                e centrato di suo, vedi _layout.scss) — un pulsante messo
+                dentro la card risulterebbe "in alto a sinistra" solo
+                rispetto alla card stessa, non alla pagina, apparendo di
+                fatto verso il centro dello schermo. */}
+            <div className="link_back link_back--left">
                 <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
+
+            <div className="preferenze-page">
 
             <div className="preferenze-page__title">Preferenze</div>
 
@@ -199,6 +209,7 @@ export default function Preferenze() {
                 </div>
             </div>
 
-        </div>
+            </div>
+        </>
     )
 }

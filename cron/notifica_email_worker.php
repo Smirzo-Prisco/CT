@@ -8,8 +8,11 @@
  * L'intervallo stesso (ogni 5 minuti) è la "finestra" — nessun timer per
  * singola notifica, il batch naturale del cron basta.
  *
- * nuovo_dm non ha un post da raggruppare (riferimento_id sempre 0): ogni riga
- * resta un gruppo a se', un'email per DM.
+ * nuovo_dm: riferimento_id e' l'id della riga sms (vedi
+ * queueNewDmEmailNotification in custom_functions.inc.php) — usato per
+ * includere mittente e testo del messaggio nell'email invece del solo
+ * avviso generico. Ogni riga resta comunque un gruppo a se', un'email
+ * per DM (niente post da raggruppare come per gli altri eventi).
  *
  * Aggiungere al crontab del server (ogni 5 minuti):
  *   * /5 * * * * php /var/www/crystaltokyo/gdrcd/cron/notifica_email_worker.php >> /var/log/notifica_email_worker.log 2>&1
@@ -25,9 +28,9 @@ $res = gdrcd_query("SELECT id, nome, evento, riferimento_id FROM notifiche
 
 $gruppi = [];
 while ($row = gdrcd_query($res, 'fetch')) {
-    // nuovo_dm: riferimento_id e' sempre 0 (nessun post da citare), quindi
-    // includiamo anche l'id della riga nella chiave cosi' ogni DM resta un
-    // gruppo separato invece di fondersi con gli altri DM in coda.
+    // nuovo_dm: includiamo comunque l'id della riga nella chiave (non solo
+    // riferimento_id) cosi' ogni DM resta un gruppo separato invece di
+    // fondersi con gli altri DM in coda.
     $key = $row['evento'] === 'nuovo_dm'
         ? $row['nome'] . '|nuovo_dm|' . $row['id']
         : $row['nome'] . '|' . $row['evento'] . '|' . $row['riferimento_id'];
@@ -58,15 +61,38 @@ foreach ($gruppi as $g) {
     $count = count($g['ids']);
 
     if ($g['evento'] === 'nuovo_dm') {
-        $subject = 'Hai un nuovo messaggio privato — Crystal Tokyo';
-        $body    = 'Hai ricevuto un nuovo messaggio privato su Crystal Tokyo.<br><br>'
-                 . '<a href="https://crystaltokyo.it/main.php?page=messages_center">Accedi per leggerlo</a>';
+        // riferimento_id = sms.id: recupera mittente e testo per mostrarli
+        // direttamente nell'email invece del solo avviso generico.
+        $sms = gdrcd_query("SELECT mittente_nome, testo FROM sms WHERE id = " . $g['riferimento_id']);
+
+        if ($sms) {
+            $mittente_html = htmlspecialchars($sms['mittente_nome'], ENT_QUOTES, 'UTF-8');
+            // testo e' gia' salvato pronto per il rendering HTML in chat
+            // (stesso campo usato da MessagesInbox.jsx), non serve escaping.
+            $subject = "Nuovo messaggio privato da $mittente_html — Crystal Tokyo";
+            $body    = "<b>$mittente_html</b> ti ha scritto:<br><br>"
+                     . '<div style="padding:10px;background:#f5f5f5;border-radius:6px;">' . $sms['testo'] . '</div><br>'
+                     . '<a href="https://crystaltokyo.it/main.php?page=messages_center">Rispondi</a>';
+        } else {
+            // sms cancellato/non trovato: fallback all'avviso generico di prima
+            $subject = 'Hai un nuovo messaggio privato — Crystal Tokyo';
+            $body    = 'Hai ricevuto un nuovo messaggio privato su Crystal Tokyo.<br><br>'
+                     . '<a href="https://crystaltokyo.it/main.php?page=messages_center">Accedi per leggerlo</a>';
+        }
     } elseif ($g['evento'] === 'chat_off_non_letta') {
         // Niente URL diretto: la chattina off e' un popover della HUD, non
         // una pagina propria — il link porta alla home.
         $subject = 'Hai messaggi non letti nella chattina off — Crystal Tokyo';
         $body    = 'Ci sono messaggi non letti nella chattina off su Crystal Tokyo.<br><br>'
                  . '<a href="https://crystaltokyo.it/main.php">Accedi per leggerli</a>';
+    } elseif ($g['evento'] === 'calendario_nuovo_impegno') {
+        // riferimento_id = calendario_eventi.id — niente pagina propria per
+        // un singolo evento, il link porta al calendario.
+        $subject = $count > 1
+            ? "Sei stato aggiunto a $count impegni nel calendario — Crystal Tokyo"
+            : 'Sei stato aggiunto a un impegno nel calendario — Crystal Tokyo';
+        $body = htmlspecialchars($subject, ENT_QUOTES, 'UTF-8') . '<br><br>'
+              . '<a href="https://crystaltokyo.it/main.php?page=agenda_center">Apri il calendario</a>';
     } else {
         $thread = gdrcd_query("SELECT titolo FROM messaggioaraldo
             WHERE id_messaggio = " . $g['riferimento_id'] . " AND id_messaggio_padre = -1 LIMIT 1");

@@ -11,6 +11,12 @@
 
 import { useEffect } from 'react'
 
+/** Naviga via CT.navigate (SPA) se disponibile, altrimenti reload. */
+function navigate(url) {
+    if (window.CT?.navigate) window.CT.navigate(url)
+    else window.top.location.href = url
+}
+
 /**
  * Aggiunge ?v=<mtime> (da window.CT_ASSET_VERSIONS, iniettato in header.inc.php)
  * per far capire al browser che il file è cambiato: nginx mette in cache questi
@@ -44,7 +50,17 @@ export default function IncrementoParametri() {
     }, [])
 
     return (
-        <div id="stats_panel" aria-live="polite" style={{ position: 'relative' }}>
+        <>
+            {/* Fuori da #stats_panel apposta: ha un suo max-width centrato
+                (margin:auto) dentro .output (gia' al 90% e centrato di suo,
+                vedi _layout.scss) — dentro il pannello il pulsante sarebbe
+                "in alto a sinistra" solo rispetto al pannello stesso, non
+                alla pagina, apparendo verso il centro dello schermo. */}
+            <div className="link_back link_back--left">
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
+            </div>
+
+            <div id="stats_panel" aria-live="polite" style={{ position: 'relative' }}>
             <h1>
                 Pannello Assegnazione Punti
                 <span className="help-container" title="Legenda livelli">
@@ -95,12 +111,7 @@ export default function IncrementoParametri() {
                     💾 Salva modifiche
                 </button>
             </div>
-            <div className="link_back">
-                <button onClick={() => {
-                    if (window.CT?.navigate) window.CT.navigate('main.php?page=uffici')
-                    else window.top.location.href = 'main.php?page=uffici'
-                }}>← Torna indietro</button>
             </div>
-        </div>
+        </>
     )
 }

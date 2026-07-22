@@ -12,6 +12,12 @@
 
 import { useEffect } from 'react'
 
+/** Naviga via CT.navigate (SPA) se disponibile, altrimenti reload. */
+function navigate(url) {
+    if (window.CT?.navigate) window.CT.navigate(url)
+    else window.top.location.href = url
+}
+
 /**
  * Aggiunge ?v=<mtime> (da window.CT_ASSET_VERSIONS, iniettato in header.inc.php)
  * per far capire al browser che il file è cambiato: nginx mette in cache questi
@@ -47,6 +53,9 @@ export default function MercatoAbilita() {
 
     return (
         <>
+            <div className="link_back link_back--left">
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
+            </div>
             <div id="skillPanel">
                 <div className="sticky-header">
                     <div className="skill-info-bar">
@@ -96,12 +105,6 @@ export default function MercatoAbilita() {
                     <div id="skill-modal-descrizione"></div>
                     <button id="close-modal">Chiudi</button>
                 </div>
-            </div>
-            <div className="link_back">
-                <button onClick={() => {
-                    if (window.CT?.navigate) window.CT.navigate('main.php?page=uffici')
-                    else window.top.location.href = 'main.php?page=uffici'
-                }}>← Torna indietro</button>
             </div>
         </>
     )

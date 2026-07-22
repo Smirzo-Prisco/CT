@@ -238,6 +238,10 @@ function send_sms($from, $to, $title, $text, $ongame = 0, $notifyNewDm = false) 
 
         gdrcd_query("INSERT INTO sms (mittente_nome, destinatario_nome, testo, id_conversazione, tipo_messaggio, ongame, ora_spedizione)
                     VALUES ('$from_safe', '$to_safe', '$text', $id_conversazione, 'individuale', $ongame_int, NOW())");
+        // Catturato subito dopo l'INSERT in sms: LAST_INSERT_ID() e' per
+        // sessione, non per tabella — gli INSERT successivi su
+        // conversazioni_individuali qui sotto lo sovrascriverebbero.
+        $sms_id = (int)gdrcd_query('SELECT LAST_INSERT_ID() AS id')['id'];
 
         // Garantisce che entrambi abbiano la riga (può mancare in conversazioni pre-fix)
         $chkFrom = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali WHERE id_conversazione = $id_conversazione AND utente_nome = '$from_safe'");
@@ -253,6 +257,7 @@ function send_sms($from, $to, $title, $text, $ongame = 0, $notifyNewDm = false) 
 
         gdrcd_query("INSERT INTO sms (mittente_nome, destinatario_nome, testo, id_conversazione, tipo_messaggio, ongame, ora_spedizione)
                     VALUES ('$from_safe', '$to_safe', '$text', $new_id, 'individuale', $ongame_int, NOW())");
+        $sms_id = (int)gdrcd_query('SELECT LAST_INSERT_ID() AS id')['id'];
 
         // Riga per entrambi: destinatario non letto, mittente già letto
         gdrcd_query("INSERT INTO conversazioni_individuali (id_conversazione, utente_nome, lettura) VALUES ($new_id, '$to_safe',   0)");
@@ -261,7 +266,7 @@ function send_sms($from, $to, $title, $text, $ongame = 0, $notifyNewDm = false) 
 
     notifySocketServer('dm:update', 'dm:' . $to);
 
-    if ($notifyNewDm) queueNewDmEmailNotification($to_safe);
+    if ($notifyNewDm) queueNewDmEmailNotification($to_safe, $sms_id);
 }
 
 // Notifiche Fase E: accoda un'email "hai un nuovo messaggio privato" per il
@@ -271,14 +276,16 @@ function send_sms($from, $to, $title, $text, $ongame = 0, $notifyNewDm = false) 
 // una mancata notifica in-app come per forum/DM — vedi brief originale).
 // Nessun via_dm per questo evento: notificare un DM con un altro DM interno
 // sarebbe circolare, l'unico canale applicabile e' l'email.
-function queueNewDmEmailNotification(string $to_safe): void {
+// riferimento_id = sms.id (non piu' sempre 0): il worker email lo usa per
+// includere mittente e testo del messaggio direttamente nel corpo dell'email.
+function queueNewDmEmailNotification(string $to_safe, int $sms_id): void {
     $pref = gdrcd_query("SELECT via_email FROM preferenze_notifiche
         WHERE nome = '$to_safe' AND evento = 'nuovo_dm'");
     $via_email = $pref ? (int)$pref['via_email'] : 0;
     if (!$via_email) return;
 
     gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato)
-        VALUES ('$to_safe', 'nuovo_dm', 0, 'email', 'pending')");
+        VALUES ('$to_safe', 'nuovo_dm', $sms_id, 'email', 'pending')");
 }
 
 // Notifiche: "hai messaggi non letti nella chattina off" (vedi api_chatoff.php,
@@ -302,6 +309,33 @@ function queueChatOffUnreadNotification(string $nome_f): void {
     if ($via_email) {
         gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato)
             VALUES ('$nome_f', 'chat_off_non_letta', 0, 'email', 'pending')");
+    }
+}
+
+// Notifiche: "sei stato aggiunto a un impegno nel calendario" — accodata da
+// api_calendario.php?op=create per ogni partecipante coinvolto in un nuovo
+// evento (mai per l'autore, che lo sa gia' avendolo creato lui). Default
+// OFF su entrambi i canali (come chat_off_non_letta): l'impegno e' gia'
+// visibile nel proprio calendario, questa e' un extra opt-in.
+function queueCalendarioEventoNotification(string $nome_f, int $evento_id, string $autore, string $data_evento): void {
+    $pref = gdrcd_query("SELECT via_dm, via_email FROM preferenze_notifiche
+        WHERE nome = '$nome_f' AND evento = 'calendario_nuovo_impegno'");
+    $via_dm    = $pref ? (int)$pref['via_dm']    : 0;
+    $via_email = $pref ? (int)$pref['via_email'] : 0;
+    if (!$via_dm && !$via_email) return;
+
+    $data_fmt = date('d/m/Y', strtotime($data_evento));
+    $autore_html = htmlspecialchars($autore, ENT_QUOTES, 'UTF-8');
+
+    if ($via_dm) {
+        gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato, data_invio)
+            VALUES ('$nome_f', 'calendario_nuovo_impegno', $evento_id, 'dm', 'sent', NOW())");
+        send_sms('Notifiche', $nome_f, '', "$autore_html ti ha aggiunto a un impegno nel calendario per il $data_fmt.", 0);
+    }
+
+    if ($via_email) {
+        gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato)
+            VALUES ('$nome_f', 'calendario_nuovo_impegno', $evento_id, 'email', 'pending')");
     }
 }
 

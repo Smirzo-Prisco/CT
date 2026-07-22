@@ -546,6 +546,7 @@ switch ($op) {
                 p.nome, p.cognome, p.sesso,
                 p.is_invisible, p.disponibile, p.ultima_mappa, p.ultimo_luogo,
                 p.url_img_chat, p.id_gilda, p.id_ruolo_gilda, p.salute,
+                p.online_status, p.stato_pallino,
                 r.sing_m, r.sing_f, r.immagine             AS razza_img,
                 m.stanza_apparente,    m.nome              AS stanza_nome,
                 mc.nome                                    AS mappa_nome,
@@ -584,6 +585,12 @@ switch ($op) {
                 'sesso'         => $row['sesso'],
                 'is_invisible'  => (bool)$row['is_invisible'],
                 'disponibile'   => (int)$row['disponibile'],
+                // Pallino stato (prima colonna): rosso automatico se in_role
+                // (aggiunto sotto), altrimenti riflette questa scelta manuale.
+                // nota = personaggio.online_status, riusato (vedi migration
+                // 2026_07_22_stato_pallino.sql) — max 25 caratteri.
+                'stato_pallino' => $row['stato_pallino'] ?: 'libero',
+                'nota'          => $row['online_status'] ?? '',
                 'ultima_mappa'  => (int)$row['ultima_mappa'],
                 'ultimo_luogo'  => (int)$row['ultimo_luogo'],
                 'url_img_chat'  => $row['url_img_chat']  ?? '',
@@ -661,6 +668,31 @@ switch ($op) {
             'users'   => array_values($users),
             'total'   => count($users),
         ]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // SET STATO — pallino manuale (libero/occupato) + nota breve, presenti_estesi.
+    // Il rosso "in giocata" resta automatico (role_sessions, vedi in_role
+    // sopra): qui si imposta solo la scelta quando NON si e' in giocata.
+    // -------------------------------------------------------------------------
+    case 'set_stato':
+        $login_f = gdrcd_filter('in', $_SESSION['login']);
+
+        $stato = $data['stato_pallino'] ?? '';
+        if (!in_array($stato, ['libero', 'occupato'], true)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Stato non valido']);
+            break;
+        }
+
+        // Stesso limite di scheda_modifica.inc.php (il campo online_status e' varchar(25))
+        $nota   = mb_substr(trim((string)($data['nota'] ?? '')), 0, 25);
+        $nota_f = gdrcd_filter('in', $nota);
+
+        gdrcd_query("UPDATE personaggio SET stato_pallino = '$stato', online_status = '$nota_f' WHERE nome = '$login_f'");
+        notifySocketServer('presenti:update', 'global');
+
+        echo json_encode(['success' => true]);
         break;
 
     default:

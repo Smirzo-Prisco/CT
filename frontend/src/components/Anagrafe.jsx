@@ -132,8 +132,8 @@ export default function Anagrafe() {
     return (
         <div className="anagrafe">
 
-            {/* ── Link indietro (in cima) ───────────────────────────────────── */}
-            <div className="link_back">
+            {/* ── Link indietro (in cima, sempre a sinistra) ────────────────── */}
+            <div className="link_back link_back--left">
                 <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
 

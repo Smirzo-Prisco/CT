@@ -115,10 +115,12 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
 
         case 'events_today':
+            // Vedi pages/api_calendario.php per lo schema (calendario_eventi/
+            // calendario_partecipanti, sostituisce la vecchia appuntamenti).
             $login_f = gdrcd_filter('in', $_SESSION['login']);
-            $sql = gdrcd_query("SELECT COUNT(*) AS n FROM appuntamenti
-                WHERE (autore = '$login_f' OR destinatario = '$login_f' OR titolo = 'Quest' OR titolo = 'Evento')
-                AND DATE(FROM_UNIXTIME(str_data)) = CURDATE()", 'result');
+            $sql = gdrcd_query("SELECT COUNT(*) AS n FROM calendario_eventi e
+                LEFT JOIN calendario_partecipanti p ON p.evento_id = e.id AND p.nome = '$login_f'
+                WHERE e.data = CURDATE() AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1)", 'result');
             $row = gdrcd_query($sql, 'fetch');
             echo json_encode(['success' => true, 'has_events' => (int)$row['n'] > 0]);
             break;
@@ -1139,8 +1141,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         // I 3 eventi commento_* (fan-out Fase C, api_forum.php) + nuovo_dm
         // (Fase E, send_sms in custom_functions.inc.php — solo canale email,
         // via_dm non applicabile: notificare un DM con un DM sarebbe circolare)
-        // + chat_off_non_letta (fan-out in api_chatoff.php, default OFF su
-        // entrambi i canali: chat molto attiva, ON di default sarebbe invasivo).
+        // + chat_off_non_letta (fan-out in api_chatoff.php) + calendario_nuovo_impegno
+        // (fan-out in api_calendario.php?op=create) — questi ultimi due default
+        // OFF su entrambi i canali: gia' visibili nell'app senza notifica push.
         // nuovo_post_sezione resta fuori: arriva con la Fase F, quando esistera'
         // davvero un trigger che lo produce.
         // -------------------------------------------------------------------------
@@ -1148,10 +1151,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             session_start();
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
-            $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta'];
+            $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta', 'calendario_nuovo_impegno'];
             $prefs  = [];
             foreach ($eventi as $ev) $prefs[$ev] = ['dm' => 1, 'email' => 0]; // default
-            $prefs['chat_off_non_letta'] = ['dm' => 0, 'email' => 0]; // default OFF: chat molto attiva, ON di default sarebbe invasivo
+            $prefs['chat_off_non_letta']       = ['dm' => 0, 'email' => 0]; // default OFF: chat molto attiva, ON di default sarebbe invasivo
+            $prefs['calendario_nuovo_impegno'] = ['dm' => 0, 'email' => 0]; // default OFF: gia' visibile nel proprio calendario
 
             $res = gdrcd_query("SELECT evento, via_dm, via_email FROM preferenze_notifiche
                 WHERE nome = '$login_f'", 'result');
@@ -1170,7 +1174,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             session_start();
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
-            $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta'];
+            $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta', 'calendario_nuovo_impegno'];
             foreach (($data['prefs'] ?? []) as $evento => $canali) {
                 if (!in_array($evento, $eventi_validi, true)) continue; // ignora chiavi non valide/impreviste
 
