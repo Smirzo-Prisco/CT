@@ -440,7 +440,7 @@ export default function ContattaModerazione() {
 
     return (
         <div className={styles.wrap}>
-            <div className="link_back">
+            <div className="link_back link_back--left">
                 <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
 
