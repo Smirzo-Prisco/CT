@@ -256,11 +256,18 @@ export default function Calendario({ isStaff }) {
     }
 
     return (
-        <div className="calendario-page">
-
-            <div className="link_back">
+        <>
+            {/* Fuori da .calendario-page apposta: ha un suo max-width
+                centrato (margin:auto) dentro .output (gia' al 90% e
+                centrato di suo, vedi _layout.scss) — dentro la card il
+                pulsante sarebbe "in alto a sinistra" solo rispetto alla
+                card, non alla pagina, apparendo verso il centro schermo
+                (stesso bug gia' corretto per Preferenze/IncrementoParametri). */}
+            <div className="link_back" style={{ textAlign: 'left' }}>
                 <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
+
+            <div className="calendario-page">
 
             <div className="calendario-page__title">Calendario</div>
 
@@ -496,6 +503,7 @@ export default function Calendario({ isStaff }) {
                 </div>
             )}
 
-        </div>
+            </div>
+        </>
     )
 }

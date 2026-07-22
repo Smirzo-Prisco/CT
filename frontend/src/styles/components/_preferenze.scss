@@ -20,11 +20,10 @@ $pref-muted:   #7a8499;
     border-radius: 10px;
     color: $pref-text;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
-    // .link_back e' centrato di default (regola globale in _layout.scss,
-    // condivisa con decine di altre pagine PHP legacy) — qui va invece in
-    // alto a sinistra, override scoped a questa sola pagina.
-    .link_back { text-align: left; }
+    // .link_back non e' piu' qui dentro (vedi Preferenze.jsx): sta fuori
+    // dalla card, altrimenti "in alto a sinistra" sarebbe relativo alla
+    // card centrata e non alla pagina — l'allineamento a sinistra e'
+    // quindi uno style inline sul suo elemento, non una regola qui.
 
     &__title {
         font-family: 'Cinzel', 'Georgia', serif;

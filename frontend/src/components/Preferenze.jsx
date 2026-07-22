@@ -120,11 +120,18 @@ export default function Preferenze() {
     }, [])
 
     return (
-        <div className="preferenze-page">
-
-            <div className="link_back">
+        <>
+            {/* Fuori da .preferenze-page apposta: quella card ha un suo
+                max-width centrato (margin:auto) dentro .output (gia' al 90%
+                e centrato di suo, vedi _layout.scss) — un pulsante messo
+                dentro la card risulterebbe "in alto a sinistra" solo
+                rispetto alla card stessa, non alla pagina, apparendo di
+                fatto verso il centro dello schermo. */}
+            <div className="link_back" style={{ textAlign: 'left' }}>
                 <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
+
+            <div className="preferenze-page">
 
             <div className="preferenze-page__title">Preferenze</div>
 
@@ -199,6 +206,7 @@ export default function Preferenze() {
                 </div>
             </div>
 
-        </div>
+            </div>
+        </>
     )
 }
