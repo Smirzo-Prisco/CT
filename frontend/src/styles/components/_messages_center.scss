@@ -676,31 +676,42 @@
 
     // ── Thread DM (ThreadView) ────────────────────────────────
 
-    // Colonna flex a tutta altezza: header fisso + messaggi scorrevoli + reply bar
+    // Pannello fisso a schermo intero (stesso pattern di div.pagina_frame_chat
+    // in _chat.scss per la chat di gioco): height:100vh in un elemento in
+    // flusso normale dentro #maincontent (gia' scrollabile di suo, con un
+    // offset in alto per la topbar HUD) sforava l'altezza realmente visibile
+    // — a scrollare finiva la pagina intera invece che il solo
+    // .thread-messages, portandosi via l'header "Torna indietro" invece di
+    // lasciarlo fermo (position:sticky non bastava: .main-content, un
+    // antenato, ha overflow-y:hidden, che spezza il contesto di sticky).
+    // position:fixed toglie .thread-container dal flusso e dallo scroll di
+    // #maincontent del tutto: ora scrolla solo .thread-messages, per davvero.
     .thread-container {
+        position: fixed;
+        top: 136px; // 86px topbar + 50px extra, stessa ragione di #maincontent in _layout.scss
+        left: 5%;
+        right: 5%;
+        bottom: 0;
         display: flex;
         flex-direction: column;
-        height: 100vh;
+        background: $palette-surface;
+        z-index: 1;
 
         @media screen and (max-width: 768px) {
+            top: 86px;
+            left: 0;
+            right: 0;
             // I pulsanti hamburger (fixed, bottom 10px, ~44px alti) coprono il fondo.
             // Il padding spinge la reply bar sopra di loro.
             padding-bottom: 60px;
         }
     }
 
-    // Header sticky: torna indietro + nome interlocutore. Il layout a
-    // colonna flex (.thread-container: height:100vh, .thread-messages:
-    // flex:1 overflow-y:auto) presume che il contenitore scrollabile sia
-    // .thread-messages — ma dentro #maincontent (gia' scrollabile di suo,
-    // con un top offset per la topbar HUD) i 100vh sforano l'altezza
-    // realmente visibile, e a scrollare finisce la pagina intera invece
-    // che il solo .thread-messages, portandosi via l'header. position:sticky
-    // lo tiene fermo in cima indipendentemente da quale ancestor scrolla.
+    // Header: torna indietro + nome interlocutore — fermo in cima perche'
+    // .thread-container (sopra) e' l'unico a scrollare... anzi, non scrolla
+    // affatto: solo .thread-messages sotto lo fa, quindi l'header resta
+    // semplicemente fuori dall'area scrollabile, senza bisogno di sticky.
     .thread-header {
-        position: sticky;
-        top: 0;
-        z-index: 5;
         flex-shrink: 0;
         display: flex;
         align-items: center;
