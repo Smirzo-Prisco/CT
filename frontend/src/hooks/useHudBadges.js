@@ -110,12 +110,21 @@ export default function useHudBadges() {
     // ── Eventi calendario di oggi ────────────────────────────────────────
     const [hasEvents, setHasEvents] = useState(false)
 
-    useEffect(() => {
+    const fetchEvents = useCallback(() => {
         fetch('/pages/api_global.php?op=events_today')
             .then(r => r.json())
             .then(d => { if (d.success) setHasEvents(d.has_events) })
             .catch(err => console.error('[Hud] Errore eventi:', err))
     }, [])
+
+    useEffect(() => {
+        fetchEvents()
+        // 'ct:calendario-update' — emesso da Calendario.jsx dopo create/update/
+        // delete riusciti: senza, il pallino resta quello del primo caricamento
+        // finche' Hud.jsx non rimonta (mai, e' l'unico componente sempre montato).
+        window.addEventListener('ct:calendario-update', fetchEvents)
+        return () => window.removeEventListener('ct:calendario-update', fetchEvents)
+    }, [fetchEvents])
 
     // Esposto per l'azzeramento ottimistico del badge quando si apre il
     // popover chat-off in Hud.jsx (op=messages lato server segna "letto"

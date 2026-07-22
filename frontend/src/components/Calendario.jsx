@@ -132,6 +132,10 @@ export default function Calendario({ isStaff }) {
         fetchMonth()
         if (selectedDay) apriGiorno(selectedDay)
         else if (ymd) apriGiorno(ymd)
+        // Aggiorna subito il pallino "Calendario" nell'HUD (useHudBadges.js):
+        // senza, resterebbe quello del primo caricamento fino al prossimo
+        // reload di pagina, dato che Hud.jsx non rimonta mai nella SPA.
+        window.dispatchEvent(new CustomEvent('ct:calendario-update'))
     }
 
     // ── Form crea/modifica ──────────────────────────────────────────────

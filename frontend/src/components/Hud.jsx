@@ -289,6 +289,18 @@ export default function Hud({ isStaff }) {
     const openChatbot = e => {
         e.preventDefault()
         window.dispatchEvent(new CustomEvent('ct:chatbot-open'))
+        closeMobileMenus()
+    }
+
+    // ── Mobile: la scheda a comparsa resta aperta finche' non la si
+    // richiude a mano — richiuderla anche alla scelta di una voce (link o
+    // bottone) evita che resti in mezzo allo schermo dopo la navigazione o
+    // l'apertura di un popover/il widget assistente.
+    const closeMobileMenus = () => {
+        if (!isMobile) return
+        setLeftOpen(false)
+        setRightOpen(false)
+        setCenterOpen(false)
     }
 
     // ── Click fuori: richiude SOLO i popover, non gli anelli =====
@@ -321,10 +333,7 @@ export default function Hud({ isStaff }) {
         // ChattingOff invece di raggiungerli: il popover appariva ma non
         // si riusciva a interagirci. Chiudendo l'anello, il portal si
         // smonta e il popover resta l'unica cosa sopra.
-        if (isMobile) {
-            setLeftOpen(false)
-            setRightOpen(false)
-        }
+        closeMobileMenus()
     }
 
     // Click su un link dentro un popover (es. un personaggio nella lista
@@ -407,7 +416,7 @@ export default function Hud({ isStaff }) {
                 <HudArcSheet isMobile={isMobile} isOpen={leftOpen} onClose={() => setLeftOpen(false)}>
                     <div className="ct-hud__arc">
                         <a className="ct-hud__icon" style={arcIcon(0, 87)} data-tour="hud-forum"
-                            href="main.php?page=forum" title="Forum">
+                            href="main.php?page=forum" title="Forum" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-list-ul" />
                             {hasNewForum && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
                         </a>
@@ -422,7 +431,7 @@ export default function Hud({ isStaff }) {
                             {hasNewChatOff && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(75, 43)} />}
                         </button>
                         <a className="ct-hud__icon" style={arcIcon(87, 0)} data-tour="hud-mappa"
-                            href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Mappa">
+                            href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Mappa" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-map-location-dot" />
                         </a>
                     </div>
@@ -451,22 +460,22 @@ export default function Hud({ isStaff }) {
                             raggiungere la propria scheda da li'. */}
                         {isMobile && (
                             <a className="ct-hud__icon" style={arcIcon(0, 87)}
-                                href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="La mia scheda">
+                                href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="La mia scheda" onClick={closeMobileMenus}>
                                 <i className="fa-solid fa-id-card" />
                             </a>
                         )}
                         <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-33, 80] : [0, 87]))} data-tour="hud-calendario"
-                            href="main.php?page=agenda_center" title="Calendario">
+                            href="main.php?page=agenda_center" title="Calendario" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-calendar-days" />
                             {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-33, 80] : [0, 87]))} />}
                         </a>
                         <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-62, 62] : [-43, 75]))} data-tour="hud-giocate"
-                            href="main.php?page=role_recap" title="Giocate">
+                            href="main.php?page=role_recap" title="Giocate" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-scroll" />
                             {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-62, 62] : [-43, 75]))} title="Giocata in corso" />}
                         </a>
                         <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-80, 33] : [-75, 43]))} data-tour="hud-messaggi"
-                            href="main.php?page=messages_center&offset=0" title="Messaggi">
+                            href="main.php?page=messages_center&offset=0" title="Messaggi" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-envelope" />
                             {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-80, 33] : [-75, 43]))} />}
                         </a>
@@ -552,11 +561,11 @@ export default function Hud({ isStaff }) {
 
                 <div className="ct-hud__center-arc">
                     <a className="ct-hud__icon" style={arcIcon(-60, 0)} data-tour="hud-manuali"
-                        href="main.php?page=servizi_gilde" title="Manuali">
+                        href="main.php?page=servizi_gilde" title="Manuali" onClick={closeMobileMenus}>
                         <i className="fa-solid fa-book" />
                     </a>
                     <a className="ct-hud__icon" style={arcIcon(-30, 52)} data-tour="hud-uffici"
-                        href="main.php?page=uffici" title="Uffici">
+                        href="main.php?page=uffici" title="Uffici" onClick={closeMobileMenus}>
                         <i className="fa-solid fa-building-columns" />
                     </a>
                     {/* Spostata qui dall'anello destro: il ventaglio centrale e' l'unico
@@ -572,7 +581,7 @@ export default function Hud({ isStaff }) {
                     </a>
                     {isStaff && (
                         <a className="ct-hud__icon" style={arcIcon(30, 52)}
-                            href="main.php?page=gestione" title="Gestione">
+                            href="main.php?page=gestione" title="Gestione" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-screwdriver-wrench" />
                         </a>
                     )}
