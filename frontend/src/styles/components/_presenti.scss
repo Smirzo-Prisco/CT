@@ -275,3 +275,39 @@ tr.presente a:visited {
     font-family: $font-base;
     text-transform: none; // override global a:link { text-transform: uppercase }
 }
+
+// ── Popup ALT icone (razza/lavoro/gilda/cariche) al click/tap ────────────
+// Il title nativo (hover) non raggiunge chi naviga da mobile — vedi
+// IconWithPopup in PresentiEstesi.jsx.
+.presenti-icon-popup-anchor {
+    position: relative;
+    display: inline-block;
+}
+
+.presenti-icon-popup {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 4px;
+    padding: 4px 8px;
+    background: $palette-surface-raised;
+    border: 1px solid $color-bg;
+    border-radius: $radius-sm;
+    color: $palette-text-title;
+    font-size: $text-xs;
+    font-family: $font-base;
+    white-space: nowrap;
+    box-shadow: $shadow-sm;
+    pointer-events: none;
+}
+
+// Header colonne (tr.second_header) solo su desktop: su mobile la tabella
+// e' gia' stretta, quest'intestazione toglie spazio senza aggiungere
+// informazioni che le icone stesse (ora con popup al tap) non diano gia'.
+@media (max-width: 680px) {
+    div.presenti_estesi tr.second_header {
+        display: none;
+    }
+}

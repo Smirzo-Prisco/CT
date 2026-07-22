@@ -66,12 +66,37 @@ function groupUsers(users) {
 // ---------------------------------------------------------------------------
 
 /**
+ * Icona con popup al click/tap del proprio ALT — il title nativo (hover)
+ * non raggiunge chi naviga da mobile, che non ha un vero "hover". iconKey
+ * deve essere univoca nella pagina: usata per sapere quale popup e' aperto
+ * e per chiuderlo ri-cliccando la stessa icona.
+ */
+function IconWithPopup({ iconKey, openPopup, setOpenPopup, ...imgProps }) {
+    const isOpen = openPopup === iconKey
+    return (
+        <span className="presenti-icon-popup-anchor">
+            <img
+                {...imgProps}
+                onClick={e => {
+                    e.stopPropagation()
+                    setOpenPopup(prev => (prev === iconKey ? null : iconKey))
+                }}
+                style={{ cursor: 'pointer' }}
+            />
+            {isOpen && <span className="presenti-icon-popup">{imgProps.alt}</span>}
+        </span>
+    )
+}
+
+/**
  * Riga della tabella per un singolo personaggio.
  *
- * @param {Object}  props.user    - Dati utente restituiti dall'API
- * @param {boolean} props.isStaff - true se il viewer è staff
+ * @param {Object}  props.user         - Dati utente restituiti dall'API
+ * @param {boolean} props.isStaff      - true se il viewer è staff
+ * @param {string?} props.openPopup    - chiave dell'icona con popup aperto (condivisa fra le righe)
+ * @param {Function}props.setOpenPopup - setter per openPopup
  */
-function UserRow({ user, isStaff }) {
+function UserRow({ user, isStaff, openPopup, setOpenPopup }) {
     /** Naviga alla pagina DM con il destinatario pre-selezionato */
     const openSms = () => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(user.nome)}`)
 
@@ -114,14 +139,16 @@ function UserRow({ user, isStaff }) {
             {/* Icona famiglia / inclinazione / gilda (rinominata Razza nell'header) */}
             <td style={{ textAlign: 'center' }}>
                 {user.gruppo_img && (
-                    <img width="25" height="25" src={user.gruppo_img} alt={user.gruppo_nome} title={user.gruppo_nome} />
+                    <IconWithPopup iconKey={`${user.nome}-gruppo`} openPopup={openPopup} setOpenPopup={setOpenPopup}
+                        width="25" height="25" src={user.gruppo_img} alt={user.gruppo_nome} title={user.gruppo_nome} />
                 )}
             </td>
 
             {/* Icona mestiere */}
             <td style={{ textAlign: 'center' }}>
                 {user.mestiere_img && (
-                    <img width="25" height="25" src={user.mestiere_img} alt={user.mestiere_nome} title={user.mestiere_nome} />
+                    <IconWithPopup iconKey={`${user.nome}-mestiere`} openPopup={openPopup} setOpenPopup={setOpenPopup}
+                        width="25" height="25" src={user.mestiere_img} alt={user.mestiere_nome} title={user.mestiere_nome} />
                 )}
             </td>
 
@@ -129,15 +156,17 @@ function UserRow({ user, isStaff }) {
                 riusano la stessa struttura dati dei mestieri, ma sono concettualmente diverse */}
             <td style={{ textAlign: 'center' }}>
                 {user.gilda_img && (
-                    <img width="25" height="25" src={user.gilda_img} alt={user.gilda_nome} title={user.gilda_nome} />
+                    <IconWithPopup iconKey={`${user.nome}-gilda`} openPopup={openPopup} setOpenPopup={setOpenPopup}
+                        width="25" height="25" src={user.gilda_img} alt={user.gilda_nome} title={user.gilda_nome} />
                 )}
             </td>
 
-            {/* Nome e cognome con link alla scheda */}
+            {/* Nome con link alla scheda — il cognome non viene piu' mostrato qui,
+                solo il nome (richiesta esplicita, la scheda resta comunque completa) */}
             <td>
                 {morto && <i className="fa-solid fa-skull pg-morto-icon" title="Morto" />}
                 <a href={`main.php?page=scheda&pg=${encodeURIComponent(user.nome)}`} className={`link_sheet gender_${user.sesso}`}>
-                    {user.nome}{user.cognome ? ` ${user.cognome}` : ''}
+                    {user.nome}
                     {/* Flag visibilità — visibile solo allo staff */}
                     {user.is_invisible && <em> (inv)</em>}
                     {/* Badge bot — visibile solo allo staff, coerente con OnlineUsers */}
@@ -149,7 +178,8 @@ function UserRow({ user, isStaff }) {
             <td style={{ textAlign: 'center' }}>
                 <span style={{ display: 'flex', justifyContent: 'center', gap: '2px' }}>
                     {STAFF_ICONS.filter(ic => user.staff[ic.key]).map(ic => (
-                        <img key={ic.key} src={ic.src} width="20" height="20" title={ic.title} alt={ic.title} />
+                        <IconWithPopup key={ic.key} iconKey={`${user.nome}-${ic.key}`} openPopup={openPopup} setOpenPopup={setOpenPopup}
+                            src={ic.src} width="20" height="20" title={ic.title} alt={ic.title} />
                     ))}
                 </span>
             </td>
@@ -171,6 +201,15 @@ export default function PresentiEstesi({ isStaff = false }) {
 
     /** true solo durante il primissimo caricamento */
     const [loading, setLoading] = useState(true)
+
+    /** Chiave dell'icona (razza/lavoro/gilda/cariche) con popup ALT aperto — una sola alla volta. */
+    const [openPopup, setOpenPopup] = useState(null)
+    useEffect(() => {
+        if (!openPopup) return
+        const close = () => setOpenPopup(null)
+        document.addEventListener('click', close)
+        return () => document.removeEventListener('click', close)
+    }, [openPopup])
 
     /**
      * Recupera la lista aggiornata dall'API.
@@ -282,7 +321,9 @@ export default function PresentiEstesi({ isStaff = false }) {
                                     )}
 
                                     {/* Righe utente */}
-                                    {utenti.map(u => <UserRow key={u.nome} user={u} isStaff={isStaff} />)}
+                                    {utenti.map(u => (
+                                        <UserRow key={u.nome} user={u} isStaff={isStaff} openPopup={openPopup} setOpenPopup={setOpenPopup} />
+                                    ))}
 
                                 </Fragment>
                             ))}
