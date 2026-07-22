@@ -2,7 +2,7 @@
  * ChatbotWidget.jsx — Widget chatbot AI Crystal Tokyo
  *
  * Pannello chat, senza piu' un proprio pulsante flottante: si apre tramite
- * l'icona "Assistente" nell'arco dell'anello destro dell'HUD (Hud.jsx),
+ * l'icona "Assistente" nel ventaglio centrale dell'HUD (Hud.jsx),
  * che dispatcha l'evento 'ct:chatbot-open' ascoltato qui sotto. Si chiude
  * dal bottone di chiusura nell'header del pannello.
  *
@@ -38,7 +38,7 @@ export default function ChatbotWidget() {
     const [tokenData, setTokenData] = useState({ used: 0, limit: 5000 })
     const messagesEndRef            = useRef(null)
 
-    // Apertura esterna (icona "Assistente" nell'arco destro dell'HUD, vedi Hud.jsx)
+    // Apertura esterna (icona "Assistente" nel ventaglio centrale dell'HUD, vedi Hud.jsx)
     useEffect(() => {
         const onExternalOpen = () => setOpen(true)
         window.addEventListener('ct:chatbot-open', onExternalOpen)

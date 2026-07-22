@@ -18,7 +18,7 @@
 const onboardingSteps = [
     {
         id: 'intro',
-        ring: 'right',
+        ring: 'center',
         target: '[data-tour="hud-assistente"]',
         text: "Ciao! Sono Crystal Bot, l'assistente di Crystal Tokyo. Ti va se ti faccio fare un giro veloce delle funzioni principali? Puoi saltare in qualsiasi momento con il pulsante qui sotto.",
     },

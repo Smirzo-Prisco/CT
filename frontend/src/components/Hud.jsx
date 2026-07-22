@@ -470,10 +470,6 @@ export default function Hud({ isStaff }) {
                             <i className="fa-solid fa-envelope" />
                             {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-80, 33] : [-75, 43]))} />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(-87, 0)} data-tour="hud-assistente"
-                            href="#" title="Assistente" onClick={openChatbot}>
-                            <i className="fa-solid fa-robot" />
-                        </a>
                     </div>
                 </HudArcSheet>
 
@@ -559,11 +555,20 @@ export default function Hud({ isStaff }) {
                         href="main.php?page=servizi_gilde" title="Manuali">
                         <i className="fa-solid fa-book" />
                     </a>
-                    {/* Senza Gestione (non-staff) Uffici prende la posizione centrale
-                        del ventaglio, cosi' non resta uno spazio vuoto al suo posto. */}
-                    <a className="ct-hud__icon" style={isStaff ? arcIcon(-30, 52) : arcIcon(0, 60)} data-tour="hud-uffici"
+                    <a className="ct-hud__icon" style={arcIcon(-30, 52)} data-tour="hud-uffici"
                         href="main.php?page=uffici" title="Uffici">
                         <i className="fa-solid fa-building-columns" />
+                    </a>
+                    {/* Spostata qui dall'anello destro: il ventaglio centrale e' l'unico
+                        dei tre a non essere mai "affollato" su schermi piccoli (vedi
+                        HudArcSheet), quindi e' il posto piu' sicuro per un'icona che
+                        deve restare raggiungibile SEMPRE, non solo aprendo un anello
+                        laterale. Senza Gestione (non-staff) prende il suo slot (30,52),
+                        cosi' non resta uno spazio vuoto al suo posto — con Gestione
+                        (staff) usa invece lo slot libero al centro (0,60). */}
+                    <a className="ct-hud__icon" style={isStaff ? arcIcon(0, 60) : arcIcon(30, 52)} data-tour="hud-assistente"
+                        href="#" title="Assistente" onClick={openChatbot}>
+                        <i className="fa-solid fa-robot" />
                     </a>
                     {isStaff && (
                         <a className="ct-hud__icon" style={arcIcon(30, 52)}

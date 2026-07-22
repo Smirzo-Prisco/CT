@@ -1,7 +1,8 @@
 // ============================================================
 // _chatbot.scss — Widget chatbot AI Crystal Tokyo
-// Solo il pannello (bottom-right): l'apertura e' affidata all'icona
-// "Assistente" nell'arco destro dell'HUD (Hud.jsx), non ha piu' un FAB suo.
+// Solo il pannello: l'apertura e' affidata all'icona "Assistente" nel
+// ventaglio centrale dell'HUD (Hud.jsx, .ct-hud__center left:50%), non ha
+// piu' un FAB suo.
 // ============================================================
 @use '../tokens' as *;
 
@@ -10,23 +11,13 @@
 .chatbot-widget {
     position: fixed;
     bottom: 120px;
-    right: 25%;
-    transform: translateX(50%);
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2000;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 12px;
-
-    // right:25% + translateX(50%) e' pensato per il desktop (vicino
-    // all'icona "Assistente" nell'anello destro dell'HUD): su schermi
-    // stretti spinge il pannello oltre il bordo destro, tagliandolo.
-    // Centrato in orizzontale invece di ancorato a destra.
-    @media (max-width: 680px) {
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%);
-    }
 }
 
 // ── Pannello ─────────────────────────────────────────────
