@@ -57,6 +57,10 @@ export default function ElencoStaff() {
     return (
         <div className="elenco-staff">
 
+            <div className="link_back" style={{ textAlign: 'left' }}>
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
+            </div>
+
             {SECTIONS.map(({ key, label }) => (
                 <div key={key}>
                     <div className="elenco-staff__section-title">{label}</div>
@@ -87,10 +91,6 @@ export default function ElencoStaff() {
                     }
                 </div>
             ))}
-
-            <div className="link_back">
-                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
-            </div>
         </div>
     )
 }

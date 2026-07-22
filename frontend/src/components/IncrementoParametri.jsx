@@ -11,6 +11,12 @@
 
 import { useEffect } from 'react'
 
+/** Naviga via CT.navigate (SPA) se disponibile, altrimenti reload. */
+function navigate(url) {
+    if (window.CT?.navigate) window.CT.navigate(url)
+    else window.top.location.href = url
+}
+
 /**
  * Aggiunge ?v=<mtime> (da window.CT_ASSET_VERSIONS, iniettato in header.inc.php)
  * per far capire al browser che il file è cambiato: nginx mette in cache questi
@@ -45,6 +51,9 @@ export default function IncrementoParametri() {
 
     return (
         <div id="stats_panel" aria-live="polite" style={{ position: 'relative' }}>
+            <div className="link_back" style={{ textAlign: 'left' }}>
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
+            </div>
             <h1>
                 Pannello Assegnazione Punti
                 <span className="help-container" title="Legenda livelli">
@@ -94,12 +103,6 @@ export default function IncrementoParametri() {
                 <button id="saveBtn" onClick={() => window.savePuntiPg?.(document.getElementById('saveBtn'))}>
                     💾 Salva modifiche
                 </button>
-            </div>
-            <div className="link_back">
-                <button onClick={() => {
-                    if (window.CT?.navigate) window.CT.navigate('main.php?page=uffici')
-                    else window.top.location.href = 'main.php?page=uffici'
-                }}>← Torna indietro</button>
             </div>
         </div>
     )

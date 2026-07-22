@@ -85,6 +85,10 @@ export default function CambioPass() {
 
     return (
         <div className="pagina_user_cambio_pass">
+            <div className="link_back" style={{ textAlign: 'left' }}>
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
+            </div>
+
             <div className="page_title">
                 <h2>Cambio Password</h2>
             </div>
@@ -164,10 +168,6 @@ export default function CambioPass() {
                     </div>
                 )}
 
-            </div>
-
-            <div className="link_back">
-                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
         </div>
     )

@@ -57,6 +57,10 @@ export default function PrenotazioniProva() {
 
     return (
         <div className="pagina_servizi_prenotazioni">
+            <div className="link_back" style={{ textAlign: 'left' }}>
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
+            </div>
+
             <div className="page_title">
                 <h2>Prenotazione Stanza</h2>
             </div>
@@ -131,9 +135,6 @@ export default function PrenotazioniProva() {
                     </form>
                 )}
 
-                <div className="link_back">
-                    <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
-                </div>
             </div>
         </div>
     )

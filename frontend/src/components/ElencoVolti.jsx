@@ -59,6 +59,10 @@ export default function ElencoVolti() {
     return (
         <div className="page_body">
 
+            <div className="link_back" style={{ textAlign: 'left' }}>
+                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
+            </div>
+
             <table className="customTable">
                 <tbody>
                     <tr className="second_header">
@@ -109,10 +113,6 @@ export default function ElencoVolti() {
                     </tbody>
                 </table>
             )}
-
-            <div className="link_back">
-                <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
-            </div>
 
         </div>
     )
