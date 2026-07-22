@@ -675,22 +675,48 @@
     }
 
     // ── Thread DM (ThreadView) ────────────────────────────────
-
-    // Colonna flex a tutta altezza: header fisso + messaggi scorrevoli + reply bar
+    //
+    // Struttura voluta: UN solo scroll (la pagina, #maincontent — gia'
+    // l'unico contenitore di scroll di tutta l'app, vedi _layout.scss),
+    // header sticky in cima, contenuto (messaggi + barra di risposta) in
+    // flusso normale sotto, raggiungibile scrollando fino in fondo.
+    //
+    // Due tentativi precedenti (entrambi sbagliati, vedi storia commit):
+    // 1) .thread-messages con un proprio overflow-y:auto interno + .thread-
+    //    container a height:100vh → creava un SECONDO scroll indipendente
+    //    dentro la pagina (doppia scrollbar, inutilizzabile).
+    // 2) .thread-container a position:fixed (pattern "pannello a schermo
+    //    intero" preso da .pagina_frame_chat) → stessa ambiguita' a due
+    //    scroll, solo spostata: quello del pannello fisso + quello residuo
+    //    della pagina.
+    // La causa di fondo per cui position:sticky da solo non bastava era
+    // .main-content con overflow-y:hidden: un antenato con overflow diverso
+    // da visible diventa il "contesto di scroll" per un discendente sticky,
+    // scavalcando #maincontent piu' in alto — quindi lo sticky restava
+    // legato a un contenitore che non scrolla mai per conto suo, seguendo
+    // comunque tutta la pagina quando #maincontent si muove. L'override e'
+    // in MessagesInbox.jsx (style inline su .main-content, solo per questa
+    // vista) invece che qui, per non toccare .main-content nelle altre viste
+    // (lista/composizione) che la condividono.
     .thread-container {
         display: flex;
         flex-direction: column;
-        height: 100vh;
 
         @media screen and (max-width: 768px) {
             // I pulsanti hamburger (fixed, bottom 10px, ~44px alti) coprono il fondo.
-            // Il padding spinge la reply bar sopra di loro.
+            // Il padding spinge la reply bar sopra di loro quando si arriva
+            // in fondo allo scroll.
             padding-bottom: 60px;
         }
     }
 
-    // Header sticky: torna indietro + nome interlocutore
+    // Torna indietro + nome interlocutore — sticky rispetto a #maincontent
+    // (l'unico scroll reale, vedi sopra), resta in cima mentre si scorrono
+    // i messaggi sotto.
     .thread-header {
+        position: sticky;
+        top: 0;
+        z-index: 5;
         flex-shrink: 0;
         display: flex;
         align-items: center;
@@ -701,17 +727,15 @@
         min-height: 56px;
     }
 
-    // Area messaggi: riempie lo spazio disponibile e scrolla internamente
+    // Flusso normale, nessuno scroll proprio: fa parte del contenuto che
+    // #maincontent scorre nel suo insieme.
     .thread-messages {
-        flex: 1;
-        overflow-y: auto;
-        min-height: 0;
         padding: $space-4;
     }
 
-    // Barra di risposta: affianca textarea e pulsante Invia
+    // Barra di risposta: affianca textarea e pulsante Invia — ultima cosa
+    // nel flusso, raggiunta scrollando fino in fondo come richiesto.
     .thread-reply {
-        flex-shrink: 0;
         border-top: 1px solid $palette-surface-hover;
         padding: $space-3 $space-4;
         display: flex;
