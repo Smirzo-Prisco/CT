@@ -25,6 +25,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import onboardingSteps from '../data/onboardingSteps'
 
 const SESSION_SKIP_KEY = 'ct_onboarding_skipped'
@@ -109,12 +110,15 @@ export default function OnboardingTour({ onOpenRing }) {
     // ── Rendering ────────────────────────────────────────────────────────────
 
     // Pulsante "?" sempre presente (anche a tour non attivo/gia' completato):
-    // unico modo per riaprire il tour a comando, come da requisito.
+    // unico modo per riaprire il tour a comando, come da requisito. Portal su
+    // document.body (vedi sotto per il perche'): senza, un anello HUD aperto
+    // su mobile lo coprirebbe rendendolo intoccabile.
     if (!active) {
-        return (
+        return createPortal(
             <button type="button" className="ct-onboarding__replay" onClick={restart} title="Rifai il tour guidato">
                 <i className="fa-solid fa-question" />
-            </button>
+            </button>,
+            document.body
         )
     }
 
@@ -132,7 +136,20 @@ export default function OnboardingTour({ onOpenRing }) {
         }
         : {}
 
-    return (
+    // Portal su document.body — non basta il suo z-index (900): .ct-hud, il
+    // contenitore radice dell'HUD (di cui questo componente e' figlio
+    // diretto), ha gia' position:fixed + z-index proprio (500), quindi crea
+    // un suo stacking context che "intrappola" qualunque z-index dei
+    // discendenti, .ct-onboarding incluso — vengono confrontati con l'esterno
+    // solo come un blocco unico al livello 500. Su mobile l'anello sinistro/
+    // destro aperto esce invece in portal su document.body (vedi HudArcSheet,
+    // stesso motivo: containing block del suo position:fixed rotto dal
+    // transform:scale() di .ct-hud__ring) con z-index 600: fuori da
+    // .ct-hud, quindi confrontato al livello radice — batte il 500 di
+    // .ct-hud e copre l'intero tour, pulsanti Avanti/Indietro/Salta compresi.
+    // Stesso portal qui pareggia il confronto: 900 fuori da .ct-hud batte
+    // sempre il 600 dell'anello, ovunque.
+    return createPortal(
         <div className="ct-onboarding" role="dialog" aria-modal="true">
             {/* Overlay scuro con "buco" sul target: box-shadow enorme invece di
                 un clip-path/mask, per restare semplice e senza calcoli di
@@ -164,6 +181,7 @@ export default function OnboardingTour({ onOpenRing }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
