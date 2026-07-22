@@ -352,6 +352,18 @@ $log-accent: #ce846f;
         text-align: right;
     }
 
+    @media (width <= 700px) {
+        left: 0;
+        width: 100%;
+        padding: 10px;
+
+        .modal {
+            max-width: 100%;
+            margin: 10px auto;
+            padding: 0 16px;
+        }
+    }
+
     @media (width <= 600px) {
         .bubble { max-width: 85%; }
     }
