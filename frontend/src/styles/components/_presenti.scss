@@ -303,6 +303,78 @@ tr.presente a:visited {
     pointer-events: none;
 }
 
+// Popup di modifica del proprio pallino stato (libero/occupato + nota) —
+// stessa ancora/posizionamento di .presenti-icon-popup ma piu' largo e
+// interattivo invece di un semplice testo.
+.presenti-stato-popup {
+    width: 180px;
+    white-space: normal;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    text-align: left;
+
+    &__hint {
+        font-size: $text-xs - 1;
+        color: $palette-text-secondary;
+    }
+
+    &__choice {
+        display: flex;
+        gap: 6px;
+
+        button {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 4px 6px;
+            background: transparent;
+            border: 1px solid $color-bg;
+            border-radius: $radius-sm;
+            color: $palette-text-title;
+            font-size: $text-xs;
+            cursor: pointer;
+
+            span {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                display: inline-block;
+            }
+
+            &.is-active { border-color: $palette-rust; background: rgba(255, 255, 255, 0.06); }
+        }
+    }
+
+    input[type='text'] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 4px 6px;
+        background: $palette-surface;
+        border: 1px solid $color-bg;
+        border-radius: $radius-sm;
+        color: $palette-text;
+        font-size: $text-xs;
+    }
+
+    &__save {
+        padding: 5px;
+        background: $palette-rust;
+        border: none;
+        border-radius: $radius-sm;
+        color: $palette-surface-raised;
+        font-size: $text-xs;
+        font-weight: 700;
+        cursor: pointer;
+
+        &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+}
+
 // Header colonne (tr.second_header) solo su desktop: su mobile la tabella
 // e' gia' stretta, quest'intestazione toglie spazio senza aggiungere
 // informazioni che le icone stesse (ora con popup al tap) non diano gia'.

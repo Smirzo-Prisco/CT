@@ -88,6 +88,68 @@ function IconWithPopup({ iconKey, openPopup, setOpenPopup, ...imgProps }) {
     )
 }
 
+/** Colori del pallino stato — rosso automatico (in giocata), giallo/verde a scelta. */
+const STATO_COLORI = { rosso: '#e74c3c', giallo: '#f1c40f', verde: '#4caf50' }
+
+/** Ricava il colore/etichetta del pallino: il rosso (in giocata) e' sempre automatico. */
+function statoDelPallino(user) {
+    if (user.in_role) return { colore: 'rosso', label: 'In giocata' }
+    if (user.stato_pallino === 'occupato') return { colore: 'giallo', label: 'Occupato' }
+    return { colore: 'verde', label: 'Libero' }
+}
+
+/**
+ * Form di modifica del proprio stato (solo sulla propria riga): scelta
+ * libero/occupato (il rosso resta automatico, non selezionabile) + nota
+ * breve. Salva su api_map.php?op=set_stato — l'aggiornamento agli altri
+ * arriva via socket 'presenti:update' (gia' ascoltato dal componente padre),
+ * non serve un refetch esplicito qui.
+ */
+function StatoEditPopup({ user, onClose }) {
+    const [stato, setStato] = useState(user.stato_pallino === 'occupato' ? 'occupato' : 'libero')
+    const [nota, setNota]   = useState(user.nota || '')
+    const [saving, setSaving] = useState(false)
+
+    const salva = () => {
+        setSaving(true)
+        fetch('pages/api_map.php?op=set_stato', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ stato_pallino: stato, nota }),
+        })
+            .then(r => r.json())
+            .then(d => { if (d.success) onClose() })
+            .catch(() => {})
+            .finally(() => setSaving(false))
+    }
+
+    return (
+        <span className="presenti-icon-popup presenti-stato-popup" onClick={e => e.stopPropagation()}>
+            {user.in_role && (
+                <div className="presenti-stato-popup__hint">Sei in giocata: il pallino resta rosso finché non finisce.</div>
+            )}
+            <div className="presenti-stato-popup__choice">
+                <button type="button" className={stato === 'libero' ? 'is-active' : ''} onClick={() => setStato('libero')}>
+                    <span style={{ background: STATO_COLORI.verde }} /> Libero
+                </button>
+                <button type="button" className={stato === 'occupato' ? 'is-active' : ''} onClick={() => setStato('occupato')}>
+                    <span style={{ background: STATO_COLORI.giallo }} /> Occupato
+                </button>
+            </div>
+            <input
+                type="text"
+                value={nota}
+                onChange={e => setNota(e.target.value.slice(0, 25))}
+                placeholder="Nota breve (max 25 caratteri)"
+                maxLength={25}
+            />
+            <button type="button" className="presenti-stato-popup__save" onClick={salva} disabled={saving}>
+                {saving ? 'Salvataggio…' : 'Salva'}
+            </button>
+        </span>
+    )
+}
+
 /**
  * Riga della tabella per un singolo personaggio.
  *
@@ -100,23 +162,41 @@ function UserRow({ user, isStaff, openPopup, setOpenPopup }) {
     /** Naviga alla pagina DM con il destinatario pre-selezionato */
     const openSms = () => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(user.nome)}`)
 
-    const morto = user.salute === 0
+    const morto  = user.salute === 0
+    const isOwn  = user.nome === (window.CT_USER?.login ?? '')
+    const statoKey = `${user.nome}-stato`
+    const statoOpen = openPopup === statoKey
+    const { colore, label } = statoDelPallino(user)
 
     return (
         <tr className={`presente${!user.disponibile ? ' presente-assente' : ''}${morto ? ' pg-morto' : ''}`}>
 
-            {/* Pallino In Role */}
+            {/* Pallino stato: rosso automatico (in giocata) o giallo/verde a
+                scelta manuale. Click sulla propria riga apre il form di
+                modifica, sulle altre mostra la nota impostata (se c'è). */}
             <td style={{ textAlign: 'center', width: '24px' }}>
-                <span
-                    title={user.in_role ? 'In giocata' : 'Non in giocata'}
-                    style={{
-                        display: 'inline-block',
-                        width: '10px',
-                        height: '10px',
-                        borderRadius: '50%',
-                        backgroundColor: user.in_role ? '#4caf50' : '#757575',
-                    }}
-                />
+                <span className="presenti-icon-popup-anchor">
+                    <span
+                        title={label}
+                        onClick={e => {
+                            e.stopPropagation()
+                            setOpenPopup(prev => (prev === statoKey ? null : statoKey))
+                        }}
+                        style={{
+                            display: 'inline-block',
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            backgroundColor: STATO_COLORI[colore],
+                            cursor: 'pointer',
+                        }}
+                    />
+                    {statoOpen && (
+                        isOwn
+                            ? <StatoEditPopup user={user} onClose={() => setOpenPopup(null)} />
+                            : <span className="presenti-icon-popup">{user.nota || 'Nessuna nota'}</span>
+                    )}
+                </span>
             </td>
 
             {/* Avatar del personaggio — grayscale se morto via CSS su .pg-morto */}
