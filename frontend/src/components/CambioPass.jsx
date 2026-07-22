@@ -85,7 +85,7 @@ export default function CambioPass() {
 
     return (
         <div className="pagina_user_cambio_pass">
-            <div className="link_back" style={{ textAlign: 'left' }}>
+            <div className="link_back link_back--left">
                 <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
 

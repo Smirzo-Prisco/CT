@@ -22,8 +22,8 @@ $cal-cell-bg: rgba(255, 255, 255, 0.03);
     color: $cal-text;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     box-sizing: border-box;
-
-    .link_back { text-align: left; }
+    // .link_back non e' piu' qui dentro (vedi Calendario.jsx): sta fuori
+    // dalla card, come .link_back--left in _layout.scss.
 
     &__title {
         font-family: 'Cinzel', 'Georgia', serif;

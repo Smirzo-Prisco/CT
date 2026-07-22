@@ -206,6 +206,21 @@ div.link_back {
     padding: 2px;
 }
 
+// Modificatore per le pagine dove il pulsante deve stare in alto a
+// sinistra invece che centrato (elenco richiesto esplicitamente: preferenze,
+// anagrafe, mercato_abilita_atarashi, incremento_parametri, elenco_staff,
+// elenco_volti, servizi_prenotazioni_prova, user_cambio_pass, calendario).
+// text-align:left da solo NON basta: themes/crystal/main.css (legacy,
+// condiviso da decine di pagine PHP) forza anche
+// "div.link_back button { display:block; margin:0 auto }", che centra il
+// bottone stesso indipendentemente dal text-align del div — va azzerato
+// il margin del bottone, non solo l'allineamento del testo.
+div.link_back.link_back--left {
+    text-align: left;
+
+    button { margin: 0; }
+}
+
 // ── Immagini decorative ───────────────────────────────────────
 
 img.descrizione {

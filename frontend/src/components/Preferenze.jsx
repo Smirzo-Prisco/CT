@@ -127,7 +127,7 @@ export default function Preferenze() {
                 dentro la card risulterebbe "in alto a sinistra" solo
                 rispetto alla card stessa, non alla pagina, apparendo di
                 fatto verso il centro dello schermo. */}
-            <div className="link_back" style={{ textAlign: 'left' }}>
+            <div className="link_back link_back--left">
                 <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
 

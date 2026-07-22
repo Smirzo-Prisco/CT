@@ -56,7 +56,7 @@ export default function IncrementoParametri() {
                 vedi _layout.scss) — dentro il pannello il pulsante sarebbe
                 "in alto a sinistra" solo rispetto al pannello stesso, non
                 alla pagina, apparendo verso il centro dello schermo. */}
-            <div className="link_back" style={{ textAlign: 'left' }}>
+            <div className="link_back link_back--left">
                 <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
 
