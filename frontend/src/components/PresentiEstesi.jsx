@@ -17,6 +17,7 @@
  */
 
 import { useState, useEffect, useCallback, Fragment } from 'react'
+import { createPortal } from 'react-dom'
 import styles from './PresentiEstesi.module.css'
 
 // ---------------------------------------------------------------------------
@@ -69,22 +70,21 @@ function groupUsers(users) {
  * Icona con popup al click/tap del proprio ALT — il title nativo (hover)
  * non raggiunge chi naviga da mobile, che non ha un vero "hover". iconKey
  * deve essere univoca nella pagina: usata per sapere quale popup e' aperto
- * e per chiuderlo ri-cliccando la stessa icona.
+ * e per chiuderlo ri-cliccando la stessa icona. Il popup vero e proprio non
+ * viene renderizzato qui (vedi PopupPortal in PresentiEstesi): serve solo
+ * la posizione dell'icona al click, il contenuto lo decide il padre.
  */
-function IconWithPopup({ iconKey, openPopup, setOpenPopup, ...imgProps }) {
-    const isOpen = openPopup === iconKey
+function IconWithPopup({ iconKey, openPopup, onOpen, ...imgProps }) {
     return (
-        <span className="presenti-icon-popup-anchor">
-            <img
-                {...imgProps}
-                onClick={e => {
-                    e.stopPropagation()
-                    setOpenPopup(prev => (prev === iconKey ? null : iconKey))
-                }}
-                style={{ cursor: 'pointer' }}
-            />
-            {isOpen && <span className="presenti-icon-popup">{imgProps.alt}</span>}
-        </span>
+        <img
+            {...imgProps}
+            onClick={e => {
+                e.stopPropagation()
+                if (openPopup?.key === iconKey) onOpen(null)
+                else onOpen({ key: iconKey, rect: e.currentTarget.getBoundingClientRect(), kind: 'text', text: imgProps.alt })
+            }}
+            style={{ cursor: 'pointer' }}
+        />
     )
 }
 
@@ -99,13 +99,13 @@ function statoDelPallino(user) {
 }
 
 /**
- * Form di modifica del proprio stato (solo sulla propria riga): scelta
- * libero/occupato (il rosso resta automatico, non selezionabile) + nota
- * breve. Salva su api_map.php?op=set_stato — l'aggiornamento agli altri
- * arriva via socket 'presenti:update' (gia' ascoltato dal componente padre),
- * non serve un refetch esplicito qui.
+ * Contenuto del form di modifica del proprio stato (solo sulla propria
+ * riga): scelta libero/occupato (il rosso resta automatico, non
+ * selezionabile) + nota breve. Salva su api_map.php?op=set_stato —
+ * l'aggiornamento agli altri arriva via socket 'presenti:update' (gia'
+ * ascoltato dal componente padre), non serve un refetch esplicito qui.
  */
-function StatoEditPopup({ user, onClose }) {
+function StatoEditForm({ user, onClose }) {
     const [stato, setStato] = useState(user.stato_pallino === 'occupato' ? 'occupato' : 'libero')
     const [nota, setNota]   = useState(user.nota || '')
     const [saving, setSaving] = useState(false)
@@ -124,7 +124,7 @@ function StatoEditPopup({ user, onClose }) {
     }
 
     return (
-        <span className="presenti-icon-popup presenti-stato-popup" onClick={e => e.stopPropagation()}>
+        <>
             {user.in_role && (
                 <div className="presenti-stato-popup__hint">Sei in giocata: il pallino resta rosso finché non finisce.</div>
             )}
@@ -146,26 +146,25 @@ function StatoEditPopup({ user, onClose }) {
             <button type="button" className="presenti-stato-popup__save" onClick={salva} disabled={saving}>
                 {saving ? 'Salvataggio…' : 'Salva'}
             </button>
-        </span>
+        </>
     )
 }
 
 /**
  * Riga della tabella per un singolo personaggio.
  *
- * @param {Object}  props.user         - Dati utente restituiti dall'API
- * @param {boolean} props.isStaff      - true se il viewer è staff
- * @param {string?} props.openPopup    - chiave dell'icona con popup aperto (condivisa fra le righe)
- * @param {Function}props.setOpenPopup - setter per openPopup
+ * @param {Object}   props.user      - Dati utente restituiti dall'API
+ * @param {boolean}  props.isStaff   - true se il viewer è staff
+ * @param {Object?}  props.openPopup - { key, rect, kind, ... } del popup aperto (condiviso fra le righe)
+ * @param {Function} props.onOpen    - apre/chiude il popup (null per chiudere)
  */
-function UserRow({ user, isStaff, openPopup, setOpenPopup }) {
+function UserRow({ user, isStaff, openPopup, onOpen }) {
     /** Naviga alla pagina DM con il destinatario pre-selezionato */
     const openSms = () => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(user.nome)}`)
 
     const morto  = user.salute === 0
     const isOwn  = user.nome === (window.CT_USER?.login ?? '')
     const statoKey = `${user.nome}-stato`
-    const statoOpen = openPopup === statoKey
     const { colore, label } = statoDelPallino(user)
 
     return (
@@ -175,28 +174,25 @@ function UserRow({ user, isStaff, openPopup, setOpenPopup }) {
                 scelta manuale. Click sulla propria riga apre il form di
                 modifica, sulle altre mostra la nota impostata (se c'è). */}
             <td style={{ textAlign: 'center', width: '24px' }}>
-                <span className="presenti-icon-popup-anchor">
-                    <span
-                        title={label}
-                        onClick={e => {
-                            e.stopPropagation()
-                            setOpenPopup(prev => (prev === statoKey ? null : statoKey))
-                        }}
-                        style={{
-                            display: 'inline-block',
-                            width: '10px',
-                            height: '10px',
-                            borderRadius: '50%',
-                            backgroundColor: STATO_COLORI[colore],
-                            cursor: 'pointer',
-                        }}
-                    />
-                    {statoOpen && (
-                        isOwn
-                            ? <StatoEditPopup user={user} onClose={() => setOpenPopup(null)} />
-                            : <span className="presenti-icon-popup">{user.nota || 'Nessuna nota'}</span>
-                    )}
-                </span>
+                <span
+                    title={label}
+                    onClick={e => {
+                        e.stopPropagation()
+                        if (openPopup?.key === statoKey) { onOpen(null); return }
+                        const rect = e.currentTarget.getBoundingClientRect()
+                        onOpen(isOwn
+                            ? { key: statoKey, rect, kind: 'stato', user }
+                            : { key: statoKey, rect, kind: 'text', text: user.nota || 'Nessuna nota' })
+                    }}
+                    style={{
+                        display: 'inline-block',
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        backgroundColor: STATO_COLORI[colore],
+                        cursor: 'pointer',
+                    }}
+                />
             </td>
 
             {/* Avatar del personaggio — grayscale se morto via CSS su .pg-morto */}
@@ -219,7 +215,7 @@ function UserRow({ user, isStaff, openPopup, setOpenPopup }) {
             {/* Icona famiglia / inclinazione / gilda (rinominata Razza nell'header) */}
             <td style={{ textAlign: 'center' }}>
                 {user.gruppo_img && (
-                    <IconWithPopup iconKey={`${user.nome}-gruppo`} openPopup={openPopup} setOpenPopup={setOpenPopup}
+                    <IconWithPopup iconKey={`${user.nome}-gruppo`} openPopup={openPopup} onOpen={onOpen}
                         width="25" height="25" src={user.gruppo_img} alt={user.gruppo_nome} title={user.gruppo_nome} />
                 )}
             </td>
@@ -227,7 +223,7 @@ function UserRow({ user, isStaff, openPopup, setOpenPopup }) {
             {/* Icona mestiere */}
             <td style={{ textAlign: 'center' }}>
                 {user.mestiere_img && (
-                    <IconWithPopup iconKey={`${user.nome}-mestiere`} openPopup={openPopup} setOpenPopup={setOpenPopup}
+                    <IconWithPopup iconKey={`${user.nome}-mestiere`} openPopup={openPopup} onOpen={onOpen}
                         width="25" height="25" src={user.mestiere_img} alt={user.mestiere_nome} title={user.mestiere_nome} />
                 )}
             </td>
@@ -236,7 +232,7 @@ function UserRow({ user, isStaff, openPopup, setOpenPopup }) {
                 riusano la stessa struttura dati dei mestieri, ma sono concettualmente diverse */}
             <td style={{ textAlign: 'center' }}>
                 {user.gilda_img && (
-                    <IconWithPopup iconKey={`${user.nome}-gilda`} openPopup={openPopup} setOpenPopup={setOpenPopup}
+                    <IconWithPopup iconKey={`${user.nome}-gilda`} openPopup={openPopup} onOpen={onOpen}
                         width="25" height="25" src={user.gilda_img} alt={user.gilda_nome} title={user.gilda_nome} />
                 )}
             </td>
@@ -258,7 +254,7 @@ function UserRow({ user, isStaff, openPopup, setOpenPopup }) {
             <td style={{ textAlign: 'center' }}>
                 <span style={{ display: 'flex', justifyContent: 'center', gap: '2px' }}>
                     {STAFF_ICONS.filter(ic => user.staff[ic.key]).map(ic => (
-                        <IconWithPopup key={ic.key} iconKey={`${user.nome}-${ic.key}`} openPopup={openPopup} setOpenPopup={setOpenPopup}
+                        <IconWithPopup key={ic.key} iconKey={`${user.nome}-${ic.key}`} openPopup={openPopup} onOpen={onOpen}
                             src={ic.src} width="20" height="20" title={ic.title} alt={ic.title} />
                     ))}
                 </span>
@@ -282,7 +278,12 @@ export default function PresentiEstesi({ isStaff = false }) {
     /** true solo durante il primissimo caricamento */
     const [loading, setLoading] = useState(true)
 
-    /** Chiave dell'icona (razza/lavoro/gilda/cariche) con popup ALT aperto — una sola alla volta. */
+    /**
+     * Popup aperto (icona ALT o form stato) — una sola alla volta, condiviso
+     * fra tutte le righe: { key, rect, kind: 'text'|'stato', text?, user? }.
+     * rect e' il DOMRect dell'elemento cliccato al momento del click, usato
+     * per posizionare il popup via portal (vedi PopupPortal sotto).
+     */
     const [openPopup, setOpenPopup] = useState(null)
     useEffect(() => {
         if (!openPopup) return
@@ -402,7 +403,7 @@ export default function PresentiEstesi({ isStaff = false }) {
 
                                     {/* Righe utente */}
                                     {utenti.map(u => (
-                                        <UserRow key={u.nome} user={u} isStaff={isStaff} openPopup={openPopup} setOpenPopup={setOpenPopup} />
+                                        <UserRow key={u.nome} user={u} isStaff={isStaff} openPopup={openPopup} onOpen={setOpenPopup} />
                                     ))}
 
                                 </Fragment>
@@ -422,6 +423,35 @@ export default function PresentiEstesi({ isStaff = false }) {
 
                 </tbody>
             </table>
+
+            {/* Popup (icona ALT o form stato) in portal su document.body: la
+                tabella ha overflow-x:hidden (per non spingere la pagina in
+                orizzontale sulle celle strette), che taglierebbe un popup
+                posizionato solo via CSS relative/absolute all'interno — vedi
+                anche il fix identico gia' fatto per la modale SMS del log
+                admin. position:fixed + coordinate calcolate in JS dal rect
+                dell'icona cliccata, con clamp ai bordi del viewport. */}
+            {openPopup && createPortal(
+                <div
+                    className={`presenti-icon-popup${openPopup.kind === 'stato' ? ' presenti-stato-popup' : ''}`}
+                    style={popupPosition(openPopup.rect, openPopup.kind === 'stato' ? 190 : 220)}
+                    onClick={e => e.stopPropagation()}
+                >
+                    {openPopup.kind === 'stato'
+                        ? <StatoEditForm user={openPopup.user} onClose={() => setOpenPopup(null)} />
+                        : openPopup.text}
+                </div>,
+                document.body
+            )}
         </div>
     )
+}
+
+/** Coordinate fixed per il popup: centrato sotto l'icona, clampato ai bordi del viewport. */
+function popupPosition(rect, assumedWidth) {
+    const left = Math.max(8, Math.min(
+        rect.left + rect.width / 2 - assumedWidth / 2,
+        window.innerWidth - assumedWidth - 8
+    ))
+    return { position: 'fixed', top: rect.bottom + 6, left }
 }

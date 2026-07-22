@@ -278,19 +278,13 @@ tr.presente a:visited {
 
 // ── Popup ALT icone (razza/lavoro/gilda/cariche) al click/tap ────────────
 // Il title nativo (hover) non raggiunge chi naviga da mobile — vedi
-// IconWithPopup in PresentiEstesi.jsx.
-.presenti-icon-popup-anchor {
-    position: relative;
-    display: inline-block;
-}
-
+// IconWithPopup in PresentiEstesi.jsx. Portato su document.body con
+// position:fixed e coordinate calcolate in JS (popupPosition, clampate ai
+// bordi del viewport): la tabella ha overflow-x:hidden, che taglierebbe un
+// posizionamento solo CSS relative/absolute anche a schermo largo.
 .presenti-icon-popup {
-    position: absolute;
-    z-index: 20;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-top: 4px;
+    z-index: 2000;
+    max-width: 220px;
     padding: 4px 8px;
     background: $palette-surface-raised;
     border: 1px solid $color-bg;
@@ -308,6 +302,7 @@ tr.presente a:visited {
 // interattivo invece di un semplice testo.
 .presenti-stato-popup {
     width: 180px;
+    box-sizing: border-box;
     white-space: normal;
     pointer-events: auto;
     display: flex;
