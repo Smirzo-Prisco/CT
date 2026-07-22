@@ -187,11 +187,15 @@ switch ($op) {
                 WHERE s.id_conversazione = $conv_id{$ongame_filter}
                 ORDER BY s.ora_spedizione DESC LIMIT 200", 'result');
 
-            // Segna come letto (solo se non è una chiamata "silent" fatta per aggiornare
-            // il thread senza emettere eventi — evita il loop dm:update → re-read → dm:update)
+            // Segna come letto SEMPRE, anche per una chiamata "silent" — chi la
+            // chiama sta gia' guardando il thread in tempo reale (vedi
+            // fetchThreadSilent in MessagesInbox.jsx), quindi il messaggio va
+            // considerato letto anche se e' appena arrivato via socket. "silent"
+            // continua a saltare solo il self-emit di dm:update, che altrimenti
+            // farebbe un loop infinito (dm:update → re-read → dm:update → ...).
+            gdrcd_query("UPDATE conversazioni_individuali SET lettura = 1
+                WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
             if (empty($_GET['silent'])) {
-                gdrcd_query("UPDATE conversazioni_individuali SET lettura = 1
-                    WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
                 notifySocketServer('dm:update', 'dm:' . $_SESSION['login']);
             }
 
@@ -213,10 +217,11 @@ switch ($op) {
                 WHERE s.gruppo_id = $gruppo_id
                 ORDER BY s.ora_spedizione DESC LIMIT 200", 'result');
 
-            // Segna come letto (solo se non è una chiamata silent)
+            // Segna come letto sempre (vedi commento nel ramo individuale sopra):
+            // "silent" salta solo il self-emit di dm:update, non l'update DB.
+            gdrcd_query("UPDATE partecipazione_gruppo SET lettura = 1
+                WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'");
             if (empty($_GET['silent'])) {
-                gdrcd_query("UPDATE partecipazione_gruppo SET lettura = 1
-                    WHERE gruppo_id = $gruppo_id AND utente_nome = '$login'");
                 notifySocketServer('dm:update', 'dm:' . $_SESSION['login']);
             }
 
