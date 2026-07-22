@@ -115,10 +115,12 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
 
         case 'events_today':
+            // Vedi pages/api_calendario.php per lo schema (calendario_eventi/
+            // calendario_partecipanti, sostituisce la vecchia appuntamenti).
             $login_f = gdrcd_filter('in', $_SESSION['login']);
-            $sql = gdrcd_query("SELECT COUNT(*) AS n FROM appuntamenti
-                WHERE (autore = '$login_f' OR destinatario = '$login_f' OR titolo = 'Quest' OR titolo = 'Evento')
-                AND DATE(FROM_UNIXTIME(str_data)) = CURDATE()", 'result');
+            $sql = gdrcd_query("SELECT COUNT(*) AS n FROM calendario_eventi e
+                LEFT JOIN calendario_partecipanti p ON p.evento_id = e.id AND p.nome = '$login_f'
+                WHERE e.data = CURDATE() AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1)", 'result');
             $row = gdrcd_query($sql, 'fetch');
             echo json_encode(['success' => true, 'has_events' => (int)$row['n'] > 0]);
             break;

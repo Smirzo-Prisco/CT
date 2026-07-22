@@ -63,6 +63,7 @@ import ServiziGilde         from './components/ServiziGilde'
 import Statuto              from './components/Statuto'
 import Documentazione       from './components/Documentazione'
 import ChatHelp             from './components/ChatHelp'
+import Calendario           from './components/Calendario'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -207,6 +208,10 @@ const ROUTES = {
     },
     chat_help: {
         component: ChatHelp,
+        css: [],
+    },
+    agenda_center: {
+        component: Calendario,
         css: [],
     },
 }
