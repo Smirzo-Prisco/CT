@@ -1013,7 +1013,13 @@ export default function MessagesInbox({ toPg = null }) {
     if (view === 'thread' && selectedConv) {
         return (
             <div id="messages-center-app" className="container">
-                <div className="main-content" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+                {/* overflowY:visible qui (non nella classe .main-content, condivisa
+                    anche dalla vista lista/composizione): .main-content di default
+                    ha overflow-y:hidden, che spezza il contesto di .thread-header
+                    sticky (vedi _messages_center.scss) facendolo restare legato a
+                    questo contenitore invece che a #maincontent, l'unico vero
+                    scroll della pagina. */}
+                <div className="main-content" style={{ width: '100%', display: 'flex', flexDirection: 'column', overflowY: 'visible' }}>
                     <ThreadView
                         messages={messages}
                         conv={selectedConv}
