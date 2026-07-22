@@ -60,7 +60,7 @@ function formaEventoVuoto(dataDefault) {
         data: dataDefault,
         ora: '',
         nota: '',
-        pubblico: false,
+        pubblico: true,
         partecipanti: [],
     }
 }
@@ -470,6 +470,7 @@ export default function Calendario({ isStaff }) {
                                     <input
                                         type="date"
                                         value={form.data}
+                                        min={oggiYMD}
                                         onChange={e => setForm(f => ({ ...f, data: e.target.value }))}
                                     />
                                 </label>

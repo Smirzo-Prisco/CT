@@ -214,6 +214,15 @@ switch ($op) {
         $c = validaCampiEvento($data, $is_staff);
         if ($c === null) break;
 
+        // Solo in creazione: non si puo' prenotare un impegno nel passato.
+        // Non si applica a update, altrimenti diventerebbe impossibile
+        // modificare/aggiungere partecipanti sui 148 eventi storici migrati.
+        if ($c['data'] < date('Y-m-d')) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Non puoi creare un impegno nel passato']);
+            break;
+        }
+
         $titolo_sql = $c['titolo'] !== null ? "'" . gdrcd_filter('in', $c['titolo']) . "'" : 'NULL';
         $luogo_sql  = $c['luogo']  !== null ? "'" . gdrcd_filter('in', $c['luogo'])  . "'" : 'NULL';
         $nota_sql   = $c['nota']   !== null ? "'" . gdrcd_filter('in', $c['nota'])   . "'" : 'NULL';

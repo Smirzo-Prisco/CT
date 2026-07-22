@@ -311,6 +311,11 @@ $cal-cell-bg: rgba(255, 255, 255, 0.03);
             color: $cal-text;
             font-size: 12px;
             font-family: inherit;
+            // Il popup del <select> (e il calendario/orologio nativi di
+            // date/time) sono disegnati dal browser, non da questo CSS —
+            // color-scheme dice al browser di usare la sua palette scura
+            // per quei popup invece del bianco di default.
+            color-scheme: dark;
 
             &:focus { outline: none; border-color: $cal-gold-h; }
         }
