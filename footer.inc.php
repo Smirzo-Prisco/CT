@@ -23,6 +23,7 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
 ?>
 <?php endif; ?>
 
+<?php if (empty($GLOBALS['ct_is_guest_home'])): ?>
     </body>
 
 
@@ -36,6 +37,7 @@ if($PARAMETERS['mode']['popup_choise'] == 'ON') echo '<script type="text/javascr
     <?php endforeach; ?>
     <?php endif; ?>
 </html>
+<?php endif; // ct_is_guest_home: themes/crystal/home/index.php chiude gia' </body></html> da solo ?>
 
 <?php
 /* Chiudo la connessione al database */

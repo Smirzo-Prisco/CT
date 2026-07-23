@@ -92,8 +92,11 @@ $json_ld = [
 ];
 
 public_head(
-    'Le Razze',
-    'Scopri le sette razze giocabili di Crystal Tokyo GDR: Adamanti, Celestiali, Elementali, Beast, Fiori, Demoni e Lancaster. Ognuna con poteri e storia propri.',
+    // "Le Razze" da solo non intercettava nessuna ricerca: Search Console mostra
+    // gia' 1 impression su "razze fantasy" (posizione 68, nessun clic) — il termine
+    // giusto, solo troppo debole nel title/H1 per emergere. Rinforzato qui e nell'H1 sotto.
+    'Razze Fantasy del GDR',
+    'Le 7 razze fantasy giocabili di Crystal Tokyo GDR: Adamanti, Celestiali, Elementali, Beast, Fiori, Demoni e Lancaster. Ognuna con poteri e storia propri.',
     'https://crystaltokyo.it/razze',
     'https://crystaltokyo.it/themes/crystal/imgs/homepage.png',
     $json_ld
@@ -106,9 +109,9 @@ public_head(
 <!-- ── HERO ──────────────────────────────────────────────────────────────── -->
 <section class="pub-hero pub-hero--short">
     <div class="pub-hero-content">
-        <h1>Le Razze</h1>
+        <h1>Le Razze Fantasy di Crystal Tokyo GDR</h1>
         <p class="pub-hero-sub">
-            Sette razze, ognuna con origini e poteri propri.
+            Sette razze fantasy, ognuna con origini e poteri propri.
             Non esiste una gerarchia — solo la storia che scegli di raccontare.
         </p>
     </div>

@@ -54,8 +54,8 @@ $json_ld = [
 ];
 
 public_head(
-    'Ambientazione',
-    'Esplora il mondo di Crystal Tokyo GDR: la storia della Città di Cristallo, la Grande Glaciazione, l\'Impero Lunare e tutto ciò che ha plasmato questo universo urban fantasy.',
+    'Ambientazione Urban Fantasy',
+    'L\'ambientazione urban fantasy di Crystal Tokyo GDR: la storia della Città di Cristallo, la Grande Glaciazione, l\'Impero Lunare e tutto ciò che ha plasmato questo mondo.',
     'https://crystaltokyo.it/ambientazione',
     'https://crystaltokyo.it/themes/crystal/imgs/homepage.png',
     $json_ld
@@ -68,7 +68,7 @@ public_head(
 <!-- ── HERO ──────────────────────────────────────────────────────────────── -->
 <section class="pub-hero pub-hero--short">
     <div class="pub-hero-content">
-        <h1>Ambientazione</h1>
+        <h1>Ambientazione Urban Fantasy</h1>
         <p class="pub-hero-sub">
             La storia della Città di Cristallo: mille anni di ghiaccio,
             una rinascita e un mondo dove la magia scorre sotto la superficie.
