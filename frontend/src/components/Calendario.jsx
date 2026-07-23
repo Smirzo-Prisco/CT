@@ -60,7 +60,11 @@ function formaEventoVuoto(dataDefault) {
         data: dataDefault,
         ora: '',
         nota: '',
-        pubblico: true,
+        // Deselezionata di default: con la spunta pre-attivata, allo staff
+        // bastava dimenticarsi di toglierla per rendere pubblico (visibile a
+        // tutti) un evento privato con partecipanti specifici — vedi bug
+        // riportato: "aggiungo un pg ma lo vedono tutti".
+        pubblico: false,
         partecipanti: [],
     }
 }
