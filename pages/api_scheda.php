@@ -170,7 +170,9 @@ switch ($op) {
                 'car6'   => (int)$pg_data['car6']  + (int)($pg_data['bonus_car6'] ?? 0) + (int)($bo['BO6'] ?? 0),
                 'car8'   => (int)$pg_data['car8'],
                 'totale' => getTotStatsPg($pg),
-                'livello' => $pg_data['id_gilda'] > 0 ? getLevelPg(getTotStatsPg($pg)) : 1,
+                // Livello calcolato sempre dalle statistiche (come in Anagrafe): i PNG non hanno
+                // id_gilda ma hanno comunque un livello reale, non vanno bloccati a 1.
+                'livello' => getLevelPg(getTotStatsPg($pg)),
             ];
             $profile['esperienza'] = (float)$pg_data['esperienza'];
             $profile['shin']       = (float)$pg_data['shin'];

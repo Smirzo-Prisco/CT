@@ -733,6 +733,12 @@
         padding: $space-4;
     }
 
+    // Il testo arriva via dangerouslySetInnerHTML: senza pre-line gli a-capo
+    // digitati nella textarea vengono collassati dal rendering HTML di default.
+    .thread-message-text {
+        white-space: pre-line;
+    }
+
     // Barra di risposta: affianca textarea e pulsante Invia — ultima cosa
     // nel flusso, raggiunta scrollando fino in fondo come richiesto.
     .thread-reply {

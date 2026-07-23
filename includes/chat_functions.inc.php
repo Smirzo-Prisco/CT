@@ -904,7 +904,26 @@ function endRoleSession($location) {
     gdrcd_query("UPDATE role_sessions SET `end` = NOW() WHERE `location` = $location");
     notifySocketServer('quest:audio_stop', 'loc:' . $location, []);
 
+    if ($role_row) deleteRolePngs($rid);
+
     chatInsertMessage($location, 'System', null, 'Role conclusa!', 'N');
+}
+
+// Elimina fisicamente dalla tabella personaggio i png della role appena conclusa,
+// a meno che lo stesso nome non sia ancora impegnato in un'altra role ancora attiva
+// altrove (es. la stessa "creatura di X" evocata più volte).
+function deleteRolePngs($id_role) {
+    $result = gdrcd_query("SELECT pg_name FROM role_session_players WHERE id_role = $id_role AND png = 1", 'result');
+    $png_names = [];
+    while ($row = gdrcd_query($result, 'fetch')) $png_names[] = $row['pg_name'];
+
+    foreach ($png_names as $png_name) {
+        $png_name_f = gdrcd_filter('in', $png_name);
+        $still_active = gdrcd_query("SELECT 1 FROM role_session_players rsp
+            INNER JOIN role_sessions rs ON rs.id_role = rsp.id_role
+            WHERE rsp.pg_name = '$png_name_f' AND rsp.png = 1 AND rs.end IS NULL");
+        if (!$still_active) gdrcd_query("DELETE FROM personaggio WHERE nome = '$png_name_f' LIMIT 1");
+    }
 }
 
 // Controllo se tutti i pg hanno inviato, così propongo la chiusura del turno a tutti quanti
