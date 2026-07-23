@@ -78,7 +78,8 @@ function public_head(
     <link rel="stylesheet" href="/themes/crystal/fontawesome/css/all.min.css">
 
     <!-- CSS condiviso per tutte le pagine pubbliche -->
-    <link rel="stylesheet" href="/public/public.css">
+    <?php $public_css_v = @filemtime($_SERVER['DOCUMENT_ROOT'] . '/public/public.css') ?: 0; ?>
+    <link rel="stylesheet" href="/public/public.css?v=<?= $public_css_v ?>">
     <?php endif; ?>
 
     <?php $favicon_v = @filemtime($_SERVER['DOCUMENT_ROOT'] . '/imgs/favicon.ico') ?: 0; ?>
