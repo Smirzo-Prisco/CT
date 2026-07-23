@@ -1007,10 +1007,11 @@ switch ($op) {
                 'avatar'    => $row['avatar']    ?? '',
                 'titolo'    => $row['titolo']    ?? '',
                 'tipologia' => $row['tipologia'] ?? '',
-                // HTML interpretato (non escapato): gdrcd_html_filter toglie solo
-                // gli elementi pericolosi (script/iframe/on*), preservando la
-                // formattazione legittima — stesso pattern usato per role_log.
-                'contenuto' => gdrcd_html_filter($row['contenuto'] ?? ''),
+                // HTML interpretato (non escapato). gdrcd_html_filter() bloccherebbe
+                // anche <img>/<iframe> (HTML_FILTER_HIGH), mentre questo campo li ha
+                // sempre mostrati senza restrizioni nel PHP legacy (echo diretto) —
+                // gdrcd_html_filter_permissivo toglie solo script/on*/javascript:.
+                'contenuto' => gdrcd_html_filter_permissivo($row['contenuto'] ?? ''),
             ],
             'can_edit' => $is_own,
         ]);
