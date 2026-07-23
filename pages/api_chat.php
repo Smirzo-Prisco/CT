@@ -86,7 +86,12 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 }
                 
                 // Se sto lanciando una mental, devo verificare se non l'ho già lanciato in questo turno
-                if($skill_info['sottotipo'] === 'comando' && checkMentaleComando($id_role, $login, $bersaglio, $turn)) {
+                // Bug storico: passava l'array $bersaglio cosi' com'e' invece di implode(',', $bersaglio)
+                // (come fatto ovunque altrove in questo blocco, es. fight()/lanciaStat()). PHP interpola un
+                // array in stringa come "Array", quindi la query dentro checkMentaleComando() confrontava
+                // role_fights.target con la stringa letterale 'Array' — non corrispondeva mai a un bersaglio
+                // reale e il blocco "stesso bersaglio due turni di fila" non ha mai funzionato.
+                if($skill_info['sottotipo'] === 'comando' && checkMentaleComando($id_role, $login, implode(',', $bersaglio), $turn)) {
                     echo json_encode(array('success' => false, 'message' => 'Attenzione! Non puoi lanciare due mentali di comando sullo stesso bersaglio per due turni di fila'));
                     exit;
                 }
