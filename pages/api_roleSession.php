@@ -270,7 +270,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'oraInizio'    => date('H:i', strtotime($row['start'])),
                     'oraFine'      => $row['end'] !== null ? date('H:i', strtotime($row['end'])) : '',
                     'totTurni'     => (int)$row['turn'],
-                    'partecipanti' => getRoleParticipantsWithMaster($row['id_role']),
+                    'partecipanti' => [], // popolato in batch subito dopo il ciclo, vedi sotto
                     'inCorso'      => $row['end'] === null,
                     'isQuest'      => !empty($row['is_quest']),
                     // >0 esclude sia NULL (mai generato) sia il valore sentinella -1 usato
@@ -286,6 +286,28 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Shin enrichment: flag/award status per giocata
             if (!empty($roles)) {
                 $all_ids = implode(',', array_map('intval', array_column($roles, 'id')));
+
+                // Partecipanti (giocatori + master) per tutte le giocate in due query totali
+                // invece di due per ogni riga (era un N+1 che, su "chat" senza indice su
+                // id_role/mittente, faceva una scansione completa della tabella per ogni giocata).
+                $players_map = [];
+                $res_pl = gdrcd_query("SELECT DISTINCT id_role, pg_name FROM role_session_players WHERE id_role IN ($all_ids)", 'result');
+                while ($r = gdrcd_query($res_pl, 'fetch')) $players_map[(int)$r['id_role']][] = $r['pg_name'];
+
+                $masters_map = [];
+                $res_ms = gdrcd_query("SELECT DISTINCT id_role, mittente FROM chat WHERE id_role IN ($all_ids) AND tipo IN ('M', 'I', 'Y') AND mittente IS NOT NULL AND mittente != ''", 'result');
+                while ($r = gdrcd_query($res_ms, 'fetch')) $masters_map[(int)$r['id_role']][] = $r['mittente'];
+
+                foreach ($roles as &$role) {
+                    $players = $players_map[$role['id']] ?? [];
+                    $masters = $masters_map[$role['id']] ?? [];
+                    $names   = array_values(array_unique(array_merge($players, $masters)));
+                    $role['partecipanti'] = array_map(
+                        fn($nome) => ['nome' => $nome, 'isMaster' => in_array($nome, $masters, true)],
+                        $names
+                    );
+                }
+                unset($role);
 
                 $my_shin_map = [];
                 $res_my = gdrcd_query("SELECT id_role, awarded_at FROM role_session_shin WHERE id_role IN ($all_ids) AND pg_name = '$login_f'", 'result');
