@@ -224,16 +224,27 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $show_gilda = $is_staff && $gilda_param !== null;
 
             if ($show_gilda) {
-                // Giocate di tutti i PG della razza selezionata
+                // Giocate di tutti i PG della razza selezionata, sia come giocatori
+                // che come master (il master non passa da role_session_players: narra
+                // in chat con tipo M/I/Y senza mai "unirsi" alla giocata).
                 $gilda_cond = ($gilda_param === 0)
                     ? "COALESCE(id_gilda, 0) <= 0"
                     : "id_gilda = $gilda_param";
-                $where = "WHERE role_session_players.pg_name IN (SELECT nome FROM personaggio WHERE $gilda_cond)";
+                $where = "WHERE role_sessions.id_role IN (
+                    SELECT id_role FROM role_session_players WHERE pg_name IN (SELECT nome FROM personaggio WHERE $gilda_cond)
+                    UNION
+                    SELECT id_role FROM chat WHERE tipo IN ('M','I','Y') AND mittente IN (SELECT nome FROM personaggio WHERE $gilda_cond)
+                )";
             } elseif ($show_all) {
                 $where = '';
             } else {
+                // Stesso ragionamento: includo anche le giocate masterate senza essersi uniti.
                 $pg_filter = ($is_staff && $pg_param !== '') ? $pg_param : $login_f;
-                $where = "WHERE role_session_players.pg_name = '$pg_filter'";
+                $where = "WHERE role_sessions.id_role IN (
+                    SELECT id_role FROM role_session_players WHERE pg_name = '$pg_filter'
+                    UNION
+                    SELECT id_role FROM chat WHERE tipo IN ('M','I','Y') AND mittente = '$pg_filter'
+                )";
             }
 
             $query = "SELECT role_sessions.id_role, role_sessions.location, role_sessions.start,
@@ -259,7 +270,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'oraInizio'    => date('H:i', strtotime($row['start'])),
                     'oraFine'      => $row['end'] !== null ? date('H:i', strtotime($row['end'])) : '',
                     'totTurni'     => (int)$row['turn'],
-                    'partecipanti' => getRolePgs($row['id_role'], false),
+                    'partecipanti' => getRoleParticipantsWithMaster($row['id_role']),
                     'inCorso'      => $row['end'] === null,
                     'isQuest'      => !empty($row['is_quest']),
                     // >0 esclude sia NULL (mai generato) sia il valore sentinella -1 usato

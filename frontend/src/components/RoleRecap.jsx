@@ -176,15 +176,18 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward, onOpenQuestRecap })
                         Partecipanti ({game.partecipanti.length})
                     </div>
                     <div className="participants-list">
-                        {game.partecipanti.map(pg => (
+                        {game.partecipanti.map(p => (
                             <div
-                                key={pg}
-                                className="participant"
+                                key={p.nome}
+                                className={`participant${p.isMaster ? ' participant--master' : ''}`}
                                 style={{ cursor: 'pointer' }}
-                                onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(pg)}`)}
+                                onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(p.nome)}`)}
                             >
                                 <i className="fas fa-user"></i>
-                                <span>{pg}</span>
+                                <span>{p.nome}</span>
+                                {p.isMaster && (
+                                    <span className="participant-master-badge" title="Master della giocata">M</span>
+                                )}
                             </div>
                         ))}
                     </div>

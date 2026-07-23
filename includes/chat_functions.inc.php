@@ -1907,6 +1907,25 @@ function getRolePgs($id_role, $active = false) {
     return $users;
 }
 
+// Partecipanti di una role, master incluso: [{nome, isMaster}]. Il master narra
+// in chat con tipo 'M'/'I'/'Y' senza mai passare da addPgToRole (le meccaniche di
+// role_session_players sono di turno e non gli si applicano), quindi va recuperato
+// separatamente da chat.mittente invece che da role_session_players.
+function getRoleParticipantsWithMaster($id_role) {
+    $players = getRolePgs($id_role, false);
+
+    $masters = [];
+    $result = gdrcd_query("SELECT DISTINCT mittente FROM chat WHERE id_role = $id_role AND tipo IN ('M', 'I', 'Y') AND mittente IS NOT NULL AND mittente != ''", 'result');
+    while ($row = gdrcd_query($result, 'fetch')) $masters[] = $row['mittente'];
+
+    $names = array_unique(array_merge($players, $masters));
+    $out = [];
+    foreach ($names as $name) {
+        $out[] = ['nome' => $name, 'isMaster' => in_array($name, $masters, true)];
+    }
+    return $out;
+}
+
 // Registra un'azione di combattimento nella role e restituisce l'ID inserito.
 // $damage_percent > 0: ogni bersaglio subisce X% del danno calcolato (attacchi PNG master).
 function fight($id_role, $striker, $target, $id_skill, $level, $car, $dice, $recap='', $damage_percent=0, $dado_raw=0) {
