@@ -1490,9 +1490,16 @@ function elaborateAttack($id_role, $turn, $intoccabili, $difensori, &$riepilogo)
                 'esito' => 1, // 1 = perde punti, 0 = respinge l'attacco
                 'pg' => $striker,
                 'danno' => $integrita,
-                'punti' => 'integrita', // Salute o integrità
+                'punti_type' => 'integrita', // Bug storico: la chiave era 'punti' invece di
+                // 'punti_type', quella letta dal totale danni in elaboratePrint() — di
+                // conseguenza il default 'salute' scalava Salute invece di Integrità.
                 'msg' => " e perde $integrita punti integrità per aver lanciato nuovamente una mentale di tipo comando"
             );
+
+            // Card esplicativa nel riepilogo turno: senza questa, la perdita di
+            // integrità comparirebbe nel totale finale senza alcuna spiegazione visibile
+            // (le voci 'subisce' senza un 'attacca' corrispondente non generano card).
+            $riepilogo[$striker]['generica'][] = "$striker perde $integrita punti integrità per aver lanciato una mentale di tipo comando in due turni consecutivi.";
         }
 
         // Elaboro l'attacco verso tutti i bersagli tenendo conto delle difese riuscite e fallite
