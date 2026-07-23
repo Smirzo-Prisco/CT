@@ -75,8 +75,13 @@ $json_ld_home = [
 
 /* ── <head> ──────────────────────────────────────────────────────────── */
 public_head(
-    'Crystal Tokyo GDR',
-    'Gioco di ruolo online play by chat gratuito, attivo da oltre vent\'anni. Crea il tuo personaggio, scegli la tua razza e unisciti alla storia della Città di Cristallo.',
+    // Title keyword-first (public_head() aggiunge da solo il suffisso " — Crystal
+    // Tokyo GDR"): passare qui il brand duplicava il title in "Crystal Tokyo GDR —
+    // Crystal Tokyo GDR". Il brand fa gia' da solo ~4,1 di posizione media su query
+    // brandizzate (Search Console) — la homepage punta a zero su termini generici
+    // come "gdr play by chat", quindi qui va anteposto il termine, non il brand.
+    'GDR Play by Chat Gratis Online',
+    'GDR play by chat gratis, gioco di ruolo testuale online da oltre vent\'anni. Crea il personaggio, scegli la razza, entra nella Città di Cristallo.',
     'https://crystaltokyo.it/',
     'https://crystaltokyo.it/themes/crystal/imgs/homepage.png',
     $json_ld_home

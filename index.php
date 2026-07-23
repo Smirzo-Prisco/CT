@@ -8,6 +8,18 @@ if ($PARAMETERS['settings']['protection'] == 'ON'){
     require 'protezione.php';
 }
 
+// Homepage guest (nessun login, nessun ?page=): themes/crystal/home/index.php genera
+// da solo un <head>/<body> completo via public_head() (SEO: title/meta/OG/JSON-LD
+// dedicati). Senza questo flag header.inc.php ne apre un secondo prima ancora
+// dell'include, risultando in due <!DOCTYPE>/<title>/<meta> annidati nello stesso
+// HTML — invalido e dannoso per l'indicizzazione (title duplicato/rotto in SERP).
+// header.inc.php e footer.inc.php controllano questo flag per saltare la propria
+// shell HTML solo in questo caso specifico; tutto il resto (sessione, DB, script) resta invariato.
+// session_start() anticipato (idempotente, header.inc.php lo richiama con lo stesso
+// guard) solo per poter leggere $_SESSION['login'] prima dell'include di header.inc.php.
+if (session_status() === PHP_SESSION_NONE) session_start();
+$GLOBALS['ct_is_guest_home'] = empty($_SESSION['login']) && empty($_GET['page']);
+
 require 'header.inc.php';
 
 

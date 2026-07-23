@@ -59,6 +59,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
 }
 ?>
 
+<?php if (empty($GLOBALS['ct_is_guest_home'])): ?>
 <!--Force IE6 into quirks mode with this comment tag-->
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="it" lang="it">
@@ -237,6 +238,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
 <?php if (!empty($_SESSION['login'])): ?>
 <div id="chatbot-widget-container"></div>
 <?php endif; ?>
+<?php endif; // ct_is_guest_home ?>
 <?php
     /** * CONTROLLO PER AGGIORNAMENTO DB
      * Il controllo viene lanciato solo in index e nelle pagine di installer/upgrade.

@@ -40,7 +40,9 @@ function menuSection($tipo, $classe) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CT — Documentazione</title>
+<title>Regolamento e Ambientazione — Crystal Tokyo GDR</title>
+<meta name="description" content="Il regolamento completo di Crystal Tokyo GDR: ambientazione, sistema di gioco, combattimento, manuali e primi passi per chi inizia questo gioco di ruolo online.">
+<link rel="canonical" href="https://crystaltokyo.it/documentazione_main.php">
 <link rel="stylesheet" href="themes/crystal/documentazione.css">
 <link rel="stylesheet" href="themes/crystal/documentazione_menu.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
