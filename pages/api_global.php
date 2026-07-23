@@ -139,11 +139,27 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
                     // Usa closures (variabili) invece di named functions per evitare
                     // "Cannot redeclare" se il file viene eseguito più volte nel processo
+                    //
+                    // Le liste sono pesate per ripetizione (array_rand() resta a
+                    // estrazione uniforme): ogni voce ripetuta N volte vale N/totale
+                    // di probabilità. Prima pioggia+temporale valevano 33-50% a
+                    // seconda della stagione (in estate 2 condizioni su 4, cioè il
+                    // 50% dei giorni) — riportato come bug: pioggia/temporali troppo
+                    // frequenti. Ora tutte le stagioni restano sul 20-30%.
                     $condFn = function($m) {
-                        if (in_array($m, [12,1,2]))  { $c = ['nuvoloso','pioggia','neve','sole_nebbia','sole_nuvoloso','temporale']; }
-                        elseif (in_array($m, [3,4,5])){ $c = ['sole','nuvoloso','sole_nuvoloso','pioggia','temporale']; }
-                        elseif (in_array($m, [6,7,8])){ $c = ['sole','nuvoloso','pioggia','temporale']; }
-                        else                          { $c = ['sole','sole_nuvoloso','nuvoloso','pioggia','sole_nebbia']; }
+                        if (in_array($m, [12,1,2])) {
+                            // Inverno: nuvoloso/nebbia dominano, neve frequente — pioggia+temporale 20%
+                            $c = ['nuvoloso','nuvoloso','nuvoloso','sole_nebbia','sole_nuvoloso','sole','neve','neve','pioggia','temporale'];
+                        } elseif (in_array($m, [3,4,5])) {
+                            // Primavera: variabile, piogge frequenti ma non dominanti — 30%
+                            $c = ['sole','sole','sole_nuvoloso','sole_nuvoloso','nuvoloso','nuvoloso','sole_nebbia','pioggia','pioggia','temporale'];
+                        } elseif (in_array($m, [6,7,8])) {
+                            // Estate: prevalentemente soleggiato — pioggia+temporale 20%
+                            $c = ['sole','sole','sole','sole','sole','sole_nuvoloso','nuvoloso','nuvoloso','pioggia','temporale'];
+                        } else {
+                            // Autunno: nuvoloso/nebbioso, piovoso ma non sempre — 20%
+                            $c = ['sole','sole','sole_nuvoloso','sole_nuvoloso','nuvoloso','nuvoloso','sole_nebbia','sole_nebbia','pioggia','pioggia'];
+                        }
                         return $c[array_rand($c)];
                     };
                     $tempFn = function($m, $t = 'giorno') {
