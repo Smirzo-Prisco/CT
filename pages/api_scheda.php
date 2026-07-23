@@ -984,6 +984,119 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // AFFETTO_GET — dettaglio di un singolo affetto (pubblico, come la lista)
+    // -------------------------------------------------------------------------
+    case 'affetto_get':
+        $affetto_id = (int)($_GET['id'] ?? 0);
+        if (!$affetto_id) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'ID mancante']);
+            exit;
+        }
+        $row = gdrcd_query("SELECT * FROM struttura_affetti WHERE id = $affetto_id AND username = '$pg' LIMIT 1");
+        if (!$row) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Affetto non trovato']);
+            exit;
+        }
+        echo json_encode([
+            'success'  => true,
+            'affetto'  => [
+                'id'        => (int)$row['id'],
+                'nomePg'    => $row['nomePg']    ?? '',
+                'avatar'    => $row['avatar']    ?? '',
+                'titolo'    => $row['titolo']    ?? '',
+                'tipologia' => $row['tipologia'] ?? '',
+                'contenuto' => $row['contenuto'] ?? '',
+            ],
+            'can_edit' => $is_own,
+        ]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // AFFETTO_UPDATE — modifica un affetto esistente (POST, own)
+    // -------------------------------------------------------------------------
+    case 'affetto_update':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Metodo non consentito']);
+            exit;
+        }
+        if (!$is_own) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Non autorizzato']);
+            exit;
+        }
+        $body = json_decode(file_get_contents('php://input'), true);
+        $upd_id = (int)($body['id'] ?? 0);
+        if (!$upd_id) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'ID mancante']);
+            exit;
+        }
+        // Verifica che l'affetto appartenga davvero al pg corrente prima di modificarlo
+        $owned = gdrcd_query("SELECT id FROM struttura_affetti WHERE id = $upd_id AND username = '$pg' LIMIT 1");
+        if (!$owned) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Affetto non trovato']);
+            exit;
+        }
+
+        $nomePg     = trim($body['nomePg'] ?? '');
+        $titolo     = trim($body['titolo'] ?? '');
+        $tipologia  = $body['tipologia'] ?? '';
+        $contenuto  = trim($body['contenuto'] ?? '');
+        $avatar_raw = trim($body['avatar'] ?? '');
+
+        $tipologie_valide = ['legami', 'nemici', 'famiglia', 'conoscenze', 'memories'];
+        if ($nomePg === '' || $contenuto === '' || !in_array($tipologia, $tipologie_valide, true)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Personaggio, tipologia e dettaglio sono obbligatori']);
+            exit;
+        }
+
+        $avatar_safe = $avatar_raw !== '' ? gdrcd_filter('in', gdrcd_filter('fullurl', $avatar_raw)) : '';
+
+        gdrcd_query(sprintf(
+            "UPDATE struttura_affetti SET nomePg='%s', titolo='%s', tipologia='%s', avatar='%s', contenuto='%s' WHERE id = %d LIMIT 1",
+            gdrcd_filter('in', $nomePg),
+            gdrcd_filter('in', $titolo),
+            gdrcd_filter('in', $tipologia),
+            $avatar_safe,
+            gdrcd_filter('in', $contenuto),
+            $upd_id
+        ));
+
+        echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
+    // AFFETTO_DELETE — elimina un affetto (POST, own)
+    // -------------------------------------------------------------------------
+    case 'affetto_delete':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Metodo non consentito']);
+            exit;
+        }
+        if (!$is_own) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Non autorizzato']);
+            exit;
+        }
+        $body = json_decode(file_get_contents('php://input'), true);
+        $del_id = (int)($body['id'] ?? 0);
+        if (!$del_id) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'ID mancante']);
+            exit;
+        }
+        gdrcd_query("DELETE FROM struttura_affetti WHERE id = $del_id AND username = '$pg' LIMIT 1");
+
+        echo json_encode(['success' => true]);
+        break;
+
+    // -------------------------------------------------------------------------
     // TRANSIZIONI — log bonifici/stipendi PX (pubblico)
     // -------------------------------------------------------------------------
     case 'transizioni':
