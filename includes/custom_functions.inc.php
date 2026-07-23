@@ -1063,4 +1063,23 @@ function generateQuestRiassunto(int $id_role): string {
     return trim($result_data['content'][0]['text'] ?? '');
 }
 /************* FINE FORUM / QUEST ******************************/
+
+/**
+ * Filtro HTML permissivo: toglie solo i vettori di XSS reali (script,
+ * attributi on*, javascript:), a differenza di gdrcd_html_filter() che con
+ * $PARAMETERS['settings']['html'] = HTML_FILTER_HIGH blocca anche <img> e
+ * <iframe> sostituendoli con testo d'errore visibile ("Immagini non
+ * consentite"/"Frame non consentiti"). Per campi che storicamente venivano
+ * mostrati senza alcun filtro (es. contenuto affetti, echo diretto nel PHP
+ * legacy) l'obiettivo è restare compatibili con quel comportamento, non
+ * aggiungere restrizioni nuove — vedi affetto_get in api_scheda.php.
+ */
+function gdrcd_html_filter_permissivo(string $str): string {
+    $notAllowed = [
+        "#(<script.*?>.*?(<\/script>)?)#is"      => '',
+        "#( on[a-zA-Z]+=\"?'?[^\s\"']+'?\"?)#is" => '',
+        "#(javascript:[^\s\"']+)#is"              => '',
+    ];
+    return preg_replace(array_keys($notAllowed), array_values($notAllowed), $str);
+}
 ?>
