@@ -157,22 +157,22 @@ function CreaPng() {
             </div>
             <div className="gdr-form-group">
                 <label className="gdr-label">Destrezza</label>
-                <input className="gdr-input" type="number" min={1} max={20} value={newPng.destrezza}
+                <input className="gdr-input" type="number" value={newPng.destrezza}
                     onChange={e => setNewPng(f => ({ ...f, destrezza: +e.target.value }))} />
             </div>
             <div className="gdr-form-group">
                 <label className="gdr-label">Potere</label>
-                <input className="gdr-input" type="number" min={1} max={20} value={newPng.potere}
+                <input className="gdr-input" type="number" value={newPng.potere}
                     onChange={e => setNewPng(f => ({ ...f, potere: +e.target.value }))} />
             </div>
             <div className="gdr-form-group">
                 <label className="gdr-label">Mente</label>
-                <input className="gdr-input" type="number" min={1} max={20} value={newPng.mente}
+                <input className="gdr-input" type="number" value={newPng.mente}
                     onChange={e => setNewPng(f => ({ ...f, mente: +e.target.value }))} />
             </div>
             <div className="gdr-form-group">
                 <label className="gdr-label">Tempra</label>
-                <input className="gdr-input" type="number" min={1} max={20} value={newPng.tempra}
+                <input className="gdr-input" type="number" value={newPng.tempra}
                     onChange={e => setNewPng(f => ({ ...f, tempra: +e.target.value }))} />
             </div>
             <button className="gdr-button" onClick={createPng} disabled={creating}>

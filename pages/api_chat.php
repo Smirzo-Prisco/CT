@@ -1406,10 +1406,12 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             if (!$pngName) { echo json_encode(['success' => false, 'message' => 'Nome PNG mancante']); exit; }
 
             $pngSalute    = max(1, min(200, (int)($data['salute']    ?? 100)));
-            $pngDestrezza = max(1, min(20,  (int)($data['destrezza'] ?? 7)));
-            $pngPotere    = max(1, min(20,  (int)($data['potere']    ?? 7)));
-            $pngMente     = max(1, min(20,  (int)($data['mente']     ?? 7)));
-            $pngTempra    = max(1, min(20,  (int)($data['tempra']    ?? 7)));
+            // Le caratteristiche del PNG non hanno un tetto: il master deve poter creare
+            // sia png deboli che entità con statistiche ben oltre quelle di un pg normale.
+            $pngDestrezza = (int)($data['destrezza'] ?? 7);
+            $pngPotere    = (int)($data['potere']    ?? 7);
+            $pngMente     = (int)($data['mente']     ?? 7);
+            $pngTempra    = (int)($data['tempra']    ?? 7);
 
             // Se non c'è una role attiva nella stanza, ne apre una nuova
             if (!$id_role) {
