@@ -62,10 +62,11 @@ function renderTestoArticolo(string $testo): string {
     return $testo;
 }
 
-/** Estrae un estratto testuale pulito (niente tag BB/HTML) per la meta description. */
+/** Estrae un estratto testuale pulito (niente tag BB/HTML, alcuni articoli usano entrambi) per la meta description. */
 function estrattoDescrizione(string $testo, int $max = 155): string {
     $plain = str_replace(["\n", "\r"], ' ', $testo);
     $plain = preg_replace('#\[/?[A-Za-z]+\]#', '', $plain);
+    $plain = strip_tags($plain);
     $plain = trim(preg_replace('/\s+/', ' ', $plain));
     return mb_strlen($plain) > $max ? mb_substr($plain, 0, $max - 1) . '…' : $plain;
 }
