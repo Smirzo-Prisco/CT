@@ -933,6 +933,57 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // AFFETTO_CREATE — crea un nuovo affetto per il proprio personaggio (POST, own)
+    // -------------------------------------------------------------------------
+    case 'affetto_create':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Metodo non consentito']);
+            exit;
+        }
+        if (!$is_own) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Non autorizzato']);
+            exit;
+        }
+        $body = json_decode(file_get_contents('php://input'), true);
+        if (!$body) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Dati non validi']);
+            exit;
+        }
+
+        $nomePg     = trim($body['nomePg'] ?? '');
+        $titolo     = trim($body['titolo'] ?? '');
+        $tipologia  = $body['tipologia'] ?? '';
+        $contenuto  = trim($body['contenuto'] ?? '');
+        $avatar_raw = trim($body['avatar'] ?? '');
+
+        $tipologie_valide = ['legami', 'nemici', 'famiglia', 'conoscenze', 'memories'];
+        if ($nomePg === '' || $contenuto === '' || !in_array($tipologia, $tipologie_valide, true)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Personaggio, tipologia e dettaglio sono obbligatori']);
+            exit;
+        }
+
+        $avatar_safe = $avatar_raw !== '' ? gdrcd_filter('in', gdrcd_filter('fullurl', $avatar_raw)) : '';
+
+        gdrcd_query(sprintf(
+            "INSERT INTO struttura_affetti (username, nomePg, titolo, tipologia, avatar, contenuto)
+             VALUES ('%s', '%s', '%s', '%s', '%s', '%s')",
+            $pg,
+            gdrcd_filter('in', $nomePg),
+            gdrcd_filter('in', $titolo),
+            gdrcd_filter('in', $tipologia),
+            $avatar_safe,
+            gdrcd_filter('in', $contenuto)
+        ));
+        $new_id = (int)gdrcd_query('SELECT LAST_INSERT_ID() AS id')['id'];
+
+        echo json_encode(['success' => true, 'id' => $new_id]);
+        break;
+
+    // -------------------------------------------------------------------------
     // TRANSIZIONI — log bonifici/stipendi PX (pubblico)
     // -------------------------------------------------------------------------
     case 'transizioni':
