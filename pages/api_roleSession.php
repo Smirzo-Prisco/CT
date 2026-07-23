@@ -294,8 +294,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $res_pl = gdrcd_query("SELECT DISTINCT id_role, pg_name FROM role_session_players WHERE id_role IN ($all_ids)", 'result');
                 while ($r = gdrcd_query($res_pl, 'fetch')) $players_map[(int)$r['id_role']][] = $r['pg_name'];
 
+                // 'System' è il mittente sentinella usato per i messaggi automatici (es. avviso
+                // polizia in gestionePoliziaAutomatica(), tipo 'M' ma non un master reale) — va escluso.
                 $masters_map = [];
-                $res_ms = gdrcd_query("SELECT DISTINCT id_role, mittente FROM chat WHERE id_role IN ($all_ids) AND tipo IN ('M', 'I', 'Y') AND mittente IS NOT NULL AND mittente != ''", 'result');
+                $res_ms = gdrcd_query("SELECT DISTINCT id_role, mittente FROM chat WHERE id_role IN ($all_ids) AND tipo IN ('M', 'I', 'Y') AND mittente IS NOT NULL AND mittente NOT IN ('', 'System')", 'result');
                 while ($r = gdrcd_query($res_ms, 'fetch')) $masters_map[(int)$r['id_role']][] = $r['mittente'];
 
                 foreach ($roles as &$role) {
