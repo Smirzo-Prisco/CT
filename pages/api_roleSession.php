@@ -411,7 +411,12 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     && $msg['mittente'] !== $_SESSION['login']
                     && $msg['destinatario'] !== $_SESSION['login']) continue;
 
-                $testo = gdrcd_filter('out', $msg['testo']);
+                // Niente gdrcd_filter('out') qui: usa htmlentities e trasformerebbe in
+                // testo letterale l'HTML reale gia' presente in chat.testo (es. <i>/<u>
+                // dei messaggi di sistema per tiri/combattimento, vedi get_chat_messages
+                // in api_chat.php) invece di interpretarlo. gdrcd_html_filter toglie solo
+                // gli elementi pericolosi (script/iframe/on*), preservando l'HTML legittimo.
+                $testo = gdrcd_html_filter($msg['testo']);
 
                 // Colora il dialogo tra parentesi/capovolta
                 if (in_array($tipo, ['P', 'A', 'M', 'G', 'X'])) {
