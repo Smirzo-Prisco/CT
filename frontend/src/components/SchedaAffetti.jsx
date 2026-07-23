@@ -221,10 +221,11 @@ function AffettoDetail({ pg, id, canEdit, onEdit, onDeleted }) {
                 </div>
             </div>
 
-            {/* white-space: pre-line (vedi CSS) preserva gli a-capo scritti nel
-                testo — nella vecchia versione (span senza questa regola) il
-                contenuto multi-riga collassava visivamente su una sola riga. */}
-            <div className={styles.detailContenuto}>{data.contenuto}</div>
+            {/* contenuto arriva già passato da gdrcd_html_filter() lato server (HTML
+                legittimo interpretato, elementi pericolosi rimossi). white-space:
+                pre-line (vedi CSS) preserva anche gli a-capo digitati come testo
+                semplice, senza tag — la vecchia versione li collassava su una riga. */}
+            <div className={styles.detailContenuto} dangerouslySetInnerHTML={{ __html: data.contenuto }} />
 
             {canEdit && (
                 <div className={styles.formActions}>

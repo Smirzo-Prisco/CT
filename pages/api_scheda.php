@@ -1007,7 +1007,10 @@ switch ($op) {
                 'avatar'    => $row['avatar']    ?? '',
                 'titolo'    => $row['titolo']    ?? '',
                 'tipologia' => $row['tipologia'] ?? '',
-                'contenuto' => $row['contenuto'] ?? '',
+                // HTML interpretato (non escapato): gdrcd_html_filter toglie solo
+                // gli elementi pericolosi (script/iframe/on*), preservando la
+                // formattazione legittima — stesso pattern usato per role_log.
+                'contenuto' => gdrcd_html_filter($row['contenuto'] ?? ''),
             ],
             'can_edit' => $is_own,
         ]);
