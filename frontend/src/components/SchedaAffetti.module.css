@@ -1,4 +1,4 @@
-/* SchedaAffetti.module.css — layout due pannelli: sidebar tile + iframe dettaglio */
+/* SchedaAffetti.module.css — layout due pannelli: sidebar tile + pannello dettaglio/form */
 
 /* ── Layout principale ────────────────────────────────── */
 
@@ -117,17 +117,80 @@
 .detailPanel {
     flex: 1;
     min-width: 0;
+    min-height: 420px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
 }
 
-.iframe {
-    display: block;
-    width: 100%;
-    min-height: 420px;
-    border: none;
+.introMsg {
+    padding: 20px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* ── Vista dettaglio affetto ───────────────────────────── */
+
+.detailBody {
+    padding: 20px;
+}
+
+.detailHeader {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.detailAvatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.detailHeaderInfo { min-width: 0; }
+
+.detailNome {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.detailTitolo {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    margin-top: 2px;
+}
+
+.detailTipo {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: rgb(74 158 255 / 14%);
+    color: #4a9eff;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+/* Il testo viene inserito come pura area di testo (textarea), non HTML:
+   pre-line preserva gli a-capo digitati senza dover interpretare tag. */
+.detailContenuto {
+    color: var(--color-text);
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-line;
 }
 
 /* Mobile: colonna singola */

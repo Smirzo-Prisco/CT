@@ -7,19 +7,21 @@
  *
  * Layout due pannelli:
  *   Sinistra: sidebar con tile cliccabili raggruppate per tipo
- *   Destra:   iframe (dettaglio_affetto.php, legacy — mostra il contenuto di
- *             un affetto esistente) oppure il form nativo AffettoForm quando
- *             si clicca "Aggiungi affetto" (mode 'add').
+ *   Destra:   AffettoDetail (view + modifica/elimina per il proprietario)
+ *             oppure AffettoForm (creazione/modifica)
  *
- * Il vecchio form_affetto.php (tabelle HTML, CSS proprio, jQuery datato) è
- * stato sostituito da AffettoForm qui sotto per uniformarsi allo stile del
- * resto della SPA — solo la creazione, l'unico flusso raggiungibile dalla UI
- * (la modifica esisteva nel PHP legacy ma non era collegata a nessun bottone).
+ * Sostituisce interamente il vecchio iframe verso dettaglio_affetto.php /
+ * form_affetto.php / intro_affetto.php (tabelle HTML, CSS proprio,
+ * jQuery 1.11.2) con componenti nativi coerenti con lo stile del progetto.
+ * Modifica ed eliminazione esistevano già nel PHP legacy (nella tabella di
+ * gestione mostrata da intro_affetto.php quando non c'era nulla selezionato)
+ * ma erano visivamente scollegate dal resto della SPA — qui sono azioni
+ * dirette sul pannello di dettaglio.
  *
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useRef, Fragment } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import SchedaMenu from './SchedaMenu'
 import styles from './SchedaAffetti.module.css'
 
@@ -36,24 +38,22 @@ const TIPO_LABELS = {
 }
 
 const AVATAR_DEFAULT = '/themes/crystal/imgs/scheda/empy_affetti.png'
-const DETAIL_BASE    = '/pages/dettaglio_affetto.php'
-const INTRO_BASE     = '/pages/intro_affetto.php'
+const EMPTY_FORM = { nomePg: '', titolo: '', tipologia: 'legami', contenuto: '', avatar: '' }
 
 // ---------------------------------------------------------------------------
 // SOTTO-COMPONENTI
 // ---------------------------------------------------------------------------
 
-function AffettoTile({ entry, pg, selected, onClick }) {
+function AffettoTile({ entry, selected, onClick }) {
     const displayName = entry.nome
         ? `${entry.nome} ${entry.cognome}`
         : entry.nomePg
-    const detailUrl = `${DETAIL_BASE}?id=${entry.id}&username=${encodeURIComponent(pg)}&pg=${encodeURIComponent(entry.nomePg)}`
 
     return (
         <button
             type="button"
             className={`${styles.tile}${selected ? ` ${styles.tileSelected}` : ''}`}
-            onClick={() => onClick(detailUrl)}
+            onClick={() => onClick(entry.id)}
         >
             <img src={entry.avatar || AVATAR_DEFAULT} alt="" className={styles.tileAvatar} />
             <div className={styles.tileInfo}>
@@ -64,11 +64,12 @@ function AffettoTile({ entry, pg, selected, onClick }) {
     )
 }
 
-/** Form nativo di creazione affetto — sostituisce l'iframe form_affetto.php. */
-function AffettoForm({ pg, onCreated, onCancel }) {
-    const [form, setForm]       = useState({ nomePg: '', titolo: '', tipologia: 'legami', contenuto: '', avatar: '' })
-    const [saving, setSaving]   = useState(false)
-    const [error, setError]     = useState(null)
+/** Form nativo di creazione/modifica affetto — sostituisce l'iframe form_affetto.php. */
+function AffettoForm({ pg, initial, onSaved, onCancel }) {
+    const isEdit = !!initial
+    const [form, setForm]     = useState(initial ? { ...EMPTY_FORM, ...initial } : EMPTY_FORM)
+    const [saving, setSaving] = useState(false)
+    const [error, setError]   = useState(null)
 
     const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
 
@@ -80,16 +81,18 @@ function AffettoForm({ pg, onCreated, onCancel }) {
         }
         setSaving(true)
         setError(null)
-        fetch(`/pages/api_scheda.php?op=affetto_create&pg=${encodeURIComponent(pg)}`, {
+        const op   = isEdit ? 'affetto_update' : 'affetto_create'
+        const body = isEdit ? { ...form, id: initial.id } : form
+        fetch(`/pages/api_scheda.php?op=${op}&pg=${encodeURIComponent(pg)}`, {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(form),
+            body: JSON.stringify(body),
         })
             .then(r => r.json())
             .then(d => {
                 setSaving(false)
-                if (d.success) onCreated(d.id, form.nomePg)
+                if (d.success) onSaved(isEdit ? initial.id : d.id)
                 else setError(d.message ?? 'Errore durante il salvataggio')
             })
             .catch(() => { setSaving(false); setError('Errore di rete') })
@@ -97,7 +100,7 @@ function AffettoForm({ pg, onCreated, onCancel }) {
 
     return (
         <form className={styles.form} onSubmit={handleSubmit}>
-            <h3 className={styles.formTitle}>Aggiungi affetto</h3>
+            <h3 className={styles.formTitle}>{isEdit ? 'Modifica affetto' : 'Aggiungi affetto'}</h3>
 
             <div className={styles.formGroup}>
                 <label htmlFor="affetto-nomePg">Personaggio</label>
@@ -162,10 +165,78 @@ function AffettoForm({ pg, onCreated, onCancel }) {
                     Annulla
                 </button>
                 <button type="submit" className="btn btn--primary" disabled={saving}>
-                    {saving ? 'Salvataggio…' : 'Inserisci'}
+                    {saving ? 'Salvataggio…' : (isEdit ? 'Salva modifiche' : 'Inserisci')}
                 </button>
             </div>
         </form>
+    )
+}
+
+/** Vista di un affetto esistente — sostituisce l'iframe dettaglio_affetto.php. */
+function AffettoDetail({ pg, id, canEdit, onEdit, onDeleted }) {
+    const [data, setData]         = useState(null)
+    const [error, setError]       = useState(null)
+    const [deleting, setDeleting] = useState(false)
+
+    useEffect(() => {
+        setData(null)
+        setError(null)
+        fetch(`/pages/api_scheda.php?op=affetto_get&pg=${encodeURIComponent(pg)}&id=${id}`)
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) setData(d.affetto)
+                else setError(d.message ?? 'Affetto non trovato')
+            })
+            .catch(() => setError('Errore di rete'))
+    }, [pg, id])
+
+    const handleDelete = () => {
+        if (!window.confirm('Eliminare questo affetto?')) return
+        setDeleting(true)
+        fetch(`/pages/api_scheda.php?op=affetto_delete&pg=${encodeURIComponent(pg)}`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+        })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) onDeleted()
+                else { setDeleting(false); setError(d.message ?? 'Errore durante l\'eliminazione') }
+            })
+            .catch(() => { setDeleting(false); setError('Errore di rete') })
+    }
+
+    if (error) return <div className={styles.detailBody}><div className={styles.formError}>{error}</div></div>
+    if (!data) return <div className={styles.detailBody}>Caricamento…</div>
+
+    return (
+        <div className={styles.detailBody}>
+            <div className={styles.detailHeader}>
+                <img src={data.avatar || AVATAR_DEFAULT} alt="" className={styles.detailAvatar} />
+                <div className={styles.detailHeaderInfo}>
+                    <div className={styles.detailNome}>{data.nomePg}</div>
+                    {data.titolo && <div className={styles.detailTitolo}>{data.titolo}</div>}
+                    <div className={styles.detailTipo}>{TIPO_LABELS[data.tipologia] ?? data.tipologia}</div>
+                </div>
+            </div>
+
+            {/* white-space: pre-line (vedi CSS) preserva gli a-capo scritti nel
+                testo — nella vecchia versione (span senza questa regola) il
+                contenuto multi-riga collassava visivamente su una sola riga. */}
+            <div className={styles.detailContenuto}>{data.contenuto}</div>
+
+            {canEdit && (
+                <div className={styles.formActions}>
+                    <button type="button" className="btn btn--danger" onClick={handleDelete} disabled={deleting}>
+                        {deleting ? 'Eliminazione…' : 'Elimina'}
+                    </button>
+                    <button type="button" className="btn btn--secondary" onClick={() => onEdit(data)}>
+                        Modifica
+                    </button>
+                </div>
+            )}
+        </div>
     )
 }
 
@@ -176,14 +247,13 @@ function AffettoForm({ pg, onCreated, onCancel }) {
 export default function SchedaAffetti() {
     const pg = new URLSearchParams(window.location.search).get('pg') ?? ''
 
-    const [profile,   setProfile]   = useState(null)
-    const [affetti,   setAffetti]   = useState(null)
-    const [canAdd,    setCanAdd]    = useState(false)
-    const [iframeSrc, setIframeSrc] = useState('')
-    const [selected,  setSelected]  = useState(null)
-    const [mode,      setMode]      = useState('detail') // 'detail' | 'add'
-    const [error,     setError]     = useState(null)
-    const iframeRef = useRef(null)
+    const [profile,     setProfile]     = useState(null)
+    const [affetti,     setAffetti]     = useState(null)
+    const [canAdd,      setCanAdd]      = useState(false)
+    const [selected,    setSelected]    = useState(null)
+    const [mode,        setMode]        = useState('intro') // 'intro' | 'detail' | 'add' | 'edit'
+    const [editInitial, setEditInitial] = useState(null)
+    const [error,       setError]       = useState(null)
 
     const loadAffetti = () => {
         const enc = encodeURIComponent(pg)
@@ -203,13 +273,11 @@ export default function SchedaAffetti() {
         ]).then(([prof]) => {
             if (prof.success) setProfile(prof)
             else              setError(prof.message ?? 'Errore profilo')
-            setIframeSrc(`${INTRO_BASE}?username=${enc}`)
         }).catch(e => setError(e.message ?? 'Errore di rete'))
     }, [pg])
 
-    const openDetail = (url, id) => {
+    const openDetail = (id) => {
         setMode('detail')
-        setIframeSrc(url)
         setSelected(id)
     }
 
@@ -218,14 +286,20 @@ export default function SchedaAffetti() {
         setSelected(null)
     }
 
-    const handleCreated = (newId, nomePg) => {
-        loadAffetti().then(() => {
-            const detailUrl = `${DETAIL_BASE}?id=${newId}&username=${encodeURIComponent(pg)}&pg=${encodeURIComponent(nomePg)}`
-            openDetail(detailUrl, newId)
-        })
+    const openEditForm = (data) => {
+        setMode('edit')
+        setEditInitial(data)
     }
 
-    if (error)              return <div className="pagina_scheda"><div className="error">{error}</div></div>
+    const handleSaved = (id) => {
+        loadAffetti().then(() => openDetail(id))
+    }
+
+    const handleDeleted = () => {
+        loadAffetti().then(() => { setMode('intro'); setSelected(null) })
+    }
+
+    if (error)                return <div className="pagina_scheda"><div className="error">{error}</div></div>
     if (!profile || !affetti) return <div className="pagina_scheda"><div>Caricamento…</div></div>
 
     const { nome, cognome, is_own, is_admin, is_staff, is_master } = profile
@@ -266,9 +340,8 @@ export default function SchedaAffetti() {
                                     <AffettoTile
                                         key={entry.id}
                                         entry={entry}
-                                        pg={pg}
-                                        selected={selected === entry.id}
-                                        onClick={url => openDetail(url, entry.id)}
+                                        selected={mode === 'detail' && selected === entry.id}
+                                        onClick={openDetail}
                                     />
                                 ))}
                             </Fragment>
@@ -288,27 +361,36 @@ export default function SchedaAffetti() {
 
                     {/* ── Pannello dettaglio ───────────────────────────── */}
                     <div className={styles.detailPanel}>
-                        {mode === 'add' ? (
+                        {mode === 'add' && (
                             <AffettoForm
                                 pg={pg}
-                                onCreated={handleCreated}
+                                onSaved={handleSaved}
+                                onCancel={() => setMode(selected ? 'detail' : 'intro')}
+                            />
+                        )}
+                        {mode === 'edit' && (
+                            <AffettoForm
+                                pg={pg}
+                                initial={editInitial}
+                                onSaved={handleSaved}
                                 onCancel={() => setMode('detail')}
                             />
-                        ) : (
-                            <iframe
-                                ref={iframeRef}
-                                src={iframeSrc}
-                                allowTransparency="true"
-                                frameBorder="0"
-                                className={styles.iframe}
-                                title="Dettaglio affetto"
-                                onLoad={() => {
-                                    try {
-                                        const h = iframeRef.current?.contentWindow?.document?.body?.scrollHeight
-                                        if (h > 420) iframeRef.current.style.height = h + 'px'
-                                    } catch {}
-                                }}
+                        )}
+                        {mode === 'detail' && selected && (
+                            <AffettoDetail
+                                pg={pg}
+                                id={selected}
+                                canEdit={is_own}
+                                onEdit={openEditForm}
+                                onDeleted={handleDeleted}
                             />
+                        )}
+                        {mode === 'intro' && (
+                            <div className={styles.introMsg}>
+                                {tipiConAffetti.length > 0
+                                    ? 'Seleziona un affetto dalla lista per leggerlo.'
+                                    : 'Nessun affetto da mostrare.'}
+                            </div>
                         )}
                     </div>
 
