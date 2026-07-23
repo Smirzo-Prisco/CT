@@ -16,4 +16,10 @@ Disallow: /giocate/
 Disallow: /nodeserver/
 Disallow: /public/
 
+# Frammento HTML puro per fetch AJAX (menu di documentazione_main.php e componente
+# React in gioco), niente title/meta propri: da non indicizzare come pagina a se'.
+# Gli articoli hanno ora un URL proprio, completo di SEO, in documentazione_main.php?articolo=N.
+Disallow: /documentazione_testo.php
+
 Sitemap: https://crystaltokyo.it/sitemap.xml
+Sitemap: https://crystaltokyo.it/sitemap-documentazione.php
