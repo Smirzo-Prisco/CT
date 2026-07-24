@@ -200,9 +200,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             gestionePoliziaAutomatica($luogo); // Gestione della polizia automatica
             gestisciSkillTemporanea($skill, $login); // Gestisci le skill temporanee
             /**************************** FINE  AZIONI   ************************************************/
-            
-            // Aggiorna la salute del personaggio se la skill lanciata non è un talento
-            if($car != 'talento') gdrcd_query("UPDATE personaggio SET salute = salute-1 WHERE nome = '$login'");
 
             // Qualsiasi lancio (attacco, scudo, talento) chiude automaticamente il turno.
             if ($id_role) checkTurnEnd($luogo, $login, $id_role);
