@@ -1876,7 +1876,12 @@ function getDefenceCar($attack_car, $target) {
     }
     
 
-    switch($attack_car) {
+    // $attack_car arriva minuscolo da alcuni punti del codice ma nel caso normale
+    // (Attacco/Mentale) e' il nome configurato in $PARAMETERS['names']['stats']
+    // (es. "Potere", "Destrezza"), quindi confrontato senza normalizzare non
+    // corrispondeva mai: la difesa risultava sempre null (parentesi vuote nel
+    // messaggio, bonus -1 spurio da "null - 1").
+    switch(strtolower($attack_car)) {
         /* In caso l'attacco sia stato fatto con forza, destrezza o potere, la difesa avviene con destrezza,
         prelevo i punti del bersaglio su destrezza e i suoi punti salute */
         case 'forza':
