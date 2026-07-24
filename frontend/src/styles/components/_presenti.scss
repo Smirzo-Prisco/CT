@@ -75,6 +75,11 @@ tr.presente.pg-morto img {
     filter: grayscale(100%);
 }
 
+// Angoli smussati sull'avatar del personaggio (non sulle icone sms/razza/stato)
+.presenti-avatar {
+    border-radius: $radius-md;
+}
+
 .pg-morto-icon {
     margin-right: 4px;
     vertical-align: middle;
