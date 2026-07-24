@@ -404,6 +404,17 @@ function loadYoutubeApi() {
  * libreria sostituisce quel nodo con l'iframe reale al di fuori di React.
  * Il player resta vivo tra un brano e l'altro (loadVideoById), così il mute
  * locale del giocatore non viene perso ai cambi/stop imposti dal master.
+ *
+ * Il div target va in un portal su un nodo dedicato fuori dall'albero React
+ * (non semplicemente reso come fratello di quest-audio-bar nello stesso
+ * Fragment): l'IFrame API sostituisce quel div con un <iframe> reale, e se
+ * restasse fratello di un elemento che React aggiorna (quest-audio-bar cambia
+ * ad ogni tick di title/muted), il primo re-render successivo tenta un
+ * insertBefore relativo a un nodo che non e' piu' figlio del genitore atteso
+ * -> "NotFoundError: insertBefore... not a child of this node", che manda in
+ * crash l'intero render tree (ChatViewer compreso) finche' non si ricarica
+ * la pagina. Isolandolo in un host dedicato, i suoi aggiornamenti non toccano
+ * mai più quel nodo.
  */
 function QuestAudioWidget({ videoId, startedAt }) {
     const containerRef = useRef(null)
@@ -411,6 +422,19 @@ function QuestAudioWidget({ videoId, startedAt }) {
     const mutedRef = useRef(localStorage.getItem('ct_quest_audio_muted') === '1')
     const [muted, setMuted] = useState(mutedRef.current)
     const [title, setTitle] = useState('')
+
+    // Host dedicato per il portal, creato una volta sola e mai più toccato da React.
+    const portalHostRef = useRef(null)
+    if (!portalHostRef.current && typeof document !== 'undefined') {
+        portalHostRef.current = document.createElement('div')
+    }
+
+    useEffect(() => {
+        const host = portalHostRef.current
+        if (!host) return
+        document.body.appendChild(host)
+        return () => { document.body.removeChild(host) }
+    }, [])
 
     useEffect(() => {
         if (!videoId) {
@@ -470,7 +494,10 @@ function QuestAudioWidget({ videoId, startedAt }) {
 
     return (
         <>
-            <div ref={containerRef} style={{ position: 'fixed', width: 1, height: 1, top: '-100px', left: '-100px', opacity: 0, pointerEvents: 'none' }} />
+            {portalHostRef.current && createPortal(
+                <div ref={containerRef} style={{ position: 'fixed', width: 1, height: 1, top: '-100px', left: '-100px', opacity: 0, pointerEvents: 'none' }} />,
+                portalHostRef.current
+            )}
             {videoId && (
                 <div className="quest-audio-bar">
                     <span className="quest-audio-bar__icon">🎵</span>
