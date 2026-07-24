@@ -44,7 +44,10 @@ $json_ld = [
 
 /* ── <head> ──────────────────────────────────────────────────────────────── */
 public_head(
-    'Il Gioco',
+    // "Il Gioco" da solo non conteneva nessuna delle parole chiave generiche
+    // (Search Console: zero impressioni su "gdr play by chat" e varianti),
+    // nonostante questa sia la pagina con più contenuto testuale sul tema.
+    'Il Gioco: Cos\'è un GDR Play by Chat',
     'Scopri Crystal Tokyo GDR: un GDR play by chat gratuito, attivo da oltre vent\'anni, in una Tokyo futuristica dove tecnologia e magia convivono.',
     'https://crystaltokyo.it/il-gioco',
     'https://crystaltokyo.it/themes/crystal/imgs/homepage.png',
