@@ -503,7 +503,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode([
                 'success'               => true,
                 'location'              => getRoleLocationName($id_role),
-                'partecipanti'          => getRolePgs($id_role, false),
+                'partecipanti'          => getRolePgs($id_role, false, true), // esclude i png: punti solo ai pg reali
                 'quest_recap_thread_id' => $recap_thread_id > 0 ? $recap_thread_id : null,
             ]);
             break;
@@ -530,6 +530,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $note      = trim($data['note']        ?? '');
             $valu      = trim($data['valutazioni'] ?? '');
             $pg_punti  = is_array($data['partecipanti_punti'] ?? null) ? $data['partecipanti_punti'] : [];
+            // Non fidarsi del client: tiene solo i pg reali della giocata, escludendo i png
+            // anche se qualcuno arrivasse comunque nel payload inviato.
+            $pg_reali_punti = getRolePgs($id_role, false, true);
+            $pg_punti  = array_values(array_filter($pg_punti, fn($p) => in_array($p['nome'] ?? '', $pg_reali_punti, true)));
 
             if ($titolo === '') { echo json_encode(['success' => false, 'message' => 'Titolo mancante']); break; }
 
