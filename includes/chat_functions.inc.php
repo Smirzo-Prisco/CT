@@ -1923,10 +1923,11 @@ function setCanSend($id_role) {
 }
 
 // Recupera i personaggi di una role
-function getRolePgs($id_role, $active = false) {
+function getRolePgs($id_role, $active = false, $excludePng = false) {
     $users = [];
     $activePgs = $active ? "AND `end` IS NULL" : ''; // Se voglio solo i pg attivi, aggiungo al filtro "end is null" per escludere quelli usciti dalla role
-    $result = gdrcd_query("SELECT DISTINCT pg_name FROM role_session_players WHERE id_role = $id_role $activePgs", 'result');
+    $pngFilter = $excludePng ? "AND png = 0" : ''; // Esclude i png: solo pg reali
+    $result = gdrcd_query("SELECT DISTINCT pg_name FROM role_session_players WHERE id_role = $id_role $activePgs $pngFilter", 'result');
 
     while($row = gdrcd_query($result, 'fetch')) $users[] = $row['pg_name'];
 
