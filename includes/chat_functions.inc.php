@@ -862,19 +862,21 @@ function addPgToRole($id_role, $pg_name, $location, $png = 0) {
 }
 
 // Controlla se il personaggio ha role attive non congelate
-function pgIsInRole($userName = '', $location = null, $active = true) {
+function pgIsInRole($userName = '', $location = null, $active = true, $excludePng = false) {
     $user_filter = $userName != '' ? "AND role_session_players.pg_name = '$userName' " : ''; // Cerco lo specifico pg in role
     $location_filter = $location ? "AND role_sessions.location = $location" : ''; // Cerco nella role della chat
     $active_filter = $active ? "AND role_session_players.end IS NULL " : ''; // Cerco pg che non sono usciti dalla role (di default)
-    
+    $png_filter = $excludePng ? "AND role_session_players.png = 0 " : ''; // Esclude i png: solo pg reali
+
     // Seleziono tutti i pg in role
-    $result = gdrcd_query("SELECT role_session_players.* FROM role_session_players 
-                            INNER JOIN role_sessions ON role_session_players.id_role = role_sessions.id_role 
-                            WHERE role_sessions.end IS NULL 
-                            AND role_sessions.freezed IS NULL  
+    $result = gdrcd_query("SELECT role_session_players.* FROM role_session_players
+                            INNER JOIN role_sessions ON role_session_players.id_role = role_sessions.id_role
+                            WHERE role_sessions.end IS NULL
+                            AND role_sessions.freezed IS NULL
                             $user_filter
                             $location_filter
-                            $active_filter", 'result');
+                            $active_filter
+                            $png_filter", 'result');
 
     if ($result && gdrcd_query($result, 'num_rows') > 0) return true;
     

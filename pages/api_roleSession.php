@@ -76,7 +76,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             if ($pgIsInRole && gdrcd_query($set_end)) {
                 chatInsertMessage($_SESSION['luogo'], 'System', $user, " ha abbandonato la role", 'N');
 
-                if(!pgIsInRole('', $_SESSION['luogo'], true)) endRoleSession($_SESSION['luogo']); // Se sono usciti tutti i pg, chiudo la role
+                // Chiudo la role appena non restano pg reali, senza aspettare che i png
+                // vengano espulsi uno per uno: endRoleSession() li elimina comunque.
+                if(!pgIsInRole('', $_SESSION['luogo'], true, true)) endRoleSession($_SESSION['luogo']);
 
                 checkTurnEnd($_SESSION['luogo'], $user, $id_role); // Controllo se i pg rimasti hanno tutti già azionato nel turno, così propongo la chiusura
 
