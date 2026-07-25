@@ -1017,15 +1017,21 @@ function generateQuestRiassunto(int $id_role): string {
 
     $system = "Sei un narratore che riassume le azioni di una giocata di ruolo (GDR) a partire dalle "
             . "azioni testuali del master. Scrivi un riassunto narrativo in italiano, chiaro e scorrevole, "
-            . "che copra gli eventi principali nell'ordine in cui sono accaduti. Non inventare eventi non "
-            . "presenti nel testo fornito. Il testo verrà pubblicato in un forum che interpreta il BBCode, "
-            . "non il Markdown: per la formattazione usa ESCLUSIVAMENTE tag BBCode (es. [b]testo[/b] per il "
-            . "grassetto, [i]testo[/i] per il corsivo, [u]testo[/u] per il sottolineato) — non usare mai gli "
-            . "asterischi ** o * tipici del Markdown.";
+            . "che copra TUTTI gli eventi principali nell'ordine in cui sono accaduti, anche se le azioni "
+            . "fornite sono molte: non troncare né tralasciare eventi per stare corto, piuttosto scrivi in "
+            . "modo più sintetico frase per frase. Non inventare eventi non presenti nel testo fornito. Il "
+            . "testo verrà pubblicato in un forum che interpreta il BBCode, non il Markdown: per la "
+            . "formattazione usa ESCLUSIVAMENTE tag BBCode (es. [b]testo[/b] per il grassetto, [i]testo[/i] "
+            . "per il corsivo, [u]testo[/u] per il sottolineato) — non usare mai gli asterischi ** o * "
+            . "tipici del Markdown.";
 
     $payload = json_encode([
         'model'      => 'claude-haiku-4-5-20251001',
-        'max_tokens' => 800,
+        // 800 tagliava a meta' il riassunto nelle quest con molte azioni master: il
+        // modello si fermava esattamente al limite di token, a prescindere da dove
+        // fosse arrivato nel racconto. Alzato con margine ampio: resta comunque un
+        // riassunto (vedi system prompt), non una trascrizione integrale.
+        'max_tokens' => 4000,
         'system'     => $system,
         'messages'   => [
             ['role' => 'user', 'content' => implode("\n\n", $azioni)],
