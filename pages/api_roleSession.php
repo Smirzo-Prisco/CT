@@ -195,6 +195,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             exit;
         case 'getRoleParticipants':
             if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false]); break; }
+            // Solo lettura: richiude subito il lock di sessione, non serve tenerlo
+            // per tutta la query (vedi getPgAllRoles per lo stesso ragionamento).
+            session_write_close();
             $res_pgs = gdrcd_query("
                 SELECT DISTINCT rsp.pg_name,
                        CASE WHEN COALESCE(p.id_gilda, 0) > 0 THEN p.id_gilda ELSE 0 END        AS id_gilda,
@@ -216,6 +219,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
 
         case 'getPgAllRoles':
+            // Solo lettura di $_SESSION: richiude subito il lock, non serve tenerlo per
+            // tutte le query di questo case (era una delle chiamate piu' lunghe della
+            // pagina, e teneva bloccate tutte le altre richieste sulla stessa sessione).
+            session_write_close();
             ensureQuestSchema();
             $is_staff    = isAdminMasterMod($_SESSION);
             $login_f     = gdrcd_filter('in', $_SESSION['login']);

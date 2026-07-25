@@ -23,8 +23,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
     switch ($_GET['op']) {
         //  GLOBALI
         case 'getPresentiOnline':
-            session_start();
-
+            // $_SESSION resta leggibile dopo il session_write_close() iniziale (riga 17):
+            // qui si legge soltanto, non serve riaprire e bloccare di nuovo la sessione.
             if (!isset($_SESSION['login'])) {
                 echo json_encode(['error' => 'Non autorizzato']);
                 exit();
@@ -236,6 +236,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             // Inizializza variabile per messaggi istantanei
             if (empty($_SESSION['last_istant_message'])) $_SESSION['last_istant_message'] = 0;
+            // Richiude subito: il resto del case legge solo, non serve tenere il lock di
+            // sessione per tutte le query sotto (con molte chiamate concorrenti sulla
+            // stessa sessione, ognuna che tiene il lock si mette in coda dietro le altre).
+            session_write_close();
 
             $login = gdrcd_filter('in', $_SESSION['login']);
 
@@ -281,8 +285,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             break;
         case 'getChatOff': // Recupero i messaggi della chat off
-            session_start();
-
+            // Solo lettura, $_SESSION resta disponibile dopo il write_close iniziale.
             $hasNewMessage = gdrcd_query("SELECT COUNT(*) AS presenza FROM chat_letta WHERE nome ='".$_SESSION['login']."'")['presenza'] == 0 ? false : true;
 
             echo json_encode(array(
@@ -470,8 +473,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             break;
         case 'getPuntiPg': // Recupero le statistiche del pg
-            session_start();
-
+            // Solo lettura, $_SESSION resta disponibile dopo il write_close iniziale.
             $pg = gdrcd_query("SELECT * FROM personaggio WHERE nome = '".gdrcd_filter('in', $_SESSION['login'])."'"); // prendo le informazioni del personaggio
             $tot_stats = getTotStatsPg($pg['nome']); // Somma totale delle statistiche (definisce il livello)
             $tot_shin_assegnati = $pg['car1'] + $pg['car3'] + $pg['car5'] + $pg['car7'] + $pg['car9'] + $pg['punto_skill']; // Punti shin assegnati alle statistiche e alle skill
@@ -527,8 +529,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             ));
             break;
         case 'savePuntiPg': // Salvo le statistiche del pg
-            session_start();
-
+            // Solo lettura di $_SESSION (le scritture vanno tutte a DB): resta disponibile
+            // dopo il write_close iniziale, non serve riaprire la sessione.
             $setParts = [
                 "esperienza_r = ".$data['xpDisponibili'],
                 "shin = ".$data['shinDisponibili']
@@ -581,8 +583,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             exit;
         case 'getSkillPg': // Recupero le skill del pg
-            session_start();
-
+            // Solo lettura, $_SESSION resta disponibile dopo il write_close iniziale.
             $pg_name = gdrcd_filter('in', $_SESSION['login']);
             $skillRes = [];
             $pg_shin = 0;
@@ -645,8 +646,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             exit;
             break;
         case 'saveSkillPg': // Salvo le skill del pg
-            session_start();
-
+            // Solo lettura di $_SESSION (le scritture vanno tutte a DB): resta disponibile
+            // dopo il write_close iniziale, non serve riaprire la sessione.
             try {
                 $pg_name = gdrcd_filter('in', $_SESSION['login']);
                 $pg = gdrcd_query("SELECT * FROM personaggio WHERE nome = '$pg_name'"); // Recupoero i dati del pg
@@ -1164,7 +1165,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         // davvero un trigger che lo produce.
         // -------------------------------------------------------------------------
         case 'getNotificationPrefs':
-            session_start();
+            // Solo lettura, $_SESSION resta disponibile dopo il write_close iniziale.
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
             $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta', 'calendario_nuovo_impegno'];
@@ -1187,7 +1188,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
 
         case 'saveNotificationPrefs':
-            session_start();
+            // Solo lettura di $_SESSION (le scritture vanno tutte a DB): resta disponibile
+            // dopo il write_close iniziale, non serve riaprire la sessione.
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
             $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta', 'calendario_nuovo_impegno'];
@@ -1213,7 +1215,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         // OnboardingTour.jsx e migrations/2026_07_20_onboarding.sql.
         // -------------------------------------------------------------------------
         case 'getOnboardingStatus':
-            session_start();
+            // Solo lettura, $_SESSION resta disponibile dopo il write_close iniziale.
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
             $row = gdrcd_query("SELECT onboarding_visto FROM personaggio WHERE nome = '$login_f' LIMIT 1");
@@ -1221,7 +1223,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
 
         case 'setOnboardingDone':
-            session_start();
+            // Solo lettura di $_SESSION (la scrittura va a DB): resta disponibile dopo il
+            // write_close iniziale, non serve riaprire la sessione.
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
             gdrcd_query("UPDATE personaggio SET onboarding_visto = 1 WHERE nome = '$login_f'");
