@@ -24,6 +24,9 @@ if (empty($_SESSION['login'])) {
     echo json_encode(['success' => false, 'message' => 'Non autenticato']);
     exit;
 }
+// Nessun punto di questo file scrive in $_SESSION: richiude subito il lock invece
+// di tenerlo per tutta la chiamata a Claude (op=ask puo' durare secondi).
+session_write_close();
 
 $op               = $_GET['op'] ?? '';
 $nome             = gdrcd_filter('in', $_SESSION['login']);

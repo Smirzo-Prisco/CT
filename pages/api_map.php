@@ -21,6 +21,10 @@ switch ($op) {
     // CURRENT — info sulla posizione corrente del personaggio
     // -------------------------------------------------------------------------
     case 'current':
+        // Solo lettura: richiude subito la sessione invece di tenerla bloccata per
+        // tutta la query, cosi' le altre chiamate concorrenti sulla stessa sessione
+        // (HUD, meteo, ecc.) non restano in coda dietro il lock.
+        session_write_close();
         $luogo = (int)$_SESSION['luogo'];
         $mappa = (int)$_SESSION['mappa'];
         $isNotte = (date("G") >= 18 || date("G") <= 6);
@@ -405,6 +409,10 @@ switch ($op) {
     // PRESENTI — utenti nella stessa stanza + heartbeat ultimo_refresh
     // -------------------------------------------------------------------------
     case 'presenti':
+        // Solo lettura di $_SESSION (l'UPDATE sotto e' su personaggio, non sulla
+        // sessione): richiude subito per non tenere bloccate le altre chiamate
+        // concorrenti sulla stessa sessione.
+        session_write_close();
         $login   = gdrcd_filter('in', $_SESSION['login']);
         $is_staff = ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1 || $_SESSION['master'] == 1);
 
