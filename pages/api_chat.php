@@ -2008,12 +2008,36 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $luogo   = (int)$_SESSION['luogo'];
             $id_role = locationActiveRole($luogo);
             if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
             // La condizione is_quest = 0 rende l'operazione idempotente: una volta attivata,
-            // non esiste alcun endpoint per disattivarla (irreversibile per design).
-            gdrcd_query("UPDATE role_sessions SET is_quest = 1 WHERE id_role = $id_role AND is_quest = 0");
+            // non esiste alcun endpoint per disattivarla (irreversibile per design). Traccia
+            // anche il master (chi attiva la quest è quasi certamente lui), senza sovrascrivere
+            // un master già impostato da startQuest.
+            gdrcd_query("UPDATE role_sessions SET is_quest = 1, master = COALESCE(master, '$login_f') WHERE id_role = $id_role AND is_quest = 0");
             notifySocketServer('quest:activated', 'loc:' . $luogo, []);
             chatInsertMessage($luogo, 'System', null, 'Il Master ha contrassegnato questa giocata come Quest!', 'N');
             echo json_encode(['success' => true, 'is_quest' => true]);
+            break;
+
+        case 'startQuest':  // Staff: avvia una nuova quest direttamente, senza attendere che un pg si unisca
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            ensureQuestSchema();
+            $luogo = (int)$_SESSION['luogo'];
+            if (locationActiveRole($luogo)) {
+                echo json_encode(['success' => false, 'message' => "C'è già una giocata in corso in questa stanza"]);
+                exit;
+            }
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+            gdrcd_query("INSERT INTO role_sessions (`location`, `start`, is_quest, master) VALUES ($luogo, NOW(), 1, '$login_f')");
+            $id_role = (int)gdrcd_query("SELECT LAST_INSERT_ID() AS id")['id'];
+
+            // Notifica tutti i client nella stanza: TargetSelector.jsx e il badge pannello
+            // giocata ascoltano 'role:update' per aggiornarsi in tempo reale.
+            notifySocketServer('role:update', 'loc:' . $luogo);
+            notifySocketServer('quest:activated', 'loc:' . $luogo, []);
+            chatInsertMessage($luogo, 'System', null, 'Il Master ha avviato una nuova Quest!', 'N');
+
+            echo json_encode(['success' => true, 'id_role' => $id_role]);
             break;
 
         case 'setQuestTimer':

@@ -381,7 +381,7 @@ function AttacchiPngSospeso() {
 
 // ── QuestPanel ────────────────────────────────────────────────────────────────
 
-function QuestPanel({ questState, luogo }) {
+function QuestPanel({ questState, luogo, roleActive }) {
     const [mins, setMins]       = useState(0)
     const [secs, setSecs]       = useState(30)
     const [timeLeft, setTimeLeft] = useState(null)
@@ -393,6 +393,8 @@ function QuestPanel({ questState, luogo }) {
     const [audioMsg, setAudioMsg]       = useState('')
     const [activating, setActivating]   = useState(false)
     const [activateMsg, setActivateMsg] = useState('')
+    const [starting, setStarting]       = useState(false)
+    const [startMsg, setStartMsg]       = useState('')
 
     // Finché la quest non è attiva, tutti i campi/pulsanti del tab restano disabilitati:
     // si abilitano solo dopo l'attivazione, che è irreversibile e richiede una giocata in corso.
@@ -406,6 +408,19 @@ function QuestPanel({ questState, luogo }) {
             .then(d => { if (!d.success) setActivateMsg(d.message ?? 'Errore') })
             .catch(() => setActivateMsg('Errore di rete'))
             .finally(() => setActivating(false))
+    }
+
+    // Avvia una quest da zero, senza che un pg si sia unito prima: crea direttamente
+    // la giocata gia' contrassegnata come Quest e col master tracciato (role:update
+    // fa comparire il pannello giocata a tutti i presenti nella stanza).
+    function startQuest() {
+        setStarting(true)
+        setStartMsg('')
+        fetch('/pages/api_chat.php?op=startQuest', { method: 'POST' })
+            .then(r => r.json())
+            .then(d => { if (!d.success) setStartMsg(d.message ?? 'Errore') })
+            .catch(() => setStartMsg('Errore di rete'))
+            .finally(() => setStarting(false))
     }
 
     // Countdown locale
@@ -521,24 +536,40 @@ function QuestPanel({ questState, luogo }) {
 
     return (
         <div className="gdr-grid">
-            {/* Attivazione Quest — sblocca il resto del tab, irreversibile */}
-            <div className="gdr-card" style={{ gridColumn: '1 / -1' }}>
-                <div className="gdr-card-title">Attiva Quest</div>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: questState.isQuest ? 'default' : 'pointer' }}>
-                    <input
-                        type="checkbox"
-                        checked={questState.isQuest}
-                        disabled={questState.isQuest || activating}
-                        onChange={attivaQuest}
-                    />
-                    <span style={{ fontSize: '13px', color: '#b4b6bf' }}>
-                        {questState.isQuest
-                            ? 'Quest attiva — non è più possibile disattivarla su questa giocata.'
-                            : 'Contrassegna questa giocata come Quest e abilita i controlli sotto (richiede una giocata in corso).'}
-                    </span>
-                </label>
-                {activateMsg && <p style={{ color: '#ef5350', fontSize: '12px', marginTop: '6px' }}>{activateMsg}</p>}
-            </div>
+            {!roleActive ? (
+                /* Nessuna giocata in corso: la si avvia direttamente come Quest,
+                   senza dover aspettare che un pg si unisca per primo. */
+                <div className="gdr-card" style={{ gridColumn: '1 / -1' }}>
+                    <div className="gdr-card-title">Avvia Quest</div>
+                    <p style={{ fontSize: '13px', color: '#b4b6bf', marginBottom: '10px' }}>
+                        Nessuna giocata in corso in questa stanza. Avviandola direttamente come Quest,
+                        i pg che si uniranno dopo la troveranno già pronta.
+                    </p>
+                    <button className="gdr-button" onClick={startQuest} disabled={starting}>
+                        {starting ? 'Avvio…' : 'Avvia Quest'}
+                    </button>
+                    {startMsg && <p style={{ color: '#ef5350', fontSize: '12px', marginTop: '6px' }}>{startMsg}</p>}
+                </div>
+            ) : (
+                /* Attivazione Quest — sblocca il resto del tab, irreversibile */
+                <div className="gdr-card" style={{ gridColumn: '1 / -1' }}>
+                    <div className="gdr-card-title">Attiva Quest</div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: questState.isQuest ? 'default' : 'pointer' }}>
+                        <input
+                            type="checkbox"
+                            checked={questState.isQuest}
+                            disabled={questState.isQuest || activating}
+                            onChange={attivaQuest}
+                        />
+                        <span style={{ fontSize: '13px', color: '#b4b6bf' }}>
+                            {questState.isQuest
+                                ? 'Quest attiva — non è più possibile disattivarla su questa giocata.'
+                                : 'Contrassegna questa giocata come Quest e abilita i controlli sotto.'}
+                        </span>
+                    </label>
+                    {activateMsg && <p style={{ color: '#ef5350', fontSize: '12px', marginTop: '6px' }}>{activateMsg}</p>}
+                </div>
+            )}
 
             {/* Timer */}
             <div className="gdr-card">
@@ -659,7 +690,7 @@ function QuestPanel({ questState, luogo }) {
  * @param {object}   props.questState  - Stato quest: timerEnd, turnMode, turnOrder, currentIdx, audioVideoId, audioStartedAt, isQuest
  * @param {number}   props.luogo       - ID stanza corrente
  */
-export default function MasterPanel({ isOpen, onClose, showPulisci, questState, luogo }) {
+export default function MasterPanel({ isOpen, onClose, showPulisci, questState, luogo, roleActive }) {
     const [activeTab, setActiveTab] = useState('pg-png')
 
     if (!isOpen) return null
@@ -724,7 +755,7 @@ export default function MasterPanel({ isOpen, onClose, showPulisci, questState, 
                     )}
 
                     {activeTab === 'quest' && (
-                        <QuestPanel questState={questState} luogo={luogo} />
+                        <QuestPanel questState={questState} luogo={luogo} roleActive={roleActive} />
                     )}
 
                 </div>
