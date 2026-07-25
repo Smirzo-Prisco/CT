@@ -1560,6 +1560,7 @@ export default function ChatShell() {
                         showPulisci={pulsanti.show_pulisci}
                         questState={questState}
                         luogo={luogo}
+                        roleActive={roleActive}
                     />
                 )}
 

@@ -236,6 +236,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     SELECT id_role FROM role_session_players WHERE pg_name IN (SELECT nome FROM personaggio WHERE $gilda_cond)
                     UNION
                     SELECT id_role FROM chat WHERE tipo IN ('M','I','Y') AND mittente IN (SELECT nome FROM personaggio WHERE $gilda_cond)
+                    UNION
+                    SELECT id_role FROM role_sessions WHERE master IN (SELECT nome FROM personaggio WHERE $gilda_cond)
                 )";
             } elseif ($show_all) {
                 $where = '';
@@ -246,12 +248,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     SELECT id_role FROM role_session_players WHERE pg_name = '$pg_filter'
                     UNION
                     SELECT id_role FROM chat WHERE tipo IN ('M','I','Y') AND mittente = '$pg_filter'
+                    UNION
+                    SELECT id_role FROM role_sessions WHERE master = '$pg_filter'
                 )";
             }
 
             $query = "SELECT role_sessions.id_role, role_sessions.location, role_sessions.start,
                              role_sessions.end, role_sessions.turn, role_sessions.is_quest,
-                             role_sessions.quest_recap_thread_id, mq.titolo AS quest_titolo,
+                             role_sessions.quest_recap_thread_id, role_sessions.master, mq.titolo AS quest_titolo,
                              mappa.nome, mappa.id as luogo_id
                       FROM role_sessions
                       LEFT JOIN mappa ON role_sessions.location = mappa.id
@@ -262,6 +266,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                       ORDER BY role_sessions.start DESC";
             $result = gdrcd_query($query, 'result');
             $roles = [];
+            $tracked_master_map = []; // id_role => master, solo per le righe che lo hanno già tracciato
 
             while ($row = gdrcd_query($result, 'fetch')) {
                 $roles[] = [
@@ -283,6 +288,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'my_shin'      => 'none',
                     'pending_count' => 0,
                 ];
+                if (!empty($row['master'])) $tracked_master_map[(int)$row['id_role']] = $row['master'];
             }
 
             // Shin enrichment: flag/award status per giocata
@@ -296,11 +302,20 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $res_pl = gdrcd_query("SELECT DISTINCT id_role, pg_name FROM role_session_players WHERE id_role IN ($all_ids)", 'result');
                 while ($r = gdrcd_query($res_pl, 'fetch')) $players_map[(int)$r['id_role']][] = $r['pg_name'];
 
-                // 'System' è il mittente sentinella usato per i messaggi automatici (es. avviso
-                // polizia in gestionePoliziaAutomatica(), tipo 'M' ma non un master reale) — va escluso.
+                // Master: prima quello già tracciato in role_sessions.master (nessuna query in
+                // più, e' gia' nella riga), poi la scansione di chat SOLO per le giocate ancora
+                // senza master tracciato (quest vecchie, o giocate mai diventate quest) — con
+                // 'System' escluso: e' il mittente sentinella dei messaggi automatici (es. avviso
+                // polizia in gestionePoliziaAutomatica(), tipo 'M' ma non un master reale).
                 $masters_map = [];
-                $res_ms = gdrcd_query("SELECT DISTINCT id_role, mittente FROM chat WHERE id_role IN ($all_ids) AND tipo IN ('M', 'I', 'Y') AND mittente IS NOT NULL AND mittente NOT IN ('', 'System')", 'result');
-                while ($r = gdrcd_query($res_ms, 'fetch')) $masters_map[(int)$r['id_role']][] = $r['mittente'];
+                foreach ($tracked_master_map as $rid => $master_name) $masters_map[$rid] = [$master_name];
+
+                $untracked_ids = array_diff(array_column($roles, 'id'), array_keys($tracked_master_map));
+                if (!empty($untracked_ids)) {
+                    $untracked_ids_str = implode(',', array_map('intval', $untracked_ids));
+                    $res_ms = gdrcd_query("SELECT DISTINCT id_role, mittente FROM chat WHERE id_role IN ($untracked_ids_str) AND tipo IN ('M', 'I', 'Y') AND mittente IS NOT NULL AND mittente NOT IN ('', 'System')", 'result');
+                    while ($r = gdrcd_query($res_ms, 'fetch')) $masters_map[(int)$r['id_role']][] = $r['mittente'];
+                }
 
                 foreach ($roles as &$role) {
                     $players = $players_map[$role['id']] ?? [];

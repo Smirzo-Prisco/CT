@@ -818,6 +818,10 @@ function ensureQuestSchema() {
         gdrcd_query("ALTER TABLE role_sessions ADD COLUMN is_quest TINYINT(1) NOT NULL DEFAULT 0");
     if (!in_array('quest_recap_thread_id', $existing))
         gdrcd_query("ALTER TABLE role_sessions ADD COLUMN quest_recap_thread_id INT NULL DEFAULT NULL");
+    // Master tracciato direttamente (chi ha avviato/attivato la quest): evita di dover
+    // scandagliare la chat (tipo M/I/Y) per risalirci in role_recap — vedi getPgAllRoles.
+    if (!in_array('master', $existing))
+        gdrcd_query("ALTER TABLE role_sessions ADD COLUMN master VARCHAR(20) NULL DEFAULT NULL, ADD INDEX idx_master (master)");
     gdrcd_query("CREATE TABLE IF NOT EXISTS quest_turn_order (
         id INT AUTO_INCREMENT PRIMARY KEY,
         id_role INT NOT NULL,
