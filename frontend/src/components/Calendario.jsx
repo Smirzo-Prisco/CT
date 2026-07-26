@@ -17,6 +17,13 @@
  * filtrato, click per selezionare — ma sorgente diversa: qui op=search_personaggi
  * cerca su tutti i personaggi, non solo i presenti in stanza.
  *
+ * Filtro "calendario di un altro utente": di default si vedono solo i propri
+ * impegni (autore/partecipante/pubblico). Cercando un nome (o scegliendo
+ * "Tutti") si aggiungono gli impegni di quell'utente — o di chiunque abbia
+ * condiviso il calendario — SE ha attivato l'opzione in Preferenze; altrimenti
+ * l'API risponde con utente_condiviso=false e viene mostrato un avviso. Vedi
+ * pages/api_calendario.php per la logica di visibilità lato server.
+ *
  * @author Crystal Tokyo Dev
  */
 
@@ -126,14 +133,62 @@ export default function Calendario({ isStaff }) {
     const [loadingMonth, setLoadingMonth] = useState(true)
     const [luoghi, setLuoghi] = useState([])
 
+    // ── Filtro "calendario di un altro utente" ──────────────────────────
+    // '' = solo i miei impegni (default), '__all__' = tutti quelli condivisi,
+    // altrimenti il nome di un personaggio specifico. Si aggiunge alla vista
+    // di base (i miei impegni restano sempre visibili), non la sostituisce.
+    const [filtroUtente, setFiltroUtente] = useState('')
+    const [filtroCondiviso, setFiltroCondiviso] = useState(null) // esito dell'ultima fetch: null=n/d, true/false
+    const [filtroInput, setFiltroInput] = useState('')
+    const [filtroSuggestions, setFiltroSuggestions] = useState([])
+    const filtroDebounce = useRef(null)
+
     const fetchMonth = useCallback(() => {
         setLoadingMonth(true)
-        fetch(`/pages/api_calendario.php?op=month&y=${anno}&m=${mese}`)
+        const utenteQs = filtroUtente ? `&utente=${encodeURIComponent(filtroUtente)}` : ''
+        fetch(`/pages/api_calendario.php?op=month&y=${anno}&m=${mese}${utenteQs}`)
             .then(r => r.json())
-            .then(d => { if (d.success) setGiorni(d.giorni) })
+            .then(d => {
+                if (d.success) {
+                    setGiorni(d.giorni)
+                    setFiltroCondiviso(d.utente_condiviso ?? null)
+                }
+            })
             .catch(() => {})
             .finally(() => setLoadingMonth(false))
-    }, [anno, mese])
+    }, [anno, mese, filtroUtente])
+
+    const handleFiltroInput = (val) => {
+        setFiltroInput(val)
+        clearTimeout(filtroDebounce.current)
+        const q = val.trim()
+        if (q.length < 1) { setFiltroSuggestions([]); return }
+        filtroDebounce.current = setTimeout(() => {
+            fetch(`/pages/api_calendario.php?op=search_personaggi&q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(d => { if (d.success) setFiltroSuggestions(d.nomi) })
+                .catch(() => {})
+        }, 250)
+    }
+
+    const selezionaFiltroUtente = (nome) => {
+        setFiltroUtente(nome)
+        setFiltroInput('')
+        setFiltroSuggestions([])
+    }
+
+    const selezionaFiltroTutti = () => {
+        setFiltroUtente('__all__')
+        setFiltroInput('')
+        setFiltroSuggestions([])
+    }
+
+    const resetFiltroUtente = () => {
+        setFiltroUtente('')
+        setFiltroCondiviso(null)
+        setFiltroInput('')
+        setFiltroSuggestions([])
+    }
 
     useEffect(() => { fetchMonth() }, [fetchMonth])
 
@@ -165,12 +220,24 @@ export default function Calendario({ isStaff }) {
         setSelectedDay(ymd)
         setHover(null)
         setLoadingDay(true)
-        fetch(`/pages/api_calendario.php?op=day&data=${ymd}`)
+        const utenteQs = filtroUtente ? `&utente=${encodeURIComponent(filtroUtente)}` : ''
+        fetch(`/pages/api_calendario.php?op=day&data=${ymd}${utenteQs}`)
             .then(r => r.json())
-            .then(d => { if (d.success) setDayEvents(d.eventi) })
+            .then(d => {
+                if (d.success) {
+                    setDayEvents(d.eventi)
+                    setFiltroCondiviso(d.utente_condiviso ?? null)
+                }
+            })
             .catch(() => {})
             .finally(() => setLoadingDay(false))
     }
+
+    // Cambio filtro utente: ricarica il mese e, se un giorno e' aperto, anche quello.
+    useEffect(() => {
+        if (selectedDay) apriGiorno(selectedDay)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filtroUtente])
 
     const chiudiGiorno = () => { setSelectedDay(null); setDayEvents([]) }
 
@@ -326,6 +393,49 @@ export default function Calendario({ isStaff }) {
                     <i className="fa-solid fa-chevron-right" />
                 </button>
             </div>
+
+            <div className="calendario-page__filtro">
+                <span className="calendario-page__filtro-label">
+                    {filtroUtente === '' && 'Solo i miei impegni'}
+                    {filtroUtente === '__all__' && 'I miei impegni + tutti quelli condivisi'}
+                    {filtroUtente !== '' && filtroUtente !== '__all__' && `I miei impegni + quelli di ${filtroUtente}`}
+                </span>
+
+                <button type="button" className="calendario-page__filtro-tutti" onClick={selezionaFiltroTutti}>
+                    Tutti
+                </button>
+
+                <div className="calendario-page__autocomplete calendario-page__filtro-autocomplete">
+                    <input
+                        type="text"
+                        value={filtroInput}
+                        placeholder="Cerca un utente…"
+                        onChange={e => handleFiltroInput(e.target.value)}
+                        autoComplete="off"
+                    />
+                    {filtroSuggestions.length > 0 && (
+                        <div className="calendario-page__autocomplete-list">
+                            {filtroSuggestions.map(nome => (
+                                <button key={nome} type="button" onClick={() => selezionaFiltroUtente(nome)}>
+                                    {nome}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {filtroUtente !== '' && (
+                    <button type="button" className="calendario-page__filtro-reset" onClick={resetFiltroUtente}>
+                        Solo i miei
+                    </button>
+                )}
+            </div>
+
+            {filtroCondiviso === false && (
+                <p className="calendario-page__filtro-avviso">
+                    {filtroUtente} non condivide il proprio calendario: non puoi visualizzare i suoi impegni.
+                </p>
+            )}
 
             <div className={`calendario-page__grid${loadingMonth ? ' is-loading' : ''}`}>
                 <div className="calendario-page__weekdays">

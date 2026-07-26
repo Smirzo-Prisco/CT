@@ -10,9 +10,28 @@
  *   POST ?op=delete               → elimina un evento (solo autore o staff)
  *   GET  ?op=search_personaggi&q= → autocomplete personaggi per il campo partecipanti
  *
- * Visibilità di un evento: autore, oppure personaggio coinvolto (calendario_partecipanti),
- * oppure evento pubblico (pubblico=1, impostabile solo da staff — vedi isAdminMasterMod()
- * in includes/custom_functions.inc.php).
+ * Visibilità di un evento (vista di default, filtro utente assente): autore,
+ * personaggio coinvolto (calendario_partecipanti), oppure evento pubblico
+ * (pubblico=1, impostabile solo da staff — vedi isAdminMasterMod() in
+ * includes/custom_functions.inc.php).
+ *
+ * Filtro "calendario di un altro utente" (parametro ?utente= su month/day,
+ * si aggiunge alla vista di default, non la sostituisce):
+ *   - ?utente=<nome>   → aggiunge gli eventi di cui <nome> è autore o
+ *                        partecipante, SOLO se <nome> ha attivato
+ *                        personaggio.calendario_condiviso (opt-in da
+ *                        Preferenze — vedi api_global.php
+ *                        op=getCalendarioCondiviso/setCalendarioCondiviso).
+ *                        Se <nome> non condivide, non si aggiunge nulla e la
+ *                        risposta riporta 'utente_condiviso' => false, cosi'
+ *                        il frontend puo' avvisare l'utente.
+ *   - ?utente=__all__  → aggiunge gli eventi di cui è autore o partecipante
+ *                        QUALSIASI utente con calendario_condiviso attivo.
+ *
+ * Nota: se l'utente scelto (o, in "Tutti", un qualsiasi utente condiviso) è
+ * semplicemente invitato a un evento di un terzo che non condivide nulla,
+ * quell'evento diventa comunque visibile — scelta consapevole, vedi
+ * conversazione di progetto del 2026-07-26.
  */
 
 session_start();
@@ -107,6 +126,44 @@ function validaCampiEvento(array $data, bool $is_staff): ?array {
 }
 
 /**
+ * Calcola il frammento SQL (JOIN + condizione OR) per il filtro "calendario di
+ * un altro utente" su month/day, e se rilevante se l'utente scelto condivide
+ * davvero il proprio calendario (per l'avviso lato frontend). Vedi commento
+ * di visibilita' in cima al file.
+ */
+function calcolaFiltroUtente(string $utente_filtro): array {
+    if ($utente_filtro === '__all__') {
+        return [
+            'join'      => 'LEFT JOIN personaggio pa ON pa.nome = e.autore',
+            'where'     => "OR pa.calendario_condiviso = 1 OR EXISTS (
+                SELECT 1 FROM calendario_partecipanti pcx
+                JOIN personaggio ppx ON ppx.nome = pcx.nome
+                WHERE pcx.evento_id = e.id AND ppx.calendario_condiviso = 1
+            )",
+            'condiviso' => null, // non applicabile: "Tutti" non ha uno stato condiviso/non condiviso
+        ];
+    }
+
+    if ($utente_filtro === '') {
+        return ['join' => '', 'where' => '', 'condiviso' => null];
+    }
+
+    $utente_f = gdrcd_filter('in', $utente_filtro);
+    $check    = gdrcd_query("SELECT calendario_condiviso FROM personaggio WHERE nome = '$utente_f' LIMIT 1");
+    $condiviso = $check && (int)$check['calendario_condiviso'] === 1;
+
+    if (!$condiviso) {
+        return ['join' => '', 'where' => '', 'condiviso' => false];
+    }
+
+    return [
+        'join'      => "LEFT JOIN calendario_partecipanti p_target ON p_target.evento_id = e.id AND p_target.nome = '$utente_f'",
+        'where'     => "OR e.autore = '$utente_f' OR p_target.nome IS NOT NULL",
+        'condiviso' => true,
+    ];
+}
+
+/**
  * Sostituisce i partecipanti di un evento — solo nomi che esistono davvero
  * in personaggio. Ritorna i nomi effettivamente salvati (validati), usati
  * da 'create' per accodare le notifiche solo a chi e' davvero coinvolto.
@@ -139,14 +196,17 @@ switch ($op) {
             break;
         }
 
+        $filtro = calcolaFiltroUtente(trim($_GET['utente'] ?? ''));
+
         $res = gdrcd_query("
             SELECT e.id, e.colore, e.ora, e.luogo, e.autore, e.data,
                    (SELECT GROUP_CONCAT(p2.nome ORDER BY p2.nome SEPARATOR ',')
                     FROM calendario_partecipanti p2 WHERE p2.evento_id = e.id) AS partecipanti_str
             FROM calendario_eventi e
             LEFT JOIN calendario_partecipanti p ON p.evento_id = e.id AND p.nome = '$login_f'
+            {$filtro['join']}
             WHERE YEAR(e.data) = $y AND MONTH(e.data) = $m
-              AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1)
+              AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1 {$filtro['where']})
             GROUP BY e.id
             ORDER BY e.data ASC, e.ora ASC
         ", 'result');
@@ -164,7 +224,7 @@ switch ($op) {
         }
         gdrcd_query($res, 'free');
 
-        echo json_encode(['success' => true, 'giorni' => $giorni]);
+        echo json_encode(['success' => true, 'giorni' => $giorni, 'utente_condiviso' => $filtro['condiviso']]);
         break;
 
     // -------------------------------------------------------------------------
@@ -178,13 +238,15 @@ switch ($op) {
             break;
         }
         $giorno_f = gdrcd_filter('in', $giorno);
+        $filtro   = calcolaFiltroUtente(trim($_GET['utente'] ?? ''));
 
         $res = gdrcd_query("
             SELECT e.*
             FROM calendario_eventi e
             LEFT JOIN calendario_partecipanti p ON p.evento_id = e.id AND p.nome = '$login_f'
+            {$filtro['join']}
             WHERE e.data = '$giorno_f'
-              AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1)
+              AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1 {$filtro['where']})
             GROUP BY e.id
             ORDER BY e.ora ASC
         ", 'result');
@@ -212,7 +274,7 @@ switch ($op) {
         }
         gdrcd_query($res, 'free');
 
-        echo json_encode(['success' => true, 'eventi' => $eventi]);
+        echo json_encode(['success' => true, 'eventi' => $eventi, 'utente_condiviso' => $filtro['condiviso']]);
         break;
 
     // -------------------------------------------------------------------------
