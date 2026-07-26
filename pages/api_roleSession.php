@@ -239,24 +239,34 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $gilda_cond = ($gilda_param === 0)
                     ? "COALESCE(id_gilda, 0) <= 0"
                     : "id_gilda = $gilda_param";
+                // La UNION va incapsulata in una subquery derivata (FROM), non lasciata
+                // dentro l'IN diretto: altrimenti MySQL la tratta come DEPENDENT SUBQUERY
+                // e la rivaluta per ogni riga della query esterna (query da ~4s invece di
+                // ~25ms, confermato con EXPLAIN — role_session_players compare sia dentro
+                // la subquery che nel JOIN esterno, ed e' quello che innesca la dipendenza).
                 $where = "WHERE role_sessions.id_role IN (
-                    SELECT id_role FROM role_session_players WHERE pg_name IN (SELECT nome FROM personaggio WHERE $gilda_cond)
-                    UNION
-                    SELECT id_role FROM chat WHERE tipo IN ('M','I','Y') AND mittente IN (SELECT nome FROM personaggio WHERE $gilda_cond)
-                    UNION
-                    SELECT id_role FROM role_sessions WHERE master IN (SELECT nome FROM personaggio WHERE $gilda_cond)
+                    SELECT id_role FROM (
+                        SELECT id_role FROM role_session_players WHERE pg_name IN (SELECT nome FROM personaggio WHERE $gilda_cond)
+                        UNION
+                        SELECT id_role FROM chat WHERE tipo IN ('M','I','Y') AND mittente IN (SELECT nome FROM personaggio WHERE $gilda_cond)
+                        UNION
+                        SELECT id_role FROM role_sessions WHERE master IN (SELECT nome FROM personaggio WHERE $gilda_cond)
+                    ) AS matched_ids
                 )";
             } elseif ($show_all) {
                 $where = '';
             } else {
                 // Stesso ragionamento: includo anche le giocate masterate senza essersi uniti.
                 $pg_filter = ($is_staff && $pg_param !== '') ? $pg_param : $login_f;
+                // Stessa incapsulazione in subquery derivata di cui sopra, stesso motivo.
                 $where = "WHERE role_sessions.id_role IN (
-                    SELECT id_role FROM role_session_players WHERE pg_name = '$pg_filter'
-                    UNION
-                    SELECT id_role FROM chat WHERE tipo IN ('M','I','Y') AND mittente = '$pg_filter'
-                    UNION
-                    SELECT id_role FROM role_sessions WHERE master = '$pg_filter'
+                    SELECT id_role FROM (
+                        SELECT id_role FROM role_session_players WHERE pg_name = '$pg_filter'
+                        UNION
+                        SELECT id_role FROM chat WHERE tipo IN ('M','I','Y') AND mittente = '$pg_filter'
+                        UNION
+                        SELECT id_role FROM role_sessions WHERE master = '$pg_filter'
+                    ) AS matched_ids
                 )";
             }
 
