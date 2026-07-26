@@ -1984,7 +1984,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 echo json_encode(['success' => true, 'active' => false]);
                 exit;
             }
-            $role = gdrcd_query("SELECT timer_end, turn_mode, turn_order_idx, audio_video_id, audio_started_at, is_quest FROM role_sessions WHERE id_role = $id_role");
+            $role = gdrcd_query("SELECT timer_end, turn_mode, turn_order_idx, audio_video_id, audio_started_at, is_quest, require_master_first FROM role_sessions WHERE id_role = $id_role");
             $res_order = gdrcd_query("SELECT pg_name FROM quest_turn_order WHERE id_role = $id_role ORDER BY position ASC", 'result');
             $turn_order = [];
             while ($r = gdrcd_query($res_order, 'fetch')) $turn_order[] = $r['pg_name'];
@@ -1999,7 +1999,20 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 'audio_video_id'   => $role['audio_video_id'] ?: null,
                 'audio_started_at' => $role['audio_started_at'] !== null ? (int)$role['audio_started_at'] : null,
                 'is_quest'         => !empty($role['is_quest']),
+                'require_master_first' => !empty($role['require_master_first']),
             ]);
+            break;
+
+        case 'setRequireMasterFirst':  // Staff: attiva/disattiva l'obbligo di azione master a inizio turno
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+            ensureQuestSchema();
+            $luogo   = (int)$_SESSION['luogo'];
+            $id_role = locationActiveRole($luogo);
+            if (!$id_role) { echo json_encode(['success' => false, 'message' => 'Nessuna role attiva']); exit; }
+            $enabled = !empty($data['enabled']) ? 1 : 0;
+            gdrcd_query("UPDATE role_sessions SET require_master_first = $enabled WHERE id_role = $id_role");
+            notifySocketServer('quest:require_master_first', 'loc:' . $luogo, ['enabled' => (bool)$enabled]);
+            echo json_encode(['success' => true, 'enabled' => (bool)$enabled]);
             break;
 
         case 'activateQuest':  // Staff: attiva la quest sulla giocata in corso (irreversibile)

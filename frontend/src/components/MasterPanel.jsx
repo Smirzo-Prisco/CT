@@ -395,6 +395,8 @@ function QuestPanel({ questState, luogo, roleActive }) {
     const [activateMsg, setActivateMsg] = useState('')
     const [starting, setStarting]       = useState(false)
     const [startMsg, setStartMsg]       = useState('')
+    const [requireMasterSaving, setRequireMasterSaving] = useState(false)
+    const [requireMasterMsg, setRequireMasterMsg]       = useState('')
 
     // Finché la quest non è attiva, tutti i campi/pulsanti del tab restano disabilitati:
     // si abilitano solo dopo l'attivazione, che è irreversibile e richiede una giocata in corso.
@@ -447,6 +449,21 @@ function QuestPanel({ questState, luogo, roleActive }) {
 
     function fermaTimer() {
         fetch('/pages/api_chat.php?op=stopQuestTimer', { method: 'POST' })
+    }
+
+    function toggleRequireMasterFirst(e) {
+        const enabled = e.target.checked
+        setRequireMasterSaving(true)
+        setRequireMasterMsg('')
+        fetch('/pages/api_chat.php?op=setRequireMasterFirst', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enabled }),
+        })
+            .then(r => r.json())
+            .then(d => { if (!d.success) setRequireMasterMsg(d.message ?? 'Errore') })
+            .catch(() => setRequireMasterMsg('Errore di rete'))
+            .finally(() => setRequireMasterSaving(false))
     }
 
     function setMode(mode) {
@@ -595,6 +612,25 @@ function QuestPanel({ questState, luogo, roleActive }) {
                         {timeLeft === 0 ? 'Scaduto' : fmtTime(timeLeft)}
                     </div>
                 )}
+            </div>
+
+            {/* Richiedi azione master a inizio turno — insieme al timer copre il caso
+                "il master apre il turno, i giocatori hanno tot tempo per agire". */}
+            <div className="gdr-card">
+                <div className="gdr-card-title">Azione Master Obbligatoria</div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: questLocked ? 'default' : 'pointer' }}>
+                    <input
+                        type="checkbox"
+                        checked={questState.requireMasterFirst}
+                        disabled={questLocked || requireMasterSaving}
+                        onChange={toggleRequireMasterFirst}
+                    />
+                    <span style={{ fontSize: '13px', color: '#b4b6bf' }}>
+                        Blocca azioni e lanci dei giocatori finché il Master non scrive
+                        qualcosa nel turno corrente.
+                    </span>
+                </label>
+                {requireMasterMsg && <p style={{ color: '#ef5350', fontSize: '12px', marginTop: '6px' }}>{requireMasterMsg}</p>}
             </div>
 
             {/* Modalità */}

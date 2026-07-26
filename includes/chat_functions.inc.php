@@ -22,9 +22,15 @@ function handleNormalMessage(&$chat_message, $action_tag, &$sender, $m_type, &$s
 
     // Inserisci il messaggio
     chatInsertMessage($session['luogo'], $sender, $targt, $chat_message, $m_type, null, $action_tag, $imgs);
-    
+
     if ($parameters['mode']['exp_by_chat'] == 'ON' && $id_role != false && $m_type === 'P') handleExperienceRewards($id_role, $session); // Assegnazione punti
     if($m_type === 'P' || $m_type === 'M') checkTurnEnd($session['luogo'], $session['login'], $id_role); // Se è un'azione o un master, controllo il turno
+
+    // Traccia il turno in cui il master ha scritto, per l'opzione "richiedi azione master
+    // a inizio turno" (questCheckTimerAndOrder) — vale anche per i sotto-tipi I/Y.
+    if ($id_role && in_array($m_type, ['M', 'I', 'Y'], true)) {
+        gdrcd_query("UPDATE role_sessions SET master_last_turn = turn WHERE id_role = $id_role");
+    }
 }
 
 /**  * Determina il tipo di messaggio  */
@@ -822,6 +828,16 @@ function ensureQuestSchema() {
     // scandagliare la chat (tipo M/I/Y) per risalirci in role_recap — vedi getPgAllRoles.
     if (!in_array('master', $existing))
         gdrcd_query("ALTER TABLE role_sessions ADD COLUMN master VARCHAR(20) NULL DEFAULT NULL, ADD INDEX idx_master (master)");
+    // Opzione "richiedi azione master a inizio turno": require_master_first è lo switch,
+    // master_last_turn tiene traccia dell'ultimo turno in cui il master ha scritto un
+    // messaggio (tipo M/I/Y) — aggiornato in handleNormalMessage(). Il confronto
+    // master_last_turn < turn (fatto in questCheckTimerAndOrder) dice se il master ha
+    // già "aperto" il turno corrente, senza dover associare un numero di turno ai
+    // messaggi in chat (che non lo tracciano).
+    if (!in_array('require_master_first', $existing))
+        gdrcd_query("ALTER TABLE role_sessions ADD COLUMN require_master_first TINYINT(1) NOT NULL DEFAULT 0");
+    if (!in_array('master_last_turn', $existing))
+        gdrcd_query("ALTER TABLE role_sessions ADD COLUMN master_last_turn INT NOT NULL DEFAULT 0");
     gdrcd_query("CREATE TABLE IF NOT EXISTS quest_turn_order (
         id INT AUTO_INCREMENT PRIMARY KEY,
         id_role INT NOT NULL,
@@ -841,12 +857,17 @@ function extractYoutubeId($url) {
 
 function questCheckTimerAndOrder($id_role, $login, $is_roll = false) {
     if (!$id_role) return null;
-    $role = gdrcd_query("SELECT timer_end, turn_mode, turn_order_idx FROM role_sessions WHERE id_role = $id_role");
+    $role = gdrcd_query("SELECT timer_end, turn_mode, turn_order_idx, require_master_first, master_last_turn, turn FROM role_sessions WHERE id_role = $id_role");
     if (!$role) return null;
     if ($role['timer_end'] !== null) {
         $now_ms = (int)(microtime(true) * 1000);
         if ($now_ms >= (int)$role['timer_end'])
             return 'Tempo scaduto! Attendi che il Master avvii il prossimo turno.';
+    }
+    // Vale per azioni testuali e lanci: il master deve aver scritto qualcosa nel turno
+    // corrente prima che chiunque altro possa agire.
+    if (!empty($role['require_master_first']) && (int)$role['master_last_turn'] < (int)$role['turn']) {
+        return 'Attendi che il Master apra il turno prima di agire.';
     }
     if (!$is_roll && $role['turn_mode'] === 'fissi') {
         $idx = (int)$role['turn_order_idx'];
