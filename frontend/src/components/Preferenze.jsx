@@ -113,6 +113,28 @@ export default function Preferenze() {
         })
     }, [])
 
+    // ── Calendario condiviso ─────────────────────────────────────────────
+    const [calendarioCondiviso, setCalendarioCondiviso] = useState(null)
+
+    useEffect(() => {
+        fetch('/pages/api_global.php?op=getCalendarioCondiviso')
+            .then(r => r.json())
+            .then(d => { if (d.success) setCalendarioCondiviso(!!d.condiviso) })
+            .catch(() => {})
+    }, [])
+
+    const toggleCalendarioCondiviso = useCallback(() => {
+        setCalendarioCondiviso(prev => {
+            const next = !prev
+            fetch('/pages/api_global.php?op=setCalendarioCondiviso', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ condiviso: next }),
+            }).catch(() => {})
+            return next
+        })
+    }, [])
+
     // ── Colori land ──────────────────────────────────────────────────────
     const [palette, setPalette] = useState(() => localStorage.getItem(PALETTE_STORAGE_KEY) || 'public')
 
@@ -185,6 +207,17 @@ export default function Preferenze() {
                             </div>
                         ))}
                     </div>
+                </div>
+            )}
+
+            {calendarioCondiviso !== null && (
+                <div className="preferenze-page__section">
+                    <div className="preferenze-page__section-title">Calendario</div>
+
+                    <label className="preferenze-page__row">
+                        <span>Rendi visibile il mio calendario agli altri utenti</span>
+                        <input type="checkbox" checked={calendarioCondiviso} onChange={toggleCalendarioCondiviso} />
+                    </label>
                 </div>
             )}
 

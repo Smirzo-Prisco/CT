@@ -1231,6 +1231,29 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode(['success' => true]);
             break;
 
+        // -------------------------------------------------------------------------
+        // CALENDARIO CONDIVISO — flag tutto-o-niente (Preferenze): se attivo, i
+        // propri eventi diventano visibili a chiunque, non solo a autore/partecipanti
+        // (vedi pages/api_calendario.php, case 'month'/'day').
+        // -------------------------------------------------------------------------
+        case 'getCalendarioCondiviso':
+            // Solo lettura, $_SESSION resta disponibile dopo il write_close iniziale.
+            $login_f = gdrcd_filter('in', $_SESSION['login']);
+
+            $row = gdrcd_query("SELECT calendario_condiviso FROM personaggio WHERE nome = '$login_f' LIMIT 1");
+            echo json_encode(['success' => true, 'condiviso' => (int)($row['calendario_condiviso'] ?? 0) === 1]);
+            break;
+
+        case 'setCalendarioCondiviso':
+            // Solo lettura di $_SESSION (la scrittura va a DB): resta disponibile dopo il
+            // write_close iniziale, non serve riaprire la sessione.
+            $login_f    = gdrcd_filter('in', $_SESSION['login']);
+            $condiviso  = !empty($data['condiviso']) ? 1 : 0;
+
+            gdrcd_query("UPDATE personaggio SET calendario_condiviso = $condiviso WHERE nome = '$login_f'");
+            echo json_encode(['success' => true]);
+            break;
+
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
     /*********************  FINE    Recupero i dati dell'utente che voglio modificare   */

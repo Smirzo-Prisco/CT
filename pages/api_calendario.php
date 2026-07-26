@@ -12,7 +12,10 @@
  *
  * Visibilità di un evento: autore, oppure personaggio coinvolto (calendario_partecipanti),
  * oppure evento pubblico (pubblico=1, impostabile solo da staff — vedi isAdminMasterMod()
- * in includes/custom_functions.inc.php).
+ * in includes/custom_functions.inc.php), oppure autore con calendario condiviso attivo
+ * (personaggio.calendario_condiviso, opt-in da Preferenze — vedi api_global.php
+ * op=getCalendarioCondiviso/setCalendarioCondiviso). Versione semplice: tutto-o-niente,
+ * nessuna eccezione per singolo evento.
  */
 
 session_start();
@@ -145,8 +148,9 @@ switch ($op) {
                     FROM calendario_partecipanti p2 WHERE p2.evento_id = e.id) AS partecipanti_str
             FROM calendario_eventi e
             LEFT JOIN calendario_partecipanti p ON p.evento_id = e.id AND p.nome = '$login_f'
+            LEFT JOIN personaggio pa ON pa.nome = e.autore
             WHERE YEAR(e.data) = $y AND MONTH(e.data) = $m
-              AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1)
+              AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1 OR pa.calendario_condiviso = 1)
             GROUP BY e.id
             ORDER BY e.data ASC, e.ora ASC
         ", 'result');
@@ -183,8 +187,9 @@ switch ($op) {
             SELECT e.*
             FROM calendario_eventi e
             LEFT JOIN calendario_partecipanti p ON p.evento_id = e.id AND p.nome = '$login_f'
+            LEFT JOIN personaggio pa ON pa.nome = e.autore
             WHERE e.data = '$giorno_f'
-              AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1)
+              AND (e.autore = '$login_f' OR p.nome IS NOT NULL OR e.pubblico = 1 OR pa.calendario_condiviso = 1)
             GROUP BY e.id
             ORDER BY e.ora ASC
         ", 'result');
