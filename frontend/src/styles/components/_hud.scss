@@ -875,8 +875,22 @@ body[data-palette="public"] {
     color: var(--gold);
     margin-bottom: 10px;
 
-    a { font-size: 11px; color: var(--muted); font-weight: 700; }
+    a { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); font-weight: 700; }
     a:hover { color: var(--gold); }
+}
+
+// Totale online sul sito (non solo nel luogo attuale) — stesso linguaggio
+// visivo di .ct-hud__pip/.map-pin__badge: pillola oro, testo scuro.
+.ct-hud__popover-total {
+    background: var(--gold);
+    color: var(--ink-deep);
+    font-size: 10px;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 999px;
+    min-width: 14px;
+    text-align: center;
+    line-height: 1.5;
 }
 
 // ── Modale descrizione luogo (click sul cerchio sinistro) ────────────────

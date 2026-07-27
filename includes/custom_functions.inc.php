@@ -816,6 +816,39 @@ function gdrcd_condizione_online() {
     )";
 }
 
+/**
+ * Conteggio utenti online sul sito intero, con le stesse esclusioni/visibilità
+ * di 'presenti_estesi' (pages/api_map.php): usata sia da 'presenti_totale' sia
+ * dal totale mostrato nel badge del popover "Presenti" (case 'presenti') —
+ * un'unica implementazione invece di riscrivere la query in ogni endpoint, per
+ * evitare che si scollino di nuovo (successo gia' una volta: il totale del
+ * badge non contava lo staff sempre_online perche' la query era stata
+ * ricopiata a mano invece di riusare gdrcd_condizione_online()).
+ */
+function gdrcd_conteggio_online_totale(string $login, bool $is_staff): int {
+    if ($login === 'Mino' || $login === 'Lii') {
+        $exclude = '';
+    } elseif ($login === 'Jamal' || $login === 'Alice') {
+        $exclude = "AND p.nome NOT IN ('Megan', 'Niklaus')";
+    } else {
+        $exclude = "AND p.nome != 'Mino'";
+    }
+
+    $condizione_online = gdrcd_condizione_online();
+    $invisible_filter  = $is_staff ? '' : 'AND p.is_invisible = 0';
+
+    $tot = gdrcd_query(
+        "SELECT COUNT(*) AS n
+         FROM personaggio p
+         LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
+         WHERE $condizione_online
+           $exclude
+           $invisible_filter"
+    );
+
+    return (int)$tot['n'];
+}
+
 /************* FORUM / QUEST ******************************/
 
 /**
