@@ -466,15 +466,15 @@ switch ($op) {
         }
         gdrcd_query($result, 'free');
 
+        // Stessa condizione online della lista sopra ($condizione_online, gia'
+        // valorizzata): una versione scritta a mano qui mancava la clausola
+        // sempre_online (staff con presenza fissa), risultando in un totale
+        // piu' basso del numero di utenti gia' visibili nella stanza.
         $tot = gdrcd_query(
             "SELECT COUNT(*) AS n
              FROM personaggio p
              LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
-             WHERE p.ora_entrata > p.ora_uscita
-               AND (
-                 (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
-                 OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
-               )
+             WHERE $condizione_online
                AND p.is_invisible = 0"
         );
 
