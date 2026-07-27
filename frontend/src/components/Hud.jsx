@@ -219,6 +219,7 @@ export default function Hud({ isStaff }) {
     // qui, una per la lista dentro OnlineUsers.jsx quando il popover si apre.
     const [presentiUsers, setPresentiUsers] = useState([])
     const [presentiIsStaff, setPresentiIsStaff] = useState(false)
+    const [presentiTotal, setPresentiTotal] = useState(0) // online sul sito intero, non solo qui — vedi badge accanto a "Vedi tutti"
     const presentiIdleRef = useRef(false)
 
     const fetchPresenti = useCallback(() => {
@@ -228,6 +229,7 @@ export default function Hud({ isStaff }) {
                 if (!d.success) return
                 setPresentiUsers(d.users)
                 setPresentiIsStaff(!!d.is_staff)
+                setPresentiTotal(d.total_online ?? 0)
             })
             .catch(err => console.error('[Hud] Errore presenti:', err))
     }, [])
@@ -597,7 +599,10 @@ export default function Hud({ isStaff }) {
                 <div className="ct-hud__popover ct-hud__popover--presence" onClick={handlePopoverClick}>
                     <div className="ct-hud__popover-head">
                         <span>Presenti qui</span>
-                        <a href="main.php?page=presenti_estesi">Vedi tutti <i className="fa-solid fa-arrow-right" /></a>
+                        <a href="main.php?page=presenti_estesi">
+                            <span className="ct-hud__popover-total">{presentiTotal}</span>
+                            Vedi tutti <i className="fa-solid fa-arrow-right" />
+                        </a>
                     </div>
                     <OnlineUsers users={presentiUsers} isStaff={presentiIsStaff} />
                 </div>
