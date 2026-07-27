@@ -466,60 +466,27 @@ switch ($op) {
         }
         gdrcd_query($result, 'free');
 
-        // Stessa condizione online della lista sopra ($condizione_online, gia'
-        // valorizzata): una versione scritta a mano qui mancava la clausola
-        // sempre_online (staff con presenza fissa), risultando in un totale
-        // piu' basso del numero di utenti gia' visibili nella stanza.
-        $tot = gdrcd_query(
-            "SELECT COUNT(*) AS n
-             FROM personaggio p
-             LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
-             WHERE $condizione_online
-               AND p.is_invisible = 0"
-        );
-
         echo json_encode([
             'success'      => true,
             'users'        => $users,
-            'total_online' => (int)$tot['n'],
+            'total_online' => gdrcd_conteggio_online_totale($_SESSION['login'], $is_staff),
             'self'         => $_SESSION['login'],
             'is_staff'     => $is_staff,
         ]);
         break;
 
     // -------------------------------------------------------------------------
-    // PRESENTI_TOTALE — stesso conteggio di 'presenti_estesi' (identica condizione
-    // online + esclusioni + visibilità invisibili) ma con una semplice COUNT senza
-    // i JOIN pesanti, e senza il side-effect di 'presenti' (che aggiorna
-    // ultimo_refresh/disponibile ad ogni chiamata: usata dal badge sull'icona
-    // "Presenti" nel menu, che si aggiorna spesso e non deve alterare lo stato
-    // di presenza dell'utente che lo visualizza).
+    // PRESENTI_TOTALE — stesso conteggio di 'presenti_estesi'/'presenti'
+    // (gdrcd_conteggio_online_totale, vedi custom_functions.inc.php) ma con una
+    // semplice COUNT senza i JOIN pesanti, per chi ha bisogno solo del numero
+    // senza gia' chiamare 'presenti' (che ha anche il side-effect di aggiornare
+    // ultimo_refresh/disponibile).
     // -------------------------------------------------------------------------
     case 'presenti_totale':
         $login    = $_SESSION['login'];
         $is_staff = ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1 || $_SESSION['master'] == 1);
 
-        if ($login === 'Mino' || $login === 'Lii') {
-            $exclude = '';
-        } elseif ($login === 'Jamal' || $login === 'Alice') {
-            $exclude = "AND p.nome NOT IN ('Megan', 'Niklaus')";
-        } else {
-            $exclude = "AND p.nome != 'Mino'";
-        }
-
-        $condizione_online = gdrcd_condizione_online();
-        $invisible_filter  = $is_staff ? '' : 'AND p.is_invisible = 0';
-
-        $tot = gdrcd_query(
-            "SELECT COUNT(*) AS n
-             FROM personaggio p
-             LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
-             WHERE $condizione_online
-               $exclude
-               $invisible_filter"
-        );
-
-        echo json_encode(['success' => true, 'total_online' => (int)$tot['n']]);
+        echo json_encode(['success' => true, 'total_online' => gdrcd_conteggio_online_totale($login, $is_staff)]);
         break;
 
     // -------------------------------------------------------------------------
