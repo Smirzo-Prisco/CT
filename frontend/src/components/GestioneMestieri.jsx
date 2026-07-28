@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 const API = '/pages/api_mestieri.php'
 
@@ -257,7 +258,10 @@ function MestiereModal({ mestiere, ruoli, tipi, onClose, onSaved, onRuoliChange 
         }
     }
 
-    return (
+    // Portal su document.body: #maincontent (position:fixed) crea sempre un proprio
+    // stacking context, quindi qualunque z-index qui dentro resterebbe intrappolato
+    // sotto .ct-hud (z-index:500) — stesso motivo del portal in ChatShell.jsx.
+    return createPortal(
         <div className="pg-edit-container" style={{ display: 'flex' }} role="dialog" aria-modal="true">
             <div className="modal-content">
                 <div className="gp-modal-header">
@@ -376,7 +380,8 @@ function MestiereModal({ mestiere, ruoli, tipi, onClose, onSaved, onRuoliChange 
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
 

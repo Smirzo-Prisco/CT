@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import styles from './GestioneBot.module.css'
 
 const GIORNI     = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
@@ -47,7 +48,10 @@ function ScheduleModal({ selected, onClose, onSaved }) {
         else setMsg(d.message ?? 'Errore durante il salvataggio')
     }
 
-    return (
+    // Portal su document.body: #maincontent (position:fixed) crea sempre un proprio
+    // stacking context, quindi qualunque z-index qui dentro resterebbe intrappolato
+    // sotto .ct-hud (z-index:500) — stesso motivo del portal in ChatShell.jsx.
+    return createPortal(
         <div className={styles.modalOverlay}>
             <div className={styles.modal}>
                 <h3>Imposta orari di presenza</h3>
@@ -100,7 +104,8 @@ function ScheduleModal({ selected, onClose, onSaved }) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
 

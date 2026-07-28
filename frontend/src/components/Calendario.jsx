@@ -28,6 +28,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
@@ -491,7 +492,11 @@ export default function Calendario({ isStaff }) {
             )}
 
             {/* ============ MODALE GIORNO ============ */}
-            {selectedDay && (
+            {/* Portal su document.body: #maincontent (position:fixed) crea sempre un
+                proprio stacking context, quindi qualunque z-index qui dentro resterebbe
+                intrappolato sotto .ct-hud (z-index:500) — stesso motivo del portal in
+                ChatShell.jsx per le sue modali. */}
+            {selectedDay && createPortal(
                 <div className="calendario-page__modal-overlay" onClick={chiudiGiorno}>
                     <div className="calendario-page__modal" onClick={e => e.stopPropagation()}>
                         <div className="calendario-page__modal-head">
@@ -534,11 +539,12 @@ export default function Calendario({ isStaff }) {
                             </div>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* ============ FORM CREA/MODIFICA ============ */}
-            {form && (
+            {form && createPortal(
                 <div className="calendario-page__modal-overlay" onClick={chiudiForm}>
                     <div className="calendario-page__modal" onClick={e => e.stopPropagation()}>
                         <div className="calendario-page__modal-head">
@@ -662,7 +668,8 @@ export default function Calendario({ isStaff }) {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             </div>

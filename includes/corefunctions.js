@@ -592,6 +592,19 @@ function openCharacterSheet(userName) { window.top.location.href = `main.php?pag
 
 /****************   Al completo caricamento del DOM della pagina... **********************************/
 document.addEventListener('DOMContentLoaded', function () {
+    // Sposta le modali .pg-edit-container (pagine gestione legacy: gilde, oggetti,
+    // personaggio, regolamento) fuori da #maincontent, che e' position:fixed — e
+    // in CSS position:fixed crea SEMPRE un proprio stacking context, a prescindere
+    // dallo z-index. Qualunque z-index dentro #maincontent resta quindi intrappolato
+    // sotto .ct-hud (z-index:500), facendo apparire la modale dietro l'header
+    // dell'HUD. appendChild sposta il nodo mantenendo id/listener gia' agganciati,
+    // quindi il resto di questo file (getElementById/closest, sotto) continua a
+    // funzionare invariato. Stesso problema gia' risolto via React Portal per le
+    // modali dei componenti React (vedi ChatShell.jsx, Calendario.jsx, ecc.).
+    document.querySelectorAll('#maincontent .pg-edit-container').forEach(el => {
+        document.body.appendChild(el);
+    });
+
     // online-users-container è gestito dal bundle React (OnlineUsers.jsx via ct:ready)
     // Cerca il container messaggi
     if (document.getElementById('menu-messages-container')) initModernMenuMessages('menu-messages-container');
