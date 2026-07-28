@@ -172,7 +172,7 @@ const SchedaProfilo = forwardRef(function SchedaProfilo({ profile }, ref) {
                                 <strong>Il livello si calcola in base alla somma di tutte le statistiche, se il personaggio appartiene ad una famiglia</strong><br />
                                 <table className="level-table">
                                     <tbody>
-                                        <tr><th className="form-group form-column">Livello</th><th className="form-group form-column">Fino a</th></tr>
+                                        <tr><th>Livello</th><th>Fino a</th></tr>
                                         <tr><td>1</td><td>50</td></tr>
                                         <tr><td>2</td><td>75</td></tr>
                                         <tr><td>3</td><td>105</td></tr>
