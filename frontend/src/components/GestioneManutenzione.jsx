@@ -21,7 +21,7 @@ const AZIONI = [
     },
     {
         key: 'old_chat',
-        label: 'Log di chat di ruolo',
+        label: 'Log di chat di gioco',
         description: 'Elimina le righe di chat di ruolo più vecchie della soglia scelta.',
         mesi: { min: 0, max: 12, default: 3 },
         danger: false,
