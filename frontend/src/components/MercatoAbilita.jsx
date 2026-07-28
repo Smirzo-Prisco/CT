@@ -11,6 +11,7 @@
  */
 
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 /** Naviga via CT.navigate (SPA) se disponibile, altrimenti reload. */
 function navigate(url) {
@@ -99,13 +100,21 @@ export default function MercatoAbilita() {
                     </div>
                 </div>
             </div>
-            <div id="skill-modal" className="skill-modal">
-                <div className="skill-modal-content">
-                    <h2 id="skill-modal-titolo"></h2>
-                    <div id="skill-modal-descrizione"></div>
-                    <button id="close-modal">Chiudi</button>
-                </div>
-            </div>
+            {/* Portal su document.body: #maincontent (position:fixed) crea sempre un
+                proprio stacking context, quindi qualunque z-index qui dentro resterebbe
+                intrappolato sotto .ct-hud (z-index:500) — stesso motivo del portal in
+                ChatShell.jsx per le sue modali. mercato_abilita.js trova comunque il nodo
+                via getElementById, indipendentemente da dove lo monta React nel DOM. */}
+            {createPortal(
+                <div id="skill-modal" className="skill-modal">
+                    <div className="skill-modal-content">
+                        <h2 id="skill-modal-titolo"></h2>
+                        <div id="skill-modal-descrizione"></div>
+                        <button id="close-modal">Chiudi</button>
+                    </div>
+                </div>,
+                document.body
+            )}
         </>
     )
 }

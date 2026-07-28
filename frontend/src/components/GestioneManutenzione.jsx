@@ -10,6 +10,7 @@
  */
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 
 const AZIONI = [
     {
@@ -226,13 +227,18 @@ export default function GestioneManutenzione() {
                 ))}
             </div>
 
-            {preview && (
+            {/* Portal su document.body: #maincontent e' position:fixed, che crea sempre
+                un proprio stacking context (a prescindere dallo z-index) — qualunque
+                z-index qui dentro resta intrappolato sotto .ct-hud (z-index:500).
+                Stesso motivo del portal gia' usato in ChatShell.jsx per le sue modali. */}
+            {preview && createPortal(
                 <ConfirmModal
                     preview={preview}
                     executing={executing}
                     onConfirm={confermaEsecuzione}
                     onClose={() => setPreview(null)}
-                />
+                />,
+                document.body
             )}
         </div>
     )
