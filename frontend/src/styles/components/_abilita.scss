@@ -187,6 +187,12 @@
     border-radius: $radius-xl + 4;
     box-shadow: 0 8px 32px rgb(0 0 0 / 30%);
     animation: modal-pop 0.25s ease forwards;
+    // .skill-modal centra verticalmente (align-items:center): senza un tetto
+    // qui, una descrizione lunga cresce oltre il viewport in entrambe le
+    // direzioni e la parte superiore finisce dietro l'header HUD.
+    max-height: 85vh;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 @keyframes modal-pop {

@@ -237,24 +237,14 @@ img.scheda_pg {
     border: none;
 }
 
-// ── Modal generica ────────────────────────────────────────────
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    inset: 0;
-    overflow: auto;
-    background-color: rgb(0 0 0 / 40%);
-    padding-top: 60px;
-}
-
-.modal-content {
-    background: url("imgs/items/Pannelli.png") no-repeat center / contain;
-    margin: 5% auto 15%;
-    width: 500px;
-    height: 500px;
-}
+// .modal/.modal-content (legacy, sfondo decorativo Pannelli.png 500x500,
+// z-index:1) rimosse: nessun markup le usa piu' come wrapper diretto — tutte
+// le modali reali passano per .pg-edit-container (vedi _gestione.scss), che
+// pero' e' un selettore piu' specifico (.pg-edit-container .modal-content) e
+// non ridichiara "height": l'height:500px di qui restava comunque applicato
+// per cascata a QUALSIASI .modal-content, bucando il max-height/overflow-y
+// pensati apposta per i contenuti lunghi. .close resta: e' il bottone "x"
+// riusato dentro .pg-edit-container .modal-content ed e' indipendente.
 
 .close {
     position: absolute;
@@ -306,39 +296,10 @@ iframe#myframe {
     border: none;
 }
 
-// ── Modal calendario ──────────────────────────────────────────
-
-.modal_calendario {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    inset: 0;
-    overflow: auto;
-    background-color: rgb(0 0 0 / 40%);
-    padding-top: 60px;
-}
-
-.modal-content_calendario {
-    background: url("imgs/items/Pannelli.png") no-repeat center / contain;
-    margin: 5% auto 15%;
-    width: 500px;
-    height: 500px;
-}
-
-.close_calendario {
-    position: absolute;
-    right: 25px;
-    top: 0;
-    color: $color-text-light;
-    font-size: 20px;
-    font-weight: $font-weight-bold;
-
-    &:hover,
-    &:focus {
-        color: white;
-        cursor: pointer;
-    }
-}
+// .modal_calendario/.modal-content_calendario/.close_calendario rimosse:
+// residuo del vecchio calendario PHP (pages/agenda_center.inc.php e
+// pages/agenda/*, eliminati e sostituiti da Calendario.jsx), nessun markup
+// le referenzia piu'.
 
 // ── Reliquie — scroll box (elenco_reliquie) ───────────────────
 
