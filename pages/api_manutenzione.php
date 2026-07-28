@@ -94,10 +94,10 @@ switch ($op) {
         if ($isPreview) {
             $count = (int)gdrcd_query("SELECT COUNT(*) AS n FROM chat $where")['n'];
             echo json_encode(['success' => true,
-                'title' => "Elimina log di chat più vecchi di $mesi mesi",
+                'title' => 'Elimina le azioni della chat di gioco',
                 'warning' => 'Operazione irreversibile.',
                 'items' => [
-                    ['label' => 'Righe di chat di ruolo', 'count' => $count],
+                    ['label' => 'Azioni della chat recuperate', 'count' => $count],
                 ],
             ]);
         } else {
