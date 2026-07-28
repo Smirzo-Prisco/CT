@@ -249,6 +249,12 @@ div.title.scheda-pg-name {
     margin-top: 5px;
     border-collapse: collapse;
     text-align: center;
+
+    th {
+        font-weight: $font-weight-bold;
+        border-bottom: 1px solid rgb(255 255 255 / 15%);
+        padding-bottom: 2px;
+    }
 }
 
 div.titolo_box {
@@ -557,6 +563,9 @@ textarea.form_textarea { height: 50px; }
     z-index: 1000;
     user-select: none;
     pointer-events: none;
+    // div.pagina_scheda mette l'intera pagina in maiuscolo (riga 23): senza
+    // questo reset il tooltip lo eredita, come .body_box fa gia' poco sotto.
+    text-transform: none;
 
     &::after {
         content: '';
