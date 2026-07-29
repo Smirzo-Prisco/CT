@@ -1584,9 +1584,14 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
         $canRow = gdrcd_query("SELECT can_send FROM role_session_players WHERE id_role = $id_role AND pg_name = '$target'");
         $can_send = $canRow ? (int)$canRow['can_send'] : 1;
 
-        // Risposta immediata: il bersaglio ha scelto esplicitamente come reagire prima della fine turno
-        $dadoRisposta = gdrcd_query("SELECT dice FROM role_fights WHERE id_role=$id_role AND turn=$turn AND ((striker='$target' AND target='$striker') OR (striker='$striker' AND target='$target')) AND car='dado_risposta' LIMIT 1");
-        $subisce      = gdrcd_query("SELECT id   FROM role_fights WHERE id_role=$id_role AND turn=$turn AND ((striker='$target' AND target='$striker') OR (striker='$striker' AND target='$target')) AND car='subisce'       LIMIT 1");
+        // Risposta immediata: il bersaglio ha scelto esplicitamente come reagire prima della fine turno.
+        // Il filtro su id_fight (l'id di QUESTO attacco, $r['id']) e' quello che rende la ricerca
+        // univoca: prima si usava solo lo striker/target in OR, che confondeva la risposta a
+        // QUESTO attacco con la risposta di un attacco opposto fra le stesse due persone nello
+        // stesso turno (es. un pg attacca un PNG che lo ha attaccato a sua volta prima).
+        $idFightAttacco = (int)$r['id'];
+        $dadoRisposta = gdrcd_query("SELECT dice FROM role_fights WHERE id_role=$id_role AND turn=$turn AND id_fight=$idFightAttacco AND (striker='$target' OR target='$target') AND car='dado_risposta' LIMIT 1");
+        $subisce      = gdrcd_query("SELECT id   FROM role_fights WHERE id_role=$id_role AND turn=$turn AND id_fight=$idFightAttacco AND (striker='$target' OR target='$target') AND car='subisce'       LIMIT 1");
 
         // Se il bersaglio può lanciare un dado automatico di difesa perché non ha lanciato uno scudo in questo turno e neanche nel precedente
         if($can_send === 1) {
@@ -1971,10 +1976,15 @@ function getRolePgs($id_role, $active = false, $excludePng = false) {
 
 // Registra un'azione di combattimento nella role e restituisce l'ID inserito.
 // $damage_percent > 0: ogni bersaglio subisce X% del danno calcolato (attacchi PNG master).
-function fight($id_role, $striker, $target, $id_skill, $level, $car, $dice, $recap='', $damage_percent=0, $dado_raw=0) {
+// $id_fight: per le risposte (dado_risposta/subisce/difesa) collega la riga all'attacco
+// originale a cui rispondono, cosi' elaborateAttackTarget() non deve piu' indovinare la
+// riga giusta confrontando solo striker/target (ambiguo quando due pg si attaccano a
+// vicenda nello stesso turno).
+function fight($id_role, $striker, $target, $id_skill, $level, $car, $dice, $recap='', $damage_percent=0, $dado_raw=0, $id_fight=null) {
     $turn = getTurn($id_role);
-    $query = "INSERT INTO role_fights (id_role, turn, striker, `target`, car, id_skill, level, dice, result, damage_percent, dado_raw)
-            VALUES ($id_role, $turn, '$striker', '$target', '$car', $id_skill, $level, $dice, '$recap', $damage_percent, $dado_raw)";
+    $id_fight_sql = $id_fight === null ? 'NULL' : (int)$id_fight;
+    $query = "INSERT INTO role_fights (id_role, turn, striker, `target`, car, id_skill, level, dice, result, damage_percent, dado_raw, id_fight)
+            VALUES ($id_role, $turn, '$striker', '$target', '$car', $id_skill, $level, $dice, '$recap', $damage_percent, $dado_raw, $id_fight_sql)";
     gdrcd_query($query);
     return (int)gdrcd_query("SELECT LAST_INSERT_ID() as id")['id'];
 }
