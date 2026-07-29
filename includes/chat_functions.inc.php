@@ -1446,16 +1446,20 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
         if (!isset($riepilogo[$striker])) $riepilogo[$striker] = array(); // Inizializzo l'array del pg
 
         // Devo recuperare il sottotipo della skill. Se il sottotipo è presente, devo elaborare il singolo sottotipo, altrimenti significa che la skill non richiede alcun intervento
-        $res = gdrcd_query("SELECT sottotipo FROM abilita WHERE id_abilita = {$r['id_skill']} AND sottotipo IS NOT NULL", 'result');
+        $res = gdrcd_query("SELECT sottotipo FROM abilita WHERE id_abilita = {$r['id_skill']}", 'result');
+        $sottotipo = ($res && gdrcd_query($res, 'num_rows') > 0) ? gdrcd_query($res, 'fetch')['sottotipo'] : null;
 
-        if ($res && gdrcd_query($res, 'num_rows') > 0) {
-            $sottotipo = gdrcd_query($res, 'fetch')['sottotipo'];
-
+        // $handled distingue "sottotipo riconosciuto" (anche se il suo effetto è
+        // volutamente silenzioso, es. danni_dimezzati_nonostante_scudo) da "nessun
+        // sottotipo o sottotipo non gestito": solo in quest'ultimo caso mostro l'esito
+        // generico riuscito/fallito richiesto per le skill generiche senza meccanica propria.
+        $handled = true;
+        if ($sottotipo) {
             switch ($sottotipo) {
                 case 'usa_creatura': // Indipendentemente dal bersaglio selezionato, il castatore dà vita alla sua creatura
                     if($dice >= 10) {
                         $exists = gdrcd_query("SELECT count(*) as creatura FROM personaggio WHERE nome = 'creatura di $striker'")['creatura'];
-                        
+
                         // Controllo se la creatura è già presente
                         if($exists > 0) $msg .= $pgTag." ha già una creatura in gioco.<br>";
                         else{
@@ -1505,13 +1509,24 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                         $msg .= $pgTag." lancia una skill generica che sottrae a $striker 15 punti salute e li dona a $target.<br>";
                     } else $msg .= $pgTag." tenta di lanciare una skill generica che sottrae a $striker 15 punti salute e li dona a $target, ma fallisce.<br>";
                 break;
+                default:
+                    $handled = false;
+                break;
             }
-
-            // Salvo la generica lanciata solo se ha prodotto un messaggio: gli id_skill con
-            // sottotipo non gestito da nessun case sopra (o sottotipo vuoto) lascerebbero $msg
-            // vuoto, generando una card senza contenuto nel riepilogo.
-            if ($msg !== '') $riepilogo[$striker]['generica'][] = $msg;
+        } else {
+            $handled = false;
         }
+
+        // Sottotipo assente/vuoto o non riconosciuto: nessuna meccanica automatica da
+        // applicare, ma segnalo comunque nel recap se il lancio è riuscito o fallito
+        // (>= 10), cosi' come per le altre generiche.
+        if (!$handled) {
+            $msg = $dice >= 10
+                 ? $pgTag." lancia una skill generica con successo.<br>"
+                 : $pgTag." tenta di lanciare una skill generica, ma fallisce.<br>";
+        }
+
+        if ($msg !== '') $riepilogo[$striker]['generica'][] = $msg;
     }
 
     return array('intoccabili' => $intoccabili); // , 'riepilogo' => $riepilogo
