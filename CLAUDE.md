@@ -55,7 +55,7 @@ Hetzner blocca tutte le porte SMTP (25, 465, 587). La funzione `send_mail()` usa
 ## Crystal Bot (chatbot AI)
 Chatbot basato su Claude Haiku (`claude-haiku-4-5-20251001`) integrato come widget floating React.
 - **Endpoint**: `pages/api_chatbot.php` (`op=status`, `op=ask`)
-- **RAG**: MySQL FULLTEXT su `regolamento (titolo, testo)` — max 5 articoli rilevanti, fallback su tutti se nessun match. Richiede: `ALTER TABLE regolamento ADD FULLTEXT INDEX ft_regolamento (titolo, testo);`
+- **RAG**: MySQL FULLTEXT su `regolamento (titolo, testo)` — max 5 articoli rilevanti, fallback su tutti se nessun match. Richiede: `ALTER TABLE regolamento ADD FULLTEXT INDEX ft_regolamento (titolo, testo);`. Stessa ricerca anche su `statuti (titolo, testo)` filtrata a `id_gilda > 0` (statuti delle razze — la tabella contiene anche voci mestiere con `id_mestiere > 0`, escluse), max 3 voci rilevanti, **senza** fallback su tutte (troppe per un contesto sempre attivo). Richiede: `ALTER TABLE statuti ADD FULLTEXT INDEX ft_statuti (titolo, testo);`
 - **Rate limit**: C-token giornalieri per utente (`SUM(tokens_usati)` su `chatbot_log`). Limite configurabile: `$PARAMETERS['anthropic']['daily_token_limit']` in `config.inc.php`
 - **Log**: tabella `chatbot_log (id, nome_personaggio, domanda, risposta, tokens_usati, created_at)`
 - **Chiave API**: `$PARAMETERS['anthropic']['api_key']` in `config.inc.php` (mai in git)
