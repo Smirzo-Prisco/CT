@@ -1173,7 +1173,11 @@ function elaboratePrint($riepilogo, $turn = null) {
                 $target   = $att['pg'];
                 $danno    = (int)($att['danno'] ?? 0);
                 $ptype    = $att['punti_type'] ?? 'salute';
-                $ptLabel  = $ptype === 'integrita' ? 'INT' : 'PS';
+                // getDefenceCar() restituisce 'integrità' (con accento): confrontare con la
+                // forma senza accento faceva sempre fallire il match, mostrando "PS" anche
+                // sugli attacchi mentali (il totale in fondo era corretto perché lì si usa
+                // un else, non un confronto esatto sulla stringa).
+                $ptLabel  = $ptype === 'integrità' ? 'INT' : 'PS';
                 $sub      = $subIdx["{$target}|{$pg}"] ?? null;
                 $shielded = $sub && !empty($sub['intoccabile']);
 
