@@ -111,6 +111,27 @@ if ($op === 'ask') {
         gdrcd_query($result, 'free');
     }
 
+    // Statuti delle razze: stessa ricerca FULLTEXT, tabella separata (statuti,
+    // filtrata a id_gilda > 0 — la stessa tabella contiene anche voci mestiere
+    // con id_mestiere > 0, non pertinenti qui). Solo se rilevanti (nessun
+    // fallback "carica tutto": 10 razze x ~10 voci ciascuna gonfierebbe il
+    // contesto anche per domande che non c'entrano nulla con le razze).
+    $result_statuti = gdrcd_query(
+        "SELECT g.nome AS razza, s.titolo, s.testo,
+                MATCH(s.titolo, s.testo) AGAINST('$domanda_ft' IN NATURAL LANGUAGE MODE) AS score
+         FROM statuti s
+         JOIN gilda g ON g.id_gilda = s.id_gilda
+         WHERE s.id_gilda > 0
+           AND MATCH(s.titolo, s.testo) AGAINST('$domanda_ft' IN NATURAL LANGUAGE MODE) > 0
+         ORDER BY score DESC
+         LIMIT 3",
+        'result'
+    );
+    while ($art = gdrcd_query($result_statuti, 'fetch')) {
+        $context .= "## [Statuto razza: {$art['razza']}] {$art['titolo']}\n{$art['testo']}\n\n";
+    }
+    gdrcd_query($result_statuti, 'free');
+
     // Chiave API Anthropic
     $api_key = $PARAMETERS['anthropic']['api_key'] ?? '';
     if (empty($api_key)) {
@@ -121,8 +142,8 @@ if ($op === 'ask') {
 
     $system = "Sei Crystal Bot, l'assistente virtuale del gioco di ruolo Crystal Tokyo. "
             . "Non aggiungere saluti o presentazioni: vai direttamente alla risposta. "
-            . "Rispondi ESCLUSIVAMENTE basandoti sulle informazioni del regolamento fornite qui sotto. "
-            . "Se la risposta non è nel regolamento, dillo chiaramente senza inventare. "
+            . "Rispondi ESCLUSIVAMENTE basandoti sulle informazioni fornite qui sotto (regolamento e statuti delle razze). "
+            . "Se la risposta non è tra queste informazioni, dillo chiaramente senza inventare. "
             . "Rispondi in italiano, in modo chiaro e conciso.\n\n---\n\n"
             . $context;
 
