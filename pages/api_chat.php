@@ -1622,7 +1622,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 case 'dado':
                     $carDifesa  = getDefenceCar($fightRow['car'], $pngName);
                     $rawDado    = mt_rand(1, 20);
-                    $bonusCar   = $carDifesa['car'] - 1;
+                    // getDefenceCar() restituisce il valore grezzo della caratteristica (es. 30),
+                    // non il bonus. La formula standard (lanciaStat(), riga ~605) è (car/10)-1:
+                    // qui mancava la divisione, gonfiando il bonus di ~10 volte (30-1=29 invece di
+                    // (30/10)-1=2).
+                    $bonusCar   = ($carDifesa['car'] / 10) - 1;
                     $dice       = max(1, $rawDado + $bonusCar);
                     $breakdown  = $bonusCar > 0
                         ? "$rawDado/20 + $bonusCar = $dice"
