@@ -1507,7 +1507,10 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                 break;
             }
 
-            $riepilogo[$striker]['generica'][] = $msg; // Salvo la generica lanciata
+            // Salvo la generica lanciata solo se ha prodotto un messaggio: gli id_skill con
+            // sottotipo non gestito da nessun case sopra (o sottotipo vuoto) lascerebbero $msg
+            // vuoto, generando una card senza contenuto nel riepilogo.
+            if ($msg !== '') $riepilogo[$striker]['generica'][] = $msg;
         }
     }
 
@@ -1812,8 +1815,11 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
             }
         }
 
-        $riepilogo[$striker]['generica'][] = $msg;
-        $riepilogo[$target]['generica'][]  = $targetMsg;
+        // Stesso motivo del filtro in elaborateGenerichePre(): sottotipi non gestiti da
+        // nessun ramo sopra (es. 'annulla_lancio_bersaglio', gestito solo in Pre) o skill
+        // senza sottotipo lasciano $msg/$targetMsg vuoti, producendo card fantasma.
+        if ($msg !== '')       $riepilogo[$striker]['generica'][] = $msg;
+        if ($targetMsg !== '') $riepilogo[$target]['generica'][]  = $targetMsg;
     }
 
     return; // array('riepilogo' => $riepilogo);
