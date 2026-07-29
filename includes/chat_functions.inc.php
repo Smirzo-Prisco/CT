@@ -1446,8 +1446,11 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
         if (!isset($riepilogo[$striker])) $riepilogo[$striker] = array(); // Inizializzo l'array del pg
 
         // Devo recuperare il sottotipo della skill. Se il sottotipo è presente, devo elaborare il singolo sottotipo, altrimenti significa che la skill non richiede alcun intervento
-        $res = gdrcd_query("SELECT sottotipo FROM abilita WHERE id_abilita = {$r['id_skill']}", 'result');
-        $sottotipo = ($res && gdrcd_query($res, 'num_rows') > 0) ? gdrcd_query($res, 'fetch')['sottotipo'] : null;
+        $res = gdrcd_query("SELECT sottotipo, nome FROM abilita WHERE id_abilita = {$r['id_skill']}", 'result');
+        $abilitaRow = ($res && gdrcd_query($res, 'num_rows') > 0) ? gdrcd_query($res, 'fetch') : null;
+        $sottotipo  = $abilitaRow['sottotipo'] ?? null;
+        $skillNome  = trim($abilitaRow['nome'] ?? '') ?: 'Sconosciuta';
+        $skillTag   = "<i>$skillNome</i>";
 
         // $handled distingue "sottotipo riconosciuto" (anche se il suo effetto è
         // volutamente silenzioso, es. danni_dimezzati_nonostante_scudo) da "nessun
@@ -1461,13 +1464,13 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                         $exists = gdrcd_query("SELECT count(*) as creatura FROM personaggio WHERE nome = 'creatura di $striker'")['creatura'];
 
                         // Controllo se la creatura è già presente
-                        if($exists > 0) $msg .= $pgTag." ha già una creatura in gioco.<br>";
+                        if($exists > 0) $msg .= $pgTag." ha già una creatura in gioco e non può lanciare $skillTag.<br>";
                         else{
                             gdrcd_query("INSERT INTO personaggio (nome, car2, salute) VALUES ('creatura di $striker', 80, 30)");
                             gdrcd_query("INSERT INTO role_session_players (id_role, pg_name, png) VALUES ($id_role, 'creatura di $striker', 1)");
-                            $msg .= $pgTag." lancia una skill generica che evoca una creatura al suo servizio.<br>";
+                            $msg .= $pgTag." lancia la skill generica $skillTag che evoca una creatura al suo servizio.<br>";
                         }
-                    } else $msg .= $pgTag." tenta di evocare una creatura al suo servizio, ma fallisce.<br>";
+                    } else $msg .= $pgTag." tenta di lanciare la skill generica $skillTag per evocare una creatura al suo servizio, ma fallisce.<br>";
                 break;
                 case 'danni_dimezzati_nonostante_scudo': // Se il bersaglio è scudato, subisce comunque metà danno
                     // Tolgo il bersaglio dagli intoccabili, così da poter elaborare l'attacco con danni dimezzati nella fase di elaborazione degli attacchi
@@ -1476,14 +1479,14 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                 case 'creatura_attacca_padrone': // L'attacco con creatura viene rivolto verso colui che lo esegue
                     if($dice >= 10) {
                         gdrcd_query("UPDATE role_fights SET target = '$striker' WHERE id_role = $id_role AND turn = $turn AND car = 'creatura'");
-                        $msg .= $pgTag." lancia una skill generica che costringe la creatura di $target ad attaccare $target.<br>";
-                    } else $msg .= $pgTag." tenta di lanciare una skill generica che costringe la creatura di $target ad attaccare $target, ma fallisce.<br>";
+                        $msg .= $pgTag." lancia la skill generica $skillTag che costringe la creatura di $target ad attaccare $target.<br>";
+                    } else $msg .= $pgTag." tenta di lanciare la skill generica $skillTag che costringe la creatura di $target ad attaccare $target, ma fallisce.<br>";
                 break;
                 case 'annulla_lancio_bersaglio': // Annullo ogni lancio del bersaglio
                     if($dice >= 10) {
                         gdrcd_query("DELETE FROM role_fights WHERE id_role = $id_role AND turn = $turn AND striker = '$target'");
-                        $msg .= $pgTag." lancia una skill generica che annulla ogni lancio di $target.<br>";
-                    } else $msg .= $pgTag." tenta di lanciare una skill generica che annulla ogni lancio di $target, ma fallisce.<br>";
+                        $msg .= $pgTag." lancia la skill generica $skillTag che annulla ogni lancio di $target.<br>";
+                    } else $msg .= $pgTag." tenta di lanciare la skill generica $skillTag che annulla ogni lancio di $target, ma fallisce.<br>";
                 break;
                 case 'malus_10ps_scudo_30ps_bersaglio_meno30ps': // Non si può fare
                     // Controllo se il bersaglio ha meno di 30 salute
@@ -1492,22 +1495,22 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                 case 'annulla_scudo': // Cancello tutti i record con car = difesa per target
                     if($dice >= 10) {
                         gdrcd_query("DELETE FROM role_fights WHERE id_role = $id_role AND turn = $turn AND car = 'difesa' AND target = '$target'");
-                        $msg .= $pgTag." lancia una skill generica che annulla ogni scudo di $target per questo turno.<br>";
-                    } else $msg .= $pgTag." tenta di lanciare una skill generica che annulla ogni scudo di $target per questo turno, ma fallisce.<br>";
+                        $msg .= $pgTag." lancia la skill generica $skillTag che annulla ogni scudo di $target per questo turno.<br>";
+                    } else $msg .= $pgTag." tenta di lanciare la skill generica $skillTag che annulla ogni scudo di $target per questo turno, ma fallisce.<br>";
                 break;
                 case 'prolunga_effetti_un_turno': // Prolunga gli effetti della skill generica lanciata dal bersaglio
                     if($dice >= 10) {
                         gdrcd_query("INSERT INTO role_fights (id_role, turn, striker, target, car, id_skill, level, dice)
                                     VALUES ($id_role, $turn + 1, '$striker', '$target', 'generica', ".$r['id_skill'].", 1, $dice)");
-                        $msg .= $pgTag." lancia una skill generica che prolunga gli effetti di una skill generica lanciata da $target anche al turno successivo.<br>";
-                    } else $msg .= $pgTag." tenta di lanciare una skill generica che prolunga gli effetti di una skill generica lanciata da $target anche al turno successivo, ma fallisce.<br>";
+                        $msg .= $pgTag." lancia la skill generica $skillTag che prolunga gli effetti di una skill generica lanciata da $target anche al turno successivo.<br>";
+                    } else $msg .= $pgTag." tenta di lanciare la skill generica $skillTag che prolunga gli effetti di una skill generica lanciata da $target anche al turno successivo, ma fallisce.<br>";
                 break;
                 case 'più_15_punti_salute': // Cura
                     if($dice >= 10) {
                         gdrcd_query("UPDATE personaggio SET salute = salute - 15 WHERE nome = '$striker'");
                         gdrcd_query("UPDATE personaggio SET salute = salute + 15 WHERE nome = '$target'");
-                        $msg .= $pgTag." lancia una skill generica che sottrae a $striker 15 punti salute e li dona a $target.<br>";
-                    } else $msg .= $pgTag." tenta di lanciare una skill generica che sottrae a $striker 15 punti salute e li dona a $target, ma fallisce.<br>";
+                        $msg .= $pgTag." lancia la skill generica $skillTag che sottrae a $striker 15 punti salute e li dona a $target.<br>";
+                    } else $msg .= $pgTag." tenta di lanciare la skill generica $skillTag che sottrae a $striker 15 punti salute e li dona a $target, ma fallisce.<br>";
                 break;
                 default:
                     $handled = false;
@@ -1522,8 +1525,8 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
         // (>= 10), cosi' come per le altre generiche.
         if (!$handled) {
             $msg = $dice >= 10
-                 ? $pgTag." lancia una skill generica con successo.<br>"
-                 : $pgTag." tenta di lanciare una skill generica, ma fallisce.<br>";
+                 ? $pgTag." lancia la skill generica $skillTag con successo.<br>"
+                 : $pgTag." tenta di lanciare la skill generica $skillTag, ma fallisce.<br>";
         }
 
         if ($msg !== '') $riepilogo[$striker]['generica'][] = $msg;
@@ -1733,10 +1736,13 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
         if (!isset($riepilogo[$striker])) $riepilogo[$striker] = [];
         if (!isset($riepilogo[$target]))  $riepilogo[$target]  = [];
 
-        $res = gdrcd_query("SELECT sottotipo FROM abilita WHERE id_abilita = {$r['id_skill']} AND sottotipo IS NOT NULL", 'result');
+        $res = gdrcd_query("SELECT sottotipo, nome FROM abilita WHERE id_abilita = {$r['id_skill']} AND sottotipo IS NOT NULL", 'result');
         if (!$res || gdrcd_query($res, 'num_rows') === 0) continue;
 
-        $sottotipo  = gdrcd_query($res, 'fetch')['sottotipo'];
+        $abilitaRow = gdrcd_query($res, 'fetch');
+        $sottotipo  = $abilitaRow['sottotipo'];
+        $skillNome  = trim($abilitaRow['nome'] ?? '') ?: 'Sconosciuta';
+        $skillTag   = "<i>$skillNome</i>";
         $hasSubisce = isset($riepilogo[$target]['subisce']) && count($riepilogo[$target]['subisce']) > 0;
 
         if (isset($moltiplicatori[$sottotipo])) {
@@ -1748,10 +1754,10 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
                     $riepilogo[$target]['totale_salute']    = $tot['salute']    * $m;
                     $riepilogo[$target]['totale_integrita'] = $tot['integrita'] * $m;
                     $label     = $m < 1 ? 'dimezzati' : 'doppi';
-                    $msg       .= "<br>$striker lancia a $target una skill generica che infligge danni $label. ";
-                    $targetMsg .= "<br>$target subisce l'effetto della skill generica di $striker e subisce danni $label. ";
-                } else $msg .= "<br>$striker tenta di lanciare a $target una skill generica sui danni, ma $target non subisce danni fisici in questo turno, quindi la generica non ha effetto. ";
-            } else $msg .= "<br>$striker tenta di lanciare a $target una skill generica sui danni, ma fallisce. ";
+                    $msg       .= "<br>$striker lancia a $target la skill generica $skillTag che infligge danni $label. ";
+                    $targetMsg .= "<br>$target subisce l'effetto della skill generica $skillTag di $striker e subisce danni $label. ";
+                } else $msg .= "<br>$striker tenta di lanciare a $target la skill generica $skillTag sui danni, ma $target non subisce danni fisici in questo turno, quindi la generica non ha effetto. ";
+            } else $msg .= "<br>$striker tenta di lanciare a $target la skill generica $skillTag sui danni, ma fallisce. ";
         } elseif (isset($danniExtra[$sottotipo])) {
             // Pattern 2 — danno fisso aggiuntivo
             if ($dice >= 10) {
@@ -1762,10 +1768,10 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
                         'pg'         => $striker,
                         'danno'      => $extra,
                         'punti_type' => 'salute',
-                        'msg'        => "Subisce l'effetto della skill generica di $striker che infligge $label. "
+                        'msg'        => "Subisce l'effetto della skill generica $skillTag di $striker che infligge $label. "
                     ];
-                } else $msg .= "<br>$striker tenta di lanciare a $target una skill generica, ma $target non subisce danni fisici in questo turno, quindi la generica non ha effetto. ";
-            } else $msg .= "<br>$striker tenta di lanciare a $target una skill generica, ma fallisce. ";
+                } else $msg .= "<br>$striker tenta di lanciare a $target la skill generica $skillTag, ma $target non subisce danni fisici in questo turno, quindi la generica non ha effetto. ";
+            } else $msg .= "<br>$striker tenta di lanciare a $target la skill generica $skillTag, ma fallisce. ";
         } else {
             // Casi speciali
             switch ($sottotipo) {
@@ -1779,21 +1785,21 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
                             $tot = sumDanni($riepilogo[$target]['subisce']);
                             $riepilogo[$target]['totale_salute']    = $tot['salute']    / 2;
                             $riepilogo[$target]['totale_integrita'] = $tot['integrita'] / 2;
-                            $msg       .= "<br>$striker lancia a $target una skill generica che infligge danni dimezzati nonostante lo scudo. ";
-                            $targetMsg .= "<br>$target, nonostante lo scudo, subisce la metà dei danni per effetto della skill generica di $striker. ";
-                        } else $msg .= "<br>$striker tenta la skill su $target, ma $target non subisce danni fisici in questo turno, quindi la generica non ha effetto. ";
-                    } else $msg .= "<br>$striker tenta di lanciare a $target una skill generica che infligge danni dimezzati nonostante lo scudo, ma fallisce. ";
+                            $msg       .= "<br>$striker lancia a $target la skill generica $skillTag che infligge danni dimezzati nonostante lo scudo. ";
+                            $targetMsg .= "<br>$target, nonostante lo scudo, subisce la metà dei danni per effetto della skill generica $skillTag di $striker. ";
+                        } else $msg .= "<br>$striker tenta la skill generica $skillTag su $target, ma $target non subisce danni fisici in questo turno, quindi la generica non ha effetto. ";
+                    } else $msg .= "<br>$striker tenta di lanciare a $target la skill generica $skillTag che infligge danni dimezzati nonostante lo scudo, ma fallisce. ";
                 break;
 
                 case 'sposta_danni_bersaglio_su_castatore':
                     if ($dice >= 10) {
                         if ($hasSubisce) {
                             $tot = sumDanni($riepilogo[$target]['subisce']);
-                            $riepilogo[$striker]['subisce'][] = ['pg' => $striker, 'danno' => $tot['salute'],    'punti_type' => 'salute',    'msg' => " e subisce l'effetto della skill generica di $striker che sposta i danni (ps) subiti da $target su $striker. "];
-                            $riepilogo[$striker]['subisce'][] = ['pg' => $striker, 'danno' => $tot['integrita'], 'punti_type' => 'integrita', 'msg' => " e subisce l'effetto della skill generica di $striker che sposta i danni (pi) subiti da $target su $striker. "];
-                            $msg .= "<br>$striker lancia a $target una skill generica che sposta i danni subiti da $target su $striker. ";
-                        } else $msg .= "<br>$striker tenta di spostare i danni di $target su se stesso, ma $target non subisce danni fisici in questo turno. ";
-                    } else $msg .= "<br>$striker tenta di spostare i danni di $target su se stesso, ma fallisce. ";
+                            $riepilogo[$striker]['subisce'][] = ['pg' => $striker, 'danno' => $tot['salute'],    'punti_type' => 'salute',    'msg' => " e subisce l'effetto della skill generica $skillTag di $striker che sposta i danni (ps) subiti da $target su $striker. "];
+                            $riepilogo[$striker]['subisce'][] = ['pg' => $striker, 'danno' => $tot['integrita'], 'punti_type' => 'integrita', 'msg' => " e subisce l'effetto della skill generica $skillTag di $striker che sposta i danni (pi) subiti da $target su $striker. "];
+                            $msg .= "<br>$striker lancia a $target la skill generica $skillTag che sposta i danni subiti da $target su $striker. ";
+                        } else $msg .= "<br>$striker tenta di spostare i danni di $target su se stesso con la skill generica $skillTag, ma $target non subisce danni fisici in questo turno. ";
+                    } else $msg .= "<br>$striker tenta di spostare i danni di $target su se stesso con la skill generica $skillTag, ma fallisce. ";
                 break;
 
                 case 'sposta_danni_castatore_su_bersaglio':
@@ -1801,11 +1807,11 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
                     if ($dice >= 10) {
                         if ($hasStrikerSubisce) {
                             $tot = sumDanni($riepilogo[$striker]['subisce']);
-                            $riepilogo[$target]['subisce'][] = ['pg' => $striker, 'danno' => $tot['salute'],    'punti_type' => 'salute',    'msg' => " e subisce l'effetto della skill generica di $striker che sposta i danni (ps) subiti da $striker su $target. "];
-                            $riepilogo[$target]['subisce'][] = ['pg' => $striker, 'danno' => $tot['integrita'], 'punti_type' => 'integrita', 'msg' => " e subisce l'effetto della skill generica di $striker che sposta i danni (pi) subiti da $striker su $target. "];
-                            $msg .= "<br>$striker lancia a $target una skill generica che sposta i propri danni su $target. ";
-                        } else $msg .= "<br>$striker tenta di spostare i propri danni su $target, ma $striker non subisce danni fisici in questo turno. ";
-                    } else $msg .= "<br>$striker tenta di spostare i propri danni su $target, ma fallisce. ";
+                            $riepilogo[$target]['subisce'][] = ['pg' => $striker, 'danno' => $tot['salute'],    'punti_type' => 'salute',    'msg' => " e subisce l'effetto della skill generica $skillTag di $striker che sposta i danni (ps) subiti da $striker su $target. "];
+                            $riepilogo[$target]['subisce'][] = ['pg' => $striker, 'danno' => $tot['integrita'], 'punti_type' => 'integrita', 'msg' => " e subisce l'effetto della skill generica $skillTag di $striker che sposta i danni (pi) subiti da $striker su $target. "];
+                            $msg .= "<br>$striker lancia a $target la skill generica $skillTag che sposta i propri danni su $target. ";
+                        } else $msg .= "<br>$striker tenta di spostare i propri danni su $target con la skill generica $skillTag, ma $striker non subisce danni fisici in questo turno. ";
+                    } else $msg .= "<br>$striker tenta di spostare i propri danni su $target con la skill generica $skillTag, ma fallisce. ";
                 break;
 
                 case 'converti_danni_bersaglio_in_salute_castatore':
@@ -1813,9 +1819,9 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
                         if ($hasSubisce) {
                             $tot = sumDanni($riepilogo[$target]['subisce']);
                             gdrcd_query("UPDATE personaggio SET salute = salute + {$tot['salute']} WHERE nome = '$striker'");
-                            $msg .= "<br>$striker lancia a $target una skill generica che converte i danni subiti da $target in punti salute per se stesso. ";
-                        } else $msg .= "<br>$striker tenta di convertire i danni di $target in salute, ma $target non subisce danni fisici in questo turno. ";
-                    } else $msg .= "<br>$striker tenta di convertire i danni di $target in salute, ma fallisce. ";
+                            $msg .= "<br>$striker lancia a $target la skill generica $skillTag che converte i danni subiti da $target in punti salute per se stesso. ";
+                        } else $msg .= "<br>$striker tenta di convertire i danni di $target in salute con la skill generica $skillTag, ma $target non subisce danni fisici in questo turno. ";
+                    } else $msg .= "<br>$striker tenta di convertire i danni di $target in salute con la skill generica $skillTag, ma fallisce. ";
                 break;
 
                 case 'converti_meta_danni_bersaglio_in_salute_castatore':
@@ -1824,9 +1830,9 @@ function elaborateGenerichePost($id_role, $turn, &$riepilogo) {
                             $tot  = sumDanni($riepilogo[$target]['subisce']);
                             $meta = (int) floor($tot['salute'] / 2);
                             gdrcd_query("UPDATE personaggio SET salute = salute + $meta WHERE nome = '$striker'");
-                            $msg .= "<br>$striker lancia a $target una skill generica che converte metà dei danni subiti da $target ({$meta} ps) in punti salute per se stesso. ";
-                        } else $msg .= "<br>$striker tenta di convertire metà dei danni di $target in salute, ma $target non subisce danni fisici in questo turno. ";
-                    } else $msg .= "<br>$striker tenta di convertire metà dei danni di $target in salute, ma fallisce. ";
+                            $msg .= "<br>$striker lancia a $target la skill generica $skillTag che converte metà dei danni subiti da $target ({$meta} ps) in punti salute per se stesso. ";
+                        } else $msg .= "<br>$striker tenta di convertire metà dei danni di $target in salute con la skill generica $skillTag, ma $target non subisce danni fisici in questo turno. ";
+                    } else $msg .= "<br>$striker tenta di convertire metà dei danni di $target in salute con la skill generica $skillTag, ma fallisce. ";
                 break;
 
                 case 'meno_50_danni_tutti_con_durata':
