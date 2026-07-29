@@ -249,7 +249,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $pg         = gdrcd_query("SELECT * FROM personaggio WHERE nome = '$login'");
                     $diceResult = lanciaStat($id_role, $attacker, $login, true, $carDifesa['nome'], $carDifesa['nome'], $carDifesa['car'], $carDifesa['punti'], 0, 0);
                     $dice       = $diceResult['risultato'];
-                    fight($id_role, $login, $attacker, 0, 0, 'dado_risposta', $dice, 'risposta immediata dado');
+                    fight($id_role, $login, $attacker, 0, 0, 'dado_risposta', $dice, 'risposta immediata dado', 0, 0, $id_fight);
                     $sussurroStr = $diceResult['sussurro'] ? " ({$diceResult['sussurro']})" : '';
                     $messaggio = "<i>Risultato provvisorio:</i> $login tira il dado di difesa e ottiene <b>$dice</b>$sussurroStr contro l'attacco di $attacker";
                     break;
@@ -258,13 +258,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $dice       = mt_rand(1, 20);
                     $shieldSkill = gdrcd_query("SELECT cpa.id_abilita FROM clgpersonaggioabilita cpa JOIN abilita a ON cpa.id_abilita = a.id_abilita WHERE cpa.nome = '$login' AND a.tipo = 'Difensiva' LIMIT 1");
                     $id_skill   = $shieldSkill ? (int)$shieldSkill['id_abilita'] : 0;
-                    fight($id_role, $login, $login, $id_skill, 0, 'difesa', $dice, 'risposta immediata scudo');
+                    fight($id_role, $login, $login, $id_skill, 0, 'difesa', $dice, 'risposta immediata scudo', 0, 0, $id_fight);
                     $esito     = $dice >= 10 ? 'con successo' : 'senza successo';
                     $messaggio = "<i>Risultato provvisorio:</i> $login usa lo scudo con un tiro di <b>$dice/20</b> $esito";
                     break;
 
                 case 'subisce':
-                    fight($id_role, $login, $attacker, 0, 0, 'subisce', 0, 'risposta immediata subisce');
+                    fight($id_role, $login, $attacker, 0, 0, 'subisce', 0, 'risposta immediata subisce', 0, 0, $id_fight);
                     $messaggio = "<i>Risultato provvisorio:</i> $login decide di subire l'attacco di $attacker";
                     break;
 
@@ -1622,16 +1622,20 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 case 'dado':
                     $carDifesa  = getDefenceCar($fightRow['car'], $pngName);
                     $rawDado    = mt_rand(1, 20);
-                    $bonusCar   = $carDifesa['car'] - 1;
+                    // getDefenceCar() restituisce il valore grezzo della caratteristica (es. 30),
+                    // non il bonus. La formula standard (lanciaStat(), riga ~605) è (car/10)-1:
+                    // qui mancava la divisione, gonfiando il bonus di ~10 volte (30-1=29 invece di
+                    // (30/10)-1=2).
+                    $bonusCar   = ($carDifesa['car'] / 10) - 1;
                     $dice       = max(1, $rawDado + $bonusCar);
                     $breakdown  = $bonusCar > 0
                         ? "$rawDado/20 + $bonusCar = $dice"
                         : ($bonusCar < 0 ? "$rawDado/20 - " . abs($bonusCar) . " = $dice" : "$rawDado/20 = $dice");
-                    fight($id_role, $attacker, $pngName, 0, 0, 'dado_risposta', $dice, 'risposta PNG dado');
+                    fight($id_role, $attacker, $pngName, 0, 0, 'dado_risposta', $dice, 'risposta PNG dado', 0, 0, $id_fight);
                     $messaggio = "<i>Risultato provvisorio:</i> $pngName tira il dado di difesa ({$carDifesa['nome']}) e ottiene <b>$dice</b> ($breakdown) contro l'attacco di $attacker";
                     break;
                 case 'subisce':
-                    fight($id_role, $attacker, $pngName, 0, 0, 'subisce', 0, 'risposta PNG subisce');
+                    fight($id_role, $attacker, $pngName, 0, 0, 'subisce', 0, 'risposta PNG subisce', 0, 0, $id_fight);
                     $messaggio = "<i>Risultato provvisorio:</i> $pngName subisce l'attacco di $attacker (tiro: <b>{$fightRow['dice']}</b>)";
                     break;
                 default:
