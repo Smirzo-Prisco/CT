@@ -42,7 +42,6 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import useWeatherEffect from '../hooks/useWeatherEffect'
 
 // Unica voce non presente in mappa_click/mappa: un link diretto a una pagina
 // di servizio (non una stanza/chat), aggiunto lato client alla zona Roppongi
@@ -87,10 +86,6 @@ export default function MapClick() {
 
     /** Info sulla posizione corrente (is_notte) */
     const [mapInfo, setMapInfo] = useState(null)
-
-    // Stesso effetto meteo del cerchio-luogo nell'HUD (Hud.jsx), qui sovrapposto
-    // all'intera mappa grande — vedi useWeatherEffect per la condizione.
-    const weatherFx = useWeatherEffect(mapInfo?.is_notte)
 
     /** Zone della mappa corrente (pin + stanze), da api_map.php?op=zones. */
     const [zones, setZones] = useState([])
@@ -352,14 +347,6 @@ export default function MapClick() {
                         style={{ width: '100%', height: 'auto', display: 'block' }}
                         onLoad={onImageLoad}
                     />
-
-                    {/* Overlay meteo sull'intera mappa — stessa condizione del cerchio-
-                        luogo nell'HUD, ma con dimensioni/tile proprie (vedi _map_click.scss):
-                        quelle dell'HUD sono tarate su un cerchio di ~150px, qui l'immagine
-                        e' larga fino a 1500px+, servono valori in scala diversa. */}
-                    {weatherFx &&
-                        <div className={`ct-map__weather-fx ct-map__weather-fx--${weatherFx}`} aria-hidden="true" />
-                    }
 
                     {/* Pin cliccabili — solo dopo il caricamento dell'immagine.
                         Marker discreto (anello bianco pulsante/fluttuante +
