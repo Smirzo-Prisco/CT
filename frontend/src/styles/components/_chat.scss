@@ -532,7 +532,7 @@ div.pagina_frame_chat {
     // per questo non puo' semplicemente ereditare da .output ed e' un fixed
     // a se stante con gli stessi margini percentuali.
     position: fixed;
-    top: 136px; // 86px topbar + 50px extra, stessa ragione di #maincontent in _layout.scss
+    top: $hud-content-top; // vedi _tokens.scss, stessa ragione di #maincontent in _layout.scss
     left: 5%;
     right: 5%;
     bottom: 0;
