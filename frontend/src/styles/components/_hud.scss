@@ -706,6 +706,12 @@ body[data-palette="public"] {
     align-items: center;
     gap: 4px;
 }
+.ct-meteo__data {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 8px;
+}
 
 .ct-hud__char-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .ct-hud__char-name {

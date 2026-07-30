@@ -133,6 +133,9 @@ export default function Calendario({ isStaff }) {
     const [giorni, setGiorni] = useState({})
     const [loadingMonth, setLoadingMonth] = useState(true)
     const [luoghi, setLuoghi] = useState([])
+    // Offset anno ambientazione (da config.inc.php via api_calendario.php): solo
+    // l'etichetta mostrata cambia, la griglia dei giorni resta sull'anno reale.
+    const [annoOffset, setAnnoOffset] = useState(0)
 
     // ── Filtro "calendario di un altro utente" ──────────────────────────
     // '' = solo i miei impegni (default), '__all__' = tutti quelli condivisi,
@@ -153,6 +156,7 @@ export default function Calendario({ isStaff }) {
                 if (d.success) {
                     setGiorni(d.giorni)
                     setFiltroCondiviso(d.utente_condiviso ?? null)
+                    setAnnoOffset(d.anno_offset ?? 0)
                 }
             })
             .catch(() => {})
@@ -389,7 +393,7 @@ export default function Calendario({ isStaff }) {
                 <button type="button" onClick={() => cambiaMese(-1)} aria-label="Mese precedente">
                     <i className="fa-solid fa-chevron-left" />
                 </button>
-                <span className="calendario-page__mese">{MESI[mese - 1]} {anno}</span>
+                <span className="calendario-page__mese">{MESI[mese - 1]} {anno + annoOffset}</span>
                 <button type="button" onClick={() => cambiaMese(1)} aria-label="Mese successivo">
                     <i className="fa-solid fa-chevron-right" />
                 </button>

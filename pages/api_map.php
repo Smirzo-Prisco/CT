@@ -52,7 +52,7 @@ switch ($op) {
                 'privata'              => (bool)($row['privata'] ?? false),
                 'meteo'                => $row['meteo'] ?? '',
                 'is_notte'             => $isNotte,
-                'anno'                 => date('Y', strtotime('+1053 years')),
+                'anno'                 => getAnnoGioco(),
             ]);
         } else {
             // Il personaggio è sulla mappa (luogo = -1)
@@ -68,7 +68,7 @@ switch ($op) {
                 'larghezza'      => (int)($zona['larghezza'] ?? 500),
                 'altezza'        => (int)($zona['altezza']   ?? 330),
                 'is_notte'       => $isNotte,
-                'anno'           => date('Y', strtotime('+1053 years')),
+                'anno'           => getAnnoGioco(),
             ]);
         }
         break;

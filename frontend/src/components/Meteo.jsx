@@ -51,7 +51,7 @@ export default function Meteo() {
     return (
         <div className="ct-meteo">
             <div className="ct-meteo__head">
-                <span>{showYesterday ? 'Meteo di ieri' : 'Meteo oggi'}</span>
+                <span>{showYesterday ? 'Meteo di ieri' : 'Meteo di oggi'}</span>
                 <button
                     type="button"
                     className="ct-meteo__toggle"
@@ -61,6 +61,7 @@ export default function Meteo() {
                     <i className="fa-solid fa-clock-rotate-left" />
                 </button>
             </div>
+            {data.data && <div className="ct-meteo__data">{data.data}</div>}
 
             <div className="ct-meteo__row">
                 <div className="ct-meteo__col">
