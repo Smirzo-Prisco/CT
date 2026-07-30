@@ -53,6 +53,29 @@ function send_mail(string $to, string $subject, string $message) : bool {
     return true;
 }
 
+/**
+ * Offset (in anni) fra l'anno reale e l'anno dell'ambientazione, letto da
+ * $PARAMETERS['date']['offset'] in config.inc.php. Unico punto da cui va letto
+ * questo valore: prima era duplicato come "+1053 years" hardcoded in api_map.php
+ * e mai sincronizzato col parametro di config previsto per questo scopo.
+ *
+ * @return int
+ */
+function getAnnoOffset() : int {
+    return (int)($GLOBALS['PARAMETERS']['date']['offset'] ?? 0);
+}
+
+/**
+ * Anno dell'ambientazione "oggi" (anno reale + offset). Per ottenere l'anno di
+ * un anno reale diverso da quello corrente (es. la vista mese del calendario),
+ * sommare getAnnoOffset() direttamente a quell'anno invece di usare questa.
+ *
+ * @return int
+ */
+function getAnnoGioco() : int {
+    return (int)date('Y') + getAnnoOffset();
+}
+
 function generateLinks($current_page, $total_pages, $url = "?") {
     $links = '';
 

@@ -210,6 +210,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $img_notte_att  = $notte_map[$meteo['meteo_notte_attuale']]  ?? $meteo['meteo_notte_attuale'];
             $img_notte_prec = $notte_map[$meteo['meteo_notte_precedente']] ?? $meteo['meteo_notte_precedente'];
 
+            // Data testuale con l'anno dell'ambientazione (giorno/mese restano quelli
+            // reali, vedi getAnnoOffset()): "oggi" e "ieri" rispetto alla data reale.
+            $mesiIt   = ['','gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+            $dataMeteo = function(string $modifier) use ($mesiIt) {
+                $ts = strtotime($modifier);
+                return (int)date('j', $ts) . ' ' . $mesiIt[(int)date('n', $ts)] . ' ' . ((int)date('Y', $ts) + getAnnoOffset());
+            };
+
             echo json_encode([
                 'success'    => true,
                 'attuale'    => [
@@ -219,6 +227,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'temp_min'    => (int)$meteo['temperatura_notte_attuale'],
                     'vento_giorno'=> $meteo['vento_giorno_attuale'],
                     'vento_notte' => $meteo['vento_notte_attuale'],
+                    'data'        => $dataMeteo('today'),
                 ],
                 'precedente' => [
                     'giorno_img'  => $meteo['meteo_giorno_precedente'],
@@ -227,6 +236,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'temp_min'    => (int)$meteo['temperatura_notte_precedente'],
                     'vento_giorno'=> $meteo['vento_giorno_precedente'],
                     'vento_notte' => $meteo['vento_notte_precedente'],
+                    'data'        => $dataMeteo('yesterday'),
                 ],
             ]);
             break;

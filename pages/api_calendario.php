@@ -224,7 +224,15 @@ switch ($op) {
         }
         gdrcd_query($res, 'free');
 
-        echo json_encode(['success' => true, 'giorni' => $giorni, 'utente_condiviso' => $filtro['condiviso']]);
+        echo json_encode([
+            'success'          => true,
+            'giorni'           => $giorni,
+            'utente_condiviso' => $filtro['condiviso'],
+            // Offset anno ambientazione (vedi getAnnoOffset()): il mese/anno visualizzato
+            // resta quello reale (guida la griglia dei giorni), solo l'etichetta mostrata
+            // all'utente somma l'offset — centralizzato qui invece che ricalcolato lato JS.
+            'anno_offset'      => getAnnoOffset(),
+        ]);
         break;
 
     // -------------------------------------------------------------------------
