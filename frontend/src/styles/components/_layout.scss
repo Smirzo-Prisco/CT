@@ -30,14 +30,15 @@ body {
 // (100%, vedi .ct-hud-map-page qui sotto — classe aggiunta/rimossa da
 // MapClick.jsx sul mount/unmount). Su mobile (@media sotto) torna sempre al
 // 100% per tutte le pagine.
-// top:136px = 86px di topbar + 50px extra: gli anelli dell'HUD sono cerchi
-// di 173px ancorati a top:0, quindi sporgono ben oltre la topbar — senza
-// questo margine aggiuntivo la parte alta della pagina ci finisce sotto.
+// top: $hud-content-top (vedi _tokens.scss) — gli anelli dell'HUD sono cerchi
+// di 173px ancorati a top:0 e il logo centrale ha un'area di hover di 110px,
+// quindi sporgono ben oltre la topbar — senza questo margine aggiuntivo la
+// parte alta della pagina ci finisce sotto, sia visivamente sia come hover.
 // Solo desktop: su mobile (@media sotto) gli anelli sono molto piu' piccoli
 // (vedi _hud.scss) e lo spazio verticale e' prezioso, quindi resta 86px.
 #maincontent {
     position: fixed;
-    top: 136px;
+    top: $hud-content-top;
     left: 0;
     right: 0;
     bottom: 0;

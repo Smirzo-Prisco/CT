@@ -98,6 +98,19 @@ $space-10: 40px;
 $space-12: 48px;
 
 
+// ── LAYOUT HUD ─────────────────────────────────────────────────────────────
+// Distanza dall'alto (desktop) a cui deve iniziare il contenuto di pagina per
+// non finire sotto l'area invisibile di hover di .ct-hud__center (il logo
+// centrale dell'HUD): quell'area e' larga 170x110px, ancorata a top:31px
+// (vedi _hud.scss), quindi il suo bordo inferiore e' a 31+110=141px. Sotto
+// quella soglia, il mouse ci passa sopra invece che sul contenuto — un menu
+// legacy (es. pages/scheda/menu.inc.php) troppo vicino al bordo veniva
+// "rubato" dall'hover del centro HUD prima ancora del click.
+// Unico punto da cui va letto questo valore (usato da #maincontent in
+// _layout.scss e da div.pagina_frame_chat in _chat.scss): se cambia la
+// dimensione di .ct-hud__center, aggiornare solo qui.
+$hud-content-top: 156px;
+
 // ── BORDER RADIUS ──────────────────────────────────────────────────────────
 
 $radius-sm: 4px;

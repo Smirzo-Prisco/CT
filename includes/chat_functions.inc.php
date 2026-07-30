@@ -926,9 +926,13 @@ function endRoleSession($location) {
         $rid = (int)$role_row['id_role'];
         gdrcd_query("DELETE FROM role_item_buffs WHERE id_role = $rid");
         gdrcd_query("DELETE FROM role_skill_buffs WHERE id_role = $rid");
+        // Bug storico: il filtro era solo su `location`, senza id_role — ogni
+        // chiusura sovrascriveva end=NOW() su TUTTE le giocate passate nella
+        // stessa stanza (che viene riusata nel tempo), non solo su quella
+        // appena conclusa. Vedi conversazione di progetto del 2026-07-30.
+        gdrcd_query("UPDATE role_sessions SET `end` = NOW() WHERE id_role = $rid");
     }
 
-    gdrcd_query("UPDATE role_sessions SET `end` = NOW() WHERE `location` = $location");
     notifySocketServer('quest:audio_stop', 'loc:' . $location, []);
 
     if ($role_row) deleteRolePngs($rid);

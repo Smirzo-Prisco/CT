@@ -134,9 +134,10 @@ body[data-palette="public"] {
     transform-origin: top left;
     // Come .ct-hud__arc/.ct-hud__panel/.ct-hud__ring-badge (vedi sotto): senza
     // questo, il box pieno 173x173 (esteso oltre il cerchio visibile e oltre
-    // #maincontent che parte a top:136px, quindi con 42px di sovrapposizione
-    // reale sul contenuto pagina) intercetta hover/click di qualunque bottone
-    // o link ci finisca sotto, anche a HUD chiuso. .ct-hud__thumb lo riattiva.
+    // #maincontent, che parte a top: $hud-content-top — vedi _tokens.scss —
+    // quindi con una sovrapposizione reale sul contenuto pagina) intercetta
+    // hover/click di qualunque bottone o link ci finisca sotto, anche a HUD
+    // chiuso. .ct-hud__thumb lo riattiva.
     pointer-events: none;
 }
 .ct-hud__ring--left { left: 5px; }
