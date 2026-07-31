@@ -64,6 +64,7 @@ import Statuto              from './components/Statuto'
 import Documentazione       from './components/Documentazione'
 import ChatHelp             from './components/ChatHelp'
 import Calendario           from './components/Calendario'
+import CancellaAccount      from './components/CancellaAccount'
 
 // ---------------------------------------------------------------------------
 // REGISTRAZIONE ROUTES
@@ -212,6 +213,10 @@ const ROUTES = {
     },
     agenda_center: {
         component: Calendario,
+        css: [],
+    },
+    user_cancella_pg: {
+        component: CancellaAccount,
         css: [],
     },
 }

@@ -4,11 +4,12 @@ require_once(__DIR__ . '../../includes/custom_functions.inc.php');
 add_script("/includes/personaggio.js");
 
 $permessi_azioni = [
-    'modifica' => ['admin', 'moderatore', 'master', 'custode'],
-    'skill'    => ['admin'],
-    'cancella' => ['admin'],
-    'esilia'   => ['admin', 'moderatore'],
-    'reset'    => ['admin']
+    'modifica'   => ['admin', 'moderatore', 'master', 'custode'],
+    'skill'      => ['admin'],
+    'cancella'   => ['admin'],
+    'esilia'     => ['admin', 'moderatore'],
+    'reset'      => ['admin'],
+    'ripristina' => ['admin', 'moderatore'],
 ];
 
 $permessi_sezioni = [
@@ -24,6 +25,7 @@ switch ($filtro) {
     case 'inattivi':    $where = "AND DATE_ADD(ora_entrata, INTERVAL 150 DAY) <= NOW() AND (esilio < NOW() OR esilio IS NULL)"; break;
     case 'mai_entrati': $where = "AND esperienza = '0.0000' AND (DATE(ora_entrata) = DATE(data_iscrizione))"; break;
     case 'esiliati':    $where = "AND (esilio > NOW() AND esilio != '0000-00-00' AND esilio IS NOT NULL)"; break;
+    case 'eliminati':   $where = "AND permessi = -1"; break;
     default:            $where = '';
 }
 
@@ -64,6 +66,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                 <option value="inattivi"    <?= $filtro === 'inattivi'    ? 'selected' : '' ?>>Inattivi (5 mesi)</option>
                 <option value="mai_entrati" <?= $filtro === 'mai_entrati' ? 'selected' : '' ?>>Mai entrati</option>
                 <option value="esiliati"    <?= $filtro === 'esiliati'    ? 'selected' : '' ?>>Esiliati</option>
+                <option value="eliminati"   <?= $filtro === 'eliminati'   ? 'selected' : '' ?>>Eliminati</option>
             </select>
         </form>
         <input type="text" id="searchPg" class="gp-search" placeholder="Cerca personaggio…">
@@ -103,6 +106,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                     $isExiled = !empty($pg['esilio'])
                         && $pg['esilio'] !== '0000-00-00 00:00:00'
                         && $pg['esilio'] > date('Y-m-d H:i:s');
+                    $isDeleted = (int)$pg['permessi'] === -1;
                 ?>
                 <tr class="<?= $isExiled ? 'gp-row--exiled' : '' ?>">
 
@@ -148,6 +152,14 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                     <!-- Azioni -->
                     <td class="gp-cell--actions">
                         <div class="gp-actions">
+
+                            <?php if ($isDeleted && hasPermesso($_SESSION, $permessi_azioni['ripristina'])): ?>
+                            <button class="btn-action btn-action--restore btn-action--icon"
+                                    title="Ripristina"
+                                    onclick="ripristinaPg('<?= addslashes($pg['nome']) ?>')">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                            <?php endif; ?>
 
                             <?php if (hasPermesso($_SESSION, $permessi_azioni['modifica'])): ?>
                             <button class="btn-action btn-action--edit btn-action--icon"

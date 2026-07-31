@@ -160,6 +160,21 @@ if ($solo_gilde) {
 
     $mestiere_info = gdrcd_query("SELECT nome FROM mestiere WHERE id_mestiere = $id_mestiere");
     $mestiere_nome = $mestiere_info ? gdrcd_filter('out', $mestiere_info['nome']) : 'Mestiere';
+
+    // La gilda e' "propria" se l'utente loggato ne e' il capo — stessa tabella
+    // (clgpersonaggioaffiliazione) e stesso controllo di MiaGilda.jsx/api_gestione.php,
+    // usata solo per le gilde create dai giocatori, mai per i mestieri veri.
+    $is_own_gilda = false;
+    if (!empty($_SESSION['login'])) {
+        $capoCheck = gdrcd_query(
+            "SELECT 1 FROM clgpersonaggioaffiliazione cpm
+               JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+              WHERE cpm.personaggio = '" . gdrcd_filter('in', $_SESSION['login']) . "'
+                AND rm.mestiere = $id_mestiere AND rm.capo = 1
+              LIMIT 1"
+        );
+        $is_own_gilda = (bool)$capoCheck;
+    }
 ?>
 
     <div class="sm-header">
@@ -168,6 +183,11 @@ if ($solo_gilde) {
             <?= $back_label ?>
         </a>
         <h2 class="sm-title"><?= $mestiere_nome ?></h2>
+        <?php if ($is_own_gilda): ?>
+        <a href="main.php?page=mia_gilda" class="btn btn--secondary sm-header-edit">
+            <i class="fas fa-pen"></i> Modifica
+        </a>
+        <?php endif; ?>
     </div>
 
     <!-- Gerarchia dei gradi, dal più alto al più basso -->

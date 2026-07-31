@@ -128,6 +128,9 @@ switch ($op) {
         }
 
         // 5. STRUMENTI (solo admin)
+        // Il ripristino di un account cancellato ora e' un'icona diretta nella
+        // lista di Gestione pg -> Personaggi (filtro "Eliminati"), non piu' uno
+        // strumento separato qui — vedi conversazione di progetto del 2026-07-31.
         if ($perms['admin']) {
             $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => [
                 ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'],
