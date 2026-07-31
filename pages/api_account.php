@@ -3,9 +3,12 @@
  * api_account.php — Cancellazione/ripristino account
  *
  * Endpoint:
- *   POST ?op=delete             — auto-cancellazione (verifica email + password): permessi=-1
- *   GET  ?op=getDeletedAccounts — lista account con permessi=-1 (solo staff)
- *   POST ?op=restore            — ripristina un account cancellato: permessi=0 (solo staff)
+ *   POST ?op=delete  — auto-cancellazione (verifica email + password): permessi=-1
+ *   POST ?op=restore — ripristina un account cancellato: permessi=0 (solo staff)
+ *
+ * op=restore è chiamato da ripristinaPg() in includes/personaggio.js, l'icona
+ * di ripristino nella colonna Azioni di gestione_personaggio.inc.php (filtro
+ * "Eliminati") — non da un pannello dedicato, rimosso perché ridondante.
  *
  * La cancellazione forzata di un account da parte dello staff non è qui:
  * esiste già in gestione_personaggio.inc.php ("Elimina definitivamente",
@@ -75,24 +78,6 @@ switch ($op) {
 
         session_destroy();
         echo json_encode(['success' => true, 'message' => 'Account cancellato.']);
-        break;
-
-    // -------------------------------------------------------------------------
-    // getDeletedAccounts — account con permessi=-1 (solo staff)
-    // -------------------------------------------------------------------------
-    case 'getDeletedAccounts':
-        if (!$isStaff) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
-            exit;
-        }
-
-        $res  = gdrcd_query("SELECT nome FROM personaggio WHERE permessi = " . DELETED . " ORDER BY nome", 'result');
-        $list = [];
-        while ($row = gdrcd_query($res, 'fetch')) $list[] = gdrcd_filter('out', $row['nome']);
-        gdrcd_query($res, 'free');
-
-        echo json_encode(['success' => true, 'accounts' => $list]);
         break;
 
     // -------------------------------------------------------------------------

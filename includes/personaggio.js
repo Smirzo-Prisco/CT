@@ -262,6 +262,28 @@ function eliminaEsiliati() {
             });
     }
 }
+// Ripristino personaggio cancellato (permessi=-1 -> 0). Endpoint diverso dal
+// resto di questo file (api_account.php, non api_personaggio.php): riusa la
+// stessa logica gia' presente li' per l'autocancellazione, invece di
+// duplicarla qui.
+function ripristinaPg(nome) {
+    if (!confirm('Ripristinare ' + nome + '?')) return;
+    fetch('pages/api_account.php?op=restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ account: nome })
+    })
+        .then(response => response.json())
+        .then(data => {
+            showNotification(data.message, data.success ? 'success' : 'error');
+            if (data.success) window.location.reload();
+        })
+        .catch(error => {
+            console.error('Errore durante il ripristino:', error);
+            showNotification('Errore durante il ripristino', 'error');
+        });
+}
+
 // Reset punti personaggio
 function resetPg(pgs) {
     if (confirm('Stai per azzerare i personaggi selezionati. Procedere?')) {

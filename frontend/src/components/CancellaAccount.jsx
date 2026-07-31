@@ -3,10 +3,10 @@
  *
  * Sostituisce pages/user_cancella_pg.inc.php (mai raggiungibile da nessun
  * menu — pagina orfana, vedi conversazione di progetto del 2026-07-31).
- * Solo autocancellazione: ripristino e cancellazione forzata di un account
- * sono strumenti da staff, separati in GestioneAccount.jsx (Gestione →
- * Strumenti → Ripristina/cancella account) — vedi conversazione di
- * progetto del 2026-07-31 sul perché sono stati divisi.
+ * Solo autocancellazione: il ripristino di un account cancellato è
+ * un'icona nella colonna Azioni di gestione_personaggio.inc.php (filtro
+ * "Eliminati"), non un pannello separato — vedi conversazione di
+ * progetto del 2026-07-31.
  *
  * API: pages/api_account.php
  *

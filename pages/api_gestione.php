@@ -127,26 +127,19 @@ switch ($op) {
             ]];
         }
 
-        // 5. STRUMENTI (solo admin, tranne "Ripristina account" — vedi sotto)
-        // "Ripristina account" e' uno strumento separato dall'autocancellazione
-        // (quella e' in Preferenze -> CancellaAccount.jsx): usa gli stessi flag di ruolo
-        // admin/moderatore di api_account.php, non personaggio.permessi (asse indipendente,
-        // usato li' solo per lo stato attivo/cancellato dell'account, non per il livello
-        // di staff — vedi conversazione di progetto del 2026-07-31). Solo ripristino: la
-        // cancellazione forzata esiste gia' in Gestione pg -> Personaggi ("Elimina
-        // definitivamente"), niente doppio percorso per la stessa azione.
-        if ($perms['admin'] || $perms['moderatore']) {
-            $voci = [];
-            if ($perms['admin']) {
-                $voci[] = ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'];
-                $voci[] = ['label' => 'Bacheche',              'url' => 'gestione.php?page=gestione_bacheche'];
-                $voci[] = ['label' => 'Luoghi',                'url' => 'gestione.php?page=gestione_luoghi'];
-                $voci[] = ['label' => 'Mappa',                 'url' => 'gestione.php?page=gestione_mappe'];
-                $voci[] = ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'];
-                $voci[] = ['label' => 'Manutenzione',          'url' => 'gestione.php?page=gestione_manutenzione'];
-            }
-            $voci[] = ['label' => 'Ripristina account', 'url' => 'gestione.php?page=gestione_account'];
-            $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => $voci];
+        // 5. STRUMENTI (solo admin)
+        // Il ripristino di un account cancellato ora e' un'icona diretta nella
+        // lista di Gestione pg -> Personaggi (filtro "Eliminati"), non piu' uno
+        // strumento separato qui — vedi conversazione di progetto del 2026-07-31.
+        if ($perms['admin']) {
+            $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => [
+                ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'],
+                ['label' => 'Bacheche',              'url' => 'gestione.php?page=gestione_bacheche'],
+                ['label' => 'Luoghi',                'url' => 'gestione.php?page=gestione_luoghi'],
+                ['label' => 'Mappa',                 'url' => 'gestione.php?page=gestione_mappe'],
+                ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'],
+                ['label' => 'Manutenzione',          'url' => 'gestione.php?page=gestione_manutenzione'],
+            ]];
         }
 
         // 6. LOG
