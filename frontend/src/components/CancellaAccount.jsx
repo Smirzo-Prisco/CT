@@ -170,9 +170,8 @@ export default function CancellaAccount() {
                         <i className="fa-solid fa-triangle-exclamation"></i> Elimina il mio account
                     </div>
                     <p className="account-page__hint">
-                        Il personaggio <strong>{window.CT_USER?.login ?? ''}</strong> verrà marcato come cancellato
-                        e non sarà più accessibile. Un membro dello staff può ripristinarlo su richiesta,
-                        ma finché resta cancellato il nome non torna disponibile per una nuova iscrizione.
+                        Stai per eliminare il tuo account. Una volta eliminato, non avrai più accesso a Crystal Tokyo.
+                        Procedi inserendo i tuoi dati per confermare l'eliminazione.
                     </p>
                     <form onSubmit={handleDelete}>
                         <label className="account-page__field">
