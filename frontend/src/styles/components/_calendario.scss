@@ -476,6 +476,17 @@ $cal-cell-bg: rgba(255, 255, 255, 0.03);
         }
     }
 
+    // Variante portata su document.body (vedi useAnchoredRect in Calendario.jsx):
+    // le coordinate arrivano da uno style inline (left/width/top), qui si
+    // sovrascrivono solo positioning e z-index — deve stare sopra la modale
+    // (z-index:1000) per non finire sotto quando il dropdown si apre dentro
+    // il form di creazione/modifica evento.
+    &__autocomplete-list--fixed {
+        position: fixed;
+        right: auto;
+        z-index: 2000;
+    }
+
     // ── Filtro "calendario di un altro utente" ─────────────────────
     &__filtro {
         display: flex;

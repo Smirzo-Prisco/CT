@@ -35,6 +35,34 @@ function navigate(url) {
     else window.top.location.href = url
 }
 
+/**
+ * Coordinate (viewport) dell'elemento riferito da ref, aggiornate finche'
+ * active e' true. Usata dai due autocomplete sotto per portare il loro
+ * dropdown su document.body in position:fixed, invece che absolute nel
+ * flusso: .calendario-page__modal scorre (overflow-y:auto) e lo taglierebbe
+ * — stesso problema e stessa soluzione del menu @ menzione in ChatShell.jsx.
+ */
+function useAnchoredRect(ref, active) {
+    const [rect, setRect] = useState(null)
+    useEffect(() => {
+        if (!active) { setRect(null); return }
+        const update = () => {
+            const el = ref.current
+            if (!el) return
+            const r = el.getBoundingClientRect()
+            setRect({ left: r.left, width: r.width, top: r.bottom })
+        }
+        update()
+        window.addEventListener('resize', update)
+        window.addEventListener('scroll', update, true)
+        return () => {
+            window.removeEventListener('resize', update)
+            window.removeEventListener('scroll', update, true)
+        }
+    }, [active, ref])
+    return rect
+}
+
 // ---------------------------------------------------------------------------
 // DATI STATICI
 // ---------------------------------------------------------------------------
@@ -146,6 +174,8 @@ export default function Calendario({ isStaff }) {
     const [filtroInput, setFiltroInput] = useState('')
     const [filtroSuggestions, setFiltroSuggestions] = useState([])
     const filtroDebounce = useRef(null)
+    const filtroAcRef = useRef(null)
+    const filtroRect = useAnchoredRect(filtroAcRef, filtroSuggestions.length > 0)
 
     const fetchMonth = useCallback(() => {
         setLoadingMonth(true)
@@ -327,6 +357,8 @@ export default function Calendario({ isStaff }) {
     const [partInput, setPartInput] = useState('')
     const [partSuggestions, setPartSuggestions] = useState([])
     const partDebounce = useRef(null)
+    const partAcRef = useRef(null)
+    const partRect = useAnchoredRect(partAcRef, partSuggestions.length > 0)
 
     const handlePartInput = (val) => {
         setPartInput(val)
@@ -410,7 +442,7 @@ export default function Calendario({ isStaff }) {
                     Tutti
                 </button>
 
-                <div className="calendario-page__autocomplete calendario-page__filtro-autocomplete">
+                <div className="calendario-page__autocomplete calendario-page__filtro-autocomplete" ref={filtroAcRef}>
                     <input
                         type="text"
                         value={filtroInput}
@@ -418,14 +450,18 @@ export default function Calendario({ isStaff }) {
                         onChange={e => handleFiltroInput(e.target.value)}
                         autoComplete="off"
                     />
-                    {filtroSuggestions.length > 0 && (
-                        <div className="calendario-page__autocomplete-list">
+                    {filtroSuggestions.length > 0 && filtroRect && createPortal(
+                        <div
+                            className="calendario-page__autocomplete-list calendario-page__autocomplete-list--fixed"
+                            style={{ left: filtroRect.left, width: filtroRect.width, top: filtroRect.top }}
+                        >
                             {filtroSuggestions.map(nome => (
                                 <button key={nome} type="button" onClick={() => selezionaFiltroUtente(nome)}>
                                     {nome}
                                 </button>
                             ))}
-                        </div>
+                        </div>,
+                        document.body
                     )}
                 </div>
 
@@ -606,7 +642,7 @@ export default function Calendario({ isStaff }) {
                                         ))}
                                     </div>
                                 )}
-                                <div className="calendario-page__autocomplete">
+                                <div className="calendario-page__autocomplete" ref={partAcRef}>
                                     <input
                                         type="text"
                                         value={partInput}
@@ -614,14 +650,18 @@ export default function Calendario({ isStaff }) {
                                         onChange={e => handlePartInput(e.target.value)}
                                         autoComplete="off"
                                     />
-                                    {partSuggestions.length > 0 && (
-                                        <div className="calendario-page__autocomplete-list">
+                                    {partSuggestions.length > 0 && partRect && createPortal(
+                                        <div
+                                            className="calendario-page__autocomplete-list calendario-page__autocomplete-list--fixed"
+                                            style={{ left: partRect.left, width: partRect.width, top: partRect.top }}
+                                        >
                                             {partSuggestions.map(nome => (
                                                 <button key={nome} type="button" onClick={() => aggiungiPartecipante(nome)}>
                                                     {nome}
                                                 </button>
                                             ))}
-                                        </div>
+                                        </div>,
+                                        document.body
                                     )}
                                 </div>
                             </label>

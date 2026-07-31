@@ -93,12 +93,34 @@ export default function Hud({ isStaff }) {
     // Sotto i 680px gli anelli diventano schede a comparsa (vedi _hud.scss):
     // stessa soglia qui, per far si' che cliccare i CERCHI stessi (non solo
     // il logo centrale) apra/chiuda la propria scheda in modo indipendente
-    // — su desktop i cerchi restano invece dedicati a modale luogo/scheda
-    // personaggio (vedi thumb onClick sotto).
-    const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 680px)').matches)
+    // — su desktop/tablet i cerchi restano invece dedicati a modale luogo/
+    // scheda personaggio (vedi thumb onClick sotto), col ventaglio radiale
+    // normale (non la scheda a griglia, le cui regole CSS esistono solo
+    // sotto questa soglia).
+    const isNarrowQuery = () => window.matchMedia('(max-width: 680px)').matches
+    const [isNarrow, setIsNarrow] = useState(isNarrowQuery)
     useEffect(() => {
         const mq = window.matchMedia('(max-width: 680px)')
-        const onChange = e => setIsMobile(e.matches)
+        const onChange = () => setIsNarrow(isNarrowQuery())
+        mq.addEventListener('change', onChange)
+        return () => mq.removeEventListener('change', onChange)
+    }, [])
+
+    // Dispositivi senza hover reale (touch), a prescindere dalla larghezza:
+    // un tablet e' spesso piu' largo di 680px (resta quindi il ventaglio
+    // radiale normale, isNarrow false) ma senza mouse il logo centrale — che
+    // su desktop apre il proprio arco SOLO al passaggio del mouse, vedi
+    // onMouseEnter/Leave piu' sotto — sarebbe irraggiungibile. Usato SOLO li:
+    // a differenza di un primo tentativo, non deve toccare il layout degli
+    // anelli laterali (accordion/portal/griglia), pena rompere il
+    // posizionamento delle icone su tablet (le regole CSS di quel layout
+    // esistono solo sotto i 680px). Vedi conversazione di progetto del
+    // 2026-07-31.
+    const isTouchQuery = () => window.matchMedia('(hover: none), (pointer: coarse)').matches
+    const [isTouch, setIsTouch] = useState(isTouchQuery)
+    useEffect(() => {
+        const mq = window.matchMedia('(hover: none), (pointer: coarse)')
+        const onChange = () => setIsTouch(isTouchQuery())
         mq.addEventListener('change', onChange)
         return () => mq.removeEventListener('change', onChange)
     }, [])
@@ -299,7 +321,7 @@ export default function Hud({ isStaff }) {
     // bottone) evita che resti in mezzo allo schermo dopo la navigazione o
     // l'apertura di un popover/il widget assistente.
     const closeMobileMenus = () => {
-        if (!isMobile) return
+        if (!isNarrow) return
         setLeftOpen(false)
         setRightOpen(false)
         setCenterOpen(false)
@@ -382,7 +404,7 @@ export default function Hud({ isStaff }) {
 
             {/* ============ ANELLO SINISTRO: LUOGO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--left${leftOpen ? ' is-open' : ''}`}>
-                <button type="button" className="ct-hud__thumb" onClick={() => isMobile ? toggleMobileMenu('left') : setShowLocationDesc(true)} title={location?.nome ?? 'Luogo'}>
+                <button type="button" className="ct-hud__thumb" onClick={() => isNarrow ? toggleMobileMenu('left') : setShowLocationDesc(true)} title={location?.nome ?? 'Luogo'}>
                     {locationImg && !locationImgFailed
                         ? <img src={locationImg} alt={location?.nome ?? ''} onError={() => setLocationImgFailed(true)} />
                         : <i className="fa-solid fa-city" />
@@ -415,7 +437,7 @@ export default function Hud({ isStaff }) {
                     </div>
                 )}
 
-                <HudArcSheet isMobile={isMobile} isOpen={leftOpen} onClose={() => setLeftOpen(false)}>
+                <HudArcSheet isMobile={isNarrow} isOpen={leftOpen} onClose={() => setLeftOpen(false)}>
                     <div className="ct-hud__arc">
                         <a className="ct-hud__icon" style={arcIcon(0, 87)} data-tour="hud-forum"
                             href="main.php?page=forum" title="Forum" onClick={closeMobileMenus}>
@@ -449,37 +471,38 @@ export default function Hud({ isStaff }) {
 
             {/* ============ ANELLO DESTRO: PERSONAGGIO ============ */}
             <div className={`ct-hud__ring ct-hud__ring--right${rightOpen ? ' is-open' : ''}`}>
-                <button type="button" className="ct-hud__thumb" data-tour="hud-scheda" onClick={() => isMobile ? toggleMobileMenu('right') : goToOwnScheda()} title={nome}>
+                <button type="button" className="ct-hud__thumb" data-tour="hud-scheda" onClick={() => isNarrow ? toggleMobileMenu('right') : goToOwnScheda()} title={nome}>
                     {avatar ? <img src={avatar} alt={nome} /> : <i className="fa-solid fa-user" />}
                 </button>
 
-                <HudArcSheet isMobile={isMobile} isOpen={rightOpen} onClose={() => setRightOpen(false)}>
+                <HudArcSheet isMobile={isNarrow} isOpen={rightOpen} onClose={() => setRightOpen(false)}>
                     <div className="ct-hud__arc">
-                        {/* "La mia scheda" solo su mobile: su desktop il tap sul
-                            cerchio stesso ci porta gia' direttamente
-                            (goToOwnScheda), ma su mobile il tap apre questo menu
-                            — senza questa icona non ci sarebbe alcun modo di
+                        {/* "La mia scheda" solo su schermi stretti: su desktop/
+                            tablet il tap sul cerchio stesso ci porta gia'
+                            direttamente (goToOwnScheda), ma sulla scheda a
+                            griglia stretta il tap apre questo menu — senza
+                            questa icona non ci sarebbe alcun modo di
                             raggiungere la propria scheda da li'. */}
-                        {isMobile && (
+                        {isNarrow && (
                             <a className="ct-hud__icon" style={arcIcon(0, 87)}
                                 href={`main.php?page=scheda&pg=${encodeURIComponent(nome)}`} title="La mia scheda" onClick={closeMobileMenus}>
                                 <i className="fa-solid fa-id-card" />
                             </a>
                         )}
-                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-33, 80] : [0, 87]))} data-tour="hud-calendario"
+                        <a className="ct-hud__icon" style={arcIcon(...(isNarrow ? [-33, 80] : [0, 87]))} data-tour="hud-calendario"
                             href="main.php?page=agenda_center" title="Calendario" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-calendar-days" />
-                            {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-33, 80] : [0, 87]))} />}
+                            {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isNarrow ? [-33, 80] : [0, 87]))} />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-62, 62] : [-43, 75]))} data-tour="hud-giocate"
+                        <a className="ct-hud__icon" style={arcIcon(...(isNarrow ? [-62, 62] : [-43, 75]))} data-tour="hud-giocate"
                             href="main.php?page=role_recap" title="Giocate" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-scroll" />
-                            {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-62, 62] : [-43, 75]))} title="Giocata in corso" />}
+                            {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isNarrow ? [-62, 62] : [-43, 75]))} title="Giocata in corso" />}
                         </a>
-                        <a className="ct-hud__icon" style={arcIcon(...(isMobile ? [-80, 33] : [-75, 43]))} data-tour="hud-messaggi"
+                        <a className="ct-hud__icon" style={arcIcon(...(isNarrow ? [-80, 33] : [-75, 43]))} data-tour="hud-messaggi"
                             href="main.php?page=messages_center&offset=0" title="Messaggi" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-envelope" />
-                            {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isMobile ? [-80, 33] : [-75, 43]))} />}
+                            {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isNarrow ? [-80, 33] : [-75, 43]))} />}
                         </a>
                     </div>
                 </HudArcSheet>
@@ -533,25 +556,31 @@ export default function Hud({ isStaff }) {
             )}
 
             {/* ============ CENTRO: LOGO + ARCO RAPIDO ============ */}
-            {/* Hover solo su desktop: su mobile deve aprirsi/chiudersi SOLO al
-                click, come i due cerchi laterali — alcuni browser touch
-                simulano comunque un mouseenter al tap, che altrimenti
-                aggirerebbe la mutua esclusivita' di toggleMobileMenu. */}
+            {/* Hover solo se c'e' un vero mouse: su touch (telefono O tablet)
+                deve aprirsi SOLO al click, altrimenti resterebbe
+                irraggiungibile — alcuni browser touch simulano comunque un
+                mouseenter al tap, che altrimenti aggirerebbe la mutua
+                esclusivita' di toggleMobileMenu sotto i 680px. */}
             {/* --expanded segue leftOpen/rightOpen (non centerOpen, che e'
                 solo l'hover del proprio ventaglio): stessa condizione della
                 topbar, cosi' la linea dorata continua a tagliare a meta'
                 anche il logo centrale quando i cerchi si aprono/chiudono. */}
             <div className={`ct-hud__center${centerOpen ? ' is-open' : ''}${leftOpen && rightOpen ? ' ct-hud__center--expanded' : ''}`}
-                onMouseEnter={() => !isMobile && setCenterOpen(true)}
-                onMouseLeave={() => !isMobile && setCenterOpen(false)}>
+                onMouseEnter={() => !isTouch && setCenterOpen(true)}
+                onMouseLeave={() => !isTouch && setCenterOpen(false)}>
                 <button type="button" className="ct-hud__brand" title="Mostra il menu" onClick={() => {
-                    if (isMobile) { toggleMobileMenu('center'); return }
-                    // Solo gli anelli laterali si aprono/chiudono al click: le
-                    // icone del cerchio centrale restano un fatto di hover
-                    // (vedi onMouseEnter/Leave sopra), il click non le tocca.
+                    if (isNarrow) { toggleMobileMenu('center'); return }
+                    // Anelli laterali: si aprono/chiudono insieme al click sul
+                    // logo (unico modo su desktop, dove i cerchi stessi restano
+                    // dedicati a modale luogo/scheda). Il proprio ventaglio
+                    // (manuali/uffici/...) resta invece un fatto di hover — ma
+                    // su touch l'hover non esiste, quindi li' il click deve
+                    // pilotare anche quello, altrimenti resterebbe
+                    // irraggiungibile (vedi isTouch sopra).
                     const open = !(leftOpen && rightOpen)
                     setLeftOpen(open)
                     setRightOpen(open)
+                    if (isTouch) setCenterOpen(open)
                 }}>
                     <span className="ct-hud__brand-ring" />
                     <img className="ct-hud__brand-mark" src="/imgs/favicon.ico" alt="Crystal Tokyo" />
