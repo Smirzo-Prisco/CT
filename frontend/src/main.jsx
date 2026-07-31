@@ -160,7 +160,7 @@ window.CT.register('GestioneBot', GestioneBot)
 /** Pannello admin manutenzione DB: pulizia log/chat/messaggi, personaggi assenti/cancellati, blacklist */
 window.CT.register('GestioneManutenzione', GestioneManutenzione)
 
-/** Pannello staff ripristino/cancellazione forzata account (separato dall'autocancellazione, in CancellaAccount.jsx) */
+/** Pannello staff ripristino account (separato dall'autocancellazione, in CancellaAccount.jsx) */
 window.CT.register('GestioneAccount', GestioneAccount)
 
 /** Pannello admin gestione mestieri e ruoli: lista, form CRUD, upload immagini */

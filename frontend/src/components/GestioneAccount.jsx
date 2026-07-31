@@ -1,12 +1,15 @@
 /**
- * GestioneAccount.jsx — Ripristino e cancellazione forzata account (staff)
+ * GestioneAccount.jsx — Ripristino account cancellati (staff)
  *
- * Separato da CancellaAccount.jsx (autocancellazione, in Preferenze): sono
- * due pubblici e due punti d'accesso diversi — vedi conversazione di
- * progetto del 2026-07-31. Montato via CT.mount() su gestione.php?page=
- * gestione_account (stesso pattern di GestioneManutenzione.jsx), non
- * un'entrata di AppRouter — gli strumenti staff vivono tutti sotto
- * gestione.php, non main.php.
+ * Separato da CancellaAccount.jsx (autocancellazione, in Preferenze) — vedi
+ * conversazione di progetto del 2026-07-31. Montato via CT.mount() su
+ * gestione.php?page=gestione_account (stesso pattern di
+ * GestioneManutenzione.jsx), non un'entrata di AppRouter — gli strumenti
+ * staff vivono tutti sotto gestione.php, non main.php.
+ *
+ * Solo ripristino: la cancellazione forzata di un account da parte dello
+ * staff non serve qui, esiste già in gestione_personaggio.inc.php
+ * ("Elimina definitivamente" — cancellazione fisica via erasepg_scelta).
  *
  * API: pages/api_account.php
  *
@@ -16,17 +19,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
 export default function GestioneAccount() {
-    const [isAdmin, setIsAdmin]   = useState(false)
-    const [loading, setLoading]   = useState(true)
-
-    useEffect(() => {
-        fetch('pages/api_account.php?op=getStaffInfo')
-            .then(r => r.json())
-            .then(d => { if (d.success) setIsAdmin(d.isAdmin); setLoading(false) })
-            .catch(() => setLoading(false))
-    }, [])
-
-    // ── Ripristino ───────────────────────────────────────────────────────────
     const [deletedAccounts, setDeletedAccounts] = useState([])
     const [restoreAcct, setRestoreAcct]          = useState('')
     const [msgRestore, setMsgRestore]            = useState(null)
@@ -65,59 +57,9 @@ export default function GestioneAccount() {
         }
     }, [restoreAcct, loadDeletedAccounts])
 
-    // ── Cancellazione forzata ────────────────────────────────────────────────
-    const [activeAccounts, setActiveAccounts]   = useState([])
-    const [forceAcct, setForceAcct]             = useState('')
-    const [forceConfirm, setForceConfirm]       = useState(false)
-    const [msgForce, setMsgForce]               = useState(null)
-    const [forceDeleting, setForceDeleting]     = useState(false)
-
-    const loadActiveAccounts = useCallback(() => {
-        fetch('pages/api_account.php?op=getActiveAccounts')
-            .then(r => r.json())
-            .then(d => { if (d.success) setActiveAccounts(d.accounts) })
-            .catch(() => {})
-    }, [])
-
-    useEffect(() => { loadActiveAccounts() }, [loadActiveAccounts])
-
-    const handleForceDelete = useCallback(async (e) => {
-        e.preventDefault()
-        if (!forceAcct || !forceConfirm) return
-        setMsgForce(null)
-        setForceDeleting(true)
-        try {
-            const res  = await fetch('pages/api_account.php?op=forceDelete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ account: forceAcct }),
-            })
-            const data = await res.json()
-            setMsgForce({ type: data.success ? 'ok' : 'err', text: data.message })
-            if (data.success) {
-                setForceAcct('')
-                setForceConfirm(false)
-                loadActiveAccounts()
-                loadDeletedAccounts()
-            }
-        } catch {
-            setMsgForce({ type: 'err', text: 'Errore di rete — riprova' })
-        } finally {
-            setForceDeleting(false)
-        }
-    }, [forceAcct, forceConfirm, loadActiveAccounts, loadDeletedAccounts])
-
-    if (loading) {
-        return (
-            <div className="pagina_gestione">
-                <div>Caricamento…</div>
-            </div>
-        )
-    }
-
     return (
         <div className="pagina_gestione">
-            <header>👤 Ripristina/cancella account</header>
+            <header>👤 Ripristina account</header>
             <div className="dashboard gm-dashboard">
 
                 <div className="card gm-card">
@@ -149,45 +91,6 @@ export default function GestioneAccount() {
                     {msgRestore && (
                         <p className={msgRestore.type === 'ok' ? 'gm-feedback gm-feedback--ok' : 'gm-feedback gm-feedback--error'}>
                             {msgRestore.text}
-                        </p>
-                    )}
-                </div>
-
-                <div className="card gm-card">
-                    <h3><i className="fa-solid fa-user-slash"></i> Cancella un account</h3>
-                    <p className="gm-description">
-                        {isAdmin
-                            ? 'Puoi cancellare qualunque account.'
-                            : 'Puoi cancellare qualunque account non appartenente allo staff superiore.'}
-                    </p>
-                    <form onSubmit={handleForceDelete}>
-                        <div className="gm-field">
-                            <label htmlFor="force-select">Account</label>
-                            <select
-                                id="force-select"
-                                value={forceAcct}
-                                onChange={e => setForceAcct(e.target.value)}
-                                required
-                            >
-                                <option value="" disabled>Seleziona…</option>
-                                {activeAccounts.map(n => <option key={n} value={n}>{n}</option>)}
-                            </select>
-                        </div>
-                        <label className="gm-field" style={{ justifyContent: 'flex-start', gap: '8px' }}>
-                            <input
-                                type="checkbox"
-                                checked={forceConfirm}
-                                onChange={e => setForceConfirm(e.target.checked)}
-                            />
-                            <span>Confermo la cancellazione di questo account.</span>
-                        </label>
-                        <button type="submit" className="btn btn--danger gm-run-btn" disabled={forceDeleting || !forceConfirm}>
-                            {forceDeleting ? 'Cancellazione…' : 'Cancella account'}
-                        </button>
-                    </form>
-                    {msgForce && (
-                        <p className={msgForce.type === 'ok' ? 'gm-feedback gm-feedback--ok' : 'gm-feedback gm-feedback--error'}>
-                            {msgForce.text}
                         </p>
                     )}
                 </div>

@@ -1,6 +1,6 @@
 <?php
 /**
- * gestione_account.inc.php — Shim di mount per il pannello React ripristino/cancellazione account
+ * gestione_account.inc.php — Shim di mount per il pannello React ripristino account
  * Incluso da gestione.php via ?page=gestione_account
  * Accesso riservato allo staff (admin o moderatore): se non autorizzato, redirect alla mappa.
  * Logica applicativa in pages/api_account.php, UI in

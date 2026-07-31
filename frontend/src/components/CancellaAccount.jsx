@@ -13,7 +13,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
@@ -21,15 +21,6 @@ function navigate(url) {
 }
 
 export default function CancellaAccount() {
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        fetch('pages/api_account.php?op=getInfo')
-            .then(r => r.json())
-            .then(() => setLoading(false))
-            .catch(() => setLoading(false))
-    }, [])
-
     const [delEmail, setDelEmail]     = useState('')
     const [delPass, setDelPass]       = useState('')
     const [delConfirm, setDelConfirm] = useState(false)
@@ -58,14 +49,6 @@ export default function CancellaAccount() {
             setDeleting(false)
         }
     }, [delEmail, delPass])
-
-    if (loading) {
-        return (
-            <div className="account-page account-page--loading">
-                <i className="fas fa-spinner fa-spin"></i> Caricamento…
-            </div>
-        )
-    }
 
     return (
         <>

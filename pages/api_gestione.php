@@ -127,12 +127,14 @@ switch ($op) {
             ]];
         }
 
-        // 5. STRUMENTI (solo admin, tranne "Ripristina/cancella account" — vedi sotto)
-        // "Ripristina/cancella account" e' uno strumento separato dall'autocancellazione
+        // 5. STRUMENTI (solo admin, tranne "Ripristina account" — vedi sotto)
+        // "Ripristina account" e' uno strumento separato dall'autocancellazione
         // (quella e' in Preferenze -> CancellaAccount.jsx): usa gli stessi flag di ruolo
         // admin/moderatore di api_account.php, non personaggio.permessi (asse indipendente,
         // usato li' solo per lo stato attivo/cancellato dell'account, non per il livello
-        // di staff — vedi conversazione di progetto del 2026-07-31).
+        // di staff — vedi conversazione di progetto del 2026-07-31). Solo ripristino: la
+        // cancellazione forzata esiste gia' in Gestione pg -> Personaggi ("Elimina
+        // definitivamente"), niente doppio percorso per la stessa azione.
         if ($perms['admin'] || $perms['moderatore']) {
             $voci = [];
             if ($perms['admin']) {
@@ -143,7 +145,7 @@ switch ($op) {
                 $voci[] = ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'];
                 $voci[] = ['label' => 'Manutenzione',          'url' => 'gestione.php?page=gestione_manutenzione'];
             }
-            $voci[] = ['label' => 'Ripristina/cancella account', 'url' => 'gestione.php?page=gestione_account'];
+            $voci[] = ['label' => 'Ripristina account', 'url' => 'gestione.php?page=gestione_account'];
             $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => $voci];
         }
 

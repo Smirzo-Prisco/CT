@@ -3,21 +3,19 @@
  * api_account.php — Cancellazione/ripristino account
  *
  * Endpoint:
- *   GET  ?op=getInfo            — email corrente (per CancellaAccount.jsx, autocancellazione)
  *   POST ?op=delete             — auto-cancellazione (verifica email + password): permessi=-1
- *   GET  ?op=getStaffInfo       — permessi staff correnti (per GestioneAccount.jsx)
  *   GET  ?op=getDeletedAccounts — lista account con permessi=-1 (solo staff)
  *   POST ?op=restore            — ripristina un account cancellato: permessi=0 (solo staff)
- *   GET  ?op=getActiveAccounts  — lista account cancellabili forzatamente (solo staff)
- *   POST ?op=forceDelete        — cancella forzatamente un account: permessi=-1 (solo staff)
+ *
+ * La cancellazione forzata di un account da parte dello staff non è qui:
+ * esiste già in gestione_personaggio.inc.php ("Elimina definitivamente",
+ * cancellazione fisica via main.php?page=erasepg_scelta) — niente doppio
+ * percorso per la stessa azione. Vedi conversazione di progetto del 2026-07-31.
  *
  * Autorizzazione staff: $_SESSION['admin']/['moderatore'] (flag da privilegi,
  * impostati al login in api_auth.php), NON personaggio.permessi — quest'ultimo
  * e' un asse indipendente (0=attivo/-1=cancellato, vedi DELETED/USER sotto),
- * non piu' usato in nessun altro punto del progetto per il livello di staff
- * (che infatti risultava sempre 0 anche per un vero admin, con la prima
- * versione di questo file: la sezione staff non compariva mai davvero).
- * I moderatori (non admin) non possono toccare account con privilegi.admin=1.
+ * non usato altrove nel progetto per il livello di staff.
  *
  * Nota sulla verifica password: il vecchio user_cancella_pg.inc.php confrontava
  * `pass = gdrcd_encript($_POST['new_pass'])` in SQL — gdrcd_encript() genera un
@@ -44,23 +42,11 @@ if (empty($_SESSION['login'])) {
     exit;
 }
 
-$op       = $_GET['op'] ?? '';
-$login    = gdrcd_filter('in', $_SESSION['login']);
-$isAdmin  = (int)($_SESSION['admin'] ?? 0) === 1;
-$isStaff  = $isAdmin || (int)($_SESSION['moderatore'] ?? 0) === 1;
+$op      = $_GET['op'] ?? '';
+$login   = gdrcd_filter('in', $_SESSION['login']);
+$isStaff = (int)($_SESSION['admin'] ?? 0) === 1 || (int)($_SESSION['moderatore'] ?? 0) === 1;
 
 switch ($op) {
-
-    // -------------------------------------------------------------------------
-    // getInfo — email corrente (autocancellazione)
-    // -------------------------------------------------------------------------
-    case 'getInfo':
-        $row = gdrcd_query("SELECT email FROM personaggio WHERE nome = '$login'");
-        echo json_encode([
-            'success' => true,
-            'email'   => gdrcd_filter('out', $row['email'] ?? ''),
-        ]);
-        break;
 
     // -------------------------------------------------------------------------
     // delete — auto-cancellazione: verifica email + password, poi permessi=-1
@@ -89,18 +75,6 @@ switch ($op) {
 
         session_destroy();
         echo json_encode(['success' => true, 'message' => 'Account cancellato.']);
-        break;
-
-    // -------------------------------------------------------------------------
-    // getStaffInfo — permessi staff correnti (per GestioneAccount.jsx)
-    // -------------------------------------------------------------------------
-    case 'getStaffInfo':
-        if (!$isStaff) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
-            exit;
-        }
-        echo json_encode(['success' => true, 'isAdmin' => $isAdmin]);
         break;
 
     // -------------------------------------------------------------------------
@@ -146,69 +120,6 @@ switch ($op) {
         );
 
         echo json_encode(['success' => true, 'message' => 'Account ripristinato.']);
-        break;
-
-    // -------------------------------------------------------------------------
-    // getActiveAccounts — account cancellabili forzatamente (solo staff)
-    // I moderatori non possono toccare account con privilegi.admin=1, gli admin si.
-    // -------------------------------------------------------------------------
-    case 'getActiveAccounts':
-        if (!$isStaff) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
-            exit;
-        }
-
-        $where = $isAdmin
-            ? "WHERE p.permessi > " . DELETED
-            : "WHERE p.permessi > " . DELETED . " AND COALESCE(pr.admin, 0) = 0";
-
-        $res  = gdrcd_query(
-            "SELECT p.nome FROM personaggio p
-             LEFT JOIN privilegi pr ON pr.nome = p.nome
-             $where ORDER BY p.nome",
-            'result'
-        );
-        $list = [];
-        while ($row = gdrcd_query($res, 'fetch')) $list[] = gdrcd_filter('out', $row['nome']);
-        gdrcd_query($res, 'free');
-
-        echo json_encode(['success' => true, 'accounts' => $list]);
-        break;
-
-    // -------------------------------------------------------------------------
-    // forceDelete — cancella forzatamente un account: permessi=-1 (solo staff)
-    // -------------------------------------------------------------------------
-    case 'forceDelete':
-        if (!$isStaff) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
-            exit;
-        }
-
-        $data    = json_decode(file_get_contents('php://input'), true) ?? [];
-        $account = gdrcd_filter('in', $data['account'] ?? '');
-
-        if ($account === '') {
-            echo json_encode(['success' => false, 'message' => 'Seleziona un account.']);
-            exit;
-        }
-
-        if (!$isAdmin) {
-            $targetIsAdmin = (bool)gdrcd_query("SELECT admin FROM privilegi WHERE nome = '$account'")['admin'] ?? false;
-            if ($targetIsAdmin) {
-                echo json_encode(['success' => false, 'message' => 'Non puoi cancellare un account dello staff superiore.']);
-                exit;
-            }
-        }
-
-        gdrcd_query("UPDATE personaggio SET permessi = " . DELETED . " WHERE nome = '$account'");
-        gdrcd_query(
-            "INSERT INTO log (nome_interessato, autore, data_evento, codice_evento, descrizione_evento)
-             VALUES ('$account', '$login', NOW(), " . DELETEPG . ", 'Account cancellato da staff')"
-        );
-
-        echo json_encode(['success' => true, 'message' => 'Account cancellato.']);
         break;
 
     default:
