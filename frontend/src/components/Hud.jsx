@@ -95,12 +95,26 @@ export default function Hud({ isStaff }) {
     // il logo centrale) apra/chiuda la propria scheda in modo indipendente
     // — su desktop i cerchi restano invece dedicati a modale luogo/scheda
     // personaggio (vedi thumb onClick sotto).
-    const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 680px)').matches)
+    //
+    // isMobile include anche i dispositivi touch a prescindere dalla
+    // larghezza (hover:none/pointer:coarse — un tablet e' spesso piu' largo
+    // di 680px ma non ha un vero hover): senza, il logo centrale sarebbe
+    // raggiungibile solo passandoci sopra col mouse, impossibile su un
+    // touchscreen. Vedi conversazione di progetto del 2026-07-31.
+    const isMobileQuery = () =>
+        window.matchMedia('(max-width: 680px)').matches ||
+        window.matchMedia('(hover: none), (pointer: coarse)').matches
+    const [isMobile, setIsMobile] = useState(isMobileQuery)
     useEffect(() => {
-        const mq = window.matchMedia('(max-width: 680px)')
-        const onChange = e => setIsMobile(e.matches)
-        mq.addEventListener('change', onChange)
-        return () => mq.removeEventListener('change', onChange)
+        const mqWidth = window.matchMedia('(max-width: 680px)')
+        const mqTouch = window.matchMedia('(hover: none), (pointer: coarse)')
+        const onChange = () => setIsMobile(isMobileQuery())
+        mqWidth.addEventListener('change', onChange)
+        mqTouch.addEventListener('change', onChange)
+        return () => {
+            mqWidth.removeEventListener('change', onChange)
+            mqTouch.removeEventListener('change', onChange)
+        }
     }, [])
 
     // Palette scelta in Preferenze.jsx > Colori land (localStorage, solo
