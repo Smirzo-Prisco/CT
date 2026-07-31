@@ -127,13 +127,13 @@ switch ($op) {
             ]];
         }
 
-        // 5. STRUMENTI (solo admin, tranne "Account" — vedi sotto)
-        // "Ripristina/cancella account" usa permessi >= MODERATOR (il livello
-        // numerico di personaggio.permessi, controllato anche da api_account.php),
-        // non il flag di ruolo $perms['admin']/moderatore: per questo la card va
-        // mostrata anche a chi ha solo quel livello, con la sola voce Account.
-        $isAccountMod = (int)($_SESSION['permessi'] ?? 0) >= MODERATOR;
-        if ($perms['admin'] || $isAccountMod) {
+        // 5. STRUMENTI (solo admin, tranne "Ripristina/cancella account" — vedi sotto)
+        // "Ripristina/cancella account" e' uno strumento separato dall'autocancellazione
+        // (quella e' in Preferenze -> CancellaAccount.jsx): usa gli stessi flag di ruolo
+        // admin/moderatore di api_account.php, non personaggio.permessi (asse indipendente,
+        // usato li' solo per lo stato attivo/cancellato dell'account, non per il livello
+        // di staff — vedi conversazione di progetto del 2026-07-31).
+        if ($perms['admin'] || $perms['moderatore']) {
             $voci = [];
             if ($perms['admin']) {
                 $voci[] = ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'];
@@ -143,7 +143,7 @@ switch ($op) {
                 $voci[] = ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'];
                 $voci[] = ['label' => 'Manutenzione',          'url' => 'gestione.php?page=gestione_manutenzione'];
             }
-            $voci[] = ['label' => 'Ripristina/cancella account', 'url' => 'main.php?page=user_cancella_pg'];
+            $voci[] = ['label' => 'Ripristina/cancella account', 'url' => 'gestione.php?page=gestione_account'];
             $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => $voci];
         }
 
