@@ -26,6 +26,11 @@
         &--list { justify-content: flex-start; }
     }
 
+    .sm-header-edit {
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
     .sm-back {
         display: inline-flex;
         align-items: center;
@@ -411,8 +416,9 @@
     @media (max-width: 480px) {
         padding: $space-3;
 
-        .sm-header { gap: $space-3; margin-bottom: $space-4; }
+        .sm-header { gap: $space-3; margin-bottom: $space-4; flex-wrap: wrap; }
         .sm-title  { font-size: $text-xl; }
+        .sm-header-edit { margin-left: 0; width: 100%; justify-content: center; }
         .sm-img-box { width: 36px; height: 36px; }
     }
 }
