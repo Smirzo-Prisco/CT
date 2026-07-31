@@ -127,16 +127,24 @@ switch ($op) {
             ]];
         }
 
-        // 5. STRUMENTI (solo admin)
-        if ($perms['admin']) {
-            $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => [
-                ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'],
-                ['label' => 'Bacheche',              'url' => 'gestione.php?page=gestione_bacheche'],
-                ['label' => 'Luoghi',                'url' => 'gestione.php?page=gestione_luoghi'],
-                ['label' => 'Mappa',                 'url' => 'gestione.php?page=gestione_mappe'],
-                ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'],
-                ['label' => 'Manutenzione',          'url' => 'gestione.php?page=gestione_manutenzione'],
-            ]];
+        // 5. STRUMENTI (solo admin, tranne "Account" — vedi sotto)
+        // "Ripristina/cancella account" usa permessi >= MODERATOR (il livello
+        // numerico di personaggio.permessi, controllato anche da api_account.php),
+        // non il flag di ruolo $perms['admin']/moderatore: per questo la card va
+        // mostrata anche a chi ha solo quel livello, con la sola voce Account.
+        $isAccountMod = (int)($_SESSION['permessi'] ?? 0) >= MODERATOR;
+        if ($perms['admin'] || $isAccountMod) {
+            $voci = [];
+            if ($perms['admin']) {
+                $voci[] = ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'];
+                $voci[] = ['label' => 'Bacheche',              'url' => 'gestione.php?page=gestione_bacheche'];
+                $voci[] = ['label' => 'Luoghi',                'url' => 'gestione.php?page=gestione_luoghi'];
+                $voci[] = ['label' => 'Mappa',                 'url' => 'gestione.php?page=gestione_mappe'];
+                $voci[] = ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'];
+                $voci[] = ['label' => 'Manutenzione',          'url' => 'gestione.php?page=gestione_manutenzione'];
+            }
+            $voci[] = ['label' => 'Ripristina/cancella account', 'url' => 'main.php?page=user_cancella_pg'];
+            $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => $voci];
         }
 
         // 6. LOG

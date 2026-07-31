@@ -202,6 +202,11 @@ $pref-muted:   #7a8499;
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
+    // ── Account ────────────────────────────────────────────────
+    &__delete-btn {
+        width: 100%;
+    }
+
     // ── Responsive ───────────────────────────────────────────
     @media (width <= 480px) {
         margin: 10px 8px;

@@ -242,6 +242,18 @@ export default function Preferenze() {
                 </div>
             </div>
 
+            <div className="preferenze-page__section">
+                <div className="preferenze-page__section-title">Account</div>
+
+                <button
+                    type="button"
+                    className="btn btn--danger preferenze-page__delete-btn"
+                    onClick={() => navigate('main.php?page=user_cancella_pg')}
+                >
+                    <i className="fa-solid fa-triangle-exclamation"></i> Elimina il mio account
+                </button>
+            </div>
+
             </div>
         </>
     )
