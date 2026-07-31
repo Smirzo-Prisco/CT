@@ -74,8 +74,6 @@ function determineMessageType($type, $first_char, $second_char, &$chat_message, 
 
 /**  * Gestisce i messaggi sussurro  */
 function handleWhisperMessage($type, &$chat_message, &$tag_n_beyond, $whisper_type, &$session) {
-    global $MESSAGE;
-    
     $m_type = $whisper_type;
     
     // Estrai destinatario dal messaggio se necessario
@@ -90,19 +88,13 @@ function handleWhisperMessage($type, &$chat_message, &$tag_n_beyond, $whisper_ty
         }
     }
     
-    // Verifica destinatario
-    if ($m_type == $whisper_type) {
-        $r_check_dest = gdrcd_query("SELECT nome FROM personaggio 
-                                   WHERE DATE_ADD(ultimo_refresh, INTERVAL 2 MINUTE) > NOW() 
-                                   AND ultimo_luogo = " . $session['luogo'] . " 
-                                   AND nome = '$tag_n_beyond' 
-                                   LIMIT 1", 'result');
-        
-        if (gdrcd_query($r_check_dest, 'num_rows') < 1) {
-            $chat_message = $tag_n_beyond . ' ' . gdrcd_filter('in', $MESSAGE['chat']['whisper']['no']);
-            $tag_n_beyond = $session['login'];
-        }
-    } else $tag_n_beyond = $session['tag'];
+    // Il sussurro arriva sempre, a prescindere dalla presenza reale del
+    // destinatario in stanza (ultimo_refresh/ultimo_luogo): un controllo qui
+    // sostituiva il messaggio con "[destinatario] non è presente" invece di
+    // recapitarlo, anche quando il destinatario era effettivamente li' ma il
+    // suo ultimo_refresh non era abbastanza recente. Vedi conversazione di
+    // progetto del 2026-08-01.
+    if ($m_type != $whisper_type) $tag_n_beyond = $session['tag'];
     
     chatInsertMessage($session['luogo'], $session['login'], $tag_n_beyond, $chat_message, $m_type);
 }
