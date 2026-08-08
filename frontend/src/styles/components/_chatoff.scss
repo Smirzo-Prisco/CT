@@ -60,28 +60,45 @@
 }
 
 .chatoff-box {
-    height: 200px;
+    height: 220px;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 6px 8px;
+    padding: 8px 10px;
     font-family: $font-chat;
-    font-size: $text-sm;
+    font-size: $text-md;
     color: $color-text;
     line-height: 1.5;
-    background: transparent;
+    // Sfondo leggermente piu' scuro solo qui (non su header/input, che
+    // restano trasparenti): il pannello vive su un popover a vetro
+    // (blur + gradiente al 40% di opacita', vedi .ct-hud__popover--chatoff
+    // in _hud.scss) — dietro puo' passare qualunque punto della mappa,
+    // anche molto chiaro, e a quel punto il testo perdeva contrasto. Un
+    // pavimento scuro fisso sotto al testo lo rende leggibile SEMPRE,
+    // indipendentemente da cosa c'e' dietro.
+    background: rgba(5, 9, 22, .3);
+    // Alone scuro dietro ogni carattere: stessa tecnica dei sottotitoli
+    // video, stesso motivo — garantisce leggibilita' anche nei punti in cui
+    // lo sfondo sfocato e' particolarmente chiaro.
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .7);
     box-sizing: border-box;
     width: 100%;
     max-width: 100%;
     word-break: break-word;
     overflow-wrap: break-word; // forza il break anche su parole/URL senza spazi
 
-    // Messaggi dal log.html — spaziatura leggermente maggiore (4px, non piu'
-    // 2px) tra un messaggio e l'altro: a compattezza quasi invariata separa
-    // meglio i turni di parola quando il nome e' un link (occhio piu'
-    // allenato a leggerlo come voce a se', non come parte del messaggio).
+    // Messaggi dal log.html. Bande alternate (nth-child even) + margine
+    // orizzontale negativo che compensa il padding del box: tecnica classica
+    // delle liste/log fitti (tabelle, log di sistema) per far scorrere
+    // l'occhio riga per riga senza "perdersi" a meta' lettura.
     .msgln {
-        margin: 0 0 4px;
+        margin: 0 -6px 6px;
+        padding: 2px 6px;
+        border-radius: 4px;
         color: $color-text;
+
+        &:nth-child(even) {
+            background: rgba(255, 255, 255, .04);
+        }
 
         // "b" resta per i messaggi gia' salvati in log.html prima di questa
         // modifica (nome non ancora un link) — stesso colore di .msgln-name
