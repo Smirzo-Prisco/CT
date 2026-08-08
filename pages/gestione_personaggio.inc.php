@@ -365,7 +365,10 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                         <label for="notorieta">Notorietà</label>
                         <input type="number" id="notorieta" name="notorieta">
                     </div>
-                    <div class="form-group form-column"></div>
+                    <div class="form-group form-column">
+                        <label for="mestiere_punti">Punti Mestiere</label>
+                        <input type="number" id="mestiere_punti" name="mestiere_punti" min="1" max="100">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="note_master">Note del Master</label>
