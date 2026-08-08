@@ -45,6 +45,20 @@ table.customTable thead {
     background-color: #1a2240;
 }
 
+// Icona mestiere/ruolo nelle tabelle di gestione (gestione_mestiere.inc.php,
+// gestione_tutta_mestiere.inc.php): le immagini caricate in imgs/mestieri/
+// non hanno una risoluzione garantita (nessun ridimensionamento all'upload,
+// a differenza di .gm-image-thumb nel pannello React di modifica) — senza
+// un vincolo qui, un file caricato piu' grande del previsto sfondava la riga
+// e con essa l'intera tabella.
+.mestiere-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    vertical-align: middle;
+    border-radius: 4px;
+}
+
 div.titolo {
     margin: auto;
     text-align: center;
