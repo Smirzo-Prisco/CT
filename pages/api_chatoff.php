@@ -55,7 +55,11 @@ switch ($op) {
         $login    = $_SESSION['login'];
         $login_f  = gdrcd_filter('in', $login);
         $escaped  = htmlspecialchars(stripslashes($text));
-        $line     = "<div class='msgln'>(" . date('d.m.y, H:i') . ") <b>" . $login . "</b>: " . $escaped . "<br></div>\n";
+        // Nome cliccabile -> scheda del mittente (stesso pattern della chat di
+        // gioco, vedi <span class="chat_name"><a...> in api_chat.php).
+        $line     = "<div class='msgln'><span class='msgln-time'>(" . date('d.m.y, H:i') . ")</span> "
+                  . "<a class='msgln-name' href='main.php?page=scheda&pg=" . $login . "'>" . $login . "</a>: "
+                  . "<span class='msgln-msg'>" . $escaped . "</span></div>\n";
 
         $existing = (file_exists($LOG) && filesize($LOG) > 0) ? file_get_contents($LOG) : '';
         file_put_contents($LOG, $line . $existing);
