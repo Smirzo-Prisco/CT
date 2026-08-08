@@ -139,10 +139,11 @@
     echo "<img src='https://gifrific.com/wp-content/uploads/2017/11/you-shall-not-pass-gandalf-lotr.gif' align='center'>";
     } else {
     ?>
-    
-    
-    
-    
+
+    <div class="topbar">
+        <a href="javascript:history.back()" class="back">⬅️ Indietro</a>
+    </div>
+
     <!----------- INIZIAMO CON I GILDATI ------------->
     <table class="customTable">
     <tr>
