@@ -1,13 +1,19 @@
 /**
  * ScegliMestiere.jsx — Selezione e avanzamento del mestiere del personaggio.
  *
- * Step 2: elenco mestieri di base — cambia liberamente, conferma a 10 px.
+ * Step 2: elenco mestieri di base — un click conferma subito (irreversibile,
+ * vedi window.confirm in MesteireCard). Non c'e' piu' una fase di scelta
+ * provvisoria: prima richiedeva un secondo passaggio ("Conferma") sbloccato
+ * a 10 px esperienza, che lasciava per un tempo indefinito un'affiliazione
+ * non confermata — invisibile alle liste staff filtrate sulle sole
+ * affiliazioni confermate ma comunque conteggiata nel limite, bloccando
+ * nuove assunzioni senza modo di vederla per liberarla lato staff. Vedi
+ * conversazione di progetto del 2026-08-08.
  * Step 3: elenco livelli del mestiere corrente — avanza se hai esperienza sufficiente.
  *
  * API: pages/api_mestiere.php
  *   op=getState  GET              → { step, esperienza, expMestiere, mestieri, hasConferma }
- *   op=change    POST { id_record, mestiere } → cambia mestiere (step 2)
- *   op=pick      POST { mestiere }            → conferma mestiere (step 2)
+ *   op=change    POST { id_record, mestiere } → sceglie e conferma il mestiere (step 2 -> 3)
  *   op=levelUp   POST { id_record, mestiere } → avanza livello (step 3)
  *
  * Stili: _scegli_razza.scss (classi sr- condivise, scoped su #scegli-mestiere-app)
@@ -24,45 +30,27 @@ function navigate(url) {
 
 // ── Card singolo mestiere ─────────────────────────────────────────────────────
 
-function MesteireCard({ mestiere, step, esperienza, onAction }) {
-    const isSelected = mestiere.selected
-
-    const handlePick = () => {
+function MesteireCard({ mestiere, step, onAction }) {
+    // Un solo click sceglie E conferma (nessuna fase provvisoria, vedi
+    // commento in cima al file): stesso avviso "irreversibile" di prima,
+    // ora davanti alla scelta stessa invece che a un secondo passaggio
+    // sbloccato a 10 px.
+    const handleChoose = () => {
         if (!window.confirm('Confermare il mestiere? Non sarà più possibile cambiarlo.')) return
-        onAction('pick', { mestiere: mestiere.mestiere })
+        onAction('change', { id_record: mestiere.id, mestiere: mestiere.mestiere })
     }
 
     return (
-        <div className={`sr-guild-card${isSelected ? ' sr-guild-card--selected' : ''}`}>
+        <div className="sr-guild-card">
             <div className="sr-guild-img">
                 <img src={`imgs/mestieri/${mestiere.immagine}`} alt={mestiere.nome} />
             </div>
             <div className="sr-guild-name">{mestiere.nome}</div>
 
-            {/* Indicatore mestiere attuale (step 2) */}
-            {step === 2 && isSelected && (
-                <div className="sr-guild-role">
-                    <i className="fas fa-check"></i> Mestiere attuale
-                </div>
-            )}
-
             {/* Azioni step 2 */}
-            {step === 2 && isSelected && esperienza >= 10 && (
-                <button className="sr-btn sr-btn--join" onClick={handlePick}>
-                    <i className="fas fa-check-circle"></i> Conferma
-                </button>
-            )}
-            {step === 2 && isSelected && esperienza < 10 && (
-                <span className="sr-guild-locked">
-                    <i className="fas fa-clock"></i> Conferma a 10 px
-                </span>
-            )}
-            {step === 2 && !isSelected && (
-                <button
-                    className="sr-btn sr-btn--cancel"
-                    onClick={() => onAction('change', { id_record: mestiere.id, mestiere: mestiere.mestiere })}
-                >
-                    <i className="fas fa-exchange-alt"></i> Cambia
+            {step === 2 && (
+                <button className="sr-btn sr-btn--join" onClick={handleChoose}>
+                    <i className="fas fa-check-circle"></i> Scegli questo mestiere
                 </button>
             )}
 
@@ -148,7 +136,7 @@ export default function ScegliMestiere() {
         </div>
     )
 
-    const { step, esperienza, expMestiere, mestieri } = state
+    const { step, expMestiere, mestieri } = state
 
     return (
         <div id="scegli-mestiere-app">
@@ -165,19 +153,6 @@ export default function ScegliMestiere() {
                 </div>
             </header>
 
-            {/* Info esperienza */}
-            {step === 2 && esperienza < 10 && (
-                <div className="sr-msg sr-msg--warn">
-                    <i className="fas fa-info-circle"></i>
-                    Non hai ancora 10 px: non sei abilitato alle bacheche né alla lista membri. A 10 px potrai confermare il mestiere.
-                </div>
-            )}
-            {step === 2 && esperienza >= 10 && (
-                <div className="sr-msg sr-msg--ok">
-                    <i className="fas fa-star"></i>
-                    Hai {expMestiere} punti mestiere
-                </div>
-            )}
             {step === 3 && (
                 <div className="sr-msg sr-msg--ok">
                     <i className="fas fa-star"></i>
@@ -205,7 +180,6 @@ export default function ScegliMestiere() {
                             key={m.id}
                             mestiere={m}
                             step={step}
-                            esperienza={esperienza}
                             onAction={doAction}
                         />
                     ))}

@@ -3,8 +3,7 @@
  * api_mestiere.php — Selezione e avanzamento mestiere del personaggio
  *
  * op=getState  — stato corrente (step 2 = scelta, step 3 = avanzamento)
- * op=change    — cambia ruolo mestiere (step 2)
- * op=pick      — conferma definitiva mestiere (step 2, richiede >= 10 exp)
+ * op=change    — sceglie il mestiere e lo conferma subito (step 2 -> step 3)
  * op=levelUp   — avanza di livello nel mestiere confermato (step 3)
  *
  * @author Crystal Tokyo Dev
@@ -101,8 +100,16 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
-    // change — cambia ruolo mestiere (step 2)
+    // change — sceglie il mestiere e lo conferma subito (step 2 -> step 3)
     // -------------------------------------------------------------------------
+    // Prima era un doppio passaggio (change poi pick, quest'ultimo bloccato
+    // sotto i 10 px esperienza): lasciava per un tempo indefinito una riga in
+    // clgpersonaggiomestiere con conferma_mestiere=0, invisibile nelle liste
+    // staff che filtrano sulle sole affiliazioni confermate (es.
+    // gestione_mestiere.inc.php) ma comunque conteggiata nel limite di
+    // affiliazioni — bloccando una nuova assunzione senza modo di vederla per
+    // liberarla. Ora la scelta è definitiva ed immediata (stesso avviso
+    // "non sarà più possibile cambiarlo" lato client, vedi ScegliMestiere.jsx).
     case 'change':
         $data     = json_decode(file_get_contents('php://input'), true);
         $idRuolo  = (int)($data['id_record'] ?? 0);
@@ -115,32 +122,15 @@ switch ($op) {
 
         $existing = gdrcd_query("SELECT id_ruolo FROM clgpersonaggiomestiere WHERE personaggio = '$login'", 'result');
         if (gdrcd_query($existing, 'num_rows') >= 1) {
-            gdrcd_query("UPDATE clgpersonaggiomestiere SET id_ruolo = $idRuolo WHERE personaggio = '$login'");
+            gdrcd_query("UPDATE clgpersonaggiomestiere SET id_ruolo = $idRuolo, conferma_mestiere = 1 WHERE personaggio = '$login'");
         } else {
-            gdrcd_query("INSERT INTO clgpersonaggiomestiere (id_ruolo, personaggio) VALUES ($idRuolo, '$login')");
+            gdrcd_query("INSERT INTO clgpersonaggiomestiere (id_ruolo, personaggio, conferma_mestiere) VALUES ($idRuolo, '$login', 1)");
         }
         gdrcd_query($existing, 'free');
         gdrcd_query("UPDATE personaggio SET id_mestiere = $mestiere, id_ruolo_mestiere = $idRuolo WHERE nome = '$login'");
 
-        echo json_encode(['success' => true, 'message' => 'Mestiere aggiornato']);
-        break;
-
-    // -------------------------------------------------------------------------
-    // pick — conferma definitiva mestiere (richiede >= 10 esperienza)
-    // -------------------------------------------------------------------------
-    case 'pick':
-        $pg = gdrcd_query("SELECT esperienza FROM personaggio WHERE nome = '$login'");
-        if ((int)($pg['esperienza'] ?? 0) < 10) {
-            echo json_encode(['success' => false, 'message' => 'Servono almeno 10 punti esperienza per confermare il mestiere']);
-            exit;
-        }
-
-        $data     = json_decode(file_get_contents('php://input'), true);
-        $mestiere = (int)($data['mestiere'] ?? 0);
-        $titolo   = gdrcd_filter('in', "Conferma nel mestiere - $login");
-        $msg      = gdrcd_filter('in', "Il personaggio [b]{$login}[/b] ha appena confermato il ruolo nel mestiere");
-
-        gdrcd_query("UPDATE clgpersonaggiomestiere SET conferma_mestiere = 1 WHERE personaggio = '$login'");
+        $titolo = gdrcd_filter('in', "Conferma nel mestiere - $login");
+        $msg    = gdrcd_filter('in', "Il personaggio [b]{$login}[/b] ha appena confermato il ruolo nel mestiere");
 
         $araldo = gdrcd_query("SELECT id_araldo FROM araldo WHERE tipo = 6 AND proprietari = $mestiere");
         if ($araldo && !empty($araldo['id_araldo'])) {
@@ -150,7 +140,7 @@ switch ($op) {
             gdrcd_query($sql);
         }
 
-        echo json_encode(['success' => true, 'message' => 'Ruolo nel mestiere confermato. Esci e rientra per vedere le modifiche.']);
+        echo json_encode(['success' => true, 'message' => 'Mestiere confermato. Esci e rientra per vedere le modifiche.']);
         break;
 
     // -------------------------------------------------------------------------

@@ -30,6 +30,7 @@ function popolaPgForm(nome) {
                 shin: user.shin || '',
                 soldi: user.soldi || '',
                 notorieta: user.notorieta || '',
+                mestiere_punti: user.esperienza_mestiere || '',
                 particolari: user.particolari || '',
                 note_master: user.note_fato || '',
                 razza: user.id_razza || '0',
@@ -58,6 +59,7 @@ function popolaPgForm(nome) {
                 { id: 'shin', value: user.shin },
                 { id: 'soldi', value: user.soldi },
                 { id: 'notorieta', value: user.notorieta },
+                { id: 'mestiere_punti', value: user.esperienza_mestiere },
                 { id: 'particolari', value: user.particolari },
                 { id: 'note_master', value: user.note_fato },
                 { id: 'razza', value: user.id_razza }
@@ -212,6 +214,7 @@ function getModifiedFields(formData) {
         'shin': 'shin',
         'soldi': 'soldi',
         'notorieta': 'notorieta',
+        'mestiere_punti': 'mestiere_punti',
         'particolari': 'particolari',
         'note_master': 'note_master',
         'razza': 'razza',

@@ -79,6 +79,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'shin' => 'shin',
                     'soldi' => 'soldi',
                     'notorieta' => 'notorieta',
+                    'mestiere_punti' => 'esperienza_mestiere',
                     'particolari' => 'particolari',
                     'note_master' => 'note_fato',
                     'razza' => 'id_razza',
@@ -92,7 +93,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 foreach ($fieldMappings as $formField => $dbField) {
                     if (isset($_POST[$formField])) {
                         // Applica il filtro appropriato
-                        if (in_array($formField, array('eta', 'salute', 'integrita', 'shin', 'soldi', 'notorieta', 'razza'))) {
+                        if (in_array($formField, array('eta', 'salute', 'integrita', 'shin', 'soldi', 'notorieta', 'mestiere_punti', 'razza'))) {
                             $value = gdrcd_filter('num', $_POST[$formField]);
                         } elseif ($formField === 'email') {
                             $value = gdrcd_filter('email', $_POST[$formField]);

@@ -139,10 +139,11 @@
     echo "<img src='https://gifrific.com/wp-content/uploads/2017/11/you-shall-not-pass-gandalf-lotr.gif' align='center'>";
     } else {
     ?>
-    
-    
-    
-    
+
+    <div class="topbar">
+        <a href="javascript:history.back()" class="back">⬅️ Indietro</a>
+    </div>
+
     <!----------- INIZIAMO CON I GILDATI ------------->
     <table class="customTable">
     <tr>
@@ -191,7 +192,7 @@
     <tr>
     <td>
     <input name="nome" type=hidden value="<?php echo $row['personaggio']; ?>">
-    <img src="imgs/mestieri/<?php echo $row['immagine']; ?>" border=0 title="<?php echo $row['nome_ruolo']; ?>">
+    <img src="imgs/mestieri/<?php echo $row['immagine']; ?>" class="mestiere-icon" border=0 title="<?php echo $row['nome_ruolo']; ?>">
     <b><a href="main.php?page=scheda&pg=<?php echo $row['personaggio']; ?>" target=_top><?php echo  $row['personaggio']; ?></a></b>
     </td>
     
