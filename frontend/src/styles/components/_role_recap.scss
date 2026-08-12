@@ -597,6 +597,37 @@
         line-height: 1;
     }
 
+    .participant-shin-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: $radius-full;
+        border: none;
+        padding: 0;
+        font-size: 0.75rem;
+        line-height: 1;
+
+        &--pending {
+            background-color: rgba($color-warning, 0.18);
+            color: #{$color-warning};
+            cursor: pointer;
+            transition: var(--transition);
+
+            &:hover {
+                background-color: #{$color-warning};
+                color: var(--bg-deep);
+            }
+        }
+
+        &--awarded {
+            background-color: rgba($palette-action, 0.18);
+            color: #{$palette-action};
+            cursor: default;
+        }
+    }
+
     // ── Nessun risultato ──────────────────────────────────────
 
     .no-results {
