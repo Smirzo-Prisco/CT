@@ -86,7 +86,6 @@ function HudArcSheet({ isMobile, isOpen, onClose, children }) {
 export default function Hud({ isStaff }) {
 
     const nome = window.CT_USER?.login ?? ''
-    const sesso = window.CT_USER?.sesso ?? 'm'
 
     const hudRef = useRef(null)
 
@@ -205,7 +204,7 @@ export default function Hud({ isStaff }) {
 
     // ── Avatar + vitali personaggio (stesso pattern di AnteprimaScheda.jsx) ─
     const [avatar, setAvatar] = useState(() => (window.CT_USER?.url_img_chat ?? '').trim())
-    const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null, gilda: null })
+    const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null, gilda: null, gildaImg: null })
 
     const fetchProfile = useCallback(() => {
         if (!nome) return
@@ -221,6 +220,7 @@ export default function Hud({ isStaff }) {
                     // La "razza" del personaggio ora e' la gilda (gilda.nome), non
                     // piu' la vecchia tabella razza.
                     gilda: d.nome_gilda,
+                    gildaImg: d.immagine_gilda,
                 })
             })
             .catch(err => console.error('[Hud] Errore profilo:', err))
@@ -510,7 +510,10 @@ export default function Hud({ isStaff }) {
                 <div className="ct-hud__panel ct-hud__panel--char">
                     <div className="ct-hud__char-row">
                         <span className="ct-hud__char-name">
-                            {nome} <i className={`fa-solid ${sesso === 'f' ? 'fa-venus' : 'fa-mars'}`} />
+                            {nome} {stats.gildaImg
+                                ? <img className="ct-hud__char-race-icon" src={`imgs/guilds/${stats.gildaImg}`} alt={stats.gilda ?? ''} />
+                                : <i className="fa-solid fa-person" title="Senza razza" />
+                            }
                         </span>
                         <span className="ct-hud__char-badge">{stats.gilda || 'Senza razza'}</span>
                     </div>
