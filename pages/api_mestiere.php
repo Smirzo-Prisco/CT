@@ -40,14 +40,33 @@ switch ($op) {
         $step           = $hasConferma ? 3 : 2;
 
         if ($step === 2) {
-            // Solo i mestieri veri (tipo=1): esclude le gilde giocatore, che condividono
-            // la stessa tabella ruolo_mestiere ma non sono scelte in questa pagina
-            $res      = gdrcd_query("SELECT rm.id_ruolo, rm.nome_ruolo, rm.immagine, rm.mestiere FROM ruolo_mestiere rm JOIN mestiere m ON rm.mestiere = m.id_mestiere WHERE rm.livello_mestiere = 3 AND m.tipo = 1 ORDER BY rm.nome_ruolo", 'result');
+            // Una card per mestiere (tipo=1, esclude le gilde giocatore che
+            // condividono la stessa tabella ruolo_mestiere), non una per
+            // ruolo: per ciascun mestiere si prende SOLO il ruolo di livello
+            // piu' basso (numero piu' ALTO di livello_mestiere = rango piu'
+            // junior — es. Apprendista/Specializzando/Parlamentare, vedi
+            // levelUp sotto che infatti avanza verso livelli numericamente
+            // minori). Prima era un valore fisso (livello_mestiere = 3): un
+            // futuro mestiere con una profondita' di livelli diversa
+            // sarebbe stato escluso in silenzio invece di comparire.
+            // Il nome mostrato e' quello del mestiere, non del ruolo
+            // specifico: qui si sceglie il mestiere, non un titolo.
+            $res = gdrcd_query(
+                "SELECT rm.id_ruolo, m.nome AS nome_mestiere, rm.immagine, rm.mestiere
+                 FROM ruolo_mestiere rm
+                 JOIN mestiere m ON rm.mestiere = m.id_mestiere
+                 WHERE m.tipo = 1
+                   AND rm.livello_mestiere = (
+                       SELECT MAX(rm2.livello_mestiere) FROM ruolo_mestiere rm2 WHERE rm2.mestiere = rm.mestiere
+                   )
+                 ORDER BY m.nome",
+                'result'
+            );
             $mestieri = [];
             while ($row = gdrcd_query($res, 'fetch')) {
                 $mestieri[] = [
                     'id'       => (int)$row['id_ruolo'],
-                    'nome'     => gdrcd_filter('out', (string)$row['nome_ruolo']),
+                    'nome'     => gdrcd_filter('out', (string)$row['nome_mestiere']),
                     'immagine' => (string)$row['immagine'],
                     'mestiere' => (int)$row['mestiere'],
                     'selected' => ((int)$row['id_ruolo'] === $currentIdRuolo),
