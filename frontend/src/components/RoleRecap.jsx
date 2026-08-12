@@ -125,6 +125,16 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward, onReject, onOpenQue
                             <span>{game.pending_count}</span>
                         </button>
                     )}
+                    {isStaff && Object.entries(game.shin_status ?? {}).filter(([, s]) => s === 'pending').map(([nome]) => (
+                        <button
+                            key={nome}
+                            className="game-shin-btn game-shin-btn--pending"
+                            title={`Richiesta shin di ${nome} — clicca per rifiutare`}
+                            onClick={() => onReject(game.id, nome)}
+                        >
+                            <i className="fas fa-bookmark"></i>
+                        </button>
+                    ))}
                     <button
                         className="game-log-btn"
                         title="Leggi la giocata"
@@ -176,37 +186,20 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward, onReject, onOpenQue
                         Partecipanti ({game.partecipanti.length})
                     </div>
                     <div className="participants-list">
-                        {game.partecipanti.map(p => {
-                            const shinStatus = isStaff ? (game.shin_status?.[p.nome] ?? null) : null
-                            return (
-                                <div
-                                    key={p.nome}
-                                    className={`participant${p.isMaster ? ' participant--master' : ''}`}
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(p.nome)}`)}
-                                >
-                                    <i className="fas fa-user"></i>
-                                    <span>{p.nome}</span>
-                                    {p.isMaster && (
-                                        <span className="participant-master-badge" title="Master della giocata">M</span>
-                                    )}
-                                    {shinStatus === 'pending' && (
-                                        <button
-                                            className="participant-shin-btn participant-shin-btn--pending"
-                                            title={`Richiesta shin di ${p.nome} — clicca per rifiutare`}
-                                            onClick={e => { e.stopPropagation(); onReject(game.id, p.nome) }}
-                                        >
-                                            <i className="fas fa-bookmark"></i>
-                                        </button>
-                                    )}
-                                    {shinStatus === 'awarded' && (
-                                        <span className="participant-shin-btn participant-shin-btn--awarded" title="Shin già assegnati">
-                                            <i className="fas fa-coins"></i>
-                                        </span>
-                                    )}
-                                </div>
-                            )
-                        })}
+                        {game.partecipanti.map(p => (
+                            <div
+                                key={p.nome}
+                                className={`participant${p.isMaster ? ' participant--master' : ''}`}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(p.nome)}`)}
+                            >
+                                <i className="fas fa-user"></i>
+                                <span>{p.nome}</span>
+                                {p.isMaster && (
+                                    <span className="participant-master-badge" title="Master della giocata">M</span>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
