@@ -3,6 +3,8 @@
  * api_mestiere.php — Selezione e avanzamento mestiere del personaggio
  *
  * op=getState  — stato corrente (step 2 = scelta, step 3 = avanzamento)
+ * op=list      — elenco mestieri veri con conteggio affiliati (step 2, vista elenco)
+ * op=detail    — gerarchia/affiliati/statuto di un mestiere (step 2, vista dettaglio)
  * op=change    — sceglie il mestiere e lo conferma subito (step 2 -> step 3)
  * op=levelUp   — avanza di livello nel mestiere confermato (step 3)
  *
@@ -40,39 +42,11 @@ switch ($op) {
         $step           = $hasConferma ? 3 : 2;
 
         if ($step === 2) {
-            // Una card per mestiere (tipo=1, esclude le gilde giocatore che
-            // condividono la stessa tabella ruolo_mestiere), non una per
-            // ruolo: per ciascun mestiere si prende SOLO il ruolo di livello
-            // piu' basso (numero piu' ALTO di livello_mestiere = rango piu'
-            // junior — es. Apprendista/Specializzando/Parlamentare, vedi
-            // levelUp sotto che infatti avanza verso livelli numericamente
-            // minori). Prima era un valore fisso (livello_mestiere = 3): un
-            // futuro mestiere con una profondita' di livelli diversa
-            // sarebbe stato escluso in silenzio invece di comparire.
-            // Il nome mostrato e' quello del mestiere, non del ruolo
-            // specifico: qui si sceglie il mestiere, non un titolo.
-            $res = gdrcd_query(
-                "SELECT rm.id_ruolo, m.nome AS nome_mestiere, rm.immagine, rm.mestiere
-                 FROM ruolo_mestiere rm
-                 JOIN mestiere m ON rm.mestiere = m.id_mestiere
-                 WHERE m.tipo = 1
-                   AND rm.livello_mestiere = (
-                       SELECT MAX(rm2.livello_mestiere) FROM ruolo_mestiere rm2 WHERE rm2.mestiere = rm.mestiere
-                   )
-                 ORDER BY m.nome",
-                'result'
-            );
+            // Vista elenco/dettaglio spostata su op=list/op=detail (stesso
+            // linguaggio visivo e stesse query di servizi_mestieri.inc.php,
+            // vedi ScegliMestiere.jsx) — qui serve solo per instradare tra
+            // step 2 e step 3, non serve piu' costruire l'elenco mestieri.
             $mestieri = [];
-            while ($row = gdrcd_query($res, 'fetch')) {
-                $mestieri[] = [
-                    'id'       => (int)$row['id_ruolo'],
-                    'nome'     => gdrcd_filter('out', (string)$row['nome_mestiere']),
-                    'immagine' => (string)$row['immagine'],
-                    'mestiere' => (int)$row['mestiere'],
-                    'selected' => ((int)$row['id_ruolo'] === $currentIdRuolo),
-                ];
-            }
-            gdrcd_query($res, 'free');
         } else {
             $res = gdrcd_query(
                 "SELECT rm.id_ruolo, rm.nome_ruolo, rm.immagine, rm.mestiere, rm.livello_mestiere
@@ -115,6 +89,123 @@ switch ($op) {
             'hasConferma'    => $hasConferma,
             'currentIdRuolo' => $currentIdRuolo,
             'mestieri'       => $mestieri,
+        ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+        break;
+
+    // -------------------------------------------------------------------------
+    // list — elenco mestieri veri (tipo=1) con conteggio affiliati confermati.
+    // Stessa query/stesso linguaggio visivo (classi .sm-*) della vista elenco
+    // di servizi_mestieri.inc.php, qui ristretta ai soli mestieri veri (la'
+    // e' invece pensata per le gilde giocatore con solo_gilde=1).
+    // -------------------------------------------------------------------------
+    case 'list':
+        $result = gdrcd_query(
+            "SELECT m.id_mestiere, m.nome, c.descrizione
+               FROM mestiere m
+               JOIN codtipomestiere c ON m.tipo = c.cod_tipo
+              WHERE m.visibile = 1 AND m.tipo = 1
+              ORDER BY m.nome",
+            'result'
+        );
+        $mestieri     = [];
+        $sezione_desc = null;
+        while ($row = gdrcd_query($result, 'fetch')) {
+            $sezione_desc = $row['descrizione'];
+            $numb = gdrcd_query(
+                "SELECT COUNT(*) AS n FROM clgpersonaggiomestiere cpm
+                   JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+                  WHERE rm.mestiere = " . (int)$row['id_mestiere'] . " AND cpm.conferma_mestiere = 1"
+            );
+            $mestieri[] = [
+                'id'   => (int)$row['id_mestiere'],
+                'nome' => gdrcd_filter('out', (string)$row['nome']),
+                'n'    => (int)($numb['n'] ?? 0),
+            ];
+        }
+        gdrcd_query($result, 'free');
+
+        echo json_encode([
+            'success'      => true,
+            'sezione'      => $sezione_desc ? gdrcd_filter('out', (string)$sezione_desc) : 'Mestieri',
+            'mestieri'     => $mestieri,
+        ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+        break;
+
+    // -------------------------------------------------------------------------
+    // detail — gerarchia, affiliati confermati e statuto di un mestiere vero.
+    // Stesse query della vista dettaglio di servizi_mestieri.inc.php; in piu'
+    // calcola entry_id_ruolo (il ruolo di livello piu' basso, per il pulsante
+    // "Entra nel mestiere" lato client — vedi anche op=change).
+    // -------------------------------------------------------------------------
+    case 'detail':
+        $id_mestiere = (int)($_GET['id_mestiere'] ?? 0);
+        if ($id_mestiere <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Mestiere non specificato']);
+            exit;
+        }
+        $mestiere_row = gdrcd_query("SELECT nome, statuto FROM mestiere WHERE id_mestiere = $id_mestiere AND tipo = 1");
+        if (!$mestiere_row) {
+            echo json_encode(['success' => false, 'message' => 'Mestiere non trovato']);
+            exit;
+        }
+
+        $rRuoli = gdrcd_query(
+            "SELECT id_ruolo, nome_ruolo, immagine, stipendio, capo, livello_mestiere
+               FROM ruolo_mestiere
+              WHERE mestiere = $id_mestiere
+              ORDER BY stipendio DESC",
+            'result'
+        );
+        $ruoli      = [];
+        $entryId    = null;
+        $maxLivello = -1;
+        while ($r = gdrcd_query($rRuoli, 'fetch')) {
+            $ruoli[] = [
+                'id_ruolo'   => (int)$r['id_ruolo'],
+                'nome_ruolo' => gdrcd_filter('out', (string)$r['nome_ruolo']),
+                'immagine'   => $r['immagine'] ? (string)$r['immagine'] : null,
+                'capo'       => (int)$r['capo'],
+            ];
+            // Livello piu' basso = numero piu' alto (rango piu' junior, vedi
+            // stesso criterio in op=getState/op=change) — MAX invece di un
+            // valore fisso per non escludere in silenzio un mestiere con una
+            // profondita' di livelli diversa.
+            if ((int)$r['livello_mestiere'] > $maxLivello) {
+                $maxLivello = (int)$r['livello_mestiere'];
+                $entryId    = (int)$r['id_ruolo'];
+            }
+        }
+        gdrcd_query($rRuoli, 'free');
+
+        $rAff = gdrcd_query(
+            "SELECT cpm.personaggio, p.cognome, rm.immagine, rm.nome_ruolo, rm.capo
+               FROM clgpersonaggiomestiere cpm
+               JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+               JOIN personaggio p ON p.nome = cpm.personaggio
+              WHERE rm.mestiere = $id_mestiere
+                AND cpm.conferma_mestiere = 1
+              ORDER BY rm.capo DESC, rm.stipendio DESC",
+            'result'
+        );
+        $affiliati = [];
+        while ($r = gdrcd_query($rAff, 'fetch')) {
+            $affiliati[] = [
+                'personaggio' => gdrcd_filter('out', (string)$r['personaggio']),
+                'cognome'     => gdrcd_filter('out', (string)$r['cognome']),
+                'immagine'    => $r['immagine'] ? (string)$r['immagine'] : null,
+                'nome_ruolo'  => gdrcd_filter('out', (string)$r['nome_ruolo']),
+                'capo'        => (int)$r['capo'],
+            ];
+        }
+        gdrcd_query($rAff, 'free');
+
+        echo json_encode([
+            'success'       => true,
+            'mestiere'      => ['id' => $id_mestiere, 'nome' => gdrcd_filter('out', (string)$mestiere_row['nome'])],
+            'statuto'       => !empty($mestiere_row['statuto']) ? gdrcd_bbcoder(gdrcd_filter('out', $mestiere_row['statuto'])) : null,
+            'ruoli'         => $ruoli,
+            'affiliati'     => $affiliati,
+            'entryIdRuolo'  => $entryId,
         ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
         break;
 
