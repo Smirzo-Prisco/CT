@@ -351,15 +351,21 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $my_shin_map[(int)$r['id_role']] = $r['awarded_at'] ? 'awarded' : 'pending';
 
                 $pending_map = [];
+                $shin_status_map = [];
                 if ($is_staff) {
-                    $res_p = gdrcd_query("SELECT id_role, COUNT(*) AS cnt FROM role_session_shin WHERE id_role IN ($all_ids) AND awarded_at IS NULL GROUP BY id_role", 'result');
-                    while ($r = gdrcd_query($res_p, 'fetch'))
-                        $pending_map[(int)$r['id_role']] = (int)$r['cnt'];
+                    $res_p = gdrcd_query("SELECT id_role, pg_name, awarded_at FROM role_session_shin WHERE id_role IN ($all_ids)", 'result');
+                    while ($r = gdrcd_query($res_p, 'fetch')) {
+                        $rid = (int)$r['id_role'];
+                        $status = $r['awarded_at'] ? 'awarded' : 'pending';
+                        $shin_status_map[$rid][$r['pg_name']] = $status;
+                        if ($status === 'pending') $pending_map[$rid] = ($pending_map[$rid] ?? 0) + 1;
+                    }
                 }
 
                 foreach ($roles as &$role) {
                     $role['my_shin']       = $my_shin_map[$role['id']] ?? 'none';
                     $role['pending_count'] = $pending_map[$role['id']] ?? 0;
+                    if ($is_staff) $role['shin_status'] = $shin_status_map[$role['id']] ?? new stdClass();
                 }
                 unset($role);
             }
@@ -425,6 +431,20 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $awarded++;
             }
             echo json_encode(['success' => true, 'message' => "$awarded shin assegnati", 'awarded' => $awarded]);
+            break;
+
+        case 'rejectShin':  // Staff: rifiuta la richiesta shin di un singolo giocatore
+            if (!isAdminMasterMod($_SESSION)) { echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); break; }
+            $id_role = isset($data['id_role']) ? (int)$data['id_role'] : 0;
+            $pg_name = isset($data['pg_name']) ? gdrcd_filter('in', trim($data['pg_name'])) : '';
+            if (!$id_role || $pg_name === '') { echo json_encode(['success' => false, 'message' => 'Dati mancanti']); break; }
+
+            $existing = gdrcd_query("SELECT awarded_at FROM role_session_shin WHERE id_role = $id_role AND pg_name = '$pg_name'");
+            if (!$existing) { echo json_encode(['success' => false, 'message' => 'Richiesta non trovata']); break; }
+            if ($existing['awarded_at']) { echo json_encode(['success' => false, 'message' => 'Questa richiesta è già stata premiata']); break; }
+
+            gdrcd_query("DELETE FROM role_session_shin WHERE id_role = $id_role AND pg_name = '$pg_name'");
+            echo json_encode(['success' => true]);
             break;
 
         case 'getRoleLog':

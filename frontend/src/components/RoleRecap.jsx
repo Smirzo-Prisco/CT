@@ -66,7 +66,7 @@ function StatCard({ icon, value, label, onClick, active }) {
     )
 }
 
-function GameCard({ game, canFlag, isStaff, onFlag, onAward, onOpenQuestRecap }) {
+function GameCard({ game, canFlag, isStaff, onFlag, onAward, onReject, onOpenQuestRecap }) {
     const today = new Date().toISOString().split('T')[0]
     const isToday = game.data === today || new Date(game.data).toISOString().split('T')[0] === today
     const duration = calcDuration(game.oraInizio, game.oraFine)
@@ -176,20 +176,37 @@ function GameCard({ game, canFlag, isStaff, onFlag, onAward, onOpenQuestRecap })
                         Partecipanti ({game.partecipanti.length})
                     </div>
                     <div className="participants-list">
-                        {game.partecipanti.map(p => (
-                            <div
-                                key={p.nome}
-                                className={`participant${p.isMaster ? ' participant--master' : ''}`}
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(p.nome)}`)}
-                            >
-                                <i className="fas fa-user"></i>
-                                <span>{p.nome}</span>
-                                {p.isMaster && (
-                                    <span className="participant-master-badge" title="Master della giocata">M</span>
-                                )}
-                            </div>
-                        ))}
+                        {game.partecipanti.map(p => {
+                            const shinStatus = isStaff ? (game.shin_status?.[p.nome] ?? null) : null
+                            return (
+                                <div
+                                    key={p.nome}
+                                    className={`participant${p.isMaster ? ' participant--master' : ''}`}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate(`main.php?page=scheda&pg=${encodeURIComponent(p.nome)}`)}
+                                >
+                                    <i className="fas fa-user"></i>
+                                    <span>{p.nome}</span>
+                                    {p.isMaster && (
+                                        <span className="participant-master-badge" title="Master della giocata">M</span>
+                                    )}
+                                    {shinStatus === 'pending' && (
+                                        <button
+                                            className="participant-shin-btn participant-shin-btn--pending"
+                                            title={`Richiesta shin di ${p.nome} — clicca per rifiutare`}
+                                            onClick={e => { e.stopPropagation(); onReject(game.id, p.nome) }}
+                                        >
+                                            <i className="fas fa-bookmark"></i>
+                                        </button>
+                                    )}
+                                    {shinStatus === 'awarded' && (
+                                        <span className="participant-shin-btn participant-shin-btn--awarded" title="Shin già assegnati">
+                                            <i className="fas fa-coins"></i>
+                                        </span>
+                                    )}
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             </div>
@@ -322,6 +339,25 @@ export default function RoleRecap() {
             fetchRoles(pg, gilda)
         }
     }, [selectedPg, filterGilda, fetchRoles])
+
+    const rejectShin = useCallback(async (id_role, pg_name) => {
+        setMsg(null)
+        const res  = await fetch('pages/api_roleSession.php?op=rejectShin', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_role, pg_name }),
+        })
+        const data = await res.json()
+        if (data.success) {
+            setRoles(prev => prev.map(r => {
+                if (Number(r.id) !== Number(id_role)) return r
+                const shin_status = { ...r.shin_status }
+                delete shin_status[pg_name]
+                return { ...r, shin_status, pending_count: Math.max(0, (r.pending_count ?? 0) - 1) }
+            }))
+        } else {
+            setMsg({ type: 'err', text: data.message })
+        }
+    }, [])
 
     const closeQuestRecap = useCallback((success) => {
         setQuestRecapGame(null)
@@ -533,6 +569,7 @@ export default function RoleRecap() {
                             isStaff={isStaff}
                             onFlag={toggleFlag}
                             onAward={awardShin}
+                            onReject={rejectShin}
                             onOpenQuestRecap={setQuestRecapGame}
                         />
                     ))}
