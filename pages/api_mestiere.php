@@ -100,7 +100,7 @@ switch ($op) {
     // -------------------------------------------------------------------------
     case 'list':
         $result = gdrcd_query(
-            "SELECT m.id_mestiere, m.nome, c.descrizione
+            "SELECT m.id_mestiere, m.nome, m.url_sito, c.descrizione
                FROM mestiere m
                JOIN codtipomestiere c ON m.tipo = c.cod_tipo
               WHERE m.visibile = 1 AND m.tipo = 1
@@ -117,9 +117,10 @@ switch ($op) {
                   WHERE rm.mestiere = " . (int)$row['id_mestiere'] . " AND cpm.conferma_mestiere = 1"
             );
             $mestieri[] = [
-                'id'   => (int)$row['id_mestiere'],
-                'nome' => gdrcd_filter('out', (string)$row['nome']),
-                'n'    => (int)($numb['n'] ?? 0),
+                'id'       => (int)$row['id_mestiere'],
+                'nome'     => gdrcd_filter('out', (string)$row['nome']),
+                'n'        => (int)($numb['n'] ?? 0),
+                'url_sito' => $row['url_sito'] ? gdrcd_filter('out', (string)$row['url_sito']) : null,
             ];
         }
         gdrcd_query($result, 'free');

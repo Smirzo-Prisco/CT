@@ -78,6 +78,12 @@ function MestiereList({ onOpen }) {
                                 <span className="sm-list-name">{m.nome}</span>
                             </button>
                             <span className="sm-list-count">{m.n}</span>
+                            {m.url_sito && (
+                                <a href={`${m.url_sito}?id2=${m.id}`} target="_blank" rel="noreferrer"
+                                   className="sm-list-statute" title="Statuto">
+                                    <i className="fas fa-scroll" />
+                                </a>
+                            )}
                         </div>
                     ))}
                 </div>
