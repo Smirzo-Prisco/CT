@@ -309,6 +309,28 @@
         &:hover { background: rgba($palette-warning, 0.22); }
     }
 
+    // ── Pulsanti rifiuto shin per singolo partecipante (staff) ─
+
+    .game-shin-btn {
+        display: inline-flex;
+        align-items: center;
+        background: transparent;
+        border: 1px solid var(--border-input);
+        border-radius: $radius-md;
+        cursor: pointer;
+        padding: 4px 10px;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        line-height: 1;
+
+        &--pending {
+            color: #{$palette-warning};
+            border-color: rgba($palette-warning, 0.5);
+            background: rgba($palette-warning, 0.08);
+            &:hover { background: rgba($palette-warning, 0.22); }
+        }
+    }
+
     // ── Toggle filtro flaggate ────────────────────────────────
 
     .filter-flag-toggle {
@@ -495,6 +517,7 @@
     .game-header-actions {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: $space-3;
     }
 
@@ -595,37 +618,6 @@
         font-size: 0.7rem;
         font-weight: 700;
         line-height: 1;
-    }
-
-    .participant-shin-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 20px;
-        height: 20px;
-        border-radius: $radius-full;
-        border: none;
-        padding: 0;
-        font-size: 0.75rem;
-        line-height: 1;
-
-        &--pending {
-            background-color: rgba($color-warning, 0.18);
-            color: #{$color-warning};
-            cursor: pointer;
-            transition: var(--transition);
-
-            &:hover {
-                background-color: #{$color-warning};
-                color: var(--bg-deep);
-            }
-        }
-
-        &--awarded {
-            background-color: rgba($palette-action, 0.18);
-            color: #{$palette-action};
-            cursor: default;
-        }
     }
 
     // ── Nessun risultato ──────────────────────────────────────
