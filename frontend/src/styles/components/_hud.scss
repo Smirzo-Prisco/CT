@@ -724,6 +724,18 @@ body[data-palette="public"] {
     text-overflow: ellipsis;
 
     i { font-size: 12px; margin-left: 6px; color: var(--muted); }
+
+    // Icona razza (gilda): stessa posizione/dimensione dell'icona a font che
+    // sostituisce (sesso, rimossa) — object-fit:contain perche' le immagini
+    // caricate per le gilde non hanno un rapporto d'aspetto garantito.
+    .ct-hud__char-race-icon {
+        width: 14px;
+        height: 14px;
+        margin-left: 6px;
+        object-fit: contain;
+        vertical-align: middle;
+        border-radius: 3px;
+    }
 }
 .ct-hud__char-badge {
     flex-shrink: 0;

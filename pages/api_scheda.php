@@ -105,6 +105,23 @@ switch ($op) {
             WHERE clgpersonaggiolavoro.personaggio = '$pg' LIMIT 1");
         $lavoro = $lavoro_q ? $lavoro_q['nome_ruolo'] : null;
 
+        // Icona "razza" mostrata in giro per il sito (HUD, presenti estesi):
+        // di norma il ruolo del pg nella propria gilda (ruolo.immagine via
+        // id_ruolo_gilda, gia' in $pg_data come immagine_famiglia) — ma se il
+        // pg ha un'inclinazione (clgpersonaggioinclinazione) quella prevale,
+        // stessa priorita'/stessa query di api_map.php (vedi gruppo_img li').
+        $gruppo_img  = $pg_data['immagine_famiglia'] ? 'imgs/guilds/' . $pg_data['immagine_famiglia'] : null;
+        $gruppo_nome = $pg_data['nome_ruolo'] ?: null;
+        $incl = gdrcd_query(
+            "SELECT i.immagine, i.nome FROM clgpersonaggioinclinazione cpi
+               JOIN inclinazione i ON i.id_inclinazione = cpi.id_ruolo
+              WHERE cpi.personaggio = '" . gdrcd_filter('in', $pg) . "'"
+        );
+        if ($incl && !empty($incl['immagine'])) {
+            $gruppo_img  = 'imgs/inclinazioni/' . $incl['immagine'];
+            $gruppo_nome = $incl['nome'];
+        }
+
         // Dati pubblici
         $profile = [
             'success'       => true,
@@ -126,6 +143,9 @@ switch ($op) {
             'nome_gilda'    => $pg_data['nome_gilda'],
             'nome_ruolo'    => $pg_data['nome_ruolo'],
             'immagine_famiglia' => $pg_data['immagine_famiglia'],
+            // Icona "razza" effettiva da mostrare — vedi commento sopra
+            'gruppo_img'    => $gruppo_img,
+            'gruppo_nome'   => $gruppo_nome,
             'nome_mestiere' => $pg_data['nome_mestiere'],
             'nome_ruolo_mestiere' => $pg_data['nome_ruolo_mestiere'],
             'immagine_mestiere'   => $pg_data['immagine_mestiere'],
