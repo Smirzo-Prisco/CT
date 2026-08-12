@@ -139,6 +139,17 @@
         color: #{$color-text};
         font-size: $text-md;
         min-width: 0;
+        // Reset per il caso <button> (ScegliMestiere.jsx, navigazione via JS
+        // invece di un href reale): senza, il bordo/sfondo di default del
+        // browser sui bottoni resta visibile — un <a> non li ha mai avuti,
+        // quindi qui non e' mai stato necessario prima. Nessun effetto sugli
+        // <a> esistenti (servizi_mestieri.inc.php), gia' privi di entrambi.
+        border: none;
+        background: none;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        width: 100%;
 
         &:hover { color: #{$palette-action}; }
     }
