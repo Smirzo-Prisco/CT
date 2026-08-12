@@ -78,12 +78,10 @@ function MestiereList({ onOpen }) {
                                 <span className="sm-list-name">{m.nome}</span>
                             </button>
                             <span className="sm-list-count">{m.n}</span>
-                            {m.url_sito && (
-                                <a href={`${m.url_sito}?id2=${m.id}`} target="_blank" rel="noreferrer"
-                                   className="sm-list-statute" title="Statuto">
-                                    <i className="fas fa-scroll" />
-                                </a>
-                            )}
+                            <button type="button" className="sm-list-statute" title="Statuto"
+                                    onClick={() => navigate(`main.php?page=statuto_main&id2=${m.id}`)}>
+                                <i className="fas fa-scroll" />
+                            </button>
                         </div>
                     ))}
                 </div>
