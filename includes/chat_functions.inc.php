@@ -2011,9 +2011,17 @@ function fight($id_role, $striker, $target, $id_skill, $level, $car, $dice, $rec
  * Ogni bersaglio riceve le opzioni disponibili (dado/scudo/subisce) calcolate server-side:
  * - scudo: solo se il pg ha la skill difensiva e non l'ha già usata nel turno corrente.
  * - dado/subisce: sempre disponibili se can_send = 1.
+ *
+ * Se un bersaglio è una creatura evocata ("creatura di X"), non ha una sessione propria
+ * per ricevere/rispondere alla notifica: viene quindi aggiunta una entry separata in
+ * creatureTargets, chiave il login del pg proprietario X, che il client usa per mostrare
+ * un secondo prompt di difesa (con le stat della creatura, non del proprietario). Tenuta
+ * separata da targetsInfo per non sovrascrivere un eventuale prompt del proprietario
+ * stesso, se anche lui è tra i bersagli diretti dello stesso attacco multi-bersaglio.
  */
 function notifyAttackIncoming($id_role, $luogo, $striker, array $targets, $car, $dice, $id_fight, $turn) {
     $targetsInfo = [];
+    $creatureTargets = [];
     foreach ($targets as $t) {
         $t = trim($t);
         if (!$t) continue;
@@ -2037,15 +2045,23 @@ function notifyAttackIncoming($id_role, $luogo, $striker, array $targets, $car, 
         $choices[] = 'subisce';
 
         $targetsInfo[$t] = ['can_send' => $canSend, 'choices' => $choices];
+
+        if (preg_match('/^creatura di (.+)$/', $t, $m)) {
+            $creatureTargets[$m[1]] = [
+                'creatureName' => $t,
+                'choices'      => ['dado', 'subisce'], // le creature non hanno scudo
+            ];
+        }
     }
 
     notifySocketServer('combat:attack_incoming', 'chat:' . (int)$luogo, [
-        'id_fight' => (int)$id_fight,
-        'attacker' => $striker,
-        'targets'  => $targetsInfo,
-        'car'      => $car,
-        'dice'     => (int)$dice,
-        'turn'     => (int)$turn,
+        'id_fight'        => (int)$id_fight,
+        'attacker'        => $striker,
+        'targets'         => $targetsInfo,
+        'creatureTargets' => $creatureTargets,
+        'car'             => $car,
+        'dice'            => (int)$dice,
+        'turn'            => (int)$turn,
     ]);
 }
 

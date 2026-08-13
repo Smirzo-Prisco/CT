@@ -295,6 +295,67 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
 
         /**
+         * risposta_immediata_creatura — il proprietario di una creatura evocata
+         * risponde a un attacco per suo conto. Stessa logica di risposta_immediata,
+         * ma il nome della creatura ("creatura di $login") si deriva sempre dalla
+         * sessione corrente (mai da input client) così un pg non può rispondere per
+         * conto della creatura di qualcun altro. Le proprietà usate per il tiro di
+         * difesa (getDefenceCar/lanciaStat) sono quelle della creatura, non del pg.
+         */
+        case 'risposta_immediata_creatura':
+            $login    = $_SESSION['login'];
+            $luogo    = $_SESSION['luogo'];
+            $id_role  = locationActiveRole($luogo);
+            $creatura = "creatura di $login";
+            $scelta   = $data['scelta']   ?? '';
+            $id_fight = (int)($data['id_fight'] ?? 0);
+            $turn     = getTurn($id_role);
+
+            $fightRow = gdrcd_query("SELECT * FROM role_fights WHERE id = $id_fight AND id_role = $id_role AND turn = $turn");
+            if (!$fightRow) {
+                echo json_encode(['success' => false, 'message' => 'Attacco non trovato']);
+                exit;
+            }
+            $fightTargets = array_map('trim', explode(',', $fightRow['target']));
+            if (!in_array($creatura, $fightTargets)) {
+                echo json_encode(['success' => false, 'message' => 'La tua creatura non è tra i bersagli di questo attacco']);
+                exit;
+            }
+
+            $attacker  = $fightRow['striker'];
+            $messaggio = '';
+            $dice      = 0;
+
+            switch ($scelta) {
+                case 'dado':
+                    $carDifesa  = getDefenceCar($fightRow['car'], $creatura);
+                    $diceResult = lanciaStat($id_role, $attacker, $creatura, true, $carDifesa['nome'], $carDifesa['nome'], $carDifesa['car'], $carDifesa['punti'], 0, 0);
+                    $dice       = $diceResult['risultato'];
+                    fight($id_role, $creatura, $attacker, 0, 0, 'dado_risposta', $dice, 'risposta immediata creatura dado', 0, 0, $id_fight);
+                    $sussurroStr = $diceResult['sussurro'] ? " ({$diceResult['sussurro']})" : '';
+                    $messaggio = "<i>Risultato provvisorio:</i> la creatura di $login tira il dado di difesa e ottiene <b>$dice</b>$sussurroStr contro l'attacco di $attacker";
+                    break;
+
+                case 'subisce':
+                    fight($id_role, $creatura, $attacker, 0, 0, 'subisce', 0, 'risposta immediata creatura subisce', 0, 0, $id_fight);
+                    $messaggio = "<i>Risultato provvisorio:</i> $login decide di far subire l'attacco di $attacker alla propria creatura";
+                    break;
+
+                default:
+                    echo json_encode(['success' => false, 'message' => 'Scelta non valida']);
+                    exit;
+            }
+
+            $messaggio = gdrcd_filter('in', $messaggio);
+            chatInsertMessage($luogo, $creatura, null, $messaggio, 'C', null, '', null);
+
+            if ($id_role) checkTurnCanClose($id_role, $luogo);
+
+            echo json_encode(['success' => true, 'scelta' => $scelta, 'dice' => $dice]);
+            exit;
+            break;
+
+        /**
          * pending_attacks — restituisce gli attacchi del turno corrente che
          * coinvolgono il pg loggato come bersaglio e a cui non ha ancora risposto.
          * Usato da ChatShell al mount per ripristinare i pulsanti difesa dopo un refresh.
@@ -356,6 +417,37 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 ];
             }
             gdrcd_query($res, 'free');
+
+            // Stessa ricerca, ma per la creatura evocata dal pg (se esiste): niente scudo
+            // possibile per una creatura, quindi le scelte sono sempre solo dado/subisce.
+            $creatura = "creatura di $login";
+            $resCreatura = gdrcd_query("
+                SELECT rf.id, rf.striker, rf.car, rf.dice
+                FROM role_fights rf
+                WHERE rf.id_role = $id_role
+                  AND rf.turn    = $turn
+                  AND rf.car     IN ('destrezza','mente','potere')
+                  AND FIND_IN_SET('$creatura', rf.target) > 0
+                  AND NOT EXISTS (
+                    SELECT 1 FROM role_fights r2
+                    WHERE r2.id_role = rf.id_role
+                      AND r2.turn    = rf.turn
+                      AND r2.striker = '$creatura'
+                      AND r2.car IN ('dado_risposta','subisce')
+                      AND r2.target = rf.striker
+                  )
+            ", 'result');
+            while ($row = gdrcd_query($resCreatura, 'fetch')) {
+                $attacks[] = [
+                    'id_fight'     => (int)$row['id'],
+                    'attacker'     => $row['striker'],
+                    'car'          => $row['car'],
+                    'choices'      => ['dado', 'subisce'],
+                    'isCreature'   => true,
+                    'creatureName' => $creatura,
+                ];
+            }
+            gdrcd_query($resCreatura, 'free');
 
             echo json_encode(['success' => true, 'attacks' => $attacks]);
             exit;
