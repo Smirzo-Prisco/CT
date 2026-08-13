@@ -731,7 +731,11 @@ export default function ChatShell() {
 
     /**
      * Ascolta 'combat:attack_incoming': aggiunge un prompt di difesa per ogni
-     * attacco che coinvolge il pg corrente come bersaglio.
+     * attacco che coinvolge il pg corrente come bersaglio, e un secondo prompt
+     * separato se a essere colpita è la sua creatura evocata (creatureTargets,
+     * chiave sul login del proprietario — la creatura non ha una sessione
+     * propria per ricevere/rispondere alla notifica). I due possono coesistere
+     * per lo stesso id_fight, quindi il dedupe controlla anche isCreature.
      * Dipende da shell perché ha bisogno di shell.login.
      */
     useEffect(() => {
@@ -741,16 +745,31 @@ export default function ChatShell() {
         const myLogin = shell.login
 
         const onAttackIncoming = (data) => {
-            if (!data?.targets?.[myLogin]) return
-            const myInfo = data.targets[myLogin]
+            const myInfo = data?.targets?.[myLogin]
+            const creatureInfo = data?.creatureTargets?.[myLogin]
+            if (!myInfo && !creatureInfo) return
+
             setAttackPrompts(prev => {
-                if (prev.some(p => p.id_fight === data.id_fight)) return prev
-                return [...prev, {
-                    id_fight: data.id_fight,
-                    attacker: data.attacker,
-                    car: data.car,
-                    choices: myInfo.choices,
-                }]
+                let next = prev
+                if (myInfo && !prev.some(p => p.id_fight === data.id_fight && !p.isCreature)) {
+                    next = [...next, {
+                        id_fight: data.id_fight,
+                        attacker: data.attacker,
+                        car: data.car,
+                        choices: myInfo.choices,
+                    }]
+                }
+                if (creatureInfo && !prev.some(p => p.id_fight === data.id_fight && p.isCreature)) {
+                    next = [...next, {
+                        id_fight: data.id_fight,
+                        attacker: data.attacker,
+                        car: data.car,
+                        choices: creatureInfo.choices,
+                        isCreature: true,
+                        creatureName: creatureInfo.creatureName,
+                    }]
+                }
+                return next
             })
         }
 
@@ -811,16 +830,25 @@ export default function ChatShell() {
             .catch(err => console.error('[handleCloseTurn]', err))
     }, [shell])
 
-    /** Invia la scelta di difesa al server e aggiorna i prompt rimanenti. */
-    const handleDefenseChoice = useCallback((id_fight, scelta) => {
+    /**
+     * Invia la scelta di difesa al server e aggiorna i prompt rimanenti.
+     * isCreature distingue il prompt della propria creatura da quello personale:
+     * possono coesistere per lo stesso id_fight (attacco multi-bersaglio che
+     * colpisce sia il pg che la sua creatura), quindi la rimozione ottimistica
+     * deve individuare esattamente quello a cui si sta rispondendo, e la scelta
+     * va instradata su un endpoint diverso (le proprietà usate per il tiro sono
+     * quelle della creatura, non del pg).
+     */
+    const handleDefenseChoice = useCallback((id_fight, scelta, isCreature = false) => {
         // Aggiornamento ottimistico in base alla scelta:
-        //   scudo  → rimuove TUTTI i prompt (lo scudo occupa l'intera azione del turno)
+        //   scudo  → rimuove TUTTI i prompt (lo scudo occupa l'intera azione del turno;
+        //            mai scelta per una creatura, che non ha mai 'scudo' tra le choices)
         //   dado   → rimuove il prompt corrente e toglie 'scudo' dagli altri
         //            (dopo aver lanciato un dado non si può più usare lo scudo)
         //   subisce → rimuove solo il prompt corrente, gli altri restano invariati
         setAttackPrompts(prev => {
             if (scelta === 'scudo') return []
-            const remaining = prev.filter(p => p.id_fight !== id_fight)
+            const remaining = prev.filter(p => !(p.id_fight === id_fight && !!p.isCreature === isCreature))
             if (scelta === 'dado') {
                 return remaining.map(p => ({
                     ...p,
@@ -829,7 +857,7 @@ export default function ChatShell() {
             }
             return remaining
         })
-        fetch('/pages/api_chat.php?op=risposta_immediata', {
+        fetch(`/pages/api_chat.php?op=${isCreature ? 'risposta_immediata_creatura' : 'risposta_immediata'}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_fight, scelta }),
@@ -1119,26 +1147,28 @@ export default function ChatShell() {
                     {/* PROMPT DIFESA IMMEDIATA — compare quando si è bersaglio      */}
                     {/* ============================================================ */}
                     {attackPrompts.map(prompt => (
-                        <div key={prompt.id_fight} className="attack-prompt">
+                        <div key={`${prompt.id_fight}-${prompt.isCreature ? 'creature' : 'self'}`} className="attack-prompt">
                             <span className="attack-prompt-text">
-                                <b>{prompt.attacker}</b> ti attacca con <b>{prompt.car}</b> — come rispondi?
+                                {prompt.isCreature
+                                    ? <><b>{prompt.attacker}</b> attacca la tua <b>creatura</b> con <b>{prompt.car}</b> — come la difendi?</>
+                                    : <><b>{prompt.attacker}</b> ti attacca con <b>{prompt.car}</b> — come rispondi?</>}
                             </span>
                             <div className="attack-prompt-buttons">
                                 {prompt.choices.includes('dado') && (
                                     <button type="button" className="attack-prompt-btn btn-dado"
-                                        onClick={() => handleDefenseChoice(prompt.id_fight, 'dado')}>
+                                        onClick={() => handleDefenseChoice(prompt.id_fight, 'dado', prompt.isCreature)}>
                                         🎲 Dado
                                     </button>
                                 )}
                                 {prompt.choices.includes('scudo') && (
                                     <button type="button" className="attack-prompt-btn btn-scudo"
-                                        onClick={() => handleDefenseChoice(prompt.id_fight, 'scudo')}>
+                                        onClick={() => handleDefenseChoice(prompt.id_fight, 'scudo', prompt.isCreature)}>
                                         🛡 Scudo
                                     </button>
                                 )}
                                 {prompt.choices.includes('subisce') && (
                                     <button type="button" className="attack-prompt-btn btn-subisce"
-                                        onClick={() => handleDefenseChoice(prompt.id_fight, 'subisce')}>
+                                        onClick={() => handleDefenseChoice(prompt.id_fight, 'subisce', prompt.isCreature)}>
                                         💔 Subisci
                                     </button>
                                 )}
