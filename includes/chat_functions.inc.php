@@ -1196,7 +1196,11 @@ function elaboratePrint($riepilogo, $turn = null) {
                     $dD     = (int)($f['dadoDifesa']     ?? 0);
                     $cA     = htmlspecialchars(ucfirst((string)($f['car_attacco'] ?? '')));
                     $cD     = htmlspecialchars(ucfirst((string)($f['car_difesa']  ?? '')));
-                    $mul    = (int)($f['moltiplicatore'] ?? 1);
+                    // Il moltiplicatore (gilda_soglie.danno) e' spesso un decimale (es. 5.2):
+                    // troncarlo a intero per la sola visualizzazione faceva apparire sbagliato
+                    // un calcolo in realta' corretto (es. "(23-10) x 5 = 68" invece di "x 5.2").
+                    $mulRaw = (float)($f['moltiplicatore'] ?? 1);
+                    $mul    = rtrim(rtrim(sprintf('%.2f', $mulRaw), '0'), '.');
                     $critHtml = $isCritico ? " &times; <b style=\"color:#ffd700;\">2 (critico)</b>" : '';
                     $res    = $danno > 0
                             ? " = <b>{$danno}&nbsp;{$ptLabel}</b>"
