@@ -880,10 +880,11 @@ body[data-palette="public"] {
 // hover/focus): si vede sempre la mappa nitida sotto, quando trasparente.
 // .chatoff-box non ha piu' un pavimento scuro proprio (vedi _chatoff.scss):
 // la leggibilita' a riposo si affida solo al text-shadow sui singoli
-// caratteri, poi la tinta di fondo cresce con l'impegno dell'interazione —
-// poco su :hover, molto (92%, quasi piena) su :focus-within, cioe' quando
-// si sta effettivamente scrivendo (necessario anche su touch, che non ha
-// mai :hover).
+// caratteri, poi la tinta di fondo sale al 92% (quasi piena) su :hover E
+// :focus-within — stesso identico stato per entrambi, non un'escalation
+// separata, perche' su mobile/touch :hover non scatta mai: senza
+// :focus-within a fare da equivalente, la chat resterebbe illeggibile a
+// meno di toccare per forza l'input.
 .ct-hud__popover--chatoff {
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.02 * 100%), transparent),
@@ -891,13 +892,7 @@ body[data-palette="public"] {
     backdrop-filter: none;
     transition: background .2s ease;
 
-    &:hover {
-        background: linear-gradient(160deg,
-            color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
-            color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
-    }
-
-    &:focus-within {
+    &:hover, &:focus-within {
         background: linear-gradient(160deg,
             color-mix(in srgb, var(--ink-light) calc(.92 * 100%), transparent),
             color-mix(in srgb, var(--ink-deep) calc(.92 * 100%), transparent));
