@@ -874,7 +874,7 @@ body[data-palette="public"] {
     .iframe_online { min-height: 120px; }
     .contenitore_presenti { min-height: 80px; }
 }
-.ct-hud__popover--chatoff .chatoff-panel { min-height: 200px; }
+.ct-hud__popover--chatoff .chatoff-panel { min-height: 220px; }
 
 // Molto piu' trasparente della regola base (che e' quasi opaca): si legge
 // la pagina sfocata sotto invece dello sfondo pieno navy.
@@ -883,6 +883,12 @@ body[data-palette="public"] {
         color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
     backdrop-filter: blur(18px);
+    // ~10% piu' grande della base .ct-hud__popover (260px): scoperta solo
+    // qui per non allargare anche il popover presenze, che condivide la
+    // stessa classe base.
+    width: 286px;
+
+    .chatoff-box { height: 242px; }
 }
 
 .ct-hud__popover-head {
@@ -1007,6 +1013,7 @@ body[data-palette="public"] {
 @media (max-width: 860px) {
     .ct-hud__ring { transform: scale(.68); }
     .ct-hud__popover { width: 240px; left: 100px; }
+    .ct-hud__popover--chatoff { width: 264px; } // +10% coerente col desktop
 }
 
 // ── MOBILE (≤680px): scheda a comparsa dal basso con pulsanti in griglia ──
@@ -1048,6 +1055,9 @@ body[data-palette="public"] {
     // left:140px (impostato sopra per desktop) sfonderebbe a destra su
     // schermi stretti insieme alla larghezza fissa del popover.
     .ct-hud__popover { width: calc(100vw - 20px); max-width: 300px; left: 10px !important; }
+    // +10% coerente col desktop, sempre limitato da calc(100vw - 20px) sui
+    // telefoni piu' stretti dell'aumento stesso.
+    .ct-hud__popover--chatoff { max-width: 330px; }
 
     .ct-hud__panel { display: none; }
 
