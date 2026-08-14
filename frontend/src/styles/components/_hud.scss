@@ -874,8 +874,6 @@ body[data-palette="public"] {
     .iframe_online { min-height: 120px; }
     .contenitore_presenti { min-height: 80px; }
 }
-.ct-hud__popover--chatoff .chatoff-panel { min-height: 220px; }
-
 // Molto piu' trasparente della regola base (che e' quasi opaca): si legge
 // la pagina sfocata sotto invece dello sfondo pieno navy.
 .ct-hud__popover--chatoff {
@@ -887,6 +885,15 @@ body[data-palette="public"] {
     // qui per non allargare anche il popover presenze, che condivide la
     // stessa classe base.
     width: 286px;
+    min-height: 220px;
+    // ChattingOff non ha piu' un div .chatoff-panel interno con il proprio
+    // sfondo/bordo (rimosso: duplicava quello del popover) — il layout a
+    // colonna (titolo/box messaggi/indicatore digitazione/input) e il
+    // ritaglio degli angoli arrotondati sono quindi diretta responsabilita'
+    // del popover stesso, unico sfondo visibile della chat.
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 
     .chatoff-box { height: 242px; }
 }

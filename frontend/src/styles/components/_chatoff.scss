@@ -8,28 +8,6 @@
     50%       { border-color: $palette-action; }
 }
 
-.chatoff-panel {
-    border: 1px solid $palette-surface-hover;
-    border-radius: $radius-lg;
-    display: flex;
-    flex-direction: column;
-    background: $palette-gradient-overlay;
-    box-sizing: border-box;
-    // 100% pieno (non calc(100% - 50/70px)): quel margine veniva dalla
-    // vecchia colonna sinistra larga, dove 50px erano uno spazio laterale
-    // proporzionato — nel popover HUD stretto (~260px, vedi .ct-hud__popover
-    // in _hud.scss) lasciava quasi un quarto della larghezza vuoto ai lati
-    // invece che al testo dei messaggi.
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-
-    &--new {
-        animation: chatoff-border-pulse 1.4s ease-in-out infinite;
-    }
-}
-
-
 .chatoff-title {
     font-family: Perpetua, serif;
     font-size: $text-sm;
@@ -85,6 +63,15 @@
     max-width: 100%;
     word-break: break-word;
     overflow-wrap: break-word; // forza il break anche su parole/URL senza spazi
+    // Bordo trasparente riservato (box-sizing:border-box, nessuno spostamento
+    // layout quando si attiva): prima il lampeggio "nuovo messaggio" era sul
+    // bordo di .chatoff-panel (rimosso, vedi _hud.scss), ora e' qui.
+    border: 1px solid transparent;
+    border-radius: $radius-md;
+
+    &--new {
+        animation: chatoff-border-pulse 1.4s ease-in-out infinite;
+    }
 
     // Messaggi dal log.html. Bande alternate (nth-child even) + margine
     // orizzontale negativo che compensa il padding del box: tecnica classica
