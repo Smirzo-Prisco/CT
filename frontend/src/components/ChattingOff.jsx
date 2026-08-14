@@ -145,12 +145,7 @@ export default function ChattingOff() {
         : `${names.join(', ')} stanno scrivendo...`
 
     return (
-        <div
-            className={`chatoff-panel${hasNew ? ' chatoff-panel--new' : ''}`}
-            onFocus={() => setHasNew(false)}
-            onClick={() => setHasNew(false)}
-        >
-
+        <>
             <div className="chatoff-title">
                 Chat Off
                 {isStaff && (
@@ -160,7 +155,8 @@ export default function ChattingOff() {
 
             <div
                 ref={boxRef}
-                className="chatoff-box"
+                className={`chatoff-box${hasNew ? ' chatoff-box--new' : ''}`}
+                onClick={() => setHasNew(false)}
                 dangerouslySetInnerHTML={{ __html: html || '<span class="chatoff-empty">Nessun messaggio</span>' }}
             />
 
@@ -175,13 +171,13 @@ export default function ChattingOff() {
                     className="chatoff-input"
                     value={text}
                     onChange={handleInputChange}
+                    onFocus={() => setHasNew(false)}
                     onKeyDown={e => e.key === 'Enter' && send()}
                     placeholder="Scrivi..."
                     maxLength={500}
                 />
                 <button className="chatoff-send-btn" onClick={send}>→</button>
             </div>
-
-        </div>
+        </>
     )
 }
