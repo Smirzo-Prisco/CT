@@ -900,13 +900,13 @@ body[data-palette="public"] {
     }
 
     // Focus (es. si sta scrivendo nell'input) e' uno stato piu' "impegnato"
-    // del semplice hover: qui la trasparenza e' quasi sparita (85%, non
+    // del semplice hover: qui la trasparenza e' quasi sparita (70%, non
     // sfondo del tutto pieno) — necessario anche su touch, che non ha mai
     // :hover.
     &:focus-within {
         background: linear-gradient(160deg,
-            color-mix(in srgb, var(--ink-light) calc(.85 * 100%), transparent),
-            color-mix(in srgb, var(--ink-deep) calc(.85 * 100%), transparent));
+            color-mix(in srgb, var(--ink-light) calc(.7 * 100%), transparent),
+            color-mix(in srgb, var(--ink-deep) calc(.7 * 100%), transparent));
         backdrop-filter: blur(4px);
     }
     // ~10% piu' grande della base .ct-hud__popover (260px): scoperta solo
