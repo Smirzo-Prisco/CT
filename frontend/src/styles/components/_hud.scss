@@ -876,27 +876,24 @@ body[data-palette="public"] {
     .iframe_online { min-height: 120px; }
     .contenitore_presenti { min-height: 80px; }
 }
-// A riposo (senza hover/focus) e' quasi del tutto trasparente e SENZA blur —
-// si vede la mappa nitida sotto, un "vetro fantasma" che si nota appena.
-// .chatoff-box non ha piu' un pavimento scuro proprio (vedi _chatoff.scss):
-// la leggibilita' a riposo si affida solo al text-shadow sui singoli
-// caratteri. Su :hover compare una tinta parziale + un blur leggero (molto
-// meno della base .ct-hud__popover, 18px). Su :focus-within (es. si sta
-// scrivendo — necessario anche su touch, che non ha mai :hover) la
-// trasparenza sparisce del tutto: sfondo pieno, per leggere/scrivere senza
-// distrazioni dalla mappa dietro.
+// Mai sfocato (backdrop-filter:none in ogni stato, niente blur nemmeno su
+// hover/focus): a riposo e' quasi del tutto trasparente, si vede la mappa
+// nitida sotto — un "vetro fantasma" che si nota appena. .chatoff-box non
+// ha piu' un pavimento scuro proprio (vedi _chatoff.scss): la leggibilita'
+// si affida solo al text-shadow sui singoli caratteri e alla tinta che
+// aumenta su :hover/:focus-within (necessario anche su touch, che non ha
+// mai :hover).
 .ct-hud__popover--chatoff {
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.02 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.03 * 100%), transparent));
     backdrop-filter: none;
-    transition: background .2s ease, backdrop-filter .2s ease;
+    transition: background .2s ease;
 
     &:hover {
         background: linear-gradient(160deg,
             color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
             color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
-        backdrop-filter: blur(4px);
     }
 
     // Focus (es. si sta scrivendo nell'input) e' uno stato piu' "impegnato"
@@ -906,7 +903,6 @@ body[data-palette="public"] {
         background: linear-gradient(160deg,
             color-mix(in srgb, var(--ink-light) calc(.2 * 100%), transparent),
             color-mix(in srgb, var(--ink-deep) calc(.2 * 100%), transparent));
-        backdrop-filter: blur(4px);
     }
     // ~10% piu' grande della base .ct-hud__popover (260px): scoperta solo
     // qui per non allargare anche il popover presenze, che condivide la
