@@ -876,26 +876,26 @@ body[data-palette="public"] {
     .iframe_online { min-height: 120px; }
     .contenitore_presenti { min-height: 80px; }
 }
-// A riposo (senza hover/focus) e' quasi del tutto trasparente e sfocata —
-// un "vetro fantasma" che si nota appena, il blur ammorbidisce quel poco
-// di tinta rimasta cosi' non sembra un semplice buco nella UI. .chatoff-box
-// non ha piu' un pavimento scuro proprio (vedi _chatoff.scss): la
-// leggibilita' a riposo si affida solo al text-shadow sui singoli caratteri.
-// Su :hover/:focus-within (necessario su touch, che non ha mai :hover) il
-// blur sparisce del tutto (si vede la mappa nitida sotto) e la tinta torna
-// piena per mantenere il testo leggibile senza piu' l'aiuto della sfocatura.
+// A riposo (senza hover/focus) e' quasi del tutto trasparente e SENZA blur —
+// si vede la mappa nitida sotto, un "vetro fantasma" che si nota appena.
+// .chatoff-box non ha piu' un pavimento scuro proprio (vedi _chatoff.scss):
+// la leggibilita' a riposo si affida solo al text-shadow sui singoli
+// caratteri. Su :hover/:focus-within (necessario su touch, che non ha mai
+// :hover) compare un blur leggero (molto meno della base .ct-hud__popover,
+// 18px) insieme alla tinta piena, per leggere comodamente senza sfocare
+// troppo la mappa dietro.
 .ct-hud__popover--chatoff {
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.02 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.03 * 100%), transparent));
-    backdrop-filter: blur(18px);
+    backdrop-filter: none;
     transition: background .2s ease, backdrop-filter .2s ease;
 
     &:hover, &:focus-within {
         background: linear-gradient(160deg,
             color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
             color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
-        backdrop-filter: none;
+        backdrop-filter: blur(4px);
     }
     // ~10% piu' grande della base .ct-hud__popover (260px): scoperta solo
     // qui per non allargare anche il popover presenze, che condivide la
