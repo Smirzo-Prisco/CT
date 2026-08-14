@@ -46,17 +46,13 @@
     font-size: $text-md;
     color: $color-text;
     line-height: 1.5;
-    // Sfondo leggermente piu' scuro solo qui (non su header/input, che
-    // restano trasparenti): il pannello vive su un popover a vetro
-    // (blur + gradiente al 40% di opacita', vedi .ct-hud__popover--chatoff
-    // in _hud.scss) — dietro puo' passare qualunque punto della mappa,
-    // anche molto chiaro, e a quel punto il testo perdeva contrasto. Un
-    // pavimento scuro fisso sotto al testo lo rende leggibile SEMPRE,
-    // indipendentemente da cosa c'e' dietro.
-    background: rgba(5, 9, 22, .3);
-    // Alone scuro dietro ogni carattere: stessa tecnica dei sottotitoli
-    // video, stesso motivo — garantisce leggibilita' anche nei punti in cui
-    // lo sfondo sfocato e' particolarmente chiaro.
+    // Niente sfondo proprio: i messaggi compaiono direttamente sul vetro
+    // sfocato del popover (.ct-hud__popover--chatoff in _hud.scss), senza
+    // un "pavimento" scuro dedicato che lo isolasse visivamente come un
+    // riquadro a se'. L'unico presidio di leggibilita' rimasto e' l'alone
+    // scuro dietro ogni carattere qui sotto (stessa tecnica dei sottotitoli
+    // video) — meno garantito del vecchio sfondo fisso, ma e' la
+    // trasparenza che si voleva.
     text-shadow: 0 1px 2px rgba(0, 0, 0, .7);
     box-sizing: border-box;
     width: 100%;
@@ -134,7 +130,7 @@
     font-size: $text-xs;
     font-style: $font-chat;
     color: $palette-text-muted;
-    padding: 2px 8px;
+    padding: 2px 10px;
     background: $palette-surface-dark;
     min-height: 16px;
     overflow: hidden;
@@ -147,7 +143,11 @@
 .chatoff-input-row {
     display: flex;
     gap: $space-1;
-    padding: 0px 6px;
+    // Il popover non ha piu' un padding proprio (vedi _hud.scss, per
+    // lasciare .chatoff-title a filo dei bordi): questa e' l'ultima riga
+    // della colonna, serve un margine anche in basso perche' prima veniva
+    // da li'.
+    padding: 6px 8px 8px;
     background: rgba(0, 0, 0, 0);
     box-sizing: border-box;
     width: 100%;

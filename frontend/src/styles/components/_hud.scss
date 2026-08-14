@@ -877,11 +877,10 @@ body[data-palette="public"] {
 // Molto piu' trasparente della regola base (che e' quasi opaca): si legge
 // la pagina sfocata sotto invece dello sfondo pieno navy. A riposo (senza
 // hover/focus) e' trasparente quasi al minimo — un "vetro fantasma" che si
-// nota appena; il testo dei messaggi resta comunque leggibile perche'
-// .chatoff-box ha un suo pavimento scuro fisso indipendente (vedi sotto),
-// quindi non serve aspettare l'hover per leggere la chat, solo per vedere
-// la cornice piena. Su :focus-within (es. mentre si scrive) torna piena
-// anche senza hover reale — necessario su touch, che non ha mai :hover.
+// nota appena. .chatoff-box non ha piu' un pavimento scuro proprio (vedi
+// _chatoff.scss): la leggibilita' a riposo si affida solo al blur + al
+// text-shadow sui singoli caratteri, e migliora entrando nello stato pieno
+// su :hover o :focus-within (necessario su touch, che non ha mai :hover).
 .ct-hud__popover--chatoff {
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.06 * 100%), transparent),
@@ -899,10 +898,15 @@ body[data-palette="public"] {
     // stessa classe base.
     width: 286px;
     min-height: 220px;
-    // Meno del padding base (14px): la base era pensata per liste testuali
-    // semplici (presenze), qui con 4 righe gia' scandite dal loro stesso
-    // padding interno (titolo/box/input) risultava eccessivo su tutti i lati.
-    padding: 8px;
+    // Zero (non il padding:14px base, pensato per liste testuali semplici
+    // come le presenze): .chatoff-title deve arrivare a filo dei bordi per
+    // sembrare un vero header, non un blocco incassato con un bordo vuoto
+    // intorno. L'overflow:hidden sotto ritaglia i suoi angoli superiori
+    // squadrati sulla stessa curva del popover, senza bisogno di un
+    // border-radius separato sull'header. Le righe sotto (box/typing/input)
+    // recuperano la spaziatura con il proprio padding interno, vedi
+    // _chatoff.scss.
+    padding: 0;
     // ChattingOff non ha piu' un div .chatoff-panel interno con il proprio
     // sfondo/bordo (rimosso: duplicava quello del popover) — il layout a
     // colonna (titolo/box messaggi/indicatore digitazione/input) e il
