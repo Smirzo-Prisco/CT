@@ -879,12 +879,15 @@ body[data-palette="public"] {
 // Mai sfocato (backdrop-filter:none in ogni stato, niente blur nemmeno su
 // hover/focus): si vede sempre la mappa nitida sotto, quando trasparente.
 // .chatoff-box non ha piu' un pavimento scuro proprio (vedi _chatoff.scss):
-// la leggibilita' si affida al text-shadow sui singoli caratteri e alla
-// tinta di fondo, all'80% gia' a riposo.
+// la leggibilita' a riposo si affida solo al text-shadow sui singoli
+// caratteri, poi la tinta di fondo cresce con l'impegno dell'interazione —
+// poco su :hover, molto (80%, quasi piena) su :focus-within, cioe' quando
+// si sta effettivamente scrivendo (necessario anche su touch, che non ha
+// mai :hover).
 .ct-hud__popover--chatoff {
     background: linear-gradient(160deg,
-        color-mix(in srgb, var(--ink-light) calc(.8 * 100%), transparent),
-        color-mix(in srgb, var(--ink-deep) calc(.8 * 100%), transparent));
+        color-mix(in srgb, var(--ink-light) calc(.02 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.03 * 100%), transparent));
     backdrop-filter: none;
     transition: background .2s ease;
 
@@ -894,13 +897,10 @@ body[data-palette="public"] {
             color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
     }
 
-    // Focus (es. si sta scrivendo nell'input) e' uno stato piu' "impegnato"
-    // del semplice hover (.22/.28): qui la tinta sale al 20% — necessario
-    // anche su touch, che non ha mai :hover.
     &:focus-within {
         background: linear-gradient(160deg,
-            color-mix(in srgb, var(--ink-light) calc(.2 * 100%), transparent),
-            color-mix(in srgb, var(--ink-deep) calc(.2 * 100%), transparent));
+            color-mix(in srgb, var(--ink-light) calc(.8 * 100%), transparent),
+            color-mix(in srgb, var(--ink-deep) calc(.8 * 100%), transparent));
     }
     // ~10% piu' grande della base .ct-hud__popover (260px): scoperta solo
     // qui per non allargare anche il popover presenze, che condivide la
