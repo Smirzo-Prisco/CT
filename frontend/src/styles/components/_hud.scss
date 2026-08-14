@@ -877,16 +877,14 @@ body[data-palette="public"] {
     .contenitore_presenti { min-height: 80px; }
 }
 // Mai sfocato (backdrop-filter:none in ogni stato, niente blur nemmeno su
-// hover/focus): a riposo e' quasi del tutto trasparente, si vede la mappa
-// nitida sotto — un "vetro fantasma" che si nota appena. .chatoff-box non
-// ha piu' un pavimento scuro proprio (vedi _chatoff.scss): la leggibilita'
-// si affida solo al text-shadow sui singoli caratteri e alla tinta che
-// aumenta su :hover/:focus-within (necessario anche su touch, che non ha
-// mai :hover).
+// hover/focus): si vede sempre la mappa nitida sotto, quando trasparente.
+// .chatoff-box non ha piu' un pavimento scuro proprio (vedi _chatoff.scss):
+// la leggibilita' si affida al text-shadow sui singoli caratteri e alla
+// tinta di fondo, all'80% gia' a riposo.
 .ct-hud__popover--chatoff {
     background: linear-gradient(160deg,
-        color-mix(in srgb, var(--ink-light) calc(.02 * 100%), transparent),
-        color-mix(in srgb, var(--ink-deep) calc(.03 * 100%), transparent));
+        color-mix(in srgb, var(--ink-light) calc(.8 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.8 * 100%), transparent));
     backdrop-filter: none;
     transition: background .2s ease;
 
