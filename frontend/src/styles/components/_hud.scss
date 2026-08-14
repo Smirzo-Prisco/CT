@@ -880,10 +880,11 @@ body[data-palette="public"] {
 // si vede la mappa nitida sotto, un "vetro fantasma" che si nota appena.
 // .chatoff-box non ha piu' un pavimento scuro proprio (vedi _chatoff.scss):
 // la leggibilita' a riposo si affida solo al text-shadow sui singoli
-// caratteri. Su :hover/:focus-within (necessario su touch, che non ha mai
-// :hover) compare un blur leggero (molto meno della base .ct-hud__popover,
-// 18px) insieme alla tinta piena, per leggere comodamente senza sfocare
-// troppo la mappa dietro.
+// caratteri. Su :hover compare una tinta parziale + un blur leggero (molto
+// meno della base .ct-hud__popover, 18px). Su :focus-within (es. si sta
+// scrivendo — necessario anche su touch, che non ha mai :hover) la
+// trasparenza sparisce del tutto: sfondo pieno, per leggere/scrivere senza
+// distrazioni dalla mappa dietro.
 .ct-hud__popover--chatoff {
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.02 * 100%), transparent),
@@ -891,10 +892,19 @@ body[data-palette="public"] {
     backdrop-filter: none;
     transition: background .2s ease, backdrop-filter .2s ease;
 
-    &:hover, &:focus-within {
+    &:hover {
         background: linear-gradient(160deg,
             color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
             color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
+        backdrop-filter: blur(4px);
+    }
+
+    // Focus (es. si sta scrivendo nell'input) e' uno stato piu' "impegnato"
+    // del semplice hover: qui la trasparenza sparisce del tutto, sfondo
+    // pieno invece della sola tinta parziale — necessario anche su touch,
+    // che non ha mai :hover.
+    &:focus-within {
+        background: linear-gradient(160deg, var(--ink-light), var(--ink-deep));
         backdrop-filter: blur(4px);
     }
     // ~10% piu' grande della base .ct-hud__popover (260px): scoperta solo
