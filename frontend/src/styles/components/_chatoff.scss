@@ -164,6 +164,12 @@
     padding: 3px 6px;
     border-radius: 3px;
     min-width: 0;
+    // Sovrascrive il margin-bottom:10px del reset legacy globale
+    // (input, textarea, select in _forms.scss, pensato per form impilati):
+    // essendo l'ultimo elemento della colonna, quel margine si sommava al
+    // padding del popover e rendeva il bordo inferiore visibilmente piu'
+    // largo degli altri tre lati.
+    margin-bottom: 0;
 
     &::placeholder {
         color: $palette-text-muted;

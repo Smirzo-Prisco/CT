@@ -875,17 +875,34 @@ body[data-palette="public"] {
     .contenitore_presenti { min-height: 80px; }
 }
 // Molto piu' trasparente della regola base (che e' quasi opaca): si legge
-// la pagina sfocata sotto invece dello sfondo pieno navy.
+// la pagina sfocata sotto invece dello sfondo pieno navy. A riposo (senza
+// hover/focus) e' trasparente quasi al minimo — un "vetro fantasma" che si
+// nota appena; il testo dei messaggi resta comunque leggibile perche'
+// .chatoff-box ha un suo pavimento scuro fisso indipendente (vedi sotto),
+// quindi non serve aspettare l'hover per leggere la chat, solo per vedere
+// la cornice piena. Su :focus-within (es. mentre si scrive) torna piena
+// anche senza hover reale — necessario su touch, che non ha mai :hover.
 .ct-hud__popover--chatoff {
     background: linear-gradient(160deg,
-        color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
-        color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
+        color-mix(in srgb, var(--ink-light) calc(.06 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.08 * 100%), transparent));
     backdrop-filter: blur(18px);
+    transition: background .2s ease;
+
+    &:hover, &:focus-within {
+        background: linear-gradient(160deg,
+            color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
+            color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
+    }
     // ~10% piu' grande della base .ct-hud__popover (260px): scoperta solo
     // qui per non allargare anche il popover presenze, che condivide la
     // stessa classe base.
     width: 286px;
     min-height: 220px;
+    // Meno del padding base (14px): la base era pensata per liste testuali
+    // semplici (presenze), qui con 4 righe gia' scandite dal loro stesso
+    // padding interno (titolo/box/input) risultava eccessivo su tutti i lati.
+    padding: 8px;
     // ChattingOff non ha piu' un div .chatoff-panel interno con il proprio
     // sfondo/bordo (rimosso: duplicava quello del popover) — il layout a
     // colonna (titolo/box messaggi/indicatore digitazione/input) e il
