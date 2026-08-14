@@ -862,8 +862,10 @@ body[data-palette="public"] {
 }
 // Vicino all'anello (non piu' a 250px): riduce quanto il popover arriva a
 // invadere il contenuto della pagina quando e' aperto.
-.ct-hud__popover--presence,
-.ct-hud__popover--chatoff { left: 140px; }
+.ct-hud__popover--presence { left: 140px; }
+// +50px rispetto al valore condiviso con --presence sopra: scoperto solo
+// qui per non spostare anche il popover presenze.
+.ct-hud__popover--chatoff { left: 190px; }
 
 // OnlineUsers/ChattingOff perdono, fuori dai vecchi container con id
 // dedicato (#online-users-container ecc.), alcune regole CSS scopate su
@@ -874,24 +876,26 @@ body[data-palette="public"] {
     .iframe_online { min-height: 120px; }
     .contenitore_presenti { min-height: 80px; }
 }
-// Molto piu' trasparente della regola base (che e' quasi opaca): si legge
-// la pagina sfocata sotto invece dello sfondo pieno navy. A riposo (senza
-// hover/focus) e' trasparente quasi al minimo — un "vetro fantasma" che si
-// nota appena. .chatoff-box non ha piu' un pavimento scuro proprio (vedi
-// _chatoff.scss): la leggibilita' a riposo si affida solo al blur + al
-// text-shadow sui singoli caratteri, e migliora entrando nello stato pieno
-// su :hover o :focus-within (necessario su touch, che non ha mai :hover).
+// A riposo (senza hover/focus) e' quasi del tutto trasparente e sfocata —
+// un "vetro fantasma" che si nota appena, il blur ammorbidisce quel poco
+// di tinta rimasta cosi' non sembra un semplice buco nella UI. .chatoff-box
+// non ha piu' un pavimento scuro proprio (vedi _chatoff.scss): la
+// leggibilita' a riposo si affida solo al text-shadow sui singoli caratteri.
+// Su :hover/:focus-within (necessario su touch, che non ha mai :hover) il
+// blur sparisce del tutto (si vede la mappa nitida sotto) e la tinta torna
+// piena per mantenere il testo leggibile senza piu' l'aiuto della sfocatura.
 .ct-hud__popover--chatoff {
     background: linear-gradient(160deg,
-        color-mix(in srgb, var(--ink-light) calc(.06 * 100%), transparent),
-        color-mix(in srgb, var(--ink-deep) calc(.08 * 100%), transparent));
+        color-mix(in srgb, var(--ink-light) calc(.02 * 100%), transparent),
+        color-mix(in srgb, var(--ink-deep) calc(.03 * 100%), transparent));
     backdrop-filter: blur(18px);
-    transition: background .2s ease;
+    transition: background .2s ease, backdrop-filter .2s ease;
 
     &:hover, &:focus-within {
         background: linear-gradient(160deg,
             color-mix(in srgb, var(--ink-light) calc(.22 * 100%), transparent),
             color-mix(in srgb, var(--ink-deep) calc(.28 * 100%), transparent));
+        backdrop-filter: none;
     }
     // ~10% piu' grande della base .ct-hud__popover (260px): scoperta solo
     // qui per non allargare anche il popover presenze, che condivide la
@@ -1041,7 +1045,10 @@ body[data-palette="public"] {
 @media (max-width: 860px) {
     .ct-hud__ring { transform: scale(.68); }
     .ct-hud__popover { width: 240px; left: 100px; }
-    .ct-hud__popover--chatoff { width: 264px; } // +10% coerente col desktop
+    // width: +10% coerente col desktop. left: stesso +50px di sopra
+    // (100+50), esplicito qui perche' altrimenti la regola generica appena
+    // sopra vincerebbe per ordine nel file nonostante la stessa specificita'.
+    .ct-hud__popover--chatoff { width: 264px; left: 150px; }
 }
 
 // ── MOBILE (≤680px): scheda a comparsa dal basso con pulsanti in griglia ──
