@@ -424,9 +424,38 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 // Registra l'assegnazione in Punti (stesso pattern di awardExperience()): senza
                 // questo insert lo shin aggiornava solo il totale su personaggio, ma non compariva
                 // mai nello storico di scheda_px/scheda_px_shin, che legge solo dalla tabella Punti.
+                //
+                // Se per questa stessa giocata esiste gia' una riga Punti di px (awardExperience(),
+                // ogni 4 azioni in location pubblica: stesso pg, stesso luogo, entro l'intervallo
+                // start/end della giocata, senza shin gia' assegnato), lo shin si fonde li' invece
+                // di creare una riga separata — cosi' in scheda_px compare sulla riga della giocata
+                // invece che come voce a se stante con la sua data (quella dell'assegnazione,
+                // spesso giorni dopo). Punti non ha una colonna id_role: e' l'unica correlazione
+                // disponibile senza una migrazione di schema. Se non c'e' nessuna riga di px da
+                // fondere (giocata troppo breve, location privata, ecc.) si ricade sull'insert.
+                $roleRow    = gdrcd_query("SELECT start, `end`, location FROM role_sessions WHERE id_role = $rid");
                 $nome_luogo = getRoleLocationName($rid);
-                $resoconto  = 'Shin per la giocata' . ($nome_luogo !== '' ? " - $nome_luogo" : '');
-                gdrcd_query("INSERT INTO Punti (nome, shin, data_evento, commento) VALUES ('$pg', '1', NOW(), '" . gdrcd_filter('in', $resoconto) . "')");
+                $pxRow      = null;
+                if ($roleRow && $roleRow['start'] && $nome_luogo !== '') {
+                    $startTs    = gdrcd_filter('in', $roleRow['start']);
+                    $endTs      = $roleRow['end'] ? gdrcd_filter('in', $roleRow['end']) : null;
+                    $endCond    = $endTs ? "'$endTs'" : 'NOW()';
+                    $commento_f = gdrcd_filter('in', "Giocata libera - $nome_luogo");
+                    $pxRow = gdrcd_query(
+                        "SELECT ID FROM Punti
+                         WHERE nome = '$pg' AND esperienza > 0 AND shin = 0
+                           AND commento = '$commento_f'
+                           AND data_evento BETWEEN '$startTs' AND $endCond
+                         ORDER BY data_evento DESC LIMIT 1"
+                    );
+                }
+
+                if ($pxRow) {
+                    gdrcd_query("UPDATE Punti SET shin = shin + 1 WHERE ID = " . (int)$pxRow['ID']);
+                } else {
+                    $resoconto = 'Shin per la giocata' . ($nome_luogo !== '' ? " - $nome_luogo" : '');
+                    gdrcd_query("INSERT INTO Punti (nome, shin, data_evento, commento) VALUES ('$pg', '1', NOW(), '" . gdrcd_filter('in', $resoconto) . "')");
+                }
 
                 $awarded++;
             }
