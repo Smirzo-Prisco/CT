@@ -23,9 +23,24 @@
 
 .anagrafe-stat-card {
     background: $palette-surface-raised;
+    border: 1px solid transparent;
     border-radius: $radius-lg;
     padding: $space-3 $space-5;
     min-width: 80px;
+    // E' un <button>: reset dei default del browser (font/testo allineato a
+    // sinistra come nel div che sostituisce) + cursore e transizione per il
+    // click di filtro.
+    font-family: $font-base;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color $transition-fast, background $transition-fast;
+
+    &:hover { border-color: $palette-action; }
+
+    &.active {
+        border-color: $palette-action;
+        background: rgba($palette-action, 0.12);
+    }
 
     .stat-count {
         font-size: $text-3xl;

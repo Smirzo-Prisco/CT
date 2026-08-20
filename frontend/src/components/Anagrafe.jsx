@@ -71,12 +71,13 @@ function navigate(url) {
 // ── Componente principale ─────────────────────────────────────────────────────
 
 export default function Anagrafe() {
-    const [stats, setStats]       = useState(null)
-    const [allChars, setAllChars] = useState([])
-    const [letter, setLetter]     = useState(null)   // null = Tutti
-    const [search, setSearch]     = useState('')
-    const [loading, setLoading]   = useState(true)
-    const [error, setError]       = useState(null)
+    const [stats, setStats]         = useState(null)
+    const [allChars, setAllChars]   = useState([])
+    const [letter, setLetter]       = useState(null)   // null = Tutti
+    const [search, setSearch]       = useState('')
+    const [razzaFilter, setRazzaFilter] = useState(undefined) // undefined = Totali, '' = Senza razza, altrimenti nome razza
+    const [loading, setLoading]     = useState(true)
+    const [error, setError]         = useState(null)
 
     // Carica statistiche e personaggi in parallelo al mount
     useEffect(() => {
@@ -101,9 +102,11 @@ export default function Anagrafe() {
         return s
     }, [allChars])
 
-    // Filtro per lettera + ricerca (entrambi client-side)
+    // Filtro per razza + lettera + ricerca (tutti client-side)
     const filtered = useMemo(() => {
         let list = allChars
+        if (razzaFilter !== undefined)
+            list = list.filter(pg => (pg.gilda?.nome || '') === razzaFilter)
         if (letter)
             list = list.filter(pg => pg.nome?.[0]?.toUpperCase() === letter)
         if (search.trim()) {
@@ -114,7 +117,7 @@ export default function Anagrafe() {
             )
         }
         return list
-    }, [allChars, letter, search])
+    }, [allChars, razzaFilter, letter, search])
 
     // Raggruppamento alfabetico dei risultati filtrati
     const grouped = useMemo(() => {
@@ -137,19 +140,32 @@ export default function Anagrafe() {
                 <button onClick={() => navigate('main.php?page=uffici')}>← Torna indietro</button>
             </div>
 
-            {/* ── Barra statistiche ─────────────────────────────────────────── */}
+            {/* ── Barra statistiche (cliccabile per filtrare per razza) ───────── */}
             {stats && (
                 <div className="anagrafe-stats">
-                    <div className="anagrafe-stat-card">
+                    <button
+                        type="button"
+                        className={`anagrafe-stat-card${razzaFilter === undefined ? ' active' : ''}`}
+                        onClick={() => setRazzaFilter(undefined)}
+                    >
                         <div className="stat-count">{stats.total}</div>
                         <div className="stat-label">Totali</div>
-                    </div>
-                    {stats.razze.map((r, i) => (
-                        <div key={r.nome || i} className="anagrafe-stat-card">
-                            <div className="stat-count" style={{ color: statColor(i) }}>{r.count}</div>
-                            <div className="stat-label">{r.nome || 'Senza razza'}</div>
-                        </div>
-                    ))}
+                    </button>
+                    {stats.razze.map((r, i) => {
+                        const value = r.nome || ''
+                        const isActive = razzaFilter === value
+                        return (
+                            <button
+                                type="button"
+                                key={value || i}
+                                className={`anagrafe-stat-card${isActive ? ' active' : ''}`}
+                                onClick={() => setRazzaFilter(isActive ? undefined : value)}
+                            >
+                                <div className="stat-count" style={{ color: statColor(i) }}>{r.count}</div>
+                                <div className="stat-label">{r.nome || 'Senza razza'}</div>
+                            </button>
+                        )
+                    })}
                 </div>
             )}
 
