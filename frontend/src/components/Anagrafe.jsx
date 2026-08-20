@@ -142,12 +142,12 @@ export default function Anagrafe() {
                 <div className="anagrafe-stats">
                     <div className="anagrafe-stat-card">
                         <div className="stat-count">{stats.total}</div>
-                        <div className="stat-label">personaggi</div>
+                        <div className="stat-label">Totali</div>
                     </div>
                     {stats.razze.map((r, i) => (
                         <div key={r.nome || i} className="anagrafe-stat-card">
                             <div className="stat-count" style={{ color: statColor(i) }}>{r.count}</div>
-                            <div className="stat-label">{r.nome || '—'}</div>
+                            <div className="stat-label">{r.nome || 'Senza razza'}</div>
                         </div>
                     ))}
                 </div>
