@@ -1,3 +1,4 @@
+<?php require_once(__DIR__ . '/../includes/custom_functions.inc.php'); ?>
 <div class="pagina_servizi_adm_gilde">
     <!-- Titolo della pagina -->
     <div class="page_title">
@@ -10,16 +11,16 @@
             echo '<div class="form_gioco">';
                 /*Seleziono i ruoli su cui l'account ha competenza*/
                 if($_SESSION['admin']==1 || $_SESSION['moderatore']==1) {
-                    $people = "SELECT nome, cognome FROM personaggio  WHERE permessi > -1 ORDER BY nome";
+                    $people = "SELECT nome, cognome FROM personaggio WHERE " . sqlPgAttivo() . " ORDER BY nome";
                     $query = "SELECT ruolo_inclinazione.id_ruolo, ruolo_inclinazione.nome_ruolo, inclinazione.nome FROM ruolo_inclinazione LEFT JOIN inclinazione ON ruolo_inclinazione.inclinazione = inclinazione.id_inclinazione ORDER BY inclinazione.nome DESC, ruolo_inclinazione.nome_ruolo";
                     $members = "SELECT clgpersonaggioinclinazione.personaggio, clgpersonaggioinclinazione.id_ruolo, ruolo_inclinazione.nome_ruolo FROM clgpersonaggioinclinazione JOIN ruolo_inclinazione ON clgpersonaggioinclinazione.id_ruolo=ruolo_inclinazione.id_ruolo ORDER BY ruolo_inclinazione.inclinazione DESC";
                 } else {
                     if($_SESSION['capofamiglia']==1) {
-                        $people = "SELECT nome, cognome FROM personaggio  WHERE permessi > -1 ORDER BY nome";
+                        $people = "SELECT nome, cognome FROM personaggio WHERE " . sqlPgAttivo() . " ORDER BY nome";
                         $query = "SELECT ruolo_inclinazione.id_ruolo, ruolo_inclinazione.nome_ruolo, inclinazione.nome FROM ruolo_inclinazione JOIN inclinazione ON ruolo_inclinazione.inclinazione = inclinazione.id_inclinazione WHERE ruolo_inclinazione.inclinazione IN (SELECT ruolo_inclinazione.inclinazione FROM clgpersonaggioinclinazione JOIN ruolo_inclinazione ON clgpersonaggioinclinazione.id_ruolo = ruolo_inclinazione.id_ruolo WHERE clgpersonaggioinclinazione.personaggio= '".$_SESSION['login']."' AND ruolo_inclinazione.inclinazione>-1) ORDER BY inclinazione.nome, ruolo_inclinazione.nome_ruolo DESC";
                         $members = "SELECT clgpersonaggioruolo.personaggio, clgpersonaggioruolo.id_ruolo, ruolo.nome_ruolo FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo=ruolo.id_ruolo WHERE ruolo.gilda IN (SELECT ruolo.gilda FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo WHERE clgpersonaggioruolo.personaggio= '".$_SESSION['login']."' AND ruolo.gilda>-1)  OR ruolo_inclinazione.inclinazione=-1  ORDER BY ruolo_inclinazione.inclinazione DESC";
                     } else {
-                        $people = "SELECT nome, cognome FROM personaggio  WHERE permessi > -1 ORDER BY nome";
+                        $people = "SELECT nome, cognome FROM personaggio WHERE " . sqlPgAttivo() . " ORDER BY nome";
                         $query = "SELECT ruolo_inclinazione.id_ruolo, ruolo_inclinazione.nome_ruolo, inclinazione.nome FROM ruolo_inclinazione JOIN inclinazione ON ruolo_inclinazione.inclinazione = inclinazione.id_inclinazione WHERE ruolo_inclinazione.inclinazione IN (SELECT ruolo_inclinazione.inclinazione FROM clgpersonaggioinclinazioneo JOIN ruolo_inclinazione ON clgpersonaggioinclinazione.id_ruolo = ruolo_inclinazione.id_ruolo WHERE clgpersonaggioinclinazione.personaggio= '".$_SESSION['login']."' AND ruolo_inclinazione.inclinazione>-1 AND ruolo_inclinazione.capo=1) ORDER BY inclinazione.nome, ruolo_inclinazione.nome_ruolo";
                         $members = "SELECT clgpersonaggioinclinazione.personaggio, clgpersonaggioinclinazione.id_ruolo, ruolo_inclinazione.nome_ruolo, ruolo_inclinazione.inclinazione FROM clgpersonaggioinclinazione JOIN ruolo_inclinazione ON clgpersonaggioinclinazione.id_ruolo_inclinazione=ruolo_inclinazione.id_ruolo WHERE ruolo_inclinazione.inclinazione IN (SELECT ruolo_inclinazione.inclinazione FROM clgpersonaggioinclinazione JOIN ruolo_inclinazione ON clgpersonaggioinclinazione.id_ruolo = ruolo_inclinazione.id_ruolo WHERE clgpersonaggioinclinazione.personaggio= '".$_SESSION['login']."' AND ruolo_inclinazione.inclinazione>-1 AND capo=1) OR ruolo_inclinazione.inclinazione=-1 ORDER BY ruolo_inclinazione.inclinazione DESC";
                     }

@@ -381,28 +381,38 @@ switch ($op) {
         switch ($tipo) {
             case 'presenti':
                 if (!$is_admin && !$is_master) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
-                $res = gdrcd_query("SELECT nome FROM personaggio WHERE ora_entrata > ora_uscita AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW()", 'result');
+                $res = gdrcd_query("SELECT nome FROM personaggio WHERE ora_entrata > ora_uscita AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW() AND " . sqlPgAttivo(), 'result');
                 while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['nome'];
                 gdrcd_query($res, 'free');
                 break;
 
             case 'broadcast':
                 if (!$is_admin) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
-                $res = gdrcd_query("SELECT nome FROM personaggio", 'result');
+                $res = gdrcd_query("SELECT nome FROM personaggio WHERE " . sqlPgAttivo(), 'result');
                 while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['nome'];
                 gdrcd_query($res, 'free');
                 break;
 
             case 'capogilda':
                 if (!$is_admin && !$is_master && !$is_capogilda) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
-                $res = gdrcd_query("SELECT nome FROM privilegi WHERE capogilda = 1", 'result');
+                $res = gdrcd_query(
+                    "SELECT pv.nome FROM privilegi pv
+                     JOIN personaggio pg ON pg.nome = pv.nome
+                     WHERE pv.capogilda = 1 AND " . sqlPgAttivo('pg.permessi'),
+                    'result'
+                );
                 while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['nome'];
                 gdrcd_query($res, 'free');
                 break;
 
             case 'capomestiere':
                 if (!$is_admin && !$is_master && !$is_capomestiere) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']); exit; }
-                $res = gdrcd_query("SELECT nome FROM privilegi WHERE capomestiere = 1", 'result');
+                $res = gdrcd_query(
+                    "SELECT pv.nome FROM privilegi pv
+                     JOIN personaggio pg ON pg.nome = pv.nome
+                     WHERE pv.capomestiere = 1 AND " . sqlPgAttivo('pg.permessi'),
+                    'result'
+                );
                 while ($row = gdrcd_query($res, 'fetch')) $destinatari[] = $row['nome'];
                 gdrcd_query($res, 'free');
                 break;

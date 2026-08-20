@@ -153,7 +153,7 @@ switch ($op) {
         }
 
         // 7. Statistiche sito (visibili a tutti)
-        $iscritti    = (int)gdrcd_query("SELECT COUNT(nome) AS num FROM personaggio WHERE permessi >= 0 AND sesso != 'b'")['num'];
+        $iscritti    = (int)gdrcd_query("SELECT COUNT(nome) AS num FROM personaggio WHERE " . sqlPgAttivo() . " AND sesso != 'b'")['num'];
         $bacheca     = (int)gdrcd_query("SELECT COUNT(id_messaggio) AS num FROM messaggioaraldo")['num'];
         $azioni_sett = (int)gdrcd_query("SELECT COUNT(id) AS num FROM chat WHERE ora > DATE_SUB(NOW(), INTERVAL 7 DAY) AND (tipo = 'P' OR tipo = 'A')")['num'];
 
@@ -167,7 +167,7 @@ switch ($op) {
         if ($perms['admin'] || $perms['master'] || $perms['moderatore']) {
             $ultimi_res    = gdrcd_query(
                 "SELECT nome, data_iscrizione FROM personaggio
-                 WHERE permessi >= 0 AND sesso != 'b'
+                 WHERE " . sqlPgAttivo() . " AND sesso != 'b'
                  ORDER BY data_iscrizione DESC LIMIT 5",
                 'result'
             );

@@ -101,7 +101,7 @@ if ($id_mestiere !== null && $id_mestiere !== -1) {
 
     <?php if (isset($_POST['op']) === false):
         /* ── Elenco lavori ────────────────────────────────────────────────── */
-        $people  = "SELECT nome, cognome FROM personaggio WHERE permessi > -1 AND nome NOT IN (SELECT personaggio FROM $tabella_affiliazione) ORDER BY nome";
+        $people  = "SELECT nome, cognome FROM personaggio WHERE " . sqlPgAttivo() . " AND nome NOT IN (SELECT personaggio FROM $tabella_affiliazione) ORDER BY nome";
         $query   = "SELECT id_ruolo, nome_ruolo FROM ruolo_mestiere WHERE mestiere = $id_mestiere ORDER BY capo DESC, stipendio DESC, nome_ruolo";
         $members = "SELECT cpm.personaggio, cpm.id_ruolo, rm.nome_ruolo FROM $tabella_affiliazione cpm JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo WHERE rm.mestiere = $id_mestiere ORDER BY rm.capo DESC, rm.stipendio DESC";
 

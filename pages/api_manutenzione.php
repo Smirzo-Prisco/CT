@@ -12,6 +12,7 @@ session_start();
 header('Content-Type: application/json');
 
 require_once(__DIR__ . '/../includes/required.php');
+require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 $handleDBConnection = gdrcd_connect();
 
 if (empty($_SESSION['login'])) {
@@ -208,7 +209,7 @@ switch ($op) {
                 ],
             ]);
         } else {
-            gdrcd_query("UPDATE personaggio SET permessi = -1 $where");
+            gdrcd_query("UPDATE personaggio SET permessi = " . DELETED . " $where");
             echo json_encode(['success' => true, 'message' => 'Personaggi inattivi marcati come cancellati.']);
         }
         break;
@@ -217,7 +218,7 @@ switch ($op) {
     // DELETED — cancellazione DEFINITIVA dei personaggi già marcati (permessi=-1)
     // -------------------------------------------------------------------------
     case 'deleted':
-        $where = "WHERE permessi = -1";
+        $where = "WHERE " . sqlPgCancellato();
 
         if ($isPreview) {
             $pg = campiona_personaggi($where);

@@ -98,7 +98,7 @@ switch ($op) {
             exit;
         }
 
-        gdrcd_query("UPDATE personaggio SET permessi = " . USER . " WHERE nome = '$account' AND permessi = " . DELETED);
+        gdrcd_query("UPDATE personaggio SET permessi = " . USER . " WHERE nome = '$account' AND " . sqlPgCancellato());
         gdrcd_query(
             "INSERT INTO log (nome_interessato, autore, data_evento, codice_evento, descrizione_evento)
              VALUES ('$account', '$login', NOW(), " . DELETEPG . ", 'Account ripristinato')"

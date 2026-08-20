@@ -899,6 +899,29 @@ function getRoleLocationName(int $id_role): string {
     return $row['nome'] ?? '';
 }
 
+/**
+ * Cancellazione soft dei personaggi: la riga resta in `personaggio`, viene
+ * solo marcata con permessi = DELETED (vedi api_account.php op=delete/
+ * restore, api_manutenzione.php op=MISSING_SOFT). Centralizza qui la regola
+ * di controllo cosi' cambiarla (es. introdurre altri stati di cancellazione)
+ * richiede di toccare un solo punto invece di ogni query sparsa nel codice.
+ */
+
+/** Frammento SQL da mettere in AND: seleziona solo i personaggi NON cancellati. */
+function sqlPgAttivo(string $colonna = 'permessi'): string {
+    return "$colonna > " . DELETED;
+}
+
+/** Complementare a sqlPgAttivo(): frammento SQL per i soli personaggi cancellati. */
+function sqlPgCancellato(string $colonna = 'permessi'): string {
+    return "$colonna = " . DELETED;
+}
+
+/** Versione booleana, per quando il valore di permessi e' gia' stato letto (non una query). */
+function isPgCancellato($permessi): bool {
+    return (int)$permessi === DELETED;
+}
+
 // Helper: verifica se l'utente corrente può accedere a una sezione araldo.
 // Spostata qui da api_forum.php (era locale al file) perché ora serve anche
 // a createQuestPost(), condivisa con la generazione quest da role_recap.

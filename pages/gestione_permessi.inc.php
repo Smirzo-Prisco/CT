@@ -1,3 +1,4 @@
+<?php require_once(__DIR__ . '/../includes/custom_functions.inc.php'); ?>
 <div class="pagina_gestione_permessi">
     <?php /*HELP: */
     /*Controllo permessi utente*/
@@ -103,7 +104,7 @@
                     <?php }//while
                     gdrcd_query($result, 'free');
                     //Nominativi utente
-                    $result = gdrcd_query("SELECT nome FROM personaggio WHERE permessi > ".DELETED, 'result');
+                    $result = gdrcd_query("SELECT nome FROM personaggio WHERE " . sqlPgAttivo(), 'result');
                     ?>
                     <form action="main.php?page=gestione_permessi" method="post" class="form_gestione">
                         <div class='form_field'>

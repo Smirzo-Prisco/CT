@@ -3,6 +3,7 @@ session_start();
 header('Content-Type: application/json');
 
 require_once(__DIR__ . '/../includes/required.php');
+require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 $handleDBConnection = gdrcd_connect();
 
 $op   = $_GET['op'] ?? '';
@@ -59,7 +60,7 @@ switch ($op) {
             LEFT JOIN privilegi ON personaggio.nome = privilegi.nome
             WHERE personaggio.nome = '" . gdrcd_filter('in', $login1) . "' LIMIT 1");
 
-        if (empty($record) || !gdrcd_password_check($pass1, $record['pass']) || $record['permessi'] < 0) {
+        if (empty($record) || !gdrcd_password_check($pass1, $record['pass']) || isPgCancellato($record['permessi'])) {
             echo json_encode(['success' => false, 'message' => 'Nome personaggio o password non riconosciuti.']);
             exit;
         }

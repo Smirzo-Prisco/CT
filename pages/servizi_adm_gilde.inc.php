@@ -1,3 +1,4 @@
+<?php require_once(__DIR__ . '/../includes/custom_functions.inc.php'); ?>
 <div class="pagina_servizi_adm_gilde">
     <!-- Titolo della pagina -->
     <div class="page_title">
@@ -10,16 +11,16 @@
             echo '<div class="form_gioco">';
                 /*Seleziono i ruoli su cui l'account ha competenza*/
                 if($_SESSION['admin']==1) {
-                    $people = "SELECT nome, cognome FROM personaggio  WHERE permessi > -1 ORDER BY nome";
+                    $people = "SELECT nome, cognome FROM personaggio WHERE " . sqlPgAttivo() . " ORDER BY nome";
                     $query = "SELECT ruolo.id_ruolo, ruolo.nome_ruolo, gilda.nome FROM ruolo LEFT JOIN gilda ON ruolo.gilda = gilda.id_gilda ORDER BY gilda.nome, ruolo.capo DESC, ruolo.stipendio DESC, ruolo.nome_ruolo";
                     $members = "SELECT clgpersonaggioruolo.personaggio, clgpersonaggioruolo.id_ruolo, ruolo.nome_ruolo FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo=ruolo.id_ruolo ORDER BY ruolo.gilda DESC, ruolo.stipendio DESC";
                 } else {
                     if($_SESSION['capogilda']==1) {
-                        $people = "SELECT nome, cognome FROM personaggio  WHERE permessi > -1 ORDER BY nome";
+                        $people = "SELECT nome, cognome FROM personaggio WHERE " . sqlPgAttivo() . " ORDER BY nome";
                         $query = "SELECT ruolo.id_ruolo, ruolo.nome_ruolo, gilda.nome FROM ruolo JOIN gilda ON ruolo.gilda = gilda.id_gilda WHERE ruolo.gilda IN (SELECT ruolo.gilda FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo WHERE clgpersonaggioruolo.personaggio= '".$_SESSION['login']."' AND ruolo.gilda>-1) ORDER BY gilda.nome, ruolo.capo DESC, ruolo.stipendio DESC, ruolo.nome_ruolo";
                         $members = "SELECT clgpersonaggioruolo.personaggio, clgpersonaggioruolo.id_ruolo, ruolo.nome_ruolo FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo=ruolo.id_ruolo WHERE ruolo.gilda IN (SELECT ruolo.gilda FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo WHERE clgpersonaggioruolo.personaggio= '".$_SESSION['login']."' AND ruolo.gilda>-1)  ORDER BY ruolo.gilda DESC, ruolo.stipendio DESC";
                     } else {
-                        $people = "SELECT nome, cognome FROM personaggio  WHERE permessi > -1 ORDER BY nome";
+                        $people = "SELECT nome, cognome FROM personaggio WHERE " . sqlPgAttivo() . " ORDER BY nome";
                         $query = "SELECT ruolo.id_ruolo, ruolo.nome_ruolo, gilda.nome FROM ruolo JOIN gilda ON ruolo.gilda = gilda.id_gilda WHERE ruolo.gilda IN (SELECT ruolo.gilda FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo WHERE clgpersonaggioruolo.personaggio= '".$_SESSION['login']."' AND ruolo.gilda>-1 AND ruolo.capo=1) ORDER BY gilda.nome, ruolo.capo DESC, ruolo.stipendio DESC, ruolo.nome_ruolo";
                         $members = "SELECT clgpersonaggioruolo.personaggio, clgpersonaggioruolo.id_ruolo, ruolo.nome_ruolo, ruolo.gilda FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo=ruolo.id_ruolo WHERE ruolo.gilda IN (SELECT ruolo.gilda FROM clgpersonaggioruolo JOIN ruolo ON clgpersonaggioruolo.id_ruolo = ruolo.id_ruolo WHERE clgpersonaggioruolo.personaggio= '".$_SESSION['login']."' AND ruolo.gilda>-1 AND capo=1) ORDER BY ruolo.gilda DESC, ruolo.stipendio DESC";
                     }
