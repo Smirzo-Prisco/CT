@@ -366,9 +366,17 @@
         &:hover { color: #f5d78a; }
     }
 
-    &__input {
+    // Selettore rinforzato (classe ripetuta + elemento, non solo &__input):
+    // _forms.scss ha una regola globale "input[type='text'], ... { background,
+    // border, padding, ... }" con l'attributo [type='text'] che le da' piu'
+    // specificita' (0,1,1) di una singola classe (0,1,0) — vinceva lei,
+    // lasciando il campo con lo sfondo/bordo/padding del reset globale invece
+    // dei nostri (visibile come un riquadro scuro decentrato dentro alla
+    // pillola dorata). input.map-search-bar__input e' invece (0,2,1), vince.
+    input.map-search-bar__input.map-search-bar__input {
         width: 220px;
         max-width: 50vw;
+        margin: 0;
         box-sizing: border-box;
         background: none;
         border: none;
@@ -378,7 +386,12 @@
         font-family: inherit;
 
         &::placeholder { color: #7a8499; }
-        &:focus { outline: none; }
+        // box-shadow esplicito: la regola globale di _forms.scss aggiunge un
+        // anello blu al focus (proprieta' che qui non veniva mai ridichiarata,
+        // quindi restava applicata nonostante la nostra specificita' piu' alta
+        // su background/border/padding — le proprieta' non in conflitto tra
+        // due regole si sommano, la specificita' conta solo dove competono).
+        &:focus { outline: none; border: none; box-shadow: none; background: none; }
     }
 }
 
