@@ -16,7 +16,7 @@
         
         if(isset($_POST['op']) === true) {
             if(gdrcd_filter('get', $_POST['op']) == 'delete') {
-                $nome = $_POST['pg'];
+                $nome = gdrcd_filter('in', $_POST['pg']);
                 
                 gdrcd_query("DELETE FROM personaggio WHERE nome = '$nome'"); /* CANCELLO PG*/
                 gdrcd_query("DELETE FROM appuntamenti WHERE autore = '$nome'"); /* CANCELLO SMS PG*/

@@ -85,7 +85,7 @@ switch ($op) {
     // -------------------------------------------------------------------------
     case 'getStats':
         $total = (int)(gdrcd_query(
-            "SELECT COUNT(*) AS c FROM personaggio WHERE (esilio < NOW() OR esilio IS NULL)"
+            "SELECT COUNT(*) AS c FROM personaggio WHERE (esilio < NOW() OR esilio IS NULL) AND sesso != 'b' AND " . sqlPgAttivo()
         )['c'] ?? 0);
 
         $rRes  = gdrcd_query(
@@ -94,6 +94,7 @@ switch ($op) {
              LEFT JOIN ruolo  ON personaggio.id_ruolo_gilda = ruolo.id_ruolo
              LEFT JOIN gilda  ON ruolo.gilda                = gilda.id_gilda
              WHERE (personaggio.esilio < NOW() OR personaggio.esilio IS NULL)
+               AND personaggio.sesso != 'b' AND " . sqlPgAttivo('personaggio.permessi') . "
              GROUP BY gilda.id_gilda
              ORDER BY cnt DESC",
             'result'
@@ -120,7 +121,8 @@ switch ($op) {
     case 'getAll':
         $soglie = loadSoglie();
         $list   = buildPersonaggiList(
-            "(personaggio.esilio < NOW() OR personaggio.esilio IS NULL)",
+            "(personaggio.esilio < NOW() OR personaggio.esilio IS NULL)
+             AND personaggio.sesso != 'b' AND " . sqlPgAttivo('personaggio.permessi'),
             $soglie
         );
         $out = json_encode(
@@ -144,7 +146,8 @@ switch ($op) {
 
         $soglie = loadSoglie();
         $where  = "personaggio.nome LIKE '" . gdrcd_filter('in', $letter) . "%'"
-                . " AND (personaggio.esilio < NOW() OR personaggio.esilio IS NULL)";
+                . " AND (personaggio.esilio < NOW() OR personaggio.esilio IS NULL)"
+                . " AND personaggio.sesso != 'b' AND " . sqlPgAttivo('personaggio.permessi');
         $list   = buildPersonaggiList($where, $soglie);
 
         $out = json_encode(

@@ -296,7 +296,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
         case 'getChatOff': // Recupero i messaggi della chat off
             // Solo lettura, $_SESSION resta disponibile dopo il write_close iniziale.
-            $hasNewMessage = gdrcd_query("SELECT COUNT(*) AS presenza FROM chat_letta WHERE nome ='".$_SESSION['login']."'")['presenza'] == 0 ? false : true;
+            $hasNewMessage = gdrcd_query("SELECT COUNT(*) AS presenza FROM chat_letta WHERE nome ='" . gdrcd_filter('in', $_SESSION['login']) . "'")['presenza'] == 0 ? false : true;
 
             echo json_encode(array(
                 'success' => true,
