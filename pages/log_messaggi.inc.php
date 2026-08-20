@@ -17,7 +17,7 @@
                     <div class="form_gestione">
                         <form action="main.php?page=log_messaggi" method="post">
                             <?php
-                            $result = gdrcd_query("SELECT nome FROM personaggio WHERE permessi > ".DELETED." ORDER BY nome", 'result'); ?>
+                            $result = gdrcd_query("SELECT nome FROM personaggio WHERE " . sqlPgAttivo() . " ORDER BY nome", 'result'); ?>
                             <div class='form_label'>
                                 <?php echo gdrcd_filter('out', $MESSAGE['interface']['administration']['log']['messages']['log_type']); ?>
                             </div>

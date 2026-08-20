@@ -25,7 +25,7 @@ switch ($filtro) {
     case 'inattivi':    $where = "AND DATE_ADD(ora_entrata, INTERVAL 150 DAY) <= NOW() AND (esilio < NOW() OR esilio IS NULL)"; break;
     case 'mai_entrati': $where = "AND esperienza = '0.0000' AND (DATE(ora_entrata) = DATE(data_iscrizione))"; break;
     case 'esiliati':    $where = "AND (esilio > NOW() AND esilio != '0000-00-00' AND esilio IS NOT NULL)"; break;
-    case 'eliminati':   $where = "AND permessi = -1"; break;
+    case 'eliminati':   $where = "AND " . sqlPgCancellato(); break;
     default:            $where = '';
 }
 

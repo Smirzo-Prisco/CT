@@ -1,5 +1,5 @@
 <?php /*HELP: */
-$query = ($_SESSION['admin']==1 || $_SESSION['moderatore']==1) ? "SELECT nome, cognome, email FROM personaggio ORDER BY nome" : "SELECT nome, cognome FROM personaggio WHERE permessi > -1 ORDER BY nome";
+$query = ($_SESSION['admin']==1 || $_SESSION['moderatore']==1) ? "SELECT nome, cognome, email FROM personaggio ORDER BY nome" : "SELECT nome, cognome FROM personaggio WHERE " . sqlPgAttivo() . " ORDER BY nome";
 $result = gdrcd_query($query, 'result'); ?>
 
 <div class="pagina_servizi_anagrafe">
