@@ -58,16 +58,17 @@ body {
 }
 
 // ── Link Iubenda ───────────────────────────────────────────────
-// Non importanti: angolo in basso a destra, discreti, dietro a tutto il
-// resto (z-index basso). Erano in flusso normale prima di #maincontent,
-// finendo visivamente nell'area della topbar dell'HUD.
+// Non importanti: centrati in basso, discreti, dietro a tutto il resto
+// (z-index basso). Erano in flusso normale prima di #maincontent, finendo
+// visivamente nell'area della topbar dell'HUD.
 #iubenda-container {
     position: fixed;
-    left: auto;
-    right: 10px;
+    left: 50%;
+    right: auto;
     bottom: 8px;
+    transform: translateX(-50%);
     z-index: 50;
-    text-align: right;
+    text-align: center;
     padding: 0;
     margin: 0;
     font-size: 10px;
