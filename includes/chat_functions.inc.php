@@ -1962,6 +1962,34 @@ function getDefenceCar($attack_car, $target) {
     }
 }
 
+/**
+ * Calcola il danno provvisorio di un attacco una volta noto anche il dado di
+ * difesa — stessa formula usata in elaborateAttackTarget() per il calcolo
+ * autorevole a chiusura turno, qui riapplicata per l'anteprima mostrata nel
+ * messaggio di risposta immediata (dopo il tiro di difesa si conoscono gia'
+ * sia il dado di attacco che quello di difesa). Nessun effetto collaterale:
+ * non registra nulla in role_fights, e' solo un'anteprima — il turno puo'
+ * ancora cambiare esito (scudi, altri attacchi) prima della chiusura vera.
+ */
+function calcolaDannoProvvisorio($fightRow, $dadoDifesa) {
+    $dadoAttacco = (float)$fightRow['dice'];
+    if ($dadoAttacco <= $dadoDifesa) return 0; // difesa riuscita, nessun danno
+
+    $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = " . (int)$fightRow['level']);
+    $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
+    $baseDmg = ($dadoAttacco - $dadoDifesa) * $moltiplicatore;
+
+    $targetsCount = max(1, count(array_filter(array_map('trim', explode(',', $fightRow['target'])))));
+    $damagePercent = (int)($fightRow['damage_percent'] ?? 0);
+    $damage = $damagePercent > 0
+        ? round($baseDmg * ($damagePercent / 100))
+        : round($baseDmg / $targetsCount);
+
+    if ((int)($fightRow['dado_raw'] ?? 0) === 20 && $damage > 0) $damage *= 2; // critico
+
+    return (int)$damage;
+}
+
 // Impedisco o consento al pg di lanciare nel prossimo turno
 function setCanSend($id_role) {
     $turn = getTurn($id_role);
