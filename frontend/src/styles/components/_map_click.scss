@@ -309,3 +309,132 @@
         border: 1px solid rgba(8, 9, 26, .9);
     }
 }
+
+// ── Ricerca chat (MapChatSearch.jsx) ────────────────────────────
+// Non una modale: un'icona che si affianca a un campo di testo quando
+// aperta, con i risultati (autocomplete) che si aprono verso l'alto sopra
+// il campo — coerente con l'ancoraggio in basso del widget. Stessa palette
+// ink/oro di .map-zone-panel, per restare coerenti col resto della pagina.
+
+.map-search-widget {
+    position: fixed;
+    // basso a sinistra: gli angoli in alto sono occupati dai due anelli HUD
+    // (luogo/personaggio, ~140px di icone ciascuno), il basso a destra dal
+    // link Iubenda e dal pulsante "?" del tour — qui e' l'unico angolo
+    // libero. Nascosto quando .map-zone-panel e' aperto (vedi MapClick.jsx),
+    // quindi nessun conflitto con la sua z-index:50 nonostante l'area comune.
+    left: 16px;
+    bottom: 16px;
+    z-index: 20;
+    display: flex;
+    // Colonna semplice (non reverse): nel JSX il dropdown viene PRIMA della
+    // barra nel DOM proprio per finire sopra di essa qui senza bisogno di
+    // invertire l'ordine — la barra resta ancorata in basso.
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.map-search-bar {
+    display: flex;
+    align-items: center;
+    background: rgba(8, 9, 26, .75);
+    border: 1px solid #4a3d22;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    transition: border-color .15s ease, background .15s ease;
+
+    &--open {
+        background: rgba(23, 28, 52, .95);
+        border-color: #daa832;
+    }
+
+    &__icon {
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        border-radius: 50%;
+        color: #daa832;
+        font-size: 16px;
+        cursor: pointer;
+        transition: color .15s ease;
+
+        &:hover { color: #f5d78a; }
+    }
+
+    // Selettore rinforzato (classe ripetuta + elemento, non solo &__input):
+    // _forms.scss ha una regola globale "input[type='text'], ... { background,
+    // border, padding, ... }" con l'attributo [type='text'] che le da' piu'
+    // specificita' (0,1,1) di una singola classe (0,1,0) — vinceva lei,
+    // lasciando il campo con lo sfondo/bordo/padding del reset globale invece
+    // dei nostri (visibile come un riquadro scuro decentrato dentro alla
+    // pillola dorata). input.map-search-bar__input e' invece (0,2,1), vince.
+    input.map-search-bar__input.map-search-bar__input {
+        width: 220px;
+        max-width: 50vw;
+        margin: 0;
+        box-sizing: border-box;
+        background: none;
+        border: none;
+        padding: 0 14px 0 0;
+        color: #e8e4da;
+        font-size: .9rem;
+        font-family: inherit;
+
+        &::placeholder { color: #7a8499; }
+        // box-shadow esplicito: la regola globale di _forms.scss aggiunge un
+        // anello blu al focus (proprieta' che qui non veniva mai ridichiarata,
+        // quindi restava applicata nonostante la nostra specificita' piu' alta
+        // su background/border/padding — le proprieta' non in conflitto tra
+        // due regole si sommano, la specificita' conta solo dove competono).
+        &:focus { outline: none; border: none; box-shadow: none; background: none; }
+    }
+}
+
+.map-search-dropdown {
+    list-style: none;
+    margin: 0 0 8px;
+    padding: 6px;
+    width: 260px;
+    max-width: 70vw;
+    max-height: 45vh;
+    overflow-y: auto;
+    background: linear-gradient(160deg, #161b35, #08091a);
+    border: 1px solid #4a3d22;
+    border-radius: 12px;
+    box-shadow: 0 -8px 24px -6px rgba(0, 0, 0, .55);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.map-search-status {
+    text-align: center;
+    color: #7a8499;
+    font-size: .82rem;
+    padding: 10px 8px;
+}
+
+.map-search-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .12s ease;
+
+    &__nome { color: #e8e4da; font-size: .88rem; }
+    &__mappa { color: #7a8499; font-size: .76rem; flex-shrink: 0; }
+
+    &:hover, &--active {
+        background: #1f2540;
+
+        .map-search-result__nome { color: #f5d78a; }
+    }
+}

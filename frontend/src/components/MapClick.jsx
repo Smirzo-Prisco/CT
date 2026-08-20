@@ -42,6 +42,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import MapChatSearch from './MapChatSearch'
 
 // Unica voce non presente in mappa_click/mappa: un link diretto a una pagina
 // di servizio (non una stanza/chat), aggiunto lato client alla zona Roppongi
@@ -330,6 +331,13 @@ export default function MapClick() {
 
     return (
         <div>
+            {/* Ricerca chat — icona che si affianca a un campo di testo
+                quando aperta, risultati verso l'alto (vedi MapChatSearch.jsx).
+                Nascosta quando il pannello zona e' aperto: entrambi vivono
+                in basso a sinistra/tutta larghezza e finirebbero sovrapposti
+                (vedi .map-zone-panel, z-index:50, stessa area). */}
+            {!openZone && <MapChatSearch />}
+
             {/* ---------------------------------------------------------------- */}
             {/* MAPPA — immagine con pallini hotspot                              */}
             {/* Il popup NON è dentro questo container per evitare overflow/clip  */}
