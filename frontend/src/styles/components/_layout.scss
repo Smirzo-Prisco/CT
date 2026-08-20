@@ -63,9 +63,10 @@ body {
 // finendo visivamente nell'area della topbar dell'HUD.
 #iubenda-container {
     position: fixed;
+    left: auto;
     right: 10px;
     bottom: 8px;
-    z-index: 1;
+    z-index: 50;
     text-align: right;
     padding: 0;
     margin: 0;
