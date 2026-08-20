@@ -123,7 +123,7 @@ const SchedaAvatar = forwardRef(function SchedaAvatar({ urlImg, nome }, ref) {
  */
 const SchedaProfilo = forwardRef(function SchedaProfilo({ profile }, ref) {
     const { nome, cognome, eta, natoa, lavoro, razza, nome_ruolo, nome_ruolo_mestiere,
-            salute, salute_max, integrita, integrita_max, /* notorieta, */
+            salute, salute_max, integrita, integrita_max, notorieta,
             esperienza, shin, statistiche, privilegi, config } = profile
     const sn = config?.stat_names ?? {}
 
@@ -214,6 +214,10 @@ const SchedaProfilo = forwardRef(function SchedaProfilo({ profile }, ref) {
                 <div className={styles.infoRow}>
                     <span className={styles.infoLabel}>{sn.integrita ?? 'Integrità'}</span>
                     <span className={styles.infoValue}>{integrita}/{integrita_max}</span>
+                </div>
+                <div className={styles.infoRow}>
+                    <span className={styles.infoLabel}>{sn.notorieta ?? 'Notorietà'}</span>
+                    <span className={styles.infoValue}>{Math.floor(notorieta ?? 0)}</span>
                 </div>
                 {statistiche && (
                     <>
