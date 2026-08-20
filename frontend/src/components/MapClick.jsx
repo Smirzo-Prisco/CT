@@ -335,15 +335,20 @@ export default function MapClick() {
     return (
         <div>
             {/* Pulsante ricerca chat — apre MapChatSearchModal (ricerca per
-                parola chiave con autocomplete tra tutte le chat di gioco) */}
-            <button
-                type="button"
-                className="map-search-trigger"
-                onClick={() => setSearchOpen(true)}
-                title="Cerca chat"
-            >
-                <i className="fas fa-magnifying-glass"></i>
-            </button>
+                parola chiave con autocomplete tra tutte le chat di gioco).
+                Nascosto quando il pannello zona e' aperto: entrambi vivono
+                in basso a sinistra/tutta larghezza e finirebbero sovrapposti
+                (vedi .map-zone-panel, z-index:50, stessa area). */}
+            {!openZone && (
+                <button
+                    type="button"
+                    className="map-search-trigger"
+                    onClick={() => setSearchOpen(true)}
+                    title="Cerca chat"
+                >
+                    <i className="fas fa-magnifying-glass"></i>
+                </button>
+            )}
 
             {searchOpen && <MapChatSearchModal onClose={() => setSearchOpen(false)} />}
 
