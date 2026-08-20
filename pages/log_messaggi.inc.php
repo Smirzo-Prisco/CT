@@ -1,3 +1,4 @@
+<?php require_once(__DIR__ . '/../includes/custom_functions.inc.php'); ?>
 <div class="pagina_gestione_razze">
     <?php /*HELP: */
     /*Controllo permessi utente*/

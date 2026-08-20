@@ -1,3 +1,4 @@
+<?php require_once(__DIR__ . '/../includes/custom_functions.inc.php'); ?>
 <div class="pagina_servizi_adm_gilde">
     <!-- Titolo della pagina -->
     <div class="page_title">
