@@ -251,7 +251,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $dice       = $diceResult['risultato'];
                     fight($id_role, $login, $attacker, 0, 0, 'dado_risposta', $dice, 'risposta immediata dado', 0, 0, $id_fight);
                     $sussurroStr = $diceResult['sussurro'] ? " ({$diceResult['sussurro']})" : '';
-                    $messaggio = "<i>Risultato provvisorio:</i> $login tira il dado di difesa e ottiene <b>$dice</b>$sussurroStr contro l'attacco di $attacker";
+                    $dannoProvv  = calcolaDannoProvvisorio($fightRow, $dice);
+                    $ptLabel     = ($carDifesa['type'] ?? '') === 'integrità' ? 'INT' : 'PS';
+                    $dannoStr    = $dannoProvv > 0 ? " — danno provvisorio: <b>{$dannoProvv} {$ptLabel}</b>" : " — nessun danno (difesa riuscita)";
+                    $messaggio = "<i>Risultato provvisorio:</i> $login tira il dado di difesa e ottiene <b>$dice</b>$sussurroStr contro l'attacco di $attacker{$dannoStr}";
                     break;
 
                 case 'scudo':
@@ -333,7 +336,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     $dice       = $diceResult['risultato'];
                     fight($id_role, $creatura, $attacker, 0, 0, 'dado_risposta', $dice, 'risposta immediata creatura dado', 0, 0, $id_fight);
                     $sussurroStr = $diceResult['sussurro'] ? " ({$diceResult['sussurro']})" : '';
-                    $messaggio = "<i>Risultato provvisorio:</i> la creatura di $login tira il dado di difesa e ottiene <b>$dice</b>$sussurroStr contro l'attacco di $attacker";
+                    $dannoProvv  = calcolaDannoProvvisorio($fightRow, $dice);
+                    $ptLabel     = ($carDifesa['type'] ?? '') === 'integrità' ? 'INT' : 'PS';
+                    $dannoStr    = $dannoProvv > 0 ? " — danno provvisorio: <b>{$dannoProvv} {$ptLabel}</b>" : " — nessun danno (difesa riuscita)";
+                    $messaggio = "<i>Risultato provvisorio:</i> la creatura di $login tira il dado di difesa e ottiene <b>$dice</b>$sussurroStr contro l'attacco di $attacker{$dannoStr}";
                     break;
 
                 case 'subisce':
@@ -1724,7 +1730,10 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         ? "$rawDado/20 + $bonusCar = $dice"
                         : ($bonusCar < 0 ? "$rawDado/20 - " . abs($bonusCar) . " = $dice" : "$rawDado/20 = $dice");
                     fight($id_role, $attacker, $pngName, 0, 0, 'dado_risposta', $dice, 'risposta PNG dado', 0, 0, $id_fight);
-                    $messaggio = "<i>Risultato provvisorio:</i> $pngName tira il dado di difesa ({$carDifesa['nome']}) e ottiene <b>$dice</b> ($breakdown) contro l'attacco di $attacker";
+                    $dannoProvv = calcolaDannoProvvisorio($fightRow, $dice);
+                    $ptLabel    = ($carDifesa['type'] ?? '') === 'integrità' ? 'INT' : 'PS';
+                    $dannoStr   = $dannoProvv > 0 ? " — danno provvisorio: <b>{$dannoProvv} {$ptLabel}</b>" : " — nessun danno (difesa riuscita)";
+                    $messaggio = "<i>Risultato provvisorio:</i> $pngName tira il dado di difesa ({$carDifesa['nome']}) e ottiene <b>$dice</b> ($breakdown) contro l'attacco di $attacker{$dannoStr}";
                     break;
                 case 'subisce':
                     fight($id_role, $attacker, $pngName, 0, 0, 'subisce', 0, 'risposta PNG subisce', 0, 0, $id_fight);

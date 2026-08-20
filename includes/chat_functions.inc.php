@@ -952,19 +952,25 @@ function deleteRolePngs($id_role) {
 // Controllo se tutti i pg hanno inviato, così propongo la chiusura del turno a tutti quanti
 function checkTurnEnd($location, $user, $id_role) {
     gdrcd_query("UPDATE role_session_players SET `sent` = 1 WHERE id_role = $id_role AND pg_name LIKE '%$user%'"); // Il pg ha azionato, sent = 1
-    // Cerco tutti i pg che non hanno ancora azionato nel turno corrente
-    $result = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND `sent` = 0 AND role_session_players.end IS NULL", 'result');
+    // Cerco tutti i pg che non hanno ancora azionato nel turno corrente. I png sono
+    // esclusi: non hanno una sessione propria che imposti sent/close_turn (li
+    // aggiorna solo un pg reale che agisce, o un altro pg che chiude il turno per
+    // conto proprio) e resterebbero quindi sent=0 per sempre, bloccando il turno
+    // a tempo indeterminato ogni volta che un png (es. una creatura evocata) e'
+    // presente nella role.
+    $result = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND `sent` = 0 AND role_session_players.end IS NULL AND png = 0", 'result');
 
     // Se non li trovo, significa che tutti hanno azionato
     if ($result && gdrcd_query($result, 'num_rows') === 0) {
         // Recupero tutti i pg che hanno azionato ma non ancora chiuso il turno
-        $pgs = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND `sent` = 1 AND close_turn = 0 AND role_session_players.end IS NULL", 'result');
+        $pgs = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND `sent` = 1 AND close_turn = 0 AND role_session_players.end IS NULL AND png = 0", 'result');
 
-        // Se c'è un solo pg TOTALE nella role, è da solo: non proporgli la chiusura
-        // (non usare num_rows di $pgs: conta solo i pg con close_turn=0, non quelli
-        // già auto-chiusi, e farebbe scattare il return in modo errato nelle sessioni
-        // a due giocatori dove uno ha già chiuso il turno con un lancio)
-        $totalActive = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM role_session_players WHERE id_role = $id_role AND `end` IS NULL")['n'] ?? 0);
+        // Se c'è un solo pg TOTALE (png esclusi) nella role, è da solo: non
+        // proporgli la chiusura (non usare num_rows di $pgs: conta solo i pg con
+        // close_turn=0, non quelli già auto-chiusi, e farebbe scattare il return
+        // in modo errato nelle sessioni a due giocatori dove uno ha già chiuso il
+        // turno con un lancio)
+        $totalActive = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM role_session_players WHERE id_role = $id_role AND `end` IS NULL AND png = 0")['n'] ?? 0);
         if ($totalActive <= 1) return;
 
         $turn = getTurn($id_role);
@@ -994,7 +1000,7 @@ function checkTurnEnd($location, $user, $id_role) {
         }
 
         // Se tutti sono stati auto-chiusi (nessun bottone necessario), chiude il turno subito (solo se nessun attacco è in sospeso)
-        $stillOpen = gdrcd_query("SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1", 'result');
+        $stillOpen = gdrcd_query("SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL AND png = 0 LIMIT 1", 'result');
         if ($stillOpen && gdrcd_query($stillOpen, 'num_rows') === 0) checkTurnCanClose($id_role, $location);
     }
 }
@@ -1005,7 +1011,7 @@ function closePgTurn($id_role, $pgName, $location) {
     gdrcd_query("UPDATE role_session_players SET close_turn = 1 WHERE id_role = $id_role AND pg_name LIKE '%$pgName%' AND `end` IS NULL");
 
     // Verifico se tutti i pg, ignorando i png, hanno scelto di chiudere il turno
-    $result = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL", 'result');
+    $result = gdrcd_query("SELECT * FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL AND png = 0", 'result');
 
     // Se tutti hanno scelto di chiudere il turno, chiudo il turno (solo se nessun attacco è in sospeso)
     if ($result && gdrcd_query($result, 'num_rows') == 0) checkTurnCanClose($id_role, $location);
@@ -1956,6 +1962,34 @@ function getDefenceCar($attack_car, $target) {
     }
 }
 
+/**
+ * Calcola il danno provvisorio di un attacco una volta noto anche il dado di
+ * difesa — stessa formula usata in elaborateAttackTarget() per il calcolo
+ * autorevole a chiusura turno, qui riapplicata per l'anteprima mostrata nel
+ * messaggio di risposta immediata (dopo il tiro di difesa si conoscono gia'
+ * sia il dado di attacco che quello di difesa). Nessun effetto collaterale:
+ * non registra nulla in role_fights, e' solo un'anteprima — il turno puo'
+ * ancora cambiare esito (scudi, altri attacchi) prima della chiusura vera.
+ */
+function calcolaDannoProvvisorio($fightRow, $dadoDifesa) {
+    $dadoAttacco = (float)$fightRow['dice'];
+    if ($dadoAttacco <= $dadoDifesa) return 0; // difesa riuscita, nessun danno
+
+    $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = " . (int)$fightRow['level']);
+    $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
+    $baseDmg = ($dadoAttacco - $dadoDifesa) * $moltiplicatore;
+
+    $targetsCount = max(1, count(array_filter(array_map('trim', explode(',', $fightRow['target'])))));
+    $damagePercent = (int)($fightRow['damage_percent'] ?? 0);
+    $damage = $damagePercent > 0
+        ? round($baseDmg * ($damagePercent / 100))
+        : round($baseDmg / $targetsCount);
+
+    if ((int)($fightRow['dado_raw'] ?? 0) === 20 && $damage > 0) $damage *= 2; // critico
+
+    return (int)$damage;
+}
+
 // Impedisco o consento al pg di lanciare nel prossimo turno
 function setCanSend($id_role) {
     $turn = getTurn($id_role);
@@ -2112,19 +2146,25 @@ function hasPendingUnrespondedAttacks($id_role, $turn) {
 }
 
 /**
- * Chiude il turno quando tutti i pg attivi hanno close_turn = 1
- * e non ci sono attacchi in sospeso senza risposta.
+ * Chiude il turno quando tutti i pg attivi (png esclusi) hanno close_turn = 1
+ * e non ci sono attacchi in sospeso senza risposta (png esclusi anche qui).
  *
  * Se un pg ha chiuso il turno ma riceve un attacco dopo la chiusura,
  * il turno rimane aperto finché il bersaglio non risponde (dado/scudo/subisce).
  * Questo garantisce che il bersaglio possa sempre scegliere come difendersi.
+ * Per i png senza risposta esplicita (nessuno dei due controlli li blocca) ci
+ * pensa comunque elaborateAttackTarget() a tirare un dado di difesa automatico
+ * con le loro statistiche in fase di elaborazione del turno.
  *
  * Viene chiamata da closePgTurn, checkTurnEnd e risposta_immediata.
  */
 function checkTurnCanClose($id_role, $location) {
-    // Prima condizione: tutti i pg attivi devono aver chiuso il turno
+    // Prima condizione: tutti i pg attivi devono aver chiuso il turno (png esclusi:
+    // nessuno imposta mai close_turn=1 per loro, bloccherebbero la chiusura a
+    // tempo indeterminato ogni volta che sono presenti — coerente con la seconda
+    // condizione qui sotto, che gia' li esclude dagli attacchi in sospeso)
     $stillOpen = gdrcd_query(
-        "SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL LIMIT 1",
+        "SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL AND png = 0 LIMIT 1",
         'result'
     );
     if (!$stillOpen || gdrcd_query($stillOpen, 'num_rows') > 0) return;
