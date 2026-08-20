@@ -106,6 +106,33 @@ switch ($op) {
         break;
 
     // -------------------------------------------------------------------------
+    // SEARCH_ROOMS — tutte le chat di gioco (mappa.chat != 0) con la mappa di
+    // appartenenza, per la ricerca con autocomplete sulla pagina mappa
+    // (MapChatSearchModal.jsx). Stesso universo di dati di 'gotomap', filtrato
+    // alle sole chat (non pagine di servizio/mappe collegate): fetch unico,
+    // poi filtrato client-side, stesso pattern di Anagrafe.jsx.
+    // -------------------------------------------------------------------------
+    case 'search_rooms':
+        $result = gdrcd_query("SELECT mappa.id, mappa.nome, mappa_click.nome AS nome_mappa
+            FROM mappa
+            JOIN mappa_click ON mappa_click.id_click = mappa.id_mappa
+            WHERE mappa.chat != 0
+            ORDER BY mappa.nome ASC", 'result');
+
+        $rooms = [];
+        while ($row = gdrcd_query($result, 'fetch')) {
+            $rooms[] = [
+                'id'        => (int)$row['id'],
+                'nome'      => $row['nome'],
+                'nome_mappa'=> $row['nome_mappa'],
+            ];
+        }
+        gdrcd_query($result, 'free');
+
+        echo json_encode(['success' => true, 'rooms' => $rooms]);
+        break;
+
+    // -------------------------------------------------------------------------
     // ROOMS — lista stanze di una mappa (per costruire la UI React)
     // -------------------------------------------------------------------------
     case 'rooms':

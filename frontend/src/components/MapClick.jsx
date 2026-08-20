@@ -42,6 +42,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import MapChatSearchModal from './MapChatSearchModal'
 
 // Unica voce non presente in mappa_click/mappa: un link diretto a una pagina
 // di servizio (non una stanza/chat), aggiunto lato client alla zona Roppongi
@@ -92,6 +93,9 @@ export default function MapClick() {
 
     /** ID zona con popup aperto (mappa_click.id_click). null = nessun popup. */
     const [openZone, setOpenZone] = useState(null)
+
+    /** Modale di ricerca chat (vedi MapChatSearchModal.jsx) */
+    const [searchOpen, setSearchOpen] = useState(false)
 
     /** Ref all'immagine mappa per leggere le dimensioni naturali reali */
     const imgRef = useRef(null)
@@ -330,6 +334,19 @@ export default function MapClick() {
 
     return (
         <div>
+            {/* Pulsante ricerca chat — apre MapChatSearchModal (ricerca per
+                parola chiave con autocomplete tra tutte le chat di gioco) */}
+            <button
+                type="button"
+                className="map-search-trigger"
+                onClick={() => setSearchOpen(true)}
+                title="Cerca chat"
+            >
+                <i className="fas fa-magnifying-glass"></i>
+            </button>
+
+            {searchOpen && <MapChatSearchModal onClose={() => setSearchOpen(false)} />}
+
             {/* ---------------------------------------------------------------- */}
             {/* MAPPA — immagine con pallini hotspot                              */}
             {/* Il popup NON è dentro questo container per evitare overflow/clip  */}
