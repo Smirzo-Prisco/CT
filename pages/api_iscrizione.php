@@ -164,7 +164,7 @@ if ($op === 'options') {
             fn($n) => '<a href="main.php?page=messages_center&to=' . urlencode($n) . '">' . htmlspecialchars($n, ENT_QUOTES, 'UTF-8') . '</a>',
             $doppi_nomi
         );
-        $testo_dm_raw .= ' — ⚠ POSSIBILE DOPPIO (stesso IP di): ' . implode(', ', $doppi_links);
+        $testo_dm_raw .= ' — POSSIBILE DOPPIO (stesso IP di): ' . implode(', ', $doppi_links);
     }
     $testo_dm   = gdrcd_filter('in', $testo_dm_raw);
     $admin_list = gdrcd_query("SELECT nome FROM privilegi WHERE admin = 1", 'result');
