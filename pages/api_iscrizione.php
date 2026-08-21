@@ -135,12 +135,38 @@ if ($op === 'options') {
         gdrcd_query("INSERT INTO clgpersonaggiomestiere (personaggio, id_ruolo) VALUES ('" . $nome . "', " . $mestiere_id . ")");
     }
 
+    // Rilevamento doppi in fase di iscrizione: il personaggio appena creato non
+    // ha ancora una propria storia di log_entrate (non si è mai loggato), ma
+    // l'IP della richiesta di iscrizione sì — stessa fonte dati (log_entrate)
+    // e stessa esclusione bot (sesso='b') del rilevamento doppi al login (vedi
+    // case 'login' in api_auth.php), qui riapplicata all'IP di chi si iscrive.
+    $ip_iscrizione = gdrcd_filter('in', $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR']);
+    $doppi_result = gdrcd_query("
+        SELECT DISTINCT le.Nome
+        FROM log_entrate le
+        JOIN personaggio p ON p.nome = le.Nome
+        WHERE le.IP = '$ip_iscrizione' AND le.Nome != '" . gdrcd_filter('in', $nome) . "' AND p.sesso != 'b'
+    ", 'result');
+    $doppi_nomi = [];
+    while ($doppi_row = gdrcd_query($doppi_result, 'fetch')) {
+        $doppi_nomi[] = $doppi_row['Nome'];
+    }
+    gdrcd_query($doppi_result, 'free');
+
     // DM di notifica a tutti gli admin — nuovo personaggio iscritto.
     // Il nome è un link cliccabile verso messages_center (compose diretto verso il pg,
     // vedi MessagesInbox.jsx che gestisce ?to=NOME) — testo/dangerouslySetInnerHTML,
     // per questo il nome visibile va comunque escapato con htmlspecialchars.
     $nome_link  = '<a href="main.php?page=messages_center&to=' . urlencode($nome) . '">' . htmlspecialchars($nome, ENT_QUOTES, 'UTF-8') . '</a>';
-    $testo_dm   = gdrcd_filter('in', 'Nuovo personaggio iscritto il ' . date('d/m/Y') . ' alle ' . date('H:i') . ': ' . $nome_link);
+    $testo_dm_raw = 'Nuovo personaggio iscritto il ' . date('d/m/Y') . ' alle ' . date('H:i') . ': ' . $nome_link;
+    if (!empty($doppi_nomi)) {
+        $doppi_links = array_map(
+            fn($n) => '<a href="main.php?page=messages_center&to=' . urlencode($n) . '">' . htmlspecialchars($n, ENT_QUOTES, 'UTF-8') . '</a>',
+            $doppi_nomi
+        );
+        $testo_dm_raw .= ' — ⚠ POSSIBILE DOPPIO (stesso IP di): ' . implode(', ', $doppi_links);
+    }
+    $testo_dm   = gdrcd_filter('in', $testo_dm_raw);
     $admin_list = gdrcd_query("SELECT nome FROM privilegi WHERE admin = 1", 'result');
     while ($admin_row = gdrcd_query($admin_list, 'fetch')) {
         send_sms('System', $admin_row['nome'], '', $testo_dm, 0);
