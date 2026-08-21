@@ -28,6 +28,7 @@
 
 import { createRoot } from 'react-dom/client'
 import { initIdleDetector } from './utils/idleDetector'
+import { initScrollReflowFix } from './utils/scrollReflowFix'
 import { initSocket } from './socket'
 
 // Interceptor globale: risposta 401 = sessione scaduta → redirect al login.
@@ -191,6 +192,7 @@ window.CT.navigate = (url) => { window.top.location.href = url }
 initSocket()
 document.dispatchEvent(new CustomEvent('ct:ready'))
 initIdleDetector()
+initScrollReflowFix()
 
 // ---------------------------------------------------------------------------
 // PHASE 3.2 / 4b — Intercettore click globale per navigazione React

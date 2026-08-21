@@ -23,7 +23,7 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, Fragment } from 'react'
 import styles from './Forum.module.scss'
 
 // ---------------------------------------------------------------------------
@@ -1154,7 +1154,7 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                     <table className={`customTable ${styles.sectionsTable}`}>
                         <tbody>
                             {Object.entries(sections).map(([tipo, secs]) => (
-                                <>
+                                <Fragment key={tipo}>
                                     {/*
                                       * Header di gruppo: third_header dà lo sfondo corretto via CSS.
                                       * Il colore arancione va aggiunto inline perché third_header colora
@@ -1181,7 +1181,7 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                                             <td className={styles.sectionDescCell}>{sec.descrizione}</td>
                                         </tr>
                                     ))}
-                                </>
+                                </Fragment>
                             ))}
                         </tbody>
                     </table>
