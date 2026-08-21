@@ -958,9 +958,11 @@ export default function ChatShell() {
 
     /** Ref alla textarea del messaggio, per leggere/scrivere valore e cursore. */
     const messageRef = useRef(null)
+    const tagRef = useRef(null)
 
     /** Timer di debounce per il salvataggio della bozza (non ad ogni keystroke). */
     const draftTimerRef = useRef(null)
+    const tagDraftTimerRef = useRef(null)
 
     /**
      * Ripristina la bozza salvata per QUESTA stanza, se presente e se il
@@ -983,6 +985,21 @@ export default function ChatShell() {
     }, [shell])
 
     /**
+     * Stesso ripristino bozza di sopra, ma per il campo TAG (action_tag):
+     * identico meccanismo (chiave per-stanza, non sovrascrive un valore gia'
+     * presente), solo su un <input> invece che una <textarea> — non serve
+     * quindi il dispatch di 'input' per autoGrow/conta(), che sono cose
+     * specifiche della textarea del messaggio.
+     */
+    useEffect(() => {
+        if (!shell) return
+        const input = tagRef.current
+        if (!input) return
+        const saved = localStorage.getItem(`chat_tag_draft_${shell.luogo}`)
+        if (saved && !input.value) input.value = saved
+    }, [shell])
+
+    /**
      * Salva la bozza con un debounce: scrivere in localStorage ad ogni
      * singolo carattere digitato aggiungerebbe un piccolo lavoro sincrono
      * sul thread principale ad ogni keystroke — impercettibile per un
@@ -997,6 +1014,17 @@ export default function ChatShell() {
         clearTimeout(draftTimerRef.current)
         draftTimerRef.current = setTimeout(() => {
             const key = `chat_draft_${shell.luogo}`
+            if (value.trim()) localStorage.setItem(key, value)
+            else localStorage.removeItem(key)
+        }, 400)
+    }, [shell])
+
+    /** Stesso debounce di saveDraft, per il campo TAG (chiave separata). */
+    const saveTagDraft = useCallback((value) => {
+        if (!shell) return
+        clearTimeout(tagDraftTimerRef.current)
+        tagDraftTimerRef.current = setTimeout(() => {
+            const key = `chat_tag_draft_${shell.luogo}`
             if (value.trim()) localStorage.setItem(key, value)
             else localStorage.removeItem(key)
         }, 400)
@@ -1221,7 +1249,9 @@ export default function ChatShell() {
 
                                 {/* Riga 1: tag (sinistra) + submit (destra) */}
                                 <div className="chat-submit-row">
-                                    <input type="text" name="action_tag" className="action-tag" maxLength={30} placeholder="TAG max 30" />
+                                    <input type="text" name="action_tag" className="action-tag" maxLength={30} placeholder="TAG max 30"
+                                        ref={tagRef}
+                                        onInput={e => saveTagDraft(e.target.value)} />
                                     <div className="chat-action-controls">
                                         <input type="hidden" id="id_role" defaultValue="" />
                                         <span className="gdr-char-counter">
