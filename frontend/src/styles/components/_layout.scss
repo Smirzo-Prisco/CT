@@ -43,6 +43,14 @@ body {
     right: 0;
     bottom: 0;
     overflow: auto;
+    // Senza questa proprieta' Safari/iOS usa lo scroll "software" invece di
+    // quello accelerato via compositor su un contenitore position:fixed +
+    // overflow:auto con contenuto alto: il sintomo e' contenuto presente e
+    // cliccabile ma non ridisegnato scorrendo (in entrambe le direzioni) —
+    // esattamente il bug segnalato su Forum/presenti estesi. E' la causa
+    // reale, non risolta dal solo reflow forzato via JS (scrollReflowFix.js,
+    // che resta comunque utile per il caso overflow:hidden di customTable).
+    -webkit-overflow-scrolling: touch;
     width: 100%;
     box-sizing: border-box;
 
