@@ -2428,6 +2428,17 @@ span.testo {
     }
 }
 
+// ── Modale "Modifica Azione" (clic sull'ultima riga propria) ──────────────────
+// .pg-edit-container (_gestione.scss) ha align-items:flex-start: ancora il
+// modale in alto, pensato per form lunghi (es. gestione_personaggio) che senza
+// questo, centrati, finirebbero con la parte superiore sopra il viewport. Qui
+// il contenuto è una singola textarea, molto più corto: ancorato in alto finiva
+// a ridosso della topbar HUD, quasi coperto. Scoped solo a questo modale (id,
+// non la classe condivisa) per non spostare anche i modali più lunghi.
+#editAction-modal {
+    align-items: center;
+}
+
 .help-soglie-table {
     width: 100%;
     margin-top: 10px;
