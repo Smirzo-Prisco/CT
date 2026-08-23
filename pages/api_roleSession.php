@@ -121,18 +121,34 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
         case 'getPngRolePlaying': // Serve per caricare i PNG, creati nella role, all'interno della sezione del pannello chat dedicata ai master
             try {
-                $query = "SELECT role_session_players.* FROM role_session_players 
-                            INNER JOIN role_sessions ON role_session_players.id_role = role_sessions.id_role 
-                            WHERE role_session_players.png = 1 
-                            AND role_session_players.end IS NULL 
-                            AND role_sessions.end IS NULL 
-                            AND role_sessions.freezed IS NULL 
+                $query = "SELECT role_session_players.* FROM role_session_players
+                            INNER JOIN role_sessions ON role_session_players.id_role = role_sessions.id_role
+                            WHERE role_session_players.png = 1
+                            AND role_session_players.end IS NULL
+                            AND role_sessions.end IS NULL
+                            AND role_sessions.freezed IS NULL
                             AND role_sessions.location = ".$_SESSION['luogo'];
                 $result = gdrcd_query($query, 'result');
-                $pngInRole = [];
+                $pngNames = [];
 
-                while ($row = gdrcd_query($result, 'fetch')) $pngInRole[] = $row['pg_name'];
-                
+                while ($row = gdrcd_query($result, 'fetch')) $pngNames[] = $row['pg_name'];
+
+                // Livello di ciascun PNG: stesso metodo (getLevelPg su car2+car4+car6+car8,
+                // vedi custom_functions.inc.php) usato per il livello dei personaggi normali —
+                // cosi' il tetto della select "Livello attacco" nel pannello master (vedi
+                // newMasterPngAttack) resta coerente con qualunque cambio futuro della formula.
+                // Soglie precaricate una sola volta, non per ogni PNG (evita N+1 query).
+                $soglieRes = gdrcd_query("SELECT livello, soglia FROM gilda_soglie ORDER BY soglia ASC", 'result');
+                $soglie = [];
+                while ($row = gdrcd_query($soglieRes, 'fetch')) $soglie[] = $row;
+
+                $pngInRole = [];
+                foreach ($pngNames as $pngName) {
+                    $statsRow = gdrcd_query("SELECT car2, car4, car6, car8 FROM personaggio WHERE nome = '" . gdrcd_filter('in', $pngName) . "' LIMIT 1");
+                    $totStats = $statsRow ? (int)($statsRow['car2'] + $statsRow['car4'] + $statsRow['car6'] + $statsRow['car8']) : 0;
+                    $pngInRole[] = ['nome' => $pngName, 'livello' => getLevelPg($totStats, $soglie)];
+                }
+
                 echo json_encode([
                     'success' => true,
                     'message' => 'PNG recuperati con successo',

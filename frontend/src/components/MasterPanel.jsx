@@ -186,6 +186,10 @@ function CreaPng() {
 // ── Gestione PNG ──────────────────────────────────────────────────────────────
 
 function GestionePng() {
+    // Ogni voce: { nome, livello } — livello calcolato server-side con
+    // getLevelPg() sulle statistiche del PNG (custom_functions.inc.php),
+    // stesso metodo usato per il livello dei personaggi normali (vedi sotto,
+    // select "Livello attacco").
     const [pngList, setPngList]             = useState([])
     const [selectedPng, setSelectedPng]     = useState('')
     const [pgList, setPgList]               = useState([])
@@ -193,6 +197,11 @@ function GestionePng() {
     const [car, setCar]                     = useState('destrezza')
     const [selectedTargets, setTargets]     = useState([])
     const [damagePercent, setDamagePercent] = useState(100)
+    // Livello dell'attacco (determina il moltiplicatore di danno): di default 1,
+    // selezionabile fino al livello del PNG scelto — stessa select/stesso
+    // comportamento del campo "Livello Abilità" nel pannello GDR dei pg normali
+    // (ChatShell.jsx, aggiornaLivelli() in chat.js).
+    const [attackLevel, setAttackLevel]     = useState(1)
     const [sending, setSending]             = useState(false)
     const [sendMsg, setSendMsg]             = useState('')
 
@@ -203,10 +212,18 @@ function GestionePng() {
                 if (d.success) {
                     const list = d.png ?? []
                     setPngList(list)
-                    setSelectedPng(prev => (list.includes(prev) ? prev : (list[0] ?? '')))
+                    setSelectedPng(prev => (list.some(p => p.nome === prev) ? prev : (list[0]?.nome ?? '')))
                 }
             })
     }, [])
+
+    // PNG selezionato: livello massimo per la select attacco.
+    const selectedPngLevel = pngList.find(p => p.nome === selectedPng)?.livello ?? 1
+
+    // Cambio PNG → il livello scelto in precedenza potrebbe non esistere piu'
+    // per il nuovo PNG (livello massimo diverso): torna a 1, stesso
+    // comportamento di aggiornaLivelli() al cambio abilita'.
+    useEffect(() => { setAttackLevel(1) }, [selectedPng])
 
     useEffect(() => {
         loadPngList()
@@ -238,6 +255,7 @@ function GestionePng() {
                 pngCar:        car,
                 targets:       selectedTargets,
                 damagePercent,
+                level:         attackLevel,
             }),
         })
             .then(r => r.json())
@@ -259,7 +277,7 @@ function GestionePng() {
                         <label className="gdr-label">PNG</label>
                         <select className="gdr-select" value={selectedPng}
                             onChange={e => setSelectedPng(e.target.value)}>
-                            {pngList.map(p => <option key={p} value={p}>{p}</option>)}
+                            {pngList.map(p => <option key={p.nome} value={p.nome}>{p.nome}</option>)}
                         </select>
                     </div>
                     <div className="gdr-form-group">
@@ -275,6 +293,15 @@ function GestionePng() {
                             <option value="potere">Potere</option>
                             <option value="mente">Mente</option>
                             <option value="tempra">Tempra</option>
+                        </select>
+                    </div>
+                    <div className="gdr-form-group">
+                        <label className="gdr-label">Livello attacco</label>
+                        <select className="gdr-select" value={attackLevel}
+                            onChange={e => setAttackLevel(+e.target.value)}>
+                            {Array.from({ length: selectedPngLevel }, (_, i) => i + 1).map(lv => (
+                                <option key={lv} value={lv}>{lv}</option>
+                            ))}
                         </select>
                     </div>
                     <div className="gdr-form-group">
