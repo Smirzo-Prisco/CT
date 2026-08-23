@@ -30,9 +30,15 @@
     position: fixed;
     z-index: 1;
     width: min(300px, calc(100vw - 32px));
+    // Fallback rgba() (palette "public" di default) prima di ogni
+    // color-mix(): su browser senza supporto (Safari/iOS <16.2, es. iOS
+    // 15.4) l'intera dichiarazione viene scartata dal parser, non solo il
+    // valore.
+    background: linear-gradient(160deg, rgba(22, 27, 53, .95), rgba(8, 9, 26, .97));
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) 95%, transparent),
         color-mix(in srgb, var(--ink-deep) 97%, transparent));
+    border: 1px solid rgba(218, 168, 50, .4);
     border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
     border-radius: 14px;
     padding: 14px 16px;
@@ -105,6 +111,7 @@
 
 .ct-onboarding__back {
     background: transparent;
+    border: 1px solid rgba(218, 168, 50, .35);
     border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
     color: var(--text);
 }
@@ -126,6 +133,7 @@
     border-radius: 50%;
     background: var(--gold);
     color: var(--ink-deep);
+    border: 2px solid rgba(8, 9, 26, .4);
     border: 2px solid color-mix(in srgb, var(--ink-deep) 40%, transparent);
     font-size: 15px;
     font-weight: 800;

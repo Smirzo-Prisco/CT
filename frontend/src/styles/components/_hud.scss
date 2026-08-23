@@ -30,7 +30,6 @@ body {
     --ink-light: #161b35;
     --gold: #daa832;
     --gold-deep: #c4922a;
-    --gold-soft: color-mix(in srgb, var(--gold) calc(.16 * 100%), transparent);
     --text: #e8e4da;
     --muted: #7a8499;
     --danger: #ff6b6b;
@@ -103,10 +102,19 @@ body[data-palette="public"] {
     // Solo la topbar si sposta: il contenuto della pagina (#maincontent,
     // altezza fissa in _layout.scss) resta dov'e', non e' legato a questo.
     height: 60px;
+    // Fallback in rgba() (palette "public" di default) prima di ogni
+    // color-mix() qui sotto: su browser che non lo capiscono (Safari/iOS
+    // <16.2, es. iOS 15.4) l'intera dichiarazione con color-mix() viene
+    // scartata, non solo il valore — senza fallback l'elemento resta senza
+    // sfondo/bordo invece di un colore leggermente "sbagliato" (palette
+    // diversa da quella scelta) ma comunque presente.
+    background: linear-gradient(180deg, rgba(22, 27, 53, .85), rgba(8, 9, 26, .92));
     background: linear-gradient(180deg,
         color-mix(in srgb, var(--ink-light) calc(.85 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.92 * 100%), transparent));
+    border-bottom: 1px solid rgba(218, 168, 50, .35);
     border-bottom: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
+    box-shadow: 0 1px 30px -2px rgba(218, 168, 50, .2);
     box-shadow: 0 1px 30px -2px color-mix(in srgb, var(--gold) calc(.2 * 100%), transparent);
     backdrop-filter: blur(14px);
     opacity: .4;
@@ -155,6 +163,7 @@ body[data-palette="public"] {
     width: 173px; height: 173px;
     border-radius: 50%;
     background: radial-gradient(circle, var(--ink-light), var(--ink) 70%);
+    border: 2px solid rgba(218, 168, 50, .4);
     border: 2px solid color-mix(in srgb, var(--gold) calc(.4 * 100%), transparent);
     color: var(--gold);
     font-size: 46px;
@@ -187,6 +196,7 @@ body[data-palette="public"] {
         position: absolute;
         inset: -8px;
         border-radius: 50%;
+        border: 1px dashed rgba(218, 168, 50, .3);
         border: 1px dashed color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
         animation: ct-hud-spin 40s linear infinite;
     }
@@ -585,6 +595,7 @@ body[data-palette="public"] {
     // blocca altrove cosi' non copre piu' il click sulla miniatura sotto.
     pointer-events: auto;
     background: var(--ink);
+    border: 1px solid rgba(218, 168, 50, .3);
     border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
     color: var(--text);
     display: grid;
@@ -641,9 +652,11 @@ body[data-palette="public"] {
 .ct-hud__panel {
     position: absolute;
     top: 34px;
+    background: linear-gradient(160deg, rgba(22, 27, 53, .85), rgba(8, 9, 26, .85));
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.85 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.85 * 100%), transparent));
+    border: 1px solid rgba(218, 168, 50, .25);
     border: 1px solid color-mix(in srgb, var(--gold) calc(.25 * 100%), transparent);
     border-radius: var(--radius);
     backdrop-filter: blur(10px);
@@ -743,8 +756,20 @@ body[data-palette="public"] {
     font-weight: 800;
     padding: 3px 9px;
     border-radius: 999px;
-    background: var(--gold-soft);
+    // Non var(--gold-soft) qui: quella custom property e' definita altrove
+    // (vedi sopra) come color-mix(), quindi su un browser senza supporto la
+    // sua sostituzione fallisce e la proprieta' consumante diventa "invalid
+    // at computed-value time" — che calcola al valore INIZIALE (trasparente),
+    // non al valore di un'eventuale dichiarazione precedente nella stessa
+    // regola (a differenza di un color-mix() usato DIRETTAMENTE in una
+    // proprieta', dove un browser che non riconosce la sintassi scarta
+    // l'intera dichiarazione a livello di parser, lasciando in vigore quella
+    // precedente). Per questo qui color-mix() e' scritto per esteso, non
+    // tramite la custom property, cosi' il trucco del fallback funziona.
+    background: rgba(218, 168, 50, .16);
+    background: color-mix(in srgb, var(--gold) calc(.16 * 100%), transparent);
     color: var(--gold);
+    border: 1px solid rgba(218, 168, 50, .4);
     border: 1px solid color-mix(in srgb, var(--gold) calc(.4 * 100%), transparent);
 }
 
@@ -754,6 +779,7 @@ body[data-palette="public"] {
     gap: 10px;
     margin-top: 10px;
     padding-top: 10px;
+    border-top: 1px solid rgba(218, 168, 50, .15);
     border-top: 1px solid color-mix(in srgb, var(--gold) calc(.15 * 100%), transparent);
 }
 .ct-hud__vital {
@@ -806,6 +832,7 @@ body[data-palette="public"] {
     font-size: 16px;
     display: grid;
     place-items: center;
+    box-shadow: 0 6px 22px -6px rgba(218, 168, 50, .5);
     box-shadow: 0 6px 22px -6px color-mix(in srgb, var(--gold) calc(.5 * 100%), transparent);
     z-index: 2;
 }
@@ -813,6 +840,7 @@ body[data-palette="public"] {
     position: absolute;
     inset: -8px;
     border-radius: 50%;
+    border: 1px dashed rgba(218, 168, 50, .45);
     border: 1px dashed color-mix(in srgb, var(--gold) calc(.45 * 100%), transparent);
     animation: ct-hud-spin 16s linear infinite;
 }
@@ -893,6 +921,7 @@ body[data-palette="public"] {
 // :focus-within a fare da equivalente, la chat resterebbe illeggibile a
 // meno di toccare per forza l'input.
 .ct-hud__popover--chatoff {
+    background: linear-gradient(160deg, rgba(22, 27, 53, .02), rgba(8, 9, 26, .03));
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.02 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.03 * 100%), transparent));
@@ -900,6 +929,7 @@ body[data-palette="public"] {
     transition: background .2s ease;
 
     &:hover, &:focus-within {
+        background: linear-gradient(160deg, rgba(22, 27, 53, .92), rgba(8, 9, 26, .92));
         background: linear-gradient(160deg,
             color-mix(in srgb, var(--ink-light) calc(.92 * 100%), transparent),
             color-mix(in srgb, var(--ink-deep) calc(.92 * 100%), transparent));
@@ -976,9 +1006,11 @@ body[data-palette="public"] {
 }
 
 .ct-hud__desc-modal {
+    background: linear-gradient(160deg, rgba(22, 27, 53, .97), rgba(8, 9, 26, .98));
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.97 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.98 * 100%), transparent));
+    border: 1px solid rgba(218, 168, 50, .3);
     border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
     border-radius: var(--radius);
     width: 420px;
@@ -995,6 +1027,7 @@ body[data-palette="public"] {
     align-items: center;
     justify-content: space-between;
     padding: 14px 18px;
+    border-bottom: 1px solid rgba(218, 168, 50, .25);
     border-bottom: 1px solid color-mix(in srgb, var(--gold) calc(.25 * 100%), transparent);
     font-size: 17px;
     font-weight: 700;
@@ -1125,6 +1158,7 @@ body[data-palette="public"] {
         max-height: 55vh;
         overflow-y: auto;
         background: linear-gradient(160deg, var(--ink-light), var(--ink-deep));
+        border-top: 1px solid rgba(218, 168, 50, .35);
         border-top: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
         border-radius: 20px 20px 0 0;
         padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
@@ -1161,6 +1195,7 @@ body[data-palette="public"] {
         max-height: 55vh;
         overflow-y: auto;
         background: linear-gradient(160deg, var(--ink-light), var(--ink-deep));
+        border-top: 1px solid rgba(218, 168, 50, .35);
         border-top: 1px solid color-mix(in srgb, var(--gold) calc(.35 * 100%), transparent);
         border-radius: 20px 20px 0 0;
         padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
