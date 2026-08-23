@@ -1956,7 +1956,12 @@ function getDefenceCar($attack_car, $target) {
         case 'forza':
         case 'destrezza':
         case 'potere': return array('nome' => 'destrezza', 'car' => $pg['car2'], 'punti' => $pg['salute'], 'punti_max' => $pg['salute_max'] ?? 100, 'type' => 'salute');
-        // Se l'attacco è con Mente, ritorno Tempra, i punti su Tempra e i punti integrità del bersaglio
+        // Se l'attacco è con Mente, ritorno Tempra, i punti su Tempra e i punti integrità del bersaglio.
+        // 'type' qui resta 'integrità' CON accento (non il nome colonna, che è integrita
+        // senza accento): elaboratePrint() confronta esplicitamente su questa stringa
+        // accentata per etichettare "INT" vs "PS" nel riepilogo turno (vedi commento li').
+        // Chi invece userebbe questo valore come nome di colonna in una query diretta
+        // (registraDurata) deve convertirlo esplicitamente, non usarlo cosi' com'e'.
         case 'mente': return array('nome' => 'tempra', 'car' => $pg['car6'], 'punti' => $pg['integrita'], 'punti_max' => $pg['integrita_max'] ?? 100, 'type' => 'integrità');
         default: return null;
     }
@@ -2265,8 +2270,14 @@ function registraDurata($type, $punti, $danno, $pg, $id_role) {
     $turni = 0;
     $msg = '';
 
-    // Se parliamo di integrità ed è compresa tra 60 e 20, registro la durata in base al danno provocato
+    // Se parliamo di integrità ed è compresa tra 60 e 20, registro la durata in base al danno provocato.
+    // $type qui arriva 'integrità' CON accento (vedi getDefenceCar) — usato per il confronto e
+    // nei messaggi, ma NON è il nome reale della colonna: role_durations.type deve contenere
+    // 'integrita' (senza accento, colColn = $col sotto), altrimenti checkSkillEffect()/scaloPunti()
+    // lo useranno cosi' com'e' in "SELECT $type FROM personaggio" — colonna inesistente, fatal
+    // error (visto in produzione: "Unknown column 'integrit…' in field list").
     if($type === 'integrità') {
+        $col = 'integrita';
         if ($salute < 20) return ['turni' => 0, 'msg' => "L'$type di $pg è troppo bassa per subire gli effetti della skill."];
         if ($salute < 60) {
             // Calcolo i turni in base al danno provocato
@@ -2279,8 +2290,8 @@ function registraDurata($type, $punti, $danno, $pg, $id_role) {
             // Elimino eventuali durate ancora attive per evitare sovrapposizioni
             gdrcd_query("DELETE FROM role_durations WHERE pg_name = '$pg'");
 
-            // Registro la durata della skill in base al danno provocato
-            gdrcd_query("INSERT INTO role_durations (id_role, pg_name, duration, current_turn, `type`) VALUES ($id_role, '$pg', $turni, 0, '$type')");
+            // Registro la durata della skill in base al danno provocato (nome colonna, non il label)
+            gdrcd_query("INSERT INTO role_durations (id_role, pg_name, duration, current_turn, `type`) VALUES ($id_role, '$pg', $turni, 0, '$col')");
 
             $msg = "A causa del danno subito $pg perderà 5 punti $type per i prossimi $turni turni.";
         }
@@ -2297,23 +2308,30 @@ function checkSkillEffect($pg, $location) {
     $checkPg = gdrcd_query("SELECT * FROM role_durations WHERE pg_name = '$pg'", 'result');
     if ($checkPg && gdrcd_query($checkPg, 'num_rows') > 0) {
         $duration = gdrcd_query($checkPg, 'fetch');
-        $type = $duration['type'];
+        // Nome reale della colonna (integrita, senza accento — vedi registraDurata()), usato
+        // sia per leggere/scalare i punti sia come chiave di role_durations.type. Il label
+        // accentato qui sotto è solo per i messaggi in chat, mai per una query diretta:
+        // l'unico caso attuale è sempre 'integrita' (le durate esistono solo per attacchi
+        // mentali), ma il label resta esplicito per non tornare a interpolare $type nei
+        // messaggi se un domani si aggiungesse un altro tipo di durata.
+        $type  = $duration['type'];
+        $label = $type === 'integrita' ? 'Integrità' : ucfirst($type);
 
         // Se la salute del pg è sotto i 20, cancello ogni effetto di durata ancora attivo, altrimenti continuo a scalare i punti
         $salute = gdrcd_query("SELECT $type FROM personaggio WHERE nome = '$pg'")[$type];
         if ($salute < 20) {
             gdrcd_query("DELETE FROM role_durations WHERE pg_name = '$pg'");
-            chatInsertMessage($location, 'System', NULL, "Essendo sceso sotto i 20 punti $type, $pg smette di subire gli effetti della skill in corso", 'N');
+            chatInsertMessage($location, 'System', NULL, "Essendo sceso sotto i 20 punti $label, $pg smette di subire gli effetti della skill in corso", 'N');
         } elseif ($duration['current_turn'] < $duration['duration']) {
             // Se la durata è ancora in corso, scalare i punti al pg e aggiornare il turno corrente
             scaloPunti($pg, $damage, $type);
             gdrcd_query("UPDATE role_durations SET current_turn = (current_turn + 1) WHERE pg_name = '$pg'");
-            chatInsertMessage($location, 'System', NULL, "$pg subisce gli effetti della skill in corso e perde $damage punti $type", 'N');
+            chatInsertMessage($location, 'System', NULL, "$pg subisce gli effetti della skill in corso e perde $damage punti $label", 'N');
         } else {
             // Scalo gli effetti per l'ultima volta, poi cancello il record dal db
             scaloPunti($pg, $damage, $type);
             gdrcd_query("DELETE FROM role_durations WHERE pg_name = '$pg'");
-            chatInsertMessage($location, 'System', NULL, "$pg subisce gli effetti della skill in corso e perde $damage punti $type. Questo è l'ultimo turno, gli effetti della skill sono svaniti", 'N');
+            chatInsertMessage($location, 'System', NULL, "$pg subisce gli effetti della skill in corso e perde $damage punti $label. Questo è l'ultimo turno, gli effetti della skill sono svaniti", 'N');
         }
     }
 }
