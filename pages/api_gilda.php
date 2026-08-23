@@ -414,6 +414,62 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             else echo json_encode(['success' => false, 'message' => 'Errore durante l\'affiliazione']);
             break;
 
+        case 'detail':  // Dettaglio razza: gerarchia (ruolo) + elenco membri affiliati
+            $id_gilda = isset($_GET['id_gilda']) ? (int)$_GET['id_gilda'] : 0;
+            if ($id_gilda < 1 || $id_gilda > 7) {
+                echo json_encode(['success' => false, 'message' => 'Razza non valida']);
+                break;
+            }
+
+            $gilda_row = gdrcd_query("SELECT id_gilda, nome, immagine FROM gilda WHERE id_gilda = $id_gilda");
+            if (!$gilda_row) {
+                echo json_encode(['success' => false, 'message' => 'Razza non trovata']);
+                break;
+            }
+
+            $res_ruoli = gdrcd_query("SELECT id_ruolo, nome_ruolo, immagine, capo, livello
+                                       FROM ruolo
+                                       WHERE gilda = $id_gilda
+                                       ORDER BY livello DESC", 'result');
+            $ruoli = [];
+            while ($r = gdrcd_query($res_ruoli, 'fetch')) {
+                $ruoli[] = [
+                    'id_ruolo'   => (int)$r['id_ruolo'],
+                    'nome_ruolo' => (string)$r['nome_ruolo'],
+                    'immagine'   => $r['immagine'],
+                    'capo'       => (int)$r['capo'],
+                ];
+            }
+
+            $res_membri = gdrcd_query("SELECT p.nome AS personaggio, p.cognome, r.immagine, r.nome_ruolo, r.capo
+                                        FROM clgpersonaggioruolo cpr
+                                        JOIN ruolo r ON r.id_ruolo = cpr.id_ruolo
+                                        JOIN personaggio p ON p.nome = cpr.personaggio
+                                        WHERE r.gilda = $id_gilda
+                                        ORDER BY r.livello DESC, p.nome ASC", 'result');
+            $affiliati = [];
+            while ($m = gdrcd_query($res_membri, 'fetch')) {
+                $affiliati[] = [
+                    'personaggio' => (string)$m['personaggio'],
+                    'cognome'     => (string)$m['cognome'],
+                    'immagine'    => $m['immagine'],
+                    'nome_ruolo'  => (string)$m['nome_ruolo'],
+                    'capo'        => (int)$m['capo'],
+                ];
+            }
+
+            echo json_encode([
+                'success'   => true,
+                'gilda'     => [
+                    'id'       => (int)$gilda_row['id_gilda'],
+                    'nome'     => (string)$gilda_row['nome'],
+                    'immagine' => $gilda_row['immagine'],
+                ],
+                'ruoli'     => $ruoli,
+                'affiliati' => $affiliati,
+            ]);
+            break;
+
         case 'leaveGuild':  // Il PG abbandona la razza (reset completo)
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
