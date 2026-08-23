@@ -1601,6 +1601,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $pngCar        = $data['pngCar']       ?? 'destrezza';
             $targets       = is_array($data['targets'] ?? null) ? $data['targets'] : [];
             $damagePercent = max(1, min(100, (int)($data['damagePercent'] ?? 100)));
+            // Livello attacco: determina il moltiplicatore di danno (gilda_soglie.danno,
+            // vedi elaborateAttackTarget/calcolaDannoProvvisorio) — 1-8 come le soglie
+            // esistenti, scelto nel pannello master tramite la stessa select (e lo stesso
+            // metodo getLevelPg) usata per il livello abilita' dei personaggi normali.
+            $level         = max(1, min(8, (int)($data['level'] ?? 1)));
             $turn          = getTurn($id_role);
 
             if (!$pngName) { echo json_encode(['success' => false, 'message' => 'Nome PNG mancante']); exit; }
@@ -1626,7 +1631,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $dice  = max(1, $raw + $bonus);
 
                 $targetsStr = implode(',', array_map(fn($t) => gdrcd_filter('post', $t), $targets));
-                $id_fight   = fight($id_role, $pngName, $targetsStr, 0, 0, $pngCar, $dice, 'attacco PNG master', $damagePercent);
+                $id_fight   = fight($id_role, $pngName, $targetsStr, 0, $level, $pngCar, $dice, 'attacco PNG master', $damagePercent);
                 notifyAttackIncoming($id_role, $luogo, $pngName, $targets, $pngCar, $dice, $id_fight, $turn);
 
                 $rollMsg = "$pngName esegue un tiro totale di $pngCar di $dice ($raw/20 + $bonus)";
