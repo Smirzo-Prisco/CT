@@ -203,18 +203,14 @@
         align-items: center;
         gap: $space-3;
         text-align: center;
+        cursor: pointer;
         transition: all #{$transition-normal};
 
-        &:hover:not(.sr-guild-card--disabled) {
+        &:hover {
             border-color: rgba($palette-action, 0.5);
             background: rgba($palette-action, 0.05);
             transform: translateY(-2px);
             box-shadow: #{$shadow-md};
-        }
-
-        &--disabled {
-            opacity: 0.45;
-            cursor: default;
         }
 
         &--selected {
@@ -257,6 +253,8 @@
         i { color: #{$palette-action}; font-size: $text-2xs; }
     }
 
+    // sr-guild-locked usato anche da ScegliMestiere.jsx (LivelloCard, step 3
+    // avanzamento livello — "Esperienza insufficiente"), non solo qui.
     .sr-guild-locked {
         font-size: $text-xs;
         color: #{$color-text-muted};
