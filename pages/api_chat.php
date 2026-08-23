@@ -1631,7 +1631,11 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $dice  = max(1, $raw + $bonus);
 
                 $targetsStr = implode(',', array_map(fn($t) => gdrcd_filter('post', $t), $targets));
-                $id_fight   = fight($id_role, $pngName, $targetsStr, 0, $level, $pngCar, $dice, 'attacco PNG master', $damagePercent);
+                // $raw (dado_raw) va passato esplicitamente: senza, restava al default 0 di
+                // fight() e un 20 naturale non veniva mai riconosciuto come critico da
+                // elaborateAttackTarget() ($critico = dado_raw === 20), qualunque fosse il
+                // tiro reale — gli attacchi PNG del master non potevano mai colpire critico.
+                $id_fight   = fight($id_role, $pngName, $targetsStr, 0, $level, $pngCar, $dice, 'attacco PNG master', $damagePercent, $raw);
                 notifyAttackIncoming($id_role, $luogo, $pngName, $targets, $pngCar, $dice, $id_fight, $turn);
 
                 $rollMsg = "$pngName esegue un tiro totale di $pngCar di $dice ($raw/20 + $bonus)";
