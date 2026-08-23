@@ -846,9 +846,16 @@ body[data-palette="public"] {
 .ct-hud__popover {
     position: fixed;
     top: 100px;
+    // Fallback per browser senza color-mix() (Safari/iOS <16.2, es. iOS
+    // 15.4): la dichiarazione con color-mix() sotto, se non capita, viene
+    // scartata per intero (non solo il valore) — senza questa prima riga il
+    // popover resta senza sfondo, solo backdrop-filter:blur, con l'effetto
+    // di apparire semi-trasparente invece che sul navy scuro previsto.
+    background: rgba(10, 12, 26, .95);
     background: linear-gradient(160deg,
         color-mix(in srgb, var(--ink-light) calc(.95 * 100%), transparent),
         color-mix(in srgb, var(--ink-deep) calc(.96 * 100%), transparent));
+    border: 1px solid rgba(218, 168, 50, .3);
     border: 1px solid color-mix(in srgb, var(--gold) calc(.3 * 100%), transparent);
     border-radius: var(--radius);
     backdrop-filter: blur(12px);
