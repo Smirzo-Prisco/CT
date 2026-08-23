@@ -1018,6 +1018,10 @@ textarea.chat_textarea {
     max-height: 180px;
     overflow-y: auto;
     background: $palette-surface-raised;
+    // Fallback rgba() prima di ogni color-mix(): su browser senza supporto
+    // (Safari/iOS <16.2) l'intera dichiarazione con color-mix() viene
+    // scartata dal parser, non solo il valore.
+    border: 1px solid rgba(174, 231, 255, .3);
     border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
     border-radius: $radius-md;
     box-shadow: $shadow-lg;
@@ -1036,6 +1040,7 @@ textarea.chat_textarea {
     cursor: pointer;
 
     &:hover, &:focus {
+        background: rgba(174, 231, 255, .15);
         background: color-mix(in srgb, var(--color-primary) 15%, transparent);
     }
 }
@@ -1859,6 +1864,7 @@ img.chat_avatar_inline {
     width: 210px;
     max-width: calc(100vw - #{$space-4} * 2);
     background: linear-gradient(160deg, $palette-surface-raised, $color-bg);
+    border: 1px solid rgba(174, 231, 255, .35);
     border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
     border-radius: $radius-md;
     box-shadow: $shadow-lg;
@@ -1935,6 +1941,7 @@ img.chat_avatar_inline {
     margin-top: $space-1;
     padding: 2px $space-2;
     border-radius: 999px;
+    background: rgba(243, 156, 18, .25);
     background: color-mix(in srgb, var(--color-warning) 25%, transparent);
     color: $color-warning;
     font-weight: $font-weight-bold;
