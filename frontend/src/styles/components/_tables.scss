@@ -31,7 +31,15 @@ table.customTable {
     color: $palette-text;
     font-size: 12px;
     font-family: $font-base;
-    filter: drop-shadow(0 0 5px rgba(0,0,0,0.57));
+    // NIENTE filter qui (era drop-shadow): su Safari/iOS un filter forza un
+    // layer composito isolato per l'intero elemento, rasterizzato una volta
+    // sola — su una tabella alta e dinamica (Forum, presenti estesi: righe
+    // aggiunte dopo il primo paint via fetch) il layer non si ridisegna
+    // correttamente scorrendo, lasciando contenuto presente e cliccabile ma
+    // invisibile, sia scendendo oltre il punto iniziale sia tornando su.
+    // box-shadow non è un'alternativa valida: verrebbe comunque tagliato
+    // dall'overflow:hidden qui sopra (necessario per gli angoli arrotondati
+    // di thead/celle interne) essendo l'ombra fuori dal border-box.
 }
 
 table.customTable td,
