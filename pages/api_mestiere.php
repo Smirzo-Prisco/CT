@@ -71,7 +71,12 @@ switch ($op) {
                           || ($livello === 1 && $expMestiere >= 55);
                 $mestieri[] = [
                     'id'       => (int)$row['id_ruolo'],
-                    'nome'     => gdrcd_filter('out', (string)$row['nome_ruolo']),
+                    // Niente gdrcd_filter('out', ...): questo è JSON per React, che
+                    // renderizza come testo semplice (JSX auto-escape, non un HTML
+                    // raw) — un nome con accenti/apostrofo veniva mostrato con le
+                    // entità HTML letterali ("Ch&agrave;vez") invece del carattere
+                    // vero, perché nessuno le decodifica lato client.
+                    'nome'     => (string)$row['nome_ruolo'],
                     'immagine' => (string)$row['immagine'],
                     'mestiere' => (int)$row['mestiere'],
                     'livello'  => $livello,
@@ -118,7 +123,7 @@ switch ($op) {
             );
             $mestieri[] = [
                 'id'   => (int)$row['id_mestiere'],
-                'nome' => gdrcd_filter('out', (string)$row['nome']),
+                'nome' => (string)$row['nome'],
                 'n'    => (int)($numb['n'] ?? 0),
             ];
         }
@@ -126,7 +131,7 @@ switch ($op) {
 
         echo json_encode([
             'success'      => true,
-            'sezione'      => $sezione_desc ? gdrcd_filter('out', (string)$sezione_desc) : 'Mestieri',
+            'sezione'      => $sezione_desc ? (string)$sezione_desc : 'Mestieri',
             'mestieri'     => $mestieri,
         ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
         break;
@@ -162,7 +167,7 @@ switch ($op) {
         while ($r = gdrcd_query($rRuoli, 'fetch')) {
             $ruoli[] = [
                 'id_ruolo'   => (int)$r['id_ruolo'],
-                'nome_ruolo' => gdrcd_filter('out', (string)$r['nome_ruolo']),
+                'nome_ruolo' => (string)$r['nome_ruolo'],
                 'immagine'   => $r['immagine'] ? (string)$r['immagine'] : null,
                 'capo'       => (int)$r['capo'],
             ];
@@ -190,10 +195,10 @@ switch ($op) {
         $affiliati = [];
         while ($r = gdrcd_query($rAff, 'fetch')) {
             $affiliati[] = [
-                'personaggio' => gdrcd_filter('out', (string)$r['personaggio']),
-                'cognome'     => gdrcd_filter('out', (string)$r['cognome']),
+                'personaggio' => (string)$r['personaggio'],
+                'cognome'     => (string)$r['cognome'],
                 'immagine'    => $r['immagine'] ? (string)$r['immagine'] : null,
-                'nome_ruolo'  => gdrcd_filter('out', (string)$r['nome_ruolo']),
+                'nome_ruolo'  => (string)$r['nome_ruolo'],
                 'capo'        => (int)$r['capo'],
             ];
         }
@@ -201,7 +206,9 @@ switch ($op) {
 
         echo json_encode([
             'success'       => true,
-            'mestiere'      => ['id' => $id_mestiere, 'nome' => gdrcd_filter('out', (string)$mestiere_row['nome'])],
+            'mestiere'      => ['id' => $id_mestiere, 'nome' => (string)$mestiere_row['nome']],
+            // statuto invece resta gdrcd_filter('out')+gdrcd_bbcoder(): diventa HTML
+            // vero via dangerouslySetInnerHTML (ScegliMestiere.jsx), qui l'escaping serve.
             'statuto'       => !empty($mestiere_row['statuto']) ? gdrcd_bbcoder(gdrcd_filter('out', $mestiere_row['statuto'])) : null,
             'ruoli'         => $ruoli,
             'affiliati'     => $affiliati,
