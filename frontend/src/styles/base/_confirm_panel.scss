@@ -1,0 +1,50 @@
+// ============================================================
+// _confirm_panel.scss — Pannello di conferma per azioni distruttive
+// (es. "Abbandona Razza/Mestiere/Gilda"): titolo di avviso, elenco
+// conseguenze, azioni Conferma/Annulla.
+//
+// Classi globali (non scoped a nessuna pagina) — usate da ConfirmDanger.jsx,
+// riusato da ScegliRazza.jsx, ScegliMestiere.jsx, MiaGilda.jsx. Prima
+// duplicato come .sr-confirm* (scoped sotto #scegli-razza-app, solo per la
+// razza): estratto qui per essere riusabile ovunque senza duplicare lo
+// stile ad ogni nuovo "abbandona".
+// ============================================================
+@use '../tokens' as *;
+
+.danger-panel {
+    width: 100%;
+    max-width: 520px;
+    background: rgba($color-danger, 0.07);
+    border: 1px solid rgba($color-danger, 0.3);
+    border-radius: $radius-md;
+    padding: $space-5;
+    text-align: left;
+}
+
+.danger-panel-title {
+    font-weight: 700;
+    color: $color-danger;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-bottom: $space-4;
+    font-size: $text-lg;
+
+    i { flex-shrink: 0; }
+}
+
+.danger-panel-list {
+    padding-left: $space-5;
+    color: $color-text-secondary;
+    font-size: $text-md;
+    line-height: 1.8;
+    margin-bottom: $space-5;
+
+    strong { color: $color-text; }
+}
+
+.danger-panel-actions {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+}

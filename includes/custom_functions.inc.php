@@ -369,6 +369,25 @@ function isAdminMasterMod($session) {
 }
 
 /************* OGGETTI ******************************/
+
+/**
+ * Mappa mestiere -> tipo oggetto per i mestieri con un "negozio" dedicato: i
+ * loro dipendenti confermati possono vedere/modificare/assegnare gli oggetti
+ * di quel tipo (main.php?page=gestione_oggetti, canEditOggetto(),
+ * api_mestiere.php per il pulsante "Gestisci oggetti del mestiere").
+ * Unica fonte di verita' per questa associazione — prima duplicata in due
+ * switch identici (qui sotto e in gestione_oggetti.inc.php). Estendere qui
+ * per aggiungere altri mestieri con lo stesso meccanismo.
+ */
+function getTipoOggettoMestiere(int $idMestiere): ?int {
+    return match ($idMestiere) {
+        3       => 8,  // Shirokuro Magic Shop
+        4       => 9,  // Secret
+        1       => 10, // ICC
+        default => null,
+    };
+}
+
 function canEditOggetto($oggetto) {
     session_start();
 
@@ -382,13 +401,9 @@ function canEditOggetto($oggetto) {
 
     // Altri ruoli possono modificare solo oggetti del loro mestiere
     $mestiere = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome = '".$_SESSION['login']."'");
+    $tipo     = getTipoOggettoMestiere((int)($mestiere['id_mestiere'] ?? 0));
 
-    switch($mestiere['id_mestiere']) {
-        case 3: return $oggetto['tipo'] == 8; // Magic
-        case 4: return $oggetto['tipo'] == 9; // Secret
-        case 1: return $oggetto['tipo'] == 10; // ICC
-        default: return false;
-    }
+    return $tipo !== null && (int)$oggetto['tipo'] === $tipo;
 }
 
 function getFiltriCategoria($categoria) {

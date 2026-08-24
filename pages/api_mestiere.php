@@ -2,11 +2,19 @@
 /**
  * api_mestiere.php — Selezione e avanzamento mestiere del personaggio
  *
- * op=getState  — stato corrente (step 2 = scelta, step 3 = avanzamento)
- * op=list      — elenco mestieri veri con conteggio affiliati (step 2, vista elenco)
- * op=detail    — gerarchia/affiliati/statuto di un mestiere (step 2, vista dettaglio)
- * op=change    — sceglie il mestiere e lo conferma subito (step 2 -> step 3)
- * op=levelUp   — avanza di livello nel mestiere confermato (step 3)
+ * Nessun concetto di "step": il dettaglio di un mestiere (op=detail) è
+ * sempre raggiungibile per chiunque, confermato lì, altrove, o per niente —
+ * vedi ScegliMestiere.jsx. getState serve solo a dire al client DOVE il PG è
+ * confermato (se lo è), cosi' la sezione "Avanzamento" compare dentro al
+ * dettaglio del proprio mestiere invece che in una vista separata.
+ *
+ * op=getState  — mestiere confermato (se c'è) + ranghi raggiungibili
+ * op=list      — elenco mestieri veri con conteggio affiliati
+ * op=detail    — gerarchia/affiliati/statuto di un mestiere + stato del
+ *                personaggio che guarda (confermato qui/altrove, gestione oggetti)
+ * op=change    — sceglie il mestiere e lo conferma subito (rifiutato se già impiegato)
+ * op=levelUp   — avanza di livello nel mestiere confermato
+ * op=leave     — abbandona il mestiere confermato (reset completo)
  *
  * @author Crystal Tokyo Dev
  */
@@ -29,23 +37,24 @@ session_write_close();
 switch ($op) {
 
     // -------------------------------------------------------------------------
-    // getState — stato personaggio + lista mestieri per lo step corrente
+    // getState — stato personaggio: mestiere confermato (se c'e') + ranghi
+    // raggiungibili con relativo sblocco. La vista dettaglio (op=detail) e'
+    // sempre raggiungibile per qualunque mestiere, confermati o no (vedi
+    // ScegliMestiere.jsx): qui serve solo a dire AL CLIENT se e dove il PG e'
+    // gia' confermato, cosi' la sezione "Avanzamento" compare dentro al
+    // dettaglio del proprio mestiere invece che in una vista separata.
     // -------------------------------------------------------------------------
     case 'getState':
         $pg          = gdrcd_query("SELECT esperienza, esperienza_mestiere, id_mestiere, id_ruolo_mestiere FROM personaggio WHERE nome = '$login'");
         $exp         = (int)($pg['esperienza']          ?? 0);
         $expMestiere = (int)($pg['esperienza_mestiere'] ?? 0);
+        $idMestiere  = (int)($pg['id_mestiere']         ?? 0);
 
         $conferma       = gdrcd_query("SELECT conferma_mestiere, id_ruolo FROM clgpersonaggiomestiere WHERE personaggio = '$login'");
         $hasConferma    = $conferma && (int)$conferma['conferma_mestiere'] >= 1;
         $currentIdRuolo = $conferma ? (int)$conferma['id_ruolo'] : 0;
-        $step           = $hasConferma ? 3 : 2;
 
-        if ($step === 2) {
-            // Vista elenco/dettaglio spostata su op=list/op=detail (stesso
-            // linguaggio visivo e stesse query di servizi_mestieri.inc.php,
-            // vedi ScegliMestiere.jsx) — qui serve solo per instradare tra
-            // step 2 e step 3, non serve piu' costruire l'elenco mestieri.
+        if (!$hasConferma) {
             $mestieri = [];
         } else {
             $res = gdrcd_query(
@@ -88,10 +97,10 @@ switch ($op) {
 
         echo json_encode([
             'success'        => true,
-            'step'           => $step,
             'esperienza'     => $exp,
             'expMestiere'    => $expMestiere,
             'hasConferma'    => $hasConferma,
+            'idMestiere'     => $idMestiere,
             'currentIdRuolo' => $currentIdRuolo,
             'mestieri'       => $mestieri,
         ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
@@ -138,9 +147,12 @@ switch ($op) {
 
     // -------------------------------------------------------------------------
     // detail — gerarchia, affiliati confermati e statuto di un mestiere vero.
-    // Stesse query della vista dettaglio di servizi_mestieri.inc.php; in piu'
-    // calcola entry_id_ruolo (il ruolo di livello piu' basso, per il pulsante
-    // "Entra nel mestiere" lato client — vedi anche op=change).
+    // Sempre raggiungibile per chiunque, confermato altrove o no (vedi
+    // ScegliMestiere.jsx: non esistono piu' step separati). Stesse query
+    // della vista dettaglio di servizi_mestieri.inc.php; in piu' calcola
+    // entry_id_ruolo (il ruolo di livello piu' basso, per il pulsante "Entra
+    // nel mestiere" lato client — vedi anche op=change) e lo stato del
+    // personaggio che sta guardando (confermato qui/altrove, gestione oggetti).
     // -------------------------------------------------------------------------
     case 'detail':
         $id_mestiere = (int)($_GET['id_mestiere'] ?? 0);
@@ -153,6 +165,11 @@ switch ($op) {
             echo json_encode(['success' => false, 'message' => 'Mestiere non trovato']);
             exit;
         }
+
+        $pgViewer          = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome = '$login'");
+        $idMestiereViewer   = (int)($pgViewer['id_mestiere'] ?? 0);
+        $vieneConfermatoQui = $idMestiereViewer === $id_mestiere;
+        $tipoOggetto        = getTipoOggettoMestiere($id_mestiere);
 
         $rRuoli = gdrcd_query(
             "SELECT id_ruolo, nome_ruolo, immagine, stipendio, capo, livello_mestiere
@@ -205,19 +222,22 @@ switch ($op) {
         gdrcd_query($rAff, 'free');
 
         echo json_encode([
-            'success'       => true,
-            'mestiere'      => ['id' => $id_mestiere, 'nome' => (string)$mestiere_row['nome']],
+            'success'             => true,
+            'mestiere'            => ['id' => $id_mestiere, 'nome' => (string)$mestiere_row['nome']],
             // statuto invece resta gdrcd_filter('out')+gdrcd_bbcoder(): diventa HTML
             // vero via dangerouslySetInnerHTML (ScegliMestiere.jsx), qui l'escaping serve.
-            'statuto'       => !empty($mestiere_row['statuto']) ? gdrcd_bbcoder(gdrcd_filter('out', $mestiere_row['statuto'])) : null,
-            'ruoli'         => $ruoli,
-            'affiliati'     => $affiliati,
-            'entryIdRuolo'  => $entryId,
+            'statuto'             => !empty($mestiere_row['statuto']) ? gdrcd_bbcoder(gdrcd_filter('out', $mestiere_row['statuto'])) : null,
+            'ruoli'               => $ruoli,
+            'affiliati'           => $affiliati,
+            'entryIdRuolo'        => $entryId,
+            'vieneConfermatoQui'  => $vieneConfermatoQui,
+            'giaConfermatoAltrove' => $idMestiereViewer > 0 && !$vieneConfermatoQui,
+            'gestioneOggetti'     => $vieneConfermatoQui && $tipoOggetto !== null,
         ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
         break;
 
     // -------------------------------------------------------------------------
-    // change — sceglie il mestiere e lo conferma subito (step 2 -> step 3)
+    // change — sceglie il mestiere e lo conferma subito, se non gia' impiegato
     // -------------------------------------------------------------------------
     // Prima era un doppio passaggio (change poi pick, quest'ultimo bloccato
     // sotto i 10 px esperienza): lasciava per un tempo indefinito una riga in
@@ -237,6 +257,17 @@ switch ($op) {
             exit;
         }
 
+        // Prima era garantito lato client (il pulsante "Entra" viveva solo
+        // nello step 2, raggiungibile solo se non ancora confermati altrove):
+        // ora che il dettaglio e' sempre raggiungibile anche da chi ha gia'
+        // un mestiere, serve lo stesso controllo lato server di joinGuild()
+        // (api_gilda.php, "Entra nella razza").
+        $pgNow = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome = '$login'");
+        if ((int)($pgNow['id_mestiere'] ?? 0) !== 0) {
+            echo json_encode(['success' => false, 'message' => 'Sei già impiegato in un mestiere: abbandonalo per poterne scegliere un altro.']);
+            exit;
+        }
+
         $existing = gdrcd_query("SELECT id_ruolo FROM clgpersonaggiomestiere WHERE personaggio = '$login'", 'result');
         if (gdrcd_query($existing, 'num_rows') >= 1) {
             gdrcd_query("UPDATE clgpersonaggiomestiere SET id_ruolo = $idRuolo, conferma_mestiere = 1 WHERE personaggio = '$login'");
@@ -245,6 +276,16 @@ switch ($op) {
         }
         gdrcd_query($existing, 'free');
         gdrcd_query("UPDATE personaggio SET id_mestiere = $mestiere, id_ruolo_mestiere = $idRuolo WHERE nome = '$login'");
+
+        // Riapre la sessione (chiusa da session_write_close() in cima al file,
+        // per non bloccare richieste concorrenti) solo per aggiornare
+        // $_SESSION['mestiere'] — senza questo il PG dovrebbe uscire e
+        // rientrare per veder comparire, ad es., gli oggetti del proprio
+        // mestiere in gestione_oggetti.inc.php (vedi conversazione di
+        // progetto del 2026-08-24).
+        session_start();
+        $_SESSION['mestiere'] = $mestiere;
+        session_write_close();
 
         $titolo = gdrcd_filter('in', "Conferma nel mestiere - $login");
         $msg    = gdrcd_filter('in', "Il personaggio [b]{$login}[/b] ha appena confermato il ruolo nel mestiere");
@@ -301,6 +342,38 @@ switch ($op) {
         gdrcd_query("UPDATE personaggio SET id_mestiere = $mestiere, id_ruolo_mestiere = $idRuolo WHERE nome = '$login'");
 
         echo json_encode(['success' => true, 'message' => 'Livello mestiere aggiornato']);
+        break;
+
+    // -------------------------------------------------------------------------
+    // leave — abbandona il mestiere confermato (reset completo lato mestiere)
+    // -------------------------------------------------------------------------
+    // Prima non esisteva alcun percorso self-service per lasciare un mestiere
+    // vero: MiaGilda.jsx/servizi_adm_mestieri.inc.php coprono solo le gilde
+    // giocatore, e op=fire su servizi_adm_mestieri.inc.php e' raggiungibile
+    // solo da capo/staff/admin, mai da un dipendente qualunque (vedi
+    // conversazione di progetto del 2026-08-24). Stesso pattern di leaveGuild()
+    // in api_gilda.php ("Abbandona Razza"): azzera anche esperienza_mestiere,
+    // a differenza del "fire" amministrativo di un singolo membro — coerente
+    // con la cancellazione dell'intero mestiere (api_mestieri.php), che la
+    // azzera per tutti i membri coinvolti.
+    case 'leave':
+        $pgNow = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome = '$login'");
+        if ((int)($pgNow['id_mestiere'] ?? 0) === 0) {
+            echo json_encode(['success' => false, 'message' => 'Non sei impiegato in alcun mestiere']);
+            exit;
+        }
+
+        gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE personaggio = '$login'");
+        gdrcd_query("UPDATE personaggio SET id_mestiere = 0, id_ruolo_mestiere = 1, esperienza_mestiere = 0 WHERE nome = '$login'");
+
+        // Stesso motivo di op=change: riapre la sessione solo per aggiornare
+        // $_SESSION['mestiere'], altrimenti resterebbe con il vecchio
+        // mestiere fino al prossimo login.
+        session_start();
+        $_SESSION['mestiere'] = 0;
+        session_write_close();
+
+        echo json_encode(['success' => true, 'message' => 'Hai abbandonato il tuo mestiere.']);
         break;
 
     default:

@@ -4,8 +4,7 @@
 // ============================================================
 @use '../tokens' as *;
 
-#scegli-razza-app,
-#scegli-mestiere-app {
+#scegli-razza-app {
     font-family: $font-base;
     background-color: #{$palette-surface-dark};
     color: #{$color-text};
@@ -128,46 +127,6 @@
         max-width: 480px;
     }
 
-    // ── Pannello di conferma abbandono ────────────────────────
-
-    .sr-confirm {
-        width: 100%;
-        max-width: 520px;
-        background: rgba($palette-danger, 0.07);
-        border: 1px solid rgba($palette-danger, 0.3);
-        border-radius: #{$radius-md};
-        padding: $space-5;
-        text-align: left;
-    }
-
-    .sr-confirm-title {
-        font-weight: 700;
-        color: #{$color-danger};
-        display: flex;
-        align-items: center;
-        gap: $space-2;
-        margin-bottom: $space-4;
-        font-size: $text-lg;
-
-        i { flex-shrink: 0; }
-    }
-
-    .sr-confirm-list {
-        padding-left: $space-5;
-        color: #{$color-text-secondary};
-        font-size: $text-md;
-        line-height: 1.8;
-        margin-bottom: $space-5;
-
-        strong { color: #{$color-text}; }
-    }
-
-    .sr-confirm-actions {
-        display: flex;
-        gap: $space-3;
-        flex-wrap: wrap;
-    }
-
     // ── Sezione griglia razze ─────────────────────────────────
 
     .sr-section {
@@ -253,16 +212,6 @@
         i { color: #{$palette-action}; font-size: $text-2xs; }
     }
 
-    // sr-guild-locked usato anche da ScegliMestiere.jsx (LivelloCard, step 3
-    // avanzamento livello — "Esperienza insufficiente"), non solo qui.
-    .sr-guild-locked {
-        font-size: $text-xs;
-        color: #{$color-text-muted};
-        display: flex;
-        align-items: center;
-        gap: $space-1;
-    }
-
     // ── Bottoni ───────────────────────────────────────────────
 
     .sr-btn {
@@ -276,34 +225,6 @@
         font-size: $text-sm;
         font-weight: 600;
         transition: all #{$transition-fast};
-
-        &--join {
-            background: #{$palette-action};
-            color: #{$palette-surface-deep};
-            border-color: #{$palette-action};
-            &:hover { background: #{$palette-action-hover}; }
-        }
-
-        &--leave {
-            background: transparent;
-            color: #{$color-danger};
-            border-color: rgba($palette-danger, 0.5);
-            &:hover { background: rgba($palette-danger, 0.1); }
-        }
-
-        &--danger {
-            background: #{$palette-danger};
-            color: #fff;
-            border-color: #{$palette-danger};
-            &:hover { filter: brightness(1.1); }
-        }
-
-        &--cancel {
-            background: transparent;
-            color: #{$color-text-secondary};
-            border-color: #{$palette-surface-hover};
-            &:hover { border-color: #{$color-text-secondary}; color: #{$color-text}; }
-        }
 
         &--statute {
             background: transparent;

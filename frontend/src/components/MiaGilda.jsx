@@ -10,16 +10,23 @@
  *  - ha una gilda ed è il capo (ruolo_mestiere.capo=1) → editor completo
  *  - ha una gilda ma non è il capo → vista di sola lettura
  *
- * L'assunzione/espulsione dei membri resta per ora su
- * main.php?page=servizi_adm_mestieri (non ancora migrata).
+ * L'assunzione/espulsione dei membri (dal capo verso altri) resta per ora su
+ * main.php?page=servizi_adm_mestieri (non ancora migrata). L'auto-abbandono
+ * di un membro semplice (op=lascia_gilda) è invece qui, inline, con lo
+ * stesso stile/componente di "Abbandona Razza" — vedi ConfirmDanger.jsx.
+ * Prima c'era solo un link verso servizi_adm_mestieri.inc.php, che però
+ * nega l'accesso a chiunque non sia capo/staff/admin: per un membro
+ * semplice non ha mai funzionato (vedi conversazione di progetto del
+ * 2026-08-24).
  *
  * Stili: _servizi_mestieri.scss (classi .sm-*), stesso linguaggio visivo
  * di servizi_mestieri.inc.php / ServiziGilde.jsx — nessuno stile custom qui.
  *
- * API: pages/api_mestieri.php (op=mia_gilda, crea_gilda, save, save_ruolo, delete_ruolo)
+ * API: pages/api_mestieri.php (op=mia_gilda, crea_gilda, lascia_gilda, save, save_ruolo, delete_ruolo)
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import ConfirmDanger from './ConfirmDanger'
 
 const API = '/pages/api_mestieri.php'
 
@@ -283,7 +290,21 @@ function GildaEsistente({ stato, onChange }) {
     const [nuovoGrado, setNuovoGrado] = useState({ nome: '', livello_mestiere: 3, stipendio: 0 })
     const [nuovoGradoFile, setNuovoGradoFile] = useState(null)
     const [nuovoGradoSaving, setNuovoGradoSaving] = useState(false)
+    const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false)
+    const [leaving, setLeaving] = useState(false)
+    const [leaveError, setLeaveError] = useState(null)
     const capoRole = ruoliLocali.find(r => r.capo == 1)
+
+    const abbandonaGilda = async () => {
+        setLeaving(true)
+        setLeaveError(null)
+        const r = await fetch(`${API}?op=lascia_gilda`, { method: 'POST' })
+        if (r.status === 403) { window.CT.navigate('main.php?page=mappaclick'); return }
+        const d = await r.json()
+        setLeaving(false)
+        if (d.success) onChange()
+        else setLeaveError(d.message ?? 'Errore nell\'abbandono')
+    }
 
     const salvaGilda = async (e) => {
         e.preventDefault()
@@ -364,7 +385,25 @@ function GildaEsistente({ stato, onChange }) {
                     </section>
                 )}
 
-                <p><a href={`main.php?page=servizi_adm_mestieri&id_mestiere=${mestiere.id_mestiere}`}>Abbandona / gestisci affiliazione</a></p>
+                <section className="sm-section">
+                    {leaveError && <p className="sm-error-text">{leaveError}</p>}
+                    {!confirmLeaveOpen ? (
+                        <button type="button" className="btn btn--danger-ghost" onClick={() => setConfirmLeaveOpen(true)}>
+                            <i className="fas fa-door-open" /> Abbandona Gilda
+                        </button>
+                    ) : (
+                        <ConfirmDanger
+                            titolo="Sei sicuro di voler abbandonare questa gilda?"
+                            confermaLabel="Confermo, abbandono"
+                            busy={leaving}
+                            onConfirm={abbandonaGilda}
+                            onCancel={() => setConfirmLeaveOpen(false)}
+                        >
+                            <li>Perderai il tuo <strong>ruolo</strong> nella gilda</li>
+                            <li>Per rientrare dovrai essere <strong>riassunto</strong> dal capo</li>
+                        </ConfirmDanger>
+                    )}
+                </section>
             </>
         )
     }
