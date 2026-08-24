@@ -67,6 +67,9 @@ define('COLLO', 9);
 /*Stati della mappa*/
 define('INVIAGGIO', -1);
 
+/* Oggetto generico evocato dalle skill con sottotipo 'evoca_arma' (vedi chat_functions.inc.php) */
+define('ID_OGGETTO_ARMA_EVOCATA', 90000);
+
 /**
  * Livelli di filtro html
  */

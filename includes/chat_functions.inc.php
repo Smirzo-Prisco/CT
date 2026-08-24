@@ -918,6 +918,15 @@ function endRoleSession($location) {
         $rid = (int)$role_row['id_role'];
         gdrcd_query("DELETE FROM role_item_buffs WHERE id_role = $rid");
         gdrcd_query("DELETE FROM role_skill_buffs WHERE id_role = $rid");
+
+        // Rimuove l'arma generica evocata (sottotipo 'evoca_arma') da tutti i pg reali
+        // di questa role: era utilizzabile solo per la durata del combattimento appena concluso.
+        $armaEvocataPlayers = gdrcd_query("SELECT pg_name FROM role_session_players WHERE id_role = $rid AND png = 0", 'result');
+        while ($p = gdrcd_query($armaEvocataPlayers, 'fetch')) {
+            $pg_f = gdrcd_filter('in', $p['pg_name']);
+            gdrcd_query("DELETE FROM clgpersonaggiooggetto WHERE nome = '$pg_f' AND id_oggetto = " . ID_OGGETTO_ARMA_EVOCATA);
+        }
+
         // Bug storico: il filtro era solo su `location`, senza id_role — ogni
         // chiusura sovrascriveva end=NOW() su TUTTE le giocate passate nella
         // stessa stanza (che viene riusata nel tempo), non solo su quella

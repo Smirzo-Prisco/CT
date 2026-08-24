@@ -199,6 +199,15 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             assegnaPuntoShin($luogo, $login); // Assegna il punto Shin se necessario
             gestionePoliziaAutomatica($luogo); // Gestione della polizia automatica
             gestisciSkillTemporanea($skill, $login); // Gestisci le skill temporanee
+
+            // Skill che evocano un'arma generica utilizzabile per il resto della role: la aggiungo
+            // (o rinnovo) nell'inventario del pg al lancio, indipendentemente dall'esito dell'attacco.
+            // Rimossa automaticamente a fine role in endRoleSession().
+            if ($skill_info['sottotipo'] === 'evoca_arma') {
+                gdrcd_query("INSERT INTO clgpersonaggiooggetto (nome, id_oggetto, cariche, posizione)
+                    VALUES ('$login', " . ID_OGGETTO_ARMA_EVOCATA . ", -1, " . ZAINO . ")
+                    ON DUPLICATE KEY UPDATE cariche = -1, posizione = " . ZAINO);
+            }
             /**************************** FINE  AZIONI   ************************************************/
 
             // Qualsiasi lancio (attacco, scudo, talento) chiude automaticamente il turno.
