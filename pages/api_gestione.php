@@ -184,7 +184,22 @@ switch ($op) {
             }
         }
 
-        // 9. OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
+        // 9. OGGETTI — admin e master (i dipendenti di un mestiere con negozio,
+        // es. Shirokuro Magic Shop, hanno un punto d'ingresso proprio: il
+        // pulsante "Gestisci oggetti del mestiere" nel dettaglio del proprio
+        // mestiere — ScegliMestiere.jsx, non passa da qui). Vedi conversazione
+        // di progetto del 2026-08-24: card riabilitata dopo il redesign di
+        // gestione_oggetti.inc.php (vista ristretta per i soli dipendenti).
+        if ($perms['admin'] || $perms['master']) {
+            $voci = [['label' => 'Oggetti', 'url' => 'gestione.php?page=gestione_oggetti']];
+            if ($perms['admin']) {
+                $voci[] = ['label' => 'Ricarica oggetto', 'url' => 'gestione.php?page=oggetto_ricarica'];
+                $voci[] = ['label' => 'Tipi di oggetto', 'url' => 'gestione.php?page=gestione_tipi&types=items'];
+            }
+            $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
+        }
+
+        // 10. OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
         // tenute solo per interventi occasionali dello staff
         if ($perms['admin']) {
             $menu[] = ['key' => 'old', 'label' => 'OLD', 'icon' => 'fa-box-archive', 'voci' => [
@@ -194,18 +209,6 @@ switch ($op) {
                 ['label' => 'Razze e spiriti',       'url' => 'gestione.php?page=gestione_razze'],
             ]];
         }
-
-        // OGGETTI
-        /*
-        if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic']) {
-            $voci = [['label' => 'Oggetti', 'url' => 'gestione.php?page=gestione_oggetti']];
-            if ($perms['admin'] || $perms['moderatore'] || $perms['master'] || $perms['magic'])
-                $voci[] = ['label' => 'Ricarica oggetto', 'url' => 'gestione.php?page=oggetto_ricarica'];
-            if ($perms['admin'])
-                $voci[] = ['label' => 'Tipi di oggetto', 'url' => 'gestione.php?page=gestione_tipi&types=items'];
-            $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
-        }
-        */
 
         echo json_encode([
             'success'   => true,
