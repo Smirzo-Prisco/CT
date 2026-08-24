@@ -695,6 +695,35 @@ function getExp_rPg($esperienza) {
     return (int)$punti;
 }
 
+/**
+ * Azzera un personaggio: statistiche riportate a 10, shin spesi/da spendere/
+ * skill consolidati in un unico pool spendibile, skill e talenti acquistati
+ * rimossi (Talento/Skill temporanea esclusi), storico spese cancellato.
+ * Stessa identica logica del pulsante "Reset punti" in Gestione > Gestione
+ * Personaggi (api_personaggio.php op=resetPg) — centralizzata qui per poter
+ * essere richiamata anche dalla cancellazione soft (api_account.php
+ * op=delete), senza duplicare la query in due file.
+ * $nomeFiltrato va gia' passato da gdrcd_filter('in', ...) a cura del chiamante
+ * (stessa convenzione delle altre funzioni PERSONAGGI in questo file).
+ */
+function resetPuntiPg(string $nomeFiltrato): bool {
+    $punti        = getPuntiPg($nomeFiltrato);
+    $esperienza_r = getExp_rPg($punti['esperienza']);
+    $tot_shin     = $punti['shin_to_spend'] + $punti['tot_shin'] + $punti['punto_skill'];
+
+    $ok1 = gdrcd_query("UPDATE personaggio SET
+                    esperienza_r = $esperienza_r,
+                    car0 = 10, car2 = 10, car4 = 10, car6 = 10, car8 = 10,
+                    car1 = 0, car3 = 0, car5 = 0, car7 = 0, car9 = 0,
+                    shin = $tot_shin,
+                    punto_skill = 0.0, esperienza_s = 0
+                WHERE nome = '$nomeFiltrato'");
+    $ok2 = gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE nome = '$nomeFiltrato' AND id_abilita NOT IN (SELECT id_abilita FROM abilita WHERE tipo IN ('Talento', 'Skill temporanea'))");
+    $ok3 = gdrcd_query("DELETE FROM log_spesa WHERE nome = '$nomeFiltrato'");
+
+    return (bool)$ok1 && (bool)$ok2 && (bool)$ok3;
+}
+
 function getTotStatsPg($pg) {
     $where = $pg != '' ? " WHERE nome = '$pg'" : '';
 

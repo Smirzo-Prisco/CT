@@ -150,35 +150,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             $errors = [];
 
-            // Ciclo tutti i nomi dei pg
+            // Ciclo tutti i nomi dei pg — logica di reset in resetPuntiPg()
+            // (custom_functions.inc.php), condivisa anche con la cancellazione
+            // soft (api_account.php op=delete).
             foreach ($pgs as $pg) {
                 $nome   = $pg["nome"];
                 $nome_f = gdrcd_filter('in', $nome);
 
-                // Recupero tutti i punti del pg
-                $punti        = getPuntiPg($nome_f); // Tutti i punti
-                $esperienza_r = getExp_rPg($punti['esperienza']); // Punti esperienza
-                $tot_shin     = ($punti['shin_to_spend'] + $punti['tot_shin'] + $punti['punto_skill']); // Punti shin
-                /*
-                - UPDATE
-                    - Esperienza residua calcolata in base agli scaglioni di guadagno dell'esperienza
-                    - Riporto le statistiche a 10
-                    - Elimino gli shin assegnati alle statistiche
-                    - Assegna gli shin calcolati su quelli assegnati alle statistiche + quelli ancora da spendere + quelli assegnati alle skill
-                    - Elimino gli shin assegnati alle skill
-                */
-                $query_updatePg = gdrcd_query("UPDATE personaggio SET
-                                esperienza_r = $esperienza_r,
-                                car0 = 10, car2 = 10, car4 = 10, car6 = 10, car8 = 10,
-                                car1 = 0, car3 = 0, car5 = 0, car7 = 0, car9 = 0,
-                                shin = $tot_shin,
-                                punto_skill = 0.0, esperienza_s = 0
-                            WHERE nome = '$nome_f'");
-                // Elimino le skill e i talenti assegnati al pg e i log che tengono traccia dell'assegnazione degli shin
-                $query_deleteSkillTalentiPg = gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE nome = '$nome_f' AND id_abilita NOT IN (SELECT id_abilita FROM abilita WHERE tipo IN ('Talento', 'Skill temporanea'))");
-                $query_deleteLogPg = gdrcd_query("DELETE from log_spesa WHERE nome = '$nome_f'");
-
-                if (!$query_updatePg || !$query_deleteSkillTalentiPg || !$query_deleteLogPg) $errors[] = $nome;
+                if (!resetPuntiPg($nome_f)) $errors[] = $nome;
             }
 
             if (empty($errors)) echo json_encode(['success' => true,  'message' => 'Personaggi azzerati con successo']);

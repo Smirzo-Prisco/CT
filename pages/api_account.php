@@ -3,8 +3,12 @@
  * api_account.php — Cancellazione/ripristino account
  *
  * Endpoint:
- *   POST ?op=delete  — auto-cancellazione (verifica email + password): permessi=-1
- *   POST ?op=restore — ripristina un account cancellato: permessi=0 (solo staff)
+ *   POST ?op=delete  — auto-cancellazione (verifica email + password): resetPuntiPg()
+ *                      + permessi=-1. Non tocca razza/gilda/mestiere (restano
+ *                      collegati, vedi conversazione di progetto del 2026-08-24).
+ *   POST ?op=restore — ripristina un account cancellato: permessi=0 (solo staff).
+ *                      Il reset di op=delete non viene annullato: il personaggio
+ *                      torna attivo ma resta azzerato.
  *
  * op=restore è chiamato da ripristinaPg() in includes/personaggio.js, l'icona
  * di ripristino nella colonna Azioni di gestione_personaggio.inc.php (filtro
@@ -69,6 +73,13 @@ switch ($op) {
             echo json_encode(['success' => false, 'message' => 'Email o password errate.']);
             exit;
         }
+
+        // Stesso azzeramento del pulsante "Reset punti" in Gestione > Gestione
+        // Personaggi (statistiche a 10, shin/skill/talenti/storico spese
+        // ripuliti) — vedi resetPuntiPg() in custom_functions.inc.php. Prima
+        // di marcare permessi=DELETED cosi' l'operazione resta un unico
+        // passaggio coerente anche in caso di errore a meta'.
+        resetPuntiPg($login);
 
         gdrcd_query("UPDATE personaggio SET permessi = " . DELETED . " WHERE nome = '$login'");
         gdrcd_query(
