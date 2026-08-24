@@ -16,19 +16,33 @@ $azioni_permessi = [
 // cosi' un nuovo mestiere con "negozio" va aggiunto in un solo punto.
 $mestiere = getTipoOggettoMestiere((int)($_SESSION['mestiere'] ?? 0)) ?? -1;
 
-// filtri
-$filtro = (isset($_POST['filtro']) ? $_POST['filtro'] : 'tutti');
+// Vista completa (admin/master): tutti gli oggetti, con filtri e pulsante
+// "Nuovo". Vista ristretta (dipendenti di un mestiere con un "negozio", es.
+// Shirokuro Magic Shop): solo gli oggetti del proprio tipo, niente filtri
+// ne' "Nuovo" — la colonna Azioni resta comunque governata dai permessi
+// come prima (vedi conversazione di progetto del 2026-08-24).
+$vistaCompleta = hasPermesso($_SESSION, ['admin', 'master']);
 
-switch($filtro) {
-    case 'creati_da_me': $where = "WHERE creatore = '".$_SESSION['login']."'"; break;
-    case 'tutti': $where = ''; break;
-    default: $_POST[$filtro] != '' ? $where = "WHERE $filtro = '".$_POST[$filtro]."'" : '';
+if ($vistaCompleta) {
+    // filtri
+    $filtro = (isset($_POST['filtro']) ? $_POST['filtro'] : 'tutti');
+
+    switch($filtro) {
+        case 'creati_da_me': $where = "WHERE creatore = '".$_SESSION['login']."'"; break;
+        case 'tutti': $where = ''; break;
+        default: $_POST[$filtro] != '' ? $where = "WHERE $filtro = '".$_POST[$filtro]."'" : '';
+    }
+} else {
+    // Vista ristretta: solo gli oggetti del proprio tipo (-1 se non si
+    // appartiene a un mestiere con negozio, che non corrisponde a nessuna riga)
+    $filtro = 'tutti';
+    $where  = "WHERE tipo = " . (int)$mestiere;
 }
 
 // FINE filtri
 $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tipo
                         FROM oggetto
-                        LEFT JOIN codtipooggetto ON oggetto.tipo = codtipooggetto.cod_tipo 
+                        LEFT JOIN codtipooggetto ON oggetto.tipo = codtipooggetto.cod_tipo
                         $where
                         ORDER BY nome ASC", 'result');
 ?>
@@ -47,9 +61,18 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             <div><i class="fa-solid fa-check-circle"></i><span>Approva</span></div>
         </div>
     </div>
+    <?php if ($vistaCompleta): ?>
+    <!-- Azzera filtri: form a se' stante (non nel <form> dei radio sotto) per
+         evitare che i due controlli, condividendo name="filtro", finiscano
+         per sovrascriversi a vicenda nel POST -->
+    <form method="post" action="main.php?page=gestione_oggetti" style="display:inline;">
+        <input type="hidden" name="filtro" value="tutti">
+        <button type="submit" class="btn-action" title="Azzera filtri">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+        </button>
+    </form>
     <!-- Filtri -->
     <form method="post" class="filter-form" action="main.php?page=gestione_oggetti">
-        <label><input type="radio" name="filtro" value="tutti" <?= $filtro=='tutti'?'checked':'' ?> onchange="this.form.submit()">Tutti</label>
         <label><input type="radio" name="filtro" value="creati_da_me" <?= $filtro=='creati_da_me'?'checked':'' ?> onchange="this.form.submit()">Creati da me</label>
         <input id="filtroTipoObj" type="radio" name="filtro" value="" onchange="this.form.submit()" <?= $filtro=='tipo'?'checked':'' ?> style="display:none;">
         <input id="filtroCategoriaObj" type="radio" name="filtro" value="" onchange="this.form.submit()" <?= $filtro=='categoria'?'checked':'' ?> style="display:none;">
@@ -69,8 +92,9 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
             echo '</select>';
         ?>
     </form>
+    <?php endif; ?>
     <?php if (hasPermesso($_SESSION, $azioni_permessi['crea'])): ?>
-	    <a href="javascript:apriModaleCreazioneObj()" class="back">➕ Nuovo</a> <!-- ELIMINARE: main.php?page=oggetto_aggiungi e main.php?page=gestione_mercato -->
+	    <a href="javascript:apriModaleCreazioneObj()" class="btn-action" title="Nuovo oggetto"><i class="fa-solid fa-plus"></i></a> <!-- ELIMINARE: main.php?page=oggetto_aggiungi e main.php?page=gestione_mercato -->
     <?php endif; ?>
 </div>
 
