@@ -94,7 +94,15 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
     </form>
     <?php endif; ?>
     <?php if (hasPermesso($_SESSION, $azioni_permessi['crea'])): ?>
-	    <a href="javascript:apriModaleCreazioneObj()" class="btn-action" title="Nuovo oggetto"><i class="fa-solid fa-plus"></i></a> <!-- ELIMINARE: main.php?page=oggetto_aggiungi e main.php?page=gestione_mercato -->
+        <!-- <button onclick>, non <a href="javascript:...">: il listener globale
+             in main.jsx intercetta il click su OGNI <a> il cui href inizia per
+             "javascript:" e chiama preventDefault() per bloccare la navigazione
+             a "#" — ma per un href javascript: quello e' anche l'azione che
+             esegue lo script, quindi il preventDefault() lo blocca del tutto
+             (nessun errore, il pulsante sembra semplicemente non fare nulla).
+             Stesso pattern gia' usato per Modifica/Elimina/Assegna qui sotto,
+             che infatti funzionano. Vedi conversazione di progetto del 2026-08-24. -->
+        <button type="button" class="btn-action" title="Nuovo oggetto" onclick="apriModaleCreazioneObj()"><i class="fa-solid fa-plus"></i></button> <!-- ELIMINARE: main.php?page=oggetto_aggiungi e main.php?page=gestione_mercato -->
     <?php endif; ?>
 </div>
 
