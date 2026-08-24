@@ -1,22 +1,28 @@
 /**
- * ScegliMestiere.jsx — Selezione e avanzamento del mestiere del personaggio.
+ * ScegliMestiere.jsx — Selezione, dettaglio e avanzamento del mestiere.
  *
- * Step 2 (nessun mestiere confermato): stesso linguaggio visivo/meccanismo di
- * servizi_mestieri.inc.php (classi .sm-*, mai duplicate qui — vedi
- * _servizi_mestieri.scss, gia' riusato anche da MiaGilda.jsx) — elenco
- * mestieri con contatore affiliati, click apre il dettaglio (gerarchia +
- * lavoratori + statuto). Unica differenza da servizi_mestieri: qui compare
- * anche il pulsante "Entra nel mestiere", assente li' perche' quella pagina
- * e' solo consultiva. Vedi conversazione di progetto del 2026-08-12.
- *
- * Step 3 (mestiere gia' confermato): invariato, avanzamento di livello.
+ * Nessun concetto di "step" (non più due viste separate scelta/avanzamento):
+ * il dettaglio di un mestiere è sempre raggiungibile da chiunque, confermato
+ * lì, confermato altrove, o senza mestiere — stesso principio già in vigore
+ * per ScegliRazza.jsx (razza) e servizi_mestieri.inc.php (gilde giocatore).
+ * Stesso linguaggio visivo/meccanismo di servizi_mestieri.inc.php (classi
+ * .sm-*, mai duplicate qui — vedi _servizi_mestieri.scss, già riusato anche
+ * da MiaGilda.jsx): elenco mestieri con contatore affiliati, click apre il
+ * dettaglio (gerarchia + lavoratori + statuto). Se il personaggio è già
+ * confermato in QUEL mestiere, il dettaglio mostra anche, in cima,
+ * "Avanzamento" (i ranghi raggiungibili) e — per i mestieri con un negozio
+ * dedicato, oggi solo Magic Shop — "Gestisci oggetti del mestiere". Vedi
+ * conversazione di progetto del 2026-08-24.
  *
  * API: pages/api_mestiere.php
- *   op=getState  GET  → { step, esperienza, expMestiere, hasConferma, mestieri (solo step 3) }
- *   op=list      GET  → { sezione, mestieri: [{id, nome, n}] }               — step 2, elenco
- *   op=detail    GET  → { mestiere, ruoli, affiliati, statuto, entryIdRuolo } — step 2, dettaglio
- *   op=change    POST { id_record, mestiere } → sceglie e conferma il mestiere (step 2 -> 3)
- *   op=levelUp   POST { id_record, mestiere } → avanza livello (step 3)
+ *   op=getState  GET  → { hasConferma, idMestiere, esperienza, expMestiere,
+ *                          currentIdRuolo, mestieri (ranghi raggiungibili, solo se confermato) }
+ *   op=list      GET  → { sezione, mestieri: [{id, nome, n}] }
+ *   op=detail    GET  → { mestiere, ruoli, affiliati, statuto, entryIdRuolo,
+ *                          vieneConfermatoQui, giaConfermatoAltrove, gestioneOggetti }
+ *   op=change    POST { id_record, mestiere } → sceglie e conferma il mestiere
+ *                (rifiutato lato server se già impiegato altrove)
+ *   op=levelUp   POST { id_record, mestiere } → avanza livello nel proprio mestiere
  *
  * @author Crystal Tokyo Dev
  */
@@ -36,7 +42,7 @@ function leggiIdMestiere() {
     return Number.isFinite(v) && v > 0 ? v : null
 }
 
-// ── STEP 2 — elenco mestieri ─────────────────────────────────────────────────
+// ── Elenco mestieri ───────────────────────────────────────────────────────
 
 function MestiereList({ onOpen }) {
     const [data, setData]   = useState(null)
@@ -90,9 +96,71 @@ function MestiereList({ onOpen }) {
     )
 }
 
-// ── STEP 2 — dettaglio mestiere (gerarchia + lavoratori + statuto + entra) ──
+// ── Avanzamento — solo se il personaggio è confermato in questo mestiere ──
+// Auto-contenuta (fetch/stato/errore propri), stesso principio di "entra"
+// dentro MestiereDetail: ogni azione gestisce la propria richiesta/feedback,
+// nessuno stato di livello va tenuto/passato dal componente principale.
 
-function MestiereDetail({ id, onBack, onJoined }) {
+function AvanzamentoSection({ expMestiere, ranghi, onChanged }) {
+    const [busyId, setBusyId] = useState(null)
+    const [err, setErr]       = useState(null)
+
+    const avanza = async (r) => {
+        setBusyId(r.id)
+        setErr(null)
+        try {
+            const res = await fetch(`${API}?op=levelUp`, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ id_record: r.id, mestiere: r.mestiere }),
+            })
+            const d = await res.json()
+            setBusyId(null)
+            if (d.success) onChanged()
+            else setErr(d.message ?? 'Errore nell\'avanzamento')
+        } catch (e) {
+            setBusyId(null)
+            setErr(e.message)
+        }
+    }
+
+    return (
+        <section className="sm-section">
+            <div className="sm-section-title">
+                <i className="fas fa-star" /> Avanzamento
+            </div>
+            <p className="sm-field-note" style={{ marginBottom: 12 }}>
+                {expMestiere > 55 ? 'Hai raggiunto il massimo dei punti mestiere.' : `Hai ${expMestiere} punti mestiere.`}
+            </p>
+            {err && <p className="sm-error-text">{err}</p>}
+            {ranghi.length > 0 && (
+                <div className="sm-rank-list">
+                    {ranghi.map(r => (
+                        <div className="sm-rank-item" key={r.id}>
+                            <div className="sm-img-box">
+                                {r.immagine
+                                    ? <img src={`imgs/mestieri/${r.immagine}`} alt={r.nome} />
+                                    : <i className="fas fa-medal" />}
+                            </div>
+                            <span className="sm-rank-name">{r.nome}</span>
+                            {r.unlocked
+                                ? <button type="button" className="btn btn--primary" disabled={busyId === r.id}
+                                          onClick={() => avanza(r)}>
+                                      <i className="fas fa-arrow-up" /> {busyId === r.id ? 'Avanzo…' : 'Avanza'}
+                                  </button>
+                                : <span className="sm-field-note">Esperienza insufficiente</span>}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </section>
+    )
+}
+
+// ── Dettaglio mestiere (gerarchia + lavoratori + statuto + avanzamento +
+// gestione oggetti + entra) ────────────────────────────────────────────────
+
+function MestiereDetail({ id, avanzamento, onBack, onJoined, onChanged }) {
     const [data, setData]     = useState(null)
     const [error, setError]   = useState(null)
     const [joining, setJoining] = useState(false)
@@ -156,6 +224,22 @@ function MestiereDetail({ id, onBack, onJoined }) {
 
             {data && (
                 <>
+                    {data.vieneConfermatoQui && avanzamento && (
+                        <AvanzamentoSection
+                            expMestiere={avanzamento.expMestiere}
+                            ranghi={avanzamento.ranghi}
+                            onChanged={onChanged}
+                        />
+                    )}
+
+                    {data.gestioneOggetti && (
+                        <section className="sm-section">
+                            <a href="main.php?page=gestione_oggetti" className="btn btn--secondary">
+                                <i className="fas fa-boxes-stacked" /> Gestisci oggetti del mestiere
+                            </a>
+                        </section>
+                    )}
+
                     {data.ruoli.length > 0 && (
                         <section className="sm-section">
                             <div className="sm-section-title">
@@ -215,9 +299,15 @@ function MestiereDetail({ id, onBack, onJoined }) {
 
                     <section className="sm-section">
                         {joinError && <p className="sm-error-text">{joinError}</p>}
-                        <button type="button" className="btn btn--primary" onClick={entra} disabled={joining || !data.entryIdRuolo}>
-                            <i className="fas fa-check-circle" /> {joining ? 'Conferma in corso…' : 'Entra nel mestiere'}
-                        </button>
+                        {data.vieneConfermatoQui ? (
+                            <p className="sm-field-note">Fai già parte di questo mestiere.</p>
+                        ) : data.giaConfermatoAltrove ? (
+                            <p className="sm-field-note">Sei già impiegato in un altro mestiere: abbandonalo per poterne scegliere uno nuovo.</p>
+                        ) : (
+                            <button type="button" className="btn btn--primary" onClick={entra} disabled={joining || !data.entryIdRuolo}>
+                                <i className="fas fa-check-circle" /> {joining ? 'Conferma in corso…' : 'Entra nel mestiere'}
+                            </button>
+                        )}
                     </section>
                 </>
             )}
@@ -225,60 +315,22 @@ function MestiereDetail({ id, onBack, onJoined }) {
     )
 }
 
-// ── STEP 3 — avanzamento livello (invariato rispetto a prima) ───────────────
-
-function LivelloCard({ mestiere, onAction }) {
-    return (
-        <div className="sr-guild-card">
-            <div className="sr-guild-img">
-                <img src={`imgs/mestieri/${mestiere.immagine}`} alt={mestiere.nome} />
-            </div>
-            <div className="sr-guild-name">{mestiere.nome}</div>
-
-            {mestiere.unlocked
-                ? <button
-                    className="sr-btn sr-btn--join"
-                    onClick={() => onAction('levelUp', { id_record: mestiere.id, mestiere: mestiere.mestiere })}
-                  >
-                    <i className="fas fa-arrow-up"></i> Avanza
-                  </button>
-                : <span className="sr-guild-locked">
-                    <i className="fas fa-lock"></i> Esperienza insufficiente
-                  </span>
-            }
-
-            <button
-                className="sr-btn sr-btn--statute"
-                onClick={() => navigate(`main.php?page=statuto_main&id2=${mestiere.mestiere}`)}
-            >
-                <i className="fas fa-book-open"></i> Statuto
-            </button>
-        </div>
-    )
-}
-
-// ── Componente principale ─────────────────────────────────────────────────────
+// ── Componente principale ─────────────────────────────────────────────────
 
 export default function ScegliMestiere() {
-    const [step, setStep]           = useState(null) // null = non ancora caricato
-    const [levelState, setLevelState] = useState(null) // payload getState per lo step 3
-    const [error, setError]         = useState(null)
-    const [msg, setMsg]             = useState(null)
+    const [state, setState] = useState(null) // risposta di op=getState
+    const [error, setError] = useState(null)
     const [idMestiere, setIdMestiere] = useState(leggiIdMestiere)
 
-    const fetchStep = useCallback(() => {
+    const fetchState = useCallback(() => {
         setError(null)
         fetch(`${API}?op=getState`)
             .then(r => r.json())
-            .then(d => {
-                if (!d.success) { setError(d.message ?? 'Errore sconosciuto'); return }
-                setStep(d.step)
-                if (d.step === 3) setLevelState(d)
-            })
+            .then(d => { if (d.success) setState(d); else setError(d.message ?? 'Errore sconosciuto') })
             .catch(e => setError(e.message))
     }, [])
 
-    useEffect(() => { fetchStep() }, [fetchStep])
+    useEffect(() => { fetchState() }, [fetchState])
 
     // Torna/avanti del browser sull'URL con ?id_mestiere=X (impostato da
     // openDetail sotto) — la pagina rimane la stessa (page=scegli_mestiere),
@@ -300,23 +352,7 @@ export default function ScegliMestiere() {
     }
     const onJoined = () => {
         closeDetail()
-        fetchStep()
-    }
-
-    const doLevelAction = async (op, payload) => {
-        setMsg(null)
-        try {
-            const res  = await fetch(`${API}?op=${op}`, {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify(payload),
-            })
-            const data = await res.json()
-            setMsg({ type: data.success ? 'ok' : 'err', text: data.message })
-            if (data.success) fetchStep()
-        } catch (e) {
-            setMsg({ type: 'err', text: e.message })
-        }
+        fetchState()
     }
 
     if (error) return (
@@ -328,7 +364,7 @@ export default function ScegliMestiere() {
         </div>
     )
 
-    if (step === null) return (
+    if (state === null) return (
         <div className="sm-page">
             <div className="sm-state">
                 <i className="fas fa-spinner fa-spin" />
@@ -337,69 +373,29 @@ export default function ScegliMestiere() {
         </div>
     )
 
-    // ── STEP 2: scelta mestiere — stesso linguaggio visivo di servizi_mestieri.inc.php ──
-    if (step === 2) {
-        return (
-            <div className="sm-page">
-                {idMestiere === null ? (
-                    <>
-                        <div className="sm-header sm-header--list">
-                            <button type="button" className="sm-back" onClick={() => navigate('main.php?page=uffici')}>
-                                <i className="fas fa-arrow-left" /> Uffici
-                            </button>
-                            <h2 className="sm-title">
-                                <i className="fas fa-briefcase" /> Scegli mestiere
-                            </h2>
-                        </div>
-                        <MestiereList onOpen={openDetail} />
-                    </>
-                ) : (
-                    <MestiereDetail id={idMestiere} onBack={closeDetail} onJoined={onJoined} />
-                )}
-            </div>
-        )
-    }
-
-    // ── STEP 3: avanzamento livello (invariato) ──────────────────────────
-    const { expMestiere, mestieri } = levelState
     return (
-        <div id="scegli-mestiere-app">
-
-            <header className="sr-header">
-                <button className="sr-back" onClick={() => navigate('main.php?page=uffici')}>
-                    <i className="fas fa-arrow-left"></i> Uffici
-                </button>
-                <div className="sr-title">
-                    <h1><i className="fas fa-briefcase"></i> Scegli Mestiere</h1>
-                    <p className="sr-subtitle">Avanza nel tuo mestiere</p>
-                </div>
-            </header>
-
-            <div className="sr-msg sr-msg--ok">
-                <i className="fas fa-star"></i>
-                {expMestiere > 55
-                    ? 'Hai raggiunto il massimo dei punti mestiere.'
-                    : `Hai ${expMestiere} punti mestiere`}
-            </div>
-
-            {msg && (
-                <div className={`sr-msg sr-msg--${msg.type}`}>
-                    <i className={`fas fa-${msg.type === 'ok' ? 'check-circle' : 'exclamation-circle'}`}></i>
-                    {msg.text}
-                </div>
+        <div className="sm-page">
+            {idMestiere === null ? (
+                <>
+                    <div className="sm-header sm-header--list">
+                        <button type="button" className="sm-back" onClick={() => navigate('main.php?page=uffici')}>
+                            <i className="fas fa-arrow-left" /> Uffici
+                        </button>
+                        <h2 className="sm-title">
+                            <i className="fas fa-briefcase" /> Scegli mestiere
+                        </h2>
+                    </div>
+                    <MestiereList onOpen={openDetail} />
+                </>
+            ) : (
+                <MestiereDetail
+                    id={idMestiere}
+                    avanzamento={state.idMestiere === idMestiere ? { expMestiere: state.expMestiere, ranghi: state.mestieri } : null}
+                    onBack={closeDetail}
+                    onJoined={onJoined}
+                    onChanged={fetchState}
+                />
             )}
-
-            <section className="sr-section">
-                <h2 className="sr-section-title">
-                    <i className="fas fa-list"></i> Livelli disponibili
-                </h2>
-                <div className="sr-grid">
-                    {mestieri.map(m => (
-                        <LivelloCard key={m.id} mestiere={m} onAction={doLevelAction} />
-                    ))}
-                </div>
-            </section>
-
         </div>
     )
 }

@@ -11,11 +11,10 @@ $azioni_permessi = [
     'approva'  => ['admin']
 ];
 
-// Ognuno di questi mestieri corrisponde a un tipo di oggetto
-switch ($_SESSION['mestiere']) {
-  case 3: $mestiere = 8; break; // Magic
-  default: $mestiere = -1; break; // Nessun mestiere
-}
+// Ognuno di questi mestieri corrisponde a un tipo di oggetto — mappa
+// centralizzata in getTipoOggettoMestiere() (custom_functions.inc.php),
+// cosi' un nuovo mestiere con "negozio" va aggiunto in un solo punto.
+$mestiere = getTipoOggettoMestiere((int)($_SESSION['mestiere'] ?? 0)) ?? -1;
 
 // filtri
 $filtro = (isset($_POST['filtro']) ? $_POST['filtro'] : 'tutti');

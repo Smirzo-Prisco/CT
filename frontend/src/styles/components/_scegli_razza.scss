@@ -4,8 +4,7 @@
 // ============================================================
 @use '../tokens' as *;
 
-#scegli-razza-app,
-#scegli-mestiere-app {
+#scegli-razza-app {
     font-family: $font-base;
     background-color: #{$palette-surface-dark};
     color: #{$color-text};
@@ -253,16 +252,6 @@
         i { color: #{$palette-action}; font-size: $text-2xs; }
     }
 
-    // sr-guild-locked usato anche da ScegliMestiere.jsx (LivelloCard, step 3
-    // avanzamento livello — "Esperienza insufficiente"), non solo qui.
-    .sr-guild-locked {
-        font-size: $text-xs;
-        color: #{$color-text-muted};
-        display: flex;
-        align-items: center;
-        gap: $space-1;
-    }
-
     // ── Bottoni ───────────────────────────────────────────────
 
     .sr-btn {
@@ -276,13 +265,6 @@
         font-size: $text-sm;
         font-weight: 600;
         transition: all #{$transition-fast};
-
-        &--join {
-            background: #{$palette-action};
-            color: #{$palette-surface-deep};
-            border-color: #{$palette-action};
-            &:hover { background: #{$palette-action-hover}; }
-        }
 
         &--leave {
             background: transparent;
