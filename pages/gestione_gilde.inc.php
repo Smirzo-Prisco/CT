@@ -476,6 +476,19 @@ if($_SESSION['admin'] != 1) {
                     </div>
                 </div>
 
+                <!-- Opzioni avanzate per skill di attacco -->
+                <div id="attaccoSection" class="form-group" style="display: none;">
+                    <label>Opzioni avanzate per skill di attacco:</label>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="" id="nessuna_opzione_attacco" checked>
+                        <label for="nessuna_opzione_attacco">Nessuna opzione</label>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" name="sottotipo" value="evoca_arma" id="evoca_arma">
+                        <label for="evoca_arma">Al lancio, evoca un'arma generica utilizzabile dal personaggio per il resto della role.</label>
+                    </div>
+                </div>
+
                 <!-- Pulsanti -->
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeGuildModal('skill')">Annulla</button>

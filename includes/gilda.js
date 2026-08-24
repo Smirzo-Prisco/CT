@@ -249,7 +249,11 @@ function editSkill(id) {
             if (sottoEl) {
                 sottoEl.checked = true;
             } else {
-                const nessId = data.tipo === 'Mentale' ? 'nessuna_opzione_mentale' : 'nessuna_opzione';
+                const tipiMentali = ['Mentale base', 'Mentale media', 'Mentale avanzata', 'Mentale di attacco'];
+                const tipiAttacco = ['Attacco base', 'Attacco medio', 'Attacco avanzato'];
+                let nessId = 'nessuna_opzione';
+                if (tipiMentali.includes(data.tipo)) nessId = 'nessuna_opzione_mentale';
+                else if (tipiAttacco.includes(data.tipo)) nessId = 'nessuna_opzione_attacco';
                 const nessEl = document.getElementById(nessId);
                 if (nessEl) nessEl.checked = true;
             }
@@ -344,6 +348,12 @@ function checkSkillType() {
     const tipiMentali = ['Mentale base', 'Mentale media', 'Mentale avanzata', 'Mentale di attacco'];
     if (tipiMentali.includes(tipoSkill.value)) mentaleSection.style.display = 'block';
     else mentaleSection.style.display = 'none';
+
+    // Tipi di skill di attacco
+    const attaccoSection = document.getElementById('attaccoSection');
+    const tipiAttacco = ['Attacco base', 'Attacco medio', 'Attacco avanzato'];
+    if (tipiAttacco.includes(tipoSkill.value)) attaccoSection.style.display = 'block';
+    else attaccoSection.style.display = 'none';
 
 }
 
