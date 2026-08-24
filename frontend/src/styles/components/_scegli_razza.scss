@@ -127,46 +127,6 @@
         max-width: 480px;
     }
 
-    // ── Pannello di conferma abbandono ────────────────────────
-
-    .sr-confirm {
-        width: 100%;
-        max-width: 520px;
-        background: rgba($palette-danger, 0.07);
-        border: 1px solid rgba($palette-danger, 0.3);
-        border-radius: #{$radius-md};
-        padding: $space-5;
-        text-align: left;
-    }
-
-    .sr-confirm-title {
-        font-weight: 700;
-        color: #{$color-danger};
-        display: flex;
-        align-items: center;
-        gap: $space-2;
-        margin-bottom: $space-4;
-        font-size: $text-lg;
-
-        i { flex-shrink: 0; }
-    }
-
-    .sr-confirm-list {
-        padding-left: $space-5;
-        color: #{$color-text-secondary};
-        font-size: $text-md;
-        line-height: 1.8;
-        margin-bottom: $space-5;
-
-        strong { color: #{$color-text}; }
-    }
-
-    .sr-confirm-actions {
-        display: flex;
-        gap: $space-3;
-        flex-wrap: wrap;
-    }
-
     // ── Sezione griglia razze ─────────────────────────────────
 
     .sr-section {
@@ -265,27 +225,6 @@
         font-size: $text-sm;
         font-weight: 600;
         transition: all #{$transition-fast};
-
-        &--leave {
-            background: transparent;
-            color: #{$color-danger};
-            border-color: rgba($palette-danger, 0.5);
-            &:hover { background: rgba($palette-danger, 0.1); }
-        }
-
-        &--danger {
-            background: #{$palette-danger};
-            color: #fff;
-            border-color: #{$palette-danger};
-            &:hover { filter: brightness(1.1); }
-        }
-
-        &--cancel {
-            background: transparent;
-            color: #{$color-text-secondary};
-            border-color: #{$palette-surface-hover};
-            &:hover { border-color: #{$color-text-secondary}; color: #{$color-text}; }
-        }
 
         &--statute {
             background: transparent;

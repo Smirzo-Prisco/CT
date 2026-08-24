@@ -5,8 +5,10 @@
  *
  * op = list | get | tipi | save | hide | save_ruolo | delete_ruolo | delete_mestiere
  *      (solo admin — pannello di sistema, tutti i mestieri inclusi i globali)
- * op = mia_gilda | crea_gilda
- *      (chiunque sia loggato — riguardano solo la propria eventuale gilda)
+ * op = mia_gilda | crea_gilda | lascia_gilda
+ *      (chiunque sia loggato — riguardano solo la propria eventuale gilda.
+ *      lascia_gilda è riservato ai membri semplici: il capo non può
+ *      abbandonare da qui, deve prima riassegnare il ruolo)
  * op = dismetti_gilda | riassegna_capo
  *      (solo admin — interventi su una gilda giocatore)
  *
@@ -354,6 +356,36 @@ switch ($op) {
             $puo_creare   = $affiliazioni < (int)$PARAMETERS['settings']['gilda_giocatore_limit'];
             echo json_encode(['success' => true, 'ha_gilda' => false, 'puo_creare' => $puo_creare]);
         }
+        break;
+
+    // Il membro (non capo) abbandona la propria gilda giocatore — analogo
+    // self-service di leaveGuild() (api_gilda.php, "Abbandona Razza") e
+    // op=leave (api_mestiere.php, "Abbandona Mestiere"). Il capo non può
+    // abbandonare da qui: deve prima riassegnare il ruolo (op=riassegna_capo,
+    // admin) o farsi espellere da un admin — altrimenti la gilda resterebbe
+    // senza nessuno autorizzato a gestirla. Vedi conversazione di progetto
+    // del 2026-08-24.
+    case 'lascia_gilda':
+        $row = gdrcd_query(
+            "SELECT cpm.id_ruolo, rm.capo
+             FROM clgpersonaggioaffiliazione cpm
+             JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+             JOIN mestiere m ON rm.mestiere = m.id_mestiere
+             WHERE cpm.personaggio = '$login' AND m.tipo != 1
+             LIMIT 1"
+        );
+        if (!$row) {
+            echo json_encode(['success' => false, 'message' => 'Non fai parte di nessuna gilda']);
+            exit;
+        }
+        if ((int)$row['capo'] === 1) {
+            echo json_encode(['success' => false, 'message' => 'Il capo non può abbandonare la gilda: riassegna prima il ruolo di capo']);
+            exit;
+        }
+
+        gdrcd_query("DELETE FROM clgpersonaggioaffiliazione WHERE personaggio = '$login' AND id_ruolo = " . (int)$row['id_ruolo']);
+
+        echo json_encode(['success' => true, 'message' => 'Hai abbandonato la gilda.']);
         break;
 
     // Crea una nuova gilda: il fondatore ne diventa automaticamente il capo

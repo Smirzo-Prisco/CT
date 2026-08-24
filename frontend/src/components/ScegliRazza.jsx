@@ -18,11 +18,13 @@
  *
  * Stili: _scegli_razza.scss (scoped su #scegli-razza-app, griglia razze)
  *        _servizi_mestieri.scss (scoped su .sm-page, dettaglio razza)
+ *        base/_confirm_panel.scss (pannello "Abbandona", globale — vedi ConfirmDanger.jsx)
  *
  * @author Crystal Tokyo Dev
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import ConfirmDanger from './ConfirmDanger'
 
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
@@ -229,7 +231,7 @@ function CurrentGuildPanel({ pg, onLeave }) {
 
                 {!confirmOpen && (
                     <button
-                        className="sr-btn sr-btn--leave"
+                        className="btn btn--danger-ghost"
                         onClick={() => setConfirmOpen(true)}
                     >
                         <i className="fas fa-door-open"></i> Abbandona Razza
@@ -237,33 +239,18 @@ function CurrentGuildPanel({ pg, onLeave }) {
                 )}
 
                 {confirmOpen && (
-                    <div className="sr-confirm">
-                        <div className="sr-confirm-title">
-                            <i className="fas fa-exclamation-triangle"></i>
-                            Sei sicuro di voler abbandonare la tua razza?
-                        </div>
-                        <ul className="sr-confirm-list">
-                            <li>Tornerai ad essere <strong>senza razza</strong></li>
-                            <li>Perderai tutti i punti <strong>shin</strong> non spesi</li>
-                            <li>I punti spesi per le <strong>caratteristiche</strong> di razza verranno azzerati</li>
-                            <li>Tutte le <strong>skill di razza</strong> verranno rimosse</li>
-                            <li>Lo <strong>storico spese</strong> verrà cancellato</li>
-                        </ul>
-                        <div className="sr-confirm-actions">
-                            <button
-                                className="sr-btn sr-btn--danger"
-                                onClick={onLeave}
-                            >
-                                <i className="fas fa-check"></i> Confermo, abbandono
-                            </button>
-                            <button
-                                className="sr-btn sr-btn--cancel"
-                                onClick={() => setConfirmOpen(false)}
-                            >
-                                <i className="fas fa-times"></i> Annulla
-                            </button>
-                        </div>
-                    </div>
+                    <ConfirmDanger
+                        titolo="Sei sicuro di voler abbandonare la tua razza?"
+                        confermaLabel="Confermo, abbandono"
+                        onConfirm={onLeave}
+                        onCancel={() => setConfirmOpen(false)}
+                    >
+                        <li>Tornerai ad essere <strong>senza razza</strong></li>
+                        <li>Perderai tutti i punti <strong>shin</strong> non spesi</li>
+                        <li>I punti spesi per le <strong>caratteristiche</strong> di razza verranno azzerati</li>
+                        <li>Tutte le <strong>skill di razza</strong> verranno rimosse</li>
+                        <li>Lo <strong>storico spese</strong> verrà cancellato</li>
+                    </ConfirmDanger>
                 )}
             </div>
         </div>

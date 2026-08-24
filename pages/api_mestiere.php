@@ -14,6 +14,7 @@
  *                personaggio che guarda (confermato qui/altrove, gestione oggetti)
  * op=change    — sceglie il mestiere e lo conferma subito (rifiutato se già impiegato)
  * op=levelUp   — avanza di livello nel mestiere confermato
+ * op=leave     — abbandona il mestiere confermato (reset completo)
  *
  * @author Crystal Tokyo Dev
  */
@@ -331,6 +332,31 @@ switch ($op) {
         gdrcd_query("UPDATE personaggio SET id_mestiere = $mestiere, id_ruolo_mestiere = $idRuolo WHERE nome = '$login'");
 
         echo json_encode(['success' => true, 'message' => 'Livello mestiere aggiornato']);
+        break;
+
+    // -------------------------------------------------------------------------
+    // leave — abbandona il mestiere confermato (reset completo lato mestiere)
+    // -------------------------------------------------------------------------
+    // Prima non esisteva alcun percorso self-service per lasciare un mestiere
+    // vero: MiaGilda.jsx/servizi_adm_mestieri.inc.php coprono solo le gilde
+    // giocatore, e op=fire su servizi_adm_mestieri.inc.php e' raggiungibile
+    // solo da capo/staff/admin, mai da un dipendente qualunque (vedi
+    // conversazione di progetto del 2026-08-24). Stesso pattern di leaveGuild()
+    // in api_gilda.php ("Abbandona Razza"): azzera anche esperienza_mestiere,
+    // a differenza del "fire" amministrativo di un singolo membro — coerente
+    // con la cancellazione dell'intero mestiere (api_mestieri.php), che la
+    // azzera per tutti i membri coinvolti.
+    case 'leave':
+        $pgNow = gdrcd_query("SELECT id_mestiere FROM personaggio WHERE nome = '$login'");
+        if ((int)($pgNow['id_mestiere'] ?? 0) === 0) {
+            echo json_encode(['success' => false, 'message' => 'Non sei impiegato in alcun mestiere']);
+            exit;
+        }
+
+        gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE personaggio = '$login'");
+        gdrcd_query("UPDATE personaggio SET id_mestiere = 0, id_ruolo_mestiere = 1, esperienza_mestiere = 0 WHERE nome = '$login'");
+
+        echo json_encode(['success' => true, 'message' => 'Hai abbandonato il tuo mestiere.']);
         break;
 
     default:

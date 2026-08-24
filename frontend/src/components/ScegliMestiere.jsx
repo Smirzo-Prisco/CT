@@ -10,9 +10,11 @@
  * da MiaGilda.jsx): elenco mestieri con contatore affiliati, click apre il
  * dettaglio (gerarchia + lavoratori + statuto). Se il personaggio è già
  * confermato in QUEL mestiere, il dettaglio mostra anche, in cima,
- * "Avanzamento" (i ranghi raggiungibili) e — per i mestieri con un negozio
- * dedicato, oggi solo Magic Shop — "Gestisci oggetti del mestiere". Vedi
- * conversazione di progetto del 2026-08-24.
+ * "Avanzamento" (i ranghi raggiungibili), — per i mestieri con un negozio
+ * dedicato, oggi solo Magic Shop — "Gestisci oggetti del mestiere", e infine
+ * "Abbandona Mestiere" (stesso stile/componente di "Abbandona Razza" in
+ * ScegliRazza.jsx — vedi ConfirmDanger.jsx). Vedi conversazione di progetto
+ * del 2026-08-24.
  *
  * API: pages/api_mestiere.php
  *   op=getState  GET  → { hasConferma, idMestiere, esperienza, expMestiere,
@@ -23,11 +25,13 @@
  *   op=change    POST { id_record, mestiere } → sceglie e conferma il mestiere
  *                (rifiutato lato server se già impiegato altrove)
  *   op=levelUp   POST { id_record, mestiere } → avanza livello nel proprio mestiere
+ *   op=leave     POST {} → abbandona il mestiere confermato (reset completo)
  *
  * @author Crystal Tokyo Dev
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import ConfirmDanger from './ConfirmDanger'
 
 const API = 'pages/api_mestiere.php'
 
@@ -160,11 +164,14 @@ function AvanzamentoSection({ expMestiere, ranghi, onChanged }) {
 // ── Dettaglio mestiere (gerarchia + lavoratori + statuto + avanzamento +
 // gestione oggetti + entra) ────────────────────────────────────────────────
 
-function MestiereDetail({ id, avanzamento, onBack, onJoined, onChanged }) {
+function MestiereDetail({ id, avanzamento, onBack, onAffiliationChanged, onChanged }) {
     const [data, setData]     = useState(null)
     const [error, setError]   = useState(null)
     const [joining, setJoining] = useState(false)
     const [joinError, setJoinError] = useState(null)
+    const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false)
+    const [leaving, setLeaving] = useState(false)
+    const [leaveError, setLeaveError] = useState(null)
 
     useEffect(() => {
         setData(null)
@@ -191,11 +198,26 @@ function MestiereDetail({ id, avanzamento, onBack, onJoined, onChanged }) {
             })
             const d = await r.json()
             setJoining(false)
-            if (d.success) onJoined()
+            if (d.success) onAffiliationChanged()
             else setJoinError(d.message ?? 'Errore nella conferma')
         } catch (e) {
             setJoining(false)
             setJoinError(e.message)
+        }
+    }
+
+    const abbandona = async () => {
+        setLeaving(true)
+        setLeaveError(null)
+        try {
+            const r = await fetch(`${API}?op=leave`, { method: 'POST' })
+            const d = await r.json()
+            setLeaving(false)
+            if (d.success) onAffiliationChanged()
+            else setLeaveError(d.message ?? 'Errore nell\'abbandono')
+        } catch (e) {
+            setLeaving(false)
+            setLeaveError(e.message)
         }
     }
 
@@ -300,7 +322,27 @@ function MestiereDetail({ id, avanzamento, onBack, onJoined, onChanged }) {
                     <section className="sm-section">
                         {joinError && <p className="sm-error-text">{joinError}</p>}
                         {data.vieneConfermatoQui ? (
-                            <p className="sm-field-note">Fai già parte di questo mestiere.</p>
+                            <>
+                                <p className="sm-field-note" style={{ marginBottom: 12 }}>Fai già parte di questo mestiere.</p>
+                                {leaveError && <p className="sm-error-text">{leaveError}</p>}
+                                {!confirmLeaveOpen ? (
+                                    <button type="button" className="btn btn--danger-ghost" onClick={() => setConfirmLeaveOpen(true)}>
+                                        <i className="fas fa-door-open" /> Abbandona Mestiere
+                                    </button>
+                                ) : (
+                                    <ConfirmDanger
+                                        titolo="Sei sicuro di voler abbandonare questo mestiere?"
+                                        confermaLabel="Confermo, abbandono"
+                                        busy={leaving}
+                                        onConfirm={abbandona}
+                                        onCancel={() => setConfirmLeaveOpen(false)}
+                                    >
+                                        <li>Tornerai ad essere <strong>senza mestiere</strong></li>
+                                        <li>Perderai tutti i <strong>punti mestiere</strong> accumulati</li>
+                                        <li>Il tuo posto nella <strong>gerarchia</strong> verrà liberato</li>
+                                    </ConfirmDanger>
+                                )}
+                            </>
                         ) : data.giaConfermatoAltrove ? (
                             <p className="sm-field-note">Sei già impiegato in un altro mestiere: abbandonalo per poterne scegliere uno nuovo.</p>
                         ) : (
@@ -350,7 +392,9 @@ export default function ScegliMestiere() {
         window.history.pushState({}, '', 'main.php?page=scegli_mestiere')
         setIdMestiere(null)
     }
-    const onJoined = () => {
+    // Nome neutro: chiude il dettaglio e ricarica lo stato sia dopo un
+    // "Entra" sia dopo un "Abbandona" (op=change / op=leave in MestiereDetail).
+    const onAffiliationChanged = () => {
         closeDetail()
         fetchState()
     }
@@ -392,7 +436,7 @@ export default function ScegliMestiere() {
                     id={idMestiere}
                     avanzamento={state.idMestiere === idMestiere ? { expMestiere: state.expMestiere, ranghi: state.mestieri } : null}
                     onBack={closeDetail}
-                    onJoined={onJoined}
+                    onAffiliationChanged={onAffiliationChanged}
                     onChanged={fetchState}
                 />
             )}

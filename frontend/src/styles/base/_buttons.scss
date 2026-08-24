@@ -121,6 +121,20 @@
     }
 }
 
+// Variante "silenziosa" di .btn--danger: per un trigger che apre una
+// conferma (es. "Abbandona Razza/Mestiere/Gilda"), non per l'azione
+// distruttiva stessa — quella resta .btn--danger piena. Stessi colori,
+// solo senza sfondo pieno finché non si clicca davvero.
+.btn--danger-ghost {
+    background: transparent;
+    border-color: rgba($color-danger, 0.5);
+    color: $color-danger;
+
+    &:hover:not(:disabled) {
+        background: rgba($color-danger, 0.1);
+    }
+}
+
 // ── Modificatori di dimensione ────────────────────────────────
 
 .btn--sm {
