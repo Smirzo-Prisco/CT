@@ -99,11 +99,21 @@ export default function MapClick() {
 
     // La mappa e' l'unica pagina che deve occupare il 100% di #maincontent
     // (le altre restano al 90%, vedi _layout.scss) — qui aggiunge/rimuove la
-    // classe che attiva l'eccezione.
+    // classe che attiva l'eccezione. Anche su document.body: #iubenda-container
+    // (link Privacy/Cookie) e' un fratello precedente di #maincontent nel DOM
+    // (left-right_frames.php), quindi non e' raggiungibile da un selettore CSS
+    // basato sulla classe di #maincontent — serve un antenato comune. Solo li'
+    // restano centrati (sulla mappa .map-search-widget occupa il basso a
+    // sinistra, vedi _map_click.scss); altrove sono spostati a sinistra perche'
+    // centrati sovrastavano i pulsanti dei messaggi DM su mobile.
     useEffect(() => {
         const el = document.getElementById('maincontent')
         el?.classList.add('ct-hud-map-page')
-        return () => el?.classList.remove('ct-hud-map-page')
+        document.body.classList.add('ct-hud-map-page')
+        return () => {
+            el?.classList.remove('ct-hud-map-page')
+            document.body.classList.remove('ct-hud-map-page')
+        }
     }, [])
 
     /**
