@@ -18,11 +18,18 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 ?>
 <div id="hud-container"></div>
 
+<!-- Link semplici (nessuna classe iubenda-embed/badge): iubenda.js "badgeifica"
+     ogni .iubenda-embed in un pulsante con width/height fissi via JS
+     (116x25px ciascuno) che ignora completamente il nostro CSS — su mobile
+     finiva sempre a ridosso di qualche pulsante reale (menu HUD, composer
+     messaggi), qualunque fosse la posizione del contenitore. Un <a> semplice
+     resta piccolo e discreto come da _layout.scss, senza che iubenda.js lo
+     tocchi (nessuno script da caricare). target=_blank: sono link esterni,
+     non deve far perdere lo stato della sessione/mappa in corso. -->
 <div id="iubenda-container">
-    <a href="https://www.iubenda.com/privacy-policy/18155810" class="iubenda-black iubenda-noiframe iubenda-embed" title="Privacy Policy">Privacy Policy</a>
+    <a href="https://www.iubenda.com/privacy-policy/18155810" target="_blank" rel="noopener" title="Privacy Policy">Privacy Policy</a>
     &nbsp;·&nbsp;
-    <a href="https://www.iubenda.com/privacy-policy/18155810/cookie-policy" class="iubenda-black iubenda-noiframe iubenda-embed" title="Cookie Policy">Cookie Policy</a>
-    <script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>
+    <a href="https://www.iubenda.com/privacy-policy/18155810/cookie-policy" target="_blank" rel="noopener" title="Cookie Policy">Cookie Policy</a>
 </div>
 
 <!-- ====================================================================== -->
