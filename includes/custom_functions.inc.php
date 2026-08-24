@@ -724,6 +724,37 @@ function resetPuntiPg(string $nomeFiltrato): bool {
     return (bool)$ok1 && (bool)$ok2 && (bool)$ok3;
 }
 
+/**
+ * Scioglie tutti i legami di un personaggio con razza (clgpersonaggioruolo),
+ * mestiere vero (clgpersonaggiomestiere) e gilde giocatore
+ * (clgpersonaggioaffiliazione — puo' essercene piu' di una, limite separato
+ * da quello dei mestieri), azzerando anche le colonne denormalizzate su
+ * personaggio. Stesso pattern di "Abbandona Razza" (leaveGuild, api_gilda.php)
+ * e di "Dimettiti/Espelli" (servizi_adm_mestieri.inc.php op=fire), applicato
+ * pero' a TUTTE le affiliazioni del personaggio insieme invece che a una sola
+ * per volta.
+ *
+ * Complementare a resetPuntiPg(), non sovrapposta: qui non si toccano
+ * shin/statistiche/skill, ne' si sottraggono i bonus statistiche di razza
+ * dalle car0-9 (a differenza di leaveGuild) perche' quando le due funzioni
+ * vengono usate insieme (cancellazione soft, vedi api_account.php e
+ * api_manutenzione.php op=missing_soft) le statistiche sono gia' azzerate a
+ * monte da resetPuntiPg() — sottrarre di nuovo i bonus li porterebbe sotto
+ * il valore base.
+ * $nomeFiltrato va gia' passato da gdrcd_filter('in', ...) a cura del chiamante.
+ */
+function scioglieAffiliazioniPg(string $nomeFiltrato): bool {
+    $ok1 = gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio = '$nomeFiltrato'");
+    $ok2 = gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE personaggio = '$nomeFiltrato'");
+    $ok3 = gdrcd_query("DELETE FROM clgpersonaggioaffiliazione WHERE personaggio = '$nomeFiltrato'");
+    $ok4 = gdrcd_query("UPDATE personaggio SET
+                    id_gilda = 0, id_ruolo_gilda = 0,
+                    id_mestiere = 0, id_ruolo_mestiere = 1
+                WHERE nome = '$nomeFiltrato'");
+
+    return (bool)$ok1 && (bool)$ok2 && (bool)$ok3 && (bool)$ok4;
+}
+
 function getTotStatsPg($pg) {
     $where = $pg != '' ? " WHERE nome = '$pg'" : '';
 

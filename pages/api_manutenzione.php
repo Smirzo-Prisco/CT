@@ -185,7 +185,9 @@ switch ($op) {
 
     // -------------------------------------------------------------------------
     // MISSING_SOFT — marca come cancellati (permessi=-1) i personaggi inattivi
-    // da N mesi, escludendo lo staff (permessi != 0)
+    // da N mesi, escludendo lo staff (permessi != 0). Stesso trattamento della
+    // cancellazione soft singola (api_account.php op=delete): resetPuntiPg()
+    // + scioglieAffiliazioniPg() prima di marcare permessi=-1.
     // -------------------------------------------------------------------------
     case 'missing_soft':
         $mesi = leggi_mesi($isPreview, $data, 1, 12);
@@ -199,18 +201,30 @@ switch ($op) {
             $pg = campiona_personaggi($where);
             echo json_encode(['success' => true,
                 'title' => "Marca come cancellati i personaggi inattivi da più di $mesi mesi",
-                'warning' => 'Operazione reversibile solo manualmente (richiede di reimpostare i permessi sul personaggio).',
+                'warning' => 'Reimpostare i permessi in seguito riattiva il personaggio, ma NON annulla il reset e lo scollegamento: statistiche, shin, skill e affiliazioni a razza/gilda/mestiere restano azzerati.',
                 'items' => [
                     ['label' => 'Personaggi coinvolti (staff escluso)', 'count' => $pg['totale'], 'sample' => $pg['sample']],
                 ],
                 'notes' => [
-                    'Nessuna riga viene cancellata fisicamente: il personaggio viene solo marcato (permessi = -1).',
+                    'Ogni personaggio viene azzerato come dal pulsante "Reset punti" (statistiche riportate a 10, shin/skill/talenti/storico spese ripuliti) e scollegato da razza, gilda e mestiere.',
+                    'Nessuna riga di personaggio viene cancellata fisicamente: resta solo marcato (permessi = -1).',
                     'Potrà essere ripulito definitivamente in seguito con "Elimina i personaggi provvisoriamente cancellati".',
                 ],
             ]);
         } else {
+            $res  = gdrcd_query("SELECT nome FROM personaggio $where", 'result');
+            $nomi = [];
+            while ($row = gdrcd_query($res, 'fetch')) $nomi[] = $row['nome'];
+            gdrcd_query($res, 'free');
+
+            foreach ($nomi as $nome) {
+                $nome_f = gdrcd_filter('in', $nome);
+                resetPuntiPg($nome_f);
+                scioglieAffiliazioniPg($nome_f);
+            }
+
             gdrcd_query("UPDATE personaggio SET permessi = " . DELETED . " $where");
-            echo json_encode(['success' => true, 'message' => 'Personaggi inattivi marcati come cancellati.']);
+            echo json_encode(['success' => true, 'message' => 'Personaggi inattivi azzerati, scollegati e marcati come cancellati.']);
         }
         break;
 
