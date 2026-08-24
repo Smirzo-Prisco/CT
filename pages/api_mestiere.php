@@ -277,6 +277,16 @@ switch ($op) {
         gdrcd_query($existing, 'free');
         gdrcd_query("UPDATE personaggio SET id_mestiere = $mestiere, id_ruolo_mestiere = $idRuolo WHERE nome = '$login'");
 
+        // Riapre la sessione (chiusa da session_write_close() in cima al file,
+        // per non bloccare richieste concorrenti) solo per aggiornare
+        // $_SESSION['mestiere'] — senza questo il PG dovrebbe uscire e
+        // rientrare per veder comparire, ad es., gli oggetti del proprio
+        // mestiere in gestione_oggetti.inc.php (vedi conversazione di
+        // progetto del 2026-08-24).
+        session_start();
+        $_SESSION['mestiere'] = $mestiere;
+        session_write_close();
+
         $titolo = gdrcd_filter('in', "Conferma nel mestiere - $login");
         $msg    = gdrcd_filter('in', "Il personaggio [b]{$login}[/b] ha appena confermato il ruolo nel mestiere");
 
@@ -355,6 +365,13 @@ switch ($op) {
 
         gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE personaggio = '$login'");
         gdrcd_query("UPDATE personaggio SET id_mestiere = 0, id_ruolo_mestiere = 1, esperienza_mestiere = 0 WHERE nome = '$login'");
+
+        // Stesso motivo di op=change: riapre la sessione solo per aggiornare
+        // $_SESSION['mestiere'], altrimenti resterebbe con il vecchio
+        // mestiere fino al prossimo login.
+        session_start();
+        $_SESSION['mestiere'] = 0;
+        session_write_close();
 
         echo json_encode(['success' => true, 'message' => 'Hai abbandonato il tuo mestiere.']);
         break;
