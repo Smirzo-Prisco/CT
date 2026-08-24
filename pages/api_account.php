@@ -3,12 +3,14 @@
  * api_account.php — Cancellazione/ripristino account
  *
  * Endpoint:
- *   POST ?op=delete  — auto-cancellazione (verifica email + password): resetPuntiPg()
- *                      + permessi=-1. Non tocca razza/gilda/mestiere (restano
- *                      collegati, vedi conversazione di progetto del 2026-08-24).
+ *   POST ?op=delete  — auto-cancellazione (verifica email + password):
+ *                      resetPuntiPg() + scioglieAffiliazioniPg() + permessi=-1.
+ *                      Stesso trattamento della cancellazione soft massiva per
+ *                      inattività (api_manutenzione.php op=missing_soft).
  *   POST ?op=restore — ripristina un account cancellato: permessi=0 (solo staff).
- *                      Il reset di op=delete non viene annullato: il personaggio
- *                      torna attivo ma resta azzerato.
+ *                      Il reset/scollegamento di op=delete non viene annullato:
+ *                      il personaggio torna attivo ma resta azzerato e senza
+ *                      razza/gilda/mestiere.
  *
  * op=restore è chiamato da ripristinaPg() in includes/personaggio.js, l'icona
  * di ripristino nella colonna Azioni di gestione_personaggio.inc.php (filtro
@@ -76,10 +78,12 @@ switch ($op) {
 
         // Stesso azzeramento del pulsante "Reset punti" in Gestione > Gestione
         // Personaggi (statistiche a 10, shin/skill/talenti/storico spese
-        // ripuliti) — vedi resetPuntiPg() in custom_functions.inc.php. Prima
-        // di marcare permessi=DELETED cosi' l'operazione resta un unico
+        // ripuliti) + scioglimento di razza/gilda/mestiere — vedi
+        // resetPuntiPg()/scioglieAffiliazioniPg() in custom_functions.inc.php.
+        // Prima di marcare permessi=DELETED cosi' l'operazione resta un unico
         // passaggio coerente anche in caso di errore a meta'.
         resetPuntiPg($login);
+        scioglieAffiliazioniPg($login);
 
         gdrcd_query("UPDATE personaggio SET permessi = " . DELETED . " WHERE nome = '$login'");
         gdrcd_query(

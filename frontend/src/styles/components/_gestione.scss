@@ -775,6 +775,53 @@ span[style*="position:relative"]:hover .tooltip-bottom {
     &:focus { outline: none; border-color: $gestione-action; }
 }
 
+// ── Legenda icone azioni ────────────────────────────────────────
+// .btn-action--icon qui sotto e' usato come chip statico (senza <button>,
+// niente cursor/hover di un pulsante vero): stessa palette per colore delle
+// icone reali in tabella, cosi' la legenda resta sempre coerente se in
+// futuro cambia lo schema colori li' invece che doverlo duplicare qui.
+
+.gp-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2 $space-5;
+    padding: $space-3 $space-4;
+    background: $gestione-surface;
+    border-bottom: 1px solid $gestione-hover;
+    font-size: $text-sm;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        max-width: 420px;
+    }
+
+    &__text {
+        color: $color-text-muted;
+        line-height: 1.4;
+
+        strong { color: $color-text; }
+    }
+
+    &__confirm {
+        display: inline-block;
+        margin-left: $space-1;
+        padding: 1px $space-2;
+        border-radius: $radius-full;
+        background: rgb(240 130 50 / 15%);
+        color: #f08230;
+        border: 1px solid rgb(240 130 50 / 30%);
+        font-size: $text-2xs;
+        white-space: nowrap;
+    }
+
+    .btn-action--icon {
+        flex-shrink: 0;
+        pointer-events: none;
+    }
+}
+
 // ── Lista personaggi ──────────────────────────────────────────
 
 .gp-list {

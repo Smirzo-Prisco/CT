@@ -87,6 +87,34 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
 
 </div>
 
+<!-- ── Legenda icone azioni ──────────────────────────────────── -->
+<div class="gp-legend">
+    <div class="gp-legend__item">
+        <span class="btn-action btn-action--edit btn-action--icon"><i class="fa-solid fa-pen-to-square"></i></span>
+        <span class="gp-legend__text"><strong>Modifica</strong> — apre il pannello di modifica anagrafica/caratteristiche</span>
+    </div>
+    <div class="gp-legend__item">
+        <span class="btn-action btn-action--skill btn-action--icon"><i class="fa-solid fa-wrench"></i></span>
+        <span class="gp-legend__text"><strong>Gestione skill</strong> — apre la pagina skill/talenti del personaggio</span>
+    </div>
+    <div class="gp-legend__item">
+        <span class="btn-action btn-action--exile btn-action--icon"><i class="fa-solid fa-user-slash"></i></span>
+        <span class="gp-legend__text"><strong>Esilia</strong> — allontana il personaggio dal gioco <span class="gp-legend__confirm">richiede conferma</span></span>
+    </div>
+    <div class="gp-legend__item">
+        <span class="btn-action btn-action--reset btn-action--icon"><i class="fa-solid fa-rotate"></i></span>
+        <span class="gp-legend__text"><strong>Reset punti</strong> — statistiche a 10, shin/skill/talenti/storico spese azzerati. Nella topbar agisce su tutti i personaggi <span class="gp-legend__confirm">richiede conferma</span></span>
+    </div>
+    <div class="gp-legend__item">
+        <span class="btn-action btn-action--delete btn-action--icon"><i class="fa-solid fa-trash"></i></span>
+        <span class="gp-legend__text"><strong>Elimina definitivamente</strong> — cancellazione fisica, irreversibile. Nella topbar elimina tutti gli esiliati <span class="gp-legend__confirm">richiede conferma</span></span>
+    </div>
+    <div class="gp-legend__item">
+        <span class="btn-action btn-action--restore btn-action--icon"><i class="fa-solid fa-rotate-left"></i></span>
+        <span class="gp-legend__text"><strong>Ripristina</strong> — riattiva un personaggio con cancellazione soft (permessi=0). Non annulla il reset/scollegamento da razza-gilda-mestiere fatto alla cancellazione <span class="gp-legend__confirm">richiede conferma</span></span>
+    </div>
+</div>
+
 <!-- ── Lista personaggi ──────────────────────────────────────── -->
 <div class="gp-list">
     <table id="pgTable">
