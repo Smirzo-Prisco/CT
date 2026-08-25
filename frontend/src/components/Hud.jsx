@@ -598,31 +598,29 @@ export default function Hud({ isStaff }) {
                 <div className="ct-hud__sheet-backdrop" onClick={() => setCenterOpen(false)} />
 
                 <div className="ct-hud__center-arc">
-                    <a className="ct-hud__icon" style={arcIcon(-60, 0)} data-tour="hud-manuali"
+                    <a className="ct-hud__icon" style={arcIcon(-100, 0)} data-tour="hud-manuali"
                         href="main.php?page=servizi_gilde" title="Manuali" onClick={closeMobileMenus}>
                         <i className="fa-solid fa-book" />
                     </a>
-                    <a className="ct-hud__icon" style={arcIcon(-30, 52)} data-tour="hud-uffici"
-                        href="main.php?page=uffici" title="Uffici" onClick={closeMobileMenus}>
-                        <i className="fa-solid fa-building-columns" />
-                    </a>
-                    {/* Spostata qui dall'anello destro: il ventaglio centrale e' l'unico
-                        dei tre a non essere mai "affollato" su schermi piccoli (vedi
-                        HudArcSheet), quindi e' il posto piu' sicuro per un'icona che
-                        deve restare raggiungibile SEMPRE, non solo aprendo un anello
-                        laterale. Senza Gestione (non-staff) prende il suo slot (30,52),
-                        cosi' non resta uno spazio vuoto al suo posto — con Gestione
-                        (staff) usa invece lo slot libero al centro (0,60). */}
-                    <a className="ct-hud__icon" style={isStaff ? arcIcon(0, 60) : arcIcon(30, 52)} data-tour="hud-assistente"
-                        href="#" title="Assistente" onClick={openChatbot}>
-                        <i className="fa-solid fa-robot" />
-                    </a>
+                    {/* Riga superiore (ty=0) invece che in basso insieme a Uffici/Assistente:
+                        li' le tre icone si sovrapponevano (40px di larghezza contro 30px di
+                        passo). Qui c'e' spazio solo verso il logo, quindi resta stretta fra
+                        Manuali e il bordo del logo (58px, raggio 29) — margini verificati
+                        per non toccare ne' l'uno ne' l'altro. */}
                     {isStaff && (
-                        <a className="ct-hud__icon" style={arcIcon(30, 52)}
+                        <a className="ct-hud__icon" style={arcIcon(-56, 0)}
                             href="main.php?page=gestione" title="Gestione" onClick={closeMobileMenus}>
                             <i className="fa-solid fa-screwdriver-wrench" />
                         </a>
                     )}
+                    <a className="ct-hud__icon" style={arcIcon(-30, 52)} data-tour="hud-uffici"
+                        href="main.php?page=uffici" title="Uffici" onClick={closeMobileMenus}>
+                        <i className="fa-solid fa-building-columns" />
+                    </a>
+                    <a className="ct-hud__icon" style={arcIcon(30, 52)} data-tour="hud-assistente"
+                        href="#" title="Assistente" onClick={openChatbot}>
+                        <i className="fa-solid fa-robot" />
+                    </a>
                     <a className="ct-hud__icon" style={arcIcon(60, 0)}
                         href="#" title="Esci" onClick={handleLogout}>
                         <i className="fa-solid fa-right-from-bracket" />
