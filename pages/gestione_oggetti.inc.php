@@ -51,16 +51,6 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
 <!-- Top bar -->
 <div class="topbar">
     <a href="javascript:history.back()" class="back">⬅️ Indietro</a>
-    <!-- Icona help che mostra la legenda sull'hover -->
-    <div class="help-icon" title="Legenda azioni">
-        <i class="fa-solid fa-circle-question"></i>
-        <div class="legend-compact tooltip">
-            <div><i class="fa-solid fa-pen-to-square"></i><span>Modifica</span></div>
-            <div><i class="fa-solid fa-trash"></i><span>Cancella</span></div>
-            <div><i class="fa-solid fa-user-plus"></i><span>Assegna</span></div>
-            <div><i class="fa-solid fa-check-circle"></i><span>Approva</span></div>
-        </div>
-    </div>
     <?php if ($vistaCompleta): ?>
     <!-- Azzera filtri: form a se' stante (non nel <form> dei radio sotto) per
          evitare che i due controlli, condividendo name="filtro", finiscano
