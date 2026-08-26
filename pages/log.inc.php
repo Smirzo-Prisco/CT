@@ -120,7 +120,7 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
                                 AND destinatario_nome NOT IN ('Segnalazione', 'Calendario', 'System')
                                 $and
                                 GROUP BY id_conversazione
-                                ORDER BY ongame ASC, ultima_ora DESC";
+                                ORDER BY ultima_ora DESC";
                 $sms = gdrcd_query($query_sms, 'result'); ?>
                 <thead>
                     <tr>
