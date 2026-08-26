@@ -973,20 +973,6 @@ body[data-palette="public"] {
     a:hover { color: var(--gold); }
 }
 
-// Totale online sul sito (non solo nel luogo attuale) — stesso linguaggio
-// visivo di .ct-hud__pip/.map-pin__badge: pillola oro, testo scuro.
-.ct-hud__popover-total {
-    background: var(--gold);
-    color: var(--ink-deep);
-    font-size: 10px;
-    font-weight: 800;
-    padding: 1px 6px;
-    border-radius: 999px;
-    min-width: 14px;
-    text-align: center;
-    line-height: 1.5;
-}
-
 // ── Modale descrizione luogo (click sul cerchio sinistro) ────────────────
 // Prima riusava le classi .info-location-* di InfoLocation.jsx (stesso
 // contenuto, il componente e' stato sostituito da Hud.jsx tempo fa) — CSS

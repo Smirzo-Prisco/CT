@@ -245,7 +245,7 @@ export default function Hud({ isStaff }) {
     // qui, una per la lista dentro OnlineUsers.jsx quando il popover si apre.
     const [presentiUsers, setPresentiUsers] = useState([])
     const [presentiIsStaff, setPresentiIsStaff] = useState(false)
-    const [presentiTotal, setPresentiTotal] = useState(0) // online sul sito intero, non solo qui — vedi badge accanto a "Vedi tutti"
+    const [presentiTotal, setPresentiTotal] = useState(0) // online sul sito intero, non solo qui — vedi badge sull'icona Presenti
     const presentiIdleRef = useRef(false)
 
     const fetchPresenti = useCallback(() => {
@@ -451,7 +451,7 @@ export default function Hud({ isStaff }) {
                         <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)} data-tour="hud-presenti"
                             title="Presenti" onClick={togglePopover('presence')}>
                             <i className="fa-solid fa-users" />
-                            {presentiCount > 0 && <b className="ct-hud__pip" style={pipOffset(43, 75)}>{presentiCount}</b>}
+                            {presentiTotal > 0 && <b className="ct-hud__pip" style={pipOffset(43, 75)}>{presentiTotal}</b>}
                         </button>
                         <button type="button" className="ct-hud__icon" style={arcIcon(75, 43)} data-tour="hud-chatoff"
                             title="Chat off" onClick={togglePopover('chatoff')}>
@@ -632,9 +632,8 @@ export default function Hud({ isStaff }) {
             {openPopover === 'presence' && (
                 <div className="ct-hud__popover ct-hud__popover--presence" onClick={handlePopoverClick}>
                     <div className="ct-hud__popover-head">
-                        <span>Presenti qui</span>
+                        <span>Presenti qui: {presentiCount}</span>
                         <a href="main.php?page=presenti_estesi">
-                            <span className="ct-hud__popover-total">{presentiTotal}</span>
                             Vedi tutti <i className="fa-solid fa-arrow-right" />
                         </a>
                     </div>
