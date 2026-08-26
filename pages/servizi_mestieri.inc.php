@@ -10,6 +10,22 @@ $id_mestiere = isset($_REQUEST['id_mestiere']) ? (int)gdrcd_filter('num', $_REQU
 // le gilde create dai giocatori (tipo != 1), non i mestieri globali fissi
 $solo_gilde = !empty($_REQUEST['solo_gilde']);
 
+// Chi è loggato e non ha ancora una gilda deve poter arrivare a "Crea la tua
+// gilda" sempre, non solo quando l'elenco è del tutto vuoto (prima dell'aggiunta
+// di questo controllo, con almeno una gilda già creata da altri non restava
+// alcun punto d'accesso alla creazione — vedi conversazione di progetto del
+// 2026-08-26). Stessa tabella/logica di mia_gilda in api_mestieri.php.
+$utente_ha_gilda = true;
+if ($solo_gilde && !empty($_SESSION['login'])) {
+    $utente_ha_gilda = (bool)gdrcd_query(
+        "SELECT 1 FROM clgpersonaggioaffiliazione cpm
+           JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
+           JOIN mestiere m ON rm.mestiere = m.id_mestiere
+          WHERE cpm.personaggio = '" . gdrcd_filter('in', $_SESSION['login']) . "' AND m.tipo != 1
+          LIMIT 1"
+    );
+}
+
 $allowed_from = ['servizi_mestieri', 'servizi_gilde'];
 $from         = isset($_REQUEST['from']) && in_array($_REQUEST['from'], $allowed_from, true)
     ? $_REQUEST['from']
@@ -39,6 +55,11 @@ if ($solo_gilde) {
             <i class="fas <?= $solo_gilde ? 'fa-shield-halved' : 'fa-briefcase' ?>"></i>
             <?= $solo_gilde ? 'Gilde' : gdrcd_filter('out', $PARAMETERS['names']['job_name']['plur']) ?>
         </h2>
+        <?php if ($solo_gilde && !$utente_ha_gilda): ?>
+        <a href="main.php?page=mia_gilda" class="btn btn--secondary sm-header-edit">
+            <i class="fas fa-plus"></i> Crea la tua gilda
+        </a>
+        <?php endif; ?>
     </div>
 
     <?php
@@ -148,11 +169,6 @@ if ($solo_gilde) {
         <p style="text-align:center; padding:20px; font-style:italic; color:var(--color-text-muted);">
             <?= $solo_gilde ? 'Nessuna gilda è stata ancora creata.' : 'Nessun mestiere disponibile al momento.' ?>
         </p>
-        <?php if ($solo_gilde): ?>
-        <p style="text-align:center;">
-            <a href="main.php?page=mia_gilda" class="sm-list-link">Crea la tua gilda</a>
-        </p>
-        <?php endif; ?>
     </div>
     <?php endif; ?>
 
