@@ -62,7 +62,7 @@ export default function OnlineUsers({ users = [], isStaff = false }) {
                 <a
                   href={`/main.php?page=scheda&pg=${encodeURIComponent(user.nome)}`}
                   target="_top"
-                  className="online-user-link"
+                  className="online-user-link presenti-nome-cell"
                 >
                   {user.nome}
                 </a>
