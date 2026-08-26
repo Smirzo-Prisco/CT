@@ -1552,8 +1552,6 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
 
 // Elaboro tutte le azioni di attacco del turno, tenendo conto delle difese riuscite e fallite
 function elaborateAttack($id_role, $turn, $intoccabili, $difensori, &$riepilogo) {
-    $defaultDamage = 15;
-
     // Prendo tutte le azioni d'attacco del turno
     $result = gdrcd_query("SELECT * FROM role_fights WHERE id_role = $id_role AND turn = $turn AND car IN ('destrezza', 'mente', 'potere') ORDER BY id ASC", 'result');
    
@@ -1589,14 +1587,36 @@ function elaborateAttack($id_role, $turn, $intoccabili, $difensori, &$riepilogo)
         }
 
         // Elaboro l'attacco verso tutti i bersagli tenendo conto delle difese riuscite e fallite
-        elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, $defaultDamage, $riepilogo, $turn);
+        elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, $riepilogo, $turn);
     }
 
     return;
 }
 
+// Calcola danno (e durata di eventuali effetti) di un attacco con difesa nulla (dado
+// di difesa = 0): usata sia da chi sceglie esplicitamente "Subisci" (scala piena) sia
+// da chi non puo' o non riesce a difendersi (scudo fallito o gia' usato scudo+attacco
+// nel turno precedente — vedi elaborateAttackTarget), che subisce invece l'80% del
+// danno previsto dalla stessa formula. Prima quest'ultimo caso applicava un danno
+// fisso di 15 punti, indipendente dal dado d'attacco e dal moltiplicatore di soglia.
+function dannoDifesaNulla($r, $dice, $critico, $damagePercent, $targetsCount, $carDifesa, $target, $id_role, $scala = 1.0) {
+    if ($dice <= 0) return ['damage' => 0, 'moltiplicatore' => 1.0, 'durata' => 0, 'durata_msg' => ''];
+
+    $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = " . (int)$r['level']);
+    $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
+    $baseDmg = $dice * $moltiplicatore;
+    $damage = $damagePercent > 0
+        ? round($baseDmg * ($damagePercent / 100))
+        : round($baseDmg / $targetsCount);
+    if ($critico && $damage > 0) $damage *= 2;
+    if ($scala != 1.0) $damage = (int)round($damage * $scala);
+
+    $durataResult = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
+    return ['damage' => $damage, 'moltiplicatore' => $moltiplicatore, 'durata' => $durataResult['turni'], 'durata_msg' => $durataResult['msg']];
+}
+
 // Per ogni azione di attacco del turno, per ogni bersaglio...
-function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, $defaultDamage, &$riepilogo, $turn) {
+function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori, &$riepilogo, $turn) {
     $striker = $r['striker']; // Attaccante
     $dice = $r['dice']; // Dado di attacco
     $critico = ((int)($r['dado_raw'] ?? 0) === 20); // Colpo critico: d20 naturale = 20
@@ -1626,31 +1646,21 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
         $dadoRisposta = gdrcd_query("SELECT dice FROM role_fights WHERE id_role=$id_role AND turn=$turn AND id_fight=$idFightAttacco AND (striker='$target' OR target='$target') AND car='dado_risposta' LIMIT 1");
         $subisce      = gdrcd_query("SELECT id   FROM role_fights WHERE id_role=$id_role AND turn=$turn AND id_fight=$idFightAttacco AND (striker='$target' OR target='$target') AND car='subisce'       LIMIT 1");
 
+        // Se damage_percent > 0 (attacchi PNG master), ogni bersaglio riceve quella
+        // percentuale del danno calcolato invece della divisione per count($targets).
+        $damagePercent = isset($r['damage_percent']) ? (int)$r['damage_percent'] : 0;
+
         // Se il bersaglio può lanciare un dado automatico di difesa perché non ha lanciato uno scudo in questo turno e neanche nel precedente
         if($can_send === 1) {
             if(!isset($difensori[$target])) { // Se non ha usato lo scudo in questo turno, significa che deve difendersi con un dado
 
-                // Se damage_percent > 0 (attacchi PNG master), ogni bersaglio riceve quella
-                // percentuale del danno calcolato invece della divisione per count($targets).
-                $damagePercent = isset($r['damage_percent']) ? (int)$r['damage_percent'] : 0;
-
                 if ($subisce) {
-                    // Il bersaglio ha scelto esplicitamente di subire: difesa nulla (dado di
-                    // difesa = 0), quindi il danno segue la stessa formula attacco-difesa
-                    // degli altri due casi, non piu' un valore fisso.
-                    $dadoDifesa = 0;
-                    if ($dice > $dadoDifesa) {
-                        $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level']);
-                        $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
-                        $baseDmg = ($dice - $dadoDifesa) * $moltiplicatore;
-                        $damage = $damagePercent > 0
-                            ? round($baseDmg * ($damagePercent / 100))
-                            : round($baseDmg / count($targets));
-                        if ($critico && $damage > 0) $damage *= 2;
-                        $durataResult = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
-                        $durata = $durataResult['turni'];
-                        $durataMsg = $durataResult['msg'];
-                    }
+                    // Il bersaglio ha scelto esplicitamente di subire: difesa nulla, scala piena.
+                    $esito = dannoDifesaNulla($r, $dice, $critico, $damagePercent, count($targets), $carDifesa, $target, $id_role, 1.0);
+                    $damage = $esito['damage'];
+                    $moltiplicatore = $esito['moltiplicatore'];
+                    $durata = $esito['durata'];
+                    $durataMsg = $esito['durata_msg'];
                 } elseif ($dadoRisposta) {
                     // Il bersaglio ha già tirato il dado in risposta immediata: usa quel risultato
                     $dadoDifesa = (int)$dadoRisposta['dice'];
@@ -1683,8 +1693,26 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                     }
                 }
 
-            } else $damage = isset($intoccabili[$target]) ? 0 : $defaultDamage; // In questo caso il bersaglio ha usato lo scudo su qualcuno o su se stesso
-        } else $damage = $defaultDamage; // Se non può lanciare il dado di difesa, subisce il danno di default
+            } elseif (isset($intoccabili[$target])) {
+                $damage = 0; // Scudo lanciato su qualcuno o su se stesso, con successo
+            } else {
+                // Scudo lanciato in questo turno ma fallito: difesa nulla, come "Subisci"
+                // ma all'80% del danno (non più un valore fisso di 15).
+                $esito = dannoDifesaNulla($r, $dice, $critico, $damagePercent, count($targets), $carDifesa, $target, $id_role, 0.8);
+                $damage = $esito['damage'];
+                $moltiplicatore = $esito['moltiplicatore'];
+                $durata = $esito['durata'];
+                $durataMsg = $esito['durata_msg'];
+            }
+        } else {
+            // Non può lanciare il dado di difesa (già usato scudo+attacco nel turno
+            // precedente): difesa nulla, come "Subisci" ma all'80% del danno.
+            $esito = dannoDifesaNulla($r, $dice, $critico, $damagePercent, count($targets), $carDifesa, $target, $id_role, 0.8);
+            $damage = $esito['damage'];
+            $moltiplicatore = $esito['moltiplicatore'];
+            $durata = $esito['durata'];
+            $durataMsg = $esito['durata_msg'];
+        }
     
         // Salvo tutti gli attacchi ricevuti
         $riepilogo[$target]['subisce'][] = array(
