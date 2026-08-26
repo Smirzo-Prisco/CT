@@ -1635,8 +1635,22 @@ function elaborateAttackTarget($id_role, $r, $targets, $intoccabili, $difensori,
                 $damagePercent = isset($r['damage_percent']) ? (int)$r['damage_percent'] : 0;
 
                 if ($subisce) {
-                    // Il bersaglio ha scelto esplicitamente di subire: danno fisso, nessun dado di difesa
-                    $damage = $critico ? ($defaultDamage * 2) : $defaultDamage;
+                    // Il bersaglio ha scelto esplicitamente di subire: difesa nulla (dado di
+                    // difesa = 0), quindi il danno segue la stessa formula attacco-difesa
+                    // degli altri due casi, non piu' un valore fisso.
+                    $dadoDifesa = 0;
+                    if ($dice > $dadoDifesa) {
+                        $sgRow = gdrcd_query("SELECT danno FROM gilda_soglie WHERE livello = ".$r['level']);
+                        $moltiplicatore = $sgRow ? (float)$sgRow['danno'] : 1.0;
+                        $baseDmg = ($dice - $dadoDifesa) * $moltiplicatore;
+                        $damage = $damagePercent > 0
+                            ? round($baseDmg * ($damagePercent / 100))
+                            : round($baseDmg / count($targets));
+                        if ($critico && $damage > 0) $damage *= 2;
+                        $durataResult = registraDurata($carDifesa['type'], $carDifesa['punti'], $damage, $target, $id_role);
+                        $durata = $durataResult['turni'];
+                        $durataMsg = $durataResult['msg'];
+                    }
                 } elseif ($dadoRisposta) {
                     // Il bersaglio ha già tirato il dado in risposta immediata: usa quel risultato
                     $dadoDifesa = (int)$dadoRisposta['dice'];
