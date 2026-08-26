@@ -70,9 +70,11 @@
     border-color: $color-primary;
     color: $color-primary;
 
+    // Sfondo azzurro chiaro come .btn--primary: serve testo scuro per il
+    // contrasto, non $color-text-light (quasi bianco, illeggibile qui sopra).
     &:hover:not(:disabled) {
         background: $color-primary;
-        color: $color-text-light;
+        color: $palette-surface-deep;
     }
 }
 
