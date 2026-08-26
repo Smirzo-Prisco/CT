@@ -238,8 +238,10 @@ function UserRow({ user, isStaff, openPopup, onOpen }) {
             </td>
 
             {/* Nome con link alla scheda — il cognome non viene piu' mostrato qui,
-                solo il nome (richiesta esplicita, la scheda resta comunque completa) */}
-            <td>
+                solo il nome (richiesta esplicita, la scheda resta comunque completa).
+                presenti-nome-cell: l'opacita' di riga assente si applica solo qui,
+                non a icone/avatar (vedi _presenti.scss). */}
+            <td className="presenti-nome-cell">
                 {morto && <i className="fa-solid fa-skull pg-morto-icon" title="Morto" />}
                 <a href={`main.php?page=scheda&pg=${encodeURIComponent(user.nome)}`} className={`link_sheet gender_${user.sesso}`}>
                     {user.nome}

@@ -58,9 +58,14 @@ div.presente {
     text-transform: none;
 }
 
-// Utente assente (altra scheda o inattivo da 60s)
-div.presente-assente,
-tr.presente-assente {
+// Utente assente (altra scheda o inattivo da 60s). Nel popover compatto (div)
+// l'opacita' resta su tutta la riga; nella tabella estesa (tr) solo sul nome
+// (.presenti-nome-cell), altrimenti icone e avatar diventano poco leggibili.
+div.presente-assente {
+    opacity: 0.4;
+    transition: opacity $transition-fast;
+}
+tr.presente-assente .presenti-nome-cell {
     opacity: 0.4;
     transition: opacity $transition-fast;
 }
