@@ -674,7 +674,7 @@ body[data-palette="public"] {
 // oltre la portata massima dell'arco (raggio 86.5px + 18px di icona =
 // 104.5px dal centro anello), anche se il box del pannello ci si sovrappone.
 .ct-hud__ring--left .ct-hud__panel { left: 140px; width: 270px; padding-left: 40px; }
-.ct-hud__ring--right .ct-hud__panel { right: 140px; width: 270px; padding-right: 74px; }
+.ct-hud__ring--right .ct-hud__panel { right: 140px; width: 270px; padding-right: 40px; }
 
 // Meteo.jsx: sostituisce nome/descrizione nel pannello sinistro quando si e'
 // sulla mappa generale (location.tipo === 'mappa', vedi Hud.jsx).
