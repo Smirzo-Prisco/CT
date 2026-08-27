@@ -305,7 +305,7 @@ function PostCard({ msg, isFirst, onEdit, onDelete, onEditQuest = null, isStaff 
                                             ) : (
                                                 <>
                                                     <p className={styles.segnalaInfo}>
-                                                        Post di <strong>{msg.autore}</strong> — il messaggio verrà inviato via DM a tutti i giocatori.
+                                                        Post di <strong>{msg.autore}</strong> — il messaggio verrà inviato via messaggio a tutti i giocatori attivi negli ultimi tre giorni.
                                                     </p>
                                                     <textarea
                                                         className={styles.segnalaTextarea}
