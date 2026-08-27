@@ -35,6 +35,13 @@ const AZIONI = [
         danger: false,
     },
     {
+        key: 'missing_notify',
+        label: 'Personaggi assenti — invio e-mail di preavviso',
+        description: 'Invia una e-mail di preavviso ai personaggi inattivi da più della soglia scelta, prima che vengano marcati come cancellati. Lo staff viene escluso automaticamente.',
+        mesi: { min: 1, max: 12, default: 6 },
+        danger: false,
+    },
+    {
         key: 'missing_soft',
         label: 'Personaggi assenti — cancellazione soft',
         description: 'Marca come cancellati (senza rimuoverli fisicamente) i personaggi inattivi da più della soglia scelta. Lo staff viene escluso automaticamente.',

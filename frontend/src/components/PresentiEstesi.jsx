@@ -369,7 +369,7 @@ export default function PresentiEstesi({ isStaff = false }) {
                         <td>SMS</td>
                         <td style={{ display: 'none' }}>RAZZA ICO</td>
                         <td>RAZZA</td>
-                        <td>LAVORO</td>
+                        <td>MESTIERE</td>
                         <td>GILDA</td>
                         <td>NOME</td>
                         <td>CARICHE</td>

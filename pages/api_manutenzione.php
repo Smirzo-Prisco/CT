@@ -2,9 +2,10 @@
 /**
  * api_manutenzione.php — Endpoint JSON per il pannello React "Gestione manutenzione"
  *
- * op = old_log | old_chat | old_messages | missing | missing_soft | deleted | blacklisted
+ * op = old_log | old_chat | old_messages | missing_notify | missing | missing_soft | deleted | blacklisted
  *   GET  → preview (sola lettura): conteggi/campione di quello che verrebbe toccato
- *   POST → execute: esegue davvero le query distruttive
+ *   POST → execute: esegue davvero le query distruttive (missing_notify invia e-mail reali,
+ *          non tocca il DB se non per il conteggio)
  *
  * Accesso riservato agli admin ($_SESSION['admin'] == 1).
  */
@@ -180,6 +181,65 @@ switch ($op) {
             gdrcd_query("DELETE FROM personaggio $where");
             gdrcd_query("OPTIMIZE TABLE personaggio");
             echo json_encode(['success' => true, 'message' => 'Personaggi inattivi eliminati definitivamente.']);
+        }
+        break;
+
+    // -------------------------------------------------------------------------
+    // MISSING_NOTIFY — invia un'e-mail di preavviso ai personaggi inattivi da
+    // N mesi (stessa soglia/esclusione staff di MISSING_SOFT), prima che
+    // vengano marcati come cancellati. Non modifica il personaggio: solo invio
+    // e-mail reali via send_mail() (Brevo), personaggi senza indirizzo saltati.
+    // -------------------------------------------------------------------------
+    case 'missing_notify':
+        $mesi = leggi_mesi($isPreview, $data, 1, 12);
+        if ($mesi === null) {
+            echo json_encode(['success' => false, 'message' => 'Numero di mesi non valido (1-12)']);
+            exit;
+        }
+        $where = "WHERE DATE_SUB(NOW(), INTERVAL $mesi MONTH) > ora_entrata AND permessi = 0";
+
+        if ($isPreview) {
+            $pg = campiona_personaggi($where);
+            echo json_encode(['success' => true,
+                'title' => "Invia e-mail di preavviso ai personaggi inattivi da più di $mesi mesi",
+                'warning' => 'Verrà inviata una vera e-mail a ciascun personaggio coinvolto che ha un indirizzo registrato. Nessun dato del personaggio viene modificato.',
+                'items' => [
+                    ['label' => 'Personaggi coinvolti (staff escluso)', 'count' => $pg['totale'], 'sample' => $pg['sample']],
+                ],
+                'notes' => [
+                    'I personaggi senza indirizzo e-mail registrato vengono saltati automaticamente.',
+                ],
+            ]);
+        } else {
+            $res = gdrcd_query("SELECT nome, email FROM personaggio $where", 'result');
+            $personaggi = [];
+            while ($row = gdrcd_query($res, 'fetch')) $personaggi[] = $row;
+            gdrcd_query($res, 'free');
+
+            $inviate = 0;
+            $fallite = 0;
+            $saltate = 0;
+            $subject = 'Il tuo personaggio ti aspetta su Crystal Tokyo';
+
+            foreach ($personaggi as $riga) {
+                if (empty($riga['email'])) { $saltate++; continue; }
+
+                $nome = htmlspecialchars($riga['nome'], ENT_QUOTES, 'UTF-8');
+                $body = "Ciao $nome,<br>"
+                      . "ci siamo accorti che non entri su Crystal Tokyo da molto tempo.<br>"
+                      . "<strong>A breve il tuo account verrà eliminato per inattività.</strong> "
+                      . "Ti consigliamo di <u>effettuare l'accesso</u> per non perdere la storia del tuo personaggio e la sua impronta in Crystal Tokyo.<br>"
+                      . "<em>Ti aspettiamo!</em><br><br>"
+                      . 'Lo staff di <a href="https://crystaltokyo.it/">Crystal Tokyo</a>';
+
+                if (send_mail($riga['email'], $subject, $body)) $inviate++;
+                else $fallite++;
+            }
+
+            $messaggio = "E-mail inviate: $inviate.";
+            if ($fallite > 0) $messaggio .= " Fallite: $fallite.";
+            if ($saltate > 0) $messaggio .= " Saltate (senza e-mail): $saltate.";
+            echo json_encode(['success' => true, 'message' => $messaggio]);
         }
         break;
 
