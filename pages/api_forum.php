@@ -931,8 +931,11 @@ switch ($op) {
             'Note: ' . nl2br(htmlspecialchars($commento, ENT_QUOTES, 'UTF-8'))
         );
 
-        // Invia DM off-game a tutti i giocatori
-        $res = gdrcd_query("SELECT nome FROM personaggio", 'result');
+        // Invia DM off-game solo ai giocatori attivi: non cancellati (permessi != -1)
+        // e che hanno effettuato l'accesso negli ultimi 3 giorni
+        $res = gdrcd_query("SELECT nome FROM personaggio
+            WHERE permessi != " . DELETED . "
+              AND ora_entrata >= DATE_SUB(NOW(), INTERVAL 3 DAY)", 'result');
         $inviati = 0;
         while ($row = gdrcd_query($res, 'fetch')) {
             send_sms($login, $row['nome'], '', $testo, 0);
