@@ -32,6 +32,9 @@ const TIPOLOGIE_QUEST = [
 /** -5 … +10 step 0.5 (come il composer manuale del forum) */
 const puntiOpts = Array.from({ length: 31 }, (_, i) => (i - 10) / 2)
 
+/** -10 … +10 interi (come il composer manuale del forum) */
+const notOpts = Array.from({ length: 21 }, (_, i) => i - 10)
+
 /** Stessa logica di navigate() usata altrove nel progetto (es. RoleRecap.jsx) */
 function navigate(url) {
     if (window.CT?.navigate) window.CT.navigate(url)
@@ -60,7 +63,7 @@ export default function QuestRecapModal({ game, onClose }) {
             .then(d => {
                 if (d.success) {
                     setLocation(d.location ?? '')
-                    setPgPunti((d.partecipanti ?? []).map(nome => ({ nome, exp: 0, shin: 0, mestiere: 0 })))
+                    setPgPunti((d.partecipanti ?? []).map(nome => ({ nome, exp: 0, shin: 0, notorieta: 0, mestiere: 0 })))
                     setRecapThreadId(d.quest_recap_thread_id ?? null)
                 } else {
                     setLoadError(d.message ?? 'Errore nel caricamento')
@@ -184,7 +187,7 @@ export default function QuestRecapModal({ game, onClose }) {
                                 <div className="quest-table-wrap">
                                     <table className="quest-punti-table">
                                         <thead>
-                                            <tr><th>Pg</th><th>Exp</th><th>Shin</th><th>Mestiere</th></tr>
+                                            <tr><th>Pg</th><th>Exp</th><th>Shin</th><th>Notorietà</th><th>Mestiere</th></tr>
                                         </thead>
                                         <tbody>
                                             {pgPunti.map((pg, i) => (
@@ -198,6 +201,11 @@ export default function QuestRecapModal({ game, onClose }) {
                                                     <td>
                                                         <select value={pg.shin} onChange={e => updatePg(i, 'shin', parseFloat(e.target.value))}>
                                                             {puntiOpts.map(v => <option key={v} value={v}>{v}</option>)}
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select value={pg.notorieta} onChange={e => updatePg(i, 'notorieta', parseInt(e.target.value))}>
+                                                            {notOpts.map(v => <option key={v} value={v}>{v}</option>)}
                                                         </select>
                                                     </td>
                                                     <td>
