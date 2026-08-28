@@ -889,10 +889,9 @@ function mestiere_luogo(int $id_mestiere): ?int {
  * transazioni), quindi un fallimento a meta' non puo' essere annullato in
  * automatico.
  *
- * Escluse deliberatamente: tokyobook.nickname (alias scelto liberamente
- * dall'utente, non deve seguire il nome reale), PNG.Nome (nome di una
- * reliquia, non di un personaggio), PuntiPNG.Nome (sempre vuoto, feature
- * morta), clgpersonaggioruolo.nickname (soprannome di ruolo, non collegato).
+ * Escluse deliberatamente: PNG.Nome (nome di una reliquia, non di un
+ * personaggio), PuntiPNG.Nome (sempre vuoto, feature morta),
+ * clgpersonaggioruolo.nickname (soprannome di ruolo, non collegato).
  */
 function rename_personaggio_completo(string $vecchio, string $nuovo): bool {
     $v = gdrcd_filter('in', $vecchio);
@@ -964,10 +963,6 @@ function rename_personaggio_completo(string $vecchio, string $nuovo): bool {
         ['sms', 'mittente_nome'],
         ['struttura_affetti', 'nomePg'],
         ['struttura_affetti', 'username'],
-        ['tokyobook', 'personaggio'],
-        ['tokyobook_bacheca', 'autore'],
-        ['tokyobook_lettura', 'login'],
-        ['tokyobook_likes', 'login'],
     ];
 
     foreach ($semplici as [$tabella, $colonna]) {

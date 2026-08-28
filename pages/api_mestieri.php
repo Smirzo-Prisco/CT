@@ -282,7 +282,7 @@ switch ($op) {
 
         // Mestieri con funzionalità hardcoded nel codice (sconti mercato, cura in
         // ospedale, permessi chat, dispacci Crystal News: pages/api_chat.php,
-        // tokyobook.inc.php, scheda/menu.inc.php, oggetto_*.inc.php, api_admin.php,
+        // scheda/menu.inc.php, oggetto_*.inc.php, api_admin.php,
         // api_bot.php). Eliminarli non lascerebbe righe orfane (le dipendenze
         // vengono comunque ripulite) ma romperebbe silenziosamente quelle
         // funzionalità: restano gestibili solo con "Nascondi".

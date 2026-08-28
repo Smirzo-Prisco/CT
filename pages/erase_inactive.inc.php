@@ -36,8 +36,6 @@
    gdrcd_query("DELETE FROM Punti WHERE nome = '$nome'"); /* CANCELLO SMS PG*/
    gdrcd_query("DELETE FROM araldo_letto WHERE nome = '$nome'"); /* CANCELLO SMS PG*/
    gdrcd_query("DELETE FROM struttura_affetti WHERE username = '$nome'"); /* CANCELLO SMS PG*/
-   gdrcd_query("DELETE FROM tokyobook_lettura WHERE login = '$nome'"); /* CANCELLO SMS PG*/
-   gdrcd_query("DELETE FROM tokyobook_likes WHERE login = '$nome'"); /* CANCELLO SMS PG*/
    gdrcd_query("DELETE from log_spesa WHERE nome = '$nome'");
 
         }
