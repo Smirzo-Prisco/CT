@@ -223,7 +223,10 @@ function PostCard({ msg, isFirst, onEdit, onDelete, onEditQuest = null, isStaff 
                                 alt={msg.autore}
                             />
                         )}
-                        <div className={`forum_post_author ${styles.authorName}`}>{msg.autore}</div>
+                        <a href={`main.php?page=scheda&pg=${encodeURIComponent(msg.autore)}`}
+                           className={`forum_post_author ${styles.authorName}`}>
+                            {msg.autore}
+                        </a>
                         <div className={`forum_date_big ${styles.authorDate}`}>{formatDate(msg.data)}</div>
                     </td>
 
