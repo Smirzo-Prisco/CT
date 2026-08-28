@@ -91,7 +91,6 @@ switch ($op) {
             $voci = [];
             if ($perms['admin']) {
                 $voci[] = ['label' => 'Mestieri e Gilde', 'url' => 'gestione.php?page=gestione_mestieri'];
-                $voci[] = ['label' => 'Assegna mestiere', 'url' => 'gestione.php?page=gestione_mestiere'];
             }
             if ($perms['admin'] || $perms['capogilda'])
                 $voci[] = ['label' => 'Statuti', 'url' => 'gestione.php?page=gestione_statuti_new'];
