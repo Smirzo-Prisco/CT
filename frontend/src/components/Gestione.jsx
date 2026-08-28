@@ -43,9 +43,11 @@ function GestioneCard({ card }) {
             <ul className="sub-menu">
                 {card.voci.map((voce, i) => (
                     <li key={i}>
-                        {voce.url === '#'
-                            ? <span>{voce.label}</span>
-                            : <a href={voce.url} onClick={e => { e.preventDefault(); navigate(voce.url) }}>{voce.label}</a>
+                        {voce.disabled
+                            ? <span className="sub-menu-disabled" title="Non più utilizzato">{voce.label}</span>
+                            : voce.url === '#'
+                                ? <span>{voce.label}</span>
+                                : <a href={voce.url} onClick={e => { e.preventDefault(); navigate(voce.url) }}>{voce.label}</a>
                         }
                     </li>
                 ))}

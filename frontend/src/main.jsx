@@ -211,11 +211,15 @@ document.addEventListener('click', function(e) {
     const link = e.target.closest('a')
     if (!link || !link.href) return
 
-    // Blocca la navigazione default per href="#" e "javascript:..." (non sono link reali).
+    // Blocca la navigazione default solo per href="#" (non e' un link reale).
     // e.preventDefault() impedisce al browser di aggiungere "#" all'URL (che può scatenare
     // popstate e uscire dalla stanza), ma NON blocca gli onclick/handler già attaccati al link.
+    // href="javascript:..." NON va bloccato qui: a differenza di "#" non tocca mai la URL/history,
+    // e per i link legacy senza un handler onclick separato E' l'unico modo in cui l'azione parte
+    // (bloccarne il default la disattiva silenziosamente, es. i pulsanti "Indietro" con
+    // href="javascript:history.back()" nelle pagine gestione_*.inc.php).
     const rawHref = link.getAttribute('href') ?? ''
-    if (!rawHref || rawHref === '#' || rawHref.startsWith('#') || rawHref.startsWith('javascript:')) {
+    if (!rawHref || rawHref === '#' || rawHref.startsWith('#')) {
         e.preventDefault()
         return
     }

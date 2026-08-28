@@ -181,9 +181,10 @@ if ($id_mestiere !== null && $id_mestiere !== -1) {
         </section>
         <?php endif; //else (ruoli definiti)
 
-        /*Dimissioni: affiliazioni scadute del login corrente (self-quit) — ora su entrambe
-          le tabelle, un utente può avere sia un mestiere che una gilda scaduti insieme*/
-        $affiliazioni        = "SELECT mestiere.id_mestiere, ruolo_mestiere.nome_ruolo, mestiere.nome, ruolo_mestiere.id_ruolo FROM ruolo_mestiere LEFT JOIN mestiere ON mestiere.id_mestiere = ruolo_mestiere.mestiere WHERE ruolo_mestiere.id_ruolo IN (
+        /*Dimissioni: affiliazione scaduta del login corrente (self-quit) SOLO per il
+          mestiere/gilda che si sta gestendo in questa pagina ($id_mestiere) — non le
+          affiliazioni scadute su altri mestieri/gilde, che non c'entrano qui*/
+        $affiliazioni        = "SELECT mestiere.id_mestiere, ruolo_mestiere.nome_ruolo, mestiere.nome, ruolo_mestiere.id_ruolo FROM ruolo_mestiere LEFT JOIN mestiere ON mestiere.id_mestiere = ruolo_mestiere.mestiere WHERE ruolo_mestiere.mestiere = $id_mestiere AND ruolo_mestiere.id_ruolo IN (
             SELECT id_ruolo FROM clgpersonaggiomestiere WHERE personaggio = '".$_SESSION['login']."' AND scadenza < NOW()
             UNION
             SELECT id_ruolo FROM clgpersonaggioaffiliazione WHERE personaggio = '".$_SESSION['login']."' AND scadenza < NOW()
