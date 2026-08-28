@@ -877,6 +877,125 @@ function mestiere_luogo(int $id_mestiere): ?int {
 }
 
 /**
+ * Rinomina un personaggio in ogni tabella del DB dove il suo nome compare come
+ * riferimento (~45 colonne, censite a mano incrociando information_schema con
+ * i dati reali — vedi conversazione di progetto del 2026-08-28). Sostituisce
+ * la vecchia cascata parziale in user_cambio_nome.inc.php, che copriva solo
+ * 8 tabelle su una quarantina.
+ *
+ * Il chiamante deve aver gia' validato che $vecchio esista e $nuovo sia libero
+ * PRIMA di invocare questa funzione: qui non ci sono controlli. Non e'
+ * atomica -- la maggior parte delle tabelle del DB e' MyISAM (nessun supporto
+ * transazioni), quindi un fallimento a meta' non puo' essere annullato in
+ * automatico.
+ *
+ * Escluse deliberatamente: tokyobook.nickname (alias scelto liberamente
+ * dall'utente, non deve seguire il nome reale), PNG.Nome (nome di una
+ * reliquia, non di un personaggio), PuntiPNG.Nome (sempre vuoto, feature
+ * morta), clgpersonaggioruolo.nickname (soprannome di ruolo, non collegato).
+ */
+function rename_personaggio_completo(string $vecchio, string $nuovo): bool {
+    $v = gdrcd_filter('in', $vecchio);
+    $n = gdrcd_filter('in', $nuovo);
+
+    // Tabelle/colonne con corrispondenza 1:1 (valore = nome esatto del personaggio)
+    $semplici = [
+        ['personaggio', 'nome'],
+        ['personaggio', 'autore_esilio'],
+        ['log', 'nome_interessato'],
+        ['log', 'autore'],
+        ['messaggi', 'mittente'],
+        ['messaggi', 'destinatario'],
+        ['backmessaggi', 'mittente'],
+        ['backmessaggi', 'destinatario'],
+        ['clgpersonaggioabilita', 'nome'],
+        ['clgpersonaggiomostrine', 'nome'],
+        ['clgpersonaggiooggetto', 'nome'],
+        ['clgpersonaggiooggetto2', 'nome'],
+        ['clgpersonaggioruolo', 'personaggio'],
+        ['clgpersonaggioaffiliazione', 'personaggio'],
+        ['clgpersonaggioinclinazione', 'personaggio'],
+        ['clgpersonaggiolavoro', 'personaggio'],
+        ['clgpersonaggiomestiere', 'personaggio'],
+        ['BakCalendario', 'Destinatario'],
+        ['BakCalendario', 'Mittente'],
+        ['Punti', 'nome'],
+        ['PuntiMestiere', 'nome'],
+        ['araldo_follow', 'nome'],
+        ['araldo_letto', 'nome'],
+        ['bak_chat', 'destinatario'],
+        ['bak_chat', 'mittente'],
+        ['calendario_eventi', 'autore'],
+        ['calendario_partecipanti', 'nome'],
+        ['chat', 'destinatario'],
+        ['chat', 'mittente'],
+        ['chat_letta', 'nome'],
+        ['chat_master', 'pg'],
+        ['chatbot_log', 'nome_personaggio'],
+        ['chess', 'nome'],
+        ['conversazioni_individuali', 'utente_nome'],
+        ['ctnews', 'autore'],
+        ['cure', 'nome'],
+        ['cure_emergenza', 'nome'],
+        ['log_doppi', 'Nome'],
+        ['log_doppi', 'Doppio'],
+        ['log_entrate', 'Nome'],
+        ['log_spesa', 'nome'],
+        ['mappa', 'proprietario'],
+        ['mappa_click', 'nome'],
+        ['messaggio_moderazione', 'autore'],
+        ['messaggio_quest', 'autore'],
+        ['messaggioaraldo', 'autore'],
+        ['notifiche', 'nome'],
+        ['oggetto', 'creatore'],
+        ['oggetto2', 'creatore'],
+        ['preferenze_notifiche', 'nome'],
+        ['privilegi', 'nome'],
+        ['quest_turn_order', 'pg_name'],
+        ['role_durations', 'pg_name'],
+        ['role_fights', 'target'],
+        ['role_item_buffs', 'pg_name'],
+        ['role_session_players', 'pg_name'],
+        ['role_session_shin', 'pg_name'],
+        ['role_skill_buffs', 'pg_name'],
+        ['role_sessions', 'master'],
+        ['scelte_utenti', 'nome'],
+        ['sms', 'destinatario_nome'],
+        ['sms', 'mittente_nome'],
+        ['struttura_affetti', 'nomePg'],
+        ['struttura_affetti', 'username'],
+        ['tokyobook', 'personaggio'],
+        ['tokyobook_bacheca', 'autore'],
+        ['tokyobook_lettura', 'login'],
+        ['tokyobook_likes', 'login'],
+    ];
+
+    foreach ($semplici as [$tabella, $colonna]) {
+        gdrcd_query("UPDATE $tabella SET $colonna = '$n' WHERE $colonna = '$v'");
+    }
+
+    // Caso speciale: appuntamenti.autore e' un nome singolo, ma .destinatario e'
+    // una lista di piu' nomi separati da virgola (es. "Acamar, Macbeth, Enma") --
+    // un UPDATE diretto per uguaglianza romperebbe la lista invece di sostituire
+    // solo il nome interessato
+    gdrcd_query("UPDATE appuntamenti SET autore = '$n' WHERE autore = '$v'");
+
+    $righe = gdrcd_query(
+        "SELECT id, destinatario FROM appuntamenti WHERE FIND_IN_SET('$v', REPLACE(destinatario, ', ', ','))",
+        'result'
+    );
+    while ($riga = gdrcd_query($righe, 'fetch')) {
+        $nomi = array_map('trim', explode(',', $riga['destinatario']));
+        $nomi = array_map(fn($x) => $x === $vecchio ? $nuovo : $x, $nomi);
+        $nuovo_destinatario = gdrcd_filter('in', implode(', ', $nomi));
+        gdrcd_query("UPDATE appuntamenti SET destinatario = '$nuovo_destinatario' WHERE id = " . (int)$riga['id']);
+    }
+    gdrcd_query($righe, 'free');
+
+    return true;
+}
+
+/**
  * Vero se il personaggio ha una qualunque affiliazione (anche non da capo)
  * su questo mestiere, tramite clgpersonaggiomestiere o clgpersonaggioaffiliazione.
  */
