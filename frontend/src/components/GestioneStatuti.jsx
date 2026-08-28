@@ -11,6 +11,10 @@
  * id_mestiere. Stessa struttura lista + modale + righe editabili inline di
  * GestioneMestieri.jsx (ruoli -> articoli).
  *
+ * StatutoModal è esportata e riusata direttamente da GestioneMestieri.jsx
+ * (icona "Statuto" nella tabella Mestieri): questa pagina standalone resta
+ * raggiungibile via URL diretto ma non è più linkata dalla dashboard.
+ *
  * API: pages/api_mestieri.php (op=list, statuti_list, statuti_save, statuti_delete)
  */
 
@@ -110,8 +114,10 @@ function ArticoloRow({ articolo, idMestiere, onSaved, onDeleted }) {
 }
 
 // ── Modale statuto di un mestiere ──────────────────────────────────────────
+// Esportata: riusata anche da GestioneMestieri.jsx come azione per riga
+// (icona "Statuto" nella tabella Mestieri), non solo da questa pagina.
 
-function StatutoModal({ mestiere, onClose }) {
+export function StatutoModal({ mestiere, onClose }) {
     const [articoli, setArticoli] = useState([])
     const [loading, setLoading]   = useState(true)
     const [error, setError]       = useState(null)

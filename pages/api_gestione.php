@@ -80,18 +80,15 @@ switch ($op) {
         }
 
         // 2. GILDE E MESTIERI (razze narrative — tabella gilda — + mestieri/gilde
-        // giocatore + statuti mestiere). Card unica: icona presa da "Mestieri e
-        // Gilde"/"Statuti mestieri" (era già quella del card mestieri).
+        // giocatore). Card unica, icona presa da "Mestieri e Gilde" (era già
+        // quella del card mestieri). Statuti mestiere non più linkati da qui:
+        // azione icona per riga nella tabella Mestieri di GestioneMestieri.jsx.
         if ($perms['admin'] || $perms['master'] || $perms['capogilda']) {
             $voci = [];
             if ($perms['admin'] || $perms['capogilda'])
                 $voci[] = ['label' => 'Nuove razze', 'url' => 'gestione.php?page=gestione_gilde'];
-            if ($perms['admin']) {
+            if ($perms['admin'])
                 $voci[] = ['label' => 'Mestieri e Gilde', 'url' => 'gestione.php?page=gestione_mestieri'];
-                // Solo admin: gli statuti di gilda (id_gilda) sono gestiti da gestione_gilde.inc.php,
-                // questa pagina copre ormai solo gli statuti mestiere
-                $voci[] = ['label' => 'Statuti mestieri', 'url' => 'gestione.php?page=gestione_statuti_new'];
-            }
             if (!empty($voci))
                 $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri e Gilde', 'icon' => 'fa-briefcase', 'voci' => $voci];
         }
