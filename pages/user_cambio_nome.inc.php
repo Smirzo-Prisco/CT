@@ -8,12 +8,17 @@ $iscriz = explode(' ', $row['data']);
 $iscriz = $iscriz['0'];
 ?>
 <div class="pagina_user_cambio_nome">
-    <!-- Titolo della pagina -->
-    <div class="page_title">
-        <h2><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['page_name']); ?></h2>
+    <div class="gp-topbar">
+        <div class="gp-topbar__left">
+            <button type="button" class="gp-back" title="Indietro" onclick="history.back()">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+        </div>
+        <div class="gp-topbar__center">
+            <h2><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['page_name']); ?></h2>
+        </div>
     </div>
-    <!-- Box principale -->
-    <div class="page_body">
+    <div class="cn-body">
         <?php /*Cambio pass utenti*/
         if($_POST['op'] == 'new') {
             if(($email == gdrcd_filter_email($_POST['email'])) && ($pass == gdrcd_encript($_POST['new_pass'])) && ($iscriz >= strftime('%Y-%m-%d')) && (empty($_POST['new_name']) === false)) {
@@ -99,33 +104,23 @@ $iscriz = $iscriz['0'];
         /*Visualizzazione di base*/
         if(isset($_POST['op']) === false) {
             if($iscriz >= strftime('%Y-%m-%d')) { ?>
-                <div class="panels_box">
-                    <div class="form_gioco">
-                        <form action="main.php?page=user_cambio_nome" method="post">
-                            <div class="form_label">
-                                <?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['email']); ?>
-                            </div>
-                            <div class="form_field">
-                                <input name="email" />
-                            </div>
-                            <div class="form_label">
-                                <?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['pass']); ?>
-                            </div>
-                            <div class="form_field">
-                                <input name="new_pass" />
-                            </div>
-                            <div class="form_label">
-                                <?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['new']); ?>
-                            </div>
-                            <div class="form_field">
-                                <input name="new_name" />
-                            </div>
-                            <div class="form_submit">
-                                <input type="hidden" name="op" value="new" />
-                                <input type="submit" name="nulla" value="<?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['pass']['submit']['user']); ?>" />
-                            </div>
-                        </form>
-                    </div>
+                <div class="cn-panel">
+                    <form action="main.php?page=user_cambio_nome" method="post">
+                        <div class="form-group">
+                            <label><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['email']); ?></label>
+                            <input name="email" />
+                        </div>
+                        <div class="form-group">
+                            <label><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['pass']); ?></label>
+                            <input name="new_pass" />
+                        </div>
+                        <div class="form-group">
+                            <label><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['new']); ?></label>
+                            <input name="new_name" />
+                        </div>
+                        <input type="hidden" name="op" value="new" />
+                        <button type="submit" class="btn btn--primary"><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['pass']['submit']['user']); ?></button>
+                    </form>
                 </div>
             <?php }//if
             if($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1) {
@@ -135,35 +130,30 @@ $iscriz = $iscriz['0'];
                     $query = "SELECT nome FROM personaggio WHERE permessi < ".SUPERUSER." ORDER BY nome";
                 }
                 $result = gdrcd_query($query, 'result'); ?>
-                <div class="panels_box">
-                    <div class="form_gioco">
-                        <form action="main.php?page=user_cambio_nome" method="post">
-                            <div class="form_label">
-                                <?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['force']); ?>
-                            </div>
-                            <div class="form_field">
-                                <input name="new_name" />
-                            </div>
-                            <div class="form_field">
-                                <select name="account">
-                                    <option disabled selected><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['change_to']); ?></option>
-                                    <?php while($row = gdrcd_query($result, 'fetch')) { ?>
-                                        <option value="<?php echo $row['nome']; ?>"><?php echo $row['nome']; ?></option>
-                                    <?php }//while
-                                    gdrcd_query($result, 'free');
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="form_submit">
-                                <input type="hidden" name="op" value="force" />
-                                <input type="submit" name="nulla" value="<?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['pass']['submit']['user']); ?>" />
-                            </div>
-                        </form>
-                    </div>
+                <div class="cn-panel">
+                    <h3 class="cn-panel__title"><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['force']); ?></h3>
+                    <form action="main.php?page=user_cambio_nome" method="post">
+                        <div class="form-group">
+                            <label><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['new']); ?></label>
+                            <input name="new_name" />
+                        </div>
+                        <div class="form-group">
+                            <select name="account">
+                                <option disabled selected><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['name']['change_to']); ?></option>
+                                <?php while($row = gdrcd_query($result, 'fetch')) { ?>
+                                    <option value="<?php echo $row['nome']; ?>"><?php echo $row['nome']; ?></option>
+                                <?php }//while
+                                gdrcd_query($result, 'free');
+                                ?>
+                            </select>
+                        </div>
+                        <input type="hidden" name="op" value="force" />
+                        <button type="submit" class="btn btn--primary"><?php echo gdrcd_filter('out', $MESSAGE['interface']['user']['pass']['submit']['user']); ?></button>
+                    </form>
                 </div>
             <?php }//if
         }//if
         ?>
     </div>
-</div><!-- Box principale -->
+</div>
 

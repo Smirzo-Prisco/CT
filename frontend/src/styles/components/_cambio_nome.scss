@@ -1,0 +1,81 @@
+@use '../tokens' as *;
+
+// Pagina cambio nome (main.php/gestione.php?page=user_cambio_nome) — pagina
+// legacy, mai state allineata alle regole grafiche del pannello Gestione
+// (mancava perfino il pulsante "Indietro"). .gp-topbar/.gp-back sono classi
+// globali gia' definite in _gestione.scss, qui serve solo lo stile del corpo.
+
+.pagina_user_cambio_nome {
+    .cn-body {
+        padding: $space-5;
+        display: flex;
+        flex-direction: column;
+        gap: $space-5;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    .cn-panel {
+        background: $color-surface-raised;
+        border-radius: $radius-lg;
+        padding: $space-5;
+    }
+
+    .cn-panel__title {
+        margin: 0 0 $space-4;
+        font-size: 1rem;
+        font-weight: $font-weight-bold;
+        color: $color-text-title;
+    }
+
+    .form-group {
+        margin-bottom: $space-4;
+
+        label {
+            display: block;
+            margin-bottom: $space-1 + 1;
+            font-weight: 600;
+            color: $color-text-muted;
+        }
+
+        input,
+        select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: $space-2 $space-3;
+            border-radius: $radius-md;
+            border: 1px solid $color-border;
+            background: $color-surface-input;
+            color: $color-text;
+        }
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .error,
+    .warning {
+        padding: $space-3 $space-4;
+        border-radius: $radius-md;
+        margin-bottom: $space-4;
+    }
+
+    .error {
+        background: rgba($color-danger, 0.15);
+        color: $color-danger;
+    }
+
+    .warning {
+        background: rgba($color-success, 0.15);
+        color: $color-success;
+    }
+
+    .link_back {
+        text-align: center;
+
+        a {
+            color: $color-action;
+        }
+    }
+}
