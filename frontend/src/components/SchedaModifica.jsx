@@ -6,7 +6,7 @@
  *
  * Accesso: solo proprio pg o admin (403 dall'API altrimenti).
  *
- * Nickname Tokyobook e Gilda diventano readonly dopo il primo salvataggio
+ * Nickname Gilda diventa readonly dopo il primo salvataggio
  * (logica enforcement anche server-side nella API).
  *
  * La funzione checkVolto chiama api_global.php?op=checkVolto direttamente,
@@ -117,7 +117,7 @@ export default function SchedaModifica() {
     if (!form)  return <div className="pagina_scheda"><div>Caricamento…</div></div>
 
     const { nome, cognome, is_own, is_admin, is_staff, is_master,
-            nickname_tokyo_readonly, nickname_gilda_set, nickname_gilda_readonly,
+            nickname_gilda_set, nickname_gilda_readonly,
             allow_audio } = form
 
     return (
@@ -225,20 +225,6 @@ export default function SchedaModifica() {
 
                                 {/* ── ALIAS E SOPRANNOMI ───────────────── */}
                                 <SectionHeader>Alias e soprannomi</SectionHeader>
-
-                                <FormRow label={
-                                    <>Tokyobook<br />
-                                    <em className={styles.smallText}>
-                                        {form.nickname_tokyo == null
-                                            ? '(Puoi impostarlo)'
-                                            : '(Modificabile una sola volta)'}
-                                    </em></>
-                                }>
-                                    <input type="text" className={`form_input ${styles.fullWidth}`}
-                                        value={form.nickname_tokyo ?? ''}
-                                        onChange={upd('nickname_tokyo')}
-                                        readOnly={nickname_tokyo_readonly} />
-                                </FormRow>
 
                                 {nickname_gilda_set && (
                                     <FormRow label={

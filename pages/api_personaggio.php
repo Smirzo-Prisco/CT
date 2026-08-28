@@ -67,7 +67,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                     'luogo' => 'natoa',
                     'volto' => 'volto',
                     'musica' => 'url_media',
-                    'alias' => 'nickname',
                     'img' => 'url_img',
                     'imgchat' => 'url_img_chat',
                     'background' => 'principale',

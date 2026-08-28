@@ -325,10 +325,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                         <label for="musica">Musica scheda (URL)</label>
                         <input type="url" id="musica" name="musica">
                     </div>
-                    <div class="form-group form-column">
-                        <label for="alias">Alias Tokyobook</label>
-                        <input type="text" id="alias" name="alias">
-                    </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group form-column">

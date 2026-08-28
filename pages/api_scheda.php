@@ -827,9 +827,6 @@ switch ($op) {
             echo json_encode(['success' => false, 'message' => 'Personaggio non trovato']);
             exit;
         }
-        // Nickname TokyoBook (tabella tokyobook)
-        $tb_r = gdrcd_query("SELECT nickname FROM tokyobook WHERE personaggio = '$pg' LIMIT 1");
-        $nick_tokyo = $tb_r ? $tb_r['nickname'] : null;
         // Nickname Gilda (tabella clgpersonaggioruolo)
         $gg_r = gdrcd_query("SELECT nickname FROM clgpersonaggioruolo WHERE personaggio = '$pg' LIMIT 1");
         $nick_gilda = $gg_r ? $gg_r['nickname'] : null;
@@ -852,8 +849,6 @@ switch ($op) {
             'off'                    => $pg_data['off']        ?? '',
             'blocca_media'           => (bool)($pg_data['blocca_media'] ?? 0),
             'url_media'              => $pg_data['url_media']  ?? '',
-            'nickname_tokyo'         => $nick_tokyo,
-            'nickname_tokyo_readonly' => ($nick_tokyo !== null) && !$is_admin,
             'nickname_gilda'         => $nick_gilda,
             'nickname_gilda_set'     => ($gg_r !== false),
             'nickname_gilda_readonly' => (!empty($nick_gilda)) && !$is_admin,
@@ -898,17 +893,6 @@ switch ($op) {
             $pg
         ));
         if ($is_own) $_SESSION['blocca_media'] = ($data['blocca_media'] ?? false) ? 1 : 0;
-        // Nickname TokyoBook
-        $nick_tokyo_new = gdrcd_filter('in', $data['nickname_tokyo'] ?? '');
-        if (!empty($nick_tokyo_new)) {
-            $existing_tb = gdrcd_query("SELECT nickname FROM tokyobook WHERE personaggio = '$pg' LIMIT 1");
-            if ($existing_tb) {
-                if ($is_admin || empty($existing_tb['nickname']))
-                    gdrcd_query("UPDATE tokyobook SET nickname='$nick_tokyo_new' WHERE personaggio='$pg'");
-            } else {
-                gdrcd_query("INSERT INTO tokyobook (personaggio, nickname) VALUES ('$pg', '$nick_tokyo_new')");
-            }
-        }
         // Nickname Gilda (solo aggiornamento, non inserimento)
         $nick_gilda_new = gdrcd_filter('in', $data['nickname_gilda'] ?? '');
         if (!empty($nick_gilda_new)) {

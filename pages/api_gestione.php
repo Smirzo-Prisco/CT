@@ -115,15 +115,11 @@ switch ($op) {
         // "Cambio nome" aggiunta il 2026-08-28: pagina esistente ma priva di
         // qualunque punto d'ingresso, riportata in vita dopo il fix del
         // controllo permessi (vedi user_cambio_nome.inc.php).
-        // "Tokyobook (provvisorio)" aggiunta lo stesso giorno solo per
-        // esplorazione admin — la pagina resta comunque irraggiungibile dal
-        // resto del sito, questo e' l'unico punto d'ingresso.
         if ($perms['admin']) {
             $menu[] = ['key' => 'log', 'label' => 'Log', 'icon' => 'fa-file-lines', 'voci' => [
                 ['label' => 'Tutti i log',  'url' => 'gestione.php?page=log'],
                 ['label' => 'Manutenzione', 'url' => 'gestione.php?page=gestione_manutenzione'],
                 ['label' => 'Cambio nome',  'url' => 'gestione.php?page=user_cambio_nome'],
-                ['label' => 'Tokyobook (provvisorio)', 'url' => 'gestione.php?page=tokyobook'],
             ]];
         }
 
