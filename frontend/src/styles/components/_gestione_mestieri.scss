@@ -37,17 +37,16 @@
     flex-direction: column;
 }
 
-// Larghezze fisse specifiche della tabella Mestieri/Gilde (Nome, Tipo,
-// Visibile, Azioni): con table-layout: fixed (definito in _gestione.scss)
-// senza queste regole il browser dividerebbe le colonne in base al primo
+// Larghezze fisse specifiche della tabella Mestieri/Gilde (Nome, Visibile,
+// Azioni): con table-layout: fixed (definito in _gestione.scss) senza
+// queste regole il browser dividerebbe le colonne in base al primo
 // render, disallineando le due tabelle (Mestieri/Gilde) tra loro nonostante
 // abbiano identica struttura. Scoperto a .gp-table--mestieri per non
 // riversarsi su altre tabelle con un numero/ordine di colonne diverso
 // (es. GestioneNarrazioneRichieste, che ha colonne diverse).
 .gp-table--mestieri {
-    th:nth-child(2), td:nth-child(2) { width: 160px; }
-    th:nth-child(3), td:nth-child(3) { width: 90px; }
-    th:nth-child(4), td:nth-child(4) { width: 140px; }
+    th:nth-child(2), td:nth-child(2) { width: 90px; }
+    th:nth-child(3), td:nth-child(3) { width: 140px; }
 }
 
 // .gm-modal-body: scroll/padding ora definiti genericamente in _gestione.scss

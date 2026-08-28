@@ -66,6 +66,20 @@ function carica_ruoli($id_mestiere) {
     return $ruoli;
 }
 
+/** Ricarica l'elenco articoli statuto di un mestiere, testo incluso (pochi articoli per mestiere, testi brevi) */
+function carica_statuti($id_mestiere) {
+    $articoli = [];
+    $result   = gdrcd_query(
+        "SELECT articolo, titolo, testo, tipo FROM statuti WHERE id_mestiere = " . (int)$id_mestiere . " ORDER BY articolo",
+        'result'
+    );
+    while ($row = gdrcd_query($result, 'fetch')) {
+        $articoli[] = $row;
+    }
+    gdrcd_query($result, 'free');
+    return $articoli;
+}
+
 // e_capo_di() -> mestiere_e_capo_di(), centralizzata in includes/custom_functions.inc.php
 // (riusata anche da pages/servizi_adm_mestieri.inc.php)
 
@@ -608,6 +622,75 @@ switch ($op) {
         gdrcd_query("DELETE FROM clgpersonaggioaffiliazione WHERE id_ruolo=$id_ruolo");
         gdrcd_query("DELETE FROM ruolo_mestiere WHERE id_ruolo=$id_ruolo LIMIT 1");
         echo json_encode(['success' => true, 'message' => 'Ruolo eliminato.', 'ruoli' => carica_ruoli($mestiere)]);
+        break;
+
+    // ===========================================================================
+    // STATUTI MESTIERE — CRUD articoli (tabella statuti, colonna id_mestiere)
+    // Sostituisce la sezione "MESTIERI" di gestione_statuti_new.inc.php. La
+    // sezione "gilda" della stessa tabella (id_gilda) resta su gestione_gilde.inc.php,
+    // non duplicata qui — vedi GestioneStatuti.jsx.
+    // ===========================================================================
+
+    case 'statuti_list':
+        if (!$is_admin) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+
+        $id_mestiere = (int)($_GET['id_mestiere'] ?? 0);
+        if ($id_mestiere <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Mestiere non specificato']);
+            exit;
+        }
+        echo json_encode(['success' => true, 'articoli' => carica_statuti($id_mestiere)]);
+        break;
+
+    case 'statuti_save':
+        if (!$is_admin) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+
+        $articolo    = (int)($_POST['articolo'] ?? 0);
+        $id_mestiere = (int)($_POST['id_mestiere'] ?? 0);
+        $titolo      = trim($_POST['titolo'] ?? '');
+        $testo       = trim($_POST['testo'] ?? '');
+        $tipo        = $_POST['tipo'] ?? '';
+
+        // Stessi 4 valori usati dallo statuto gilda (vedi api_statuto.php): qui le
+        // etichette in UI sono diverse (Statuto/Descrizione/Cariche/Specifiche) ma il
+        // valore salvato deve restare storia/statuto/skill/requisiti, letto da li'
+        $tipi_validi = ['storia', 'statuto', 'skill', 'requisiti'];
+        if ($id_mestiere <= 0 || $titolo === '' || $testo === '' || !in_array($tipo, $tipi_validi, true)) {
+            echo json_encode(['success' => false, 'message' => 'Compilare tutti i campi']);
+            exit;
+        }
+
+        $titolo_esc = gdrcd_filter('in', $titolo);
+        $testo_esc  = gdrcd_filter('in', $testo);
+        $tipo_esc   = gdrcd_filter('in', $tipo);
+
+        if ($articolo > 0) {
+            $esistente = gdrcd_query("SELECT articolo FROM statuti WHERE articolo = $articolo AND id_mestiere > 0");
+            if (!$esistente) {
+                echo json_encode(['success' => false, 'message' => 'Articolo non trovato']);
+                exit;
+            }
+            gdrcd_query("UPDATE statuti SET titolo='$titolo_esc', testo='$testo_esc', tipo='$tipo_esc' WHERE articolo = $articolo LIMIT 1");
+        } else {
+            gdrcd_query("INSERT INTO statuti (titolo, testo, tipo, id_mestiere, id_gilda) VALUES ('$titolo_esc', '$testo_esc', '$tipo_esc', $id_mestiere, 0)");
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Articolo salvato.', 'articoli' => carica_statuti($id_mestiere)]);
+        break;
+
+    case 'statuti_delete':
+        if (!$is_admin) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+
+        $articolo = (int)($_POST['articolo'] ?? 0);
+        $row      = $articolo > 0 ? gdrcd_query("SELECT id_mestiere FROM statuti WHERE articolo = $articolo AND id_mestiere > 0") : null;
+        if (!$row) {
+            echo json_encode(['success' => false, 'message' => 'Articolo non trovato']);
+            exit;
+        }
+        $id_mestiere = (int)$row['id_mestiere'];
+        gdrcd_query("DELETE FROM statuti WHERE articolo = $articolo LIMIT 1");
+
+        echo json_encode(['success' => true, 'message' => 'Articolo eliminato.', 'articoli' => carica_statuti($id_mestiere)]);
         break;
 
     default:

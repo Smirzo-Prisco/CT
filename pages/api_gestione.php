@@ -92,8 +92,10 @@ switch ($op) {
             if ($perms['admin']) {
                 $voci[] = ['label' => 'Mestieri e Gilde', 'url' => 'gestione.php?page=gestione_mestieri'];
             }
-            if ($perms['admin'] || $perms['capogilda'])
-                $voci[] = ['label' => 'Statuti', 'url' => 'gestione.php?page=gestione_statuti_new'];
+            // Solo admin: gli statuti di gilda (id_gilda) sono gestiti da gestione_gilde.inc.php,
+            // questa pagina copre ormai solo gli statuti mestiere
+            if ($perms['admin'])
+                $voci[] = ['label' => 'Statuti mestieri', 'url' => 'gestione.php?page=gestione_statuti_new'];
             if (!empty($voci))
                 $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri e Gilde', 'icon' => 'fa-briefcase', 'voci' => $voci];
         }

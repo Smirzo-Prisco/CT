@@ -164,20 +164,18 @@ function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide, onDelete }) 
             <thead>
                 <tr>
                     <th>Nome</th>
-                    <th>Tipo</th>
                     <th>Visibile</th>
                     <th className="gp-th-actions">Azioni</th>
                 </tr>
             </thead>
             <tbody>
                 {loading ? (
-                    <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20 }}>Caricamento…</td></tr>
+                    <tr><td colSpan={3} style={{ textAlign: 'center', padding: 20 }}>Caricamento…</td></tr>
                 ) : rows.length === 0 ? (
-                    <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>{emptyLabel}</td></tr>
+                    <tr><td colSpan={3} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>{emptyLabel}</td></tr>
                 ) : rows.map(m => (
                     <tr key={m.id_mestiere}>
                         <td className="gp-cell--name">{m.nome}</td>
-                        <td className="gp-cell--meta">{m.tipo_descrizione ?? '—'}</td>
                         <td>{m.visibile == 1 ? 'Sì' : 'No'}</td>
                         <td className="gp-cell--actions">
                             <div className="gp-actions">
