@@ -1,15 +1,22 @@
 <div class="pagina_gestione_mercato">
 
     <?php /*HELP: Pagina di gestione del mercato */
+    require_once(__DIR__ . '/../includes/custom_functions.inc.php');
+
     $login = $_SESSION['login'];
     $luogo = $_SESSION['luogo'];
 
     /*Controllo permessi*/
     $mestiere = gdrcd_query("SELECT * FROM personaggio WHERE nome ='".$_SESSION['login']."'");
-    
+
+    // Luogo associato al mestiere 3 (Shirokuro Magic Shop), impostato dal pannello
+    // admin "Luoghi mestiere" (gestione.php?page=gestione_luoghi_mestiere) —
+    // sostituisce il vecchio $_SESSION['luogo'] == 24 hardcoded
+    $luogo_negozio = mestiere_luogo(3);
+
     if ($mestiere['id_mestiere'] != 3) {
     echo '<div class="error">'.gdrcd_filter('out', $MESSAGE['error']['not_allowed']).'</div>';
-    } else if ($mestiere['id_mestiere'] == 3 && $_SESSION['luogo'] == 24) {
+    } else if ($mestiere['id_mestiere'] == 3 && $luogo_negozio !== null && $_SESSION['luogo'] == $luogo_negozio) {
                
     //controllo che ci siano minimo 2 azioni
                             

@@ -864,6 +864,19 @@ function mestiere_e_capo_di($login, $id_mestiere) {
 }
 
 /**
+ * Luogo (mappa.id) associato a un mestiere, impostato dal pannello admin
+ * "Luoghi mestiere" (gestione.php?page=gestione_luoghi_mestiere, mestiere.id_luogo).
+ * Sostituisce i vecchi array/confronti hardcoded id_mestiere->luogo sparsi nel
+ * codice (bonus punti mestiere, mercato, cure in ospedale).
+ * @return int|null null se il mestiere non esiste o non ha un luogo associato
+ */
+function mestiere_luogo(int $id_mestiere): ?int {
+    if ($id_mestiere <= 0) return null;
+    $row = gdrcd_query("SELECT id_luogo FROM mestiere WHERE id_mestiere = $id_mestiere");
+    return ($row && $row['id_luogo'] !== null) ? (int)$row['id_luogo'] : null;
+}
+
+/**
  * Vero se il personaggio ha una qualunque affiliazione (anche non da capo)
  * su questo mestiere, tramite clgpersonaggiomestiere o clgpersonaggioaffiliazione.
  */

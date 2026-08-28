@@ -64,7 +64,7 @@ import ChatbotWidget   from './components/ChatbotWidget'
 import GestioneBot    from './components/GestioneBot'
 import GestioneManutenzione from './components/GestioneManutenzione'
 import GestioneMestieri from './components/GestioneMestieri'
-import GestioneStatuti from './components/GestioneStatuti'
+import GestioneLuoghiMestiere from './components/GestioneLuoghiMestiere'
 import ContattaModerazione from './components/ContattaModerazione'
 
 /**
@@ -164,8 +164,8 @@ window.CT.register('GestioneManutenzione', GestioneManutenzione)
 /** Pannello admin gestione mestieri e ruoli: lista, form CRUD, upload immagini */
 window.CT.register('GestioneMestieri', GestioneMestieri)
 
-/** Pannello admin statuti mestiere: articoli (titolo/testo/sezione) per mestiere */
-window.CT.register('GestioneStatuti', GestioneStatuti)
+/** Pannello admin associazione mestiere -> luogo (sostituisce gli array hardcoded) */
+window.CT.register('GestioneLuoghiMestiere', GestioneLuoghiMestiere)
 
 /** Form + cronologia richieste di moderazione, con pannello staff integrato */
 window.CT.register('ContattaModerazione', ContattaModerazione)

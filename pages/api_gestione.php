@@ -87,8 +87,10 @@ switch ($op) {
             $voci = [];
             if ($perms['admin'] || $perms['capogilda'])
                 $voci[] = ['label' => 'Nuove razze', 'url' => 'gestione.php?page=gestione_gilde'];
-            if ($perms['admin'])
+            if ($perms['admin']) {
                 $voci[] = ['label' => 'Mestieri e Gilde', 'url' => 'gestione.php?page=gestione_mestieri'];
+                $voci[] = ['label' => 'Luoghi mestiere',  'url' => 'gestione.php?page=gestione_luoghi_mestiere'];
+            }
             if (!empty($voci))
                 $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri e Gilde', 'icon' => 'fa-briefcase', 'voci' => $voci];
         }

@@ -1158,7 +1158,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $login_f = gdrcd_filter('in', $login);
             $luogo   = (int)$_SESSION['luogo'];
 
-            if ($luogo !== 25) {
+            // Luogo associato al mestiere 10 (Ospedale) — vedi mestiere_luogo() in custom_functions.inc.php
+            if ($luogo !== mestiere_luogo(10)) {
                 echo json_encode(['success' => false, 'message' => 'Puoi usare questo comando solo in ospedale.']);
                 exit;
             }
@@ -1228,7 +1229,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $login = $_SESSION['login'];
             $luogo = (int)$_SESSION['luogo'];
 
-            if ($luogo !== 25) {
+            // Luogo associato al mestiere 10 (Ospedale) — vedi mestiere_luogo() in custom_functions.inc.php
+            if ($luogo !== mestiere_luogo(10)) {
                 echo json_encode(['success' => false, 'message' => 'Puoi usare questo comando solo in ospedale.']);
                 exit;
             }
@@ -1868,6 +1870,9 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             );
             $is_ospedale = !empty($is_ospedale_row);
 
+            // Luogo associato al mestiere 10 (Ospedale) — vedi mestiere_luogo() in custom_functions.inc.php
+            $luogo_ospedale = mestiere_luogo(10);
+
             // Visibilità pulsanti
             $show_backchat   = (float)$pg['esperienza'] > 19;
             $backchat_on     = (int)$pg['back_chat'] === 1;
@@ -1875,13 +1880,13 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $can_self_cure    = (int)$pg['salute'] > 0 && (int)$pg['salute'] < (int)$pg['salute_max'];
             $can_self_cure_pi = (int)$pg['integrita'] < (int)$pg['integrita_max'];
             $medico_abilitato = false;
-            if ($is_ospedale && $luogo === 25) {
+            if ($is_ospedale && $luogo === $luogo_ospedale) {
                 $azioni_row   = gdrcd_query("SELECT COUNT(*) AS n FROM chat WHERE stanza = '$luogo' AND mittente = '$login_f' AND tipo = 'P'");
                 $medico_abilitato = (int)($azioni_row['n'] ?? 0) > 1;
             }
-            $show_cura        = $luogo === 25 && ($can_self_cure || $can_self_cure_pi || $is_ospedale);
+            $show_cura        = $luogo === $luogo_ospedale && ($can_self_cure || $can_self_cure_pi || $is_ospedale);
             $show_pulisci    = $is_staff;
-            $show_scacchiera = ($is_admin || $is_master) && $luogo !== 25;
+            $show_scacchiera = ($is_admin || $is_master) && $luogo !== $luogo_ospedale;
             $can_master_msg  = $is_admin || $is_master;
 
             // Helper: recupera oggetti per categoria come array JSON
@@ -2038,7 +2043,8 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $login_f  = gdrcd_filter('in', $login);
             $luogo    = (int)$_SESSION['luogo'];
 
-            if ($luogo !== 25) {
+            // Luogo associato al mestiere 10 (Ospedale) — vedi mestiere_luogo() in custom_functions.inc.php
+            if ($luogo !== mestiere_luogo(10)) {
                 echo json_encode(['success' => false, 'message' => 'Puoi usare questo comando solo in ospedale.']);
                 exit;
             }
