@@ -93,7 +93,67 @@ switch ($op) {
                 $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri e Gilde', 'icon' => 'fa-briefcase', 'voci' => $voci];
         }
 
-        // 3. GILDA (giocatore) — chiunque non abbia già una gilda (gilda_giocatore_limit permettendo)
+        // 3. STRUMENTI (solo admin)
+        // Il ripristino di un account cancellato ora e' un'icona diretta nella
+        // lista di Gestione pg -> Personaggi (filtro "Eliminati"), non piu' uno
+        // strumento separato qui — vedi conversazione di progetto del 2026-07-31.
+        // Manutenzione spostata sotto la card Log (voce "Tutti i log").
+        if ($perms['admin']) {
+            $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => [
+                ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'],
+                ['label' => 'Bacheche',              'url' => 'gestione.php?page=gestione_bacheche'],
+                ['label' => 'Luoghi',                'url' => 'gestione.php?page=gestione_luoghi'],
+                ['label' => 'Mappa',                 'url' => 'gestione.php?page=gestione_mappe'],
+                ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'],
+            ]];
+        }
+
+        // 4. LOG — "Richiesta log chat" e "Log chat" rimosse (vedi conversazione
+        // di progetto del 2026-08-28); "Manutenzione" spostata qui sotto "Tutti i log"
+        if ($perms['admin']) {
+            $menu[] = ['key' => 'log', 'label' => 'Log', 'icon' => 'fa-file-lines', 'voci' => [
+                ['label' => 'Tutti i log',  'url' => 'gestione.php?page=log'],
+                ['label' => 'Manutenzione', 'url' => 'gestione.php?page=gestione_manutenzione'],
+            ]];
+        }
+
+        // 5. OGGETTI — admin e master (i dipendenti di un mestiere con negozio,
+        // es. Shirokuro Magic Shop, hanno un punto d'ingresso proprio: il
+        // pulsante "Gestisci oggetti del mestiere" nel dettaglio del proprio
+        // mestiere — ScegliMestiere.jsx, non passa da qui). Vedi conversazione
+        // di progetto del 2026-08-24: card riabilitata dopo il redesign di
+        // gestione_oggetti.inc.php (vista ristretta per i soli dipendenti).
+        if ($perms['admin'] || $perms['master']) {
+            $voci = [['label' => 'Oggetti', 'url' => 'gestione.php?page=gestione_oggetti']];
+            if ($perms['admin']) {
+                $voci[] = ['label' => 'Ricarica oggetto', 'url' => 'gestione.php?page=oggetto_ricarica'];
+                $voci[] = ['label' => 'Tipi di oggetto', 'url' => 'gestione.php?page=gestione_tipi&types=items'];
+            }
+            $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
+        }
+
+        // 6. Ultimi iscritti (admin, master, moderatore)
+        if ($perms['admin'] || $perms['master'] || $perms['moderatore']) {
+            $ultimi_res    = gdrcd_query(
+                "SELECT nome, data_iscrizione FROM personaggio
+                 WHERE " . sqlPgAttivo() . " AND sesso != 'b'
+                 ORDER BY data_iscrizione DESC LIMIT 5",
+                'result'
+            );
+            $voci_iscritti = [];
+            while ($u = gdrcd_query($ultimi_res, 'fetch')) {
+                $voci_iscritti[] = [
+                    'label' => $u['nome'] . ' — ' . date('d/m/Y', strtotime($u['data_iscrizione'])),
+                    'url'   => 'main.php?page=scheda&pg=' . urlencode($u['nome']),
+                ];
+            }
+            gdrcd_query($ultimi_res, 'free');
+            if (!empty($voci_iscritti)) {
+                $menu[] = ['key' => 'ultimi_iscritti', 'label' => 'Ultimi iscritti', 'icon' => 'fa-user-plus', 'voci' => $voci_iscritti];
+            }
+        }
+
+        // 7. GILDA (giocatore) — chiunque non abbia già una gilda (gilda_giocatore_limit permettendo)
         // o sia capo=1 di quella che ha già, non solo lo staff. Tabella dedicata
         // clgpersonaggioaffiliazione: scollegata dal mestiere vero, un personaggio può avere entrambi
         $login_esc = gdrcd_filter('in', $_SESSION['login']);
@@ -118,67 +178,6 @@ switch ($op) {
             $menu[] = ['key' => 'mia_gilda', 'label' => 'Gilda', 'icon' => 'fa-shield-halved', 'voci' => [
                 ['label' => $voce_mia_gilda, 'url' => 'main.php?page=mia_gilda'],
             ]];
-        }
-
-        // 4. STRUMENTI (solo admin)
-        // Il ripristino di un account cancellato ora e' un'icona diretta nella
-        // lista di Gestione pg -> Personaggi (filtro "Eliminati"), non piu' uno
-        // strumento separato qui — vedi conversazione di progetto del 2026-07-31.
-        if ($perms['admin']) {
-            $menu[] = ['key' => 'strumenti', 'label' => 'Strumenti', 'icon' => 'fa-wrench', 'voci' => [
-                ['label' => 'Assegna ruoli apicali', 'url' => 'gestione.php?page=gestione_nomine'],
-                ['label' => 'Bacheche',              'url' => 'gestione.php?page=gestione_bacheche'],
-                ['label' => 'Luoghi',                'url' => 'gestione.php?page=gestione_luoghi'],
-                ['label' => 'Mappa',                 'url' => 'gestione.php?page=gestione_mappe'],
-                ['label' => 'Regolamento',           'url' => 'gestione.php?page=gestione_regolamento'],
-                ['label' => 'Manutenzione',          'url' => 'gestione.php?page=gestione_manutenzione'],
-            ]];
-        }
-
-        // 5. LOG
-        if ($perms['admin'] || $perms['master'] || $perms['capomestiere'] || $perms['moderatore']) {
-            $voci = [];
-            if ($perms['admin'])                              $voci[] = ['label' => 'Tutti i log',        'url' => 'gestione.php?page=log'];
-            if ($perms['admin'] || $perms['master'])          $voci[] = ['label' => 'Richiesta log chat', 'url' => 'gestione.php?page=richiesta_log'];
-            if ($perms['admin'] || $perms['moderatore'])      $voci[] = ['label' => 'Log chat',           'url' => 'gestione.php?page=log_chat'];
-            if (!empty($voci))
-                $menu[] = ['key' => 'log', 'label' => 'Log', 'icon' => 'fa-file-lines', 'voci' => $voci];
-        }
-
-        // 6. Ultimi iscritti (admin, master, moderatore)
-        if ($perms['admin'] || $perms['master'] || $perms['moderatore']) {
-            $ultimi_res    = gdrcd_query(
-                "SELECT nome, data_iscrizione FROM personaggio
-                 WHERE " . sqlPgAttivo() . " AND sesso != 'b'
-                 ORDER BY data_iscrizione DESC LIMIT 5",
-                'result'
-            );
-            $voci_iscritti = [];
-            while ($u = gdrcd_query($ultimi_res, 'fetch')) {
-                $voci_iscritti[] = [
-                    'label' => $u['nome'] . ' — ' . date('d/m/Y', strtotime($u['data_iscrizione'])),
-                    'url'   => 'main.php?page=scheda&pg=' . urlencode($u['nome']),
-                ];
-            }
-            gdrcd_query($ultimi_res, 'free');
-            if (!empty($voci_iscritti)) {
-                $menu[] = ['key' => 'ultimi_iscritti', 'label' => 'Ultimi iscritti', 'icon' => 'fa-user-plus', 'voci' => $voci_iscritti];
-            }
-        }
-
-        // 7. OGGETTI — admin e master (i dipendenti di un mestiere con negozio,
-        // es. Shirokuro Magic Shop, hanno un punto d'ingresso proprio: il
-        // pulsante "Gestisci oggetti del mestiere" nel dettaglio del proprio
-        // mestiere — ScegliMestiere.jsx, non passa da qui). Vedi conversazione
-        // di progetto del 2026-08-24: card riabilitata dopo il redesign di
-        // gestione_oggetti.inc.php (vista ristretta per i soli dipendenti).
-        if ($perms['admin'] || $perms['master']) {
-            $voci = [['label' => 'Oggetti', 'url' => 'gestione.php?page=gestione_oggetti']];
-            if ($perms['admin']) {
-                $voci[] = ['label' => 'Ricarica oggetto', 'url' => 'gestione.php?page=oggetto_ricarica'];
-                $voci[] = ['label' => 'Tipi di oggetto', 'url' => 'gestione.php?page=gestione_tipi&types=items'];
-            }
-            $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
         }
 
         // 8. OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
