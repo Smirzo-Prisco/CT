@@ -111,11 +111,15 @@ switch ($op) {
         }
 
         // 4. LOG — "Richiesta log chat" e "Log chat" rimosse (vedi conversazione
-        // di progetto del 2026-08-28); "Manutenzione" spostata qui sotto "Tutti i log"
+        // di progetto del 2026-08-28); "Manutenzione" spostata qui sotto "Tutti i log".
+        // "Cambio nome" aggiunta il 2026-08-28: pagina esistente ma priva di
+        // qualunque punto d'ingresso, riportata in vita dopo il fix del
+        // controllo permessi (vedi user_cambio_nome.inc.php).
         if ($perms['admin']) {
             $menu[] = ['key' => 'log', 'label' => 'Log', 'icon' => 'fa-file-lines', 'voci' => [
                 ['label' => 'Tutti i log',  'url' => 'gestione.php?page=log'],
                 ['label' => 'Manutenzione', 'url' => 'gestione.php?page=gestione_manutenzione'],
+                ['label' => 'Cambio nome',  'url' => 'gestione.php?page=user_cambio_nome'],
             ]];
         }
 

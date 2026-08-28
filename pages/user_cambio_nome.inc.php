@@ -58,7 +58,7 @@ $iscriz = $iscriz['0'];
                     <div class="error">
                         <?php echo gdrcd_filter('out', $MESSAGE['error']['existing_name']); ?>
                     </div>
-                <?php} else {
+                <?php } else {
                     // Un moderatore (non admin) non puo' rinominare un account admin --
                     // il vecchio controllo SQL "AND permessi < SUPERUSER" era gia' un
                     // no-op (nessuna di quelle tabelle ha una colonna permessi), quindi
