@@ -33,6 +33,13 @@
     color: #4da6ff;
 }
 
+/* !important necessario: una regola globale (textarea{min-height:60px} in
+   _forms.scss) altrimenti vince sull'altezza data dall'attributo rows. */
+.collapsedTextarea {
+    height: 64px !important;
+    overflow-y: auto;
+}
+
 /* ── Barra azioni sticky ────────────────────────────────────── */
 
 .stickyBar {
