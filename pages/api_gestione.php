@@ -90,7 +90,7 @@ switch ($op) {
         if ($perms['admin'] || $perms['master'] || $perms['capogilda']) {
             $voci = [];
             if ($perms['admin']) {
-                $voci[] = ['label' => 'Mestieri',          'url' => 'gestione.php?page=gestione_mestieri'];
+                $voci[] = ['label' => 'Mestieri e Gilde', 'url' => 'gestione.php?page=gestione_mestieri'];
                 $voci[] = ['label' => 'Assegna mestiere', 'url' => 'gestione.php?page=gestione_mestiere'];
             }
             if ($perms['admin'] || $perms['capogilda'])
