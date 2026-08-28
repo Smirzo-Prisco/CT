@@ -5,10 +5,22 @@ function get_decorated_diff($string_old, $string_new) {
     $old_array = explode(' ', $string_old);
     $new_array = explode(' ', $string_new);
 
-    // Creazione della matrice per la ricerca della Longest Common Subsequence (LCS)
-    $matrix = [];
     $old_length = count($old_array);
     $new_length = count($new_array);
+
+    // Guardia di sicurezza: la matrice LCS sotto occupa O(old_length * new_length)
+    // celle. Un articolo di ~2200 parole (es. "Regolamento Master", il piu'
+    // lungo del regolamento) genera una matrice di ~5 milioni di celle che da
+    // sola esaurisce il memory_limit di 128MB in produzione (Fatal error
+    // verificato il 2026-08-28). Oltre soglia si rinuncia all'evidenziazione
+    // parola per parola e si restituisce il testo grezzo prima/dopo, senza
+    // calcolare la matrice.
+    if ($old_length * $new_length > 500000) {
+        return ['old' => $string_old, 'new' => $string_new];
+    }
+
+    // Creazione della matrice per la ricerca della Longest Common Subsequence (LCS)
+    $matrix = [];
 
     for ($i = 0; $i <= $old_length; $i++) {
         $matrix[$i] = array_fill(0, $new_length + 1, 0);
