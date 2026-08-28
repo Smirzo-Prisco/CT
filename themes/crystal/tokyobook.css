@@ -160,9 +160,9 @@ body {
             flex-direction: column;
             align-items: center;
             box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-            position: fixed;
+            position: sticky;
             top: 120px;
-            left: 267px;
+            flex-shrink: 0;
             z-index: 1000;
             overflow: visible;
         }
@@ -277,14 +277,13 @@ body {
 
         /* Contenitore per il contenuto centrale */
         .content {
-            width: calc(100% - 250px);
             padding: 30px;
             background-color: #101326;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             margin-top: 30px;
-            margin-left: 250px;
             flex-grow: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             overflow: auto;
@@ -590,14 +589,7 @@ body {
     .sidebar {
         width: 180px;
         padding: 20px;
-        left: 0;
         top: 100px;
-    }
-
-    /* Riduce margine tra contenuto centrale e sidebar */
-    .content {
-        margin-left: 180px;
-        width: calc(100% - 200px);
     }
 
     .top-bar .search-container {
