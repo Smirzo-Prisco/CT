@@ -79,28 +79,24 @@ switch ($op) {
             $menu[] = ['key' => 'gestione_pg', 'label' => 'Gestione pg', 'icon' => 'fa-user-gear', 'voci' => $voci];
         }
 
-        // 2. GILDE (ex famiglie, oggi "razze" narrative — tabella gilda)
-        if ($perms['admin'] || $perms['capogilda']) {
-            $menu[] = ['key' => 'gilde', 'label' => 'Nuove razze', 'icon' => 'fa-users', 'voci' => [
-                ['label' => 'Nuove razze', 'url' => 'gestione.php?page=gestione_gilde'],
-            ]];
-        }
-
-        // 3. MESTIERI
+        // 2. GILDE E MESTIERI (razze narrative — tabella gilda — + mestieri/gilde
+        // giocatore + statuti mestiere). Card unica: icona presa da "Mestieri e
+        // Gilde"/"Statuti mestieri" (era già quella del card mestieri).
         if ($perms['admin'] || $perms['master'] || $perms['capogilda']) {
             $voci = [];
+            if ($perms['admin'] || $perms['capogilda'])
+                $voci[] = ['label' => 'Nuove razze', 'url' => 'gestione.php?page=gestione_gilde'];
             if ($perms['admin']) {
                 $voci[] = ['label' => 'Mestieri e Gilde', 'url' => 'gestione.php?page=gestione_mestieri'];
-            }
-            // Solo admin: gli statuti di gilda (id_gilda) sono gestiti da gestione_gilde.inc.php,
-            // questa pagina copre ormai solo gli statuti mestiere
-            if ($perms['admin'])
+                // Solo admin: gli statuti di gilda (id_gilda) sono gestiti da gestione_gilde.inc.php,
+                // questa pagina copre ormai solo gli statuti mestiere
                 $voci[] = ['label' => 'Statuti mestieri', 'url' => 'gestione.php?page=gestione_statuti_new'];
+            }
             if (!empty($voci))
                 $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri e Gilde', 'icon' => 'fa-briefcase', 'voci' => $voci];
         }
 
-        // 4. GILDA (giocatore) — chiunque non abbia già una gilda (gilda_giocatore_limit permettendo)
+        // 3. GILDA (giocatore) — chiunque non abbia già una gilda (gilda_giocatore_limit permettendo)
         // o sia capo=1 di quella che ha già, non solo lo staff. Tabella dedicata
         // clgpersonaggioaffiliazione: scollegata dal mestiere vero, un personaggio può avere entrambi
         $login_esc = gdrcd_filter('in', $_SESSION['login']);
@@ -127,7 +123,7 @@ switch ($op) {
             ]];
         }
 
-        // 5. STRUMENTI (solo admin)
+        // 4. STRUMENTI (solo admin)
         // Il ripristino di un account cancellato ora e' un'icona diretta nella
         // lista di Gestione pg -> Personaggi (filtro "Eliminati"), non piu' uno
         // strumento separato qui — vedi conversazione di progetto del 2026-07-31.
@@ -142,7 +138,7 @@ switch ($op) {
             ]];
         }
 
-        // 6. LOG
+        // 5. LOG
         if ($perms['admin'] || $perms['master'] || $perms['capomestiere'] || $perms['moderatore']) {
             $voci = [];
             if ($perms['admin'])                              $voci[] = ['label' => 'Tutti i log',        'url' => 'gestione.php?page=log'];
@@ -152,7 +148,7 @@ switch ($op) {
                 $menu[] = ['key' => 'log', 'label' => 'Log', 'icon' => 'fa-file-lines', 'voci' => $voci];
         }
 
-        // 7. Ultimi iscritti (admin, master, moderatore)
+        // 6. Ultimi iscritti (admin, master, moderatore)
         if ($perms['admin'] || $perms['master'] || $perms['moderatore']) {
             $ultimi_res    = gdrcd_query(
                 "SELECT nome, data_iscrizione FROM personaggio
@@ -173,7 +169,7 @@ switch ($op) {
             }
         }
 
-        // 8. OGGETTI — admin e master (i dipendenti di un mestiere con negozio,
+        // 7. OGGETTI — admin e master (i dipendenti di un mestiere con negozio,
         // es. Shirokuro Magic Shop, hanno un punto d'ingresso proprio: il
         // pulsante "Gestisci oggetti del mestiere" nel dettaglio del proprio
         // mestiere — ScegliMestiere.jsx, non passa da qui). Vedi conversazione
@@ -188,7 +184,7 @@ switch ($op) {
             $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
         }
 
-        // 9. OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
+        // 8. OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
         // disattivate (non cliccabili) ma tenute visibili per riferimento storico
         if ($perms['admin']) {
             $menu[] = ['key' => 'old', 'label' => 'OLD', 'icon' => 'fa-box-archive', 'voci' => [
