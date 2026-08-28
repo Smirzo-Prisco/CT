@@ -59,7 +59,7 @@ $iscriz = $iscriz['0'];
         <?php }
         /*Cambio pass admin*/
         if(gdrcd_filter('get', $_POST['op']) == 'force') {
-            if(($_SESSION['permessi'] >= MODERATOR) && (empty($_POST['new_name']) === false)) {
+            if((($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1)) && (empty($_POST['new_name']) === false)) {
                 $query = "SELECT nome FROM personaggio WHERE nome ='".gdrcd_filter('in', $_POST['new_name'])."'";
                 $result = gdrcd_query($query, 'result');
                 if(gdrcd_query($result, 'num_rows') > 0) {
@@ -69,7 +69,7 @@ $iscriz = $iscriz['0'];
                         <?php echo gdrcd_filter('out', $MESSAGE['error']['existing_name']); ?>
                     </div>
                 <?php} else {
-                    if($_SESSION['permessi'] == SUPERUSER) {
+                    if($_SESSION['admin'] == 1) {
 
                         gdrcd_query("UPDATE log SET nome_interessato = '".gdrcd_filter('in', $_POST['new_name'])."' WHERE nome_interessato = '".gdrcd_filter('in', $_POST['account'])."'");
                         gdrcd_query("UPDATE log SET autore = '".gdrcd_filter('in', $_POST['new_name'])."' WHERE autore = '".gdrcd_filter('in', $_POST['account'])."'");
@@ -147,8 +147,8 @@ $iscriz = $iscriz['0'];
                     </div>
                 </div>
             <?php }//if
-            if($_SESSION['permessi'] >= MODERATOR) {
-                if($_SESSION['permessi'] == SUPERUSER) {
+            if($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1) {
+                if($_SESSION['admin'] == 1) {
                     $query = "SELECT nome FROM personaggio ORDER BY nome";
                 } else {
                     $query = "SELECT nome FROM personaggio WHERE permessi < ".SUPERUSER." ORDER BY nome";
