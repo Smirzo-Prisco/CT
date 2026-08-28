@@ -90,14 +90,13 @@ switch ($op) {
         if ($perms['admin'] || $perms['master'] || $perms['capogilda']) {
             $voci = [];
             if ($perms['admin']) {
-                $voci[] = ['label' => 'Mestieri',             'url' => 'gestione.php?page=gestione_mestieri'];
-                $voci[] = ['label' => 'Assegna mestiere',    'url' => 'gestione.php?page=gestione_mestiere'];
-                $voci[] = ['label' => 'Lavori indipendenti', 'url' => 'gestione.php?page=gestione_mestieri&op=edit&id_record=-1'];
+                $voci[] = ['label' => 'Mestieri',          'url' => 'gestione.php?page=gestione_mestieri'];
+                $voci[] = ['label' => 'Assegna mestiere', 'url' => 'gestione.php?page=gestione_mestiere'];
             }
             if ($perms['admin'] || $perms['capogilda'])
                 $voci[] = ['label' => 'Statuti', 'url' => 'gestione.php?page=gestione_statuti_new'];
             if (!empty($voci))
-                $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri', 'icon' => 'fa-briefcase', 'voci' => $voci];
+                $menu[] = ['key' => 'mestieri', 'label' => 'Mestieri e Gilde', 'icon' => 'fa-briefcase', 'voci' => $voci];
         }
 
         // 4. GILDA (giocatore) — chiunque non abbia già una gilda (gilda_giocatore_limit permettendo)

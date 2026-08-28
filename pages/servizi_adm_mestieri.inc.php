@@ -66,7 +66,8 @@ if ($id_mestiere !== null && $id_mestiere !== -1) {
     </div>
     <section class="sm-section">
         <div class="sm-section-title">Seleziona il mestiere o la gilda da gestire</div>
-        <form action="main.php?page=servizi_adm_mestieri" method="get">
+        <form action="main.php" method="get">
+            <input type="hidden" name="page" value="servizi_adm_mestieri">
             <div class="sm-field">
                 <select name="id_mestiere">
                     <?php while ($m = gdrcd_query($elenco, 'fetch')): ?>
