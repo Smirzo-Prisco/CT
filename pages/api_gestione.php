@@ -4,7 +4,7 @@
  *
  * Endpoint:
  *   ?op=menu — Restituisce il menu della dashboard in base ai permessi della
- *              sessione corrente, le statistiche del sito e gli ultimi iscritti.
+ *              sessione corrente e gli ultimi iscritti.
  *              Il filtro dei permessi è server-side: il client riceve solo le
  *              voci a cui l'utente ha effettivamente accesso.
  *
@@ -151,18 +151,7 @@ switch ($op) {
                 $menu[] = ['key' => 'log', 'label' => 'Log', 'icon' => 'fa-file-lines', 'voci' => $voci];
         }
 
-        // 7. Statistiche sito (visibili a tutti)
-        $iscritti    = (int)gdrcd_query("SELECT COUNT(nome) AS num FROM personaggio WHERE " . sqlPgAttivo() . " AND sesso != 'b'")['num'];
-        $bacheca     = (int)gdrcd_query("SELECT COUNT(id_messaggio) AS num FROM messaggioaraldo")['num'];
-        $azioni_sett = (int)gdrcd_query("SELECT COUNT(id) AS num FROM chat WHERE ora > DATE_SUB(NOW(), INTERVAL 7 DAY) AND (tipo = 'P' OR tipo = 'A')")['num'];
-
-        $menu[] = ['key' => 'stats', 'label' => 'Informazioni', 'icon' => 'fa-chart-line', 'voci' => [
-            ['label' => "Iscritti: $iscritti",        'url' => '#'],
-            ['label' => "Post in bacheca: $bacheca",  'url' => '#'],
-            ['label' => "Azioni settimana: $azioni_sett", 'url' => '#'],
-        ]];
-
-        // 8. Ultimi iscritti (admin, master, moderatore)
+        // 7. Ultimi iscritti (admin, master, moderatore)
         if ($perms['admin'] || $perms['master'] || $perms['moderatore']) {
             $ultimi_res    = gdrcd_query(
                 "SELECT nome, data_iscrizione FROM personaggio
@@ -183,7 +172,7 @@ switch ($op) {
             }
         }
 
-        // 9. OGGETTI — admin e master (i dipendenti di un mestiere con negozio,
+        // 8. OGGETTI — admin e master (i dipendenti di un mestiere con negozio,
         // es. Shirokuro Magic Shop, hanno un punto d'ingresso proprio: il
         // pulsante "Gestisci oggetti del mestiere" nel dettaglio del proprio
         // mestiere — ScegliMestiere.jsx, non passa da qui). Vedi conversazione
@@ -198,14 +187,14 @@ switch ($op) {
             $menu[] = ['key' => 'oggetti', 'label' => 'Oggetti', 'icon' => 'fa-box', 'voci' => $voci];
         }
 
-        // 10. OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
-        // tenute solo per interventi occasionali dello staff
+        // 9. OLD — voci superate dal nuovo sistema (nuove razze / gilde giocatore),
+        // disattivate (non cliccabili) ma tenute visibili per riferimento storico
         if ($perms['admin']) {
             $menu[] = ['key' => 'old', 'label' => 'OLD', 'icon' => 'fa-box-archive', 'voci' => [
-                ['label' => 'Famiglie indipendenti', 'url' => 'gestione.php?page=gestione_gilde&op=edit&id_record=-1'],
-                ['label' => 'Correnti',              'url' => 'gestione.php?page=gestione_tipi&types=guilds'],
-                ['label' => 'Reliquie',              'url' => 'gestione.php?page=punti_png'],
-                ['label' => 'Razze e spiriti',       'url' => 'gestione.php?page=gestione_razze'],
+                ['label' => 'Famiglie indipendenti', 'url' => 'gestione.php?page=gestione_gilde&op=edit&id_record=-1', 'disabled' => true],
+                ['label' => 'Correnti',              'url' => 'gestione.php?page=gestione_tipi&types=guilds',          'disabled' => true],
+                ['label' => 'Reliquie',              'url' => 'gestione.php?page=punti_png',                          'disabled' => true],
+                ['label' => 'Razze e spiriti',       'url' => 'gestione.php?page=gestione_razze',                     'disabled' => true],
             ]];
         }
 
