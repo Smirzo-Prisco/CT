@@ -11,6 +11,28 @@
 .smallText       { font-size: 11px; text-transform: none; }
 .centered        { text-align: center; padding: 20px; }
 
+.collapseToggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    text-transform: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.collapseIcon {
+    display: inline-block;
+    flex-shrink: 0;
+    font-size: 10px;
+    color: #4da6ff;
+}
+
 /* ── Barra azioni sticky ────────────────────────────────────── */
 
 .stickyBar {
