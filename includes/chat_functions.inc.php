@@ -216,7 +216,7 @@ function awardExperience($session) {
 
 /**  * Verifica se assegnare esperienza mestiere  */
 function shouldAwardCraftExperience($check_backing, $check_actions, $session) {
-    if ($check_backing['esperienza_mestiere'] >= 55) return false;
+    if ($check_backing['esperienza_mestiere'] >= 100) return false;
     if ($check_actions != 4) return false;
     
     $craft_locations = array(
