@@ -1007,6 +1007,14 @@ span[style*="position:relative"]:hover .tooltip-bottom {
         &:hover { background: rgb(224 92 122 / 25%); }
     }
 
+    &--members {
+        background: rgb(39 174 96 / 15%);
+        color: #27ae60;
+        border: 1px solid rgb(39 174 96 / 30%);
+
+        &:hover { background: rgb(39 174 96 / 25%); }
+    }
+
     &--exile {
         background: rgb(240 130 50 / 15%);
         color: #f08230;

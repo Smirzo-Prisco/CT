@@ -184,6 +184,10 @@ function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide, onDelete }) 
                                 <button className="btn-action btn-action--edit btn-action--icon" title="Modifica" onClick={() => onEdit(m.id_mestiere)}>
                                     <i className="fa-solid fa-pencil"></i>
                                 </button>
+                                <a className="btn-action btn-action--members btn-action--icon" title="Assumi / espelli membri"
+                                   href={`main.php?page=servizi_adm_mestieri&id_mestiere=${m.id_mestiere}`}>
+                                    <i className="fa-solid fa-user-gear"></i>
+                                </a>
                                 <button className="btn-action btn-action--delete btn-action--icon" title="Nascondi" onClick={() => onHide(m.id_mestiere, m.nome)}>
                                     <i className="fa-solid fa-eye-slash"></i>
                                 </button>
