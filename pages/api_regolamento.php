@@ -94,9 +94,12 @@ switch ($op) {
         gdrcd_query("INSERT INTO messaggioaraldo (id_messaggio_padre, id_araldo, messaggio, autore, anonimo, giornalista, data_messaggio, data_ultimo_messaggio) VALUES ($id_mex, '142', '" . gdrcd_filter('in', $testo_notifica) . "', 'Coordinazione', 'no', 'no', NOW(), NOW())");
         gdrcd_query("DELETE FROM araldo_letto WHERE thread_id = $id_mex AND nome != '" . $_SESSION['login'] . "'");
 
-        // Notifica separata per le guide
+        // Notifica separata per le guide — id_mex_guide punta al thread radice
+        // creato in migrations/2026_08_28_fix_guide_notify_thread.sql: prima
+        // referenziava 250843, mai esistito in messaggioaraldo (le notifiche
+        // finivano come risposte orfane, invisibili da sempre)
         if ($_SESSION['guida'] == 1) {
-            $id_mex_guide = '250843';
+            $id_mex_guide = '300000';
             $testo_guide  = "Il personaggio <b>" . $_SESSION['login'] . "</b> ha modificato la seguente sezione del manuale: <b>" . $old_titolo . "</b>";
             gdrcd_query("INSERT INTO messaggioaraldo (id_messaggio_padre, id_araldo, messaggio, autore, anonimo, giornalista, data_messaggio, data_ultimo_messaggio) VALUES ($id_mex_guide, '109', '" . gdrcd_filter('in', $testo_guide) . "', 'Sistema', 'no', 'no', NOW(), NOW())");
             gdrcd_query("DELETE FROM araldo_letto WHERE thread_id = $id_mex_guide AND nome != '" . $_SESSION['login'] . "'");
