@@ -86,9 +86,14 @@
 }
 
 .authorName {
+    display: block;
     font-size: 12px;
     color: $color-text-title;
     text-align: center;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 .authorDate {

@@ -229,8 +229,12 @@ div.pagina_presenti {
 }
 
 // ── Tabella presenti estesa ───────────────────────────────────
+// NB: scoped a div.presenti_estesi — table.customTable e' condivisa da
+// decine di pagine (forum compreso), un selettore globale qui rompeva
+// il gap tra i post del forum (margin:auto vinceva su .postCard per
+// specificita', azzerando il margin-bottom che li separa).
 
-table.customTable {
+div.presenti_estesi table.customTable {
     min-width: 70%;
     background-color: $palette-surface-raised;
     border-collapse: collapse;
