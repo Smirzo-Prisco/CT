@@ -376,12 +376,19 @@ export default function PresentiEstesi({ isStaff = false }) {
                     </tr>
 
                     {/* Iterazione per mappa — Fragment con key per evitare warning React e re-mount indesiderati */}
-                    {Object.entries(grouped).map(([mappa, stanze]) => (
+                    {Object.entries(grouped).map(([mappa, stanze]) => {
+                        const mapId = Object.values(stanze)[0]?.[0]?.ultima_mappa
+                        return (
                         <Fragment key={`mappa-${mappa}`}>
 
-                            {/* Header mappa */}
-                            <tr className="mappa">
-                                <td colSpan="10" className={styles.schedaUpper}>{mappa}</td>
+                            {/* Header mappa — stesso stile cliccabile delle stanze (third_header),
+                                rimanda alla mappa stessa (main.php?page=mappaclick&map_id=...) */}
+                            <tr className="third_header">
+                                <td colSpan="10" className={styles.schedaUpper}>
+                                    <a href={`main.php?page=mappaclick&map_id=${mapId}`}>
+                                        {mappa}
+                                    </a>
+                                </td>
                             </tr>
 
                             {/* Iterazione per stanza — Fragment con key, obbligatorio per liste React */}
@@ -412,7 +419,8 @@ export default function PresentiEstesi({ isStaff = false }) {
                             ))}
 
                         </Fragment>
-                    ))}
+                        )
+                    })}
 
                     {/* Messaggio quando non ci sono utenti online */}
                     {users.length === 0 && (
