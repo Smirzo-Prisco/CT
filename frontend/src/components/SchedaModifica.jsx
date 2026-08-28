@@ -46,6 +46,25 @@ function SectionHeader({ children }) {
     )
 }
 
+/**
+ * Riga con textarea collassabile: parte chiusa (poche righe visibili),
+ * l'utente la apre/richiude cliccando l'etichetta. Il valore non viene
+ * mai toccato dal collasso, solo l'altezza visibile del textarea.
+ */
+function CollapsibleFormRow({ label, expanded, onToggle, children }) {
+    return (
+        <tr>
+            <td className={`second_header ${styles.labelCellTop}`}>
+                <button type="button" className={styles.collapseToggle} onClick={onToggle}>
+                    <span className={styles.collapseIcon}>{expanded ? '▾' : '▸'}</span>
+                    {label}
+                </button>
+            </td>
+            <td>{children}</td>
+        </tr>
+    )
+}
+
 // ---------------------------------------------------------------------------
 // COMPONENTE PRINCIPALE
 // ---------------------------------------------------------------------------
@@ -58,6 +77,11 @@ export default function SchedaModifica() {
     const [saving, setSaving] = useState(false)
     const [msg,    setMsg]    = useState(null)
     const [error,  setError]  = useState(null)
+
+    // Textarea grandi ("Descrizioni"): collassate di default, l'utente le
+    // apre/richiude a piacimento — stato solo visivo, non tocca form/dati.
+    const [expandedFields, setExpandedFields] = useState({})
+    const toggleField = (field) => setExpandedFields(prev => ({ ...prev, [field]: !prev[field] }))
 
     useEffect(() => {
         if (!pg) { setError('Personaggio non specificato'); return }
@@ -190,22 +214,26 @@ export default function SchedaModifica() {
                                 {/* ── DESCRIZIONI ──────────────────────── */}
                                 <SectionHeader>Descrizioni</SectionHeader>
 
-                                <FormRow label="Background" valignTop>
-                                    <textarea className={`form_input ${styles.fullWidth}`} rows="15"
+                                <CollapsibleFormRow label="Background"
+                                    expanded={!!expandedFields.principale} onToggle={() => toggleField('principale')}>
+                                    <textarea className={`form_input ${styles.fullWidth}`} rows={expandedFields.principale ? 15 : 3}
                                         value={form.principale ?? ''} onChange={upd('principale')} />
-                                </FormRow>
-                                <FormRow label="Storia" valignTop>
-                                    <textarea className={`form_input ${styles.fullWidth}`} rows="15"
+                                </CollapsibleFormRow>
+                                <CollapsibleFormRow label="Storia"
+                                    expanded={!!expandedFields.storia} onToggle={() => toggleField('storia')}>
+                                    <textarea className={`form_input ${styles.fullWidth}`} rows={expandedFields.storia ? 15 : 3}
                                         value={form.storia ?? ''} onChange={upd('storia')} />
-                                </FormRow>
-                                <FormRow label="Dice di sé" valignTop>
-                                    <textarea className={`form_input ${styles.fullWidth}`} rows="15"
+                                </CollapsibleFormRow>
+                                <CollapsibleFormRow label="Dice di sé"
+                                    expanded={!!expandedFields.descrizione} onToggle={() => toggleField('descrizione')}>
+                                    <textarea className={`form_input ${styles.fullWidth}`} rows={expandedFields.descrizione ? 15 : 3}
                                         value={form.descrizione ?? ''} onChange={upd('descrizione')} />
-                                </FormRow>
-                                <FormRow label="Off" valignTop>
-                                    <textarea className={`form_input ${styles.fullWidth}`} rows="15"
+                                </CollapsibleFormRow>
+                                <CollapsibleFormRow label="Off"
+                                    expanded={!!expandedFields.off} onToggle={() => toggleField('off')}>
+                                    <textarea className={`form_input ${styles.fullWidth}`} rows={expandedFields.off ? 15 : 3}
                                         value={form.off ?? ''} onChange={upd('off')} />
-                                </FormRow>
+                                </CollapsibleFormRow>
 
                                 {/* ── IMPOSTAZIONI ─────────────────────── */}
                                 <SectionHeader>Impostazioni</SectionHeader>
