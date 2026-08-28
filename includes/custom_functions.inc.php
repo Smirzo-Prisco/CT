@@ -1114,6 +1114,12 @@ function createQuestPost(int $araldo_id, int $padre, string $titolo, string $tip
             WHERE nome = '$login_f'");
     }
 
+    // Shin fisso al master per ogni resoconto pubblicato, indipendente dalla
+    // tipologia (a differenza del master_xp sopra, che varia/si azzera per tipo)
+    gdrcd_query("INSERT INTO Punti (nome, shin, data_evento, id_messaggio, commento)
+        VALUES ('$login_f', '2', NOW(), '$thread_id', 'Master della quest')");
+    gdrcd_query("UPDATE personaggio SET shin = shin + 2 WHERE nome = '$login_f'");
+
     // Punti ai partecipanti (solo se la sezione lo prevede)
     if ((int)$section['punti'] > 0) {
         foreach ($pg_punti as $pg) {
