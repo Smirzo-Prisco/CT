@@ -690,6 +690,7 @@ span.chat_msg {
     font-size: 15px;
     font-family: $font-chat;
     text-align: justify;
+    white-space: pre-line;
 }
 
 span.chat_msg_off {
