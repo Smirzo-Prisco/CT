@@ -107,8 +107,10 @@ switch ($op) {
 
         // Mestieri veri (tipo = 1): pochi e fissi, si mostrano tutti in un'unica tabella, senza paginazione
         $result = gdrcd_query(
-            "SELECT m.id_mestiere, m.nome, m.visibile, m.tipo, c.descrizione AS tipo_descrizione
+            "SELECT m.id_mestiere, m.nome, m.visibile, m.tipo, c.descrizione AS tipo_descrizione,
+                    m.id_luogo, l.nome AS luogo_nome
              FROM mestiere m LEFT JOIN codtipomestiere c ON m.tipo = c.cod_tipo
+                              LEFT JOIN mappa l ON m.id_luogo = l.id
              WHERE m.tipo = 1
              ORDER BY m.nome",
             'result'
@@ -154,6 +156,48 @@ switch ($op) {
         gdrcd_query($result, 'free');
 
         echo json_encode(['success' => true, 'tipi' => $tipi]);
+        break;
+
+    // Elenco luoghi (mappa) per il select del pannello "Luoghi mestiere"
+    case 'luoghi':
+        if (!$is_admin) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+
+        $luoghi = [];
+        $result = gdrcd_query("SELECT id, nome FROM mappa WHERE nome IS NOT NULL AND nome != '' ORDER BY nome", 'result');
+        while ($row = gdrcd_query($result, 'fetch')) {
+            $luoghi[] = $row;
+        }
+        gdrcd_query($result, 'free');
+
+        echo json_encode(['success' => true, 'luoghi' => $luoghi]);
+        break;
+
+    // Imposta/rimuove il luogo associato a un mestiere vero (tipo=1). Sostituisce
+    // gli array hardcoded in chat_functions.inc.php/oggetto_assegna_chat.inc.php/api_chat.php
+    case 'mestiere_set_luogo':
+        if (!$is_admin) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Accesso negato']); exit; }
+
+        $id_mestiere = (int)($_POST['id_mestiere'] ?? 0);
+        $id_luogo    = trim($_POST['id_luogo'] ?? '') === '' ? null : (int)$_POST['id_luogo'];
+
+        $mestiere = $id_mestiere > 0 ? carica_mestiere($id_mestiere) : null;
+        if (!$mestiere || (int)$mestiere['tipo'] !== 1) {
+            echo json_encode(['success' => false, 'message' => 'Mestiere non trovato']);
+            exit;
+        }
+
+        if ($id_luogo === null) {
+            gdrcd_query("UPDATE mestiere SET id_luogo = NULL WHERE id_mestiere = $id_mestiere LIMIT 1");
+        } else {
+            $luogo_check = gdrcd_query("SELECT id FROM mappa WHERE id = $id_luogo");
+            if (!$luogo_check) {
+                echo json_encode(['success' => false, 'message' => 'Luogo non trovato']);
+                exit;
+            }
+            gdrcd_query("UPDATE mestiere SET id_luogo = $id_luogo WHERE id_mestiere = $id_mestiere LIMIT 1");
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Luogo aggiornato.']);
         break;
 
     case 'get':

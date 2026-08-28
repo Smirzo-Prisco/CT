@@ -1,24 +1,21 @@
 /**
- * GestioneStatuti.jsx — Pannello admin statuti mestiere
- *
- * Sostituisce pages/gestione_statuti_new.inc.php (legacy monolitico), che
- * gestiva anche gli statuti delle 7 razze/gilde narrative: quella parte è
- * stata rimossa qui perché già coperta da gestione.php?page=gestione_gilde
- * (accordion "Statuto" per ogni gilda), non va duplicata.
+ * GestioneStatuti.jsx — Modale statuto mestiere (StatutoModal)
  *
  * Un mestiere ha N "articoli" statuto (titolo, testo, sezione), letti dalla
  * stessa tabella `statuti` usata dallo statuto gilda ma filtrati per
- * id_mestiere. Stessa struttura lista + modale + righe editabili inline di
+ * id_mestiere. Stessa struttura modale + righe editabili inline di
  * GestioneMestieri.jsx (ruoli -> articoli).
  *
- * StatutoModal è esportata e riusata direttamente da GestioneMestieri.jsx
- * (icona "Statuto" nella tabella Mestieri): questa pagina standalone resta
- * raggiungibile via URL diretto ma non è più linkata dalla dashboard.
+ * Riusata direttamente da GestioneMestieri.jsx (icona "Statuto" nella tabella
+ * Mestieri) — non ha più una pagina standalone propria: la vecchia
+ * pages/gestione_statuti_new.inc.php e il default export di questo file
+ * (elenco mestieri + apertura modale) sono stati rimossi perché ormai
+ * ridondanti con quell'icona.
  *
- * API: pages/api_mestieri.php (op=list, statuti_list, statuti_save, statuti_delete)
+ * API: pages/api_mestieri.php (op=statuti_list, statuti_save, statuti_delete)
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
 const API = '/pages/api_mestieri.php'
@@ -222,89 +219,5 @@ export function StatutoModal({ mestiere, onClose }) {
             </div>
         </div>,
         document.body
-    )
-}
-
-// ── Tabella mestieri ───────────────────────────────────────────────────────
-
-function MestieriTable({ rows, loading, onOpen }) {
-    return (
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th className="gp-th-actions">Azioni</th>
-                </tr>
-            </thead>
-            <tbody>
-                {loading ? (
-                    <tr><td colSpan={2} style={{ textAlign: 'center', padding: 20 }}>Caricamento…</td></tr>
-                ) : rows.length === 0 ? (
-                    <tr><td colSpan={2} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Nessun mestiere trovato.</td></tr>
-                ) : rows.map(m => (
-                    <tr key={m.id_mestiere}>
-                        <td className="gp-cell--name">{m.nome}</td>
-                        <td className="gp-cell--actions">
-                            <div className="gp-actions">
-                                <button className="btn-action btn-action--members btn-action--icon" title="Statuto" onClick={() => onOpen(m)}>
-                                    <i className="fa-solid fa-scroll"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    )
-}
-
-// ── Componente principale ────────────────────────────────────────────────────
-
-export default function GestioneStatuti() {
-    const [mestieri, setMestieri] = useState([])
-    const [loading, setLoading]   = useState(true)
-    const [error, setError]       = useState(null)
-    const [editing, setEditing]   = useState(null) // mestiere selezionato oppure null
-
-    const loadList = useCallback(async () => {
-        setLoading(true)
-        try {
-            const r = await fetch(`${API}?op=list`)
-            if (r.status === 403) { window.CT.navigate('main.php?page=mappaclick'); return }
-            const d = await r.json()
-            setLoading(false)
-            if (d.success) setMestieri(d.mestieri)
-            else setError(d.message ?? 'Errore nel caricamento')
-        } catch {
-            setLoading(false)
-            setError('Errore di rete')
-        }
-    }, [])
-
-    useEffect(() => { loadList() }, [loadList])
-
-    return (
-        <div className="pagina_gestione_gilde">
-            <div className="gp-topbar">
-                <div className="gp-topbar__left">
-                    <button type="button" onClick={() => window.history.back()} className="gp-back" title="Indietro">
-                        <i className="fa-solid fa-chevron-left"></i>
-                    </button>
-                </div>
-                <div className="gp-topbar__center">
-                    <span className="gp-title">Statuti Mestieri</span>
-                </div>
-            </div>
-
-            {error && <div className="gm-feedback gm-feedback--error" style={{ margin: '12px' }}>{error}</div>}
-
-            <div className="gp-list">
-                <MestieriTable rows={mestieri} loading={loading} onOpen={setEditing} />
-            </div>
-
-            {editing && (
-                <StatutoModal mestiere={editing} onClose={() => setEditing(null)} />
-            )}
-        </div>
     )
 }

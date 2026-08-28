@@ -218,16 +218,14 @@ function awardExperience($session) {
 function shouldAwardCraftExperience($check_backing, $check_actions, $session) {
     if ($check_backing['esperienza_mestiere'] >= 100) return false;
     if ($check_actions != 4) return false;
-    
-    $craft_locations = array(
-        1 => 20,   // Mestiere 1 -> Location 20
-        2 => 30,   // Mestiere 2 -> Location 30  
-        3 => 24,   // Mestiere 3 -> Location 24
-        10 => 25,  // Mestiere 10 -> Location 25
-        4 => 14    // Mestiere 4 -> Location 14
-    );
-    
-    return isset($craft_locations[$check_backing['id_mestiere']]) && $session['luogo'] == $craft_locations[$check_backing['id_mestiere']];
+
+    // Luogo associato al mestiere, impostato dal pannello admin "Luoghi mestiere"
+    // (mestiere.id_luogo, vedi mestiere_luogo() in custom_functions.inc.php) —
+    // sostituisce il vecchio array hardcoded id_mestiere->luogo
+    $luogo_mestiere = mestiere_luogo((int)($check_backing['id_mestiere'] ?? 0));
+    if ($luogo_mestiere === null) return false;
+
+    return (int)$session['luogo'] === $luogo_mestiere;
 }
 
 /**  * Assegna esperienza mestiere  */
