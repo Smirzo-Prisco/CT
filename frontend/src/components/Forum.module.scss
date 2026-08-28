@@ -214,6 +214,13 @@
 .sectionsTable {
     width: 100%;
     margin: 0 auto;
+
+    // Griglia tra le righe, non ereditata da customTable (globale, per non
+    // spargere il bordo su tutte le altre ~40 pagine che la condividono).
+    td,
+    th {
+        border: 1px solid $color-bg;
+    }
 }
 
 .groupHeaderCell {
