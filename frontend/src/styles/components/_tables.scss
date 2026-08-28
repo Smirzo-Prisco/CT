@@ -47,9 +47,6 @@ table.customTable th {
     padding: 5px;
     font-size: 12px;
     font-family: $font-base;
-    // Griglia tra le righe — usata anche da tabelle senza un proprio
-    // sfondo/hover a separare le righe (es. elenco sezioni forum).
-    border: 1px solid $color-bg;
 }
 
 table.customTable thead {
