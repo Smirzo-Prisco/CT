@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { StatutoModal } from './GestioneStatuti'
 
 const API = '/pages/api_mestieri.php'
 
@@ -158,7 +159,7 @@ function RuoloRow({ ruolo, onSaved, onDeleted }) {
 // Tabella riusata sia per i mestieri veri che per le gilde giocatore: stessa
 // struttura, righe diverse.
 
-function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide, onDelete }) {
+function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide, onDelete, onStatuto }) {
     return (
         <table className="gp-table--mestieri">
             <thead>
@@ -192,6 +193,11 @@ function MestieriTable({ rows, loading, emptyLabel, onEdit, onHide, onDelete }) 
                                 <button className="btn-action btn-action--delete btn-action--icon" title="Elimina definitivamente" onClick={() => onDelete(m.id_mestiere, m.nome)}>
                                     <i className="fa-solid fa-trash-can"></i>
                                 </button>
+                                {onStatuto && (
+                                    <button className="btn-action btn-action--skill btn-action--icon" title="Statuto" onClick={() => onStatuto(m)}>
+                                        <i className="fa-solid fa-scroll"></i>
+                                    </button>
+                                )}
                             </div>
                         </td>
                     </tr>
@@ -399,6 +405,7 @@ export default function GestioneMestieri() {
     const [error, setError]             = useState(null)
     const [editing, setEditing]         = useState(null) // { mestiere, ruoli, tipi } oppure null
     const [hideMsg, setHideMsg]         = useState(null) // { ok: bool, text: string } oppure null
+    const [statutoFor, setStatutoFor]   = useState(null) // mestiere selezionato per StatutoModal, oppure null
 
     const loadList = useCallback(async (offset = 0) => {
         setLoading(true)
@@ -525,6 +532,7 @@ export default function GestioneMestieri() {
                     onEdit={apriModifica}
                     onHide={nascondi}
                     onDelete={eliminaDefinitivamente}
+                    onStatuto={setStatutoFor}
                 />
             </div>
 
@@ -559,6 +567,10 @@ export default function GestioneMestieri() {
                     onSaved={onMestiereSaved}
                     onRuoliChange={ruoli => setEditing({ ...editing, ruoli })}
                 />
+            )}
+
+            {statutoFor && (
+                <StatutoModal mestiere={statutoFor} onClose={() => setStatutoFor(null)} />
             )}
         </div>
     )
