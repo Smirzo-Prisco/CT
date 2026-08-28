@@ -83,11 +83,10 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
                 </tbody>
             <?php break;
             case 'generali': // ******************  GENERALI ******************
-                $query_generali = gdrcd_query("SELECT autore, nome_interessato, data_evento, descrizione_evento 
+                $query_generali = gdrcd_query("SELECT autore, nome_interessato, data_evento, descrizione_evento
                                 FROM log
-                                WHERE codice_evento = ".gdrcd_filter('num', $_GET['generaliType'])." 
-                                ORDER BY data_evento DESC", 'result');
-                $generali = gdrcd_query($query_generali, 'fetch'); ?>
+                                WHERE codice_evento = ".gdrcd_filter('num', $_GET['generaliType'])."
+                                ORDER BY data_evento DESC", 'result'); ?>
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)"><?=gdrcd_filter('out', $MESSAGE['interface']['administration']['log']['events']['author'])?></th>
@@ -97,7 +96,7 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
                     </tr>
                 </thead>
                 <tbody>
-                <?php while ($row = gdrcd_query($result, 'fetch')) : ?>
+                <?php while ($row = gdrcd_query($query_generali, 'fetch')) : ?>
                     <tr>
                         <td><?=gdrcd_filter('out', $row['autore'])?></td>
                         <td>
