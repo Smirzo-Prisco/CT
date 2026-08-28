@@ -229,21 +229,27 @@ div.pagina_presenti {
 }
 
 // ── Tabella presenti estesa ───────────────────────────────────
-// NB: scoped a div.presenti_estesi — table.customTable e' condivisa da
-// decine di pagine (forum compreso), un selettore globale qui rompeva
-// il gap tra i post del forum (margin:auto vinceva su .postCard per
-// specificita', azzerando il margin-bottom che li separa).
+// NB: table.customTable e' condivisa da decine di pagine (forum
+// compreso) — selettore lasciato globale come in origine (scoping a
+// div.presenti_estesi alzava la specificita' e faceva vincere qui
+// background/border invece di quelli col bordo oro di _tables.scss,
+// sbiadendo la pagina). Tocca solo margin-left/right (mai margin
+// bottom/top): "margin: auto" scorciatoia impostava anche
+// margin-bottom, con specificita' piu' alta di .postCard nel forum
+// vinceva su margin-bottom:10px, azzerando il gap tra i post.
 
-div.presenti_estesi table.customTable {
+table.customTable {
     min-width: 70%;
     background-color: $palette-surface-raised;
     border-collapse: collapse;
     border: 1px solid $color-bg;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
     text-align: center;
 
     td,
     th {
+        border: 1px solid $color-bg;
         padding: $space-1 + 1;
     }
 
