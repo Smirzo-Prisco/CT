@@ -91,6 +91,18 @@ function IconWithPopup({ iconKey, openPopup, onOpen, ...imgProps }) {
 /** Colori del pallino stato — rosso automatico (in giocata), giallo/verde a scelta. */
 const STATO_COLORI = { rosso: '#e74c3c', giallo: '#f1c40f', verde: '#4caf50' }
 
+/** Persistenza dell'espansione colonna stato (dot+testo vs solo dot) fra le sessioni. */
+const STATO_EXPANDED_KEY = 'ct-presenti-stato-expanded'
+
+function loadStatoExpanded() {
+    try {
+        const v = localStorage.getItem(STATO_EXPANDED_KEY)
+        return v === null ? true : v === '1'
+    } catch {
+        return true
+    }
+}
+
 /** Ricava il colore/etichetta del pallino: il rosso (in giocata) e' sempre automatico. */
 function statoDelPallino(user) {
     if (user.in_role) return { colore: 'rosso', label: 'In giocata' }
@@ -157,8 +169,9 @@ function StatoEditForm({ user, onClose }) {
  * @param {boolean}  props.isStaff   - true se il viewer è staff
  * @param {Object?}  props.openPopup - { key, rect, kind, ... } del popup aperto (condiviso fra le righe)
  * @param {Function} props.onOpen    - apre/chiude il popup (null per chiudere)
+ * @param {boolean}  props.statoExpanded - true se la colonna stato mostra anche il testo
  */
-function UserRow({ user, isStaff, openPopup, onOpen }) {
+function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
     /** Naviga alla pagina DM con il destinatario pre-selezionato */
     const openSms = () => window.CT.navigate(`main.php?page=messages_center&to=${encodeURIComponent(user.nome)}`)
 
@@ -173,26 +186,34 @@ function UserRow({ user, isStaff, openPopup, onOpen }) {
             {/* Pallino stato: rosso automatico (in giocata) o giallo/verde a
                 scelta manuale. Click sulla propria riga apre il form di
                 modifica, sulle altre mostra la nota impostata (se c'è). */}
-            <td style={{ textAlign: 'center', width: '24px' }}>
+            <td
+                title={label}
+                onClick={e => {
+                    e.stopPropagation()
+                    if (openPopup?.key === statoKey) { onOpen(null); return }
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    onOpen(isOwn
+                        ? { key: statoKey, rect, kind: 'stato', user }
+                        : { key: statoKey, rect, kind: 'text', text: user.nota || 'Nessuna nota' })
+                }}
+                style={{
+                    textAlign: statoExpanded ? 'left' : 'center',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                }}
+            >
                 <span
-                    title={label}
-                    onClick={e => {
-                        e.stopPropagation()
-                        if (openPopup?.key === statoKey) { onOpen(null); return }
-                        const rect = e.currentTarget.getBoundingClientRect()
-                        onOpen(isOwn
-                            ? { key: statoKey, rect, kind: 'stato', user }
-                            : { key: statoKey, rect, kind: 'text', text: user.nota || 'Nessuna nota' })
-                    }}
                     style={{
                         display: 'inline-block',
                         width: '10px',
                         height: '10px',
                         borderRadius: '50%',
                         backgroundColor: STATO_COLORI[colore],
-                        cursor: 'pointer',
+                        verticalAlign: 'middle',
+                        marginRight: statoExpanded ? '6px' : 0,
                     }}
                 />
+                {statoExpanded && <span style={{ verticalAlign: 'middle' }}>{label}</span>}
             </td>
 
             {/* Avatar del personaggio — grayscale se morto via CSS su .pg-morto */}
@@ -286,6 +307,16 @@ export default function PresentiEstesi({ isStaff = false }) {
      * rect e' il DOMRect dell'elemento cliccato al momento del click, usato
      * per posizionare il popup via portal (vedi PopupPortal sotto).
      */
+    /** Colonna stato: dot+testo (espansa) o solo dot (collassata) — persistita in localStorage. */
+    const [statoExpanded, setStatoExpanded] = useState(loadStatoExpanded)
+    const toggleStatoExpanded = () => {
+        setStatoExpanded(prev => {
+            const next = !prev
+            try { localStorage.setItem(STATO_EXPANDED_KEY, next ? '1' : '0') } catch {}
+            return next
+        })
+    }
+
     const [openPopup, setOpenPopup] = useState(null)
     useEffect(() => {
         if (!openPopup) return
@@ -364,7 +395,13 @@ export default function PresentiEstesi({ isStaff = false }) {
 
                     {/* Intestazioni colonne */}
                     <tr className="second_header">
-                        <td></td>
+                        <td
+                            onClick={toggleStatoExpanded}
+                            title={statoExpanded ? 'Comprimi stato' : 'Espandi stato'}
+                            style={{ width: statoExpanded ? '90px' : '24px', cursor: 'pointer' }}
+                        >
+                            {statoExpanded ? '◂' : '▸'}
+                        </td>
                         <td>AVATAR</td>
                         <td>SMS</td>
                         <td style={{ display: 'none' }}>RAZZA ICO</td>
@@ -412,7 +449,7 @@ export default function PresentiEstesi({ isStaff = false }) {
 
                                     {/* Righe utente */}
                                     {utenti.map(u => (
-                                        <UserRow key={u.nome} user={u} isStaff={isStaff} openPopup={openPopup} onOpen={setOpenPopup} />
+                                        <UserRow key={u.nome} user={u} isStaff={isStaff} openPopup={openPopup} onOpen={setOpenPopup} statoExpanded={statoExpanded} />
                                     ))}
 
                                 </Fragment>
