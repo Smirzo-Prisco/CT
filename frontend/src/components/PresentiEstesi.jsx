@@ -187,7 +187,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
                 scelta manuale. Click sulla propria riga apre il form di
                 modifica, sulle altre mostra la nota impostata (se c'è). */}
             <td
-                title={label}
+                title={user.nota ? `${label} — ${user.nota}` : label}
                 onClick={e => {
                     e.stopPropagation()
                     if (openPopup?.key === statoKey) { onOpen(null); return }
@@ -213,7 +213,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
                         marginRight: statoExpanded ? '6px' : 0,
                     }}
                 />
-                {statoExpanded && <span style={{ verticalAlign: 'middle' }}>{label}</span>}
+                {statoExpanded && user.nota && <span style={{ verticalAlign: 'middle' }}>{user.nota}</span>}
             </td>
 
             {/* Avatar del personaggio — grayscale se morto via CSS su .pg-morto */}
