@@ -400,7 +400,7 @@ export default function PresentiEstesi({ isStaff = false }) {
                             title={statoExpanded ? 'Comprimi stato' : 'Espandi stato'}
                             style={{ width: statoExpanded ? '90px' : '24px', cursor: 'pointer' }}
                         >
-                            {statoExpanded ? '◂' : '▸'}
+                            <span style={{ fontSize: '2em', lineHeight: 1 }}>{statoExpanded ? '◂' : '▸'}</span>
                         </td>
                         <td>AVATAR</td>
                         <td>SMS</td>
