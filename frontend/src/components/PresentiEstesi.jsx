@@ -396,6 +396,7 @@ export default function PresentiEstesi({ isStaff = false }) {
                     {/* Intestazioni colonne */}
                     <tr className="second_header">
                         <td
+                            className="presenti-stato-toggle"
                             onClick={toggleStatoExpanded}
                             title={statoExpanded ? 'Comprimi stato' : 'Espandi stato'}
                             style={{ width: statoExpanded ? '90px' : '24px', cursor: 'pointer' }}

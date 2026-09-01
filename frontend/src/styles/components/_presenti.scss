@@ -382,8 +382,22 @@ tr.presente a:visited {
 // Header colonne (tr.second_header) solo su desktop: su mobile la tabella
 // e' gia' stretta, quest'intestazione toglie spazio senza aggiungere
 // informazioni che le icone stesse (ora con popup al tap) non diano gia'.
+// Eccezione: il toggle espandi/comprimi della colonna stato resta
+// raggiungibile anche da smartphone/tablet — l'unico modo per cambiarlo li'.
+// visibility (non display) sulle celle sorelle: con table-layout:fixed un
+// display:none sulla cella della PRIMA riga (quella che definisce la
+// larghezza colonna) disallinea le colonne nelle righe utente sottostanti,
+// che restano tutte visibili.
 @media (max-width: 680px) {
     div.presenti_estesi tr.second_header {
-        display: none;
+        td {
+            visibility: hidden;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        td.presenti-stato-toggle {
+            visibility: visible;
+        }
     }
 }
