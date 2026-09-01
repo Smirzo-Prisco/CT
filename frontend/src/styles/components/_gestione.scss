@@ -920,6 +920,11 @@ span[style*="position:relative"]:hover .tooltip-bottom {
     font-weight: normal;
 }
 
+.gp-th-meta,
+.gp-cell--meta {
+    width: 90px;
+}
+
 .gp-cell--meta {
     color: $color-text-muted;
     font-size: $text-md;
