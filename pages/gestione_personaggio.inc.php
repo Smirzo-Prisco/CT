@@ -120,7 +120,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
     <table id="pgTable">
         <thead>
             <tr>
-                <th></th>
+                <th class="gp-th-avatar"></th>
                 <th>Personaggio</th>
                 <?php /* <th>Spirito</th> */ ?>
                 <th>Razza</th>

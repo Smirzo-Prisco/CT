@@ -259,13 +259,14 @@ img.scheda_pg {
 }
 
 // .modal/.modal-content (legacy, sfondo decorativo Pannelli.png 500x500,
-// z-index:1) rimosse: nessun markup le usa piu' come wrapper diretto — tutte
-// le modali reali passano per .pg-edit-container (vedi _gestione.scss), che
-// pero' e' un selettore piu' specifico (.pg-edit-container .modal-content) e
-// non ridichiara "height": l'height:500px di qui restava comunque applicato
-// per cascata a QUALSIASI .modal-content, bucando il max-height/overflow-y
-// pensati apposta per i contenuti lunghi. .close resta: e' il bottone "x"
-// riusato dentro .pg-edit-container .modal-content ed e' indipendente.
+// z-index:1) rimosse: tutte le modali reali passano per .pg-edit-container
+// (vedi _gestione.scss) o per componenti React dedicati (SkillDescModal.jsx,
+// NoteFatoModal in Scheda.jsx...). .close resta: e' il bottone "x" riusato
+// dentro .pg-edit-container .modal-content ed e' indipendente.
+//
+// .animate/.container2/.imgcontainer/iframe#myframe rimosse insieme: erano
+// tutte del vecchio modale skill (#id01 in left-right_frames.php +
+// skill_desc.proc.php), eliminato e sostituito da SkillDescModal.jsx.
 
 .close {
     position: absolute;
@@ -282,39 +283,6 @@ img.scheda_pg {
         color: white;
         cursor: pointer;
     }
-}
-
-.animate {
-    animation: animatezoom 0.6s;
-}
-
-@keyframes animatezoom {
-    from {
-        transform: scale(0);
-    }
-
-    to {
-        transform: scale(1);
-    }
-}
-
-.container2 {
-    padding: 30px;
-    text-align: center;
-    color: $color-text-light;
-    height: 75%;
-}
-
-.imgcontainer {
-    text-align: center;
-    margin: 24px 0 12px;
-    position: relative;
-}
-
-iframe#myframe {
-    width: 100%;
-    height: 100%;
-    border: none;
 }
 
 // .modal_calendario/.modal-content_calendario/.close_calendario rimosse:

@@ -139,8 +139,7 @@ $px_totali_pg = $personaggio['esperienza'];
                         <td width="40%">
                             <?php
                             $id = gdrcd_filter('out', $row['id_abilita']);
-                            $addr = "skill_desc.proc.php".$id;
-                            $to = "changeFrame('skill_desc.proc.php?id=$id');document.getElementById('id01').style.display='block'";
+                            $to = "CT.openSkillDesc($id);return false;";
                             ?>
                                 
                                       

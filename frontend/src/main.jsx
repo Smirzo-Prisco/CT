@@ -66,6 +66,7 @@ import GestioneManutenzione from './components/GestioneManutenzione'
 import GestioneMestieri from './components/GestioneMestieri'
 import GestioneLuoghiMestiere from './components/GestioneLuoghiMestiere'
 import ContattaModerazione from './components/ContattaModerazione'
+import SkillDescModal  from './components/SkillDescModal'
 
 /**
  * Registry privato dei componenti.
@@ -170,6 +171,9 @@ window.CT.register('GestioneLuoghiMestiere', GestioneLuoghiMestiere)
 /** Form + cronologia richieste di moderazione, con pannello staff integrato */
 window.CT.register('ContattaModerazione', ContattaModerazione)
 
+/** Modale globale descrizione abilità — pilotato via window.CT.openSkillDesc() */
+window.CT.register('SkillDescModal', SkillDescModal)
+
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.
  * Legge ?page=X dalla URL e renderizza il componente giusto senza reload.
@@ -187,6 +191,22 @@ window.CT.register('AppRouter', AppRouter)
  * @param {string} url - URL di destinazione
  */
 window.CT.navigate = (url) => { window.top.location.href = url }
+
+/**
+ * CT.openSkillDesc — apre il modale globale di descrizione abilità
+ * (SkillDescModal, montato una volta in header.inc.php).
+ * Chiamabile sia da JS legacy (onclick nelle pagine .inc.php non ancora
+ * migrate) sia da componenti React.
+ *
+ * @param {number|string|{nome: string, descrizione: string}} arg
+ *   Un id abilità (fa fetch di nome+descrizione da api_global.php),
+ *   oppure un oggetto già con nome/descrizione noti (nessun fetch).
+ */
+window.CT.openSkillDesc = (arg) => {
+    window.dispatchEvent(new CustomEvent('ct:skill-desc-open', {
+        detail: (typeof arg === 'object' && arg !== null) ? arg : { id: arg },
+    }))
+}
 
 // --------------------------------------------------------------------------------------------
 // EVENTO ct:ready — segnala ai file PHP che il bundle è pronto

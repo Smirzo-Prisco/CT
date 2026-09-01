@@ -10,9 +10,8 @@ $avversario = $_POST['avversario'];
 /*link di descrizione*/
 
 $id = gdrcd_filter('out', $magia);
-$addr = "skill_desc.proc.php".$id;
 
-$leggi = "<font color=\"#b4b6bf\">(<a href=\"#\" onclick=\"changeFrame(\'skill_desc.proc.php?id=$id\');document.getElementById(\'id01\').style.display=\'block\'\">Leggi</a>)</font>";
+$leggi = "<font color=\"#b4b6bf\">(<a href=\"#\" onclick=\"CT.openSkillDesc($id);return false;\">Leggi</a>)</font>";
 
 if (gdrcd_filter('get',$_POST['op'])=='take_action')
 	{

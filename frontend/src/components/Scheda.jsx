@@ -57,8 +57,7 @@ function getYoutubeId(url) {
 }
 
 /**
- * Apre il frame modale per l'invio di un SMS privato al personaggio.
- * changeFrame() è definita in left-right_frames.php ed è globale.
+ * Naviga alla pagina di invio SMS privato al personaggio.
  * @param {string} nome - Nome del destinatario
  */
 function openSmsFrame(nome) {

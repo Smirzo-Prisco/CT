@@ -69,7 +69,7 @@ $px_totali_pg = $personaggio['esperienza'];
                     <tr>
                         <td>
                             <div class="abilita_scheda_nome">
-                            <a href="javascript:void(0);" onClick="window.open('skill_desc.proc.php','Log','toolbar=no,width=500,height=500');">
+                            <a href="javascript:void(0);" onClick="CT.openSkillDesc(<?php echo (int)$row['id_abilita']; ?>);">
                            <?php echo gdrcd_filter('out', $row['nome']); ?>
                                         </a>
                             </div>

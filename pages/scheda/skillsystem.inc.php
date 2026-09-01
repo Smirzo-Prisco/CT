@@ -101,7 +101,7 @@ foreach ($ordine_categorie as $tipo) {
         echo '<table class="customTable"><tr class="second_header"><td colspan="3" style="text-transform: uppercase; font-size: 13px; color: #9a6353 ; font-family: DejaVu Serif; filter: drop-shadow(0 0 5px rgba(0,0,0,0.57));">' . $tipo . '</td></tr>';
         foreach ($abilita_per_tipo[$tipo] as $row) {
             $id = gdrcd_filter('out', $row['id_abilita']);
-            $to = "changeFrame('skill_desc.proc.php?id=$id');document.getElementById('id01').style.display='block'";
+            $to = "CT.openSkillDesc($id);return false;";
             echo '<tr>';
             echo '<td width="40%"><a href="#" onClick="'. $to .'">' . gdrcd_filter('out', $row['nome']) . '</a><br>';
             if ($tipo !== 'Talento') {

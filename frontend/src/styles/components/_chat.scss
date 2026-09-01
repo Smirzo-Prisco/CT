@@ -2266,41 +2266,10 @@ img.chat_avatar_inline {
     }
 }
 
-// ── Descrizione stanza / abilità (descrizione_chat.php, skill_desc.proc.php) ──
-
-#container {
-    text-align: center;
-    margin-top: 50px;
-}
-
-.container2 {
-    overflow: auto;
-}
-
-span.luogo {
-    color: #ce846f;
-    letter-spacing: 3px;
-    font-size: 14px;
-    font-family: "DejaVu Serif";
-    filter: drop-shadow(-1.732px 1px 2px #000);
-    text-transform: uppercase;
-}
-
-span.sottotitolo {
-    font-size: 10px;
-    letter-spacing: 1px;
-    color: #8f8f8f;
-    font-family: "DejaVu Serif";
-    text-align: center;
-}
-
-span.testo {
-    font-size: 11px;
-    color: #8f8f8f;
-    font-family: "DejaVu Sans";
-    text-align: center;
-    filter: drop-shadow(0 0 3.5px rgba(0,0,0,0.57));
-}
+// #container/.container2/span.luogo/span.sottotitolo/span.testo rimosse:
+// erano di descrizione_chat.php e skill_desc.proc.php, entrambi eliminati
+// (il secondo sostituito dal modale globale SkillDescModal.jsx, il primo
+// era gia' completamente orfano, nessun trigger lo referenziava piu').
 
 // ── Guida chat (chat_help.css) ────────────────────────────────
 
