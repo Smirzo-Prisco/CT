@@ -121,7 +121,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
         <thead>
             <tr>
                 <th class="gp-th-avatar"></th>
-                <th>Personaggio</th>
+                <th class="gp-th-name">Personaggio</th>
                 <?php /* <th>Spirito</th> */ ?>
                 <th class="gp-th-meta">Razza</th>
                 <th class="gp-th-meta">Mestiere</th>
