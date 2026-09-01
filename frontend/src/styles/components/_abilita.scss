@@ -158,68 +158,10 @@
     }
 }
 
-// ── Modale descrizione skill ──────────────────────────────────
-
-.skill-modal {
-    position: fixed;
-    inset: 0;
-    background: rgb(0 0 0 / 55%);
-    backdrop-filter: blur(4px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.25s ease;
-
-    &.open {
-        display: flex;
-        opacity: 1;
-    }
-}
-
-.skill-modal-content {
-    background: rgb(255 255 255 / 80%);
-    backdrop-filter: blur(8px);
-    padding: $space-6 32px;
-    width: 90%;
-    max-width: 520px;
-    border-radius: $radius-xl + 4;
-    box-shadow: 0 8px 32px rgb(0 0 0 / 30%);
-    animation: modal-pop 0.25s ease forwards;
-    // .skill-modal centra verticalmente (align-items:center): senza un tetto
-    // qui, una descrizione lunga cresce oltre il viewport in entrambe le
-    // direzioni e la parte superiore finisce dietro l'header HUD.
-    max-height: 85vh;
-    overflow-y: auto;
-    box-sizing: border-box;
-}
-
-@keyframes modal-pop {
-    from { opacity: 0; transform: scale(0.85); }
-    to   { opacity: 1; transform: scale(1); }
-}
-
-#skill-modal-descrizione {
-    font-size: 1rem;
-    color: #333;
-    margin-bottom: $space-5;
-    line-height: 1.5;
-}
-
-#close-modal {
-    padding: $space-2 + 2 $space-4 + 2;
-    border: none;
-    background: #4a6fff;
-    color: $color-text-light;
-    font-size: 0.95rem;
-    border-radius: $radius-xl - 2;
-    cursor: pointer;
-    transition: background $transition-fast, transform 0.15s ease;
-
-    &:hover  { background: #3956d4; transform: translateY(-2px); }
-    &:active { transform: translateY(0); }
-}
+// .skill-modal/.skill-modal-content/#skill-modal-descrizione/#close-modal
+// rimosse: mercato_abilita.js usa ora il modale globale condiviso
+// SkillDescModal.jsx (window.CT.openSkillDesc), stile in
+// SkillDescModal.module.css.
 
 // ── Help animato (incremento_parametri) ───────────────────────
 // Variante di .help-animated con tooltip che si apre verso il basso

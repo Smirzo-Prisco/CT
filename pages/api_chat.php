@@ -183,7 +183,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
             // Mesaggio in chat
             $messaggio .= " verso <u>".implode(',', $bersaglio)."</u>"; // Aggiungi il bersaglio al messaggio se presente
-            $leggi = "<font color=\"#b4b6bf\">(<a href=\"#\" onclick=\"changeFrame('skill_desc.proc.php?id=$id');document.getElementById('id01').style.display='block'\">Leggi</a>)</font>";
+            $leggi = "<font color=\"#b4b6bf\">(<a href=\"#\" onclick=\"CT.openSkillDesc($id);return false;\">Leggi</a>)</font>";
             $messaggio .= " " . $leggi;
             $messaggio = gdrcd_filter('in', $messaggio); // Pulisco il messaggio
             $sussurro = isset($messaggio_talento['testo']) ? gdrcd_filter('in', $messaggio_talento['testo']) : $sussurro;

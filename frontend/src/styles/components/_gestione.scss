@@ -875,10 +875,21 @@ span[style*="position:relative"]:hover .tooltip-bottom {
     }
 }
 
+.gp-th-actions,
+.gp-cell--actions {
+    // Larghezza esplicita anche sull'header: con table-layout:fixed solo
+    // la prima riga (thead) determina le colonne — un width solo sul td
+    // (come .gp-cell--avatar aveva prima) viene ignorato dai browser.
+    width: 190px;
+}
+
 .gp-th-actions { text-align: center; }
 
+.gp-th-avatar,
 .gp-cell--avatar {
-    width: 48px;
+    width: 40px;
+    padding-left: $space-1;
+    padding-right: $space-1;
 
     img {
         display: block;

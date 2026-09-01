@@ -38,18 +38,6 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 <div id="maincontent">
     <div class="output">
 
-        <!-- Modale per la descrizione delle skill lanciate in chat -->
-        <div id="id01" class="modal">
-            <form class="modal-content animate" action="/action_page.php" method="post">
-                <div class="imgcontainer">
-                    <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">Chiudi</span>
-                </div>
-                <div class="container2">
-                    <iframe id="myframe" src="about:blank"></iframe>
-                </div>
-            </form>
-        </div>
-
         <?php
         // Thin shell: pagine migrate → container React diretto, senza I/O su file .inc.php.
         // Pagine non migrate (gestione sub-pagine, tool staff) → include PHP classico.
@@ -61,14 +49,3 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
         <?php endif; ?>
     </div>
 </div>
-
-<script>
-    // Gestione modale skill
-    var modal = document.getElementById('id01');
-    window.onclick = function(event) {
-        if (event.target == modal) { modal.style.display = 'none'; }
-    }
-    function changeFrame(input_text) {
-        document.getElementById('myframe').src = input_text;
-    }
-</script>

@@ -57,8 +57,7 @@ Nome
 while($row = gdrcd_query($elenco_talenti, 'fetch')) {
 
                             $id = gdrcd_filter('out', $row['id_abilita']);
-                            $addr = "skill_desc.proc.php".$id;
-                            $to = "window.open('skill_desc.proc.php?id=$id','Log','toolbar=no,width=500,height=500');";
+                            $to = "CT.openSkillDesc($id);";
 ?>
 <tr>
 <td>
@@ -96,8 +95,7 @@ $elenco_talenti_generici = gdrcd_query("SELECT * FROM abilita WHERE id_razza = '
 while($ro = gdrcd_query($elenco_talenti_generici, 'fetch')) {
 
                             $id = gdrcd_filter('out', $ro['id_abilita']);
-                            $addr = "skill_desc.proc.php".$id;
-                            $to = "window.open('skill_desc.proc.php?id=$id','Log','toolbar=no,width=500,height=500');";
+                            $to = "CT.openSkillDesc($id);";
 ?>
 <tr>
 <td width="30%">

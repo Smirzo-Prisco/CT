@@ -167,28 +167,6 @@ function conta(el) {
     if (countdown) countdown.style.width = width + "px";
 }
 
-var modal = document.getElementById('id01');
-
-window.onclick = function (event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
-
-function changeFrame(input_text) {
-    document.getElementById("myframe").src = input_text;
-}
-
-var modal = document.getElementById('id02');
-
-window.onclick = function (event) {
-    if (event.target == modal) modal.style.display = "none";
-}
-
-function changeFrame(input_text) {
-    document.getElementById("myframe").src = input_text;
-}
-
 // Elemento singleton per le notifiche — creato una volta sola, aggiornato ad ogni chiamata
 function showNotification(message, type = 'info') {
     let el = document.getElementById('ct-notification');

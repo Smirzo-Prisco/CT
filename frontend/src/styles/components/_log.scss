@@ -151,7 +151,14 @@ $log-accent: #ce846f;
     max-width: 1200px;
     margin: auto;
 
-    h1 { margin-bottom: 20px; color: #fff; }
+    // .gp-topbar (di _gestione.scss) qui e' figlio di un flex column con
+    // align-items:center: senza stretch resterebbe stretto alla larghezza
+    // del contenuto invece di occupare tutta la riga come nelle altre
+    // pagine gestione_*.inc.php.
+    .gp-topbar {
+        align-self: stretch;
+        margin-bottom: 20px;
+    }
 
     .tabs {
         display: flex;

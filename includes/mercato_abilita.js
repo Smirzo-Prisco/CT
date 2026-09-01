@@ -218,18 +218,11 @@ document.addEventListener("click", function (e) {
 
     if (e.target.classList.contains("btn-up")) return;
 
-    const descrizione = row.dataset.descrizione ?? "Nessuna descrizione";
-    const titolo = row.dataset.titolo ?? "Nessun titolo";
-    // Inserisco titolo e descrizione interpretando gli HTML
-    document.getElementById("skill-modal-titolo").textContent = titolo;
-    document.getElementById("skill-modal-descrizione").innerHTML = descrizione;
-
-    document.getElementById("skill-modal").classList.add("open");
+    // Descrizione/titolo gia' noti dal DOM (nessun fetch): apre il modale
+    // globale condiviso con le altre liste skill (chat, scheda personaggio).
+    window.CT.openSkillDesc({
+        nome: row.dataset.titolo ?? "Nessun titolo",
+        descrizione: row.dataset.descrizione ?? "Nessuna descrizione",
+    });
 });
-
-// Lo script è caricato dinamicamente dopo il mount React: il DOM è già pronto,
-// DOMContentLoaded non scatterà mai → chiamo direttamente senza attendere l'evento.
-document.getElementById("close-modal")?.addEventListener("click", () =>
-    document.getElementById("skill-modal").classList.remove("open")
-);
 loadSkills();

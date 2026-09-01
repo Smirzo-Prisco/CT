@@ -592,6 +592,16 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
 
             exit;
+        case 'getSkillDesc': // Nome + descrizione di un'abilità — modale "Leggi" (SkillDescModal.jsx)
+            $id = (int)($_GET['id'] ?? 0);
+            $abilita = gdrcd_query("SELECT nome, descrizione FROM abilita WHERE id_abilita = $id");
+
+            if ($abilita) {
+                echo json_encode(['success' => true, 'nome' => $abilita['nome'], 'descrizione' => $abilita['descrizione']]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Abilità non trovata']);
+            }
+            break;
         case 'getSkillPg': // Recupero le skill del pg
             // Solo lettura, $_SESSION resta disponibile dopo il write_close iniziale.
             $pg_name = gdrcd_filter('in', $_SESSION['login']);

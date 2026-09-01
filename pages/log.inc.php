@@ -11,7 +11,16 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
 ?>
 
 <div class="log-container">
-    <h1>Logs</h1>
+    <div class="gp-topbar">
+        <div class="gp-topbar__left">
+            <button type="button" class="gp-back" title="Indietro" onclick="history.back()">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+        </div>
+        <div class="gp-topbar__center">
+            <h1 class="gp-title">Logs</h1>
+        </div>
+    </div>
     <!-- TABS -->
     <div class="tabs">
         <div class="tab <?= $currentTab == 'chatbot' ? 'active' : '' ?>" onclick="changeTab('chatbot')">Domande chatbot</div>
