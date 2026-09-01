@@ -167,6 +167,18 @@ function conta(el) {
     if (countdown) countdown.style.width = width + "px";
 }
 
+// Shim di compatibilita': changeFrame()/#id01 (vecchio modale skill, sostituito
+// da SkillDescModal.jsx) possono essere ancora referenziati da contenuti
+// storici salvati in DB anni fa e mai piu' modificati (es. mappa.descrizione,
+// stampata senza sanitizzazione — vedi Hud.jsx). Se il testo passato e' un
+// link a skill_desc.proc.php ne estraggo l'id e apro il modale nuovo,
+// altrimenti non faccio nulla: evita solo il ReferenceError, senza
+// resuscitare la vecchia modale visibile.
+function changeFrame(input_text) {
+    var match = /[?&]id=(\d+)/.exec(input_text || '');
+    if (match && window.CT && window.CT.openSkillDesc) window.CT.openSkillDesc(Number(match[1]));
+}
+
 // Elemento singleton per le notifiche — creato una volta sola, aggiornato ad ogni chiamata
 function showNotification(message, type = 'info') {
     let el = document.getElementById('ct-notification');
