@@ -125,7 +125,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                 <?php /* <th>Spirito</th> */ ?>
                 <th>Razza</th>
                 <th>Mestiere</th>
-                <th>Esilio</th>
+                <th class="gp-th-esilio">Esilio</th>
                 <th class="gp-th-actions">Azioni</th>
             </tr>
         </thead>
@@ -181,14 +181,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                     <td class="gp-cell--actions">
                         <div class="gp-actions">
 
-                            <?php if ($isDeleted && hasPermesso($_SESSION, $permessi_azioni['ripristina'])): ?>
-                            <button class="btn-action btn-action--restore btn-action--icon"
-                                    title="Ripristina"
-                                    onclick="ripristinaPg('<?= addslashes($pg['nome']) ?>')">
-                                <i class="fa-solid fa-rotate-left"></i>
-                            </button>
-                            <?php endif; ?>
-
                             <?php if (hasPermesso($_SESSION, $permessi_azioni['modifica'])): ?>
                             <button class="btn-action btn-action--edit btn-action--icon"
                                     title="Modifica"
@@ -235,6 +227,14 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
+                            <?php endif; ?>
+
+                            <?php if ($isDeleted && hasPermesso($_SESSION, $permessi_azioni['ripristina'])): ?>
+                            <button class="btn-action btn-action--restore btn-action--icon"
+                                    title="Ripristina"
+                                    onclick="ripristinaPg('<?= addslashes($pg['nome']) ?>')">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
                             <?php endif; ?>
 
                         </div>
