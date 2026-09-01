@@ -875,7 +875,7 @@ span[style*="position:relative"]:hover .tooltip-bottom {
     }
 }
 
-.gp-th-actions { text-align: center; }
+.gp-th-actions { text-align: left; }
 
 // Nessun width qui, di proposito: e' l'unica colonna senza una larghezza
 // esplicita (tutte le altre ora ce l'hanno), quindi con table-layout:fixed
@@ -940,7 +940,7 @@ span[style*="position:relative"]:hover .tooltip-bottom {
 }
 
 .gp-cell--actions {
-    text-align: center;
+    text-align: left;
     white-space: nowrap;
 }
 
@@ -948,7 +948,7 @@ span[style*="position:relative"]:hover .tooltip-bottom {
     display: flex;
     gap: $space-1;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 
     form { margin: 0; }
 }
