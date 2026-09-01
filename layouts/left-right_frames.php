@@ -38,6 +38,13 @@ if (isset($_GET['css'])) { header('Content-Type:text/css; charset=utf-8'); exit;
 <div id="maincontent">
     <div class="output">
 
+        <!-- Placeholder inerte: contenuti storici in DB (es. mappa.descrizione,
+             mai sanitizzati) possono ancora referenziare document.getElementById('id01')
+             dal vecchio modale skill (sostituito da SkillDescModal.jsx) — senza
+             questo elemento quella chiamata lancerebbe un TypeError. Vedi anche
+             lo shim changeFrame() in corefunctions.js. -->
+        <div id="id01" style="display:none"></div>
+
         <?php
         // Thin shell: pagine migrate → container React diretto, senza I/O su file .inc.php.
         // Pagine non migrate (gestione sub-pagine, tool staff) → include PHP classico.
