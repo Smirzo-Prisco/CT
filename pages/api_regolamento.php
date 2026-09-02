@@ -99,8 +99,12 @@ switch ($op) {
         // Niente [spoiler] qui, a differenza del resto della bacheca: l'estratto
         // e' gia' pensato per essere breve, nasconderlo per default vanificherebbe
         // il punto (leggere subito cos'e' cambiato senza aprire nulla).
+        // Niente mb_substr qui: il limite di lunghezza e' gia' applicato
+        // dentro get_diff_excerpt(), a blocchi interi — un mb_substr sulla
+        // stringa finale poteva tagliare a meta' un tag e "inghiottire" il
+        // resto del post (link incluso), vedi commento nella funzione.
         if ($excerpt) {
-            $testo_notifica .= "<br><b>Cosa è cambiato</b><br>" . mb_substr($excerpt, 0, 10000) . "<br>";
+            $testo_notifica .= "<br><b>Cosa è cambiato</b><br>" . $excerpt . "<br>";
         }
 
         $testo_notifica .= "<br><a href=\"" . $link_art . "\" target=\"_blank\">→ Vai all'articolo</a>";

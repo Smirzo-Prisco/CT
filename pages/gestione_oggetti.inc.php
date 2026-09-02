@@ -49,41 +49,49 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
 
 
 <!-- Top bar -->
-<div class="topbar">
-    <a href="javascript:history.back()" class="back">⬅️ Indietro</a>
-    <?php if ($vistaCompleta): ?>
-    <!-- Azzera filtri: form a se' stante (non nel <form> dei radio sotto) per
-         evitare che i due controlli, condividendo name="filtro", finiscano
-         per sovrascriversi a vicenda nel POST -->
-    <form method="post" action="main.php?page=gestione_oggetti" style="display:inline;">
-        <input type="hidden" name="filtro" value="tutti">
-        <button type="submit" class="btn-action" title="Azzera filtri">
-            <i class="fa-solid fa-filter-circle-xmark"></i>
+<div class="gp-topbar">
+    <div class="gp-topbar__left">
+        <button type="button" onclick="history.back()" class="gp-back" title="Indietro">
+            <i class="fa-solid fa-chevron-left"></i>
         </button>
-    </form>
-    <!-- Filtri -->
-    <form method="post" class="filter-form" action="main.php?page=gestione_oggetti">
-        <label><input type="radio" name="filtro" value="creati_da_me" <?= $filtro=='creati_da_me'?'checked':'' ?> onchange="this.form.submit()">Creati da me</label>
-        <input id="filtroTipoObj" type="radio" name="filtro" value="" onchange="this.form.submit()" <?= $filtro=='tipo'?'checked':'' ?> style="display:none;">
-        <input id="filtroCategoriaObj" type="radio" name="filtro" value="" onchange="this.form.submit()" <?= $filtro=='categoria'?'checked':'' ?> style="display:none;">
-        <?php
-            // Per tipo
-            $tipi = gdrcd_query("SELECT * FROM codtipooggetto ORDER BY descrizione ASC", 'result');
+        <span class="gp-title">Gestione Oggetti</span>
+    </div>
+    <?php if ($vistaCompleta): ?>
+    <div class="gp-topbar__center">
+        <!-- Azzera filtri: form a se' stante (non nel <form> dei radio sotto) per
+             evitare che i due controlli, condividendo name="filtro", finiscano
+             per sovrascriversi a vicenda nel POST -->
+        <form method="post" action="main.php?page=gestione_oggetti" style="display:inline;">
+            <input type="hidden" name="filtro" value="tutti">
+            <button type="submit" class="btn-action" title="Azzera filtri">
+                <i class="fa-solid fa-filter-circle-xmark"></i>
+            </button>
+        </form>
+        <!-- Filtri -->
+        <form method="post" class="filter-form gp-filter-form" action="main.php?page=gestione_oggetti">
+            <label><input type="radio" name="filtro" value="creati_da_me" <?= $filtro=='creati_da_me'?'checked':'' ?> onchange="this.form.submit()">Creati da me</label>
+            <input id="filtroTipoObj" type="radio" name="filtro" value="" onchange="this.form.submit()" <?= $filtro=='tipo'?'checked':'' ?> style="display:none;">
+            <input id="filtroCategoriaObj" type="radio" name="filtro" value="" onchange="this.form.submit()" <?= $filtro=='categoria'?'checked':'' ?> style="display:none;">
+            <?php
+                // Per tipo
+                $tipi = gdrcd_query("SELECT * FROM codtipooggetto ORDER BY descrizione ASC", 'result');
 
-            echo '<select name="tipo" id="selectTipoObj"><option value="">Tutti</option>';
-            while ($row = gdrcd_query($tipi, 'fetch')) { echo '<option value="' . $row['cod_tipo'] . '" '.($_POST[$filtro]==$row['cod_tipo']?'selected':'').'>' . htmlspecialchars($row['descrizione']) . '</option>'; }
-            echo '</select>';
+                echo '<select name="tipo" id="selectTipoObj"><option value="">Tutti</option>';
+                while ($row = gdrcd_query($tipi, 'fetch')) { echo '<option value="' . $row['cod_tipo'] . '" '.($_POST[$filtro]==$row['cod_tipo']?'selected':'').'>' . htmlspecialchars($row['descrizione']) . '</option>'; }
+                echo '</select>';
 
-            // Per categoria
-            $tipi = gdrcd_query("SELECT DISTINCT categoria FROM oggetto ORDER BY categoria ASC", 'result');
+                // Per categoria
+                $tipi = gdrcd_query("SELECT DISTINCT categoria FROM oggetto ORDER BY categoria ASC", 'result');
 
-            echo '<select name="categoria" id="selectCategoriaObj"><option value="">Tutti</option>';
-            while ($row = gdrcd_query($tipi, 'fetch')) { echo '<option '.($_POST[$filtro]==htmlspecialchars($row['categoria'])?'selected':'').'>' . htmlspecialchars($row['categoria']) . '</option>'; }
-            echo '</select>';
-        ?>
-    </form>
+                echo '<select name="categoria" id="selectCategoriaObj"><option value="">Tutti</option>';
+                while ($row = gdrcd_query($tipi, 'fetch')) { echo '<option '.($_POST[$filtro]==htmlspecialchars($row['categoria'])?'selected':'').'>' . htmlspecialchars($row['categoria']) . '</option>'; }
+                echo '</select>';
+            ?>
+        </form>
+    </div>
     <?php endif; ?>
     <?php if (hasPermesso($_SESSION, $azioni_permessi['crea'])): ?>
+    <div class="gp-topbar__right">
         <!-- <button onclick>, non <a href="javascript:...">: il listener globale
              in main.jsx intercetta il click su OGNI <a> il cui href inizia per
              "javascript:" e chiama preventDefault() per bloccare la navigazione
@@ -92,7 +100,8 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
              (nessun errore, il pulsante sembra semplicemente non fare nulla).
              Stesso pattern gia' usato per Modifica/Elimina/Assegna qui sotto,
              che infatti funzionano. Vedi conversazione di progetto del 2026-08-24. -->
-        <button type="button" class="btn-action" title="Nuovo oggetto" onclick="apriModaleCreazioneObj()"><i class="fa-solid fa-plus"></i></button> <!-- ELIMINARE: main.php?page=oggetto_aggiungi e main.php?page=gestione_mercato -->
+        <button type="button" class="btn btn--primary btn-sm" title="Nuovo oggetto" onclick="apriModaleCreazioneObj()"><i class="fa-solid fa-plus"></i>&nbsp; Nuovo Oggetto</button> <!-- ELIMINARE: main.php?page=oggetto_aggiungi e main.php?page=gestione_mercato -->
+    </div>
     <?php endif; ?>
 </div>
 

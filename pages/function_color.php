@@ -151,7 +151,26 @@ function get_diff_excerpt($string_old, $string_new, $context = 6, $max_hunks = 5
         $parts[] = balance_html_tags($bit);
     }
 
-    return implode(' &nbsp;&nbsp; ', $parts);
+    // Limite di lunghezza applicato QUI, per blocchi interi — non con un
+    // mb_substr sulla stringa finale come faceva prima api_regolamento.php:
+    // tagliare a un carattere arbitrario puo' spezzare un tag a meta' (es.
+    // "<span style='colo") lasciando un tag mai chiuso che, quando il
+    // browser prova a fare il parsing, "inghiotte" tutto quello che segue
+    // nel post (compreso il link all'articolo) come se fosse dentro
+    // quell'attributo mai chiuso. Ogni $parts[] qui e' gia' un blocco intero
+    // e bilanciato (balance_html_tags sopra) — scartare blocchi interi in
+    // coda non puo' mai tagliare a meta' un tag.
+    $joined = '';
+    foreach ($parts as $idx => $part) {
+        $separator = $idx > 0 ? ' &nbsp;&nbsp; ' : '';
+        if (mb_strlen($joined . $separator . $part) > 9000) {
+            $joined .= ' &nbsp;&nbsp; […]';
+            break;
+        }
+        $joined .= $separator . $part;
+    }
+
+    return $joined;
 }
 
 /**
