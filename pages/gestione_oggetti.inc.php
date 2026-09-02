@@ -106,52 +106,53 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
 </div>
 
 <!-- Lista oggetti -->
-<div id="item-list" class="item-list">
-  <div class="ct-table-responsive">
-    <table>
+<div id="item-list" class="gp-list">
+    <table class="gp-table--oggetti">
+      <thead>
       <tr>
-        <!-- <th>ID</th> -->
         <th>Immagine</th>
         <th>Nome</th>
         <th>Descrizione</th>
         <th>Tipo</th>
         <th>Categoria</th>
-        <th>Azioni</th>
+        <th class="gp-th-actions">Azioni</th>
       </tr>
+      </thead>
+      <tbody>
       <?php foreach ($oggetti as $obj): ?>
       <tr>
-        <td width="5%" data-label="Immagine" style="text-align:center"><img width="50" height="50" src="imgs/items/<?=$obj['urlimg']?>" alt="Immagine"/></td>
-        <td data-label="Nome"><?= htmlspecialchars($obj['nome']) ?></td>
+        <td class="gp-cell--image" data-label="Immagine"><img class="gm-image-thumb" src="imgs/items/<?=$obj['urlimg']?>" alt="Immagine"/></td>
+        <td class="gp-cell--name" data-label="Nome"><?= htmlspecialchars($obj['nome']) ?></td>
         <td data-label="Descrizione"><?= mb_substr(htmlspecialchars($obj['descrizione']), 0, 120, "UTF-8").'...' ?></td>
         <td data-label="Tipo"><?= htmlspecialchars($obj['desc_tipo']) ?></td>
         <td data-label="Categoria"><?= htmlspecialchars($obj['categoria']) ?></td>
         <!-- Colonna Azioni -->
-        <td class="azioni" data-label="Azioni">
-          <div class="action-buttons">
+        <td class="gp-cell--actions" data-label="Azioni">
+          <div class="gp-actions">
           <?php if (hasPermesso($_SESSION, $azioni_permessi['modifica']) || $mestiere == $obj['tipo']): ?>
-            <button type="button" class="btn-action" title="Modifica" onclick="apriModaleModificaObj(<?= $obj['id_oggetto'] ?>)"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button type="button" class="btn-action btn-action--icon btn-action--edit" title="Modifica" onclick="apriModaleModificaObj(<?= $obj['id_oggetto'] ?>)"><i class="fa-solid fa-pen-to-square"></i></button>
           <?php endif; ?>
 
           <?php if (hasPermesso($_SESSION, $azioni_permessi['cancella']) || $mestiere == $obj['tipo']): ?>
-            <button type="submit" class="btn-action" title="Elimina" onclick="deleteObj(<?=$obj['id_oggetto']?>)"><i class="fa-solid fa-trash"></i></button>
+            <button type="submit" class="btn-action btn-action--icon btn-action--delete" title="Elimina" onclick="deleteObj(<?=$obj['id_oggetto']?>)"><i class="fa-solid fa-trash"></i></button>
           <?php endif; ?>
           <?php if (hasPermesso($_SESSION, $azioni_permessi['assegna']) || $obj['descrizione'] == $_SESSION['login'] || $mestiere == $obj['tipo']): ?>
             <form action="main.php?page=oggetto_assegna" method="POST">
-              <button type="submit" class="btn-action" title="Assegna"><i class="fa-solid fa-user-plus"></i></button>
+              <button type="submit" class="btn-action btn-action--icon btn-action--members" title="Assegna"><i class="fa-solid fa-user-plus"></i></button>
             </form>
           <?php endif; ?>
 
           <?php if (hasPermesso($_SESSION, $azioni_permessi['approva']) && $obj['richiesto'] == 2): ?>
             <form action="main.php?page=oggetto_approvazione" method="POST">
-              <button type="submit" class="btn-action" title="Approva"><i class="fa-solid fa-check-circle"></i></button>
+              <button type="submit" class="btn-action btn-action--icon btn-action--skill" title="Approva"><i class="fa-solid fa-check-circle"></i></button>
             </form>
           <?php endif; ?>
           </div>
         </td>
       </tr>
       <?php endforeach; ?>
+      </tbody>
     </table>
-  </div>
 </div>
 
 <!-- Form di creazione e di modifica -->
