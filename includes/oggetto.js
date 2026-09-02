@@ -68,8 +68,10 @@ function apriModaleModificaObj(idOggetto) {
                     document.getElementById('imagePreviewObj').style.display = 'block';
                 }
 
-                // MOSTRA LA MODALE
-                modalObj.style.display = 'block';
+                // MOSTRA LA MODALE (flex, non block: .pg-edit-container centra il
+                // contenuto via align-items/justify-content, che valgono solo su
+                // un container flex)
+                modalObj.style.display = 'flex';
 
                 // CARICA I TIPI E POI GESTISCI I CAMPI DINAMICI
                 caricaTipiPerCategoriaObj(oggetto.categoria, oggetto.tipo)
@@ -185,8 +187,8 @@ function apriModaleCreazioneObj() {
         sec.style.display = 'none';
     });
 
-    // Mostra modale e carica tipi
-    modalObj.style.display = 'block';
+    // Mostra modale e carica tipi (flex, vedi commento in apriModaleModificaObj)
+    modalObj.style.display = 'flex';
 
     // Setup del listener per cambio categoria
     setupCategoriaChangeListener();
