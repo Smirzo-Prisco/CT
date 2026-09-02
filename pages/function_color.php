@@ -135,8 +135,8 @@ function get_diff_excerpt($string_old, $string_new, $context = 6, $max_hunks = 5
             // spazio visibile che nell'originale non c'era.
             $space = preg_match('/^<[^>]+>$/', $word) ? '' : ' ';
             switch ($ops[$k]['type']) {
-                case 'del': $bit .= "<del>$word</del>$space"; break;
-                case 'add': $bit .= "<b>$word</b>$space"; break;
+                case 'del': $bit .= "<span style='color: red; text-decoration: line-through;'>$word</span>$space"; break;
+                case 'add': $bit .= "<span style='color: green; font-weight: bold;'>$word</span>$space"; break;
                 default:    $bit .= "$word$space"; break;
             }
         }
