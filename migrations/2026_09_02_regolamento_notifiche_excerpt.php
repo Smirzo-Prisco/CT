@@ -89,9 +89,13 @@ while ($row = gdrcd_query($result, 'fetch')) {
         continue;
     }
 
+    // Niente mb_substr: il limite di lunghezza e' gia' applicato dentro
+    // get_diff_excerpt() a blocchi interi — un mb_substr qui poteva tagliare
+    // a meta' un tag e inghiottire tutto cio' che segue, link compreso
+    // (bug trovato e corretto il 2026-09-02 sul post live 300042).
     $titolo_html = htmlspecialchars($new_titolo, ENT_QUOTES, 'UTF-8');
     $nuovo_messaggio = "<b>" . $titolo_html . "</b> è stato modificato.<br>"
-        . "<br><b>Cosa è cambiato</b><br>" . mb_substr($excerpt, 0, 10000) . "<br>"
+        . "<br><b>Cosa è cambiato</b><br>" . $excerpt . "<br>"
         . "<br><a href=\"user_regolamento_testo.php?articolo=" . (int)$art['articolo'] . "\" target=\"_blank\">→ Vai all'articolo</a>";
 
     $n_ok++;
