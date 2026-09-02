@@ -83,13 +83,27 @@ switch ($op) {
 
         $old_titolo = $_POST['old_titolo'] ?? '';
         $old_testo  = $_POST['old_testo'] ?? '';
-        $diff       = get_decorated_diff($old_testo, $testo);
 
-        $id_mex   = '264815';
-        $diff_old = mb_substr($diff['old'], 0, 10000);
-        $diff_new = mb_substr($diff['new'], 0, 10000);
-        $testo_notifica = "Modifica al <b>manuale</b>.<br><br><b>Prima della modifica</b><br>[spoiler]<b>Titolo</b>:" . $old_titolo . "<br><b>Testo</b>:" . $diff_old . "[/spoiler]
-                       <br><br><b>Modifica</b><br>[spoiler]<b>Titolo</b>:" . $titolo . "<br><b>Testo</b>:" . $diff_new . "[/spoiler]";
+        // Solo le porzioni di testo realmente cambiate (con un po' di contesto
+        // attorno), non l'intero articolo due volte: su un articolo lungo con
+        // una modifica di poche parole il vecchio formato era illeggibile.
+        // null = testo troppo lungo per il diff, o troppi punti di modifica
+        // sparsi — in quel caso si rinuncia all'estratto, non alla notifica.
+        $excerpt   = get_diff_excerpt($old_testo, $testo);
+        $link_art  = "user_regolamento_testo.php?articolo=" . $art_originale;
+        $id_mex    = '264815';
+
+        $titolo_esc_html = htmlspecialchars($titolo, ENT_QUOTES, 'UTF-8');
+        $testo_notifica  = "<b>" . $titolo_esc_html . "</b> è stato modificato.<br>";
+
+        // Niente [spoiler] qui, a differenza del resto della bacheca: l'estratto
+        // e' gia' pensato per essere breve, nasconderlo per default vanificherebbe
+        // il punto (leggere subito cos'e' cambiato senza aprire nulla).
+        if ($excerpt) {
+            $testo_notifica .= "<br><b>Cosa è cambiato</b><br>" . mb_substr($excerpt, 0, 10000) . "<br>";
+        }
+
+        $testo_notifica .= "<br><a href=\"" . $link_art . "\" target=\"_blank\">→ Vai all'articolo</a>";
 
         gdrcd_query("INSERT INTO messaggioaraldo (id_messaggio_padre, id_araldo, messaggio, autore, anonimo, giornalista, data_messaggio, data_ultimo_messaggio) VALUES ($id_mex, '142', '" . gdrcd_filter('in', $testo_notifica) . "', 'Coordinazione', 'no', 'no', NOW(), NOW())");
         gdrcd_query("DELETE FROM araldo_letto WHERE thread_id = $id_mex AND nome != '" . $_SESSION['login'] . "'");
