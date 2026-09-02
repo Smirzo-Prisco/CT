@@ -1,0 +1,16 @@
+// ============================================================
+// _gestione_bacheche.scss — Pannello admin bacheche (sezioni forum/araldo)
+// Riusa .gp-topbar/.gp-list/.pg-edit-container/.form-row/.form-group/
+// .gp-checkbox-field/.gp-label-note da _gestione.scss; qui solo le
+// larghezze di colonna, non coperte perché specifiche di questa tabella.
+// ============================================================
+
+// Larghezze fisse (Nome, Tipo, Visibile — Azioni resta l'unica colonna
+// "auto", stesso principio di .gp-th-name/.gp-cell--name in
+// gestione_personaggio: senza queste, table-layout:fixed distribuirebbe lo
+// spazio libero in modo imprevedibile invece che ad Azioni.
+.gp-table--bacheche {
+    th:nth-child(1), td:nth-child(1) { width: 220px; }
+    th:nth-child(2), td:nth-child(2) { width: 160px; }
+    th:nth-child(3), td:nth-child(3) { width: 90px; }
+}
