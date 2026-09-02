@@ -1,0 +1,13 @@
+// ============================================================
+// _gestione_luoghi.scss — Pannello admin luoghi (mappa)
+// Riusa .gp-topbar/.gp-list/.pg-edit-container/.form-row/.form-group/
+// .gp-checkbox-field/.gp-label-note/.gm-image-field/.gm-image-thumb da
+// _gestione.scss/_gestione_mestieri.scss; qui solo le larghezze di colonna.
+// ============================================================
+
+.gp-table--luoghi {
+    th:nth-child(1), td:nth-child(1) { width: 220px; }
+    th:nth-child(2), td:nth-child(2) { width: 160px; }
+    th:nth-child(3), td:nth-child(3) { width: 80px; }
+    th:nth-child(4), td:nth-child(4) { width: 80px; }
+}

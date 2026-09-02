@@ -69,6 +69,7 @@ import ContattaModerazione from './components/ContattaModerazione'
 import SkillDescModal  from './components/SkillDescModal'
 import GestioneBacheche from './components/GestioneBacheche'
 import GestioneMappe   from './components/GestioneMappe'
+import GestioneLuoghi  from './components/GestioneLuoghi'
 
 /**
  * Registry privato dei componenti.
@@ -181,6 +182,9 @@ window.CT.register('GestioneBacheche', GestioneBacheche)
 
 /** Pannello admin gestione mappe (mappa_click): lista, form CRUD */
 window.CT.register('GestioneMappe', GestioneMappe)
+
+/** Pannello admin gestione luoghi (mappa): lista, form CRUD */
+window.CT.register('GestioneLuoghi', GestioneLuoghi)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.
