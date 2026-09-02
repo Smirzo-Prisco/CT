@@ -68,6 +68,7 @@ import GestioneLuoghiMestiere from './components/GestioneLuoghiMestiere'
 import ContattaModerazione from './components/ContattaModerazione'
 import SkillDescModal  from './components/SkillDescModal'
 import GestioneBacheche from './components/GestioneBacheche'
+import GestioneMappe   from './components/GestioneMappe'
 
 /**
  * Registry privato dei componenti.
@@ -177,6 +178,9 @@ window.CT.register('SkillDescModal', SkillDescModal)
 
 /** Pannello admin gestione bacheche (sezioni forum/araldo): lista, form CRUD */
 window.CT.register('GestioneBacheche', GestioneBacheche)
+
+/** Pannello admin gestione mappe (mappa_click): lista, form CRUD */
+window.CT.register('GestioneMappe', GestioneMappe)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.
