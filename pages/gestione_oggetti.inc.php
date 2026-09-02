@@ -54,7 +54,6 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
         <button type="button" onclick="history.back()" class="gp-back" title="Indietro">
             <i class="fa-solid fa-chevron-left"></i>
         </button>
-        <span class="gp-title">Gestione Oggetti</span>
     </div>
     <?php if ($vistaCompleta): ?>
     <div class="gp-topbar__center">
