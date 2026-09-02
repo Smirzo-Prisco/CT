@@ -67,6 +67,7 @@ import GestioneMestieri from './components/GestioneMestieri'
 import GestioneLuoghiMestiere from './components/GestioneLuoghiMestiere'
 import ContattaModerazione from './components/ContattaModerazione'
 import SkillDescModal  from './components/SkillDescModal'
+import GestioneBacheche from './components/GestioneBacheche'
 
 /**
  * Registry privato dei componenti.
@@ -173,6 +174,9 @@ window.CT.register('ContattaModerazione', ContattaModerazione)
 
 /** Modale globale descrizione abilità — pilotato via window.CT.openSkillDesc() */
 window.CT.register('SkillDescModal', SkillDescModal)
+
+/** Pannello admin gestione bacheche (sezioni forum/araldo): lista, form CRUD */
+window.CT.register('GestioneBacheche', GestioneBacheche)
 
 /**
  * AppRouter — Phase 3.1: router client-side per le pagine migrate.
