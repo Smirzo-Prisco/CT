@@ -112,12 +112,12 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
       <?php foreach ($oggetti as $obj): ?>
       <tr>
         <td width="5%" data-label="Immagine" style="text-align:center"><img width="50" height="50" src="imgs/items/<?=$obj['urlimg']?>" alt="Immagine"/></td>
-        <td><?= htmlspecialchars($obj['nome']) ?></td>
-        <td><?= mb_substr(htmlspecialchars($obj['descrizione']), 0, 120, "UTF-8").'...' ?></td>
-        <td><?= htmlspecialchars($obj['desc_tipo']) ?></td>
-        <td><?= htmlspecialchars($obj['categoria']) ?></td>
+        <td data-label="Nome"><?= htmlspecialchars($obj['nome']) ?></td>
+        <td data-label="Descrizione"><?= mb_substr(htmlspecialchars($obj['descrizione']), 0, 120, "UTF-8").'...' ?></td>
+        <td data-label="Tipo"><?= htmlspecialchars($obj['desc_tipo']) ?></td>
+        <td data-label="Categoria"><?= htmlspecialchars($obj['categoria']) ?></td>
         <!-- Colonna Azioni -->
-        <td class="azioni">
+        <td class="azioni" data-label="Azioni">
           <div class="action-buttons">
           <?php if (hasPermesso($_SESSION, $azioni_permessi['modifica']) || $mestiere == $obj['tipo']): ?>
             <button type="button" class="btn-action" title="Modifica" onclick="apriModaleModificaObj(<?= $obj['id_oggetto'] ?>)"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -148,71 +148,89 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
 <!-- Form di creazione e di modifica -->
 <div class="pg-edit-container" role="dialog" aria-modal="true" id="oggettoModal">
     <div class="modal-content">
-        <span class="close" id="closeObj">&times;</span>
-        <h3 id="modalTitleObj">Gestione Oggetto</h3>
+        <div class="gp-modal-header">
+            <h2 class="gp-modal-title" id="modalTitleObj"><i class="fa-solid fa-box"></i> Gestione Oggetto</h2>
+            <div class="gp-modal-header-actions">
+                <button type="button" class="gp-modal-close" id="closeObj" aria-label="Chiudi">✕</button>
+            </div>
+        </div>
         <form id="oggettoForm" enctype="multipart/form-data">
             <input type="hidden" name="id_oggetto" id="id_oggetto" value="">
-            <!-- Campi Base -->
-            <div class="form-group">
-                <label for="nome">Nome Oggetto *</label>
-                <input type="text" name="nome" id="nome" required>
-            </div>
-            <div class="form-group">
-                <label for="descrizione">Descrizione *</label>
-                <textarea name="descrizione" id="descrizione" rows="5" required></textarea>
-            </div>
-            <!-- Immagine con preview -->
-			<div class="form-row">
-				<div class="form-group form-column">
-					<label for="immagine">Immagine</label>
-					<div id="imagePreviewObj" style="margin-bottom: 10px; display: none;">
-						<img id="previewImgObj" src="" alt="Preview" style="max-width: 100px; max-height: 100px;">
-					</div>
-				</div>
-				<div class="form-group form-column">
-					<input type="file" name="img_oggetto" id="img_oggetto" accept="image/*">
-				</div>
-			</div>
-            <div class="form-group">
-                <label for="ubicabile">Posizionabile in</label>
-                <select name="ubicabile" id="ubicabile">
-                    <?php
-                    $posizioni = [
-                        0 => 'Non trasportabile', 1 => 'Equipaggia', 2 => 'Mano Dx', 3 => 'Mano Sx',
-                        4 => 'Torso', 5 => 'Gambe', 6 => 'Piedi', 7 => 'Testa',
-                        8 => 'Anello', 9 => 'Collo'
-                    ];
 
-                    foreach ($posizioni as $val => $label) {
-                        echo "<option value='$val'>$label</option>";
-                    }
-                    ?>
-                </select>
+            <div class="form-section">
+                <h3 class="section-title">Informazioni base</h3>
+                <div class="form-group">
+                    <label for="nome">Nome Oggetto *</label>
+                    <input type="text" name="nome" id="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="descrizione">Descrizione *</label>
+                    <textarea name="descrizione" id="descrizione" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="ubicabile">Posizionabile in</label>
+                    <select name="ubicabile" id="ubicabile">
+                        <?php
+                        $posizioni = [
+                            0 => 'Non trasportabile', 1 => 'Equipaggia', 2 => 'Mano Dx', 3 => 'Mano Sx',
+                            4 => 'Torso', 5 => 'Gambe', 6 => 'Piedi', 7 => 'Testa',
+                            8 => 'Anello', 9 => 'Collo'
+                        ];
+
+                        foreach ($posizioni as $val => $label) {
+                            echo "<option value='$val'>$label</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
             </div>
 
-            <!-- Categoria (modificabile solo in creazione) -->
-            <div class="form-group">
-                <label for="categoria">Categoria *</label>
-                <select name="categoria" id="categoriaObj" required>
-                    <option value="">Seleziona categoria</option>
-                    <option value="standard">Standard</option>
-                    <option value="arma">Arma</option>
-                    <option value="curativo">Curativo</option>
-                    <option value="statistica">Statistica</option>
-                    <option value="magico">Magico</option>
-                </select>
+            <div class="form-section">
+                <h3 class="section-title">Immagine</h3>
+                <div class="form-row">
+                    <div class="form-group form-column">
+                        <label for="immagine">Anteprima</label>
+                        <div id="imagePreviewObj" class="gm-image-field" style="display: none;">
+                            <img id="previewImgObj" src="" alt="Preview" class="gm-image-thumb">
+                        </div>
+                    </div>
+                    <div class="form-group form-column">
+                        <label for="img_oggetto">Carica immagine</label>
+                        <input type="file" name="img_oggetto" id="img_oggetto" accept="image/*">
+                    </div>
+                </div>
             </div>
 
-            <!-- Tipo Oggetto (dinamico) -->
-            <div class="form-group">
-                <label for="tipo">Tipo Oggetto *</label>
-                <select name="tipo" id="tipo" required>
-                    <option value="">Seleziona tipo</option>
-                </select>
+            <div class="form-section">
+                <h3 class="section-title">Categoria e tipo</h3>
+                <div class="form-row">
+                    <!-- Categoria (modificabile solo in creazione) -->
+                    <div class="form-group form-column">
+                        <label for="categoria">Categoria *</label>
+                        <select name="categoria" id="categoriaObj" required>
+                            <option value="">Seleziona categoria</option>
+                            <option value="standard">Standard</option>
+                            <option value="arma">Arma</option>
+                            <option value="curativo">Curativo</option>
+                            <option value="statistica">Statistica</option>
+                            <option value="magico">Magico</option>
+                        </select>
+                    </div>
+
+                    <!-- Tipo Oggetto (dinamico) -->
+                    <div class="form-group form-column">
+                        <label for="tipo">Tipo Oggetto *</label>
+                        <select name="tipo" id="tipo" required>
+                            <option value="">Seleziona tipo</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <!-- SEZIONI DINAMICHE -->
 
+            <div class="form-section">
+            <h3 class="section-title">Dettagli specifici</h3>
             <!-- ARMA -->
             <div id="sezione_arma" class="sezione-dinamica-obj" style="display: none;">
                 <div class="form-group">
@@ -345,11 +363,13 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                     </select>
                 </div>
             </div>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Salva</button>
-                <button type="button" class="btn btn-secondary" onclick="document.getElementById('oggettoModal').style.display = 'none';">Annulla</button>
             </div>
         </form>
+
+        <div class="gp-modal-footer">
+            <button type="button" class="btn btn--ghost" onclick="document.getElementById('oggettoModal').style.display = 'none';">Annulla</button>
+            <button type="submit" form="oggettoForm" class="btn btn--ghost">Salva</button>
+        </div>
     </div>
 </div>
 <!-- FINE Form di creazione e di modifica -->
