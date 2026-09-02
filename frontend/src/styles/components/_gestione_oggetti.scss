@@ -6,6 +6,7 @@
 // e la miniatura immagine (non un avatar circolare — icone oggetto, non
 // ritratti — .gp-cell--avatar non è adatta).
 // ============================================================
+@use '../tokens' as *;
 
 // Descrizione resta l'unica colonna "auto": e' quella che beneficia di piu'
 // spazio, a differenza di Azioni che ha un contenuto a larghezza fissa
