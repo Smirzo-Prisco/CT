@@ -21,3 +21,17 @@
 .gp-cell--image {
     text-align: center;
 }
+
+// Con il titolo "Gestione Oggetti" tolto dalla topbar, lo spazio recuperato
+// va al radio "Creati da me": piu' respiro tra pallino e testo e attorno
+// all'etichetta, invece di lasciarlo semplicemente vuoto.
+.gp-filter-form label {
+    gap: $space-2 + 2;
+    padding: $space-1 $space-3;
+}
+
+.gp-filter-form input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 0;
+}
