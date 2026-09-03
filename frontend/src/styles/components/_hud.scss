@@ -910,6 +910,11 @@ body[data-palette="public"] {
 .ct-hud__popover--presence {
     .iframe_online { min-height: 120px; }
     .contenitore_presenti { min-height: 80px; }
+    // Stessa regola di #online-users-container div.presente img (_presenti.scss),
+    // mai applicata qui perche' scoperta su un ID che questo popover non ha:
+    // senza, l'icona gruppo/inclinazione (gruppo_img) va a dimensione naturale
+    // (centinaia di px) invece che alla piccola icona attesa.
+    div.presente img { height: 15px; width: auto; }
 }
 // Mai sfocato (backdrop-filter:none in ogni stato, niente blur nemmeno su
 // hover/focus): si vede sempre la mappa nitida sotto, quando trasparente.
