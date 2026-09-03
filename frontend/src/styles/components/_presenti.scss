@@ -401,3 +401,15 @@ tr.presente a:visited {
         }
     }
 }
+
+// Tutte le icone della tabella presenti estesi ~10% piu' grandi, ma solo da
+// desktop (stesso breakpoint del blocco mobile sopra) — su schermi piccoli
+// restano alla dimensione base, gia' al limite per lo spazio disponibile.
+@media (min-width: 681px) {
+    div.presenti_estesi {
+        .presenti-avatar { width: 55px; height: 55px; }
+        .presenti-icon,
+        .presenti-sms-icon { width: 28px; height: 28px; }
+        .presenti-staff-icon { width: 22px; height: 22px; }
+    }
+}

@@ -224,7 +224,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
             {/* Link per messaggio privato */}
             <td style={{ textAlign: 'center' }}>
                 <a href="#" onClick={e => { e.preventDefault(); openSms() }}>
-                    <img src="themes/crystal/imgs/presenti/sms_presenti.png" alt="Invia SMS" />
+                    <img className="presenti-sms-icon" src="themes/crystal/imgs/presenti/sms_presenti.png" alt="Invia SMS" />
                 </a>
             </td>
 
@@ -237,7 +237,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
             <td style={{ textAlign: 'center' }}>
                 {user.gruppo_img && (
                     <IconWithPopup iconKey={`${user.nome}-gruppo`} openPopup={openPopup} onOpen={onOpen}
-                        width="25" height="25" src={user.gruppo_img} alt={user.gruppo_nome} title={user.gruppo_nome} />
+                        className="presenti-icon" width="25" height="25" src={user.gruppo_img} alt={user.gruppo_nome} title={user.gruppo_nome} />
                 )}
             </td>
 
@@ -245,7 +245,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
             <td style={{ textAlign: 'center' }}>
                 {user.mestiere_img && (
                     <IconWithPopup iconKey={`${user.nome}-mestiere`} openPopup={openPopup} onOpen={onOpen}
-                        width="25" height="25" src={user.mestiere_img} alt={user.mestiere_nome} title={user.mestiere_nome} />
+                        className="presenti-icon" width="25" height="25" src={user.mestiere_img} alt={user.mestiere_nome} title={user.mestiere_nome} />
                 )}
             </td>
 
@@ -254,7 +254,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
             <td style={{ textAlign: 'center' }}>
                 {user.gilda_img && (
                     <IconWithPopup iconKey={`${user.nome}-gilda`} openPopup={openPopup} onOpen={onOpen}
-                        width="25" height="25" src={user.gilda_img} alt={user.gilda_nome} title={user.gilda_nome} />
+                        className="presenti-icon" width="25" height="25" src={user.gilda_img} alt={user.gilda_nome} title={user.gilda_nome} />
                 )}
             </td>
 
@@ -278,7 +278,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
                 <span style={{ display: 'flex', justifyContent: 'center', gap: '2px' }}>
                     {STAFF_ICONS.filter(ic => user.staff[ic.key]).map(ic => (
                         <IconWithPopup key={ic.key} iconKey={`${user.nome}-${ic.key}`} openPopup={openPopup} onOpen={onOpen}
-                            src={ic.src} width="20" height="20" title={ic.title} alt={ic.title} />
+                            className="presenti-staff-icon" src={ic.src} width="20" height="20" title={ic.title} alt={ic.title} />
                     ))}
                 </span>
             </td>

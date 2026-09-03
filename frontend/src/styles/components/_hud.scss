@@ -913,8 +913,10 @@ body[data-palette="public"] {
     // Stessa regola di #online-users-container div.presente img (_presenti.scss),
     // mai applicata qui perche' scoperta su un ID che questo popover non ha:
     // senza, l'icona gruppo/inclinazione (gruppo_img) va a dimensione naturale
-    // (centinaia di px) invece che alla piccola icona attesa.
-    div.presente img { height: 15px; width: auto; }
+    // (centinaia di px) invece che alla piccola icona attesa. 20px (non 15px
+    // come in _presenti.scss): qui l'icona e' l'unico elemento visivo oltre
+    // al nome, 15px risultava troppo piccola.
+    div.presente img { height: 20px; width: auto; }
 }
 // Mai sfocato (backdrop-filter:none in ogni stato, niente blur nemmeno su
 // hover/focus): si vede sempre la mappa nitida sotto, quando trasparente.
