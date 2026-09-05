@@ -585,6 +585,15 @@ img.chat_avatar {
     position: relative;
 }
 
+// Icona razza/gilda accanto al nome mittente: senza dimensioni fisse
+// veniva renderizzata alla grandezza nativa del file (variabile da razza a razza).
+.chat_icons img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
 // ── Tipi di riga chat ─────────────────────────────────────────
 
 @mixin chat-row-base {
