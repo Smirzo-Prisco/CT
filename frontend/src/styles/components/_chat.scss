@@ -587,11 +587,17 @@ img.chat_avatar {
 
 // Icona razza/gilda accanto al nome mittente: senza dimensioni fisse
 // veniva renderizzata alla grandezza nativa del file (variabile da razza a razza).
+// vertical-align:text-bottom (non middle): essendo piu' alta del testo,
+// allarga la riga — con "middle" l'aggiunta si distribuiva soprattutto
+// sotto, spingendo giu' la prima riga del messaggio; con "text-bottom"
+// l'immagine si allinea al fondo del testo e l'altezza in piu' si sposta
+// sopra, allargando lo spazio verso il messaggio precedente invece che
+// verso quello sottostante (verificato: sotto scende da ~10px a ~2px).
 .chat_icons img {
     width: 30px;
     height: 30px;
     object-fit: contain;
-    vertical-align: middle;
+    vertical-align: text-bottom;
 }
 
 // ── Tipi di riga chat ─────────────────────────────────────────
