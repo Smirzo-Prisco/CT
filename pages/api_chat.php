@@ -911,7 +911,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         if (!empty($row['url_img_chat'])) $add_chat .= '<br style="clear:both;" />';
                         break;
                     case 'A': // azioni
-                        $add_chat .= '<div class="chat_row_'.$row['tipo'].'">';
                         if ($PARAMETERS['mode']['chat_avatar']=='OFF' && !empty($row['url_img_chat'])) {
                             $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar" data-pg="'.gdrcd_filter('out',$row['mittente']).'" style="width:'.$PARAMETERS['settings']['chat_avatar']['width'].'px; height:'.$PARAMETERS['settings']['chat_avatar']['height'].'px;" />';
                         }
@@ -924,7 +923,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         $add_chat .= '</span>';
                         $add_chat .= '<span class="chat_msg">'.gdrcd_chatme($_SESSION['login'], $row['testo']).'</span>';
                         if (!empty($row['url_img_chat'])) $add_chat .= '<br style="clear:both;" />';
-                        $add_chat .= '</div>';
                         break;
                     case 'S':
                     case 'Q':
