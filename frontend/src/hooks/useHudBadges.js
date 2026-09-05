@@ -6,15 +6,33 @@
  * mount + refetch su un evento socket/DOM dedicato — estratto qui per non
  * affollare Hud.jsx di 5 blocchi state+effect pressoché identici.
  *
+ * Ogni badge espone anche un contatore "pulse": incrementato solo quando il
+ * flag passa da false a true (nuova notifica arrivata, non ad ogni refetch),
+ * usato da Hud.jsx come key per far ripartire l'animazione "trema" sull'icona
+ * — un cambio di key rimonta il nodo DOM e la CSS animation riparte da sola,
+ * senza bisogno di setTimeout per aggiungere/rimuovere una classe.
+ *
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+
+// Incrementa `setPulse` solo sul fronte di salita (false -> true) del valore.
+function usePulseOnRise() {
+    const prev = useRef(false)
+    const [pulse, setPulse] = useState(0)
+    const check = useCallback((value) => {
+        if (value && !prev.current) setPulse(p => p + 1)
+        prev.current = value
+    }, [])
+    return [pulse, check]
+}
 
 export default function useHudBadges() {
 
     // ── Messaggi privati ─────────────────────────────────────────────────
     const [hasNewMessages, setHasNewMessages] = useState(false)
+    const [messagesPulse, checkMessagesPulse] = usePulseOnRise()
 
     const fetchMessages = useCallback(() => {
         fetch('/pages/api_global.php?op=getMessages')
@@ -22,6 +40,7 @@ export default function useHudBadges() {
             .then(d => {
                 if (!d.success) return
                 setHasNewMessages(d.hasNew)
+                checkMessagesPulse(d.hasNew)
 
                 // Suono sms.wav al nuovo messaggio: presente in FrameMessaggi.jsx
                 // (il componente sostituito da Hud) ma mai riportato qui durante
@@ -37,7 +56,7 @@ export default function useHudBadges() {
                 }
             })
             .catch(err => console.error('[Hud] Errore messaggi:', err))
-    }, [])
+    }, [checkMessagesPulse])
 
     useEffect(() => {
         fetchMessages()
@@ -48,13 +67,14 @@ export default function useHudBadges() {
 
     // ── Chat off non letta ───────────────────────────────────────────────
     const [hasNewChatOff, setHasNewChatOff] = useState(false)
+    const [chatOffPulse, checkChatOffPulse] = usePulseOnRise()
 
     const fetchChatOff = useCallback(() => {
         fetch('/pages/api_global.php?op=getChatOff')
             .then(r => r.json())
-            .then(d => { if (d.success) setHasNewChatOff(d.hasNew) })
+            .then(d => { if (d.success) { setHasNewChatOff(d.hasNew); checkChatOffPulse(d.hasNew) } })
             .catch(err => console.error('[Hud] Errore chat off:', err))
-    }, [])
+    }, [checkChatOffPulse])
 
     useEffect(() => {
         fetchChatOff()
@@ -65,13 +85,14 @@ export default function useHudBadges() {
 
     // ── Post forum non letti ─────────────────────────────────────────────
     const [hasNewForum, setHasNewForum] = useState(false)
+    const [forumPulse, checkForumPulse] = usePulseOnRise()
 
     const fetchForumUnread = useCallback(() => {
         fetch('/pages/api_global.php?op=getForumUnread')
             .then(r => r.json())
-            .then(d => { if (d.success) setHasNewForum(d.has_unread) })
+            .then(d => { if (d.success) { setHasNewForum(d.has_unread); checkForumPulse(d.has_unread) } })
             .catch(err => console.error('[Hud] Errore forum:', err))
-    }, [])
+    }, [checkForumPulse])
 
     useEffect(() => {
         fetchForumUnread()
@@ -92,13 +113,14 @@ export default function useHudBadges() {
 
     // ── Giocate aperte ───────────────────────────────────────────────────
     const [hasOpenRoles, setHasOpenRoles] = useState(false)
+    const [openRolesPulse, checkOpenRolesPulse] = usePulseOnRise()
 
     const fetchOpenRoles = useCallback(() => {
         fetch('/pages/api_global.php?op=getOpenRoles')
             .then(r => r.json())
-            .then(d => { if (d.success) setHasOpenRoles(d.has_open_roles) })
+            .then(d => { if (d.success) { setHasOpenRoles(d.has_open_roles); checkOpenRolesPulse(d.has_open_roles) } })
             .catch(err => console.error('[Hud] Errore giocate:', err))
-    }, [])
+    }, [checkOpenRolesPulse])
 
     useEffect(() => {
         fetchOpenRoles()
@@ -109,13 +131,14 @@ export default function useHudBadges() {
 
     // ── Eventi calendario di oggi ────────────────────────────────────────
     const [hasEvents, setHasEvents] = useState(false)
+    const [eventsPulse, checkEventsPulse] = usePulseOnRise()
 
     const fetchEvents = useCallback(() => {
         fetch('/pages/api_global.php?op=events_today')
             .then(r => r.json())
-            .then(d => { if (d.success) setHasEvents(d.has_events) })
+            .then(d => { if (d.success) { setHasEvents(d.has_events); checkEventsPulse(d.has_events) } })
             .catch(err => console.error('[Hud] Errore eventi:', err))
-    }, [])
+    }, [checkEventsPulse])
 
     useEffect(() => {
         fetchEvents()
@@ -131,5 +154,8 @@ export default function useHudBadges() {
     // subito, senza aspettare un giro di socket che qui non arriverebbe).
     const clearChatOff = useCallback(() => setHasNewChatOff(false), [])
 
-    return { hasNewMessages, hasNewChatOff, hasNewForum, hasOpenRoles, hasEvents, clearChatOff }
+    return {
+        hasNewMessages, hasNewChatOff, hasNewForum, hasOpenRoles, hasEvents, clearChatOff,
+        messagesPulse, chatOffPulse, forumPulse, openRolesPulse, eventsPulse,
+    }
 }

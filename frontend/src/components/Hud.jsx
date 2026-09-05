@@ -238,7 +238,10 @@ export default function Hud({ isStaff }) {
     }, [fetchProfile])
 
     // ── Badge: messaggi privati, chat off, forum, giocate, eventi ───────────
-    const { hasNewMessages, hasNewChatOff, hasNewForum, hasOpenRoles, hasEvents, clearChatOff } = useHudBadges()
+    const {
+        hasNewMessages, hasNewChatOff, hasNewForum, hasOpenRoles, hasEvents, clearChatOff,
+        messagesPulse, chatOffPulse, forumPulse, openRolesPulse, eventsPulse,
+    } = useHudBadges()
 
     // ── Presenti nel luogo attuale: badge conteggio + lista nel popover ─────
     // Un'unica fetch condivisa (props a OnlineUsers) invece delle due fetch
@@ -446,8 +449,8 @@ export default function Hud({ isStaff }) {
                     <div className="ct-hud__arc">
                         <a className="ct-hud__icon" style={arcIcon(0, 87)} data-tour="hud-forum"
                             href="main.php?page=forum" title="Forum" onClick={closeMobileMenus}>
-                            <i className="fa-solid fa-list-ul" />
-                            {hasNewForum && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
+                            <i key={forumPulse} className="fa-solid fa-list-ul ct-hud__icon-shake" />
+                            {hasNewForum &&<b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(0, 87)} />}
                         </a>
                         <button type="button" className="ct-hud__icon" style={arcIcon(43, 75)} data-tour="hud-presenti"
                             title="Presenti" onClick={togglePopover('presence')}>
@@ -456,8 +459,8 @@ export default function Hud({ isStaff }) {
                         </button>
                         <button type="button" className="ct-hud__icon" style={arcIcon(75, 43)} data-tour="hud-chatoff"
                             title="Chat off" onClick={togglePopover('chatoff')}>
-                            <i className="fa-solid fa-comment-dots" />
-                            {hasNewChatOff && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(75, 43)} />}
+                            <i key={chatOffPulse} className="fa-solid fa-comment-dots ct-hud__icon-shake" />
+                            {hasNewChatOff &&<b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(75, 43)} />}
                         </button>
                         <a className="ct-hud__icon" style={arcIcon(87, 0)} data-tour="hud-mappa"
                             href={`main.php?page=mappaclick&map_id=${mappaId}`} title="Mappa" onClick={closeMobileMenus}>
@@ -496,18 +499,18 @@ export default function Hud({ isStaff }) {
                         )}
                         <a className="ct-hud__icon" style={arcIcon(...(isNarrow ? [-33, 80] : [0, 87]))} data-tour="hud-calendario"
                             href="main.php?page=agenda_center" title="Calendario" onClick={closeMobileMenus}>
-                            <i className="fa-solid fa-calendar-days" />
-                            {hasEvents && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isNarrow ? [-33, 80] : [0, 87]))} />}
+                            <i key={eventsPulse} className="fa-solid fa-calendar-days ct-hud__icon-shake" />
+                            {hasEvents &&<b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isNarrow ? [-33, 80] : [0, 87]))} />}
                         </a>
                         <a className="ct-hud__icon" style={arcIcon(...(isNarrow ? [-62, 62] : [-43, 75]))} data-tour="hud-giocate"
                             href="main.php?page=role_recap" title="Giocate" onClick={closeMobileMenus}>
-                            <i className="fa-solid fa-scroll" />
-                            {hasOpenRoles && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isNarrow ? [-62, 62] : [-43, 75]))} title="Giocata in corso" />}
+                            <i key={openRolesPulse} className="fa-solid fa-scroll ct-hud__icon-shake" />
+                            {hasOpenRoles &&<b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isNarrow ? [-62, 62] : [-43, 75]))} title="Giocata in corso" />}
                         </a>
                         <a className="ct-hud__icon" style={arcIcon(...(isNarrow ? [-80, 33] : [-75, 43]))} data-tour="hud-messaggi"
                             href="main.php?page=messages_center&offset=0" title="Messaggi" onClick={closeMobileMenus}>
-                            <i className="fa-solid fa-envelope" />
-                            {hasNewMessages && <b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isNarrow ? [-80, 33] : [-75, 43]))} />}
+                            <i key={messagesPulse} className="fa-solid fa-envelope ct-hud__icon-shake" />
+                            {hasNewMessages &&<b className="ct-hud__pip ct-hud__pip--dot" style={pipOffset(...(isNarrow ? [-80, 33] : [-75, 43]))} />}
                         </a>
                     </div>
                 </HudArcSheet>

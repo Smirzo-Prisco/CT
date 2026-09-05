@@ -1088,6 +1088,29 @@ a.ct-hud__char-badge {
 // cerchio. Il tocco resta comunque garantito sotto i 680px, dove le
 // icone diventano una scheda a griglia indipendente dallo scale
 // dell'anello (vedi sotto).
+// Icona che "trema" quando il suo badge passa da nessuna notifica a una nuova
+// (vedi messagesPulse/chatOffPulse/forumPulse/openRolesPulse/eventsPulse in
+// useHudBadges.js — Hud.jsx mette quel contatore come key sull'<i>, cosi'
+// ogni incremento rimonta il nodo e la CSS animation riparte da sola, senza
+// bisogno di aggiungere/rimuovere una classe via setTimeout). Solo desktop
+// (min-width: 681px, stesso breakpoint di _presenti.scss): su mobile l'icona
+// e' gia' piccola in una griglia dedicata, l'animazione aggiungerebbe solo
+// rumore visivo senza il contesto di un anello fisso da notare con la coda
+// dell'occhio.
+@media (min-width: 681px) {
+    @keyframes ct-hud-shake {
+        0%, 100% { transform: translateX(0) rotate(0); }
+        20% { transform: translateX(-2px) rotate(-10deg); }
+        40% { transform: translateX(2px) rotate(10deg); }
+        60% { transform: translateX(-2px) rotate(-7deg); }
+        80% { transform: translateX(2px) rotate(7deg); }
+    }
+    .ct-hud__icon-shake {
+        display: inline-block;
+        animation: ct-hud-shake .5s ease-in-out;
+    }
+}
+
 @media (max-width: 1080px) {
     .ct-hud__ring { transform: scale(.82); }
 }
