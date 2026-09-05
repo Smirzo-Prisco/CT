@@ -886,19 +886,18 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         $row['testo'] = str_replace('»', '</font>»', $row['testo']);
                         $row['testo'] = str_replace('[', '«<font color=#ce846f>', $row['testo']);
                         $row['testo'] = str_replace(']', '</font>»', $row['testo']);
-                        // Avatar + testo in un contenitore flex (non piu' float): con
-                        // il float il cerchio restava sempre ancorato in cima alla riga,
-                        // mentre le righe di testo sotto potevano finire piu' in basso
-                        // lasciando spazio vuoto sotto il cerchio invece di restarci
-                        // centrate accanto. Con flex + align-items:center il cerchio resta
-                        // centrato sull'intero blocco di testo qualunque sia la sua altezza.
-                        $has_avatar_p = !empty($row['url_img_chat']);
-                        if ($has_avatar_p) $add_chat .= '<div class="chat_avatar_row">';
-                        if ($PARAMETERS['mode']['chat_avatar']=='ON' && $has_avatar_p) {
+                        // L'avatar (float) va SEMPRE per primo: un float si aggancia
+                        // comunque al bordo sinistro del contenitore a prescindere da dove
+                        // lo si mette nel DOM, quindi metterlo dopo l'header non lo separa
+                        // da lui — semplicemente schiaccia anche l'header nel wrap. Messo
+                        // per primo, header e messaggio scorrono entrambi alla sua destra
+                        // in modo uniforme fin dalla prima riga (senza shape-outside, vedi
+                        // _chat.scss, il wrap segue il riquadro squadrato, non il cerchio:
+                        // niente fasce strette in cima/fondo dove il cerchio si assottiglia).
+                        if ($PARAMETERS['mode']['chat_avatar']=='ON' && !empty($row['url_img_chat'])) {
                             $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar" data-pg="'.gdrcd_filter('out',$row['mittente']).'" style="width:'.$PARAMETERS['settings']['chat_avatar']['width'].'px; height:'.$PARAMETERS['settings']['chat_avatar']['height'].'px;" />';
                         }
-                        if ($has_avatar_p) $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar_inline" data-pg="'.gdrcd_filter('out',$row['mittente']).'" />';
-                        if ($has_avatar_p) $add_chat .= '<div class="chat_msg_content">';
+                        if (!empty($row['url_img_chat'])) $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar_inline" data-pg="'.gdrcd_filter('out',$row['mittente']).'" />';
                         $add_chat .= '<span class="chat_time">'.gdrcd_format_time($row['ora']).'</span>';
                         if ($row['modificato']) $add_chat .= '<span class="chat_badge--modificato" title="Modificato">✎</span>';
                         if ($PARAMETERS['mode']['chaticons']=='ON') $add_chat .= $add_icon;
@@ -906,16 +905,16 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         if (!empty($row['destinatario'])) $add_chat .= '<span class="chat_tag"> [<font color=#d89d8c>'.gdrcd_filter('out',$row['destinatario']).'</font>]</span>';
                         $add_chat .= ': </span>';
                         $add_chat .= '<span class="chat_msg">'.gdrcd_chatme($_SESSION['login'], $row['testo']).'</span>';
-                        if ($has_avatar_p) $add_chat .= '</div></div>';
+                        // chat_avatar_inline e' un float (vedi _chat.scss): senza clear qui,
+                        // "galleggerebbe" nel messaggio successivo invece di restare contenuto
+                        // in questa riga.
+                        if (!empty($row['url_img_chat'])) $add_chat .= '<br style="clear:both;" />';
                         break;
                     case 'A': // azioni
-                        $has_avatar_a = !empty($row['url_img_chat']);
-                        if ($has_avatar_a) $add_chat .= '<div class="chat_avatar_row">';
-                        if ($PARAMETERS['mode']['chat_avatar']=='OFF' && $has_avatar_a) {
+                        if ($PARAMETERS['mode']['chat_avatar']=='OFF' && !empty($row['url_img_chat'])) {
                             $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar" data-pg="'.gdrcd_filter('out',$row['mittente']).'" style="width:'.$PARAMETERS['settings']['chat_avatar']['width'].'px; height:'.$PARAMETERS['settings']['chat_avatar']['height'].'px;" />';
                         }
-                        if ($has_avatar_a) $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar_inline" data-pg="'.gdrcd_filter('out',$row['mittente']).'" />';
-                        if ($has_avatar_a) $add_chat .= '<div class="chat_msg_content">';
+                        if (!empty($row['url_img_chat'])) $add_chat .= '<img src="'.$row['url_img_chat'].'" class="chat_avatar_inline" data-pg="'.gdrcd_filter('out',$row['mittente']).'" />';
                         $add_chat .= '<span class="chat_time">'.gdrcd_format_time($row['ora']).'</span>';
                         if ($row['modificato']) $add_chat .= '<span class="chat_badge--modificato" title="Modificato">✎</span>';
                         if ($PARAMETERS['mode']['chaticons']=='ON') $add_chat .= $add_icon;
@@ -923,7 +922,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         if(!empty($row['destinatario'])) $add_chat .= '<span class="chat_tag"> ['.gdrcd_filter('out',$row['destinatario']).']</span>';
                         $add_chat .= '</span>';
                         $add_chat .= '<span class="chat_msg">'.gdrcd_chatme($_SESSION['login'], $row['testo']).'</span>';
-                        if ($has_avatar_a) $add_chat .= '</div></div>';
+                        if (!empty($row['url_img_chat'])) $add_chat .= '<br style="clear:both;" />';
                         break;
                     case 'S':
                     case 'Q':
