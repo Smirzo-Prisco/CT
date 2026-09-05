@@ -237,7 +237,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
             <td style={{ textAlign: 'center' }}>
                 {user.gruppo_img && (
                     <IconWithPopup iconKey={`${user.nome}-gruppo`} openPopup={openPopup} onOpen={onOpen}
-                        className="presenti-icon" width="25" height="25" src={user.gruppo_img} alt={user.gruppo_nome} title={user.gruppo_nome} />
+                        className="presenti-icon" width="30" height="30" src={user.gruppo_img} alt={user.gruppo_nome} title={user.gruppo_nome} />
                 )}
             </td>
 
@@ -245,7 +245,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
             <td style={{ textAlign: 'center' }}>
                 {user.mestiere_img && (
                     <IconWithPopup iconKey={`${user.nome}-mestiere`} openPopup={openPopup} onOpen={onOpen}
-                        className="presenti-icon" width="25" height="25" src={user.mestiere_img} alt={user.mestiere_nome} title={user.mestiere_nome} />
+                        className="presenti-icon" width="30" height="30" src={user.mestiere_img} alt={user.mestiere_nome} title={user.mestiere_nome} />
                 )}
             </td>
 
@@ -254,7 +254,7 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
             <td style={{ textAlign: 'center' }}>
                 {user.gilda_img && (
                     <IconWithPopup iconKey={`${user.nome}-gilda`} openPopup={openPopup} onOpen={onOpen}
-                        className="presenti-icon" width="25" height="25" src={user.gilda_img} alt={user.gilda_nome} title={user.gilda_nome} />
+                        className="presenti-icon" width="30" height="30" src={user.gilda_img} alt={user.gilda_nome} title={user.gilda_nome} />
                 )}
             </td>
 
