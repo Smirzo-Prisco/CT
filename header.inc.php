@@ -72,7 +72,14 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
         <meta name="description" content="Scopri Crystal Tokyo GDR, un GDR play by chat gratuito con combattimenti a dadi, famiglie magiche, crescita del personaggio e gioco narrativo condiviso.">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <?php $favicon_v = @filemtime(__DIR__ . '/imgs/favicon.ico') ?: 0; ?>
+        <?php
+        // Hash del contenuto, non filemtime: il deploy fa "git reset --hard", che
+        // ad ogni push aggiorna la mtime di TUTTI i file anche se il loro contenuto
+        // non e' cambiato. Con filemtime l'URL della favicon cambiava quindi ad ogni
+        // deploy — impedendo a Google di stabilizzare l'indicizzazione dell'icona
+        // nei risultati di ricerca (richiede una URL stabile nel tempo).
+        $favicon_v = substr(@md5_file(__DIR__ . '/imgs/favicon.ico') ?: '0', 0, 8);
+        ?>
         <link rel="icon" type="image/x-icon" href="imgs/favicon.ico?v=<?= $favicon_v ?>">
         <?php
         $theme_path = 'themes/' . $PARAMETERS['themes']['current_theme'];

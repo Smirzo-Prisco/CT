@@ -82,7 +82,14 @@ function public_head(
     <link rel="stylesheet" href="/public/public.css?v=<?= $public_css_v ?>">
     <?php endif; ?>
 
-    <?php $favicon_v = @filemtime($_SERVER['DOCUMENT_ROOT'] . '/imgs/favicon.ico') ?: 0; ?>
+    <?php
+    // Hash del contenuto, non filemtime: il deploy fa "git reset --hard", che
+    // ad ogni push aggiorna la mtime di TUTTI i file anche se il loro contenuto
+    // non e' cambiato. Con filemtime l'URL della favicon cambiava quindi ad ogni
+    // deploy — impedendo a Google di stabilizzare l'indicizzazione dell'icona
+    // nei risultati di ricerca (richiede una URL stabile nel tempo).
+    $favicon_v = substr(@md5_file($_SERVER['DOCUMENT_ROOT'] . '/imgs/favicon.ico') ?: '0', 0, 8);
+    ?>
     <link rel="icon" type="image/x-icon" href="/imgs/favicon.ico?v=<?= $favicon_v ?>">
 </head>
 <?php
