@@ -1855,9 +1855,17 @@ img.chat_avatar_inline {
     // sembrando "scontrarsi" con la circle. Senza shape-outside il testo
     // segue il riquadro quadrato dell'immagine: larghezza disponibile
     // costante fin dalla prima riga, nessuna fascia stretta.
+    //
+    // Altezza 64 (non 72): quando il fondo del float taglia una riga di
+    // testo anche di un solo pixel, il browser indenta l'INTERA riga (una
+    // riga non puo' essere "meta' stretta meta' larga"), sprecando fino a
+    // una riga intera di larghezza ridotta anche dopo la fine reale
+    // dell'immagine. Verificato che con l'interlinea di .chat_msg, 64px
+    // fa cadere il fondo del float esattamente su un confine di riga
+    // invece che a meta' — niente riga sprecata.
     float: left;
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     border-radius: $radius-full;
     object-fit: cover;
     margin: 0 $space-2 $space-1 0;
