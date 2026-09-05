@@ -204,7 +204,7 @@ export default function Hud({ isStaff }) {
 
     // ── Avatar + vitali personaggio (stesso pattern di AnteprimaScheda.jsx) ─
     const [avatar, setAvatar] = useState(() => (window.CT_USER?.url_img_chat ?? '').trim())
-    const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null, gilda: null, gruppoImg: null, gruppoNome: null })
+    const [stats, setStats] = useState({ salute: null, salute_max: null, integrita: null, integrita_max: null, livello: null, gilda: null, idGilda: null, gruppoImg: null, gruppoNome: null })
 
     const fetchProfile = useCallback(() => {
         if (!nome) return
@@ -220,6 +220,7 @@ export default function Hud({ isStaff }) {
                     // La "razza" del personaggio ora e' la gilda (gilda.nome), non
                     // piu' la vecchia tabella razza.
                     gilda: d.nome_gilda,
+                    idGilda: d.id_gilda,
                     // Stessa icona/stessa priorita' della lista estesa dei presenti
                     // (PresentiEstesi.jsx/api_map.php, campo gruppo_img): ruolo
                     // nella gilda di norma, inclinazione se il pg ne ha una.
@@ -519,7 +520,10 @@ export default function Hud({ isStaff }) {
                                 : <i className="fa-solid fa-person" title="Senza razza" />
                             }
                         </span>
-                        <span className="ct-hud__char-badge">{stats.gilda || 'Senza razza'}</span>
+                        {stats.gilda && stats.idGilda
+                            ? <a className="ct-hud__char-badge" href={`main.php?page=scegli_razza&id_gilda=${stats.idGilda}`}>{stats.gilda}</a>
+                            : <span className="ct-hud__char-badge">{stats.gilda || 'Senza razza'}</span>
+                        }
                     </div>
                     <div className="ct-hud__vitals">
                         <span className="ct-hud__vital ct-hud__vital--hp" title="Salute">

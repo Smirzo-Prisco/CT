@@ -140,6 +140,7 @@ switch ($op) {
             'url_img'       => $pg_data['url_img'],
             'url_img_chat'  => $pg_data['url_img_chat'],
             'razza'         => $pg_data['sesso'] == 'f' ? $pg_data['sing_f'] : $pg_data['sing_m'],
+            'id_gilda'      => $pg_data['id_gilda'],
             'nome_gilda'    => $pg_data['nome_gilda'],
             'nome_ruolo'    => $pg_data['nome_ruolo'],
             'immagine_famiglia' => $pg_data['immagine_famiglia'],

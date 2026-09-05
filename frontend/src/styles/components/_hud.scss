@@ -773,6 +773,18 @@ body[data-palette="public"] {
     border: 1px solid color-mix(in srgb, var(--gold) calc(.4 * 100%), transparent);
 }
 
+// Quando la razza ha una scheda (badge reso come <a>, non <span>): stesso aspetto,
+// solo senza sottolineatura di default del link e un leggero feedback all'hover.
+a.ct-hud__char-badge {
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(218, 168, 50, .28);
+        background: color-mix(in srgb, var(--gold) calc(.28 * 100%), transparent);
+    }
+}
+
 .ct-hud__vitals {
     display: flex;
     flex-wrap: wrap;
