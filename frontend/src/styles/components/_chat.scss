@@ -1838,29 +1838,28 @@ button.chat_button {
 }
 
 // ── Avatar inline nella riga chat ────────────────────────────
+// Contenitore flex (vedi api_chat.php, case 'P'/'A'): avatar e blocco
+// testo sono due colonne, centrate verticalmente l'una sull'altra a
+// prescindere da quante righe occupa il messaggio — con il vecchio
+// float il cerchio restava sempre ancorato in cima, con dello spazio
+// vuoto sotto quando il testo era piu' alto di lui.
+.chat_avatar_row {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+}
+
+.chat_msg_content {
+    flex: 1;
+    min-width: 0;
+}
 
 img.chat_avatar_inline {
-    // float, non inline-block: con inline-block l'immagine si comporta come
-    // un carattere gigante dentro la SUA riga, che quindi diventa piu' alta
-    // delle righe di testo successive quando il messaggio va a capo (grosso
-    // "salto" fra la prima riga e la seconda). Con float il testo (nome,
-    // orario, messaggio) gli scorre invece attorno per tutta la sua altezza
-    // — righe piu' strette finche' non superano il fondo dell'immagine, poi
-    // tornano a piena larghezza — mantenendo l'interlinea normale ovunque.
-    //
-    // NIENTE shape-outside: un cerchio e' strettissimo (quasi 0px di
-    // larghezza disponibile) proprio in cima e in fondo alla sua altezza —
-    // il testo che ci si affianca li' (l'header ora/nome, essendo il primo
-    // contenuto dopo il float) finisce schiacciato in una fascia minuscola,
-    // sembrando "scontrarsi" con la circle. Senza shape-outside il testo
-    // segue il riquadro quadrato dell'immagine: larghezza disponibile
-    // costante fin dalla prima riga, nessuna fascia stretta.
-    float: left;
+    flex-shrink: 0;
     width: 72px;
     height: 72px;
     border-radius: $radius-full;
     object-fit: cover;
-    margin: 0 $space-2 $space-1 0;
     cursor: pointer;
 }
 
