@@ -928,7 +928,12 @@ a.ct-hud__char-badge {
     // (centinaia di px) invece che alla piccola icona attesa. 22px (non 15px
     // come in _presenti.scss): qui l'icona e' l'unico elemento visivo oltre
     // al nome, 15px risultava troppo piccola.
-    div.presente img { height: 22px; width: auto; }
+    // width+height fissi (non solo height con width:auto): le icone gruppo/
+    // inclinazione/sms non condividono tutte lo stesso rapporto larghezza-
+    // altezza nativo, quindi "solo altezza" le rendeva ugualmente alte ma
+    // visibilmente di larghezza diversa. object-fit:contain evita di
+    // deformare quelle non quadrate nel riquadro fisso.
+    div.presente img { width: 22px; height: 22px; object-fit: contain; }
 }
 // Mai sfocato (backdrop-filter:none in ogni stato, niente blur nemmeno su
 // hover/focus): si vede sempre la mappa nitida sotto, quando trasparente.
