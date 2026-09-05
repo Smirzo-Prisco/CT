@@ -121,7 +121,7 @@ const SchedaAvatar = forwardRef(function SchedaAvatar({ urlImg, nome }, ref) {
  * stat_names proviene da profile.config.stat_names (configurazione backend).
  */
 const SchedaProfilo = forwardRef(function SchedaProfilo({ profile }, ref) {
-    const { nome, cognome, eta, natoa, lavoro, razza, nome_ruolo, nome_ruolo_mestiere, nome_gilda,
+    const { nome, cognome, eta, natoa, lavoro, razza, nome_ruolo, nome_ruolo_mestiere, gilda_mestiere,
             salute, salute_max, integrita, integrita_max, notorieta,
             esperienza, shin, statistiche, privilegi, config } = profile
     const sn = config?.stat_names ?? {}
@@ -159,7 +159,7 @@ const SchedaProfilo = forwardRef(function SchedaProfilo({ profile }, ref) {
                 </div>
                 <div className={styles.infoRow}>
                     <span className={styles.infoLabel}>Gilda</span>
-                    <span className={styles.infoValue}>{nome_gilda || 'Nessuna'}</span>
+                    <span className={styles.infoValue}>{gilda_mestiere || 'Nessuna'}</span>
                 </div>
             </div>
 

@@ -52,7 +52,7 @@ function load_pg(string $pg): ?array {
             razza.bonus_car3, razza.bonus_car4, razza.bonus_car5,
             gilda.nome AS nome_gilda,
             ruolo.nome_ruolo, ruolo.immagine AS immagine_famiglia,
-            mestiere.nome AS nome_mestiere,
+            mestiere.nome AS nome_mestiere, mestiere.tipo AS tipo_mestiere,
             ruolo_mestiere.nome_ruolo AS nome_ruolo_mestiere,
             ruolo_mestiere.immagine AS immagine_mestiere
         FROM personaggio
@@ -150,6 +150,9 @@ switch ($op) {
             'nome_mestiere' => $pg_data['nome_mestiere'],
             'nome_ruolo_mestiere' => $pg_data['nome_ruolo_mestiere'],
             'immagine_mestiere'   => $pg_data['immagine_mestiere'],
+            // Mestiere di tipo "Gilda" (codtipomestiere.cod_tipo = 2, vedi gestione_tipi.inc.php)
+            // — concetto distinto dalla "razza" (tabella gilda, vedi id_gilda/nome_gilda sopra).
+            'gilda_mestiere' => ($pg_data['tipo_mestiere'] == 2) ? $pg_data['nome_mestiere'] : null,
             // Vitali (pubblici)
             'salute'        => (int)$pg_data['salute'],
             'salute_max'    => (int)$pg_data['salute_max'],
