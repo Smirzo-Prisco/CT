@@ -52,7 +52,8 @@ function load_pg(string $pg): ?array {
             razza.bonus_car3, razza.bonus_car4, razza.bonus_car5,
             gilda.nome AS nome_gilda,
             ruolo.nome_ruolo, ruolo.immagine AS immagine_famiglia,
-            mestiere.nome AS nome_mestiere, mestiere.tipo AS tipo_mestiere,
+            mestiere.nome AS nome_mestiere,
+            codtipomestiere.descrizione AS tipo_mestiere_desc,
             ruolo_mestiere.nome_ruolo AS nome_ruolo_mestiere,
             ruolo_mestiere.immagine AS immagine_mestiere
         FROM personaggio
@@ -60,6 +61,7 @@ function load_pg(string $pg): ?array {
         LEFT JOIN gilda          ON personaggio.id_gilda = gilda.id_gilda
         LEFT JOIN ruolo          ON personaggio.id_ruolo_gilda = ruolo.id_ruolo
         LEFT JOIN mestiere       ON personaggio.id_mestiere = mestiere.id_mestiere
+        LEFT JOIN codtipomestiere ON mestiere.tipo = codtipomestiere.cod_tipo
         LEFT JOIN ruolo_mestiere ON personaggio.id_ruolo_mestiere = ruolo_mestiere.id_ruolo
         WHERE personaggio.nome = '$pg' LIMIT 1");
     return $r ?: null;
@@ -150,9 +152,13 @@ switch ($op) {
             'nome_mestiere' => $pg_data['nome_mestiere'],
             'nome_ruolo_mestiere' => $pg_data['nome_ruolo_mestiere'],
             'immagine_mestiere'   => $pg_data['immagine_mestiere'],
-            // Mestiere di tipo "Gilda" (codtipomestiere.cod_tipo = 2, vedi gestione_tipi.inc.php)
-            // — concetto distinto dalla "razza" (tabella gilda, vedi id_gilda/nome_gilda sopra).
-            'gilda_mestiere' => ($pg_data['tipo_mestiere'] == 2) ? $pg_data['nome_mestiere'] : null,
+            // Mestiere di tipo "Gilda" — codtipomestiere.cod_tipo e' un id
+            // assegnato dinamicamente da gestione_tipi.inc.php (non un enum
+            // fisso), quindi il confronto e' sulla descrizione testuale del
+            // tipo, non su un numero hardcodato che può cambiare installazione
+            // per installazione. Concetto distinto dalla "razza" (tabella
+            // gilda, vedi id_gilda/nome_gilda sopra).
+            'gilda_mestiere' => (strcasecmp((string)$pg_data['tipo_mestiere_desc'], 'Gilda') === 0) ? $pg_data['nome_mestiere'] : null,
             // Vitali (pubblici)
             'salute'        => (int)$pg_data['salute'],
             'salute_max'    => (int)$pg_data['salute_max'],
