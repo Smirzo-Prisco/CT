@@ -707,7 +707,14 @@ function getExp_rPg($esperienza) {
         $prec = $limite;
     }
 
-    return (int)$punti;
+    // Niente (int) qui: da regolamento lo schema px->punti e' un rapporto
+    // continuo (es. 1 ogni 15 px da 501 a 800), non un arrotondamento per
+    // scaglione — troncare a intero qui perdeva silenziosamente il resto
+    // frazionario (mai assegnabile, ma comunque accumulato) prima ancora
+    // che arrivasse a xp_da_assegnare. round(2) evita rumore di virgola
+    // mobile sui divisori non decimali (15, 30) restando coerente con la
+    // colonna personaggio.esperienza_r, DECIMAL(14,5).
+    return round($punti, 2);
 }
 
 /**
