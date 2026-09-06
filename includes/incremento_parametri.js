@@ -6,6 +6,7 @@ const ns_parametri = {
 const panel = document.getElementById('stats_panel');
 const attributesContainer = document.getElementById('attributesContainer');
 const xpDisponibiliEl = document.getElementById('xpDisponibili');
+const xpDecimaliEl = document.getElementById('xpDecimali');
 const shinDisponibiliEl = document.getElementById('shinDisponibili');
 const totalBarXP = document.getElementById('totalBarXP');
 const totalBarShin = document.getElementById('totalBarShin');
@@ -21,6 +22,22 @@ let characterLevel = 0;
 let totalXPsum = 0;
 let totalShinsum = 0;
 let soglie = [];
+
+/* L'esperienza residua (getExp_rPg lato server) puo' avere decimali, ma gli
+   incrementi sono sempre di punti interi: la parte decimale non e' mai
+   assegnabile. Mostriamo quindi solo l'intero nel numero grande, con
+   l'eventuale resto decimale come nota sotto, cosi' resta visibile senza
+   far credere che sia spendibile. */
+function renderXpDisponibili() {
+	const xpInt = Math.floor(xpDisponibili);
+	const xpDec = xpDisponibili - xpInt;
+
+	xpDisponibiliEl.textContent = String(xpInt);
+
+	if (xpDecimaliEl) {
+		xpDecimaliEl.textContent = xpDec > 0.005 ? `+${xpDec.toFixed(2)} non assegnabili` : '';
+	}
+}
 
 /* helper: create DOM structures without innerHTML */
 function createAttributeCard(attr) {
@@ -165,7 +182,7 @@ function updateUI() {
 	levelTotalLabel.textContent = `${grandTotal} punti`;
 	characterLevelEl.textContent = getLevelPg(grandTotal, soglie);
 
-	xpDisponibiliEl.textContent = xpDisponibili;
+	renderXpDisponibili();
 	shinDisponibiliEl.textContent = shinDisponibili;
 }
 
@@ -339,7 +356,7 @@ function loadInitial() {
 			attributesContainer.appendChild(errEl);
 			xpDisponibili = 0;
 			shinDisponibili = 0;
-			xpDisponibiliEl.textContent = String(xpDisponibili);
+			renderXpDisponibili();
 			shinDisponibiliEl.textContent = String(shinDisponibili);
 		});
 }

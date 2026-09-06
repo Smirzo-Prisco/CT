@@ -95,6 +95,10 @@ export default function IncrementoParametri() {
                 <div className="col total-card">
                     <div className="total-label" style={{ color: 'var(--xp)', fontWeight: 700 }}>Esperienza disponibile</div>
                     <div style={{ fontWeight: 700, fontSize: '20px', marginTop: '6px' }} id="xpDisponibili">0</div>
+                    {/* Resto decimale dell'esperienza residua: mai assegnabile (gli
+                        incrementi sono sempre punti interi), mostrato solo per
+                        trasparenza — vedi renderXpDisponibili() in incremento_parametri.js */}
+                    <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '2px' }} id="xpDecimali"></div>
                 </div>
                 <div className="col total-card">
                     <div className="total-label" style={{ color: 'var(--shin)', fontWeight: 700 }}>Shin disponibili</div>
