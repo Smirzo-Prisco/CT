@@ -124,6 +124,25 @@ switch ($op) {
             $gruppo_nome = $incl['nome'];
         }
 
+        // Gilda giocatore (mestiere di tipo "Gilda"): dalla migrazione del
+        // 2026-07-03 NON e' piu' in personaggio.id_mestiere/id_ruolo_mestiere
+        // (riservati al mestiere vero, tipo "Mestieri") ma in una tabella di
+        // affiliazione dedicata, clgpersonaggioaffiliazione — vedi
+        // migrations/2026_07_03_clgpersonaggioaffiliazione.sql e lo stesso
+        // pattern in api_servizi_gilde.php.
+        $affiliazione = gdrcd_query(
+            "SELECT mestiere.nome AS nome_gilda_mestiere
+               FROM clgpersonaggioaffiliazione cpa
+               JOIN ruolo_mestiere ON cpa.id_ruolo = ruolo_mestiere.id_ruolo
+               JOIN mestiere ON ruolo_mestiere.mestiere = mestiere.id_mestiere
+               JOIN codtipomestiere ON mestiere.tipo = codtipomestiere.cod_tipo
+              WHERE cpa.personaggio = '" . gdrcd_filter('in', $pg) . "'
+                AND cpa.conferma_mestiere = 1
+                AND codtipomestiere.descrizione = 'Gilda'
+              LIMIT 1"
+        );
+        $gilda_mestiere_affiliazione = $affiliazione ? $affiliazione['nome_gilda_mestiere'] : null;
+
         // Dati pubblici
         $profile = [
             'success'       => true,
@@ -152,13 +171,18 @@ switch ($op) {
             'nome_mestiere' => $pg_data['nome_mestiere'],
             'nome_ruolo_mestiere' => $pg_data['nome_ruolo_mestiere'],
             'immagine_mestiere'   => $pg_data['immagine_mestiere'],
-            // Mestiere di tipo "Gilda" — codtipomestiere.cod_tipo e' un id
-            // assegnato dinamicamente da gestione_tipi.inc.php (non un enum
-            // fisso), quindi il confronto e' sulla descrizione testuale del
-            // tipo, non su un numero hardcodato che può cambiare installazione
-            // per installazione. Concetto distinto dalla "razza" (tabella
-            // gilda, vedi id_gilda/nome_gilda sopra).
-            'gilda_mestiere' => (strcasecmp((string)$pg_data['tipo_mestiere_desc'], 'Gilda') === 0) ? $pg_data['nome_mestiere'] : null,
+            // Mestiere di tipo "Gilda" — dalla migrazione del 2026-07-03 vive in
+            // clgpersonaggioaffiliazione ($gilda_mestiere_affiliazione sopra),
+            // non piu' in personaggio.id_mestiere (riservato al mestiere vero).
+            // Il fallback su nome_mestiere/tipo_mestiere_desc resta per
+            // personaggi eventualmente non coperti dalla migrazione.
+            // codtipomestiere.cod_tipo e' un id assegnato dinamicamente da
+            // gestione_tipi.inc.php (non un enum fisso): confronto sempre
+            // sulla descrizione testuale, mai su un numero hardcodato.
+            // Concetto distinto dalla "razza" (tabella gilda, vedi
+            // id_gilda/nome_gilda sopra).
+            'gilda_mestiere' => $gilda_mestiere_affiliazione
+                ?: ((strcasecmp((string)$pg_data['tipo_mestiere_desc'], 'Gilda') === 0) ? $pg_data['nome_mestiere'] : null),
             // Vitali (pubblici)
             'salute'        => (int)$pg_data['salute'],
             'salute_max'    => (int)$pg_data['salute_max'],
