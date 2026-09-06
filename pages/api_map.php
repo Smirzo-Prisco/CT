@@ -227,7 +227,6 @@ switch ($op) {
                 $invisible_filter  = $is_staff ? '' : 'AND p.is_invisible = 0';
                 $cresult = gdrcd_query("SELECT p.ultimo_luogo, COUNT(*) AS n
                     FROM personaggio p
-                    LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
                     WHERE $condizione_online
                       $invisible_filter
                       AND p.ultimo_luogo IN ($roomIds)
@@ -466,7 +465,6 @@ switch ($op) {
              FROM personaggio p
              LEFT JOIN mappa       m    ON p.ultimo_luogo   = m.id
              LEFT JOIN ruolo       ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
-             LEFT JOIN bot_status  bs   ON bs.bot_nome = p.nome
              WHERE $condizione_online
                AND p.ultimo_luogo = $luogo
                AND p.ultima_mappa = $mappa
@@ -567,7 +565,6 @@ switch ($op) {
             LEFT JOIN ruolo_mestiere rm2  ON cga.id_ruolo        = rm2.id_ruolo
             LEFT JOIN ruolo          ru_fam ON p.id_ruolo_gilda = ru_fam.id_ruolo
             LEFT JOIN privilegi      pr   ON pr.nome            = p.nome
-            LEFT JOIN bot_status     bs   ON bs.bot_nome        = p.nome
             WHERE $condizione_online
               $exclude
             ORDER BY p.is_invisible, mc.nome, m.nome, p.nome

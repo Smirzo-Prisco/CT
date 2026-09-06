@@ -61,7 +61,6 @@ import ChattingOff     from './components/ChattingOff'
 import Meteo           from './components/Meteo'
 import Hud             from './components/Hud'
 import ChatbotWidget   from './components/ChatbotWidget'
-import GestioneBot    from './components/GestioneBot'
 import GestioneManutenzione from './components/GestioneManutenzione'
 import GestioneMestieri from './components/GestioneMestieri'
 import GestioneLuoghiMestiere from './components/GestioneLuoghiMestiere'
@@ -158,9 +157,6 @@ window.CT.register('Hud', Hud)
 
 /** Chatbot AI floating widget — bottom-right, 5 domande/giorno, max 500 char */
 window.CT.register('ChatbotWidget', ChatbotWidget)
-
-/** Pannello admin gestione bot (sesso='b'): lista, schedule, DM */
-window.CT.register('GestioneBot', GestioneBot)
 
 /** Pannello admin manutenzione DB: pulizia log/chat/messaggi, personaggi assenti/cancellati, blacklist */
 window.CT.register('GestioneManutenzione', GestioneManutenzione)

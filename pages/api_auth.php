@@ -200,22 +200,10 @@ switch ($op) {
                 }
             };
 
-            // Verifica se il login corrente o l'altro nome coinvolto è un bot (sesso='b').
-            // I bot sono esclusi dal rilevamento doppi account.
-            $nomi_da_verificare = array_unique(array_filter([
-                $_SESSION['login'],
-                $_COOKIE['lastlogin']          ?? '',
-                $last_doppio['Nome']           ?? '',
-            ]));
-            $nomi_in_check = implode(',', array_map(fn($n) => "'" . gdrcd_filter('in', $n) . "'", $nomi_da_verificare));
-            $bot_coinvolto = gdrcd_query("SELECT COUNT(*) AS c FROM personaggio WHERE nome IN ($nomi_in_check) AND sesso = 'b'", 'query', true);
-
-            if (empty($bot_coinvolto['c'])) {
-                if (isset($_COOKIE['lastlogin']) && $_COOKIE['lastlogin'] !== $_SESSION['login']) {
-                    $logga_doppio($_SESSION['login'], $_COOKIE['lastlogin'], $IP, $Host, $Browser);
-                } elseif (!empty($last_doppio['n'])) {
-                    $logga_doppio($_SESSION['login'], $last_doppio['Nome'], $IP, $Host, $Browser);
-                }
+            if (isset($_COOKIE['lastlogin']) && $_COOKIE['lastlogin'] !== $_SESSION['login']) {
+                $logga_doppio($_SESSION['login'], $_COOKIE['lastlogin'], $IP, $Host, $Browser);
+            } elseif (!empty($last_doppio['n'])) {
+                $logga_doppio($_SESSION['login'], $last_doppio['Nome'], $IP, $Host, $Browser);
             }
             setcookie('lastlogin', $_SESSION['login'], time() + (86400 * 30), '/');
 

@@ -75,7 +75,6 @@ switch ($op) {
             if ($perms['admin'] || $perms['master'])
                 $voci[] = ['label' => 'Abilità temporanee', 'url' => 'gestione.php?page=gestione_abilita_master'];
             if ($perms['admin'])
-                $voci[] = ['label' => 'Bot', 'url' => 'gestione.php?page=gestione_bot'];
             $menu[] = ['key' => 'gestione_pg', 'label' => 'Gestione pg', 'icon' => 'fa-user-gear', 'voci' => $voci];
         }
 
@@ -142,7 +141,7 @@ switch ($op) {
         if ($perms['admin'] || $perms['master'] || $perms['moderatore']) {
             $ultimi_res    = gdrcd_query(
                 "SELECT nome, data_iscrizione FROM personaggio
-                 WHERE " . sqlPgAttivo() . " AND sesso != 'b'
+                 WHERE " . sqlPgAttivo() . "
                  ORDER BY data_iscrizione DESC LIMIT 5",
                 'result'
             );

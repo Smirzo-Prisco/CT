@@ -138,14 +138,14 @@ if ($op === 'options') {
     // Rilevamento doppi in fase di iscrizione: il personaggio appena creato non
     // ha ancora una propria storia di log_entrate (non si è mai loggato), ma
     // l'IP della richiesta di iscrizione sì — stessa fonte dati (log_entrate)
-    // e stessa esclusione bot (sesso='b') del rilevamento doppi al login (vedi
-    // case 'login' in api_auth.php), qui riapplicata all'IP di chi si iscrive.
+    // del rilevamento doppi al login (vedi case 'login' in api_auth.php), qui
+    // riapplicata all'IP di chi si iscrive.
     $ip_iscrizione = gdrcd_filter('in', $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR']);
     $doppi_result = gdrcd_query("
         SELECT DISTINCT le.Nome
         FROM log_entrate le
         JOIN personaggio p ON p.nome = le.Nome
-        WHERE le.IP = '$ip_iscrizione' AND le.Nome != '" . gdrcd_filter('in', $nome) . "' AND p.sesso != 'b'
+        WHERE le.IP = '$ip_iscrizione' AND le.Nome != '" . gdrcd_filter('in', $nome) . "'
     ", 'result');
     $doppi_nomi = [];
     while ($doppi_row = gdrcd_query($doppi_result, 'fetch')) {

@@ -1026,23 +1026,19 @@ function mestiere_e_membro_di($login, $id_mestiere) {
  * (api_map.php op=presenti, op=presenti_estesi, themes/crystal/home/index.php)
  * — tenerle sincronizzate a mano è stata la causa di un blocco del sito.
  *
- * Richiede che la query chiamante usi l'alias "p" per personaggio e includa:
- *   LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
+ * Richiede che la query chiamante usi l'alias "p" per personaggio.
  *
  * Un personaggio è online se: ha una sessione aperta (ora_entrata > ora_uscita)
- * con attività recente (o, per i bot, non in pausa) — oppure, a prescindere
- * dalla sessione, se personaggio.sempre_online è attivo. Il flag vive
- * direttamente su personaggio (non su privilegi, che si è rivelata più
- * fragile: gestione_nomine.inc.php itera dinamicamente ogni sua colonna).
+ * con attività recente — oppure, a prescindere dalla sessione, se
+ * personaggio.sempre_online è attivo. Il flag vive direttamente su
+ * personaggio (non su privilegi, che si è rivelata più fragile:
+ * gestione_nomine.inc.php itera dinamicamente ogni sua colonna).
  */
 function gdrcd_condizione_online() {
     return "(
         (
             p.ora_entrata > p.ora_uscita
-            AND (
-                (p.sesso != 'b' AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW())
-                OR (p.sesso = 'b' AND COALESCE(bs.paused, 1) = 0)
-            )
+            AND DATE_ADD(p.ultimo_refresh, INTERVAL 4 MINUTE) > NOW()
         )
         OR COALESCE(p.sempre_online, 0) = 1
     )";
@@ -1072,7 +1068,6 @@ function gdrcd_conteggio_online_totale(string $login, bool $is_staff): int {
     $tot = gdrcd_query(
         "SELECT COUNT(*) AS n
          FROM personaggio p
-         LEFT JOIN bot_status bs ON bs.bot_nome = p.nome
          WHERE $condizione_online
            $exclude
            $invisible_filter"

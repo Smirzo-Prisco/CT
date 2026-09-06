@@ -268,8 +268,6 @@ function UserRow({ user, isStaff, openPopup, onOpen, statoExpanded }) {
                     {user.nome}
                     {/* Flag visibilità — visibile solo allo staff */}
                     {user.is_invisible && <em> (inv)</em>}
-                    {/* Badge bot — visibile solo allo staff, coerente con OnlineUsers */}
-                    {isStaff && user.sesso === 'b' && <span className="badge-bot">B</span>}
                 </a>
             </td>
 

@@ -66,9 +66,6 @@ export default function OnlineUsers({ users = [], isStaff = false }) {
                 >
                   {user.nome}
                 </a>
-                {isStaff && user.sesso === 'b' && (
-                  <span className="badge-bot">B</span>
-                )}
               </div>
             )
           })

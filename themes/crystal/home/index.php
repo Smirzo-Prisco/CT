@@ -30,11 +30,11 @@ if ($PARAMETERS['settings']['protection'] == 'ON') {
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/functions.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/custom_functions.inc.php';
 $_db_home = gdrcd_connect();
-$stat_iscritti       = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE " . sqlPgAttivo() . " AND sesso != 'b'")['n'] ?? 0);
+$stat_iscritti       = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE " . sqlPgAttivo())['n'] ?? 0);
 $_condizione_online  = gdrcd_condizione_online();
-$stat_online         = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM personaggio p LEFT JOIN bot_status bs ON bs.bot_nome = p.nome WHERE $_condizione_online")['n'] ?? 0);
+$stat_online         = (int)(gdrcd_query("SELECT COUNT(*) AS n FROM personaggio p WHERE $_condizione_online")['n'] ?? 0);
 $stat_azioni_settimana = (int)(gdrcd_query("SELECT COUNT(id) AS n FROM chat WHERE ora >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND tipo IN ('P','A')")['n'] ?? 0);
-$stat_nuovi_settimana = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE " . sqlPgAttivo() . " AND sesso != 'b' AND data_iscrizione >= DATE_SUB(NOW(), INTERVAL 7 DAY)")['n'] ?? 0);
+$stat_nuovi_settimana = (int)(gdrcd_query("SELECT COUNT(nome) AS n FROM personaggio WHERE " . sqlPgAttivo() . " AND data_iscrizione >= DATE_SUB(NOW(), INTERVAL 7 DAY)")['n'] ?? 0);
 $_mesi = ['','gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 $_data_iso  = date('Y-m-d');
 $_data_it   = (int)date('j') . ' ' . $_mesi[(int)date('n')] . ' ' . date('Y');
