@@ -73,7 +73,7 @@ switch ($op) {
             if ($perms['admin'])
                 $voci[] = ['label' => 'Azzera punti', 'url' => 'gestione.php?page=gestione_azzeramento_skill'];
             if ($perms['admin'] || $perms['master'])
-                $voci[] = ['label' => 'Crea e assegna skill temporanee', 'url' => 'gestione.php?page=gestione_abilita_master'];
+                $voci[] = ['label' => 'Abilità temporanee', 'url' => 'gestione.php?page=gestione_abilita_master'];
             if ($perms['admin'])
                 $voci[] = ['label' => 'Bot', 'url' => 'gestione.php?page=gestione_bot'];
             $menu[] = ['key' => 'gestione_pg', 'label' => 'Gestione pg', 'icon' => 'fa-user-gear', 'voci' => $voci];
