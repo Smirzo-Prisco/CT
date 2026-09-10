@@ -1006,9 +1006,16 @@ function checkTurnEnd($location, $user, $id_role) {
             }
         }
 
-        // Se tutti sono stati auto-chiusi (nessun bottone necessario), chiude il turno subito (solo se nessun attacco è in sospeso)
-        $stillOpen = gdrcd_query("SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL AND png = 0 LIMIT 1", 'result');
-        if ($stillOpen && gdrcd_query($stillOpen, 'num_rows') === 0) checkTurnCanClose($id_role, $location);
+        // Se il timer è attivo, la chiusura effettiva del turno è demandata solo alla
+        // sua scadenza (vedi op=timerExpired in api_chat.php, chiamato dal countdown
+        // lato client): non va chiusa qui anche se tutti i pg già presenti risultano
+        // auto-confermati, altrimenti chi deve ancora entrare in giocata e azionare
+        // prima della scadenza del timer ne perderebbe la possibilità.
+        if (!$timerActive) {
+            // Se tutti sono stati auto-chiusi (nessun bottone necessario), chiude il turno subito (solo se nessun attacco è in sospeso)
+            $stillOpen = gdrcd_query("SELECT 1 FROM role_session_players WHERE id_role = $id_role AND close_turn = 0 AND `end` IS NULL AND png = 0 LIMIT 1", 'result');
+            if ($stillOpen && gdrcd_query($stillOpen, 'num_rows') === 0) checkTurnCanClose($id_role, $location);
+        }
     }
 }
 
