@@ -399,41 +399,43 @@ function loadYoutubeApi() {
 /**
  * Player YouTube nascosto (solo audio) che riproduce la musica impostata dal
  * master nel tab Quest. Sincronizzato per tutti tramite startedAt: chi entra
- * a metà brano fa un seek all'offset corretto. Il div target dell'IFrame API
- * viene renderizzato una volta sola e mai più toccato da React, perché la
- * libreria sostituisce quel nodo con l'iframe reale al di fuori di React.
- * Il player resta vivo tra un brano e l'altro (loadVideoById), così il mute
- * locale del giocatore non viene perso ai cambi/stop imposti dal master.
+ * a metà brano fa un seek all'offset corretto. Il player resta vivo tra un
+ * brano e l'altro (loadVideoById), così il mute locale del giocatore non
+ * viene perso ai cambi/stop imposti dal master.
  *
- * Il div target va in un portal su un nodo dedicato fuori dall'albero React
- * (non semplicemente reso come fratello di quest-audio-bar nello stesso
- * Fragment): l'IFrame API sostituisce quel div con un <iframe> reale, e se
- * restasse fratello di un elemento che React aggiorna (quest-audio-bar cambia
- * ad ogni tick di title/muted), il primo re-render successivo tenta un
- * insertBefore relativo a un nodo che non e' piu' figlio del genitore atteso
- * -> "NotFoundError: insertBefore... not a child of this node", che manda in
- * crash l'intero render tree (ChatViewer compreso) finche' non si ricarica
- * la pagina. Isolandolo in un host dedicato, i suoi aggiornamenti non toccano
- * mai più quel nodo.
+ * Il div target dell'IFrame API NON viene mai renderizzato da React (niente
+ * JSX/portal): è creato e distrutto con DOM API dirette dentro un host anch'esso
+ * creato a mano, perché la libreria sostituisce quel nodo con un <iframe> reale
+ * al di fuori del controllo di React. Se React tentasse di rimuoverlo alla
+ * dismissione del componente (es. uscendo dalla chat mentre la musica suona),
+ * troverebbe un nodo già scollegato dal DOM (rimpiazzato dall'iframe) e
+ * lancerebbe "NotFoundError: removeChild... not a child of this node", che
+ * manda in crash il commit React e blocca la navigazione (la URL cambia via
+ * pushState perché è un'API del browser indipendente, ma il contenuto resta
+ * quello vecchio finché non si ricarica la pagina). Rimuovendo solo l'host
+ * (mai il nodo target) questo scenario non si presenta più.
  */
 function QuestAudioWidget({ videoId, startedAt }) {
-    const containerRef = useRef(null)
     const playerRef = useRef(null)
+    const targetElRef = useRef(null)
     const mutedRef = useRef(localStorage.getItem('ct_quest_audio_muted') === '1')
     const [muted, setMuted] = useState(mutedRef.current)
     const [title, setTitle] = useState('')
 
-    // Host dedicato per il portal, creato una volta sola e mai più toccato da React.
-    const portalHostRef = useRef(null)
-    if (!portalHostRef.current && typeof document !== 'undefined') {
-        portalHostRef.current = document.createElement('div')
-    }
-
     useEffect(() => {
-        const host = portalHostRef.current
-        if (!host) return
+        const host = document.createElement('div')
+        host.style.cssText = 'position:fixed;width:1px;height:1px;top:-100px;left:-100px;opacity:0;pointer-events:none'
+        const target = document.createElement('div')
+        host.appendChild(target)
         document.body.appendChild(host)
-        return () => { document.body.removeChild(host) }
+        targetElRef.current = target
+
+        return () => {
+            playerRef.current?.destroy?.()
+            playerRef.current = null
+            targetElRef.current = null
+            document.body.removeChild(host)
+        }
     }, [])
 
     useEffect(() => {
@@ -447,7 +449,7 @@ function QuestAudioWidget({ videoId, startedAt }) {
         let clickHandler = null
 
         loadYoutubeApi().then(YT => {
-            if (cancelled) return
+            if (cancelled || !targetElRef.current) return
             const offsetSeconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000))
 
             if (playerRef.current) {
@@ -455,7 +457,7 @@ function QuestAudioWidget({ videoId, startedAt }) {
                 return
             }
 
-            playerRef.current = new YT.Player(containerRef.current, {
+            playerRef.current = new YT.Player(targetElRef.current, {
                 videoId,
                 width: '1',
                 height: '1',
@@ -494,10 +496,6 @@ function QuestAudioWidget({ videoId, startedAt }) {
 
     return (
         <>
-            {portalHostRef.current && createPortal(
-                <div ref={containerRef} style={{ position: 'fixed', width: 1, height: 1, top: '-100px', left: '-100px', opacity: 0, pointerEvents: 'none' }} />,
-                portalHostRef.current
-            )}
             {videoId && (
                 <div className="quest-audio-bar">
                     <span className="quest-audio-bar__icon">🎵</span>
