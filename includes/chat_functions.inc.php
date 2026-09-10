@@ -1527,8 +1527,8 @@ function elaborateGenerichePre($id_role, $turn, $intoccabili, &$riepilogo) {
                 break;
                 case 'più_15_punti_salute': // Cura
                     if($dice >= 10) {
-                        gdrcd_query("UPDATE personaggio SET salute = salute - 15 WHERE nome = '$striker'");
-                        gdrcd_query("UPDATE personaggio SET salute = salute + 15 WHERE nome = '$target'");
+                        adjustPgStats($striker, -15, 0);
+                        adjustPgStats($target, 15, 0);
                         $msg .= $pgTag." lancia la skill generica $skillTag che sottrae a $striker 15 punti salute e li dona a $target.<br>";
                     } else $msg .= $pgTag." tenta di lanciare la skill generica $skillTag che sottrae a $striker 15 punti salute e li dona a $target, ma fallisce.<br>";
                 break;
@@ -2316,8 +2316,12 @@ function scaloIntegritaDoppioComando($id_role, $striker, $turn) {
 }
 
 // Funzione per scalare i punti del pg, che siano salute o integrità
+// Applica un danno a salute o integrità passando da adjustPgStats(), che clampa il
+// risultato a [0, max]: un UPDATE diretto (come prima di questo fix) lascia scendere i
+// punti sotto zero quando il danno supera i punti residui.
 function scaloPunti($pg, $damage, $type) {
-    gdrcd_query("UPDATE personaggio SET $type = ($type - $damage) WHERE nome = '$pg'");
+    if ($type === 'salute') adjustPgStats($pg, -$damage, 0);
+    else adjustPgStats($pg, 0, -$damage);
 }
 
 // Se l'integrità scende sotto una certa soglia, registro la durata della skill in base al danno provocato
