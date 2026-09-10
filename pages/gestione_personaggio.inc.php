@@ -391,7 +391,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                     </div>
                     <div class="form-group form-column">
                         <label for="mestiere_punti">Punti Mestiere</label>
-                        <input type="number" id="mestiere_punti" name="mestiere_punti" min="1" max="100">
+                        <input type="number" id="mestiere_punti" name="mestiere_punti" min="0" max="100">
                     </div>
                 </div>
                 <div class="form-group">
