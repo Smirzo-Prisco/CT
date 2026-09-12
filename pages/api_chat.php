@@ -1056,7 +1056,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
 
             // Se il personaggio che invia è soggetto a una skill di durata, scalo i punti (integrità) — solo per le azioni P (una per turno)
-            if ($m_type === 'P') checkSkillEffect($login, $location, $id_role);
+            if ($m_type === 'P') checkSkillEffect($login, $location);
 
             // Verifica timer e ordine turni per le azioni P
             if ($m_type === 'P' && $id_role) {
