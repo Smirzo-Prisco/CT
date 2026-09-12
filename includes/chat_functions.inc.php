@@ -2361,11 +2361,15 @@ function registraDurata($type, $punti, $danno, $pg, $id_role) {
 }
 
 // Controllo se il pg è sottoposto a una durata e, in caso affermativo, scalare i punti per la durata della skill, aggiornare i turni e cancellare la durata al termine
-function checkSkillEffect($pg, $location) {
+function checkSkillEffect($pg, $location, $id_role) {
     $damage = 5; // Punti da scalare
 
-    // Controllo se il pg deve essere sottoposto allo scalo dei punti per skill di durata
-    $checkPg = gdrcd_query("SELECT * FROM role_durations WHERE pg_name = '$pg'", 'result');
+    // Filtrata anche per id_role: senza questo vincolo una durata inflitta in una role
+    // continuava a scattare per lo stesso pg in QUALSIASI altra role/quest successiva
+    // (bastava restasse pg_name = ..., la role di origine poteva anche essere ancora
+    // aperta altrove) — visto in produzione su Latino, colpito a distanza di giorni
+    // in una quest scollegata da quella che gli aveva inflitto l'effetto.
+    $checkPg = gdrcd_query("SELECT * FROM role_durations WHERE pg_name = '$pg' AND id_role = $id_role", 'result');
     if ($checkPg && gdrcd_query($checkPg, 'num_rows') > 0) {
         $duration = gdrcd_query($checkPg, 'fetch');
         // Nome reale della colonna (integrita, senza accento — vedi registraDurata()), usato
@@ -2380,17 +2384,17 @@ function checkSkillEffect($pg, $location) {
         // Se la salute del pg è sotto i 20, cancello ogni effetto di durata ancora attivo, altrimenti continuo a scalare i punti
         $salute = gdrcd_query("SELECT $type FROM personaggio WHERE nome = '$pg'")[$type];
         if ($salute < 20) {
-            gdrcd_query("DELETE FROM role_durations WHERE pg_name = '$pg'");
+            gdrcd_query("DELETE FROM role_durations WHERE pg_name = '$pg' AND id_role = $id_role");
             chatInsertMessage($location, 'System', NULL, "Essendo sceso sotto i 20 punti $label, $pg smette di subire gli effetti della skill in corso", 'N');
         } elseif ($duration['current_turn'] < $duration['duration']) {
             // Se la durata è ancora in corso, scalare i punti al pg e aggiornare il turno corrente
             scaloPunti($pg, $damage, $type);
-            gdrcd_query("UPDATE role_durations SET current_turn = (current_turn + 1) WHERE pg_name = '$pg'");
+            gdrcd_query("UPDATE role_durations SET current_turn = (current_turn + 1) WHERE pg_name = '$pg' AND id_role = $id_role");
             chatInsertMessage($location, 'System', NULL, "$pg subisce gli effetti della skill in corso e perde $damage punti $label", 'N');
         } else {
             // Scalo gli effetti per l'ultima volta, poi cancello il record dal db
             scaloPunti($pg, $damage, $type);
-            gdrcd_query("DELETE FROM role_durations WHERE pg_name = '$pg'");
+            gdrcd_query("DELETE FROM role_durations WHERE pg_name = '$pg' AND id_role = $id_role");
             chatInsertMessage($location, 'System', NULL, "$pg subisce gli effetti della skill in corso e perde $damage punti $label. Questo è l'ultimo turno, gli effetti della skill sono svaniti", 'N');
         }
     }
