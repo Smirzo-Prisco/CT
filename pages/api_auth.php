@@ -207,15 +207,10 @@ switch ($op) {
             }
             setcookie('lastlogin', $_SESSION['login'], time() + (86400 * 30), '/');
 
-            $check_24h = gdrcd_query("SELECT COUNT(*) AS c FROM log_entrate WHERE Nome = '$login_filtered' AND DataEvento > NOW() - INTERVAL 1 DAY", 'query', true);
-            if (!empty($check_24h['c'])) {
-                $check_ip = gdrcd_query("SELECT COUNT(*) AS c FROM log_entrate WHERE Nome = '$login_filtered' AND IP = '$IP' AND DataEvento > NOW() - INTERVAL 1 DAY", 'query', true);
-                if (empty($check_ip['c'])) {
-                    gdrcd_query("INSERT INTO log_entrate (Nome, DataEvento, IP, Host) VALUES ('$login_filtered', NOW(), '$IP', '$Host')", 'query', true);
-                }
-            } else {
-                gdrcd_query("INSERT INTO log_entrate (Nome, DataEvento, IP, Host) VALUES ('$login_filtered', NOW(), '$IP', '$Host')", 'query', true);
-            }
+            // Ogni login viene registrato, senza deduplica per finestra di 24h/IP ripetuto
+            // (rimossa su richiesta esplicita: l'elenco accessi deve riflettere ogni accesso
+            // reale, non solo il primo di giornata da un dato IP).
+            gdrcd_query("INSERT INTO log_entrate (Nome, DataEvento, IP, Host) VALUES ('$login_filtered', NOW(), '$IP', '$Host')", 'query', true);
         } catch (\Exception $e) { /* non critico */ }
 
         // Reset back_chat se passate 24h o se è cambiata mattina (soglia ore 6)
