@@ -8,6 +8,22 @@ if ($_SESSION['admin'] != 1 && $_SESSION['moderatore'] != 1) {
 require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 
 $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
+
+// Stima quanto sia plausibile che un doppio segnalato sia davvero lo stesso giocatore:
+// più personaggi DISTINTI sono mai passati da quell'IP (in tutta la storia di
+// log_entrate, senza limite di tempo), più è probabile che sia una connessione
+// condivisa/dinamica (rete mobile, CGNAT, wifi pubblico) invece di una vera
+// coincidenza — un IP usato solo da questi due personaggi resta un segnale forte
+// anche a distanza di mesi o anni, che un taglio temporale perderebbe.
+function probabilitaDoppio($ip) {
+    $ip_f = gdrcd_filter('in', $ip);
+    $row  = gdrcd_query("SELECT COUNT(DISTINCT Nome) AS n FROM log_entrate WHERE IP = '$ip_f'");
+    $n    = (int)($row['n'] ?? 0);
+
+    if ($n <= 2)     return ['label' => 'Alta',  'n' => $n];
+    elseif ($n <= 5) return ['label' => 'Media', 'n' => $n];
+    else             return ['label' => 'Bassa', 'n' => $n];
+}
 ?>
 
 <div class="log-container">
@@ -185,17 +201,24 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
                     <tr>
                         <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
                         <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> Doppio</th>
-                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> IP</th>
-                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> Host</th>
-                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Browser</th>
-                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Data</th>
+                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Probabilità</th>
+                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> IP</th>
+                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Host</th>
+                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Browser</th>
+                        <th onclick="sortTable(6)"><i class="fa-solid fa-sort"></i> Data</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php while ($row = gdrcd_query($doppi, 'fetch')) : ?>
+                <?php while ($row = gdrcd_query($doppi, 'fetch')) :
+                    $prob = probabilitaDoppio($row['IP']); ?>
                     <tr>
                         <td><?=gdrcd_filter('out', $row['Nome'])?></td>
                         <td><?=gdrcd_filter('out', $row['Doppio'])?></td>
+                        <td>
+                            <span class="status <?=$prob['label']?>" title="<?=$prob['n']?> personaggi distinti hanno usato questo IP">
+                                <?=$prob['label']?>
+                            </span>
+                        </td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
                         <td><?=gdrcd_filter('out', $row['Host'])?></td>
                         <td><?=gdrcd_filter('out', $row['Browser'])?></td>

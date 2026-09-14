@@ -250,9 +250,9 @@ $log-accent: #ce846f;
         font-size: 0.9em;
     }
 
-    .Active, .Success, .Granted { background-color: rgb(40 167 69 / 20%); color: #8fff9b; }
-    .Inactive, .Failed, .Denied { background-color: rgb(255 0 0 / 20%); color: #ff8b8b; }
-    .Pending { background-color: rgb(255 193 7 / 20%); color: #ffd86b; }
+    .Active, .Success, .Granted, .Bassa { background-color: rgb(40 167 69 / 20%); color: #8fff9b; }
+    .Inactive, .Failed, .Denied, .Alta  { background-color: rgb(255 0 0 / 20%); color: #ff8b8b; }
+    .Pending, .Media { background-color: rgb(255 193 7 / 20%); color: #ffd86b; }
 }
 
 // ── Modale chat nel log ───────────────────────────────────────────────────────
