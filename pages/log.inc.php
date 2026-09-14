@@ -15,14 +15,10 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
 // condivisa/dinamica (rete mobile, CGNAT, wifi pubblico) invece di una vera
 // coincidenza — un IP usato solo da questi due personaggi resta un segnale forte
 // anche a distanza di mesi o anni, che un taglio temporale perderebbe.
-function probabilitaDoppio($ip) {
-    $ip_f = gdrcd_filter('in', $ip);
-    $row  = gdrcd_query("SELECT COUNT(DISTINCT Nome) AS n FROM log_entrate WHERE IP = '$ip_f'");
-    $n    = (int)($row['n'] ?? 0);
-
-    if ($n <= 2)     return ['label' => 'Alta',  'n' => $n];
-    elseif ($n <= 5) return ['label' => 'Media', 'n' => $n];
-    else             return ['label' => 'Bassa', 'n' => $n];
+function classificaProbabilitaDoppio($n) {
+    if ($n <= 2)     return 'Alta';
+    elseif ($n <= 5) return 'Media';
+    else             return 'Bassa';
 }
 ?>
 
@@ -196,7 +192,16 @@ function probabilitaDoppio($ip) {
             case 'doppi': //  ******************  PG DOPPI ******************
                 $pg = gdrcd_filter('in', $_GET['pg']);
                 $where = $pg != '' ? "WHERE Nome = '$pg' OR Doppio = '$pg'" : '';
-                $doppi = gdrcd_query("SELECT * FROM log_doppi $where ORDER BY DataEvento DESC", 'result'); ?>
+                $doppi = gdrcd_query("SELECT * FROM log_doppi $where ORDER BY DataEvento DESC", 'result');
+
+                // Conteggio "quanti personaggi distinti per IP" calcolato una sola volta
+                // per tutti gli IP coinvolti, invece di una query per ogni riga della
+                // tabella (era il vero collo di bottiglia: centinaia di scansioni di
+                // log_entrate ad ogni caricamento di questa pagina).
+                $ipCount = [];
+                $resIp = gdrcd_query('SELECT IP, COUNT(DISTINCT Nome) AS n FROM log_entrate GROUP BY IP', 'result');
+                while ($r = gdrcd_query($resIp, 'fetch')) { $ipCount[$r['IP']] = (int)$r['n']; }
+                ?>
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
@@ -213,13 +218,14 @@ function probabilitaDoppio($ip) {
                 <?php
                 $metodi = ['ip' => 'Stesso IP', 'dispositivo' => 'Stesso dispositivo'];
                 while ($row = gdrcd_query($doppi, 'fetch')) :
-                    $prob = probabilitaDoppio($row['IP']); ?>
+                    $n = $ipCount[$row['IP']] ?? 0;
+                    $probLabel = classificaProbabilitaDoppio($n); ?>
                     <tr>
                         <td><?=gdrcd_filter('out', $row['Nome'])?></td>
                         <td><?=gdrcd_filter('out', $row['Doppio'])?></td>
                         <td>
-                            <span class="status <?=$prob['label']?>" title="<?=$prob['n']?> personaggi distinti hanno usato questo IP">
-                                <?=$prob['label']?>
+                            <span class="status <?=$probLabel?>" title="<?=$n?> personaggi distinti hanno usato questo IP">
+                                <?=$probLabel?>
                             </span>
                         </td>
                         <td><?=$metodi[$row['Metodo']] ?? '—'?></td>
