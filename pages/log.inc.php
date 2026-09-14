@@ -194,11 +194,11 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
                 <tbody>
                 <?php while ($row = gdrcd_query($doppi, 'fetch')) : ?>
                     <tr>
-                        <td><?=$row['Nome']?></td>
-                        <td><?=$row['Doppio']?></td>
-                        <td><?=$row['IP']?></td>
-                        <td><?=$row['Host']?></td>
-                        <td><?=$row['Browser']?></td>
+                        <td><?=gdrcd_filter('out', $row['Nome'])?></td>
+                        <td><?=gdrcd_filter('out', $row['Doppio'])?></td>
+                        <td><?=gdrcd_filter('out', $row['IP'])?></td>
+                        <td><?=gdrcd_filter('out', $row['Host'])?></td>
+                        <td><?=gdrcd_filter('out', $row['Browser'])?></td>
                         <td><?=$row['DataEvento']?></td>
                     </tr>
                 <?php endwhile; ?>
@@ -217,9 +217,9 @@ $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
                 <tbody>
                 <?php while ($row = gdrcd_query($doppi, 'fetch')) : ?>
                     <tr>
-                        <td><?=$row['Nome']?></td>
-                        <td><?=$row['IP']?></td>
-                        <td><?=$row['Host']?></td>
+                        <td><?=gdrcd_filter('out', $row['Nome'])?></td>
+                        <td><?=gdrcd_filter('out', $row['IP'])?></td>
+                        <td><?=gdrcd_filter('out', $row['Host'])?></td>
                         <td><?=$row['DataEvento']?></td>
                     </tr>
                 <?php endwhile; ?>
