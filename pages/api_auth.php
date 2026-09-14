@@ -172,40 +172,68 @@ switch ($op) {
             }
         } catch (\Exception $e) { /* non critico */ }
 
-        // Tracciamento IP: log_entrate + rilevamento doppi account
+        // Tracciamento IP + dispositivo: log_entrate + rilevamento doppi account
         try {
             $ip_raw  = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'];
             $IP      = gdrcd_filter('in', $ip_raw);
             $Host    = gdrcd_filter('in', gethostbyaddr($ip_raw));
             $Browser = gdrcd_filter('in', $_SERVER['HTTP_USER_AGENT'] ?? '');
 
-            $last_doppio = gdrcd_query("SELECT Nome, COUNT(*) AS n FROM log_entrate WHERE IP = '$IP' AND Nome != '$login_filtered' ORDER BY DataEvento DESC LIMIT 1", 'query', true);
+            // Cookie di lunga durata (1 anno) con un ID casuale non legato al nome del
+            // personaggio: a differenza del vecchio cookie 'lastlogin' (sovrascritto ad
+            // ogni login, ricordava solo l'ultimo personaggio) sopravvive ai cambi di
+            // rete/IP e, tramite log_dispositivi, risale a TUTTI i personaggi mai
+            // passati da questo browser, non solo l'ultimo.
+            $deviceId = $_COOKIE['device_id'] ?? bin2hex(random_bytes(16));
+            setcookie('device_id', $deviceId, [
+                'expires'  => time() + 86400 * 365,
+                'path'     => '/',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+            $deviceIdF = gdrcd_filter('in', $deviceId);
+
+            // Due segnali indipendenti (IP e dispositivo), controllati ed eventualmente
+            // loggati ENTRAMBI: un match sull'uno non deve più nascondere l'altro come
+            // succedeva con il vecchio elseif. Query a riga singola (niente COUNT senza
+            // GROUP BY): la precedente pescava un Nome arbitrario quando dallo stesso IP
+            // erano passati più personaggi diversi, ORDER BY/LIMIT non avevano alcun
+            // effetto perché applicati dopo che l'aggregazione aveva già collassato il
+            // risultato in un'unica riga.
+            $altroPerIp = gdrcd_query("SELECT Nome FROM log_entrate WHERE IP = '$IP' AND Nome != '$login_filtered' ORDER BY DataEvento DESC LIMIT 1", 'query', true);
+            $altroPerDispositivo = gdrcd_query("SELECT Nome FROM log_dispositivi WHERE device_id = '$deviceIdF' AND Nome != '$login_filtered' ORDER BY DataEvento DESC LIMIT 1", 'query', true);
 
             // Funzioni inline per evitare die() nei log_doppi
-            $log_doppio_esiste = function(string $n1, string $n2, string $ip) use ($IP): int|false {
+            $log_doppio_esiste = function(string $n1, string $n2, string $ip, string $metodo): int|false {
                 $n1f = gdrcd_filter('in', $n1);
                 $n2f = gdrcd_filter('in', $n2);
-                $r   = gdrcd_query("SELECT id FROM log_doppi WHERE ((Nome='$n1f' AND Doppio='$n2f') OR (Nome='$n2f' AND Doppio='$n1f')) AND IP='" . gdrcd_filter('in', $ip) . "' LIMIT 1", 'result', true);
+                $mf  = gdrcd_filter('in', $metodo);
+                $r   = gdrcd_query("SELECT id FROM log_doppi WHERE ((Nome='$n1f' AND Doppio='$n2f') OR (Nome='$n2f' AND Doppio='$n1f')) AND IP='" . gdrcd_filter('in', $ip) . "' AND Metodo='$mf' LIMIT 1", 'result', true);
                 $row = gdrcd_query($r, 'fetch');
                 gdrcd_query($r, 'free');
                 return $row ? (int)$row['id'] : false;
             };
 
-            $logga_doppio = function(string $pg1, string $pg2, string $ip, string $host, string $browser) use ($log_doppio_esiste): void {
-                $id = $log_doppio_esiste($pg1, $pg2, $ip);
+            $logga_doppio = function(string $pg1, string $pg2, string $ip, string $host, string $browser, string $metodo) use ($log_doppio_esiste): void {
+                $id = $log_doppio_esiste($pg1, $pg2, $ip, $metodo);
                 if ($id !== false) {
                     gdrcd_query("UPDATE log_doppi SET DataEvento = NOW() WHERE id = $id", 'query', true);
                 } else {
-                    gdrcd_query("INSERT INTO log_doppi (Nome, Doppio, IP, Host, Browser, DataEvento) VALUES ('" . gdrcd_filter('in', $pg1) . "','" . gdrcd_filter('in', $pg2) . "','$ip','$host','$browser', NOW())", 'query', true);
+                    gdrcd_query("INSERT INTO log_doppi (Nome, Doppio, IP, Host, Browser, DataEvento, Metodo) VALUES ('" . gdrcd_filter('in', $pg1) . "','" . gdrcd_filter('in', $pg2) . "','$ip','$host','$browser', NOW(), '" . gdrcd_filter('in', $metodo) . "')", 'query', true);
                 }
             };
 
-            if (isset($_COOKIE['lastlogin']) && $_COOKIE['lastlogin'] !== $_SESSION['login']) {
-                $logga_doppio($_SESSION['login'], $_COOKIE['lastlogin'], $IP, $Host, $Browser);
-            } elseif (!empty($last_doppio['n'])) {
-                $logga_doppio($_SESSION['login'], $last_doppio['Nome'], $IP, $Host, $Browser);
+            if (!empty($altroPerIp['Nome'])) {
+                $logga_doppio($_SESSION['login'], $altroPerIp['Nome'], $IP, $Host, $Browser, 'ip');
             }
-            setcookie('lastlogin', $_SESSION['login'], time() + (86400 * 30), '/');
+            if (!empty($altroPerDispositivo['Nome'])) {
+                $logga_doppio($_SESSION['login'], $altroPerDispositivo['Nome'], $IP, $Host, $Browser, 'dispositivo');
+            }
+
+            // Registra questo dispositivo per questo personaggio (upsert: se la coppia
+            // esiste già aggiorna solo la data dell'ultimo utilizzo).
+            gdrcd_query("INSERT INTO log_dispositivi (device_id, Nome, DataEvento) VALUES ('$deviceIdF', '$login_filtered', NOW())
+                         ON DUPLICATE KEY UPDATE DataEvento = NOW()", 'query', true);
 
             // Ogni login viene registrato, senza deduplica per finestra di 24h/IP ripetuto
             // (rimossa su richiesta esplicita: l'elenco accessi deve riflettere ogni accesso

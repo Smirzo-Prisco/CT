@@ -202,14 +202,17 @@ function probabilitaDoppio($ip) {
                         <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
                         <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> Doppio</th>
                         <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Probabilità</th>
-                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> IP</th>
-                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Host</th>
-                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Browser</th>
-                        <th onclick="sortTable(6)"><i class="fa-solid fa-sort"></i> Data</th>
+                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> Rilevato da</th>
+                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> IP</th>
+                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Host</th>
+                        <th onclick="sortTable(6)"><i class="fa-solid fa-sort"></i> Browser</th>
+                        <th onclick="sortTable(7)"><i class="fa-solid fa-sort"></i> Data</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php while ($row = gdrcd_query($doppi, 'fetch')) :
+                <?php
+                $metodi = ['ip' => 'Stesso IP', 'dispositivo' => 'Stesso dispositivo'];
+                while ($row = gdrcd_query($doppi, 'fetch')) :
                     $prob = probabilitaDoppio($row['IP']); ?>
                     <tr>
                         <td><?=gdrcd_filter('out', $row['Nome'])?></td>
@@ -219,6 +222,7 @@ function probabilitaDoppio($ip) {
                                 <?=$prob['label']?>
                             </span>
                         </td>
+                        <td><?=$metodi[$row['Metodo']] ?? '—'?></td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
                         <td><?=gdrcd_filter('out', $row['Host'])?></td>
                         <td><?=gdrcd_filter('out', $row['Browser'])?></td>
