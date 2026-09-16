@@ -410,29 +410,43 @@ function gestisciSkillTemporanea($magia, $login) {
 }
 
 function assegnaPuntoShin($luogo, $login) {
-    $result_exp = gdrcd_query("SELECT count_exp, last_date_shin FROM personaggio WHERE nome = '$login'");
-    $count_exp = $result_exp['count_exp'];
-    $last_date_exp = new DateTime($result_exp['last_date_shin']);
+    $login_f = gdrcd_filter('in', $login);
 
-    $current = new DateTime('now');
-    $new_day = new DateTime('today 7:00');
+    // La finestra di conteggio è la giocata in corso in questa stanza (stesso criterio
+    // di locationActiveRole(), usato ovunque in api_chat.php per trovarla), non più un
+    // intervallo di tempo fisso: regge sia giocate brevi che lunghe senza perdere le
+    // abilità lanciate a inizio giocata né continuare a contare dopo la sua fine.
+    $id_role = locationActiveRole($luogo);
+    if (!$id_role) return; // Nessuna giocata in corso: nessun punto shin automatico da valutare.
 
-    if ($current < $new_day) $new_day->modify('-1 day');
+    $role = gdrcd_query("SELECT start FROM role_sessions WHERE id_role = $id_role");
+    if (!$role) return;
 
-    $check_actions = gdrcd_query("SELECT * FROM chat WHERE stanza = '$luogo' AND mittente = '$login' AND tipo = 'C' 
-        AND (testo LIKE '%usa la skill generica%' OR 
-             testo LIKE '%usa la skill di attacco%' OR
-             testo LIKE '%usa la skill mentale%' OR
-             testo LIKE '%usa la skill difensiva%' OR
-             testo LIKE '%usa la skill potere speciale%' OR
-             testo LIKE '%usa la skill di default%')
-        AND DATE_ADD(ora, INTERVAL 12 HOUR) >= NOW()", 'result');
+    $result_pg = gdrcd_query("SELECT last_date_shin FROM personaggio WHERE nome = '$login_f'");
+    // NULL (pg che non ha mai ricevuto uno shin automatico) va trattato come "nessun
+    // precedente", non come "adesso": new DateTime(null) equivarrebbe a 'now' e
+    // bloccherebbe di fatto il primissimo punto shin di un personaggio nuovo.
+    $last_date_shin = $result_pg['last_date_shin'] ? new DateTime($result_pg['last_date_shin']) : null;
+    $inizio_giocata = new DateTime($role['start']);
 
-    // Do il punto shin se il pg ha lanciato più di due skill
-    if ((gdrcd_query($check_actions, 'num_rows') > 2) && ($last_date_exp < $new_day)) {
-        $nome_luogo = gdrcd_query("SELECT nome FROM mappa WHERE id = '$luogo'");
+    // Già premiato in QUESTA giocata? last_date_shin traccia l'ultimo punto shin
+    // automatico ricevuto: se è successivo (o pari) all'inizio della giocata corrente,
+    // il pg lo ha già ottenuto qui e non va assegnato una seconda volta.
+    if ($last_date_shin !== null && $last_date_shin >= $inizio_giocata) return;
+
+    // Conta i lanci di QUALSIASI tipo di abilità (generica, di attacco, mentale,
+    // difensiva, potere speciale, default, fisica, e ogni categoria futura): tutti i
+    // messaggi di lancio abilità iniziano con "usa la skill", al posto del precedente
+    // elenco chiuso di diciture che escludeva per omissione "skill fisica".
+    $inizio_giocata_f = gdrcd_filter('in', $role['start']);
+    $check_actions = gdrcd_query("SELECT * FROM chat WHERE stanza = '$luogo' AND mittente = '$login_f' AND tipo = 'C'
+        AND testo LIKE '%usa la skill%'
+        AND ora >= '$inizio_giocata_f'", 'result');
+
+    // Do il punto shin se il pg ha lanciato più di due abilità in questa giocata
+    if (gdrcd_query($check_actions, 'num_rows') > 2) {
         chatInsertMessage($luogo, 'System', $login, 'Punto shin assegnato', 'Q');
-        gdrcd_query("UPDATE personaggio SET shin = shin + 1, last_date_shin = NOW() WHERE nome = '$login' LIMIT 1");
+        gdrcd_query("UPDATE personaggio SET shin = shin + 1, last_date_shin = NOW() WHERE nome = '$login_f' LIMIT 1");
     }
 }
 
