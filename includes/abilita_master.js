@@ -86,6 +86,7 @@ if (assegnaForm) {
                 if (data.success) {
                     showNotification(data.message, 'success');
                     if (modalAssegnaAbilita) modalAssegnaAbilita.style.display = 'none';
+                    window.location.reload(); // aggiorna la colonna "Assegnatario"
                 } else {
                     showNotification('Errore nell\'assegnazione: ' + data.message, 'error');
                 }

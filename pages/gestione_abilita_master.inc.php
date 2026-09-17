@@ -13,7 +13,19 @@ if (!hasPermesso($_SESSION, $permessi_azioni['gestisci'])) {
 } elseif ($PARAMETERS['mode']['skillsystem'] == 'OFF') {
     echo '<div class="warning">' . gdrcd_filter('out', $MESSAGE['warning']['unactive']) . '</div>';
 } else {
-    $skills = gdrcd_query("SELECT id_abilita, nome, descrizione FROM abilita WHERE tipo = 'Skill temporanea' ORDER BY nome ASC", 'result');
+    // GROUP_CONCAT invece di una query per riga: con N skill temporanee, una
+    // sola query invece di N per sapere chi le ha in mano (stesso principio del
+    // fix N+1 sulla tab Doppi in log.inc.php).
+    $skills = gdrcd_query(
+        "SELECT a.id_abilita, a.nome, a.descrizione,
+                GROUP_CONCAT(CONCAT(cpa.nome, ' (', cpa.usi, ' usi)') ORDER BY cpa.nome SEPARATOR ', ') AS assegnatari
+         FROM abilita a
+         LEFT JOIN clgpersonaggioabilita cpa ON cpa.id_abilita = a.id_abilita
+         WHERE a.tipo = 'Skill temporanea'
+         GROUP BY a.id_abilita
+         ORDER BY a.nome ASC",
+        'result'
+    );
     $personaggi = gdrcd_query("SELECT nome FROM personaggio WHERE esperienza > 0 ORDER BY nome ASC", 'result');
 ?>
 
@@ -61,6 +73,7 @@ if (!hasPermesso($_SESSION, $permessi_azioni['gestisci'])) {
             <tr>
                 <th class="gp-th-name">Nome</th>
                 <th>Descrizione</th>
+                <th>Assegnatario</th>
                 <th class="gp-th-actions">Azioni</th>
             </tr>
         </thead>
@@ -70,6 +83,7 @@ if (!hasPermesso($_SESSION, $permessi_azioni['gestisci'])) {
             <tr>
                 <td class="gp-cell--name"><?= gdrcd_filter('out', $skill['nome']) ?></td>
                 <td><?= mb_substr(gdrcd_filter('out', $skill['descrizione']), 0, 140, 'UTF-8') ?></td>
+                <td><?= $skill['assegnatari'] !== null ? gdrcd_filter('out', $skill['assegnatari']) : '<span class="gp-empty-inline">—</span>' ?></td>
                 <td class="gp-cell--actions">
                     <div class="gp-actions">
                         <button type="button" class="btn-action btn-action--edit btn-action--icon"
@@ -93,7 +107,7 @@ if (!hasPermesso($_SESSION, $permessi_azioni['gestisci'])) {
             <?php endwhile; ?>
             <?php else: ?>
             <tr>
-                <td colspan="3" class="gp-empty">Nessuna skill temporanea creata finora.</td>
+                <td colspan="4" class="gp-empty">Nessuna skill temporanea creata finora.</td>
             </tr>
             <?php endif; ?>
         </tbody>

@@ -94,7 +94,7 @@ function classificaProbabilitaDoppio($n) {
                 <tbody>
                 <?php while ($row = gdrcd_query($chatbot_log, 'fetch')) : ?>
                     <tr>
-                        <td><?=gdrcd_filter('out', $row['nome_personaggio'])?></td>
+                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['nome_personaggio'])?>"><?=gdrcd_filter('out', $row['nome_personaggio'])?></a></td>
                         <td><?=gdrcd_filter('out', $row['domanda'])?></td>
                         <td><?=gdrcd_filter('out', $row['risposta'])?></td>
                         <td style="text-align:right;"><?=$row['tokens_usati']?></td>
@@ -221,8 +221,8 @@ function classificaProbabilitaDoppio($n) {
                     $n = $ipCount[$row['IP']] ?? 0;
                     $probLabel = classificaProbabilitaDoppio($n); ?>
                     <tr>
-                        <td><?=gdrcd_filter('out', $row['Nome'])?></td>
-                        <td><?=gdrcd_filter('out', $row['Doppio'])?></td>
+                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
+                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Doppio'])?>"><?=gdrcd_filter('out', $row['Doppio'])?></a></td>
                         <td>
                             <span class="status <?=$probLabel?>" title="<?=$n?> personaggi distinti hanno usato questo IP">
                                 <?=$probLabel?>
@@ -250,7 +250,7 @@ function classificaProbabilitaDoppio($n) {
                 <tbody>
                 <?php while ($row = gdrcd_query($doppi, 'fetch')) : ?>
                     <tr>
-                        <td><?=gdrcd_filter('out', $row['Nome'])?></td>
+                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
                         <td><?=gdrcd_filter('out', $row['Host'])?></td>
                         <td><?=$row['DataEvento']?></td>
@@ -288,7 +288,7 @@ function classificaProbabilitaDoppio($n) {
                 ?>
                     <tr <?=$errore ? ' style="background-color: rgba(255, 0, 0, 0.2);"' : ''?>>
                         <td style="text-align:right;"><?=$row['riga']?></td>
-                        <td><?=$row['nome']?></td>
+                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['nome'])?>"><?=gdrcd_filter('out', $row['nome'])?></a></td>
                         <td style="text-align:right;"><?=$row['tot_xp']-50?></td>
                         <td style="text-align:right;"><?=$row['tot_shin']?></td>
                         <td style="text-align:right;"><?=$row['punto_skill']?></td>

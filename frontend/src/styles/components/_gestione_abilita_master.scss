@@ -6,15 +6,20 @@
 @use '../tokens' as *;
 
 // Descrizione resta l'unica colonna "auto": beneficia di piu' spazio,
-// Azioni ha contenuto a larghezza fissa (icone) — stesso principio di
-// .gp-table--oggetti.
+// Assegnatario/Azioni hanno contenuto a larghezza piu' prevedibile — stesso
+// principio di .gp-table--oggetti.
 .gp-table--abilita {
-    th:nth-child(1), td:nth-child(1) { width: 200px; }
-    th:nth-child(3), td:nth-child(3) { width: 140px; }
+    th:nth-child(1), td:nth-child(1) { width: 180px; }
+    th:nth-child(3), td:nth-child(3) { width: 180px; }
+    th:nth-child(4), td:nth-child(4) { width: 140px; }
 }
 
 .gp-empty {
     text-align: center;
     padding: $space-5;
+    color: $color-text-muted;
+}
+
+.gp-empty-inline {
     color: $color-text-muted;
 }
