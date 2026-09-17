@@ -138,10 +138,52 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
         
             case 'deleteEsiliati':  // Elimino tutti i pg esiliati
             $queryDelete = gdrcd_query("DELETE FROM personaggio WHERE esilio != '0000-00-00' AND esilio IS NOT NULL");
-            
+
             if ($queryDelete) echo json_encode(['success' => true, 'message' => 'Personaggi esiliati eliminati con successo']);
             else echo json_encode(['success' => false, 'message' => 'Errore nella cancellazione']);
 
+            break;
+        case 'deletePg':  // Admin: cancellazione fisica e irreversibile di un personaggio
+            // Stessa logica delle pagine legacy erase_pg.inc.php / erasepg_scelta.inc.php /
+            // erase_inactive.inc.php, richiamata via AJAX invece che con una form POST che
+            // portava fuori dalla SPA (gestione_personaggio.inc.php navigava a
+            // main.php?page=erasepg_scelta). log_entrate e log_doppi NON vengono cancellati:
+            // sono lo storico usato per il rilevamento doppi account.
+            if (($_SESSION['admin'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+            $nome = isset($data['pg']) ? gdrcd_filter('in', trim($data['pg'])) : '';
+            if ($nome === '') {
+                echo json_encode(['success' => false, 'message' => 'Nome mancante']);
+                break;
+            }
+            if ($nome === $_SESSION['login']) {
+                echo json_encode(['success' => false, 'message' => 'Non puoi cancellare il tuo stesso personaggio']);
+                break;
+            }
+
+            gdrcd_query("DELETE FROM personaggio WHERE nome = '$nome'");
+            gdrcd_query("DELETE FROM appuntamenti WHERE autore = '$nome'");
+            gdrcd_query("DELETE FROM BakCalendario WHERE Destinatario = '$nome'");
+            gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE nome = '$nome'");
+            gdrcd_query("DELETE FROM clgpersonaggiooggetto WHERE nome = '$nome'");
+            gdrcd_query("DELETE FROM clgpersonaggioruolo WHERE personaggio = '$nome'");
+            gdrcd_query("DELETE FROM clgpersonaggiomestiere WHERE personaggio = '$nome'");
+            gdrcd_query("DELETE FROM clgpersonaggiolavoro WHERE personaggio = '$nome'");
+            gdrcd_query("DELETE FROM clgpersonaggioinclinazione WHERE personaggio = '$nome'");
+            gdrcd_query("DELETE FROM clgpersonaggiomostrine WHERE nome = '$nome'");
+            gdrcd_query("DELETE FROM log WHERE nome_interessato = '$nome'");
+            gdrcd_query("DELETE FROM messaggi WHERE destinatario = '$nome'");
+            gdrcd_query("DELETE FROM messaggi WHERE mittente = '$nome'");
+            gdrcd_query("DELETE FROM privilegi WHERE nome = '$nome'");
+            gdrcd_query("DELETE FROM Punti WHERE nome = '$nome'");
+            gdrcd_query("DELETE FROM araldo_letto WHERE nome = '$nome'");
+            gdrcd_query("DELETE FROM struttura_affetti WHERE username = '$nome'");
+            gdrcd_query("DELETE FROM log_spesa WHERE nome = '$nome'");
+
+            echo json_encode(['success' => true, 'message' => "$nome cancellato definitivamente"]);
             break;
         case 'resetPg':  // Tolgo al pg tutti i punti shin, le skill e i talenti acquistati
             // Se non viene specificato alcun personaggio, agisco su tutti i personaggi del sistema

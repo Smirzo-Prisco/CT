@@ -286,6 +286,25 @@ function ripristinaPg(nome) {
             showNotification('Errore durante il ripristino', 'error');
         });
 }
+// Cancellazione fisica e irreversibile di un singolo personaggio. Sostituisce la
+// vecchia form POST verso main.php?page=erasepg_scelta, che portava fuori dalla SPA.
+function eliminaPg(nome) {
+    if (!confirm('Eliminare definitivamente ' + nome + '? Operazione irreversibile.')) return;
+    fetch(ns_personaggio.api_file + '?' + ns_personaggio.param + '=deletePg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pg: nome })
+    })
+        .then(response => response.json())
+        .then(data => {
+            showNotification(data.message, data.success ? 'success' : 'error');
+            if (data.success) window.location.reload();
+        })
+        .catch(error => {
+            console.error('Errore durante la cancellazione:', error);
+            showNotification('Errore durante la cancellazione', 'error');
+        });
+}
 
 // Reset punti personaggio
 function resetPg(pgs) {

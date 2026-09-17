@@ -218,15 +218,11 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                             <?php endif; ?>
 
                             <?php if (hasPermesso($_SESSION, $permessi_azioni['cancella']) && $_SESSION['login'] !== $pg['nome']): ?>
-                            <form action="main.php?page=erasepg_scelta" method="POST">
-                                <input type="hidden" name="op"  value="delete">
-                                <input type="hidden" name="pg"  value="<?= $pg['nome'] ?>">
-                                <button type="submit" class="btn-action btn-action--delete btn-action--icon"
-                                        title="Elimina definitivamente"
-                                        onclick="return confirm('Eliminare definitivamente <?= addslashes($pg['nome']) ?>? Operazione irreversibile.')">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
+                            <button class="btn-action btn-action--delete btn-action--icon"
+                                    title="Elimina definitivamente"
+                                    onclick="eliminaPg('<?= addslashes($pg['nome']) ?>')">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                             <?php endif; ?>
 
                             <?php if ($isDeleted && hasPermesso($_SESSION, $permessi_azioni['ripristina'])): ?>
