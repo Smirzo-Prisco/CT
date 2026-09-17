@@ -88,27 +88,13 @@
                         <div class='form_field'>
                             <textarea name="descrizione"><?php echo $loaded_record['descrizione']; ?></textarea>
                         </div>
-                        <div class='form_label'>
-                            <?php echo 'Liv. max'; ?>
-                        </div>
-                        <div class='form_field'>
-                            <select name='max_lvl'>
-                                <option value="0" <?php if($loaded_record['max_lvl'] == 0) { echo 'SELECTED'; } ?>>
-                                    0</option>
-                                <option value="1" <?php if($loaded_record['max_lvl'] == 1) { echo 'SELECTED'; } ?>>
-                                    1</option>
-                                <option value="2" <?php if($loaded_record['max_lvl'] == 2) { echo 'SELECTED'; } ?>>
-                                    2</option>
-                                <option value="3" <?php if($loaded_record['max_lvl'] == 3) { echo 'SELECTED'; } ?>>
-                                    3</option>
-                                <option value="4" <?php if($loaded_record['max_lvl'] == 4) { echo 'SELECTED'; } ?>>
-                                    4</option>
-                                <option value="5" <?php if($loaded_record['max_lvl'] == 5) { echo 'SELECTED'; } ?>>
-                                    5</option>
-                            </select>
-                        </div>
+                        <?php /* Skill temporanee (l'unico tipo gestito da questa pagina) sono sempre
+                                 assegnate a grado fisso 1, mai comprate/livellate via mercato_abilita
+                                 — max_lvl non ha quindi alcun effetto sull'acquisto, ma resta usato in
+                                 sola lettura sulla scheda pg ("Livello attuale: grado/max_lvl"). Fisso
+                                 a 1 invece di lasciarlo scegliere (default 0) per non mostrare "1/0". */ ?>
+                        <input type="hidden" name="max_lvl" value="1" />
 
-                        
                         <!-- bottoni -->
                         <div class='form_submit'>
                             <?php /* Se l'operazione è una modifica stampo i tasti modifica e annulla */
