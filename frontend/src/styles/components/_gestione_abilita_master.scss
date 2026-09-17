@@ -1,0 +1,20 @@
+// ============================================================
+// _gestione_abilita_master.scss — Pannello admin skill temporanee
+// Riusa .gp-topbar/.gp-list/.pg-edit-container/.form-section/.form-group/
+// .gp-legend da _gestione.scss; qui solo le larghezze di colonna.
+// ============================================================
+@use '../tokens' as *;
+
+// Descrizione resta l'unica colonna "auto": beneficia di piu' spazio,
+// Azioni ha contenuto a larghezza fissa (icone) — stesso principio di
+// .gp-table--oggetti.
+.gp-table--abilita {
+    th:nth-child(1), td:nth-child(1) { width: 200px; }
+    th:nth-child(3), td:nth-child(3) { width: 140px; }
+}
+
+.gp-empty {
+    text-align: center;
+    padding: $space-5;
+    color: $color-text-muted;
+}
