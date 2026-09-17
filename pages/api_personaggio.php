@@ -137,6 +137,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
         
             case 'deleteEsiliati':  // Elimino tutti i pg esiliati
+            // Stesso permesso richiesto dal bottone in gestione_personaggio.inc.php
+            // ($permessi_azioni['cancella'] = ['admin']), mancante finora qui: chiunque
+            // fosse autenticato poteva chiamare questo op direttamente.
+            if (($_SESSION['admin'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
             $queryDelete = gdrcd_query("DELETE FROM personaggio WHERE esilio != '0000-00-00' AND esilio IS NOT NULL");
 
             if ($queryDelete) echo json_encode(['success' => true, 'message' => 'Personaggi esiliati eliminati con successo']);
@@ -186,6 +194,14 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             echo json_encode(['success' => true, 'message' => "$nome cancellato definitivamente"]);
             break;
         case 'resetPg':  // Tolgo al pg tutti i punti shin, le skill e i talenti acquistati
+            // Stesso permesso richiesto dal bottone in gestione_personaggio.inc.php
+            // ($permessi_azioni['reset'] = ['admin']), mancante finora qui — critico perché
+            // senza $data['pgs'] questo op azzera TUTTI i personaggi del sistema.
+            if (($_SESSION['admin'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
             // Se non viene specificato alcun personaggio, agisco su tutti i personaggi del sistema
             $pgs = isset($data['pgs']) && is_array($data['pgs']) && count($data['pgs']) > 0 ? $data['pgs'] : gdrcd_query("SELECT * FROM personaggio ORDER BY nome ASC", 'result');
 
