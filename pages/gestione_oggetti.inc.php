@@ -45,6 +45,10 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
                         LEFT JOIN codtipooggetto ON oggetto.tipo = codtipooggetto.cod_tipo
                         $where
                         ORDER BY nome ASC", 'result');
+
+// Per la modale "Assegna" — stessa lista di personaggi (nessun filtro) gia'
+// usata in oggetto_assegna.inc.php.
+$personaggiAssegna = gdrcd_query("SELECT nome FROM personaggio ORDER BY nome ASC", 'result');
 ?>
 
 
@@ -135,10 +139,13 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
           <?php if (hasPermesso($_SESSION, $azioni_permessi['cancella']) || $mestiere == $obj['tipo']): ?>
             <button type="submit" class="btn-action btn-action--icon btn-action--delete" title="Elimina" onclick="deleteObj(<?=$obj['id_oggetto']?>)"><i class="fa-solid fa-trash"></i></button>
           <?php endif; ?>
-          <?php if (hasPermesso($_SESSION, $azioni_permessi['assegna']) || $obj['descrizione'] == $_SESSION['login'] || $mestiere == $obj['tipo']): ?>
-            <form action="main.php?page=oggetto_assegna" method="POST">
-              <button type="submit" class="btn-action btn-action--icon btn-action--members" title="Assegna"><i class="fa-solid fa-user-plus"></i></button>
-            </form>
+          <?php /* canEditOggetto() invece della vecchia condizione ad-hoc (confrontava
+                   $obj['descrizione'] col login, probabilmente un refuso per 'creatore':
+                   canEditOggetto() è la stessa regola già usata per Modifica in saveObj
+                   lato server, qui riusata anche per Assegna così i due lati restano
+                   coerenti — vedi case 'assegnaObj' in api_oggetto.php). */ ?>
+          <?php if (canEditOggetto($obj)): ?>
+            <button type="button" class="btn-action btn-action--icon btn-action--members" title="Assegna" onclick="apriModaleAssegnaObj(<?= $obj['id_oggetto'] ?>, '<?= addslashes($obj['nome']) ?>')"><i class="fa-solid fa-user-plus"></i></button>
           <?php endif; ?>
 
           <?php if (hasPermesso($_SESSION, $azioni_permessi['approva']) && $obj['richiesto'] == 2): ?>
@@ -382,3 +389,41 @@ $oggetti = gdrcd_query("SELECT oggetto.*, codtipooggetto.descrizione AS desc_tip
     </div>
 </div>
 <!-- FINE Form di creazione e di modifica -->
+
+<!-- Form di assegnazione oggetto a uno o più personaggi -->
+<div class="pg-edit-container" role="dialog" aria-modal="true" id="assegnaOggettoModal">
+    <div class="modal-content">
+        <div class="gp-modal-header">
+            <h2 class="gp-modal-title"><i class="fa-solid fa-user-plus"></i> Assegna — <span id="assegnaOggettoNome">…</span></h2>
+            <div class="gp-modal-header-actions">
+                <button type="button" class="gp-modal-close" id="closeAssegnaOggetto" aria-label="Chiudi">✕</button>
+            </div>
+        </div>
+        <form id="assegnaOggettoForm">
+            <input type="hidden" name="id_oggetto" id="assegna_id_oggetto">
+
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="assegna_personaggi">Personaggi (selezione multipla)</label>
+                    <select name="personaggi[]" id="assegna_personaggi" multiple size="8" required>
+                        <?php while ($pg = gdrcd_query($personaggiAssegna, 'fetch')): ?>
+                        <option value="<?= gdrcd_filter('out', $pg['nome']) ?>"><?= gdrcd_filter('out', $pg['nome']) ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="assegna_num_oggetti">Numero di oggetti da assegnare</label>
+                    <input type="number" name="num_oggetti" id="assegna_num_oggetti" value="1" min="1">
+                </div>
+            </div>
+        </form>
+
+        <div class="gp-modal-footer">
+            <button type="button" class="btn btn--ghost" onclick="document.getElementById('assegnaOggettoModal').style.display = 'none';">Annulla</button>
+            <button type="submit" form="assegnaOggettoForm" class="btn-action btn-action--members">
+                <i class="fa-solid fa-user-plus"></i> Assegna
+            </button>
+        </div>
+    </div>
+</div>
+<!-- FINE Form di assegnazione -->

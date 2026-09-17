@@ -118,6 +118,72 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             else echo json_encode(['error' => false, 'message' => 'Errore nella cancellazione']);
 
             break;
+        case 'assegnaObj':  // Assegna un oggetto a uno o più personaggi (ex oggetto_assegna.inc.php,
+            // ora richiamato in modale dalla riga dell'oggetto invece che da una pagina a sé)
+            $id_oggetto = (int)($_POST['id_oggetto'] ?? 0);
+            $personaggi = $_POST['personaggi'] ?? [];
+            $num_oggetti = (int)($_POST['num_oggetti'] ?? 1);
+
+            if ($id_oggetto <= 0 || empty($personaggi) || $num_oggetti < 1) {
+                echo json_encode(['success' => false, 'message' => 'Dati mancanti o non validi']);
+                break;
+            }
+
+            $oggetto = gdrcd_query("SELECT tipo, categoria, cariche, isTemp, temp_giorni, ricarica_massima, creatore FROM oggetto WHERE id_oggetto = $id_oggetto");
+            if (!$oggetto) {
+                echo json_encode(['success' => false, 'message' => 'Oggetto non trovato']);
+                break;
+            }
+
+            // Stessa regola di canEditOggetto() (custom_functions.inc.php): chi può
+            // modificare un oggetto può anche assegnarlo. Riusata qui invece di
+            // ripetere la logica ad-hoc che c'era in oggetto_assegna.inc.php (solo
+            // mestiere Magic Shop hardcoded, non generalizzata su ogni mestiere con
+            // un "negozio" tramite getTipoOggettoMestiere()).
+            if (!canEditOggetto($oggetto)) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti per assegnare questo oggetto']);
+                break;
+            }
+
+            // Stessa logica cariche di oggetto_assegna.inc.php, per categoria
+            switch ($oggetto['categoria']) {
+                case 'arma':
+                    $cariche = ((int)$oggetto['tipo'] === 15) ? -1 : (int)$oggetto['ricarica_massima']; // 15 = Arma di Gilda, cariche infinite
+                    break;
+                case 'statistica': $cariche = (int)$oggetto['ricarica_massima']; break;
+                case 'curativo':
+                case 'magico':     $cariche = (int)$oggetto['cariche']; break;
+                case 'standard':   $cariche = ($oggetto['cariche'] == 'illimitato') ? -1 : (int)$oggetto['cariche']; break;
+                default:           $cariche = 0;
+            }
+
+            $isTemp = $oggetto['isTemp'];
+            $temp_giorni = $oggetto['temp_giorni'];
+            $assegnati = 0;
+
+            foreach ($personaggi as $pg) {
+                $pg_f = gdrcd_filter('in', trim($pg));
+                if ($pg_f === '') continue;
+
+                $check = gdrcd_query("SELECT id_oggetto FROM clgpersonaggiooggetto WHERE id_oggetto = $id_oggetto AND nome = '$pg_f'", 'result');
+
+                if (gdrcd_query($check, 'num_rows') > 0) {
+                    // Già posseduto: ricarica solo se scarico, non tocca il numero
+                    $dati_pg_oggetto = gdrcd_query("SELECT cariche FROM clgpersonaggiooggetto WHERE id_oggetto = $id_oggetto AND nome = '$pg_f'");
+                    if ($dati_pg_oggetto['cariche'] == 0) {
+                        gdrcd_query("UPDATE clgpersonaggiooggetto SET cariche = $cariche WHERE id_oggetto = $id_oggetto AND nome = '$pg_f'");
+                    }
+                } else {
+                    gdrcd_query("INSERT INTO clgpersonaggiooggetto (nome, id_oggetto, cariche, numero, isTemp, temp_giorni)
+                                VALUES ('$pg_f', $id_oggetto, $cariche, $num_oggetti, $isTemp, $temp_giorni)");
+                }
+                gdrcd_query($check, 'free');
+                $assegnati++;
+            }
+
+            echo json_encode(['success' => true, 'message' => "Oggetto assegnato a $assegnati personaggi con successo"]);
+            break;
         case 'buyObj':  // Acquisto oggetti dal mercato
             $id_oggetto = $data['id_oggetto'];
             $user = $data['user'];

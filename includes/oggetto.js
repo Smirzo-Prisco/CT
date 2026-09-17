@@ -7,6 +7,17 @@ const ns_oggetti = {
 // Variabili globali oggetto
 let modalObj = null;
 let isEditMode = false;
+let modalAssegnaObj = null;
+
+// Apertura modale ASSEGNA — l'oggetto è già noto (riga di partenza), restano da
+// scegliere personaggi e quantità.
+function apriModaleAssegnaObj(idOggetto, nomeOggetto) {
+    document.getElementById('assegnaOggettoNome').textContent = nomeOggetto;
+    document.getElementById('assegna_id_oggetto').value = idOggetto;
+    document.getElementById('assegnaOggettoForm').reset();
+    document.getElementById('assegna_id_oggetto').value = idOggetto; // il reset sopra lo svuota
+    modalAssegnaObj.style.display = 'flex';
+}
 
 function gestioneCampiDinamici(categoriaObj) {
     const categoria = categoriaObj.value;
@@ -303,6 +314,33 @@ if (oggettoForm) {
     });
 }
 
+// ASSEGNA oggetto a uno o più personaggi
+const assegnaOggettoForm = document.getElementById('assegnaOggettoForm');
+if (assegnaOggettoForm) {
+    assegnaOggettoForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        fetch(ns_oggetti.api_file + '?' + ns_oggetti.param + '=assegnaObj', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    if (modalAssegnaObj) modalAssegnaObj.style.display = 'none';
+                } else {
+                    showNotification('Errore nell\'assegnazione: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Errore nell\'assegnazione', 'error');
+            });
+    });
+}
+
 function deleteObj(idOggetto) {
     if (confirm('Sei sicuro di voler cancellare?') && idOggetto > 0) {
         fetch(ns_oggetti.api_file + '?' + ns_oggetti.param + '=deleteObj', {
@@ -426,6 +464,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Variabili globali oggetto
     modalObj = document.getElementById('oggettoModal');
+    modalAssegnaObj = document.getElementById('assegnaOggettoModal');
 
     // Gestione cambio categoria
     const categoriaObj = document.getElementById('categoriaObj');
@@ -436,9 +475,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (closeObj) closeObj.addEventListener('click', function () {
         if (modalObj) modalObj.style.display = 'none';
     });
+    const closeAssegnaOggetto = document.getElementById('closeAssegnaOggetto');
+    if (closeAssegnaOggetto) closeAssegnaOggetto.addEventListener('click', function () {
+        if (modalAssegnaObj) modalAssegnaObj.style.display = 'none';
+    });
     window.addEventListener('click', function (e) {
         if (e.target == modalObj) {
             modalObj.style.display = 'none';
+        }
+        if (e.target == modalAssegnaObj) {
+            modalAssegnaObj.style.display = 'none';
         }
     });
 
