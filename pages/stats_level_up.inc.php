@@ -1,6 +1,6 @@
 <?php
 //carico tutto ciò di cui ho bisogno
-$abilita = gdrcd_query("SELECT clgpersonaggioabilita.id_abilita, grado FROM clgpersonaggioabilita LEFT JOIN abilita ON clgpersonaggioabilita.id_abilita = abilita.id_abilita WHERE clgpersonaggioabilita.nome='".gdrcd_filter('in', $_SESSION['login'])."' AND abilita.tipo!='Talento' AND abilita.tipo!='Default' AND abilita.tipo!='Difesa' AND abilita.tipo!='Temporanea'", 'result');
+$abilita = gdrcd_query("SELECT clgpersonaggioabilita.id_abilita, grado FROM clgpersonaggioabilita LEFT JOIN abilita ON clgpersonaggioabilita.id_abilita = abilita.id_abilita WHERE clgpersonaggioabilita.nome='".gdrcd_filter('in', $_SESSION['login'])."' AND abilita.tipo!='Talento' AND abilita.tipo!='Default' AND abilita.tipo!='Difensiva' AND abilita.tipo!='Skill temporanea'", 'result');
 $info_pg = gdrcd_query("SELECT esperienza, esperienza_r, car0, car1, car2, car3, car4, car5, car6, car7, punto_skill FROM personaggio WHERE nome='".gdrcd_filter('in', $_SESSION['login'])."'");
 $id_ruolo_pg = gdrcd_query("SELECT id_ruolo FROM clgpersonaggioruolo WHERE personaggio='".gdrcd_filter('in', $_SESSION['login'])."'");
 $id_ruolo_pg = $id_ruolo_pg['id_ruolo'];
@@ -107,7 +107,7 @@ if((gdrcd_filter('get', $_REQUEST['op']) == 'addstat') && (($_SESSION['login'] =
     <div class="page_body">
     <?php 
     //ricalcolo per i valori aggiornati
-	$abilita = gdrcd_query("SELECT clgpersonaggioabilita.id_abilita, grado FROM clgpersonaggioabilita LEFT JOIN abilita ON clgpersonaggioabilita.id_abilita = abilita.id_abilita WHERE clgpersonaggioabilita.nome='".gdrcd_filter('in', $_SESSION['login'])."' AND abilita.tipo!='Talento' AND abilita.tipo!='Default' AND abilita.tipo!='Difesa' AND abilita.tipo!='Temporanea'", 'result');
+	$abilita = gdrcd_query("SELECT clgpersonaggioabilita.id_abilita, grado FROM clgpersonaggioabilita LEFT JOIN abilita ON clgpersonaggioabilita.id_abilita = abilita.id_abilita WHERE clgpersonaggioabilita.nome='".gdrcd_filter('in', $_SESSION['login'])."' AND abilita.tipo!='Talento' AND abilita.tipo!='Default' AND abilita.tipo!='Difensiva' AND abilita.tipo!='Skill temporanea'", 'result');
     $info_pg = gdrcd_query("SELECT esperienza, esperienza_r, car0, car1, car2, car3, car4, car5, car6, car7, punto_skill FROM personaggio WHERE nome='".gdrcd_filter('in', $_SESSION['login'])."'");
     $id_ruolo_pg = gdrcd_query("SELECT id_ruolo FROM clgpersonaggioruolo WHERE personaggio='".gdrcd_filter('in', $_SESSION['login'])."'");
     $id_ruolo_pg = $id_ruolo_pg['id_ruolo'];

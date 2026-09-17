@@ -15,7 +15,7 @@
             <?php /*Inserimento di un nuovo record*/
             if($_POST['op'] == 'insert') {
                 /*Eseguo l'inserimento*/
-                gdrcd_query("INSERT INTO abilita (nome, descrizione, max_lvl, id_razza, tipo) VALUES ('".gdrcd_filter('in', $_POST['nome'])."', '".gdrcd_filter('in', $_POST['descrizione'])."', ".gdrcd_filter('num', $_POST['max_lvl']).", '0', 'Temporanea')");
+                gdrcd_query("INSERT INTO abilita (nome, descrizione, max_lvl, id_razza, tipo) VALUES ('".gdrcd_filter('in', $_POST['nome'])."', '".gdrcd_filter('in', $_POST['descrizione'])."', ".gdrcd_filter('num', $_POST['max_lvl']).", '0', 'Skill temporanea')");
                 ?>
                 <div class="warning">
                     <?php echo gdrcd_filter('out', $MESSAGE['warning']['inserted']); ?>
@@ -50,7 +50,7 @@
             /*Modifica di un record*/
             if(gdrcd_filter('get', $_POST['op']) == 'modify') {
                 /*Eseguo l'aggiornamento*/
-                gdrcd_query("UPDATE abilita SET nome ='".gdrcd_filter('in', $_POST['nome'])."', descrizione ='".gdrcd_filter('in', $_POST['descrizione'])."', max_lvl = ".gdrcd_filter('num', $_POST['max_lvl']).", id_razza = '0', tipo = 'Temporanea' WHERE id_abilita = ".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1"); ?>
+                gdrcd_query("UPDATE abilita SET nome ='".gdrcd_filter('in', $_POST['nome'])."', descrizione ='".gdrcd_filter('in', $_POST['descrizione'])."', max_lvl = ".gdrcd_filter('num', $_POST['max_lvl']).", id_razza = '0', tipo = 'Skill temporanea' WHERE id_abilita = ".gdrcd_filter('num', $_POST['id_record'])." LIMIT 1"); ?>
                 <div class="warning">
                     <?php echo gdrcd_filter('out', $MESSAGE['warning']['modified']); ?>
                 </div>
@@ -134,7 +134,7 @@
             <?php }
             /*assegno skill*/
                 if(gdrcd_filter('get', $_REQUEST['op']) == 'assegna') {
-            $elenco_skill = gdrcd_query("SELECT id_abilita, nome FROM abilita WHERE tipo = 'Temporanea' ORDER BY nome", 'result');
+            $elenco_skill = gdrcd_query("SELECT id_abilita, nome FROM abilita WHERE tipo = 'Skill temporanea' ORDER BY nome", 'result');
             $characters = gdrcd_query("SELECT nome FROM personaggio WHERE esperienza > 0 ORDER BY nome", 'result');
             ?>
             <div class="panels_box">
@@ -219,11 +219,11 @@
                 $pagebegin = (int) gdrcd_filter('get', $_REQUEST['offset']) * $PARAMETERS['settings']['records_per_page'];
                 $pageend = $PARAMETERS['settings']['records_per_page'];
                 //Conteggio record totali
-                $record_globale = gdrcd_query("SELECT COUNT(*) FROM abilita WHERE tipo = 'Temporanea'");
+                $record_globale = gdrcd_query("SELECT COUNT(*) FROM abilita WHERE tipo = 'Skill temporanea'");
                 $totaleresults = $record_globale['COUNT(*)'];
 
                 //Lettura record
-                $result = gdrcd_query("SELECT id_abilita, nome, max_lvl, id_razza FROM abilita WHERE tipo = 'Temporanea' ORDER BY id_abilita LIMIT ".$pagebegin.", ".$pageend."", 'result');
+                $result = gdrcd_query("SELECT id_abilita, nome, max_lvl, id_razza FROM abilita WHERE tipo = 'Skill temporanea' ORDER BY id_abilita LIMIT ".$pagebegin.", ".$pageend."", 'result');
                 $numresults = gdrcd_query($result, 'num_rows');
 
                 /* Se esistono record */
