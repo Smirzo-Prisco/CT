@@ -1,0 +1,12 @@
+// ============================================================
+// _gestione_tipi.scss — Pannello admin tipi (oggetto/gilda/mestiere)
+// Riusa .gp-topbar/.gp-list/.pg-edit-container/.form-section/.form-group/
+// .gp-empty da _gestione.scss e _gestione_abilita_master.scss; qui solo
+// le larghezze di colonna.
+// ============================================================
+@use '../tokens' as *;
+
+.gp-table--tipi {
+    th:nth-child(2), td:nth-child(2) { width: 100px; }
+    th:nth-child(3), td:nth-child(3) { width: 140px; }
+}
