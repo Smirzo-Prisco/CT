@@ -693,19 +693,6 @@ $MESSAGE['interface']['administration']['guilds']['role']['head'] = "Controlli d
 $MESSAGE['interface']['administration']['guilds']['role']['head_info'] = "I ruoli che hanno abilitati i controlli di gilda possono nominare e rimuovere i membri ed altri privilegi.";
 $MESSAGE['interface']['administration']['guilds']['role']['submit']['edit'] = 'Modifica';
 $MESSAGE['interface']['administration']['guilds']['role']['submit']['delete'] = 'Elimina';
-/*Tipi*/
-$MESSAGE['interface']['administration']['types']['page_name']['items'] = 'Gestione tipi oggetto';
-$MESSAGE['interface']['administration']['types']['page_name']['guilds'] = 'Gestione tipi ' . strtolower($PARAMETERS['names']['guilds']['sing']) . '';
-$MESSAGE['interface']['administration']['types']['page_name']['jobs'] = 'Gestione tipi ' . strtolower($PARAMETERS['names']['jobs']['sing']) . '';
-$MESSAGE['interface']['administration']['types']['link']['new'] = 'Crea un nuovo tipo';
-$MESSAGE['interface']['administration']['types']['link']['back'] = 'Torna all\'elenco';
-$MESSAGE['interface']['administration']['types']['link']['guilds'] = 'Gestione ' . strtolower($PARAMETERS['names']['guilds']['plur']) . '...';
-$MESSAGE['interface']['administration']['types']['link']['jobs'] = 'Gestione ' . strtolower($PARAMETERS['names']['guilds']['plur']) . '...';
-$MESSAGE['interface']['administration']['types']['link']['items'] = 'Gestione oggetti...';
-$MESSAGE['interface']['administration']['types']['submit']['insert'] = 'Crea';
-$MESSAGE['interface']['administration']['types']['submit']['edit'] = 'Modifica';
-$MESSAGE['interface']['administration']['types']['submit']['undo'] = 'Annulla';
-$MESSAGE['interface']['administration']['types']['name'] = 'Tipo';
 /*Permessi utente*/
 $MESSAGE['interface']['administration']['roles']['page_name'] = 'Gestione permessi utente';
 $MESSAGE['interface']['administration']['roles']['submit']['edit'] = 'Modifica';
@@ -713,22 +700,6 @@ $MESSAGE['interface']['administration']['roles']['submit']['new'] = 'Nuovo';
 $MESSAGE['interface']['administration']['roles']['link']['back'] = 'Torna al pannello';
 $MESSAGE['interface']['administration']['roles']['message_body'][0] = 'Avviso automatico: I permessi del tuo account sono stati cambiati in "';
 $MESSAGE['interface']['administration']['roles']['message_body'][1] = '".';
-/*Abilità*/
-$MESSAGE['interface']['administration']['skills']['page_name'] = 'Gestione abilità';
-$MESSAGE['interface']['administration']['skills']['submit']['insert'] = 'Inserisci';
-$MESSAGE['interface']['administration']['skills']['submit']['edit'] = 'Modifica';
-$MESSAGE['interface']['administration']['skills']['submit']['undo'] = 'Annulla';
-$MESSAGE['interface']['administration']['skills']['car'] = 'Caratteristica';
-$MESSAGE['interface']['administration']['skills']['race'] = 'Riservata alla razza';
-$MESSAGE['interface']['administration']['skills']['no_race'] = 'Non riservata alla razza';
-$MESSAGE['interface']['administration']['skills']['guild'] = 'Riservata alla gilda';
-$MESSAGE['interface']['administration']['skills']['no_guild'] = 'Non riservata alla gilda';
-$MESSAGE['interface']['administration']['skills']['job'] = 'Riservata alla gilda';
-$MESSAGE['interface']['administration']['skills']['no_job'] = 'Non riservata alla gilda';
-$MESSAGE['interface']['administration']['skills']['name'] = 'Nome';
-$MESSAGE['interface']['administration']['skills']['infos'] = 'Descrizione';
-$MESSAGE['interface']['administration']['skills']['link']['back'] = 'Torna all\'elenco';
-$MESSAGE['interface']['administration']['skills']['link']['new'] = 'Nuova abilità';
 /*Regolamento e ambientazione*/
 $MESSAGE['interface']['administration']['rules']['page_name'] = 'Gestione regolamento';
 $MESSAGE['interface']['administration']['rules']['art'] = 'Articolo';
