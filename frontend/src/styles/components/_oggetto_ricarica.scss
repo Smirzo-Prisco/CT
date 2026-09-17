@@ -1,0 +1,53 @@
+// ============================================================
+// _oggetto_ricarica.scss — Ricarica oggetto scaduto
+// Pagina standalone (non un elenco con modale): il pannello del form
+// replica lo stesso "peso" visivo di .modal-content/.form-group, che in
+// _gestione.scss sono annidati sotto .pg-edit-container e quindi non
+// applicabili qui fuori da una modale.
+// ============================================================
+@use '../tokens' as *;
+
+.gp-panel {
+    max-width: 480px;
+    margin: $space-5 auto;
+    padding: $space-5;
+    background: $palette-surface-raised;
+    border-radius: $radius-lg;
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: $space-2;
+        margin-bottom: $space-4;
+
+        label {
+            font-size: $text-sm;
+            color: $color-text-secondary;
+        }
+
+        select,
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            background: $palette-surface-deep;
+            border: 1px solid $color-border;
+            border-radius: $radius-md;
+            color: $color-text;
+            padding: $space-2 + 2 $space-3;
+            font-size: $text-md;
+
+            &:focus { outline: none; border-color: $palette-blue-alt; }
+        }
+    }
+
+    button[type="submit"] {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.gp-hint {
+    color: $color-text-muted;
+    font-size: $text-sm;
+    margin-bottom: $space-4;
+}
