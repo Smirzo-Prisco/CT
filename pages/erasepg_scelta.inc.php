@@ -29,8 +29,10 @@
                 gdrcd_query("DELETE FROM clgpersonaggioinclinazione WHERE personaggio = '$nome'"); /* CANCELLO INCLINAZIONE PG*/
                 gdrcd_query("DELETE FROM clgpersonaggiomostrine WHERE nome = '$nome'"); /* CANCELLO MOSTRINE PG*/
                 gdrcd_query("DELETE FROM log WHERE nome_interessato = '$nome'"); /* CANCELLO SMS PG*/
-                gdrcd_query("DELETE FROM log_entrate WHERE Nome = '$nome'"); /* CANCELLO SMS PG*/
-                gdrcd_query("DELETE FROM log_doppi WHERE Nome = '$nome'"); /* CANCELLO SMS PG*/
+                // log_entrate e log_doppi NON vanno cancellati: sono lo storico usato per il
+                // rilevamento doppi account (main.php?page=log&tab=doppi) — cancellarli
+                // insieme al personaggio cancellerebbe anche l'evidenza che servirebbe a
+                // riconoscerlo se tornasse con un nuovo personaggio dallo stesso IP.
                 gdrcd_query("DELETE FROM messaggi WHERE destinatario = '$nome'"); /* CANCELLO SMS PG*/
                 gdrcd_query("DELETE FROM messaggi WHERE mittente = '$nome'"); /* CANCELLO SMS PG*/
                 gdrcd_query("DELETE FROM privilegi WHERE nome = '$nome'"); /* CANCELLO SMS PG*/
@@ -41,7 +43,7 @@
                 // gdrcd_query("UPDATE msg SET destinatario = 'pgcancellato' WHERE destinatario = '$nome'"); /* CANCELLO SMS PG*/
                 // gdrcd_query("UPDATE msggrpuser SET nome = 'pgcancellato' WHERE nome = '$nome'"); /* CANCELLO SMS PG*/
                 gdrcd_query("DELETE from log_spesa WHERE nome = '$nome'");
-                echo "<font color='red'><b>$nome cancellato (skill, entrate, doppi, oggetti)</b></font><br>";
+                echo "<font color='red'><b>$nome cancellato (skill, oggetti). Storico accessi e doppi conservato.</b></font><br>";
             }
         }
 ?>
