@@ -11,7 +11,7 @@ $types = isset($_REQUEST['types']) ? gdrcd_filter('get', $_REQUEST['types']) : '
 if (!in_array($types, ['items', 'guilds', 'jobs'], true)) $types = 'items';
 
 $config = [
-    'items'  => ['tabella' => 'codtipooggetto',  'usato_da' => 'oggetto',  'titolo' => 'Tipi di oggetto',  'indietro' => 'main.php?page=gestione_mercato'],
+    'items'  => ['tabella' => 'codtipooggetto',  'usato_da' => 'oggetto',  'titolo' => 'Tipi di oggetto',  'indietro' => 'main.php?page=gestione_oggetti'],
     'guilds' => ['tabella' => 'codtipogilda',    'usato_da' => 'gilda',    'titolo' => 'Tipi di gilda',    'indietro' => 'main.php?page=gestione_gilde'],
     'jobs'   => ['tabella' => 'codtipomestiere', 'usato_da' => 'mestiere', 'titolo' => 'Tipi di mestiere', 'indietro' => 'main.php?page=gestione_mestieri'],
 ][$types];
