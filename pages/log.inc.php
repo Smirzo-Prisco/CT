@@ -9,6 +9,22 @@ require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 
 $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
 
+// Tab "accessi": filtro per giorno, default oggi — la tabella non aveva alcun
+// filtro e scaricava tutta la cronologia di log_entrate (11.000+ righe da
+// quando è stata rimossa la deduplica), lenta da caricare e poco utile per
+// capire chi ha fatto accesso in una giornata specifica. "tutti" = storico
+// completo, con un limite di sicurezza sulle righe mostrate.
+if ($currentTab === 'accessi') {
+    $filtroDataAccessi = $_GET['data'] ?? date('Y-m-d');
+    if ($filtroDataAccessi !== 'tutti' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $filtroDataAccessi)) {
+        $filtroDataAccessi = date('Y-m-d');
+    }
+    $whereDataAccessi = $filtroDataAccessi === 'tutti'
+        ? ''
+        : "WHERE DATE(DataEvento) = '" . gdrcd_filter('in', $filtroDataAccessi) . "'";
+    $riepilogoAccessi = gdrcd_query("SELECT COUNT(*) AS totali, COUNT(DISTINCT Nome) AS distinti FROM log_entrate $whereDataAccessi");
+}
+
 // Stima quanto sia plausibile che un doppio segnalato sia davvero lo stesso giocatore:
 // più personaggi DISTINTI sono mai passati da quell'IP (in tutta la storia di
 // log_entrate, senza limite di tempo), più è probabile che sia una connessione
@@ -69,12 +85,25 @@ function classificaProbabilitaDoppio($n) {
             <?php } ?>
         </select>
     <?php elseif ($currentTab == 'accessi'): ?>
-        <!-- No filters for accessi tab -->
+        <input type="date"
+               value="<?= $filtroDataAccessi === 'tutti' ? '' : gdrcd_filter('out', $filtroDataAccessi) ?>"
+               max="<?= date('Y-m-d') ?>"
+               onchange="window.location.href = 'main.php?page=log&tab=accessi&data=' + this.value;">
+        <a href="main.php?page=log&tab=accessi&data=tutti" class="tab<?= $filtroDataAccessi === 'tutti' ? ' active' : '' ?>">Tutti i giorni</a>
     <?php elseif ($currentTab == 'punti'): ?>
         <b>Limiti:</b> xp 260, shin 240, totale 550</li>
         </ul>
     <?php endif; ?>
     </div>
+    <?php if ($currentTab === 'accessi'): ?>
+    <div class="log-summary">
+        <?php if ($filtroDataAccessi === 'tutti'): ?>
+            <strong><?= (int)$riepilogoAccessi['distinti'] ?></strong> personaggi distinti · <strong><?= (int)$riepilogoAccessi['totali'] ?></strong> accessi totali in tutto lo storico (mostrati gli ultimi 500)
+        <?php else: ?>
+            <strong><?= (int)$riepilogoAccessi['distinti'] ?></strong> personaggi distinti hanno effettuato l'accesso il <strong><?= date('d/m/Y', strtotime($filtroDataAccessi)) ?></strong> (<?= (int)$riepilogoAccessi['totali'] ?> accessi totali)
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
     <!-- TABELLA -->
     <div class="log-table-scroll">
     <table id="logTable">
@@ -238,7 +267,8 @@ function classificaProbabilitaDoppio($n) {
                 </tbody>
             <?php break;
             case 'accessi': //  ******************  ACCESSI ******************
-                $doppi = gdrcd_query("SELECT * FROM log_entrate ORDER BY DataEvento DESC", 'result'); ?>
+                $limiteAccessi = $filtroDataAccessi === 'tutti' ? ' LIMIT 500' : '';
+                $doppi = gdrcd_query("SELECT * FROM log_entrate $whereDataAccessi ORDER BY DataEvento DESC$limiteAccessi", 'result'); ?>
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>

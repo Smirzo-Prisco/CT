@@ -173,6 +173,11 @@ $log-accent: #ce846f;
         background-color: #1d2038;
         cursor: pointer;
         transition: all 0.2s;
+        // .tab e' nata per i <div onclick> dello switcher tab; riusata anche come
+        // <a> per il toggle "Tutti i giorni" nei filtri accessi, da qui il reset.
+        text-decoration: none;
+        color: inherit;
+        display: inline-block;
 
         &.active {
             background-color: #2f356b;
@@ -184,6 +189,7 @@ $log-accent: #ce846f;
     .filters {
         display: flex;
         justify-content: center;
+        align-items: center;
         gap: 10px;
         margin-bottom: 20px;
 
@@ -199,6 +205,21 @@ $log-accent: #ce846f;
         select {
             min-width: 260px;
         }
+    }
+
+    // Riepilogo tab accessi: quanti personaggi distinti/accessi nel giorno
+    // filtrato, subito visibile senza dover scorrere/contare le righe della
+    // tabella sotto — soprattutto utile ora che di default mostra solo oggi.
+    .log-summary {
+        text-align: center;
+        padding: 10px 16px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        background-color: rgb(76 82 163 / 15%);
+        border: 1px solid #4c52a3;
+        color: #c1c4e0;
+
+        strong { color: $log-accent; }
     }
 
     // Scroll orizzontale invece di schiacciare le colonne: la tabella
