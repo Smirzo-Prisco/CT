@@ -137,21 +137,62 @@ if ($op === 'options') {
 
     // Rilevamento doppi in fase di iscrizione: il personaggio appena creato non
     // ha ancora una propria storia di log_entrate (non si è mai loggato), ma
-    // l'IP della richiesta di iscrizione sì — stessa fonte dati (log_entrate)
-    // del rilevamento doppi al login (vedi case 'login' in api_auth.php), qui
-    // riapplicata all'IP di chi si iscrive.
+    // l'IP e (se presente) il cookie device_id della richiesta di iscrizione sì —
+    // stesse due fonti dati (log_entrate + log_dispositivi) del rilevamento doppi
+    // al login (vedi case 'login' in api_auth.php), qui riapplicate a chi si
+    // iscrive. Il solo segnale IP non basta: era l'unico controllato qui finché
+    // un'iscrizione doppia da rete mobile (IP diverso da quello dell'ultimo login
+    // del pg originale, ma stesso browser/device_id) non è passata inosservata.
     $ip_iscrizione = gdrcd_filter('in', $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR']);
+    $nome_filtrato = gdrcd_filter('in', $nome);
+
+    $doppi_segnali = []; // Nome => ['ip', 'dispositivo']
+
     $doppi_result = gdrcd_query("
         SELECT DISTINCT le.Nome
         FROM log_entrate le
         JOIN personaggio p ON p.nome = le.Nome
-        WHERE le.IP = '$ip_iscrizione' AND le.Nome != '" . gdrcd_filter('in', $nome) . "'
+        WHERE le.IP = '$ip_iscrizione' AND le.Nome != '$nome_filtrato'
     ", 'result');
-    $doppi_nomi = [];
     while ($doppi_row = gdrcd_query($doppi_result, 'fetch')) {
-        $doppi_nomi[] = $doppi_row['Nome'];
+        $doppi_segnali[$doppi_row['Nome']][] = 'ip';
     }
     gdrcd_query($doppi_result, 'free');
+
+    // Il device_id è un cookie di lunga durata impostato al login (vedi api_auth.php):
+    // chi si iscrive da un browser già usato per giocare un altro personaggio lo
+    // porta con sé nella richiesta. Non ne generiamo uno nuovo qui: associare un
+    // device_id a un nome resta compito esclusivo del login.
+    $deviceId = $_COOKIE['device_id'] ?? null;
+    if ($deviceId !== null) {
+        $deviceIdF = gdrcd_filter('in', $deviceId);
+        $doppi_dispositivo_result = gdrcd_query("
+            SELECT DISTINCT Nome FROM log_dispositivi
+            WHERE device_id = '$deviceIdF' AND Nome != '$nome_filtrato'
+        ", 'result');
+        while ($doppi_row = gdrcd_query($doppi_dispositivo_result, 'fetch')) {
+            $doppi_segnali[$doppi_row['Nome']][] = 'dispositivo';
+        }
+        gdrcd_query($doppi_dispositivo_result, 'free');
+    }
+
+    // Stessa tabella log_doppi del login, stesso helper di upsert: così un doppio
+    // rilevato in iscrizione compare anche nella tab Doppi (main.php?page=log&tab=doppi)
+    // invece di restare visibile solo nel DM del momento.
+    if (!empty($doppi_segnali)) {
+        $host_iscrizione    = gdrcd_filter('in', gethostbyaddr($_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR']));
+        $browser_iscrizione = gdrcd_filter('in', $_SERVER['HTTP_USER_AGENT'] ?? '');
+        foreach ($doppi_segnali as $altro_nome => $metodi) {
+            foreach (array_unique($metodi) as $metodo) {
+                $esiste = gdrcd_query("SELECT id FROM log_doppi WHERE ((Nome='$nome_filtrato' AND Doppio='" . gdrcd_filter('in', $altro_nome) . "') OR (Nome='" . gdrcd_filter('in', $altro_nome) . "' AND Doppio='$nome_filtrato')) AND IP='$ip_iscrizione' AND Metodo='" . gdrcd_filter('in', $metodo) . "' LIMIT 1");
+                if ($esiste) {
+                    gdrcd_query("UPDATE log_doppi SET DataEvento = NOW() WHERE id = " . (int)$esiste['id']);
+                } else {
+                    gdrcd_query("INSERT INTO log_doppi (Nome, Doppio, IP, Host, Browser, DataEvento, Metodo) VALUES ('$nome_filtrato', '" . gdrcd_filter('in', $altro_nome) . "', '$ip_iscrizione', '$host_iscrizione', '$browser_iscrizione', NOW(), '" . gdrcd_filter('in', $metodo) . "')");
+                }
+            }
+        }
+    }
 
     // DM di notifica a tutti gli admin — nuovo personaggio iscritto.
     // Il nome è un link cliccabile verso messages_center (compose diretto verso il pg,
@@ -159,12 +200,15 @@ if ($op === 'options') {
     // per questo il nome visibile va comunque escapato con htmlspecialchars.
     $nome_link  = '<a href="main.php?page=messages_center&to=' . urlencode($nome) . '">' . htmlspecialchars($nome, ENT_QUOTES, 'UTF-8') . '</a>';
     $testo_dm_raw = 'Nuovo personaggio iscritto il ' . date('d/m/Y') . ' alle ' . date('H:i') . ': ' . $nome_link;
-    if (!empty($doppi_nomi)) {
-        $doppi_links = array_map(
-            fn($n) => '<a href="main.php?page=messages_center&to=' . urlencode($n) . '">' . htmlspecialchars($n, ENT_QUOTES, 'UTF-8') . '</a>',
-            $doppi_nomi
-        );
-        $testo_dm_raw .= ' — POSSIBILE DOPPIO (stesso IP di): ' . implode(', ', $doppi_links);
+    if (!empty($doppi_segnali)) {
+        $etichette_metodo = ['ip' => 'stesso IP', 'dispositivo' => 'stesso dispositivo'];
+        $doppi_desc = [];
+        foreach ($doppi_segnali as $altro_nome => $metodi) {
+            $link = '<a href="main.php?page=messages_center&to=' . urlencode($altro_nome) . '">' . htmlspecialchars($altro_nome, ENT_QUOTES, 'UTF-8') . '</a>';
+            $etichette = implode(' + ', array_map(fn($m) => $etichette_metodo[$m], array_unique($metodi)));
+            $doppi_desc[] = "$link ($etichette)";
+        }
+        $testo_dm_raw .= ' — POSSIBILE DOPPIO: ' . implode(', ', $doppi_desc);
     }
     $testo_dm   = gdrcd_filter('in', $testo_dm_raw);
     $admin_list = gdrcd_query("SELECT nome FROM privilegi WHERE admin = 1", 'result');
