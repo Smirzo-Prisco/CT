@@ -25,7 +25,14 @@ register_shutdown_function(function () {
     if (strpos($script, 'api_') !== 0) {
         return;
     }
-    if (session_status() !== PHP_SESSION_ACTIVE || empty($_SESSION['login'])) {
+    // Niente controllo su session_status(): diversi endpoint (api_map.php,
+    // api_scheda.php, ecc.) chiamano session_write_close() subito dopo il
+    // controllo di login per non tenere il lock di sessione — da quel momento
+    // session_status() torna PHP_SESSION_NONE, ma $_SESSION resta leggibile
+    // in memoria per tutto il resto della richiesta. Un controllo su
+    // PHP_SESSION_ACTIVE qui perdeva silenziosamente l'intera riga (non solo
+    // il nome) per quegli endpoint.
+    if (empty($_SESSION['login'])) {
         return;
     }
 
@@ -114,7 +121,10 @@ register_shutdown_function(function () {
                     continue;
                 }
 
-                $nome = (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['login']))
+                // Stesso motivo del log Movimenti sopra: niente controllo su
+                // session_status(), $_SESSION resta leggibile anche dopo un
+                // eventuale session_write_close() a monte.
+                $nome = !empty($_SESSION['login'])
                     ? "'" . gdrcd_filter('in', $_SESSION['login']) . "'"
                     : 'NULL';
                 $script = gdrcd_filter('in', basename($_SERVER['SCRIPT_NAME'] ?? ''));
