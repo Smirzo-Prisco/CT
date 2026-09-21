@@ -31,14 +31,22 @@ if($record['number'] == 0 ) {
     gdrcd_redirect("installer.php");
 }
 
-// Definizione pagina da visualizzare
-$page = ( ! empty($_GET['page'])) ? gdrcd_filter('include', $_GET['page']) : 'index';
+// Definizione pagina da visualizzare — whitelist esplicita, non un filtro generico:
+// gdrcd_filter('include', ...) qui sotto usato prima era un no-op silenzioso
+// (gdrcd_filter() gestisce solo il case 'includes' plurale, non 'include'), quindi
+// $_GET['page'] finiva INTERO, senza alcuna sanitizzazione, dentro un include diretto
+// poco più sotto — un Local File Inclusion sfruttabile con path traversal
+// (es. ?page=../../../../etc/passwd, o per leggere altri .php del progetto).
+// Un include dinamico su input utente è sicuro solo con una whitelist come questa,
+// mai con un filtro "ripulisci la stringa" per quanto stretto.
+$paginePermesse = ['index', 'home', 'ambientazione', 'recupero_password', 'registrazione_riepilogo', 'user_regolamento', 'user_stats'];
+$page = ( ! empty($_GET['page']) && in_array($_GET['page'], $paginePermesse, true)) ? $_GET['page'] : 'index';
 
 /*
  * Definizione dell'eventuale contenuto interno
  * Utile se si vuol mantenere la struttura della homepage quando si aprono i link
  */
-$content = ( ! empty($_GET['content'])) ? gdrcd_filter('include', $_GET['content']) : 'home';
+$content = ( ! empty($_GET['content']) && in_array($_GET['content'], $paginePermesse, true)) ? $_GET['content'] : 'home';
 
 // Conteggio utenti online
 $users = gdrcd_query("SELECT COUNT(nome) AS online FROM personaggio WHERE ora_entrata > ora_uscita AND DATE_ADD(ultimo_refresh, INTERVAL 4 MINUTE) > NOW()");
