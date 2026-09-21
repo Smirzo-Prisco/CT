@@ -25,6 +25,28 @@ if ($currentTab === 'accessi') {
     $riepilogoAccessi = gdrcd_query("SELECT COUNT(*) AS totali, COUNT(DISTINCT Nome) AS distinti FROM log_entrate $whereDataAccessi");
 }
 
+// Tab "movimenti": stesso filtro per giorno (default oggi) della tab accessi,
+// più un filtro opzionale per personaggio — log_movimenti traccia ogni azione
+// (non lettura) di OGNI personaggio loggato, volume potenzialmente molto più
+// alto di log_entrate, quindi senza filtro data di default sarebbe subito
+// impraticabile da scorrere.
+if ($currentTab === 'movimenti') {
+    $pgMovimenti = gdrcd_filter('in', $_GET['pg'] ?? '');
+    $filtroDataMovimenti = $_GET['data'] ?? date('Y-m-d');
+    if ($filtroDataMovimenti !== 'tutti' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $filtroDataMovimenti)) {
+        $filtroDataMovimenti = date('Y-m-d');
+    }
+    $condizioniMovimenti = [];
+    if ($pgMovimenti !== '') {
+        $condizioniMovimenti[] = "Nome = '$pgMovimenti'";
+    }
+    if ($filtroDataMovimenti !== 'tutti') {
+        $condizioniMovimenti[] = "DATE(DataEvento) = '" . gdrcd_filter('in', $filtroDataMovimenti) . "'";
+    }
+    $whereMovimenti = $condizioniMovimenti ? 'WHERE ' . implode(' AND ', $condizioniMovimenti) : '';
+    $riepilogoMovimenti = gdrcd_query("SELECT COUNT(*) AS totali, COUNT(DISTINCT Nome) AS distinti FROM log_movimenti $whereMovimenti");
+}
+
 // Stima quanto sia plausibile che un doppio segnalato sia davvero lo stesso giocatore:
 // più personaggi DISTINTI sono mai passati da quell'IP (in tutta la storia di
 // log_entrate, senza limite di tempo), più è probabile che sia una connessione
@@ -56,6 +78,7 @@ function classificaProbabilitaDoppio($n) {
         <div class="tab <?= $currentTab == 'doppi' ? 'active' : '' ?>" onclick="changeTab('doppi')">Doppi</div>
         <div class="tab <?= $currentTab == 'punti' ? 'active' : '' ?>" onclick="changeTab('punti')">Limite punti</div>
         <div class="tab <?= $currentTab == 'accessi' ? 'active' : '' ?>" onclick="changeTab('accessi')">Accessi</div>
+        <div class="tab <?= $currentTab == 'movimenti' ? 'active' : '' ?>" onclick="changeTab('movimenti')">Movimenti</div>
         <div class="tab <?= $currentTab == 'generali' ? 'active' : '' ?>" onclick="changeTab('generali')">Generali</div>
     </div>
     <!-- FILTRI -->
@@ -90,6 +113,19 @@ function classificaProbabilitaDoppio($n) {
                max="<?= date('Y-m-d') ?>"
                onchange="window.location.href = 'main.php?page=log&tab=accessi&data=' + this.value;">
         <a href="main.php?page=log&tab=accessi&data=tutti" class="tab<?= $filtroDataAccessi === 'tutti' ? ' active' : '' ?>">Tutti i giorni</a>
+    <?php elseif ($currentTab == 'movimenti'):
+        $query_pg_movimenti = gdrcd_query("SELECT nome FROM personaggio ORDER BY nome ASC", 'result'); ?>
+        <select onchange="window.location.href = 'main.php?page=log&tab=movimenti&data=<?=$filtroDataMovimenti === 'tutti' ? 'tutti' : gdrcd_filter('out', $filtroDataMovimenti)?>&pg=' + this.value;">
+            <option value="">Personaggio</option>
+            <?php while ($pgOpt = gdrcd_query($query_pg_movimenti, 'fetch')) { ?>
+                <option value="<?=htmlspecialchars($pgOpt['nome'])?>" <?=$pgMovimenti===$pgOpt['nome']?'selected':''?>><?=htmlspecialchars($pgOpt['nome'])?></option>
+            <?php } ?>
+        </select>
+        <input type="date"
+               value="<?= $filtroDataMovimenti === 'tutti' ? '' : gdrcd_filter('out', $filtroDataMovimenti) ?>"
+               max="<?= date('Y-m-d') ?>"
+               onchange="window.location.href = 'main.php?page=log&tab=movimenti&pg=<?=urlencode($pgMovimenti)?>&data=' + this.value;">
+        <a href="main.php?page=log&tab=movimenti&pg=<?=urlencode($pgMovimenti)?>&data=tutti" class="tab<?= $filtroDataMovimenti === 'tutti' ? ' active' : '' ?>">Tutti i giorni</a>
     <?php elseif ($currentTab == 'punti'): ?>
         <b>Limiti:</b> xp 260, shin 240, totale 550</li>
         </ul>
@@ -101,6 +137,15 @@ function classificaProbabilitaDoppio($n) {
             <strong><?= (int)$riepilogoAccessi['distinti'] ?></strong> personaggi distinti · <strong><?= (int)$riepilogoAccessi['totali'] ?></strong> accessi totali in tutto lo storico (mostrati gli ultimi 500)
         <?php else: ?>
             <strong><?= (int)$riepilogoAccessi['distinti'] ?></strong> personaggi distinti hanno effettuato l'accesso il <strong><?= date('d/m/Y', strtotime($filtroDataAccessi)) ?></strong> (<?= (int)$riepilogoAccessi['totali'] ?> accessi totali)
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+    <?php if ($currentTab === 'movimenti'): ?>
+    <div class="log-summary">
+        <?php if ($filtroDataMovimenti === 'tutti'): ?>
+            <strong><?= (int)$riepilogoMovimenti['distinti'] ?></strong> personaggi distinti · <strong><?= (int)$riepilogoMovimenti['totali'] ?></strong> azioni<?= $pgMovimenti !== '' ? ' di ' . gdrcd_filter('out', $pgMovimenti) : '' ?> in tutto lo storico (mostrate le ultime 500)
+        <?php else: ?>
+            <strong><?= (int)$riepilogoMovimenti['distinti'] ?></strong> personaggi distinti · <strong><?= (int)$riepilogoMovimenti['totali'] ?></strong> azioni<?= $pgMovimenti !== '' ? ' di ' . gdrcd_filter('out', $pgMovimenti) : '' ?> il <strong><?= date('d/m/Y', strtotime($filtroDataMovimenti)) ?></strong>
         <?php endif; ?>
     </div>
     <?php endif; ?>
@@ -283,6 +328,30 @@ function classificaProbabilitaDoppio($n) {
                         <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
                         <td><?=gdrcd_filter('out', $row['Host'])?></td>
+                        <td><?=$row['DataEvento']?></td>
+                    </tr>
+                <?php endwhile; ?>
+                </tbody>
+            <?php break;
+            case 'movimenti': //  ******************  MOVIMENTI ******************
+                $limiteMovimenti = $filtroDataMovimenti === 'tutti' ? ' LIMIT 500' : '';
+                $movimenti = gdrcd_query("SELECT * FROM log_movimenti $whereMovimenti ORDER BY DataEvento DESC$limiteMovimenti", 'result'); ?>
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
+                        <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> Endpoint</th>
+                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Operazione</th>
+                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> IP</th>
+                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php while ($row = gdrcd_query($movimenti, 'fetch')) : ?>
+                    <tr>
+                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
+                        <td><?=gdrcd_filter('out', $row['Endpoint'])?></td>
+                        <td><?=gdrcd_filter('out', $row['Operazione'])?></td>
+                        <td><?=gdrcd_filter('out', $row['IP'])?></td>
                         <td><?=$row['DataEvento']?></td>
                     </tr>
                 <?php endwhile; ?>
