@@ -73,7 +73,7 @@ function classificaProbabilitaDoppio($n) {
     </div>
     <!-- TABS -->
     <div class="tabs">
-        <div class="tab <?= $currentTab == 'chatbot' ? 'active' : '' ?>" onclick="changeTab('chatbot')">Domande chatbot</div>
+        <div class="tab <?= $currentTab == 'chatbot' ? 'active' : '' ?>" onclick="changeTab('chatbot')">CrystalBot</div>
         <div class="tab <?= $currentTab == 'sms' ? 'active' : '' ?>" onclick="changeTab('sms')">SMS</div>
         <div class="tab <?= $currentTab == 'doppi' ? 'active' : '' ?>" onclick="changeTab('doppi')">Doppi</div>
         <div class="tab <?= $currentTab == 'punti' ? 'active' : '' ?>" onclick="changeTab('punti')">Limite punti</div>
