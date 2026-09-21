@@ -936,20 +936,19 @@ $MESSAGE['names']['skill']['13'] = 'Mentale di attacco';
 
 
 /********** Eventi **********/
+// BLOCKED, LOGGEDIN, ERRORELOGIN, CHANGEDROLE e PX rimossi dal menu: nessun
+// punto del codice scrive più questi codice_evento nella tabella `log` (login
+// e XP sono tracciati altrove, in log_entrate e nella tabella Punti), quindi
+// selezionarli restituiva sempre una tabella vuota.
 if ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1) {
-$MESSAGE['event'][BLOCKED] = 'Postazioni bloccate';
 $MESSAGE['event'][BONIFICO] = 'Transazioni tra PG';
 $MESSAGE['event'][DELETEPG] = 'Personaggi cancellati';
 $MESSAGE['event'][CHANGEDNAME] = 'Cambi nome';
 }
 if ($_SESSION['admin'] == 1) {
-$MESSAGE['event'][LOGGEDIN] = 'Log in';
-$MESSAGE['event'][ERRORELOGIN] = 'Log in errati';
 $MESSAGE['event'][NUOVOLAVORO] = 'Assunzioni';
 $MESSAGE['event'][DIMISSIONE] = 'Dimissioni';
-$MESSAGE['event'][CHANGEDROLE] = 'Cambio permessi';
 $MESSAGE['event'][CHANGEDPASS] = 'Cambio password';
-$MESSAGE['event'][PX] = 'Esperienza assegnata';
 }
 
 /********** Ricorrenti **********/
