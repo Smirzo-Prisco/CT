@@ -58,6 +58,118 @@ function classificaProbabilitaDoppio($n) {
     elseif ($n <= 5) return 'Media';
     else             return 'Bassa';
 }
+
+// Etichette leggibili per la colonna "Operazione" della tab Movimenti: i valori
+// grezzi sono il parametro ?op= così com'è usato dal frontend (spesso inglese/
+// camelCase, es. "setIdle"), chiaro solo a chi conosce il codice. Copre solo le
+// combinazioni endpoint+operazione che sono davvero azioni POST (le uniche
+// tracciate in log_movimenti) — non serve includere le letture in GET, che qui
+// non compaiono mai. Se una combinazione non è mappata si ricade sul valore
+// grezzo, quindi una voce nuova non fa sparire nulla, resta solo da tradurre.
+function etichettaMovimento($endpoint, $operazione) {
+    static $mappa = [
+        'api_auth.php' => [
+            'login' => 'Login',
+            'logout' => 'Logout',
+        ],
+        'api_iscrizione.php' => [
+            'register' => 'Registrazione nuovo personaggio',
+        ],
+        'api_account.php' => [
+            'delete' => 'Auto-cancellazione account',
+            'restore' => 'Ripristino account',
+        ],
+        'api_cambio_pass.php' => [
+            'changePass' => 'Cambio password',
+            'forcePass' => 'Cambio password forzato (staff)',
+        ],
+        'api_map.php' => [
+            'move' => 'Spostamento',
+            'changemap' => 'Cambio mappa',
+            'leave' => 'Uscita dalla stanza',
+            'setIdle' => 'Cambio stato assente/attivo',
+            'set_stato' => 'Cambio stato pallino (libero/occupato)',
+        ],
+        'api_chat.php' => [
+            'curaPgGiornaliera' => 'Cura giornaliera personaggio',
+            'curaPg' => 'Cura personaggio',
+            'curaAltroPg' => 'Cura di un altro personaggio',
+            'timerExpired' => 'Timer scaduto',
+            'pending_attacks' => 'Coda attacchi in sospeso',
+            'pending_close_turn' => 'Coda chiusura turno',
+            'setBackChat' => 'Reset presenza in chat',
+            'risposta_immediata' => 'Risposta immediata (PG)',
+            'risposta_immediata_creatura' => 'Risposta immediata (creatura)',
+            'savePgData' => 'Salvataggio dati PNG',
+            'newMasterPng' => 'Creazione PNG master',
+            'newMasterPngAttack' => 'Attacco PNG master',
+            'risposta_immediata_png' => 'Risposta immediata (PNG)',
+            'activateQuest' => 'Attivazione quest',
+            'startQuest' => 'Avvio quest',
+            'setQuestTimer' => 'Impostazione timer quest',
+            'stopQuestTimer' => 'Arresto timer quest',
+            'setRequireMasterFirst' => 'Impostazione priorità master',
+            'setTurnMode' => 'Impostazione modalità turni',
+            'setTurnOrder' => 'Impostazione ordine turni',
+            'setQuestAudio' => 'Impostazione audio quest',
+            'stopQuestAudio' => 'Arresto audio quest',
+        ],
+        'api_roleSession.php' => [
+            'getRolePgs' => 'Elenco PG in ruolo',
+            'closePgTurn' => 'Chiusura turno PG',
+            'flagRole' => 'Segnalazione ruolo',
+            'awardShin' => 'Assegnazione Shin',
+            'rejectShin' => 'Rifiuto Shin',
+            'saveQuestRecap' => 'Salvataggio recap quest',
+        ],
+        'api_scheda.php' => [
+            'save_modifica' => 'Modifica scheda',
+            'affetto_delete' => 'Cancellazione affetto',
+            'oggetti_unif_action' => 'Azione su oggetto (equip/usa/scarta)',
+        ],
+        'api_messages.php' => [
+            'send' => 'Invio messaggio',
+            'sendMass' => 'Invio messaggio massivo',
+            'delete_convs' => 'Cancellazione conversazioni',
+            'delete_msgs' => 'Cancellazione messaggi',
+            'delete_conv' => 'Cancellazione conversazione',
+        ],
+        'api_forum.php' => [
+            'segnala' => 'Segnalazione post',
+            'readall' => 'Segna tutto come letto',
+            'follow_thread' => 'Segui/non seguire discussione',
+            'post' => 'Nuovo post/discussione',
+            'edit_post' => 'Modifica post',
+            'delete_post' => 'Cancellazione post',
+            'delete_thread' => 'Cancellazione discussione',
+            'edit_quest' => 'Modifica quest collegata',
+        ],
+        'api_gilda.php' => [
+            'joinGuild' => 'Adesione a una razza/gilda',
+        ],
+        'api_calendario.php' => [
+            'delete' => 'Cancellazione evento',
+        ],
+        'api_moderazione.php' => [
+            'rispondi' => 'Risposta a segnalazione',
+            'submit' => 'Invio segnalazione allo staff',
+        ],
+        'api_volti.php' => [
+            'deleteVolto' => 'Cancellazione volto',
+        ],
+        'api_albergo.php' => [
+            'book' => 'Prenotazione stanza',
+        ],
+        'api_global.php' => [
+            'saveSoundPrefs' => 'Salvataggio preferenze audio',
+            'saveNotificationPrefs' => 'Salvataggio preferenze notifiche',
+            'setCalendarioCondiviso' => 'Impostazione calendario condiviso',
+            'setOnboardingDone' => 'Completamento tour guidato',
+        ],
+    ];
+
+    return $mappa[$endpoint][$operazione] ?? null;
+}
 ?>
 
 <div class="log-container">
@@ -348,11 +460,12 @@ function classificaProbabilitaDoppio($n) {
                     </tr>
                 </thead>
                 <tbody>
-                <?php while ($row = gdrcd_query($movimenti, 'fetch')) : ?>
+                <?php while ($row = gdrcd_query($movimenti, 'fetch')) :
+                    $etichettaOp = etichettaMovimento($row['Endpoint'], $row['Operazione']); ?>
                     <tr>
                         <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
                         <td><?=gdrcd_filter('out', $row['Endpoint'])?></td>
-                        <td><?=gdrcd_filter('out', $row['Operazione'])?></td>
+                        <td title="<?=gdrcd_filter('out', $row['Operazione'])?>"><?=gdrcd_filter('out', $etichettaOp ?? $row['Operazione'])?></td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
                         <td><?=$row['DataEvento']?></td>
                     </tr>
