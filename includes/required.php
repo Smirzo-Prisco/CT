@@ -36,9 +36,20 @@ register_shutdown_function(function () {
         return;
     }
 
+    // Endpoint+operazione esclusi dal log Movimenti: azioni troppo frequenti/
+    // poco significative per un'indagine (rumore puro), non vere "azioni" nel
+    // senso per cui è nata questa tabella.
+    $movimenti_esclusi = [
+        'api_map.php' => ['setIdle'],
+    ];
+    $operazioneRichiesta = (string)($_GET['op'] ?? $_POST['op'] ?? '');
+    if (in_array($operazioneRichiesta, $movimenti_esclusi[$script] ?? [], true)) {
+        return;
+    }
+
     try {
         $nome = gdrcd_filter('in', $_SESSION['login']);
-        $op   = gdrcd_filter('in', (string)($_GET['op'] ?? $_POST['op'] ?? ''));
+        $op   = gdrcd_filter('in', $operazioneRichiesta);
         $ip   = gdrcd_filter('in', $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '');
         gdrcd_query(
             "INSERT INTO log_movimenti (Nome, Endpoint, Operazione, IP, DataEvento) VALUES ('$nome', '" . gdrcd_filter('in', $script) . "', '$op', '$ip', NOW())",
