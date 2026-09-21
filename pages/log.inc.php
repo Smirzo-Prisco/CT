@@ -80,10 +80,12 @@ function classificaProbabilitaDoppio($n) {
         <div class="tab <?= $currentTab == 'movimenti' ? 'active' : '' ?>" onclick="changeTab('movimenti')">Movimenti</div>
         <div class="tab <?= $currentTab == 'generali' ? 'active' : '' ?>" onclick="changeTab('generali')">Generali</div>
         <div class="tab <?= $currentTab == 'punti' ? 'active' : '' ?>" onclick="changeTab('punti')">Punti</div>
+        <div class="tab <?= $currentTab == 'injection' ? 'active' : '' ?>" onclick="changeTab('injection')">Injection</div>
     </div>
     <!-- FILTRI -->
     <div class="filters">
     <?php if ($currentTab == 'chatbot'): ?>
+    <?php elseif ($currentTab == 'injection'): ?>
     <?php elseif ($currentTab == 'generali'): ?>
         <select onchange="window.location.href = 'main.php?page=log&tab=<?=$currentTab?>&generaliType=' + this.value;">
             <?php
@@ -351,6 +353,35 @@ function classificaProbabilitaDoppio($n) {
                         <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
                         <td><?=gdrcd_filter('out', $row['Endpoint'])?></td>
                         <td><?=gdrcd_filter('out', $row['Operazione'])?></td>
+                        <td><?=gdrcd_filter('out', $row['IP'])?></td>
+                        <td><?=$row['DataEvento']?></td>
+                    </tr>
+                <?php endwhile; ?>
+                </tbody>
+            <?php break;
+            case 'injection': //  ******************  INJECTION ******************
+                $injection = gdrcd_query("SELECT * FROM log_injection ORDER BY DataEvento DESC", 'result'); ?>
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
+                        <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> Endpoint</th>
+                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Operazione</th>
+                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> Campo</th>
+                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Valore</th>
+                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Pattern</th>
+                        <th onclick="sortTable(6)"><i class="fa-solid fa-sort"></i> IP</th>
+                        <th onclick="sortTable(7)"><i class="fa-solid fa-sort"></i> Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php while ($row = gdrcd_query($injection, 'fetch')) : ?>
+                    <tr>
+                        <td><?php if ($row['Nome']): ?><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a><?php else: ?>—<?php endif; ?></td>
+                        <td><?=gdrcd_filter('out', $row['Endpoint'])?></td>
+                        <td><?=gdrcd_filter('out', $row['Operazione'])?></td>
+                        <td><?=gdrcd_filter('out', $row['Campo'])?></td>
+                        <td><?=gdrcd_filter('out', $row['Valore'])?></td>
+                        <td><?=gdrcd_filter('out', $row['Pattern'])?></td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
                         <td><?=$row['DataEvento']?></td>
                     </tr>
