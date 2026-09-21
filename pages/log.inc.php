@@ -173,26 +173,21 @@ function etichettaMovimento($endpoint, $operazione) {
 ?>
 
 <div class="log-container">
-    <div class="gp-topbar">
-        <div class="gp-topbar__left">
-            <button type="button" class="gp-back" title="Indietro" onclick="history.back()">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
-        </div>
-        <div class="gp-topbar__center">
-            <h1 class="gp-title">Logs</h1>
-        </div>
-    </div>
     <!-- TABS -->
-    <div class="tabs">
-        <div class="tab <?= $currentTab == 'chatbot' ? 'active' : '' ?>" onclick="changeTab('chatbot')">CrystalBot</div>
-        <div class="tab <?= $currentTab == 'accessi' ? 'active' : '' ?>" onclick="changeTab('accessi')">Accessi</div>
-        <div class="tab <?= $currentTab == 'doppi' ? 'active' : '' ?>" onclick="changeTab('doppi')">Doppi</div>
-        <div class="tab <?= $currentTab == 'sms' ? 'active' : '' ?>" onclick="changeTab('sms')">SMS</div>
-        <div class="tab <?= $currentTab == 'movimenti' ? 'active' : '' ?>" onclick="changeTab('movimenti')">Movimenti</div>
-        <div class="tab <?= $currentTab == 'generali' ? 'active' : '' ?>" onclick="changeTab('generali')">Generali</div>
-        <div class="tab <?= $currentTab == 'punti' ? 'active' : '' ?>" onclick="changeTab('punti')">Punti</div>
-        <div class="tab <?= $currentTab == 'injection' ? 'active' : '' ?>" onclick="changeTab('injection')">Injection</div>
+    <div class="tabs-row">
+        <button type="button" class="gp-back" title="Indietro" onclick="history.back()">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div class="tabs">
+            <div class="tab <?= $currentTab == 'chatbot' ? 'active' : '' ?>" onclick="changeTab('chatbot')">CrystalBot</div>
+            <div class="tab <?= $currentTab == 'accessi' ? 'active' : '' ?>" onclick="changeTab('accessi')">Accessi</div>
+            <div class="tab <?= $currentTab == 'doppi' ? 'active' : '' ?>" onclick="changeTab('doppi')">Doppi</div>
+            <div class="tab <?= $currentTab == 'sms' ? 'active' : '' ?>" onclick="changeTab('sms')">SMS</div>
+            <div class="tab <?= $currentTab == 'movimenti' ? 'active' : '' ?>" onclick="changeTab('movimenti')">Movimenti</div>
+            <div class="tab <?= $currentTab == 'generali' ? 'active' : '' ?>" onclick="changeTab('generali')">Generali</div>
+            <div class="tab <?= $currentTab == 'punti' ? 'active' : '' ?>" onclick="changeTab('punti')">Punti</div>
+            <div class="tab <?= $currentTab == 'injection' ? 'active' : '' ?>" onclick="changeTab('injection')">Injection</div>
+        </div>
     </div>
     <!-- FILTRI -->
     <div class="filters">
