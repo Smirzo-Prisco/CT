@@ -148,11 +148,18 @@ if ($op === 'options') {
 
     $doppi_segnali = []; // Nome => ['ip', 'dispositivo']
 
+    // Niente JOIN con personaggio: un doppio il cui personaggio "originale" è
+    // stato nel frattempo cancellato definitivamente (es. Patrick, vedi caso
+    // Jolie del 22/09) sparirebbe altrimenti da questo controllo, perché il
+    // JOIN richiede una riga in personaggio che a quel punto non c'è più — pur
+    // restando visibile al login (case 'login' in api_auth.php, che non fa
+    // questo JOIN). log_entrate va letta da sola: è preservata apposta per
+    // riconoscere un ritorno anche dopo la cancellazione (vedi commenti in
+    // erase_pg.inc.php/erasepg_scelta.inc.php/erase_inactive.inc.php).
     $doppi_result = gdrcd_query("
-        SELECT DISTINCT le.Nome
-        FROM log_entrate le
-        JOIN personaggio p ON p.nome = le.Nome
-        WHERE le.IP = '$ip_iscrizione' AND le.Nome != '$nome_filtrato'
+        SELECT DISTINCT Nome
+        FROM log_entrate
+        WHERE IP = '$ip_iscrizione' AND Nome != '$nome_filtrato'
     ", 'result');
     while ($doppi_row = gdrcd_query($doppi_result, 'fetch')) {
         $doppi_segnali[$doppi_row['Nome']][] = 'ip';
