@@ -78,10 +78,13 @@ register_shutdown_function(function () {
             'sqli-tautologia' => '/\bor\b\s*[\'"]?\s*\d+\s*[\'"]?\s*=\s*[\'"]?\s*\d+/i',
             'sqli-comando'    => '/\b(drop|alter)\s+table\b|\bxp_cmdshell\b|\binto\s+outfile\b|\bload_file\s*\(/i',
             'sqli-tempo'      => '/\bsleep\s*\(\s*\d|\bbenchmark\s*\(/i',
-            // Richiede una virgoletta subito prima di "--" (payload classico tipo
-            // ' -- o " --): un doppio trattino da solo è troppo comune nel testo
-            // libero di gioco (usato come lineetta) e darebbe solo falsi positivi.
-            'sqli-commento'   => '/([\'"])\s*--|\/\*[\s\S]*?\*\/|;\s*--/i',
+            // Richiede una virgoletta subito prima di "--" o "/*" (payload classico
+            // tipo ' -- o '/**/): un doppio trattino da solo è troppo comune nel
+            // testo libero di gioco (usato come lineetta), e un commento /* */ da
+            // solo è normalissimo nell'HTML/CSS che i personaggi possono inserire
+            // nella propria scheda (personalizzazione legittima, es. Liva il
+            // 26/09) — senza la virgoletta prima erano entrambi solo rumore.
+            'sqli-commento'   => '/([\'"])\s*(--|\/\*)|;\s*--/i',
             'xss-script'      => '/<script\b|<\/script>/i',
             'xss-handler'     => '/\bon(error|load|click|mouseover|focus)\s*=/i',
             'xss-javascript'  => '/javascript\s*:/i',
