@@ -1,4 +1,5 @@
 <?php /*HELP: */
+require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 
 $row = gdrcd_query("SELECT email, pass, DATE_ADD(data_iscrizione, INTERVAL 7 DAY) AS data FROM personaggio WHERE nome = '".$_SESSION['login']."'");
 
