@@ -45,7 +45,7 @@
 // riversarsi su altre tabelle con un numero/ordine di colonne diverso
 // (es. GestioneNarrazioneRichieste, che ha colonne diverse).
 .gp-table--mestieri {
-    th:nth-child(2), td:nth-child(2) { width: 90px; }
+    th:nth-child(2), td:nth-child(2) { width: 64px; }
     th:nth-child(3), td:nth-child(3) { width: 200px; }
 }
 
