@@ -432,8 +432,23 @@ function etichettaMovimento($endpoint, $operazione) {
                     // non va usato per scartare la riga.
                     if ($row['Metodo'] === 'ip' && $n <= 1) continue;
 
-                    $probLabel  = classificaProbabilitaDoppio($n); // Alta | Media | Bassa
-                    $probClasse = strtolower($probLabel);
+                    // Il conteggio "N personaggi distinti su questo IP" ha senso SOLO per
+                    // Metodo='ip' (l'IP è per definizione condiviso dai due personaggi).
+                    // Per Metodo='dispositivo' l'IP salvato è solo quello dell'ultimo
+                    // login (vedi api_auth.php): mostrare "N personaggi" lì è fuorviante
+                    // (es. "1 personaggio" anche per un match fortissimo via device
+                    // fingerprint) — quindi qui niente conteggio, solo l'etichetta del
+                    // metodo. Il match per dispositivo condiviso resta di per sé un
+                    // segnale forte (Alta), indipendentemente dall'IP.
+                    if ($row['Metodo'] === 'dispositivo') {
+                        $probLabel  = 'Alta';
+                        $probClasse = 'alta';
+                        $probNota   = 'Stesso dispositivo (device fingerprint) usato da entrambi i personaggi, indipendentemente dall\'IP — utile a intercettare chi cambia rete o usa Tor';
+                    } else {
+                        $probLabel  = classificaProbabilitaDoppio($n); // Alta | Media | Bassa
+                        $probClasse = strtolower($probLabel);
+                        $probNota   = "$n personaggi distinti hanno usato questo IP";
+                    }
 
                     $luogoInfo  = $geo[$row['IP']] ?? null;
                     $luogoTesto = $luogoInfo ? implode(', ', array_filter([$luogoInfo['city'] ?? null, $luogoInfo['country'] ?? null])) : '';
@@ -449,7 +464,7 @@ function etichettaMovimento($endpoint, $operazione) {
                             </span>
                             <span class="log-card__fill"></span>
                             <span class="log-card__meta-group">
-                                <span class="log-card__luogo log-card__luogo--<?=$probClasse?>" title="Probabilità <?=$probLabel?>: <?=$n?> personaggi distinti hanno usato questo IP">
+                                <span class="log-card__luogo log-card__luogo--<?=$probClasse?>" title="Probabilità <?=$probLabel?>: <?=gdrcd_filter('out', $probNota)?>">
                                     <?=gdrcd_filter('out', $luogoTesto)?>
                                 </span>
                                 <span class="log-card__date"><?=$row['DataEvento']?></span>
@@ -457,7 +472,7 @@ function etichettaMovimento($endpoint, $operazione) {
                             </span>
                         </div>
                         <div class="log-card__detail">
-                            <p class="log-card__prob-note">Probabilità <strong><?=$probLabel?></strong> — <?=$n?> personaggi distinti hanno usato questo IP</p>
+                            <p class="log-card__prob-note">Probabilità <strong><?=$probLabel?></strong> — <?=gdrcd_filter('out', $probNota)?></p>
                             <div class="log-card__grid">
                                 <div>
                                     <div class="log-card__label">Rilevato da</div>
