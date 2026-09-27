@@ -509,10 +509,10 @@ export default function GestioneMestieri() {
                 <div className="gp-topbar__right">
                     <a href="main.php?page=gestione_tipi&types=jobs" className="btn btn--ghost btn-sm">Tipi</a>
                     <button className="btn btn--ghost btn-sm" onClick={() => apriModifica(-1)}>
-                        Lavori indipendenti
+                        Indipendenti
                     </button>
                     <button className="btn btn--primary btn-sm" onClick={apriNuovo}>
-                        <i className="fa-solid fa-plus"></i>&nbsp; Nuovo Mestiere
+                        <i className="fa-solid fa-plus"></i>&nbsp; Nuovo
                     </button>
                 </div>
             </div>
