@@ -375,7 +375,10 @@ function etichettaMovimento($endpoint, $operazione) {
             case 'doppi': //  ******************  PG DOPPI ******************
                 $pg = gdrcd_filter('in', $_GET['pg']);
                 $where = $pg != '' ? "WHERE Nome = '$pg' OR Doppio = '$pg'" : '';
-                $doppi = gdrcd_query("SELECT * FROM log_doppi $where ORDER BY DataEvento DESC", 'result');
+                $doppiRes = gdrcd_query("SELECT * FROM log_doppi $where ORDER BY DataEvento DESC", 'result');
+                $doppi = [];
+                while ($row = gdrcd_query($doppiRes, 'fetch')) { $doppi[] = $row; }
+                gdrcd_query($doppiRes, 'free');
 
                 // Conteggio "quanti personaggi distinti per IP" calcolato una sola volta
                 // per tutti gli IP coinvolti, invece di una query per ogni riga della
@@ -384,6 +387,13 @@ function etichettaMovimento($endpoint, $operazione) {
                 $ipCount = [];
                 $resIp = gdrcd_query('SELECT IP, COUNT(DISTINCT Nome) AS n FROM log_entrate GROUP BY IP', 'result');
                 while ($r = gdrcd_query($resIp, 'fetch')) { $ipCount[$r['IP']] = (int)$r['n']; }
+                gdrcd_query($resIp, 'free');
+
+                // Geolocalizzazione IP (servizio terzo ip-api.com, vedi
+                // gdrcd_geoip_lookup() in custom_functions.inc.php): un'unica
+                // chiamata batch per tutti gli IP distinti di questa tabella,
+                // non una per riga.
+                $geo = gdrcd_geoip_lookup(array_column($doppi, 'IP'));
                 ?>
                 <thead>
                     <tr>
@@ -392,15 +402,16 @@ function etichettaMovimento($endpoint, $operazione) {
                         <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Probabilità</th>
                         <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> Rilevato da</th>
                         <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> IP</th>
-                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Host</th>
-                        <th onclick="sortTable(6)"><i class="fa-solid fa-sort"></i> Browser</th>
-                        <th onclick="sortTable(7)"><i class="fa-solid fa-sort"></i> Data</th>
+                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Luogo</th>
+                        <th onclick="sortTable(6)"><i class="fa-solid fa-sort"></i> Host</th>
+                        <th onclick="sortTable(7)"><i class="fa-solid fa-sort"></i> Browser</th>
+                        <th onclick="sortTable(8)"><i class="fa-solid fa-sort"></i> Data</th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php
                 $metodi = ['ip' => 'Stesso IP', 'dispositivo' => 'Stesso dispositivo'];
-                while ($row = gdrcd_query($doppi, 'fetch')) :
+                foreach ($doppi as $row):
                     $n = $ipCount[$row['IP']] ?? 0;
                     $probLabel = classificaProbabilitaDoppio($n); ?>
                     <tr>
@@ -413,62 +424,85 @@ function etichettaMovimento($endpoint, $operazione) {
                         </td>
                         <td><?=$metodi[$row['Metodo']] ?? '—'?></td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
+                        <td><?=gdrcd_geoip_label($geo[$row['IP']] ?? null)?></td>
                         <td><?=gdrcd_filter('out', $row['Host'])?></td>
                         <td><?=gdrcd_filter('out', $row['Browser'])?></td>
                         <td><?=$row['DataEvento']?></td>
                     </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
                 </tbody>
             <?php break;
             case 'accessi': //  ******************  ACCESSI ******************
                 $limiteAccessi = $filtroDataAccessi === 'tutti' ? ' LIMIT 500' : '';
-                $doppi = gdrcd_query("SELECT * FROM log_entrate $whereDataAccessi ORDER BY DataEvento DESC$limiteAccessi", 'result'); ?>
+                $accessiRes = gdrcd_query("SELECT * FROM log_entrate $whereDataAccessi ORDER BY DataEvento DESC$limiteAccessi", 'result');
+                $accessi = [];
+                while ($row = gdrcd_query($accessiRes, 'fetch')) { $accessi[] = $row; }
+                gdrcd_query($accessiRes, 'free');
+
+                $geo = gdrcd_geoip_lookup(array_column($accessi, 'IP'));
+                ?>
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
                         <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> IP</th>
-                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Host</th>
-                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> Data</th>
+                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Luogo</th>
+                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> Host</th>
+                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Data</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php while ($row = gdrcd_query($doppi, 'fetch')) : ?>
+                <?php foreach ($accessi as $row) : ?>
                     <tr>
                         <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
+                        <td><?=gdrcd_geoip_label($geo[$row['IP']] ?? null)?></td>
                         <td><?=gdrcd_filter('out', $row['Host'])?></td>
                         <td><?=$row['DataEvento']?></td>
                     </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
                 </tbody>
             <?php break;
             case 'movimenti': //  ******************  MOVIMENTI ******************
                 $limiteMovimenti = $filtroDataMovimenti === 'tutti' ? ' LIMIT 500' : '';
-                $movimenti = gdrcd_query("SELECT * FROM log_movimenti $whereMovimenti ORDER BY DataEvento DESC$limiteMovimenti", 'result'); ?>
+                $movimentiRes = gdrcd_query("SELECT * FROM log_movimenti $whereMovimenti ORDER BY DataEvento DESC$limiteMovimenti", 'result');
+                $movimenti = [];
+                while ($row = gdrcd_query($movimentiRes, 'fetch')) { $movimenti[] = $row; }
+                gdrcd_query($movimentiRes, 'free');
+
+                $geo = gdrcd_geoip_lookup(array_column($movimenti, 'IP'));
+                ?>
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
                         <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> Endpoint</th>
                         <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Operazione</th>
                         <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> IP</th>
-                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Data</th>
+                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Luogo</th>
+                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Data</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php while ($row = gdrcd_query($movimenti, 'fetch')) :
+                <?php foreach ($movimenti as $row):
                     $etichettaOp = etichettaMovimento($row['Endpoint'], $row['Operazione']); ?>
                     <tr>
                         <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
                         <td><?=gdrcd_filter('out', $row['Endpoint'])?></td>
                         <td title="<?=gdrcd_filter('out', $row['Operazione'])?>"><?=gdrcd_filter('out', $etichettaOp ?? $row['Operazione'])?></td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
+                        <td><?=gdrcd_geoip_label($geo[$row['IP']] ?? null)?></td>
                         <td><?=$row['DataEvento']?></td>
                     </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
                 </tbody>
             <?php break;
             case 'injection': //  ******************  INJECTION ******************
-                $injection = gdrcd_query("SELECT * FROM log_injection ORDER BY DataEvento DESC", 'result'); ?>
+                $injectionRes = gdrcd_query("SELECT * FROM log_injection ORDER BY DataEvento DESC", 'result');
+                $injection = [];
+                while ($row = gdrcd_query($injectionRes, 'fetch')) { $injection[] = $row; }
+                gdrcd_query($injectionRes, 'free');
+
+                $geo = gdrcd_geoip_lookup(array_column($injection, 'IP'));
+                ?>
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
@@ -478,11 +512,12 @@ function etichettaMovimento($endpoint, $operazione) {
                         <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Valore</th>
                         <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Pattern</th>
                         <th onclick="sortTable(6)"><i class="fa-solid fa-sort"></i> IP</th>
-                        <th onclick="sortTable(7)"><i class="fa-solid fa-sort"></i> Data</th>
+                        <th onclick="sortTable(7)"><i class="fa-solid fa-sort"></i> Luogo</th>
+                        <th onclick="sortTable(8)"><i class="fa-solid fa-sort"></i> Data</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php while ($row = gdrcd_query($injection, 'fetch')) : ?>
+                <?php foreach ($injection as $row) : ?>
                     <tr>
                         <td><?php if ($row['Nome']): ?><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a><?php else: ?>—<?php endif; ?></td>
                         <td><?=gdrcd_filter('out', $row['Endpoint'])?></td>
@@ -491,9 +526,10 @@ function etichettaMovimento($endpoint, $operazione) {
                         <td><?=gdrcd_filter('out', $row['Valore'])?></td>
                         <td><?=gdrcd_filter('out', $row['Pattern'])?></td>
                         <td><?=gdrcd_filter('out', $row['IP'])?></td>
+                        <td><?=gdrcd_geoip_label($geo[$row['IP']] ?? null)?></td>
                         <td><?=$row['DataEvento']?></td>
                     </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
                 </tbody>
             <?php break;
             case 'punti': //  ******************  PUNTI POSSEDUTI ******************

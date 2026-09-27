@@ -1012,6 +1012,127 @@ function isPgCancellato($permessi): bool {
     return (int)$permessi === DELETED;
 }
 
+/**
+ * Risolve uno o più IP in paese/città/ISP tramite ip-api.com (servizio terzo
+ * gratuito, nessuna chiave richiesta, limite 45 richieste/minuto — vedi tab
+ * Accessi/Doppi/Movimenti/Injection in main.php?page=log). Cache permanente
+ * su DB: un IP viene interrogato una sola volta, mai più aggiornato — qui
+ * serve solo un'indicazione indicativa per l'analisi dei log, non un dato
+ * sempre fresco, e la posizione di un IP non cambia abbastanza spesso da
+ * giustificare una scadenza.
+ *
+ * Per un nodo di uscita Tor mostra solo la posizione del nodo, non quella
+ * reale di chi lo usa — 'proxy' segnala quando ip-api riconosce l'IP come
+ * VPN/proxy/hosting (i nodi Tor rientrano quasi sempre in questa categoria).
+ *
+ * Fallisce in silenzio: un lookup non riuscito (rete, rate limit, IP privato)
+ * non deve mai rompere la pagina di log che lo richiede — quell'IP resta
+ * semplicemente assente dal risultato.
+ *
+ * @param string[] $ips
+ * @return array<string, array{country:?string, city:?string, isp:?string, proxy:bool}>
+ */
+function gdrcd_geoip_lookup(array $ips): array {
+    $ips = array_values(array_unique(array_filter($ips)));
+    if (!$ips) return [];
+
+    $risultati = [];
+    $mancanti  = [];
+
+    foreach ($ips as $ip) {
+        $ipF = gdrcd_filter('in', $ip);
+        $row = gdrcd_query("SELECT Country, City, Isp, Proxy FROM geoip_cache WHERE IP = '$ipF'");
+        if ($row) {
+            $risultati[$ip] = [
+                'country' => $row['Country'] !== '' ? $row['Country'] : null,
+                'city'    => $row['City']    !== '' ? $row['City']    : null,
+                'isp'     => $row['Isp']     !== '' ? $row['Isp']     : null,
+                'proxy'   => (bool)$row['Proxy'],
+            ];
+        } else {
+            $mancanti[] = $ip;
+        }
+    }
+
+    // Niente chiamata per IP privati/riservati (127.0.0.1, rete locale, ecc.):
+    // ip-api risponderebbe comunque "fail", inutile consumare quota per quello.
+    $mancanti = array_values(array_filter(
+        $mancanti,
+        fn($ip) => filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false
+    ));
+    if (!$mancanti) return $risultati;
+
+    // Batch: una sola richiesta HTTP per fino a 100 IP (limite del servizio),
+    // molto più efficiente di una chiamata per riga quando una tabella di log
+    // mostra decine di IP diversi nella stessa pagina.
+    $mancanti = array_slice($mancanti, 0, 100);
+    $payload  = json_encode(array_map(fn($ip) => ['query' => $ip], $mancanti));
+
+    $ch = curl_init('http://ip-api.com/batch?fields=status,country,city,isp,proxy,query');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_HTTPHEADER     => ['content-type: application/json'],
+        CURLOPT_TIMEOUT        => 5,
+    ]);
+    $response = curl_exec($ch);
+    $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr  = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlErr || $httpCode !== 200) {
+        if ($curlErr) error_log("[geoip] curl error: $curlErr");
+        return $risultati;
+    }
+
+    $dati = json_decode($response, true);
+    if (!is_array($dati)) return $risultati;
+
+    foreach ($dati as $voce) {
+        if (($voce['status'] ?? '') !== 'success') continue;
+
+        $ip   = (string)$voce['query'];
+        $info = [
+            'country' => $voce['country'] ?? null,
+            'city'    => $voce['city']    ?? null,
+            'isp'     => $voce['isp']     ?? null,
+            'proxy'   => (bool)($voce['proxy'] ?? false),
+        ];
+        $risultati[$ip] = $info;
+
+        gdrcd_query(
+            "INSERT INTO geoip_cache (IP, Country, City, Isp, Proxy, DataRisoluzione) VALUES ('" .
+            gdrcd_filter('in', $ip) . "', '" .
+            gdrcd_filter('in', (string)$info['country']) . "', '" .
+            gdrcd_filter('in', (string)$info['city']) . "', '" .
+            gdrcd_filter('in', (string)$info['isp']) . "', " .
+            ($info['proxy'] ? 1 : 0) . ", NOW())
+             ON DUPLICATE KEY UPDATE Country=VALUES(Country), City=VALUES(City), Isp=VALUES(Isp), Proxy=VALUES(Proxy), DataRisoluzione=VALUES(DataRisoluzione)"
+        );
+    }
+
+    return $risultati;
+}
+
+/**
+ * Formatta il risultato di gdrcd_geoip_lookup() per una singola riga di
+ * tabella: "Città, Paese" (+ badge se è un proxy/VPN/hosting noto), oppure
+ * un trattino se l'IP non è stato risolto.
+ */
+function gdrcd_geoip_label(?array $info): string {
+    if (!$info || (!$info['city'] && !$info['country'])) return '—';
+
+    $parti = array_filter([$info['city'], $info['country']]);
+    $label = gdrcd_filter('out', implode(', ', $parti));
+
+    if ($info['proxy']) {
+        $label .= ' <span class="status Alta" title="IP riconosciuto come VPN/proxy/hosting (include i nodi Tor)">VPN/Proxy</span>';
+    }
+
+    return $label;
+}
+
 // Helper: verifica se l'utente corrente può accedere a una sezione araldo.
 // Spostata qui da api_forum.php (era locale al file) perché ora serve anche
 // a createQuestPost(), condivisa con la generazione quest da role_recap.
