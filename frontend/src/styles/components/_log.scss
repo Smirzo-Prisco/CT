@@ -234,7 +234,11 @@ $log-accent: #ce846f;
         border: 1px solid #4c52a3;
         color: #c1c4e0;
 
-        strong { color: $log-accent; }
+        // #aee7ff, non $log-accent (arancione/rust, mai migrato al sistema di
+        // token — legacy delle tabelle sopra, abbandonato da mesi altrove):
+        // stesso ciano già usato per .tab.active poco sotto, coerente con il
+        // resto di questa sezione "moderna" della pagina.
+        strong { color: #aee7ff; }
     }
 
     // Scroll orizzontale invece di schiacciare le colonne: la tabella
@@ -289,6 +293,123 @@ $log-accent: #ce846f;
     .Active, .Success, .Granted, .Bassa { background-color: rgb(40 167 69 / 20%); color: #8fff9b; }
     .Inactive, .Failed, .Denied, .Alta  { background-color: rgb(255 0 0 / 20%); color: #ff8b8b; }
     .Pending, .Media { background-color: rgb(255 193 7 / 20%); color: #ffd86b; }
+
+    // ── Tab Doppi: elenco di card, non una tabella ──────────────────────────
+    // 9 colonne erano illeggibili sia su desktop che, soprattutto, su mobile
+    // (dove la vecchia tabella forzava uno scroll orizzontale a 640px). Ogni
+    // riga è ora una card compatta (nomi, luogo colorato per probabilità,
+    // data) che si espande al click mostrando IP/host/browser — niente
+    // colonna "Probabilità" a parte, il colore del Luogo la sostituisce
+    // (rosso/giallo/verde, stessi valori di .Alta/.Media/.Bassa sopra).
+    .doppio-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .doppio-card {
+        background-color: #1d2038;
+        border: 1px solid #2a2e4b;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: border-color 0.15s;
+
+        &.is-open { border-color: #4c52a3; }
+    }
+
+    .doppio-card__row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        cursor: pointer;
+        flex-wrap: wrap;
+
+        &:hover { background-color: #2a2e4b; }
+    }
+
+    .doppio-card__names {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        font-weight: bold;
+        flex-shrink: 0;
+
+        a { color: #aee7ff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    }
+
+    .doppio-card__sep { color: #8890b5; }
+    .doppio-card__fill { flex: 1; min-width: 8px; }
+
+    .doppio-card__luogo {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.85em;
+        font-weight: bold;
+        white-space: nowrap;
+        border: 1px solid transparent;
+
+        &--alta  { color: #ff8b8b; background-color: rgb(255 0 0 / 14%); border-color: rgb(255 90 90 / 35%); }
+        &--media { color: #ffd86b; background-color: rgb(255 193 7 / 14%); border-color: rgb(255 193 7 / 35%); }
+        &--bassa { color: #8fff9b; background-color: rgb(40 167 69 / 14%); border-color: rgb(80 200 110 / 35%); }
+    }
+
+    .doppio-card__date {
+        font-size: 0.85em;
+        color: #9498b8;
+        white-space: nowrap;
+    }
+
+    .doppio-card__chevron {
+        color: #9498b8;
+        transition: transform 0.15s;
+    }
+    .doppio-card.is-open .doppio-card__chevron { transform: rotate(180deg); color: #e7e8f5; }
+
+    .doppio-card__detail {
+        display: none;
+        padding: 0 14px 14px;
+        border-top: 1px solid #2a2e4b;
+    }
+    .doppio-card.is-open .doppio-card__detail { display: block; }
+
+    .doppio-card__prob-note {
+        font-size: 0.85em;
+        color: #9498b8;
+        margin: 12px 0 0;
+
+        strong { color: #e7e8f5; }
+    }
+
+    .doppio-card__grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 20px;
+        margin-top: 12px;
+    }
+
+    .doppio-card__label {
+        font-size: 0.7em;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #9498b8;
+        margin-bottom: 3px;
+    }
+
+    .doppio-card__value {
+        font-size: 0.85em;
+        word-break: break-word;
+
+        &--mono { font-family: monospace; }
+    }
+
+    @media (width <= 480px) {
+        .doppio-card__grid { grid-template-columns: 1fr; }
+    }
 }
 
 // ── Modale chat nel log ───────────────────────────────────────────────────────

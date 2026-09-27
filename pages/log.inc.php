@@ -260,7 +260,11 @@ function etichettaMovimento($endpoint, $operazione) {
     <?php endif; ?>
     <!-- TABELLA -->
     <div class="log-table-scroll">
+    <?php if ($currentTab === 'doppi'): ?>
+    <div class="doppi-cards">
+    <?php else: ?>
     <table id="logTable">
+    <?php endif; ?>
         <?php
         switch ($currentTab) {
             case 'chatbot': //  ******************  DOMANDE CHATBOT ******************
@@ -394,43 +398,63 @@ function etichettaMovimento($endpoint, $operazione) {
                 // chiamata batch per tutti gli IP distinti di questa tabella,
                 // non una per riga.
                 $geo = gdrcd_geoip_lookup(array_column($doppi, 'IP'));
-                ?>
-                <thead>
-                    <tr>
-                        <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
-                        <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> Doppio</th>
-                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Probabilità</th>
-                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> Rilevato da</th>
-                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> IP</th>
-                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Luogo</th>
-                        <th onclick="sortTable(6)"><i class="fa-solid fa-sort"></i> Host</th>
-                        <th onclick="sortTable(7)"><i class="fa-solid fa-sort"></i> Browser</th>
-                        <th onclick="sortTable(8)"><i class="fa-solid fa-sort"></i> Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php
+
+                // Niente colonna "Probabilità" separata: il Luogo stesso viene
+                // colorato in base alla probabilità (rosso/giallo/verde, stessa
+                // scala di classificaProbabilitaDoppio) — risparmia una colonna
+                // ed è leggibile anche su mobile, dove la vecchia tabella a 9
+                // colonne era illeggibile. Il valore per esteso resta comunque
+                // nel dettaglio espanso, non solo nel colore, per chi non
+                // riesce a distinguerli. Vedi mockup discusso il 27/09.
                 $metodi = ['ip' => 'Stesso IP', 'dispositivo' => 'Stesso dispositivo'];
-                foreach ($doppi as $row):
+                ?>
+                <?php foreach ($doppi as $row):
                     $n = $ipCount[$row['IP']] ?? 0;
-                    $probLabel = classificaProbabilitaDoppio($n); ?>
-                    <tr>
-                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
-                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Doppio'])?>"><?=gdrcd_filter('out', $row['Doppio'])?></a></td>
-                        <td>
-                            <span class="status <?=$probLabel?>" title="<?=$n?> personaggi distinti hanno usato questo IP">
-                                <?=$probLabel?>
+                    $probLabel  = classificaProbabilitaDoppio($n); // Alta | Media | Bassa
+                    $probClasse = strtolower($probLabel);
+
+                    $luogoInfo  = $geo[$row['IP']] ?? null;
+                    $luogoTesto = $luogoInfo ? implode(', ', array_filter([$luogoInfo['city'] ?? null, $luogoInfo['country'] ?? null])) : '';
+                    if ($luogoTesto === '') $luogoTesto = 'Luogo sconosciuto';
+                    if (!empty($luogoInfo['proxy'])) $luogoTesto .= ' · VPN/Proxy';
+                    ?>
+                    <div class="doppio-card">
+                        <div class="doppio-card__row" onclick="toggleDoppioCard(this)">
+                            <span class="doppio-card__names">
+                                <a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>" onclick="event.stopPropagation()"><?=gdrcd_filter('out', $row['Nome'])?></a>
+                                <span class="doppio-card__sep">⇄</span>
+                                <a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Doppio'])?>" onclick="event.stopPropagation()"><?=gdrcd_filter('out', $row['Doppio'])?></a>
                             </span>
-                        </td>
-                        <td><?=$metodi[$row['Metodo']] ?? '—'?></td>
-                        <td><?=gdrcd_filter('out', $row['IP'])?></td>
-                        <td><?=gdrcd_geoip_label($geo[$row['IP']] ?? null)?></td>
-                        <td><?=gdrcd_filter('out', $row['Host'])?></td>
-                        <td><?=gdrcd_filter('out', $row['Browser'])?></td>
-                        <td><?=$row['DataEvento']?></td>
-                    </tr>
+                            <span class="doppio-card__fill"></span>
+                            <span class="doppio-card__luogo doppio-card__luogo--<?=$probClasse?>" title="Probabilità <?=$probLabel?>: <?=$n?> personaggi distinti hanno usato questo IP">
+                                <?=gdrcd_filter('out', $luogoTesto)?>
+                            </span>
+                            <span class="doppio-card__date"><?=$row['DataEvento']?></span>
+                            <span class="doppio-card__chevron">▾</span>
+                        </div>
+                        <div class="doppio-card__detail">
+                            <p class="doppio-card__prob-note">Probabilità <strong><?=$probLabel?></strong> — <?=$n?> personaggi distinti hanno usato questo IP</p>
+                            <div class="doppio-card__grid">
+                                <div>
+                                    <div class="doppio-card__label">Rilevato da</div>
+                                    <div class="doppio-card__value"><?=$metodi[$row['Metodo']] ?? '—'?></div>
+                                </div>
+                                <div>
+                                    <div class="doppio-card__label">IP</div>
+                                    <div class="doppio-card__value doppio-card__value--mono"><?=gdrcd_filter('out', $row['IP'])?></div>
+                                </div>
+                                <div>
+                                    <div class="doppio-card__label">Host</div>
+                                    <div class="doppio-card__value doppio-card__value--mono"><?=gdrcd_filter('out', $row['Host'])?></div>
+                                </div>
+                                <div>
+                                    <div class="doppio-card__label">Browser</div>
+                                    <div class="doppio-card__value doppio-card__value--mono"><?=gdrcd_filter('out', $row['Browser'])?></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
-                </tbody>
             <?php break;
             case 'accessi': //  ******************  ACCESSI ******************
                 $limiteAccessi = $filtroDataAccessi === 'tutti' ? ' LIMIT 500' : '';
@@ -575,7 +599,11 @@ function etichettaMovimento($endpoint, $operazione) {
                 </tbody>
             <?php break;
             } ?>
+    <?php if ($currentTab === 'doppi'): ?>
+    </div>
+    <?php else: ?>
     </table>
+    <?php endif; ?>
     </div>
 </div>
 
