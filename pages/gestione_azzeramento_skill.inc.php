@@ -37,9 +37,10 @@ $tutti_pg = gdrcd_query("SELECT * FROM personaggio WHERE id_gilda > 1 AND nome !
             <i class="fa-solid fa-chevron-left"></i>
         </button>
     </div>
+    <div class="gp-topbar__center">
+        <span class="gp-title">Azzera skill personaggi</span>
+    </div>
 </div>
-
-<h2 class="gp-title">Azzera skill personaggi</h2>
 
 <form action="main.php?page=gestione_azzeramento_skill" method="post" name="cancellaselezione">
     <div class="gp-list">

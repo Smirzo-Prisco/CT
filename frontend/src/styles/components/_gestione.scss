@@ -919,6 +919,13 @@ span[style*="position:relative"]:hover .tooltip-bottom {
     width: 180px;
 }
 
+// Scoperto a .gp-table--personaggi (non sul generico .gp-th-name/.gp-cell--name,
+// condiviso con altre 5 tabelle): qui ci sono altre 4 colonne oltre ad Azioni,
+// quindi meno spazio superfluo per andare a capo su mobile.
+.gp-table--personaggi {
+    th:nth-child(2), td:nth-child(2) { width: 130px; }
+}
+
 .gp-cell--name {
     font-weight: $font-weight-bold;
 

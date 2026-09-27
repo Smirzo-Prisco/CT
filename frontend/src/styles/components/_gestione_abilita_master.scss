@@ -12,9 +12,9 @@
 // larghezza esplicita la tabella supera semplicemente la larghezza dello
 // schermo e scorre in orizzontale (rete di sicurezza già prevista da .gp-list).
 .gp-table--abilita {
-    th:nth-child(1), td:nth-child(1) { width: 180px; }
+    th:nth-child(1), td:nth-child(1) { width: 110px; }
     th:nth-child(2), td:nth-child(2) { width: 220px; }
-    th:nth-child(3), td:nth-child(3) { width: 180px; }
+    th:nth-child(3), td:nth-child(3) { width: 130px; }
     th:nth-child(4), td:nth-child(4) { width: 140px; }
 }
 

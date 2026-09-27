@@ -114,7 +114,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
 
 <!-- ── Lista personaggi ──────────────────────────────────────── -->
 <div class="gp-list">
-    <table id="pgTable">
+    <table id="pgTable" class="gp-table--personaggi">
         <thead>
             <tr>
                 <th class="gp-th-avatar"></th>
