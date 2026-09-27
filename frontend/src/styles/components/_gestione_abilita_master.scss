@@ -5,11 +5,15 @@
 // ============================================================
 @use '../tokens' as *;
 
-// Descrizione resta l'unica colonna "auto": beneficia di piu' spazio,
-// Assegnatario/Azioni hanno contenuto a larghezza piu' prevedibile — stesso
-// principio di .gp-table--oggetti.
+// Descrizione ha una larghezza esplicita (non "auto" come in .gp-table--oggetti):
+// senza, con table-layout:fixed, su schermi stretti dove le altre 3 colonne
+// da sole già superano la larghezza disponibile finiva a 0px, con ogni
+// lettera del testo a capo invece di un paragrafo leggibile. Con una
+// larghezza esplicita la tabella supera semplicemente la larghezza dello
+// schermo e scorre in orizzontale (rete di sicurezza già prevista da .gp-list).
 .gp-table--abilita {
     th:nth-child(1), td:nth-child(1) { width: 180px; }
+    th:nth-child(2), td:nth-child(2) { width: 220px; }
     th:nth-child(3), td:nth-child(3) { width: 180px; }
     th:nth-child(4), td:nth-child(4) { width: 140px; }
 }

@@ -51,7 +51,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
 ?>
 
 <!-- ── Topbar ─────────────────────────────────────────────────── -->
-<div class="gp-topbar">
+<div class="gp-topbar gp-topbar--personaggi">
 
     <div class="gp-topbar__left">
         <button type="button" class="gp-back" title="Indietro" onclick="history.back()">

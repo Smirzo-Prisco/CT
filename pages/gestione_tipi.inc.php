@@ -41,8 +41,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['moderatore'] != 1) {
 
 </div>
 
-<h2 class="gp-title"><?= gdrcd_filter('out', $config['titolo']) ?></h2>
-
 <!-- ── Elenco tipi ────────────────────────────────────────────── -->
 <div class="gp-list">
     <table id="tipiTable" class="gp-table--tipi" data-types="<?= gdrcd_filter('out', $types) ?>">

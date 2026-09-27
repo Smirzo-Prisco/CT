@@ -1,0 +1,12 @@
+// ============================================================
+// _gestione_luoghi_mestiere.scss — Associazione luogo/mestiere
+// Riusa .gp-topbar/.gp-list/.gp-label-note da _gestione.scss; qui solo la
+// larghezza di colonna: Azioni ha un solo pulsante (icona), senza una
+// larghezza esplicita con table-layout:fixed veniva divisa in parti uguali
+// con le altre due colonne, rubando spazio a "Luogo associato".
+// ============================================================
+@use '../tokens' as *;
+
+.gp-table--luoghi-mestiere {
+    th:nth-child(3), td:nth-child(3) { width: 64px; }
+}

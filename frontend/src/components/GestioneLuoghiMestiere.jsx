@@ -119,7 +119,7 @@ export default function GestioneLuoghiMestiere() {
             </p>
 
             <div className="gp-list">
-                <table>
+                <table className="gp-table--luoghi-mestiere">
                     <thead>
                         <tr>
                             <th>Mestiere</th>

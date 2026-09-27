@@ -36,9 +36,10 @@ if ($_SESSION['admin'] == 1) {
             <i class="fa-solid fa-chevron-left"></i>
         </button>
     </div>
+    <div class="gp-topbar__center">
+        <span class="gp-title">Ricarica oggetto scaduto</span>
+    </div>
 </div>
-
-<h2 class="gp-title">Ricarica oggetto scaduto</h2>
 
 <div class="gp-panel">
     <form id="ricaricaForm">

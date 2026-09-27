@@ -720,6 +720,12 @@ span[style*="position:relative"]:hover .tooltip-bottom {
         align-items: center;
         gap: $space-2;
         flex-shrink: 0;
+        // Ancora il gruppo al bordo destro anche quando __center non c'è
+        // (pagine con solo indietro + campi): senza __center non c'è più
+        // nessun elemento flex:1 a spingerlo, senza sarebbe attaccato al
+        // pulsante indietro. Se __center c'è, ha già consumato lui tutto lo
+        // spazio libero (flex:1) e questo margin-auto non ha nulla da assorbire.
+        margin-left: auto;
     }
 }
 
@@ -873,6 +879,15 @@ span[style*="position:relative"]:hover .tooltip-bottom {
 
         &:hover { background: $gestione-hover; }
     }
+}
+
+// Riga di pulsanti sotto una .gp-list (es. Seleziona tutto / Azzera in
+// gestione_azzeramento_skill), fuori dalla tabella.
+.gp-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-2;
+    padding: 0 $space-3 $space-3;
 }
 
 .gp-th-actions { text-align: left; }
@@ -1184,5 +1199,36 @@ span[style*="position:relative"]:hover .tooltip-bottom {
 @media (width <= 768px) {
     .gp-topbar {
         &__right { flex-wrap: wrap; }
+    }
+}
+
+// gestione_personaggio: filtro + ricerca + azioni sono troppi elementi per
+// andare tutti in una riga in larghezza piena, ma da mobile devono restare
+// su una sola riga senza scroll orizzontale della pagina — qui si stringono
+// invece di lasciarli andare a capo (comportamento di default di __right sopra).
+@media (width <= 480px) {
+    .gp-topbar--personaggi {
+        flex-wrap: nowrap;
+
+        .gp-topbar__right {
+            flex-wrap: nowrap;
+            flex-shrink: 1;
+            min-width: 0;
+            gap: $space-1;
+        }
+
+        .gp-filter-form select {
+            max-width: 64px;
+            padding: 4px $space-1;
+            font-size: $text-sm;
+            text-overflow: ellipsis;
+        }
+
+        #searchPg {
+            min-width: 0;
+            flex: 1 1 40px;
+            padding: 4px $space-2;
+            font-size: $text-sm;
+        }
     }
 }

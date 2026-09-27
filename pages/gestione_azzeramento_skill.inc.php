@@ -29,32 +29,49 @@ if (isset($_POST['delete'])){
 $login_corrente = gdrcd_filter('in', $_SESSION['login']);
 $tutti_pg = gdrcd_query("SELECT * FROM personaggio WHERE id_gilda > 1 AND nome != '$login_corrente' ORDER BY nome", 'result');
 ?>
-    <form action="main.php?page=gestione_azzeramento_skill" method="post" name="cancellaselezione">
-        <table class="customTable">
-            <tr><td colspan="2">Azzerare skill pg</td></tr>
-            <tr class="second_header"><td>Nome</td><td>Punti</td><td></td></tr>
-            <?php while ($row = mysqli_fetch_array($tutti_pg)) :
-                $check_punti = gdrcd_query("SELECT sum(grado) AS total FROM clgpersonaggioabilita WHERE nome = '". $row['nome'] ."' AND (id_abilita > 42 AND id_abilita < 349)"); ?>
+
+<!-- ── Topbar ─────────────────────────────────────────────────── -->
+<div class="gp-topbar">
+    <div class="gp-topbar__left">
+        <button type="button" class="gp-back" title="Indietro" onclick="history.back()">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+    </div>
+</div>
+
+<h2 class="gp-title">Azzera skill personaggi</h2>
+
+<form action="main.php?page=gestione_azzeramento_skill" method="post" name="cancellaselezione">
+    <div class="gp-list">
+        <table class="gp-table--azzeramento">
+            <thead>
                 <tr>
-                    <td><a href="main.php?page=scheda&pg=<?=$row['nome']?>"><?=$row['nome']?></a></td>
+                    <th class="gp-th-name">Nome</th>
+                    <th>Punti</th>
+                    <th class="gp-th-actions"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = mysqli_fetch_array($tutti_pg)) :
+                    $check_punti = gdrcd_query("SELECT sum(grado) AS total FROM clgpersonaggioabilita WHERE nome = '". $row['nome'] ."' AND (id_abilita > 42 AND id_abilita < 349)"); ?>
+                <tr>
+                    <td class="gp-cell--name"><a href="main.php?page=scheda&pg=<?=$row['nome']?>"><?=$row['nome']?></a></td>
                     <td>
                         <?=$check_punti['total']?>
                         <input type="hidden" name="punti" value="<?=$check_punti['total']?>">
                     </td>
-                    <td><input type="checkbox" name="checkbox[]" value="<?=$row['nome']?>"></td>
+                    <td class="gp-cell--actions"><input type="checkbox" name="checkbox[]" value="<?=$row['nome']?>"></td>
                 </tr>
-            <?php endwhile; ?>
-            <tr>
-                <td colspan="2">
-                    <center>
-                        <input type="submit" name="delete" id="delete" value="Azzera">
-                        &nbsp;&nbsp;
-                        <input type="button" value="Seleziona tutto" onClick="SelezTT()" style="background-color: #070a1b; border: 1px solid rgba(58, 72, 86, 0.49); color: #8a9ca0; font-size: 10px; font-family: Tahoma, Geneva, sans-serif; padding: 4px; text-transform: uppercase;">
-                    </center>
-                </td>
-            </tr>
+                <?php endwhile; ?>
+            </tbody>
         </table>
-    </form>
+    </div>
+
+    <div class="gp-form-actions">
+        <input type="button" value="Seleziona tutto" onClick="SelezTT()" class="btn btn--ghost btn-sm">
+        <input type="submit" name="delete" id="delete" value="Azzera" class="btn btn--primary btn-sm">
+    </div>
+</form>
 </div>
 
 <script type="text/javascript">
