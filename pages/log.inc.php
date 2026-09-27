@@ -9,6 +9,17 @@ require_once(__DIR__ . '/../includes/custom_functions.inc.php');
 
 $currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'chatbot';
 
+// Tab "generali": di default mostra la prima voce disponibile per il ruolo
+// corrente (Log in errati per l'admin, vedi l'ordine assegnato in
+// vocabulary) invece di restare vuota finché non si sceglie manualmente
+// qualcosa dal menu a tendina.
+if ($currentTab === 'generali') {
+    $generaliTypeDefault = array_key_first($MESSAGE['event']);
+    $generaliType = (isset($_GET['generaliType']) && $_GET['generaliType'] !== '')
+        ? (int)gdrcd_filter('num', $_GET['generaliType'])
+        : $generaliTypeDefault;
+}
+
 // Tab "accessi": filtro per giorno, default oggi — la tabella non aveva alcun
 // filtro e scaricava tutta la cronologia di log_entrate (11.000+ righe da
 // quando è stata rimossa la deduplica), lenta da caricare e poco utile per
@@ -197,7 +208,7 @@ function etichettaMovimento($endpoint, $operazione) {
         <select onchange="window.location.href = 'main.php?page=log&tab=<?=$currentTab?>&generaliType=' + this.value;">
             <?php
             foreach ($MESSAGE['event'] as $key => $event) { ?>
-                <option value="<?=$key?>" <?=$_GET['generaliType']==$key?'selected':''?>><?=$event?></option>
+                <option value="<?=$key?>" <?=$generaliType==$key?'selected':''?>><?=$event?></option>
             <?php } ?>
         </select>
     <?php elseif ($currentTab == 'sms'):
@@ -294,7 +305,7 @@ function etichettaMovimento($endpoint, $operazione) {
             case 'generali': // ******************  GENERALI ******************
                 $query_generali = gdrcd_query("SELECT autore, nome_interessato, data_evento, descrizione_evento
                                 FROM log
-                                WHERE codice_evento = ".gdrcd_filter('num', $_GET['generaliType'])."
+                                WHERE codice_evento = ".(int)$generaliType."
                                 ORDER BY data_evento DESC", 'result'); ?>
                 <thead>
                     <tr>

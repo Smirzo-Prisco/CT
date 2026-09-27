@@ -944,8 +944,13 @@ $MESSAGE['names']['skill']['13'] = 'Mentale di attacco';
 // personaggi cancellati/esiliati, vedi conversazione del 27/09) ed è
 // rientrato nel menu.
 //
-// Transazioni tra PG (BONIFICO) volutamente per ultima: ordine dell'array =
-// ordine nel menu a tendina.
+// Log in errati (ERRORELOGIN) volutamente per prima: è anche la voce di
+// default mostrata all'apertura della pagina (vedi pages/log.inc.php,
+// $generaliType = array_key_first($MESSAGE['event'])). Transazioni tra PG
+// (BONIFICO) volutamente per ultima. Ordine dell'array = ordine nel menu.
+if ($_SESSION['admin'] == 1) {
+$MESSAGE['event'][ERRORELOGIN] = 'Log in errati';
+}
 if ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1) {
 $MESSAGE['event'][DELETEPG] = 'Personaggi cancellati';
 $MESSAGE['event'][CHANGEDNAME] = 'Cambi nome';
@@ -954,7 +959,6 @@ if ($_SESSION['admin'] == 1) {
 $MESSAGE['event'][NUOVOLAVORO] = 'Assunzioni';
 $MESSAGE['event'][DIMISSIONE] = 'Dimissioni';
 $MESSAGE['event'][CHANGEDPASS] = 'Cambio password';
-$MESSAGE['event'][ERRORELOGIN] = 'Log in errati';
 }
 if ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1) {
 $MESSAGE['event'][BONIFICO] = 'Transazioni tra PG';

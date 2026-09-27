@@ -61,6 +61,21 @@ switch ($op) {
             WHERE personaggio.nome = '" . gdrcd_filter('in', $login1) . "' LIMIT 1");
 
         if (empty($record) || !gdrcd_password_check($pass1, $record['pass'])) {
+            // Utente inesistente o password sbagliata per uno esistente: stesso
+            // codice ERRORELOGIN dei due casi sopra, ma qui nome_interessato è
+            // il nome così come digitato (può anche non corrispondere a nessun
+            // personaggio reale) — troncato a 20 caratteri, limite della
+            // colonna. L'IP nella descrizione è l'unico modo per riconoscere
+            // pattern (stesso IP che prova nomi diversi, scanner automatici).
+            try {
+                $ip_tentativo = gdrcd_filter('in', $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '');
+                $nome_tentativo = gdrcd_filter('in', substr($login1 !== '' ? $login1 : '(vuoto)', 0, 20));
+                gdrcd_query(
+                    "INSERT INTO log (nome_interessato, autore, data_evento, codice_evento, descrizione_evento) VALUES ('$nome_tentativo', '$nome_tentativo', NOW(), " . ERRORELOGIN . ", 'Utente o password errati — IP $ip_tentativo')",
+                    'query', true
+                );
+            } catch (\Exception $e) { /* non critico */ }
+
             echo json_encode(['success' => false, 'message' => 'Nome personaggio o password non riconosciuti.']);
             exit;
         }
