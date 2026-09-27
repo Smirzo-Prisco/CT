@@ -38,11 +38,8 @@ if (!hasPermesso($_SESSION, $permessi_azioni['gestisci'])) {
         </button>
     </div>
 
-    <div class="gp-topbar__center">
-        <input type="text" id="searchAbilita" class="gp-search" placeholder="Cerca skill temporanea…">
-    </div>
-
     <div class="gp-topbar__right">
+        <input type="text" id="searchAbilita" class="gp-search" placeholder="Cerca skill temporanea…">
         <button type="button" class="btn btn--primary btn-sm" title="Nuova skill temporanea" onclick="apriModaleCreazioneAbilita()">
             <i class="fa-solid fa-plus"></i>&nbsp; Nuova skill
         </button>

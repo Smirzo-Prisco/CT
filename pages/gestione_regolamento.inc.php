@@ -62,7 +62,7 @@ $tipo_label = [
         </button>
     </div>
 
-    <div class="gp-topbar__center">
+    <div class="gp-topbar__right">
         <form method="get" action="main.php" class="gp-filter-form">
             <input type="hidden" name="page" value="gestione_regolamento">
             <select name="tipo_filter" onchange="this.form.submit()">
@@ -73,9 +73,6 @@ $tipo_label = [
             </select>
         </form>
         <input type="text" id="searchRegolamento" class="gp-search" placeholder="Cerca articolo…">
-    </div>
-
-    <div class="gp-topbar__right">
         <button class="btn btn--primary btn-sm" onclick="apriRegolamentoForm(null)">
             <i class="fa-solid fa-plus"></i>&nbsp; <?= gdrcd_filter('out', $MESSAGE['interface']['administration']['rules']['link']['new']) ?>
         </button>

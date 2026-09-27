@@ -59,7 +59,7 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
         </button>
     </div>
 
-    <div class="gp-topbar__center">
+    <div class="gp-topbar__right">
         <form method="post" action="main.php?page=gestione_personaggio" class="gp-filter-form">
             <select name="filtro" id="selectFiltroPg" onchange="this.form.submit()">
                 <option value="tutti"       <?= $filtro === 'tutti'       ? 'selected' : '' ?>>Tutti</option>
@@ -70,9 +70,6 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
             </select>
         </form>
         <input type="text" id="searchPg" class="gp-search" placeholder="Cerca personaggio…">
-    </div>
-
-    <div class="gp-topbar__right">
         <?php if (hasPermesso($_SESSION, $permessi_azioni['reset'])): ?>
         <button class="btn-action btn-action--reset btn-action--icon" title="Reset punti di tutti i personaggi" onclick="resetPg([])">
             <i class="fa-solid fa-rotate"></i>

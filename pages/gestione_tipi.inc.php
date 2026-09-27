@@ -32,11 +32,8 @@ if ($_SESSION['admin'] != 1 && $_SESSION['moderatore'] != 1) {
         </button>
     </div>
 
-    <div class="gp-topbar__center">
-        <input type="text" id="searchTipo" class="gp-search" placeholder="Cerca <?= mb_strtolower(gdrcd_filter('out', $config['titolo'])) ?>…">
-    </div>
-
     <div class="gp-topbar__right">
+        <input type="text" id="searchTipo" class="gp-search" placeholder="Cerca <?= mb_strtolower(gdrcd_filter('out', $config['titolo'])) ?>…">
         <button type="button" class="btn btn--primary btn-sm" title="Nuovo tipo" onclick="apriModaleCreazioneTipo()">
             <i class="fa-solid fa-plus"></i>&nbsp; Nuovo tipo
         </button>

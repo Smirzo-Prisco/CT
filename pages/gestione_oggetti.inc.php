@@ -59,8 +59,8 @@ $personaggiAssegna = gdrcd_query("SELECT nome FROM personaggio ORDER BY nome ASC
             <i class="fa-solid fa-chevron-left"></i>
         </button>
     </div>
+    <div class="gp-topbar__right">
     <?php if ($vistaCompleta): ?>
-    <div class="gp-topbar__center">
         <!-- Azzera filtri: form a se' stante (non nel <form> dei radio sotto) per
              evitare che i due controlli, condividendo name="filtro", finiscano
              per sovrascriversi a vicenda nel POST -->
@@ -91,10 +91,8 @@ $personaggiAssegna = gdrcd_query("SELECT nome FROM personaggio ORDER BY nome ASC
                 echo '</select>';
             ?>
         </form>
-    </div>
     <?php endif; ?>
     <?php if (hasPermesso($_SESSION, $azioni_permessi['crea'])): ?>
-    <div class="gp-topbar__right">
         <!-- <button onclick>, non <a href="javascript:...">: il listener globale
              in main.jsx intercetta il click su OGNI <a> il cui href inizia per
              "javascript:" e chiama preventDefault() per bloccare la navigazione
@@ -104,8 +102,8 @@ $personaggiAssegna = gdrcd_query("SELECT nome FROM personaggio ORDER BY nome ASC
              Stesso pattern gia' usato per Modifica/Elimina/Assegna qui sotto,
              che infatti funzionano. Vedi conversazione di progetto del 2026-08-24. -->
         <button type="button" class="btn btn--primary btn-sm" title="Nuovo oggetto" onclick="apriModaleCreazioneObj()"><i class="fa-solid fa-plus"></i>&nbsp; Nuovo Oggetto</button> <!-- ELIMINARE: main.php?page=oggetto_aggiungi e main.php?page=gestione_mercato -->
-    </div>
     <?php endif; ?>
+    </div>
 </div>
 
 <!-- Lista oggetti -->
