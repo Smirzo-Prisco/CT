@@ -427,11 +427,13 @@ function etichettaMovimento($endpoint, $operazione) {
                                 <a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Doppio'])?>" onclick="event.stopPropagation()"><?=gdrcd_filter('out', $row['Doppio'])?></a>
                             </span>
                             <span class="log-card__fill"></span>
-                            <span class="log-card__luogo log-card__luogo--<?=$probClasse?>" title="Probabilità <?=$probLabel?>: <?=$n?> personaggi distinti hanno usato questo IP">
-                                <?=gdrcd_filter('out', $luogoTesto)?>
+                            <span class="log-card__meta-group">
+                                <span class="log-card__luogo log-card__luogo--<?=$probClasse?>" title="Probabilità <?=$probLabel?>: <?=$n?> personaggi distinti hanno usato questo IP">
+                                    <?=gdrcd_filter('out', $luogoTesto)?>
+                                </span>
+                                <span class="log-card__date"><?=$row['DataEvento']?></span>
+                                <span class="log-card__chevron">▾</span>
                             </span>
-                            <span class="log-card__date"><?=$row['DataEvento']?></span>
-                            <span class="log-card__chevron">▾</span>
                         </div>
                         <div class="log-card__detail">
                             <p class="log-card__prob-note">Probabilità <strong><?=$probLabel?></strong> — <?=$n?> personaggi distinti hanno usato questo IP</p>
@@ -481,9 +483,11 @@ function etichettaMovimento($endpoint, $operazione) {
                                 <a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>" onclick="event.stopPropagation()"><?=gdrcd_filter('out', $row['Nome'])?></a>
                             </span>
                             <span class="log-card__fill"></span>
-                            <span class="log-card__meta"><?=gdrcd_filter('out', $luogoTesto)?></span>
-                            <span class="log-card__date"><?=$row['DataEvento']?></span>
-                            <span class="log-card__chevron">▾</span>
+                            <span class="log-card__meta-group">
+                                <span class="log-card__meta"><?=gdrcd_filter('out', $luogoTesto)?></span>
+                                <span class="log-card__date"><?=$row['DataEvento']?></span>
+                                <span class="log-card__chevron">▾</span>
+                            </span>
                         </div>
                         <div class="log-card__detail">
                             <div class="log-card__grid">
@@ -526,9 +530,11 @@ function etichettaMovimento($endpoint, $operazione) {
                                 <a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>" onclick="event.stopPropagation()"><?=gdrcd_filter('out', $row['Nome'])?></a>
                             </span>
                             <span class="log-card__fill"></span>
-                            <span class="log-card__meta" title="<?=gdrcd_filter('out', $row['Operazione'])?>"><?=gdrcd_filter('out', $etichettaOp ?? $row['Operazione'])?></span>
-                            <span class="log-card__date"><?=$row['DataEvento']?></span>
-                            <span class="log-card__chevron">▾</span>
+                            <span class="log-card__meta-group">
+                                <span class="log-card__meta" title="<?=gdrcd_filter('out', $row['Operazione'])?>"><?=gdrcd_filter('out', $etichettaOp ?? $row['Operazione'])?></span>
+                                <span class="log-card__date"><?=$row['DataEvento']?></span>
+                                <span class="log-card__chevron">▾</span>
+                            </span>
                         </div>
                         <div class="log-card__detail">
                             <div class="log-card__grid">

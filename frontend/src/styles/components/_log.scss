@@ -320,9 +320,13 @@ $log-accent: #ce846f;
     .log-card__row {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         padding: 12px 14px;
         cursor: pointer;
+        // Va a capo l'intero .log-card__meta-group (vedi sotto), non i singoli
+        // figli: su mobile la Data restava isolata su una riga a sé perché
+        // ogni elemento poteva andare a capo per conto proprio (segnalato il
+        // 27/09) — ora è tutto-o-niente per quel blocco.
         flex-wrap: wrap;
 
         &:hover { background-color: #2a2e4b; }
@@ -342,7 +346,20 @@ $log-accent: #ce846f;
     }
     .log-card__sep { color: #8890b5; }
 
-    .log-card__fill { flex: 1; min-width: 8px; }
+    .log-card__fill { flex: 1 1 auto; min-width: 8px; }
+
+    // Luogo/Operazione + Data + freccia raggruppati: quando manca spazio va a
+    // capo TUTTO questo blocco insieme (mai la sola Data), e al suo interno
+    // solo Luogo/Operazione si restringe con ellissi — Data e freccia restano
+    // sempre leggibili per intero, non vengono mai tagliate né isolate.
+    .log-card__meta-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        max-width: 100%;
+        flex-shrink: 0;
+    }
 
     // Meta testuale nella riga compatta (Operazione in Movimenti, ecc.) —
     // senza colore semantico, a differenza del Luogo in Doppi qui sotto.
@@ -352,6 +369,7 @@ $log-accent: #ce846f;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        min-width: 0;
     }
 
     // Luogo colorato per probabilità (solo tab Doppi) — sostituisce la
@@ -364,6 +382,9 @@ $log-accent: #ce846f;
         font-size: 0.85em;
         font-weight: bold;
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
         border: 1px solid transparent;
 
         &--alta  { color: #ff8b8b; background-color: rgb(255 0 0 / 14%); border-color: rgb(255 90 90 / 35%); }
@@ -375,11 +396,13 @@ $log-accent: #ce846f;
         font-size: 0.85em;
         color: #9498b8;
         white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .log-card__chevron {
         color: #9498b8;
         transition: transform 0.15s;
+        flex-shrink: 0;
     }
     .log-card.is-open .log-card__chevron { transform: rotate(180deg); color: #e7e8f5; }
 
