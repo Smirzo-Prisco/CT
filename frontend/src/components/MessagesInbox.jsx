@@ -235,7 +235,29 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                         <button onClick={onBack} className={styles.backBtn}>←</button>
                         {!selectMode && (
                             <>
-                                <strong>{conv.display_name}</strong>
+                                {conv.tipo === 'individuale' ? (
+                                    <a
+                                        href={`main.php?page=scheda&pg=${encodeURIComponent(conv.display_name)}`}
+                                        className={styles.headerLink}
+                                        title="Vai alla scheda del personaggio"
+                                    >
+                                        <img
+                                            src={getAvatarUrl(conv) || `../themes/crystal/imgs/race_presenti/Png.png`}
+                                            alt=""
+                                            className={styles.headerAvatar}
+                                        />
+                                        <strong>{conv.display_name}</strong>
+                                    </a>
+                                ) : (
+                                    <span className={styles.headerIdentity}>
+                                        <img
+                                            src={getAvatarUrl(conv) || `../themes/crystal/imgs/race_presenti/Png.png`}
+                                            alt=""
+                                            className={styles.headerAvatar}
+                                        />
+                                        <strong>{conv.display_name}</strong>
+                                    </span>
+                                )}
                                 <span className={styles.onlineBadge}>
                                     {conv.ongame ? '[ON]' : '[OFF]'}
                                     {conv.tipo === 'gruppo' ? ' · Gruppo' : ''}

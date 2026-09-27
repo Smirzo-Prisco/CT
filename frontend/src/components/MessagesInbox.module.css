@@ -26,6 +26,31 @@
     justify-content: space-between;
 }
 
+.headerIdentity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.headerAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.headerLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.headerLink:hover strong {
+    text-decoration: underline;
+}
+
 .headerActions {
     display: flex;
     align-items: center;
