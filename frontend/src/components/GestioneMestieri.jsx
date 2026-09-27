@@ -506,9 +506,6 @@ export default function GestioneMestieri() {
                         <i className="fa-solid fa-chevron-left"></i>
                     </button>
                 </div>
-                <div className="gp-topbar__center">
-                    <span className="gp-title">Gestione Mestieri</span>
-                </div>
                 <div className="gp-topbar__right">
                     <a href="main.php?page=gestione_tipi&types=jobs" className="btn btn--ghost btn-sm">Tipi</a>
                     <button className="btn btn--ghost btn-sm" onClick={() => apriModifica(-1)}>
