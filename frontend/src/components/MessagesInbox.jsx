@@ -231,7 +231,7 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
             {/* Header: normale → [← nome badge] [Seleziona][Elimina conv]; selezione → [←] [Elimina N][Annulla] */}
             <div className="thread-header">
                 <div className={styles.threadHeaderRow}>
-                    <div>
+                    <div className={styles.headerLeft}>
                         <button onClick={onBack} className={styles.backBtn}>←</button>
                         {!selectMode && (
                             <>

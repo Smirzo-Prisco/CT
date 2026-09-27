@@ -10,7 +10,7 @@
 // larghezza disponibile), rendendola invisibile — stesso bug già risolto
 // in .gp-table--abilita (colonna Descrizione).
 .gp-table--bacheche {
-    th:nth-child(1), td:nth-child(1) { width: 220px; }
+    th:nth-child(1), td:nth-child(1) { width: 140px; }
     th:nth-child(2), td:nth-child(2) { width: 100px; }
     th:nth-child(3), td:nth-child(3) { width: 70px; }
     th:nth-child(4), td:nth-child(4) { width: 140px; }

@@ -40,3 +40,14 @@
     height: 18px;
     margin-right: 0;
 }
+
+// I due select (Tipo/Categoria) restano larghi quanto il testo dell'opzione
+// selezionata: ristretti a meta' della larghezza naturale per lasciare
+// spazio agli altri controlli della topbar.
+#selectTipoObj,
+#selectCategoriaObj {
+    width: 90px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

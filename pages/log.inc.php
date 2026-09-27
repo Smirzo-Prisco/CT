@@ -422,6 +422,16 @@ function etichettaMovimento($endpoint, $operazione) {
                 ?>
                 <?php foreach ($doppi as $row):
                     $n = $ipCount[$row['IP']] ?? 0;
+
+                    // Per Metodo='ip' il campo IP è per definizione condiviso da Nome e
+                    // Doppio: se log_entrate conta 1 solo personaggio su quell'IP è un
+                    // dato anomalo, non un doppio reale — riga scartata. Per Metodo=
+                    // 'dispositivo' invece l'IP salvato è solo quello dell'ultimo login
+                    // (vedi api_auth.php), non condiviso: lì n=1 è normale (es. Tor/reti
+                    // diverse, il caso stesso per cui il segnale dispositivo esiste) e
+                    // non va usato per scartare la riga.
+                    if ($row['Metodo'] === 'ip' && $n <= 1) continue;
+
                     $probLabel  = classificaProbabilitaDoppio($n); // Alta | Media | Bassa
                     $probClasse = strtolower($probLabel);
 

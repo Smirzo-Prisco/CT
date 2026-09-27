@@ -773,6 +773,15 @@ span[style*="position:relative"]:hover .tooltip-bottom {
     }
 }
 
+// gestione_regolamento: select e ricerca stessa larghezza — stesso flex/
+// min-width di .gp-search sotto, cosi' si dividono lo spazio disponibile
+// in parti uguali invece che il select restare alla sua larghezza
+// "naturale" (dipendente dal testo dell'opzione selezionata).
+.gp-topbar--regolamento .gp-filter-form select {
+    flex: 1;
+    min-width: 110px;
+}
+
 .gp-search {
     flex: 1;
     min-width: 110px;
@@ -1254,18 +1263,16 @@ span[style*="position:relative"]:hover .tooltip-bottom {
             gap: $space-1;
         }
 
-        .gp-filter-form select {
-            max-width: 70px;
-            padding: 4px $space-1;
-            font-size: $text-sm;
-            text-overflow: ellipsis;
-        }
-
+        // Stessa regola (flex/min-width/max-width) per select e ricerca:
+        // devono restare della stessa larghezza anche stretti su mobile.
+        .gp-filter-form select,
         #searchRegolamento {
             min-width: 0;
             flex: 1 1 40px;
-            padding: 4px $space-2;
+            max-width: 90px;
+            padding: 4px $space-1;
             font-size: $text-sm;
+            text-overflow: ellipsis;
         }
 
         .btn {

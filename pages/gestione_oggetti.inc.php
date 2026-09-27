@@ -101,7 +101,7 @@ $personaggiAssegna = gdrcd_query("SELECT nome FROM personaggio ORDER BY nome ASC
              (nessun errore, il pulsante sembra semplicemente non fare nulla).
              Stesso pattern gia' usato per Modifica/Elimina/Assegna qui sotto,
              che infatti funzionano. Vedi conversazione di progetto del 2026-08-24. -->
-        <button type="button" class="btn btn--primary btn-sm" title="Nuovo oggetto" onclick="apriModaleCreazioneObj()"><i class="fa-solid fa-plus"></i>&nbsp; Nuovo Oggetto</button> <!-- ELIMINARE: main.php?page=oggetto_aggiungi e main.php?page=gestione_mercato -->
+        <button type="button" class="btn btn--primary btn-sm" title="Nuovo oggetto" onclick="apriModaleCreazioneObj()"><i class="fa-solid fa-plus"></i>&nbsp; Nuovo</button> <!-- ELIMINARE: main.php?page=oggetto_aggiungi e main.php?page=gestione_mercato -->
     <?php endif; ?>
     </div>
 </div>
