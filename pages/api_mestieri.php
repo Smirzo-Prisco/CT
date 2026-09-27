@@ -302,15 +302,18 @@ switch ($op) {
         // e privilegi.capomestiere vanno resettati. Le gilde giocatore non toccano mai questi
         // campi (clgpersonaggioaffiliazione è la fonte di verità per l'affiliazione a una
         // gilda), quindi non c'è nulla da resettare in quel caso.
+        // Query diretta su personaggio.id_mestiere, non più tramite JOIN con
+        // clgpersonaggiomestiere: quella tabella può non avere più la riga di
+        // qualcuno (es. dopo un delete_ruolo su un suo ruolo, ora corretto per
+        // fare lo stesso reset — ma restava comunque il rischio che qualunque
+        // altra causa disallineasse le due fonti), lasciandolo fuori da questo
+        // conteggio e "impiegato fantasma" per sempre (caso reale: Kamari e
+        // altri 6 pg, indagine del 27/09). personaggio.id_mestiere è la fonte
+        // autoritativa già usata da op=change/leave per decidere chi è impiegato.
         if ($e_mestiere_vero) {
             $affetti = [];
-            $res = gdrcd_query(
-                "SELECT DISTINCT cpm.personaggio FROM clgpersonaggiomestiere cpm
-                 JOIN ruolo_mestiere rm ON cpm.id_ruolo = rm.id_ruolo
-                 WHERE rm.mestiere = $id",
-                'result'
-            );
-            while ($row = gdrcd_query($res, 'fetch')) { $affetti[] = $row['personaggio']; }
+            $res = gdrcd_query("SELECT nome FROM personaggio WHERE id_mestiere = $id", 'result');
+            while ($row = gdrcd_query($res, 'fetch')) { $affetti[] = $row['nome']; }
             gdrcd_query($res, 'free');
 
             if ($affetti) {
@@ -640,6 +643,7 @@ switch ($op) {
             exit;
         }
         $mestiere = (int)$ruolo['mestiere'];
+        $mestiere_row = carica_mestiere($mestiere);
 
         if (!$is_admin) {
             if (!mestiere_e_capo_di($login, $mestiere)) {
@@ -652,11 +656,30 @@ switch ($op) {
                 echo json_encode(['success' => false, 'message' => 'Il ruolo di comando non può essere eliminato da qui']);
                 exit;
             }
-            $mestiere_row = carica_mestiere($mestiere);
             if (!$mestiere_row || (int)$mestiere_row['tipo'] === 1) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'I mestieri globali sono gestiti solo dagli admin']);
                 exit;
+            }
+        }
+
+        // Solo per i mestieri veri: chi aveva QUESTO ruolo va sganciato anche da
+        // personaggio.id_mestiere/id_ruolo_mestiere, altrimenti resta "impiegato
+        // fantasma" — bloccato dal controllo "già impiegato" di op=change/leave
+        // in api_mestiere.php, ma senza più nessun ruolo/mestiere reale da cui
+        // uscire (caso reale: Kamari e altri 6 pg, ruolo 76 del mestiere già
+        // cancellato allora, indagine del 27/09). Stesso pattern di
+        // delete_mestiere, qui limitato a chi ha esattamente questo id_ruolo.
+        if ($mestiere_row && (int)$mestiere_row['tipo'] === 1) {
+            $affetti_ruolo = [];
+            $res_ruolo = gdrcd_query("SELECT nome FROM personaggio WHERE id_ruolo_mestiere=$id_ruolo", 'result');
+            while ($row = gdrcd_query($res_ruolo, 'fetch')) { $affetti_ruolo[] = $row['nome']; }
+            gdrcd_query($res_ruolo, 'free');
+
+            if ($affetti_ruolo) {
+                $nomi_in_ruolo = implode(',', array_map(fn($n) => "'" . gdrcd_filter('in', $n) . "'", $affetti_ruolo));
+                gdrcd_query("UPDATE personaggio SET id_mestiere=0, id_ruolo_mestiere=1, esperienza_mestiere=0 WHERE nome IN ($nomi_in_ruolo)");
+                gdrcd_query("UPDATE privilegi SET capomestiere=0 WHERE nome IN ($nomi_in_ruolo)");
             }
         }
 
