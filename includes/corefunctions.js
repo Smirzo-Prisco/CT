@@ -482,10 +482,10 @@ function sortTable(n) {
     _lastSort.dir = dir;
 }
 
-// Espande/richiude il dettaglio (IP/Host/Browser) di una riga della tab Doppi —
-// niente colonna sort qui, e' un elenco di card non una tabella ordinabile.
-function toggleDoppioCard(header) {
-    header.closest('.doppio-card').classList.toggle('is-open');
+// Espande/richiude il dettaglio di una riga nelle tab Doppi/Accessi/Movimenti
+// (elenchi di card, non tabelle ordinabili — niente sortTable qui).
+function toggleLogCard(header) {
+    header.closest('.log-card').classList.toggle('is-open');
 }
 /***********    FINE    LOG  *********************/
 

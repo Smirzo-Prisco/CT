@@ -294,20 +294,20 @@ $log-accent: #ce846f;
     .Inactive, .Failed, .Denied, .Alta  { background-color: rgb(255 0 0 / 20%); color: #ff8b8b; }
     .Pending, .Media { background-color: rgb(255 193 7 / 20%); color: #ffd86b; }
 
-    // ── Tab Doppi: elenco di card, non una tabella ──────────────────────────
-    // 9 colonne erano illeggibili sia su desktop che, soprattutto, su mobile
-    // (dove la vecchia tabella forzava uno scroll orizzontale a 640px). Ogni
-    // riga è ora una card compatta (nomi, luogo colorato per probabilità,
-    // data) che si espande al click mostrando IP/host/browser — niente
-    // colonna "Probabilità" a parte, il colore del Luogo la sostituisce
-    // (rosso/giallo/verde, stessi valori di .Alta/.Media/.Bassa sopra).
-    .doppio-cards {
+    // ── Tab Doppi/Accessi/Movimenti: elenco di card, non una tabella ────────
+    // Tabelle fino a 9 colonne erano illeggibili sia su desktop che,
+    // soprattutto, su mobile (scroll orizzontale forzato a 640px). Ogni riga
+    // è ora una card compatta con solo i campi essenziali, che si espande al
+    // click mostrando il resto — struttura generica (.log-card*), condivisa
+    // dalle tre tab; solo il contenuto della riga compatta e del dettaglio
+    // cambia da una all'altra.
+    .log-cards {
         display: flex;
         flex-direction: column;
         gap: 8px;
     }
 
-    .doppio-card {
+    .log-card {
         background-color: #1d2038;
         border: 1px solid #2a2e4b;
         border-radius: 10px;
@@ -317,7 +317,7 @@ $log-accent: #ce846f;
         &.is-open { border-color: #4c52a3; }
     }
 
-    .doppio-card__row {
+    .log-card__row {
         display: flex;
         align-items: center;
         gap: 12px;
@@ -328,7 +328,9 @@ $log-accent: #ce846f;
         &:hover { background-color: #2a2e4b; }
     }
 
-    .doppio-card__names {
+    // Doppi: due nomi + separatore. Accessi/Movimenti: un nome solo (stesso
+    // colore/peso, senza il flex per la coppia).
+    .log-card__names {
         display: flex;
         align-items: baseline;
         gap: 6px;
@@ -338,11 +340,23 @@ $log-accent: #ce846f;
         a { color: #aee7ff; text-decoration: none; }
         a:hover { text-decoration: underline; }
     }
+    .log-card__sep { color: #8890b5; }
 
-    .doppio-card__sep { color: #8890b5; }
-    .doppio-card__fill { flex: 1; min-width: 8px; }
+    .log-card__fill { flex: 1; min-width: 8px; }
 
-    .doppio-card__luogo {
+    // Meta testuale nella riga compatta (Operazione in Movimenti, ecc.) —
+    // senza colore semantico, a differenza del Luogo in Doppi qui sotto.
+    .log-card__meta {
+        font-size: 0.85em;
+        color: #c1c4e0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    // Luogo colorato per probabilità (solo tab Doppi) — sostituisce la
+    // colonna "Probabilità" a parte, stessi valori di .Alta/.Media/.Bassa sopra.
+    .log-card__luogo {
         display: inline-flex;
         align-items: center;
         padding: 4px 10px;
@@ -357,26 +371,26 @@ $log-accent: #ce846f;
         &--bassa { color: #8fff9b; background-color: rgb(40 167 69 / 14%); border-color: rgb(80 200 110 / 35%); }
     }
 
-    .doppio-card__date {
+    .log-card__date {
         font-size: 0.85em;
         color: #9498b8;
         white-space: nowrap;
     }
 
-    .doppio-card__chevron {
+    .log-card__chevron {
         color: #9498b8;
         transition: transform 0.15s;
     }
-    .doppio-card.is-open .doppio-card__chevron { transform: rotate(180deg); color: #e7e8f5; }
+    .log-card.is-open .log-card__chevron { transform: rotate(180deg); color: #e7e8f5; }
 
-    .doppio-card__detail {
+    .log-card__detail {
         display: none;
         padding: 0 14px 14px;
         border-top: 1px solid #2a2e4b;
     }
-    .doppio-card.is-open .doppio-card__detail { display: block; }
+    .log-card.is-open .log-card__detail { display: block; }
 
-    .doppio-card__prob-note {
+    .log-card__prob-note {
         font-size: 0.85em;
         color: #9498b8;
         margin: 12px 0 0;
@@ -384,14 +398,14 @@ $log-accent: #ce846f;
         strong { color: #e7e8f5; }
     }
 
-    .doppio-card__grid {
+    .log-card__grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px 20px;
         margin-top: 12px;
     }
 
-    .doppio-card__label {
+    .log-card__label {
         font-size: 0.7em;
         font-weight: bold;
         letter-spacing: 0.5px;
@@ -400,7 +414,7 @@ $log-accent: #ce846f;
         margin-bottom: 3px;
     }
 
-    .doppio-card__value {
+    .log-card__value {
         font-size: 0.85em;
         word-break: break-word;
 
@@ -408,7 +422,7 @@ $log-accent: #ce846f;
     }
 
     @media (width <= 480px) {
-        .doppio-card__grid { grid-template-columns: 1fr; }
+        .log-card__grid { grid-template-columns: 1fr; }
     }
 }
 

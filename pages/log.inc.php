@@ -259,9 +259,10 @@ function etichettaMovimento($endpoint, $operazione) {
     </div>
     <?php endif; ?>
     <!-- TABELLA -->
+    <?php $tabACard = in_array($currentTab, ['doppi', 'accessi', 'movimenti'], true); ?>
     <div class="log-table-scroll">
-    <?php if ($currentTab === 'doppi'): ?>
-    <div class="doppi-cards">
+    <?php if ($tabACard): ?>
+    <div class="log-cards">
     <?php else: ?>
     <table id="logTable">
     <?php endif; ?>
@@ -418,38 +419,38 @@ function etichettaMovimento($endpoint, $operazione) {
                     if ($luogoTesto === '') $luogoTesto = 'Luogo sconosciuto';
                     if (!empty($luogoInfo['proxy'])) $luogoTesto .= ' · VPN/Proxy';
                     ?>
-                    <div class="doppio-card">
-                        <div class="doppio-card__row" onclick="toggleDoppioCard(this)">
-                            <span class="doppio-card__names">
+                    <div class="log-card">
+                        <div class="log-card__row" onclick="toggleLogCard(this)">
+                            <span class="log-card__names">
                                 <a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>" onclick="event.stopPropagation()"><?=gdrcd_filter('out', $row['Nome'])?></a>
-                                <span class="doppio-card__sep">⇄</span>
+                                <span class="log-card__sep">⇄</span>
                                 <a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Doppio'])?>" onclick="event.stopPropagation()"><?=gdrcd_filter('out', $row['Doppio'])?></a>
                             </span>
-                            <span class="doppio-card__fill"></span>
-                            <span class="doppio-card__luogo doppio-card__luogo--<?=$probClasse?>" title="Probabilità <?=$probLabel?>: <?=$n?> personaggi distinti hanno usato questo IP">
+                            <span class="log-card__fill"></span>
+                            <span class="log-card__luogo log-card__luogo--<?=$probClasse?>" title="Probabilità <?=$probLabel?>: <?=$n?> personaggi distinti hanno usato questo IP">
                                 <?=gdrcd_filter('out', $luogoTesto)?>
                             </span>
-                            <span class="doppio-card__date"><?=$row['DataEvento']?></span>
-                            <span class="doppio-card__chevron">▾</span>
+                            <span class="log-card__date"><?=$row['DataEvento']?></span>
+                            <span class="log-card__chevron">▾</span>
                         </div>
-                        <div class="doppio-card__detail">
-                            <p class="doppio-card__prob-note">Probabilità <strong><?=$probLabel?></strong> — <?=$n?> personaggi distinti hanno usato questo IP</p>
-                            <div class="doppio-card__grid">
+                        <div class="log-card__detail">
+                            <p class="log-card__prob-note">Probabilità <strong><?=$probLabel?></strong> — <?=$n?> personaggi distinti hanno usato questo IP</p>
+                            <div class="log-card__grid">
                                 <div>
-                                    <div class="doppio-card__label">Rilevato da</div>
-                                    <div class="doppio-card__value"><?=$metodi[$row['Metodo']] ?? '—'?></div>
+                                    <div class="log-card__label">Rilevato da</div>
+                                    <div class="log-card__value"><?=$metodi[$row['Metodo']] ?? '—'?></div>
                                 </div>
                                 <div>
-                                    <div class="doppio-card__label">IP</div>
-                                    <div class="doppio-card__value doppio-card__value--mono"><?=gdrcd_filter('out', $row['IP'])?></div>
+                                    <div class="log-card__label">IP</div>
+                                    <div class="log-card__value log-card__value--mono"><?=gdrcd_filter('out', $row['IP'])?></div>
                                 </div>
                                 <div>
-                                    <div class="doppio-card__label">Host</div>
-                                    <div class="doppio-card__value doppio-card__value--mono"><?=gdrcd_filter('out', $row['Host'])?></div>
+                                    <div class="log-card__label">Host</div>
+                                    <div class="log-card__value log-card__value--mono"><?=gdrcd_filter('out', $row['Host'])?></div>
                                 </div>
                                 <div>
-                                    <div class="doppio-card__label">Browser</div>
-                                    <div class="doppio-card__value doppio-card__value--mono"><?=gdrcd_filter('out', $row['Browser'])?></div>
+                                    <div class="log-card__label">Browser</div>
+                                    <div class="log-card__value log-card__value--mono"><?=gdrcd_filter('out', $row['Browser'])?></div>
                                 </div>
                             </div>
                         </div>
@@ -457,6 +458,9 @@ function etichettaMovimento($endpoint, $operazione) {
                 <?php endforeach; ?>
             <?php break;
             case 'accessi': //  ******************  ACCESSI ******************
+                // Card compatta con solo Pg/Luogo/Data (le colonne davvero utili
+                // a colpo d'occhio): IP e Host restano nel dettaglio espanso.
+                // Stesso pattern della tab Doppi, vedi commento lì sopra.
                 $limiteAccessi = $filtroDataAccessi === 'tutti' ? ' LIMIT 500' : '';
                 $accessiRes = gdrcd_query("SELECT * FROM log_entrate $whereDataAccessi ORDER BY DataEvento DESC$limiteAccessi", 'result');
                 $accessi = [];
@@ -465,28 +469,41 @@ function etichettaMovimento($endpoint, $operazione) {
 
                 $geo = gdrcd_geoip_lookup(array_column($accessi, 'IP'));
                 ?>
-                <thead>
-                    <tr>
-                        <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
-                        <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> IP</th>
-                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Luogo</th>
-                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> Host</th>
-                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($accessi as $row) : ?>
-                    <tr>
-                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
-                        <td><?=gdrcd_filter('out', $row['IP'])?></td>
-                        <td><?=gdrcd_geoip_label($geo[$row['IP']] ?? null)?></td>
-                        <td><?=gdrcd_filter('out', $row['Host'])?></td>
-                        <td><?=$row['DataEvento']?></td>
-                    </tr>
+                <?php foreach ($accessi as $row):
+                    $luogoInfo  = $geo[$row['IP']] ?? null;
+                    $luogoTesto = $luogoInfo ? implode(', ', array_filter([$luogoInfo['city'] ?? null, $luogoInfo['country'] ?? null])) : '';
+                    if ($luogoTesto === '') $luogoTesto = 'Luogo sconosciuto';
+                    if (!empty($luogoInfo['proxy'])) $luogoTesto .= ' · VPN/Proxy';
+                    ?>
+                    <div class="log-card">
+                        <div class="log-card__row" onclick="toggleLogCard(this)">
+                            <span class="log-card__names">
+                                <a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>" onclick="event.stopPropagation()"><?=gdrcd_filter('out', $row['Nome'])?></a>
+                            </span>
+                            <span class="log-card__fill"></span>
+                            <span class="log-card__meta"><?=gdrcd_filter('out', $luogoTesto)?></span>
+                            <span class="log-card__date"><?=$row['DataEvento']?></span>
+                            <span class="log-card__chevron">▾</span>
+                        </div>
+                        <div class="log-card__detail">
+                            <div class="log-card__grid">
+                                <div>
+                                    <div class="log-card__label">IP</div>
+                                    <div class="log-card__value log-card__value--mono"><?=gdrcd_filter('out', $row['IP'])?></div>
+                                </div>
+                                <div>
+                                    <div class="log-card__label">Host</div>
+                                    <div class="log-card__value log-card__value--mono"><?=gdrcd_filter('out', $row['Host'])?></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
-                </tbody>
             <?php break;
             case 'movimenti': //  ******************  MOVIMENTI ******************
+                // Card compatta con solo Pg/Operazione/Data: Endpoint, IP e
+                // Luogo restano nel dettaglio espanso. Stesso pattern di
+                // Doppi/Accessi sopra.
                 $limiteMovimenti = $filtroDataMovimenti === 'tutti' ? ' LIMIT 500' : '';
                 $movimentiRes = gdrcd_query("SELECT * FROM log_movimenti $whereMovimenti ORDER BY DataEvento DESC$limiteMovimenti", 'result');
                 $movimenti = [];
@@ -495,29 +512,42 @@ function etichettaMovimento($endpoint, $operazione) {
 
                 $geo = gdrcd_geoip_lookup(array_column($movimenti, 'IP'));
                 ?>
-                <thead>
-                    <tr>
-                        <th onclick="sortTable(0)"><i class="fa-solid fa-sort"></i> Pg</th>
-                        <th onclick="sortTable(1)"><i class="fa-solid fa-sort"></i> Endpoint</th>
-                        <th onclick="sortTable(2)"><i class="fa-solid fa-sort"></i> Operazione</th>
-                        <th onclick="sortTable(3)"><i class="fa-solid fa-sort"></i> IP</th>
-                        <th onclick="sortTable(4)"><i class="fa-solid fa-sort"></i> Luogo</th>
-                        <th onclick="sortTable(5)"><i class="fa-solid fa-sort"></i> Data</th>
-                    </tr>
-                </thead>
-                <tbody>
                 <?php foreach ($movimenti as $row):
-                    $etichettaOp = etichettaMovimento($row['Endpoint'], $row['Operazione']); ?>
-                    <tr>
-                        <td><a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>"><?=gdrcd_filter('out', $row['Nome'])?></a></td>
-                        <td><?=gdrcd_filter('out', $row['Endpoint'])?></td>
-                        <td title="<?=gdrcd_filter('out', $row['Operazione'])?>"><?=gdrcd_filter('out', $etichettaOp ?? $row['Operazione'])?></td>
-                        <td><?=gdrcd_filter('out', $row['IP'])?></td>
-                        <td><?=gdrcd_geoip_label($geo[$row['IP']] ?? null)?></td>
-                        <td><?=$row['DataEvento']?></td>
-                    </tr>
+                    $etichettaOp = etichettaMovimento($row['Endpoint'], $row['Operazione']);
+
+                    $luogoInfo  = $geo[$row['IP']] ?? null;
+                    $luogoTesto = $luogoInfo ? implode(', ', array_filter([$luogoInfo['city'] ?? null, $luogoInfo['country'] ?? null])) : '';
+                    if ($luogoTesto === '') $luogoTesto = 'Luogo sconosciuto';
+                    if (!empty($luogoInfo['proxy'])) $luogoTesto .= ' · VPN/Proxy';
+                    ?>
+                    <div class="log-card">
+                        <div class="log-card__row" onclick="toggleLogCard(this)">
+                            <span class="log-card__names">
+                                <a href="main.php?page=scheda&pg=<?=gdrcd_filter('out', $row['Nome'])?>" onclick="event.stopPropagation()"><?=gdrcd_filter('out', $row['Nome'])?></a>
+                            </span>
+                            <span class="log-card__fill"></span>
+                            <span class="log-card__meta" title="<?=gdrcd_filter('out', $row['Operazione'])?>"><?=gdrcd_filter('out', $etichettaOp ?? $row['Operazione'])?></span>
+                            <span class="log-card__date"><?=$row['DataEvento']?></span>
+                            <span class="log-card__chevron">▾</span>
+                        </div>
+                        <div class="log-card__detail">
+                            <div class="log-card__grid">
+                                <div>
+                                    <div class="log-card__label">Endpoint</div>
+                                    <div class="log-card__value log-card__value--mono"><?=gdrcd_filter('out', $row['Endpoint'])?></div>
+                                </div>
+                                <div>
+                                    <div class="log-card__label">IP</div>
+                                    <div class="log-card__value log-card__value--mono"><?=gdrcd_filter('out', $row['IP'])?></div>
+                                </div>
+                                <div>
+                                    <div class="log-card__label">Luogo</div>
+                                    <div class="log-card__value"><?=gdrcd_filter('out', $luogoTesto)?></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
-                </tbody>
             <?php break;
             case 'injection': //  ******************  INJECTION ******************
                 $injectionRes = gdrcd_query("SELECT * FROM log_injection ORDER BY DataEvento DESC", 'result');
@@ -599,7 +629,7 @@ function etichettaMovimento($endpoint, $operazione) {
                 </tbody>
             <?php break;
             } ?>
-    <?php if ($currentTab === 'doppi'): ?>
+    <?php if ($tabACard): ?>
     </div>
     <?php else: ?>
     </table>
