@@ -936,12 +936,17 @@ $MESSAGE['names']['skill']['13'] = 'Mentale di attacco';
 
 
 /********** Eventi **********/
-// BLOCKED, LOGGEDIN, ERRORELOGIN, CHANGEDROLE e PX rimossi dal menu: nessun
-// punto del codice scrive più questi codice_evento nella tabella `log` (login
-// e XP sono tracciati altrove, in log_entrate e nella tabella Punti), quindi
-// selezionarli restituiva sempre una tabella vuota.
+// BLOCKED, LOGGEDIN, CHANGEDROLE e PX restano fuori dal menu: nessun punto
+// del codice scrive questi codice_evento nella tabella `log` (login e XP
+// sono tracciati altrove, in log_entrate e nella tabella Punti), quindi
+// selezionarli restituirebbe sempre una tabella vuota. ERRORELOGIN invece è
+// tornato utile (api_auth.php ora traccia i tentativi di accesso a
+// personaggi cancellati/esiliati, vedi conversazione del 27/09) ed è
+// rientrato nel menu.
+//
+// Transazioni tra PG (BONIFICO) volutamente per ultima: ordine dell'array =
+// ordine nel menu a tendina.
 if ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1) {
-$MESSAGE['event'][BONIFICO] = 'Transazioni tra PG';
 $MESSAGE['event'][DELETEPG] = 'Personaggi cancellati';
 $MESSAGE['event'][CHANGEDNAME] = 'Cambi nome';
 }
@@ -949,6 +954,10 @@ if ($_SESSION['admin'] == 1) {
 $MESSAGE['event'][NUOVOLAVORO] = 'Assunzioni';
 $MESSAGE['event'][DIMISSIONE] = 'Dimissioni';
 $MESSAGE['event'][CHANGEDPASS] = 'Cambio password';
+$MESSAGE['event'][ERRORELOGIN] = 'Log in errati';
+}
+if ($_SESSION['admin'] == 1 || $_SESSION['moderatore'] == 1) {
+$MESSAGE['event'][BONIFICO] = 'Transazioni tra PG';
 }
 
 /********** Ricorrenti **********/

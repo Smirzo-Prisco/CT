@@ -60,7 +60,26 @@ switch ($op) {
             LEFT JOIN privilegi ON personaggio.nome = privilegi.nome
             WHERE personaggio.nome = '" . gdrcd_filter('in', $login1) . "' LIMIT 1");
 
-        if (empty($record) || !gdrcd_password_check($pass1, $record['pass']) || isPgCancellato($record['permessi'])) {
+        if (empty($record) || !gdrcd_password_check($pass1, $record['pass'])) {
+            echo json_encode(['success' => false, 'message' => 'Nome personaggio o password non riconosciuti.']);
+            exit;
+        }
+
+        if (isPgCancellato($record['permessi'])) {
+            // La password era corretta (altrimenti si sarebbe già usciti sopra):
+            // non è un tentativo a caso, ma qualcuno che conosce le credenziali
+            // di un personaggio cancellato — utile per capire se sta tentando di
+            // rientrare con l'account che dovrebbe essere fuori gioco. Messaggio
+            // all'utente invariato, per non rivelare che l'account esiste ed è
+            // stato cancellato.
+            try {
+                gdrcd_query(
+                    "INSERT INTO log (nome_interessato, autore, data_evento, codice_evento, descrizione_evento) VALUES ('" .
+                    gdrcd_filter('in', $login1) . "', '" . gdrcd_filter('in', $login1) . "', NOW(), " . ERRORELOGIN . ", 'Tentativo di accesso a personaggio cancellato')",
+                    'query', true
+                );
+            } catch (\Exception $e) { /* non critico */ }
+
             echo json_encode(['success' => false, 'message' => 'Nome personaggio o password non riconosciuti.']);
             exit;
         }
@@ -117,6 +136,18 @@ switch ($op) {
         try {
             $exilio = gdrcd_query("SELECT esilio FROM personaggio WHERE nome = '" . gdrcd_filter('in', $record['nome']) . "' LIMIT 1", 'query', true);
             if (!empty($exilio['esilio']) && strtotime($exilio['esilio']) > time()) {
+                // Password corretta ma personaggio in esilio: tracciato per
+                // capire se un esiliato sta tentando di rientrare — a differenza
+                // del caso "cancellato" sopra, qui il messaggio all'utente è già
+                // esplicito sull'esilio, quindi loggarlo non rivela nulla di nuovo.
+                try {
+                    gdrcd_query(
+                        "INSERT INTO log (nome_interessato, autore, data_evento, codice_evento, descrizione_evento) VALUES ('" .
+                        gdrcd_filter('in', $record['nome']) . "', '" . gdrcd_filter('in', $record['nome']) . "', NOW(), " . ERRORELOGIN . ", 'Tentativo di accesso mentre il personaggio è in esilio')",
+                        'query', true
+                    );
+                } catch (\Exception $eLog) { /* non critico */ }
+
                 session_destroy();
                 echo json_encode(['success' => false, 'message' => 'Il tuo personaggio è attualmente in esilio.']);
                 exit;
