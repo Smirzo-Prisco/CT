@@ -53,7 +53,7 @@ $personaggiAssegna = gdrcd_query("SELECT nome FROM personaggio ORDER BY nome ASC
 
 
 <!-- Top bar -->
-<div class="gp-topbar">
+<div class="gp-topbar gp-topbar--oggetti">
     <div class="gp-topbar__left">
         <button type="button" onclick="history.back()" class="gp-back" title="Indietro">
             <i class="fa-solid fa-chevron-left"></i>

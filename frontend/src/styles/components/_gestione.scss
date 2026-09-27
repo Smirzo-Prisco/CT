@@ -923,7 +923,7 @@ span[style*="position:relative"]:hover .tooltip-bottom {
 // condiviso con altre 5 tabelle): qui ci sono altre 4 colonne oltre ad Azioni,
 // quindi meno spazio superfluo per andare a capo su mobile.
 .gp-table--personaggi {
-    th:nth-child(2), td:nth-child(2) { width: 130px; }
+    th:nth-child(2), td:nth-child(2) { width: 100px; }
 }
 
 .gp-cell--name {
@@ -1236,6 +1236,75 @@ span[style*="position:relative"]:hover .tooltip-bottom {
             flex: 1 1 40px;
             padding: 4px $space-2;
             font-size: $text-sm;
+        }
+    }
+}
+
+// gestione_regolamento: stesso problema/soluzione di .gp-topbar--personaggi
+// sopra — select tipo + ricerca + pulsante "Nuovo" non ci stanno su una riga
+// a larghezza piena, vanno stretti invece di allargare la pagina.
+@media (width <= 480px) {
+    .gp-topbar--regolamento {
+        flex-wrap: nowrap;
+
+        .gp-topbar__right {
+            flex-wrap: nowrap;
+            flex-shrink: 1;
+            min-width: 0;
+            gap: $space-1;
+        }
+
+        .gp-filter-form select {
+            max-width: 70px;
+            padding: 4px $space-1;
+            font-size: $text-sm;
+            text-overflow: ellipsis;
+        }
+
+        #searchRegolamento {
+            min-width: 0;
+            flex: 1 1 40px;
+            padding: 4px $space-2;
+            font-size: $text-sm;
+        }
+
+        .btn {
+            padding: 4px $space-2;
+            font-size: $text-sm;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+    }
+}
+
+// gestione_oggetti: qui i controlli sono troppi (azzera filtri, radio
+// "Creati da me", 2 select, pulsante "Nuovo Oggetto") per stare tutti su
+// una riga anche stringendoli — a differenza di .gp-topbar--personaggi/
+// --regolamento qui si lascia __right andare a capo (comportamento di
+// base già previsto), ma si riducono i singoli controlli così le righe
+// che si formano restano leggibili invece di un accavallamento confuso.
+@media (width <= 480px) {
+    .gp-topbar--oggetti {
+        .gp-topbar__right { gap: $space-1; }
+
+        .gp-filter-form {
+            label {
+                font-size: $text-sm;
+                padding: $space-1 $space-2;
+            }
+
+            select {
+                max-width: 90px;
+                padding: 4px $space-1;
+                font-size: $text-sm;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .btn {
+            padding: 4px $space-2;
+            font-size: $text-sm;
+            white-space: nowrap;
         }
     }
 }

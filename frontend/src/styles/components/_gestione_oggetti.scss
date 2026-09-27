@@ -8,15 +8,19 @@
 // ============================================================
 @use '../tokens' as *;
 
-// Descrizione resta l'unica colonna "auto": e' quella che beneficia di piu'
-// spazio, a differenza di Azioni che ha un contenuto a larghezza fissa
-// (icone). Stesso principio di .gp-th-name in gestione_personaggio.
+// Descrizione ha ora una larghezza esplicita: lasciata "auto" con
+// table-layout:fixed finiva a 0px su mobile (le altre 5 colonne da sole
+// superano già la larghezza disponibile), con ogni lettera del testo a
+// capo invece di un paragrafo leggibile — stesso bug già risolto in
+// .gp-table--abilita. Le altre colonne sono state ristrette per limitare
+// lo scroll orizzontale complessivo.
 .gp-table--oggetti {
     th:nth-child(1), td:nth-child(1) { width: 70px; }
-    th:nth-child(2), td:nth-child(2) { width: 180px; }
-    th:nth-child(4), td:nth-child(4) { width: 130px; }
-    th:nth-child(5), td:nth-child(5) { width: 110px; }
-    th:nth-child(6), td:nth-child(6) { width: 160px; }
+    th:nth-child(2), td:nth-child(2) { width: 100px; }
+    th:nth-child(3), td:nth-child(3) { width: 140px; }
+    th:nth-child(4), td:nth-child(4) { width: 80px; }
+    th:nth-child(5), td:nth-child(5) { width: 70px; }
+    th:nth-child(6), td:nth-child(6) { width: 140px; }
 }
 
 .gp-cell--image {

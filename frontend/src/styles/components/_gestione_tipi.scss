@@ -7,6 +7,11 @@
 @use '../tokens' as *;
 
 .gp-table--tipi {
-    th:nth-child(2), td:nth-child(2) { width: 100px; }
+    // Nome scoperto qui (non sul generico .gp-th-name, condiviso con altre
+    // 5 tabelle): con solo Codice e Azioni attorno c'è meno bisogno di
+    // spazio, quindi si può ridurre di più che altrove per eliminare lo
+    // scroll orizzontale su mobile.
+    th:nth-child(1), td:nth-child(1) { width: 110px; }
+    th:nth-child(2), td:nth-child(2) { width: 70px; }
     th:nth-child(3), td:nth-child(3) { width: 140px; }
 }

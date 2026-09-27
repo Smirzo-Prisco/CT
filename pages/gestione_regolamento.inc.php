@@ -54,7 +54,7 @@ $tipo_label = [
 ?>
 
 <!-- ── Topbar ─────────────────────────────────────────────────── -->
-<div class="gp-topbar">
+<div class="gp-topbar gp-topbar--regolamento">
 
     <div class="gp-topbar__left">
         <button type="button" class="gp-back" title="Indietro" onclick="history.back()">

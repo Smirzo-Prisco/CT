@@ -5,12 +5,13 @@
 // larghezze di colonna, non coperte perché specifiche di questa tabella.
 // ============================================================
 
-// Larghezze fisse (Nome, Tipo, Visibile — Azioni resta l'unica colonna
-// "auto", stesso principio di .gp-th-name/.gp-cell--name in
-// gestione_personaggio: senza queste, table-layout:fixed distribuirebbe lo
-// spazio libero in modo imprevedibile invece che ad Azioni.
+// Larghezze fisse per tutte le colonne, Azioni incluso: lasciata "auto"
+// finiva a 0px su mobile (le altre colonne da sole superavano già la
+// larghezza disponibile), rendendola invisibile — stesso bug già risolto
+// in .gp-table--abilita (colonna Descrizione).
 .gp-table--bacheche {
     th:nth-child(1), td:nth-child(1) { width: 220px; }
-    th:nth-child(2), td:nth-child(2) { width: 160px; }
-    th:nth-child(3), td:nth-child(3) { width: 90px; }
+    th:nth-child(2), td:nth-child(2) { width: 100px; }
+    th:nth-child(3), td:nth-child(3) { width: 70px; }
+    th:nth-child(4), td:nth-child(4) { width: 140px; }
 }
