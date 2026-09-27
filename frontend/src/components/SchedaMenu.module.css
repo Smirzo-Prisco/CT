@@ -1,8 +1,19 @@
 /* SchedaMenu.module.css — tab bar navigazione scheda personaggio */
 
+/* Sticky rispetto a #maincontent (l'unico contenitore di scroll reale
+   dell'app, position:fixed+overflow:auto — vedi _layout.scss), stesso
+   pattern già usato per l'header dei messaggi privati (.thread-header in
+   _messages_center.scss): resta in cima mentre si scorre il contenuto
+   della scheda sotto. Sfondo opaco altrimenti il contenuto scrollato
+   sarebbe visibile nelle fessure tra i gruppi di tab. */
 .nav {
     width: 100%;
     margin-bottom: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 8px 0;
+    background: #0c0d17;
 }
 
 .strip {
