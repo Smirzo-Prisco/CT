@@ -435,16 +435,26 @@ function assegnaPuntoShin($luogo, $login) {
     if ($last_date_shin !== null && $last_date_shin >= $inizio_giocata) return;
 
     // Conta i lanci di QUALSIASI tipo di abilità (generica, di attacco, mentale,
-    // difensiva, potere speciale, default, fisica, e ogni categoria futura): tutti i
-    // messaggi di lancio abilità iniziano con "usa la skill", al posto del precedente
-    // elenco chiuso di diciture che escludeva per omissione "skill fisica".
-    $inizio_giocata_f = gdrcd_filter('in', $role['start']);
-    $check_actions = gdrcd_query("SELECT * FROM chat WHERE stanza = '$luogo' AND mittente = '$login_f' AND tipo = 'C'
-        AND testo LIKE '%usa la skill%'
-        AND ora >= '$inizio_giocata_f'", 'result');
+    // difensiva, potere speciale, default, fisica, temporanea, e ogni categoria
+    // futura). Il tentativo precedente cercava "usa la skill" nel TESTO CHAT
+    // mostrato al giocatore, ma quel testo varia per tipo ("usa il talento",
+    // "usa il potere speciale", "usa una skill sconosciuta" per il fallback):
+    // Talento e Potere speciale non contenevano quella substring e i loro lanci
+    // non venivano mai contati (bug segnalato in game — Latino: 3 lanci reali,
+    // solo 2 contati). role_fights.result è invece un marcatore fisso e
+    // strutturato, scritto una sola volta subito dopo lo switch qui sopra con
+    // esattamente 'usa una skill '.$skill_info['tipo'] indipendentemente dal
+    // tipo — a differenza del testo chat non deve restare sincronizzato con le
+    // diciture mostrate ai giocatori. Il filtro su id_role (non su un intervallo
+    // di orari) esclude già di per sé le risposte a un attacco subito (car
+    // 'dado_risposta'/'subisce'/'difesa' da risposta immediata) e l'uso di
+    // oggetti (car 'oggetto'), che hanno tutti un `result` diverso.
+    $check_actions = gdrcd_query("SELECT COUNT(*) AS n FROM role_fights
+        WHERE id_role = $id_role AND striker = '$login_f'
+        AND result LIKE 'usa una skill %'");
 
     // Do il punto shin se il pg ha lanciato più di due abilità in questa giocata
-    if (gdrcd_query($check_actions, 'num_rows') > 2) {
+    if ((int)$check_actions['n'] > 2) {
         chatInsertMessage($luogo, 'System', $login, 'Punto shin assegnato', 'Q');
         gdrcd_query("UPDATE personaggio SET shin = shin + 1, last_date_shin = NOW() WHERE nome = '$login_f' LIMIT 1");
     }
