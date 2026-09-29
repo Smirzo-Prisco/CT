@@ -162,12 +162,15 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                         }
                         return $c[array_rand($c)];
                     };
+                    // Range alzati di circa 5° su tutte le stagioni (giorno e notte): i
+                    // valori precedenti (es. inverno di giorno fino a -5°, di notte fino
+                    // a -10°) risultavano troppo bassi/improbabili per l'ambientazione.
                     $tempFn = function($m, $t = 'giorno') {
-                        if (in_array($m, [12,1,2]))  return $t === 'giorno' ? rand(-5,10)  : rand(-10,5);
-                        if (in_array($m, [3,4,5]))   return $t === 'giorno' ? rand(10,20)  : rand(5,15);
-                        if (in_array($m, [6,7,8]))   return $t === 'giorno' ? rand(25,35)  : rand(15,25);
-                        if (in_array($m, [9,10,11])) return $t === 'giorno' ? rand(10,20)  : rand(5,15);
-                        return rand(10,25);
+                        if (in_array($m, [12,1,2]))  return $t === 'giorno' ? rand(0,15)   : rand(-5,10);
+                        if (in_array($m, [3,4,5]))   return $t === 'giorno' ? rand(15,25)  : rand(10,20);
+                        if (in_array($m, [6,7,8]))   return $t === 'giorno' ? rand(28,38)  : rand(18,28);
+                        if (in_array($m, [9,10,11])) return $t === 'giorno' ? rand(15,25)  : rand(10,20);
+                        return rand(15,28);
                     };
                     $ventoFn = function($m) {
                         if (in_array($m, [12,1,2]))  { $v = ['assente','brezza','medio','forte']; }
