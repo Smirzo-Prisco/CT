@@ -1107,8 +1107,15 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             $id     = isset($data['id']) ? (int)$data['id'] : 0;
             $content = isset($data['content']) ? gdrcd_filter('in', gdrcd_angs(trim($data['content']))) : '';
 
-            if (!$id || $content === '') {
-                echo json_encode(['success' => false, 'message' => 'Dati mancanti.']);
+            // Messaggio distinto per capire subito quale dei due manca, invece del
+            // generico "Dati mancanti." che non permetteva di diagnosticare da remoto
+            // un bug segnalato (vedi conversazione di progetto del 2026-09-29).
+            if (!$id) {
+                echo json_encode(['success' => false, 'message' => 'Dati mancanti: id azione non ricevuto.']);
+                break;
+            }
+            if ($content === '') {
+                echo json_encode(['success' => false, 'message' => 'Dati mancanti: il testo non può essere vuoto.']);
                 break;
             }
 

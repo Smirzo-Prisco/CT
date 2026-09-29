@@ -267,6 +267,13 @@ function saveEditAction() {
     const content = document.getElementById("edit_action_textarea").value;
     const id = document.getElementById("edit_action_id").value;
 
+    // Log diagnostico: se in futuro ricompare "Dati mancanti" permette di vedere
+    // subito in console quale dei due campi era vuoto/mancante lato client
+    // invece di dover indagare alla cieca (vedi conversazione di progetto del 2026-09-29).
+    if (!id || !content.trim()) {
+        console.warn('saveEditAction: dati sospetti prima dell\'invio —', { id, contentLength: content.length });
+    }
+
     fetch(ns_chat.api_file + '?' + ns_chat.param + '=saveEditAction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
