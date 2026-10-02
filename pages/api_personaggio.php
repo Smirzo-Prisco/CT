@@ -88,13 +88,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                 $set_parts = array();
                 $campi_modificati = 0;
                 
-                // Campi scheda che ammettono HTML/CSS personalizzato: vanno
-                // spogliati dei vettori XSS reali (script, on*, javascript:)
-                // prima di salvare, altrimenti chiunque visiti la scheda del
-                // pg esegue lo script con la propria sessione — stesso punto
-                // debole corretto in api_scheda.php (save_modifica/profile).
-                $campiHtml = array('background', 'storia', 'dice', 'off', 'particolari', 'note_master');
-
                 // Processa solo i campi che sono stati inviati (modificati)
                 foreach ($fieldMappings as $formField => $dbField) {
                     if (isset($_POST[$formField])) {
@@ -105,8 +98,6 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
                             $value = gdrcd_filter('email', $_POST[$formField]);
                         } elseif ($formField === 'suoni') {
                             $value = ($_POST[$formField] == '1') ? 1 : 0;
-                        } elseif (in_array($formField, $campiHtml)) {
-                            $value = gdrcd_filter('in', gdrcd_html_filter_permissivo($_POST[$formField]));
                         } else {
                             $value = gdrcd_filter('in', $_POST[$formField]);
                         }
