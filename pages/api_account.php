@@ -3,23 +3,35 @@
  * api_account.php — Cancellazione/ripristino account
  *
  * Endpoint:
- *   POST ?op=delete  — auto-cancellazione (verifica email + password):
- *                      resetPuntiPg() + scioglieAffiliazioniPg() + permessi=-1.
- *                      Stesso trattamento della cancellazione soft massiva per
- *                      inattività (api_manutenzione.php op=missing_soft).
- *   POST ?op=restore — ripristina un account cancellato: permessi=0 (solo staff).
- *                      Il reset/scollegamento di op=delete non viene annullato:
- *                      il personaggio torna attivo ma resta azzerato e senza
- *                      razza/gilda/mestiere.
+ *   POST ?op=delete       — auto-cancellazione (verifica email + password): softDeletePg().
+ *   POST ?op=admin_delete — cancellazione logica forzata da staff (solo admin) su un
+ *                           personaggio non proprio, stessa softDeletePg(), senza
+ *                           verifica email/password (qui decide l'admin).
+ *   POST ?op=restore      — ripristina un account cancellato: permessi=0 (solo staff).
+ *                           Il reset/scollegamento di softDeletePg() non viene annullato:
+ *                           il personaggio torna attivo ma resta azzerato e senza
+ *                           razza/gilda/mestiere.
+ *
+ * softDeletePg() (custom_functions.inc.php) centralizza resetPuntiPg() +
+ * scioglieAffiliazioniPg() + permessi=DELETED + log: unico punto usato anche
+ * da op=delete, op=admin_delete e dalla pulizia automatica inattivi
+ * (api_manutenzione.php op=missing_soft) — niente doppio percorso per la
+ * stessa sequenza.
  *
  * op=restore è chiamato da ripristinaPg() in includes/personaggio.js, l'icona
  * di ripristino nella colonna Azioni di gestione_personaggio.inc.php (filtro
  * "Eliminati") — non da un pannello dedicato, rimosso perché ridondante.
+ * op=admin_delete e' chiamato da disattivaPg() nello stesso file, l'icona
+ * "Disattiva" accanto a "Elimina definitivamente".
  *
- * La cancellazione forzata di un account da parte dello staff non è qui:
- * esiste già in gestione_personaggio.inc.php ("Elimina definitivamente",
- * cancellazione fisica via main.php?page=erasepg_scelta) — niente doppio
- * percorso per la stessa azione. Vedi conversazione di progetto del 2026-07-31.
+ * Distinzione tra le due cancellazioni disponibili allo staff in
+ * gestione_personaggio.inc.php:
+ *   - "Disattiva" (qui, op=admin_delete)            → logica, reversibile (Ripristina)
+ *   - "Elimina definitivamente" (api_personaggio.php op=deletePg) → fisica, irreversibile
+ * Decisione storica (conversazione di progetto del 2026-07-31) di non
+ * duplicare la cancellazione FISICA in due posti resta valida — questo e' un
+ * endpoint nuovo e distinto (cancellazione logica), non un secondo percorso
+ * per la stessa azione di deletePg().
  *
  * Autorizzazione staff: $_SESSION['admin']/['moderatore'] (flag da privilegi,
  * impostati al login in api_auth.php), NON personaggio.permessi — quest'ultimo
@@ -76,23 +88,45 @@ switch ($op) {
             exit;
         }
 
-        // Stesso azzeramento del pulsante "Reset punti" in Gestione > Gestione
-        // Personaggi (statistiche a 10, shin/skill/talenti/storico spese
-        // ripuliti) + scioglimento di razza/gilda/mestiere — vedi
-        // resetPuntiPg()/scioglieAffiliazioniPg() in custom_functions.inc.php.
-        // Prima di marcare permessi=DELETED cosi' l'operazione resta un unico
-        // passaggio coerente anche in caso di errore a meta'.
-        resetPuntiPg($login);
-        scioglieAffiliazioniPg($login);
-
-        gdrcd_query("UPDATE personaggio SET permessi = " . DELETED . " WHERE nome = '$login'");
-        gdrcd_query(
-            "INSERT INTO log (nome_interessato, autore, data_evento, codice_evento, descrizione_evento)
-             VALUES ('$login', '$login', NOW(), " . DELETEPG . ", 'Account cancellato dal proprietario')"
-        );
+        // softDeletePg() = azzeramento (stesso del pulsante "Reset punti") +
+        // scioglimento affiliazioni + permessi=DELETED + log, in un'unica
+        // sequenza condivisa con op=admin_delete e missing_soft — vedi
+        // custom_functions.inc.php.
+        softDeletePg($login, $login, 'Account cancellato dal proprietario');
 
         session_destroy();
         echo json_encode(['success' => true, 'message' => 'Account cancellato.']);
+        break;
+
+    // -------------------------------------------------------------------------
+    // admin_delete — cancellazione logica forzata da staff su un personaggio
+    // non proprio: stessa sequenza di op=delete (softDeletePg), senza verifica
+    // email/password perche' qui la decisione e' dell'admin, non del
+    // proprietario. Resta distinta da "Elimina definitivamente" (cancellazione
+    // FISICA, api_personaggio.php op=deletePg) — quella e' irreversibile,
+    // questa e' ripristinabile da op=restore.
+    // -------------------------------------------------------------------------
+    case 'admin_delete':
+        if ((int)($_SESSION['admin'] ?? 0) !== 1) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+            exit;
+        }
+
+        $data    = json_decode(file_get_contents('php://input'), true) ?? [];
+        $account = gdrcd_filter('in', $data['account'] ?? '');
+
+        if ($account === '') {
+            echo json_encode(['success' => false, 'message' => 'Seleziona un account.']);
+            exit;
+        }
+        if ($account === $login) {
+            echo json_encode(['success' => false, 'message' => 'Non puoi disattivare il tuo stesso personaggio.']);
+            exit;
+        }
+
+        softDeletePg($account, $login, 'Account disattivato da staff');
+        echo json_encode(['success' => true, 'message' => 'Personaggio disattivato.']);
         break;
 
     // -------------------------------------------------------------------------

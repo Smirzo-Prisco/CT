@@ -286,6 +286,26 @@ function ripristinaPg(nome) {
             showNotification('Errore durante il ripristino', 'error');
         });
 }
+// Cancellazione logica (permessi=-1), reversibile con ripristinaPg(). Stesso
+// endpoint/funzione condivisa (softDeletePg) di api_account.php op=delete
+// (autocancellazione) e della pulizia automatica inattivi.
+function disattivaPg(nome) {
+    if (!confirm('Disattivare ' + nome + '? Il personaggio verra\' azzerato (statistiche, skill, affiliazioni) e marcato come cancellato — reversibile da "Ripristina".')) return;
+    fetch('pages/api_account.php?op=admin_delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ account: nome })
+    })
+        .then(response => response.json())
+        .then(data => {
+            showNotification(data.message, data.success ? 'success' : 'error');
+            if (data.success) window.location.reload();
+        })
+        .catch(error => {
+            console.error('Errore durante la disattivazione:', error);
+            showNotification('Errore durante la disattivazione', 'error');
+        });
+}
 // Cancellazione fisica e irreversibile di un singolo personaggio. Sostituisce la
 // vecchia form POST verso main.php?page=erasepg_scelta, che portava fuori dalla SPA.
 function eliminaPg(nome) {

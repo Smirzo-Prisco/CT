@@ -1093,6 +1093,17 @@ span[style*="position:relative"]:hover .tooltip-bottom {
 
         &:hover { background: rgb(136 136 136 / 25%); }
     }
+
+    // "Disattiva" (cancellazione logica, reversibile) — colore distinto sia
+    // da --exile (arancio, punizione temporanea) sia da --delete (rosa/rosso,
+    // cancellazione fisica irreversibile): qui e' una via di mezzo reversibile.
+    &--disable {
+        background: rgb(91 122 153 / 15%);
+        color: #5b7a99;
+        border: 1px solid rgb(91 122 153 / 30%);
+
+        &:hover { background: rgb(91 122 153 / 25%); }
+    }
 }
 
 // ── Modal header/footer ───────────────────────────────────────

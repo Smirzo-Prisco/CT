@@ -245,9 +245,9 @@ switch ($op) {
 
     // -------------------------------------------------------------------------
     // MISSING_SOFT — marca come cancellati (permessi=-1) i personaggi inattivi
-    // da N mesi, escludendo lo staff (permessi != 0). Stesso trattamento della
-    // cancellazione soft singola (api_account.php op=delete): resetPuntiPg()
-    // + scioglieAffiliazioniPg() prima di marcare permessi=-1.
+    // da N mesi, escludendo lo staff (permessi != 0). Usa softDeletePg()
+    // (custom_functions.inc.php), la stessa funzione di api_account.php
+    // op=delete/admin_delete — niente sequenza duplicata.
     // -------------------------------------------------------------------------
     case 'missing_soft':
         $mesi = leggi_mesi($isPreview, $data, 1, 12);
@@ -277,13 +277,11 @@ switch ($op) {
             while ($row = gdrcd_query($res, 'fetch')) $nomi[] = $row['nome'];
             gdrcd_query($res, 'free');
 
+            $autore = gdrcd_filter('in', $_SESSION['login']);
             foreach ($nomi as $nome) {
-                $nome_f = gdrcd_filter('in', $nome);
-                resetPuntiPg($nome_f);
-                scioglieAffiliazioniPg($nome_f);
+                softDeletePg(gdrcd_filter('in', $nome), $autore, 'Account cancellato per inattivita\' (pulizia automatica)');
             }
 
-            gdrcd_query("UPDATE personaggio SET permessi = " . DELETED . " $where");
             echo json_encode(['success' => true, 'message' => 'Personaggi inattivi azzerati, scollegati e marcati come cancellati.']);
         }
         break;

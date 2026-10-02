@@ -663,6 +663,28 @@ function scioglieAffiliazioniPg(string $nomeFiltrato): bool {
     return (bool)$ok1 && (bool)$ok2 && (bool)$ok3 && (bool)$ok4;
 }
 
+/**
+ * Cancellazione logica (soft) di un personaggio: azzera statistiche/skill
+ * (resetPuntiPg), scioglie le affiliazioni (scioglieAffiliazioniPg), marca
+ * permessi=DELETED e registra l'evento in log. Unico punto che esegue questa
+ * sequenza — usata da auto-cancellazione (api_account.php op=delete),
+ * cancellazione forzata da staff (api_account.php op=admin_delete) e pulizia
+ * automatica inattivi (api_manutenzione.php op=missing_soft): prima la stessa
+ * sequenza era duplicata in due di questi tre punti (la terza, missing_soft,
+ * non registrava nemmeno il log).
+ * $nomeFiltrato e $autoreFiltrato vanno gia' passati da gdrcd_filter('in', ...)
+ * a cura del chiamante (stessa convenzione delle altre funzioni PERSONAGGI).
+ */
+function softDeletePg(string $nomeFiltrato, string $autoreFiltrato, string $motivo): void {
+    resetPuntiPg($nomeFiltrato);
+    scioglieAffiliazioniPg($nomeFiltrato);
+    gdrcd_query("UPDATE personaggio SET permessi = " . DELETED . " WHERE nome = '$nomeFiltrato'");
+    gdrcd_query(
+        "INSERT INTO log (nome_interessato, autore, data_evento, codice_evento, descrizione_evento)
+         VALUES ('$nomeFiltrato', '$autoreFiltrato', NOW(), " . DELETEPG . ", '" . gdrcd_filter('in', $motivo) . "')"
+    );
+}
+
 function getTotStatsPg($pg) {
     $where = $pg != '' ? " WHERE nome = '$pg'" : '';
 

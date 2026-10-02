@@ -103,6 +103,10 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
         <span class="gp-legend__text"><strong>Reset punti</strong> — statistiche a 10, shin/skill/talenti/storico spese azzerati. Nella topbar agisce su tutti i personaggi <span class="gp-legend__confirm">richiede conferma</span></span>
     </div>
     <div class="gp-legend__item">
+        <span class="btn-action btn-action--disable btn-action--icon"><i class="fa-solid fa-user-xmark"></i></span>
+        <span class="gp-legend__text"><strong>Disattiva</strong> — cancellazione logica (permessi=-1): azzera e scollega come il reset, ma è reversibile con Ripristina <span class="gp-legend__confirm">richiede conferma</span></span>
+    </div>
+    <div class="gp-legend__item">
         <span class="btn-action btn-action--delete btn-action--icon"><i class="fa-solid fa-trash"></i></span>
         <span class="gp-legend__text"><strong>Elimina definitivamente</strong> — cancellazione fisica, irreversibile. Nella topbar elimina tutti gli esiliati <span class="gp-legend__confirm">richiede conferma</span></span>
     </div>
@@ -214,9 +218,17 @@ if ($_SESSION['admin'] != 1 && $_SESSION['master'] != 1 && $_SESSION['moderatore
                             </button>
                             <?php endif; ?>
 
+                            <?php if (!$isDeleted && hasPermesso($_SESSION, $permessi_azioni['cancella']) && $_SESSION['login'] !== $pg['nome']): ?>
+                            <button class="btn-action btn-action--disable btn-action--icon"
+                                    title="Disattiva (cancellazione logica, reversibile con Ripristina)"
+                                    onclick="disattivaPg('<?= addslashes($pg['nome']) ?>')">
+                                <i class="fa-solid fa-user-xmark"></i>
+                            </button>
+                            <?php endif; ?>
+
                             <?php if (hasPermesso($_SESSION, $permessi_azioni['cancella']) && $_SESSION['login'] !== $pg['nome']): ?>
                             <button class="btn-action btn-action--delete btn-action--icon"
-                                    title="Elimina definitivamente"
+                                    title="Elimina definitivamente (cancellazione fisica, irreversibile)"
                                     onclick="eliminaPg('<?= addslashes($pg['nome']) ?>')">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
