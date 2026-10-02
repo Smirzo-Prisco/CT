@@ -189,13 +189,18 @@ switch ($op) {
             'integrita'     => (int)$pg_data['integrita'],
             'integrita_max' => (int)$pg_data['integrita_max'],
             'notorieta'     => (float)$pg_data['notorieta'],
-            // Testi (pubblici)
-            'particolari'   => $pg_data['particolari'],
-            'note_fato'     => $pg_data['note_fato'],
-            'principale'    => $pg_data['principale'],
-            'storia'        => $pg_data['storia'],
-            'descrizione'   => $pg_data['descrizione'],
-            'off'           => $pg_data['off'],
+            // Testi (pubblici) — HTML/CSS personalizzato e' consentito per
+            // design della scheda, ma va filtrato dei vettori XSS reali
+            // (script, attributi on*, javascript:) prima di arrivare al
+            // dangerouslySetInnerHTML di Scheda.jsx/SchedaSub.jsx: altrimenti
+            // chiunque visiti la scheda esegue lo script nel proprio browser
+            // con la propria sessione (es. furto cookie via mail se admin).
+            'particolari'   => gdrcd_html_filter_permissivo($pg_data['particolari'] ?? ''),
+            'note_fato'     => gdrcd_html_filter_permissivo($pg_data['note_fato'] ?? ''),
+            'principale'    => gdrcd_html_filter_permissivo($pg_data['principale'] ?? ''),
+            'storia'        => gdrcd_html_filter_permissivo($pg_data['storia'] ?? ''),
+            'descrizione'   => gdrcd_html_filter_permissivo($pg_data['descrizione'] ?? ''),
+            'off'           => gdrcd_html_filter_permissivo($pg_data['off'] ?? ''),
             // Date
             'data_iscrizione' => $pg_data['data_iscrizione'],
             'ora_entrata'   => $pg_data['ora_entrata'],
@@ -823,9 +828,9 @@ switch ($op) {
         }
         echo json_encode([
             'success'    => true,
-            'principale' => $pg_data['principale'],
-            'particolari' => $pg_data['particolari'],
-            'note_fato'  => $pg_data['note_fato'],
+            'principale' => gdrcd_html_filter_permissivo($pg_data['principale'] ?? ''),
+            'particolari' => gdrcd_html_filter_permissivo($pg_data['particolari'] ?? ''),
+            'note_fato'  => gdrcd_html_filter_permissivo($pg_data['note_fato'] ?? ''),
         ]);
         break;
 
@@ -911,6 +916,11 @@ switch ($op) {
             exit;
         }
         $f = fn($k) => gdrcd_filter('in', $data[$k] ?? '');
+        // Campi che ammettono HTML/CSS personalizzato: oltre al filtro 'in'
+        // vanno spogliati dei vettori XSS reali (script, on*, javascript:)
+        // anche in scrittura, cosi' non finisce in DB nulla da dover
+        // ri-filtrare in output se cambia il punto da cui vengono letti.
+        $fHtml = fn($k) => gdrcd_filter('in', gdrcd_html_filter_permissivo($data[$k] ?? ''));
         // Aggiornamento tabella personaggio
         gdrcd_query(sprintf(
             "UPDATE personaggio SET
@@ -918,8 +928,8 @@ switch ($op) {
                 principale='%s', descrizione='%s', eta=%d, natoa='%s',
                 blocca_media=%d, url_img='%s', url_img_chat='%s', url_media='%s'
              WHERE nome='%s'",
-            $f('cognome'), $f('volto'), $f('storia'), $f('off'),
-            $f('principale'), $f('descrizione'), (int)($data['eta'] ?? 0), $f('natoa'),
+            $f('cognome'), $f('volto'), $fHtml('storia'), $fHtml('off'),
+            $fHtml('principale'), $fHtml('descrizione'), (int)($data['eta'] ?? 0), $f('natoa'),
             ($data['blocca_media'] ?? false) ? 1 : 0,
             gdrcd_filter('in', gdrcd_filter('fullurl', $data['url_img']      ?? '')),
             gdrcd_filter('in', gdrcd_filter('fullurl', $data['url_img_chat'] ?? '')),
