@@ -17,7 +17,14 @@
     // qui dentro: gli header sono semplici fratelli flex fuori dall'area che
     // scrolla, non elementi sticky — e' quello il pattern che in passato ha
     // creato i bug di doppio scroll, vedi commento su .thread-container).
-    .container {
+    //
+    // &.container (non ".container" discendente): nel JSX id="messages-center-app"
+    // e className="container ..." stanno sullo STESSO div, non in rapporto
+    // antenato-discendente — un selettore con lo spazio non avrebbe mai
+    // trovato corrispondenza nel DOM (bug preesistente, invisibile prima
+    // perche' il vecchio layout a vista singola non dipendeva da flex/height
+    // sul contenitore).
+    &.container {
         display: flex;
         width: 100%;
         height: calc(100vh - #{$hud-content-top});
@@ -48,17 +55,17 @@
     // classe view-${view} sul .container (impostata da MessagesInbox.jsx)
     // dice quale nascondere. Su desktop entrambe restano sempre visibili.
     @media screen and (max-width: 768px) {
-        & .container {
+        &.container {
             // 86px = top di #maincontent su mobile, vedi _layout.scss.
             height: calc(100vh - 86px);
             border-radius: 0;
         }
 
-        & .col-list { width: 100%; }
+        .col-list { width: 100%; }
 
-        & .container.view-list .col-detail { display: none; }
-        & .container.view-thread .col-list,
-        & .container.view-compose .col-list { display: none; }
+        &.view-list .col-detail { display: none; }
+        &.view-thread .col-list,
+        &.view-compose .col-list { display: none; }
     }
 
     // Header della lista conversazioni: tab ON/OFF a sinistra, azioni
