@@ -699,5 +699,14 @@
         display: flex;
         align-items: flex-end;
         gap: $space-3;
+
+        @media screen and (max-width: 768px) {
+            // Stesso margine riservato ai pulsanti hamburger fissi
+            // (bottom:10px, ~44px alti) usato altrove in questo file — qui la
+            // barra di risposta non scrolla mai (e' un fratello flex-shrink:0
+            // fuori da .thread-messages), quindi serve spazio vero sotto, non
+            // solo un padding sull'area scrollabile.
+            margin-bottom: 50px;
+        }
     }
 }

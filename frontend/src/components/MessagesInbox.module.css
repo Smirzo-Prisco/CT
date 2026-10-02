@@ -246,6 +246,11 @@
 /* ── ComposeView ───────────────────────────────────────────── */
 .composeWrap   { flex: 1; overflow-y: auto; padding: 22px; }
 
+@media screen and (max-width: 768px) {
+    /* Spazio per i pulsanti hamburger fissi, stesso margine usato altrove. */
+    .composeWrap { padding-bottom: 72px; }
+}
+
 .composeWrap h3 {
     margin: 0 0 18px;
     color: var(--color-text-title);
