@@ -23,8 +23,8 @@
 import { useState, useEffect, useRef, useCallback, forwardRef } from 'react'
 import { createPortal } from 'react-dom'
 import SchedaMenu from './SchedaMenu'
+import SandboxedHtml from './SandboxedHtml'
 import styles from './Scheda.module.css'
-import { extractAndScopeStyles } from '../utils/schedaStyles'
 
 /**
  * Formatta una stringa data MySQL in formato italiano leggibile.
@@ -74,7 +74,7 @@ function openSmsFrame(nome) {
  * Modale Note del Fato — portaled su document.body per evitare clip da transform.
  * Chiudibile con Esc, clic sul backdrop o il pulsante ✕.
  */
-function NoteFatoModal({ nome, particolariHtml, noteFatoHtml, onClose }) {
+function NoteFatoModal({ nome, particolari, note_fato, onClose }) {
     useEffect(() => {
         const onKey = e => { if (e.key === 'Escape') onClose() }
         document.addEventListener('keydown', onKey)
@@ -89,15 +89,11 @@ function NoteFatoModal({ nome, particolariHtml, noteFatoHtml, onClose }) {
                     <button className={styles.noteFatoClose} onClick={onClose} aria-label="Chiudi">✕</button>
                 </div>
                 <div className={styles.noteFatoContent}>
-                    {particolariHtml && (
-                        <div dangerouslySetInnerHTML={{ __html: particolariHtml }} />
-                    )}
-                    {particolariHtml && noteFatoHtml && (
+                    {particolari && <SandboxedHtml html={particolari} />}
+                    {particolari && note_fato && (
                         <hr className={styles.noteFatoSep} />
                     )}
-                    {noteFatoHtml && (
-                        <div dangerouslySetInnerHTML={{ __html: noteFatoHtml }} />
-                    )}
+                    {note_fato && <SandboxedHtml html={note_fato} />}
                 </div>
             </div>
         </div>,
@@ -266,7 +262,6 @@ export default function Scheda() {
     const [error, setError]     = useState(null)
     const [noteFatoOpen, setNoteFatoOpen] = useState(false)
     const [soundScheda, setSoundScheda] = useState(() => window.CT_USER?.soundPrefs?.scheda ?? 1)
-    const scopedStyleEl = useRef(null)
     const schedaRef     = useRef(null)
     const avatarRef     = useRef(null)
     const profileRef    = useRef(null)
@@ -366,24 +361,6 @@ export default function Scheda() {
             .catch(() => setError('Errore di rete'))
     }, [pg])
 
-    // Inietta in <head> il CSS dai campi DB, limitato a .pagina_scheda.
-    // Rimosso automaticamente quando si lascia la scheda.
-    useEffect(() => {
-        if (!profile) return
-        const allCss = [profile.principale, profile.particolari, profile.note_fato]
-            .map(s => extractAndScopeStyles(s).css)
-            .filter(Boolean)
-            .join('\n')
-        if (scopedStyleEl.current) scopedStyleEl.current.remove()
-        if (allCss) {
-            const el = document.createElement('style')
-            el.textContent = allCss
-            document.head.appendChild(el)
-            scopedStyleEl.current = el
-        }
-        return () => { if (scopedStyleEl.current) scopedStyleEl.current.remove() }
-    }, [profile])
-
     if (error) {
         return (
             <div className="pagina_scheda">
@@ -406,10 +383,6 @@ export default function Scheda() {
 
     const lvNum   = profile.statistiche?.livello
     const lvClass = `${styles.pgCardWrapper}${lvNum >= 1 && lvNum <= 8 ? ` ${styles[`lv-${lvNum}`]}` : ''}`
-
-    const { html: principaleHtml } = extractAndScopeStyles(principale)
-    const { html: particolariHtml } = extractAndScopeStyles(particolari)
-    const { html: noteFatoHtml }    = extractAndScopeStyles(note_fato)
 
     return (
         <div className="pagina_scheda" ref={schedaRef}>
@@ -469,8 +442,8 @@ export default function Scheda() {
                 {noteFatoOpen && (
                     <NoteFatoModal
                         nome={nome}
-                        particolariHtml={particolariHtml}
-                        noteFatoHtml={noteFatoHtml}
+                        particolari={particolari}
+                        note_fato={note_fato}
                         onClose={() => setNoteFatoOpen(false)}
                     />
                 )}
@@ -478,8 +451,9 @@ export default function Scheda() {
                 {/* ── Background principale ────────────────────────────── */}
                 <div className="background">
                     <br />
-                    <div className="body_box"
-                        dangerouslySetInnerHTML={{ __html: principaleHtml }} />
+                    <div className="body_box">
+                        <SandboxedHtml html={principale} />
+                    </div>
                 </div>
 
             </div>{/* fine scheda_page_body */}
