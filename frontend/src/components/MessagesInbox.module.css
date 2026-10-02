@@ -79,6 +79,21 @@
     margin-left: 20px;
 }
 
+.newMessageBtn {
+    font-size: 0.8em;
+    color: #fff;
+    background: #2a2f4a;
+    border: 1px solid #3a4060;
+    border-radius: 3px;
+    padding: 4px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.newMessageBtn:hover {
+    background: #343a5c;
+}
+
 .selectModeBtn {
     font-size: 0.8em;
     color: #aaa;

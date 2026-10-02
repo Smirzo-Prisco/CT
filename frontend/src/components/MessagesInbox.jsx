@@ -925,10 +925,37 @@ export default function MessagesInbox({ toPg = null }) {
             <div id="messages-center-app" className="container">
                 <div className="sidebar" style={{ width: '100%' }}>
 
-                    {/* Intestazione */}
+                    {/* Intestazione: azioni (Nuovo Messaggio/Seleziona, o Elimina/Annulla
+                        in modalità selezione) — spostate qui da in fondo alla pagina,
+                        cosi' restano sempre visibili e raggiungibili senza scroll. */}
                     <div className="header">
-                        <div className="header-container">
-                            <h1 className="header-title">Messaggi Privati</h1>
+                        <div className={styles.headerActions}>
+                            {listSelectMode ? (
+                                <>
+                                    <button
+                                        onClick={handleDeleteSelectedConvs}
+                                        disabled={listSelected.size === 0}
+                                        className={styles.deleteConvBtn}
+                                    >
+                                        {listSelected.size > 0 ? `Elimina (${listSelected.size})` : 'Elimina'}
+                                    </button>
+                                    <button
+                                        onClick={() => { setListSelectMode(false); setListSelected(new Set()) }}
+                                        className={styles.cancelSelectBtn}
+                                    >
+                                        Annulla
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button id="new-message-button" onClick={() => setView('compose')} className={styles.newMessageBtn}>
+                                        Nuovo Messaggio
+                                    </button>
+                                    <button onClick={() => setListSelectMode(true)} className={styles.selectModeBtn}>
+                                        Seleziona
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
 
@@ -998,33 +1025,6 @@ export default function MessagesInbox({ toPg = null }) {
                                 ))
                             )}
                         </div>
-                    </div>
-
-                    {/* Azioni in fondo */}
-                    <div className="bottom-bar">
-                        {listSelectMode ? (
-                            <>
-                                <button
-                                    onClick={handleDeleteSelectedConvs}
-                                    disabled={listSelected.size === 0}
-                                    className={styles.deleteConvBtn}
-                                >
-                                    {listSelected.size > 0 ? `Elimina (${listSelected.size})` : 'Elimina'}
-                                </button>
-                                <button onClick={() => { setListSelectMode(false); setListSelected(new Set()) }}>
-                                    Annulla
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <button id="new-message-button" onClick={() => setView('compose')}>
-                                    Nuovo Messaggio
-                                </button>
-                                <button onClick={() => setListSelectMode(true)} className={styles.selectModeBtn}>
-                                    Seleziona
-                                </button>
-                            </>
-                        )}
                     </div>
                 </div>
             </div>

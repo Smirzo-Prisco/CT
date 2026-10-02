@@ -30,7 +30,6 @@
         overflow-y: hidden;
     }
 
-    .header,
     .main-header {
         background-color: #111423;
         padding: 0;
@@ -43,6 +42,20 @@
         justify-content: flex-start;
         box-sizing: border-box;
         flex-direction: column;
+    }
+
+    // Header della lista conversazioni: niente piu' titolo, solo la barra
+    // di azioni (Nuovo Messaggio/Seleziona o Elimina/Annulla), allineata a
+    // destra per restare sempre visibile e raggiungibile senza scroll.
+    .header {
+        background-color: #111423;
+        border-bottom: 1px solid #070a1b;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        box-sizing: border-box;
+        padding: 0 $space-3;
     }
 
     .header-title-container,
@@ -60,15 +73,6 @@
         font-size: 1em;
         text-align: center;
         margin-top: 0;
-    }
-
-    .header-title {
-        display: flex;
-        align-items: center;
-        font-family: Lato, sans-serif;
-        font-size: 1.5em;
-        color: #b4b6bf;
-        margin-bottom: 3px;
     }
 
     .message-section {
@@ -120,16 +124,6 @@
         background-size: contain;
     }
 
-    .header-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .header .header-title {
-        margin: 0;
-    }
-
     .toggle-buttons {
         display: flex;
         justify-content: center;
@@ -151,26 +145,14 @@
         }
     }
 
-    .navigation-buttons,
-    .bottom-bar {
-        width: 100%;
-        background-color: #1a1d2a;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px;
-    }
-
-    .sidebar .navigation-buttons,
-    .sidebar .bottom-bar {
-        width: 100%;
-    }
-
     .navigation-buttons {
-        margin-top: 10px;
-        justify-content: space-between;
-        padding: 5px 10px;
+        width: 100%;
         background-color: #111423;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 10px;
+        margin-top: 10px;
         border-top: 1px solid #070a1b;
 
         button {
@@ -192,34 +174,8 @@
         }
     }
 
-    .bottom-bar {
-        background-color: #111423;
-        justify-content: center;
-        padding: 5px;
-        border-radius: 5px;
-        border-top: 1px solid #070a1b;
-
-        button {
-            background-color: #1a1f3a;
-            color: #b4b6bf;
-            border: none;
-            padding: 8px 10px;
-            font-size: 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            flex: 0 1 auto;
-            margin: 0 3px;
-            text-align: center;
-            max-width: 120px;
-
-            &:hover {
-                background-color: #2a2f4a;
-            }
-
-            &:first-child { margin-left: 0; }
-            &:last-child  { margin-right: 0; }
-        }
+    .sidebar .navigation-buttons {
+        width: 100%;
     }
 
     .message-details {
