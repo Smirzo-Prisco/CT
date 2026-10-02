@@ -9,51 +9,70 @@
 
 #messages-center-app {
 
+    // Shell a due colonne: lista + dettaglio affiancate, altezza ancorata
+    // agli stessi riferimenti usati da #maincontent (vedi _layout.scss) cosi'
+    // il componente riempie esattamente lo spazio disponibile sotto l'HUD,
+    // senza dipendere dalla propagazione di height:100% lungo gli antenati.
+    // Ogni colonna gestisce il proprio scroll interno (niente position:sticky
+    // qui dentro: gli header sono semplici fratelli flex fuori dall'area che
+    // scrolla, non elementi sticky — e' quello il pattern che in passato ha
+    // creato i bug di doppio scroll, vedi commento su .thread-container).
     .container {
         display: flex;
         width: 100%;
-    }
-
-    .sidebar {
-        width: 30%;
-        background-color: #161d36;
-        display: flex;
-        flex-direction: column;
+        height: calc(100vh - #{$hud-content-top});
+        background-color: $palette-surface-deep;
+        border-radius: $radius-lg;
         overflow: hidden;
     }
 
-    .main-content {
-        width: 70%;
-        background-color: #0f111d;
+    .col-list {
+        width: 340px;
+        flex-shrink: 0;
+        background-color: $palette-surface-dark;
+        border-right: 1px solid $palette-surface-hover;
         display: flex;
         flex-direction: column;
-        overflow-y: hidden;
+        min-height: 0; // permette a .messages-list di scrollare invece di espandere il flex item
     }
 
-    .main-header {
-        background-color: #111423;
-        padding: 0;
-        margin: 0;
-        text-align: left;
-        border-bottom: 1px solid #070a1b;
-        height: 60px;
+    .col-detail {
+        flex: 1;
+        min-width: 0;
         display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        box-sizing: border-box;
         flex-direction: column;
+        min-height: 0;
     }
 
-    // Header della lista conversazioni: niente piu' titolo, solo la barra
-    // di azioni (Nuovo Messaggio/Seleziona o Elimina/Annulla), allineata a
-    // destra per restare sempre visibile e raggiungibile senza scroll.
+    // Mobile: una sola colonna alla volta, come nell'app originale — la
+    // classe view-${view} sul .container (impostata da MessagesInbox.jsx)
+    // dice quale nascondere. Su desktop entrambe restano sempre visibili.
+    @media screen and (max-width: 768px) {
+        & .container {
+            // 86px = top di #maincontent su mobile, vedi _layout.scss.
+            height: calc(100vh - 86px);
+            border-radius: 0;
+        }
+
+        & .col-list { width: 100%; }
+
+        & .container.view-list .col-detail { display: none; }
+        & .container.view-thread .col-list,
+        & .container.view-compose .col-list { display: none; }
+    }
+
+    // Header della lista conversazioni: tab ON/OFF a sinistra, azioni
+    // (Nuovo/Seleziona o Elimina/Annulla) a destra, sempre visibili senza
+    // scroll.
     .header {
-        background-color: #111423;
-        border-bottom: 1px solid #070a1b;
-        height: 60px;
+        background-color: $palette-surface-dark;
+        border-bottom: 1px solid $palette-surface-hover;
+        height: 56px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
-        justify-content: flex-end;
+        justify-content: space-between;
+        gap: $space-2;
         box-sizing: border-box;
         padding: 0 $space-3;
     }
@@ -75,31 +94,38 @@
         margin-top: 0;
     }
 
-    .message-section {
-        flex-grow: 1;
-        position: relative;
-    }
+    // Lista conversazioni: unico scroll interno della colonna (l'header sopra
+    // e' un fratello flex-shrink:0, non sticky — vedi commento su .container).
+    .messages-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: $space-2;
 
-    .message-section.active {
-        opacity: 1;
-        display: block;
-    }
-
-    #messages-off {
-        display: none;
+        @media screen and (max-width: 768px) {
+            // Lascia spazio ai pulsanti hamburger fissi (bottom:10px, ~44px alti)
+            // che altrimenti coprono l'ultima conversazione della lista.
+            padding-bottom: 60px;
+        }
     }
 
     .message-item {
-        background-color: #1a1d2a;
-        padding: 10px;
-        margin-bottom: 8px;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        background-color: transparent;
+        padding: $space-2 $space-3;
+        margin-bottom: $space-1;
+        border-radius: $radius-lg;
+        border-left: 3px solid transparent;
         display: flex;
         align-items: flex-start;
+        cursor: pointer;
+        transition: background-color $transition-fast, border-color $transition-fast;
 
         &:hover {
-            background-color: #2a2f4a;
+            background-color: $palette-surface;
+        }
+
+        &.selected {
+            background-color: $palette-surface-raised;
+            border-left-color: $color-action;
         }
 
         p {
@@ -109,39 +135,12 @@
         img {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
+            border-radius: $radius-full;
+            margin-right: $space-3;
             object-fit: cover;
             display: block;
-        }
-    }
-
-    .message-content {
-        width: 500px;
-        height: 500px;
-        margin: auto;
-        background: url('/themes/crystal/imgs/icone/logo_chat.png') no-repeat center center;
-        background-size: contain;
-    }
-
-    .toggle-buttons {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 10px;
-    }
-
-    .toggle-button {
-        cursor: pointer;
-        margin: 0 5px;
-        border-radius: 5px;
-        transition: filter 0.3s;
-
-        img {
-            display: block;
-        }
-
-        &.active img {
-            filter: brightness(1.5);
+            flex-shrink: 0;
+            background-color: $palette-surface-select;
         }
     }
 
@@ -174,45 +173,41 @@
         }
     }
 
-    .sidebar .navigation-buttons {
-        width: 100%;
-    }
-
     .message-details {
         flex-grow: 1;
+        min-width: 0;
         text-align: left;
 
         p {
-            margin: 3px 0;
-            color: #b4b6bf;
+            margin: 2px 0;
+            color: $color-text;
         }
 
         .sender {
-            font-weight: bold;
-            font-size: 12px;
+            font-weight: $font-weight-bold;
+            font-size: $text-md;
+            display: flex;
+            align-items: center;
+            gap: $space-1 + 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .date {
-            font-size: 11px;
-            color: #8c8f99;
+            font-size: $text-xs;
+            color: $color-text-muted;
         }
 
         .preview {
-            font-size: 11px;
-            color: #b4b6bf;
+            font-family: $font-chat;
+            font-size: $text-sm;
+            color: $color-text-secondary;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
         }
-    }
-
-    .messages-list {
-        flex-grow: 1;
-        max-height: calc(100vh - 240px);
-        overflow-y: auto;
-        overflow-x: hidden;
-        min-height: 400px;
     }
 
     .main-header {
@@ -444,8 +439,8 @@
     }
 
     .unread-avatar {
-        border: 3px solid #ce846f;
-        border-radius: 50%;
+        border: 2px solid $color-action;
+        border-radius: $radius-full;
     }
 
     .popup {
@@ -632,72 +627,66 @@
 
     // ── Thread DM (ThreadView) ────────────────────────────────
     //
-    // Struttura voluta: UN solo scroll (la pagina, #maincontent — gia'
-    // l'unico contenitore di scroll di tutta l'app, vedi _layout.scss),
-    // header sticky in cima, contenuto (messaggi + barra di risposta) in
-    // flusso normale sotto, raggiungibile scrollando fino in fondo.
-    //
-    // Due tentativi precedenti (entrambi sbagliati, vedi storia commit):
-    // 1) .thread-messages con un proprio overflow-y:auto interno + .thread-
-    //    container a height:100vh → creava un SECONDO scroll indipendente
-    //    dentro la pagina (doppia scrollbar, inutilizzabile).
-    // 2) .thread-container a position:fixed (pattern "pannello a schermo
-    //    intero" preso da .pagina_frame_chat) → stessa ambiguita' a due
-    //    scroll, solo spostata: quello del pannello fisso + quello residuo
-    //    della pagina.
-    // La causa di fondo per cui position:sticky da solo non bastava era
-    // .main-content con overflow-y:hidden: un antenato con overflow diverso
-    // da visible diventa il "contesto di scroll" per un discendente sticky,
-    // scavalcando #maincontent piu' in alto — quindi lo sticky restava
-    // legato a un contenitore che non scrolla mai per conto suo, seguendo
-    // comunque tutta la pagina quando #maincontent si muove. L'override e'
-    // in MessagesInbox.jsx (style inline su .main-content, solo per questa
-    // vista) invece che qui, per non toccare .main-content nelle altre viste
-    // (lista/composizione) che la condividono.
+    // Struttura voluta ORA (redesign a due colonne): .col-detail ha
+    // un'altezza vincolata (vedi .container), quindi .thread-container
+    // riempie quello spazio e scrolla al proprio interno — header e barra
+    // di risposta sono semplici fratelli flex-shrink:0 FUORI dall'area che
+    // scrolla, non elementi position:sticky dentro di essa. Questo evita per
+    // costruzione il bug storico di doppio scroll (vedi commit precedenti):
+    // quel bug nasceva da position:sticky dentro un antenato con overflow
+    // diverso da visible che ne scavalcava il contesto di scroll reale —
+    // qui non c'e' alcun elemento sticky, quindi la causa non si presenta.
     .thread-container {
         display: flex;
         flex-direction: column;
-
-        @media screen and (max-width: 768px) {
-            // I pulsanti hamburger (fixed, bottom 10px, ~44px alti) coprono il fondo.
-            // Il padding spinge la reply bar sopra di loro quando si arriva
-            // in fondo allo scroll.
-            padding-bottom: 60px;
-        }
+        height: 100%;
+        min-height: 0;
     }
 
-    // Torna indietro + nome interlocutore — sticky rispetto a #maincontent
-    // (l'unico scroll reale, vedi sopra), resta in cima mentre si scorrono
-    // i messaggi sotto.
     .thread-header {
-        position: sticky;
-        top: 0;
-        z-index: 5;
         flex-shrink: 0;
         display: flex;
         align-items: center;
         gap: $space-3;
-        padding: $space-4 $space-5;
+        padding: $space-3 $space-4;
         background-color: $palette-surface-dark;
         border-bottom: 1px solid $palette-surface-hover;
         min-height: 56px;
+        box-sizing: border-box;
     }
 
-    // Flusso normale, nessuno scroll proprio: fa parte del contenuto che
-    // #maincontent scorre nel suo insieme.
+    // Unico scroll interno della colonna dettaglio.
     .thread-messages {
+        flex: 1;
+        overflow-y: auto;
         padding: $space-4;
+        display: flex;
+        flex-direction: column;
+        gap: $space-3;
+
+        @media screen and (max-width: 768px) {
+            // Lascia spazio ai pulsanti hamburger fissi (bottom:10px, ~44px alti).
+            padding-bottom: 60px;
+        }
     }
 
-    // Il testo arriva via dangerouslySetInnerHTML: senza pre-line gli a-capo
-    // digitati nella textarea vengono collassati dal rendering HTML di default.
+    // Bolla del messaggio: il testo arriva via dangerouslySetInnerHTML, senza
+    // pre-line gli a-capo digitati nella textarea vengono collassati dal
+    // rendering HTML di default.
     .thread-message-text {
         white-space: pre-line;
+        background-color: $palette-surface;
+        border-radius: $radius-lg;
+        padding: $space-2 + 1 $space-3;
+        font-family: $font-chat;
+        font-size: $text-md;
+        line-height: 1.45;
     }
 
-    // Barra di risposta: affianca textarea e pulsante Invia — ultima cosa
-    // nel flusso, raggiunta scrollando fino in fondo come richiesto.
+    // Barra di risposta: affianca textarea e pulsante Invia — fratello
+    // flex-shrink:0 fuori dall'area di scroll, sempre visibile in fondo.
     .thread-reply {
+        flex-shrink: 0;
         border-top: 1px solid $palette-surface-hover;
         padding: $space-3 $space-4;
         display: flex;

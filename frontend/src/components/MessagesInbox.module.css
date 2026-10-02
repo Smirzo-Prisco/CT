@@ -2,23 +2,117 @@
 
 /* ── ConvItem ──────────────────────────────────────────────── */
 .noDecoration  { text-decoration: none; }
-.unreadDot     { color: #e74c3c; margin-left: 6px; }
+.unreadDot     { color: var(--color-action); font-size: 8px; }
+
+/* ── Header lista: tab ON/OFF a pillola ───────────────────────── */
+.tabsOnOff {
+    display: inline-flex;
+    background: var(--color-surface);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+}
+
+.tabsOnOff button {
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tabActive {
+    background: var(--color-action) !important;
+    color: var(--color-bg) !important;
+}
+
+.tabDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentcolor;
+    flex-shrink: 0;
+}
+
+/* ── Stato vuoto colonna dettaglio (desktop, nessuna conversazione aperta) ── */
+.emptyDetail {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+}
+
+.emptyDetail span {
+    font-size: 32px;
+    opacity: .5;
+}
+
+.listHint,
+.listHintMuted {
+    padding: 10px;
+    color: var(--color-text-muted);
+}
+
+.listHintMuted {
+    font-style: italic;
+}
 
 /* ── ThreadView ────────────────────────────────────────────── */
-.loading       { padding: 20px; color: #aaa; }
+.loading       { padding: 20px; color: var(--color-text-muted); }
 .threadWrap    { display: flex; flex-direction: column; height: 100%; }
-.threadHeader  { border-bottom: 1px solid #333; padding: 10px; }
-.backBtn       { margin-right: 10px; }
-.onlineBadge   { margin-left: 8px; font-size: 0.85em; color: #aaa; flex-shrink: 0; white-space: nowrap; }
-.messages      { overflow-y: auto; max-height: calc(100vh - 180px); padding: 10px; }
-.emptyMsg      { color: #aaa; font-style: italic; }
-.msgRow        { display: flex; gap: 10px; margin: 12px; align-items: flex-start; }
-.msgAvatar     { width: 40px; height: 40px; border-radius: 4px; flex-shrink: 0; }
-.msgBody       { flex: 1; }
-.msgMeta       { font-size: 0.8em; color: #aaa; margin-bottom: 2px; }
-.replyBar      { border-top: 1px solid #333; padding: 10px; display: flex; gap: 8px; }
-.replyTextarea { flex: 1; resize: vertical; }
+.emptyMsg      { color: var(--color-text-muted); font-style: italic; }
+.msgRow        { display: flex; gap: 10px; align-items: flex-start; max-width: 78%; }
+.msgAvatar     { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; object-fit: cover; }
+.msgBody       { flex: 1; min-width: 0; }
+.msgMeta       { font-size: 10.5px; color: var(--color-text-muted); margin-bottom: 3px; }
+.replyBar      { border-top: 1px solid var(--color-surface-raised); padding: 10px; display: flex; gap: 8px; }
 .sendBtn       { align-self: flex-end; }
+
+.replyTextarea {
+    flex: 1;
+    resize: none;
+    height: 40px;
+    background: var(--color-surface-input);
+    border: 1px solid var(--color-surface-hover, var(--color-border));
+    border-radius: 6px;
+    color: var(--color-text);
+    font-family: var(--font-ui);
+    font-size: var(--text-md);
+    padding: 9px 11px;
+    box-sizing: border-box;
+}
+
+.replyTextarea:focus {
+    outline: none;
+    border-color: var(--color-action);
+}
+
+/* Messaggio proprio: allineato a destra, avatar invertito, bolla accentata. */
+.msgOwn {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.msgOwn .msgMeta {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+
+/* .thread-message-text e' una classe globale (non module), vedi _messages_center.scss */
+.msgOwn :global(.thread-message-text) {
+    background-color: rgb(174 231 255 / 12%);
+}
 
 .threadHeaderRow {
     display: flex;
@@ -32,6 +126,7 @@
 .headerLeft {
     display: flex;
     align-items: center;
+    gap: 10px;
     min-width: 0;
     flex-shrink: 1;
 }
@@ -54,8 +149,9 @@
 .headerAvatar {
     width: 32px;
     height: 32px;
-    border-radius: 4px;
+    border-radius: 6px;
     flex-shrink: 0;
+    object-fit: cover;
 }
 
 .headerLink {
@@ -76,51 +172,42 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-left: 20px;
+    flex-shrink: 0;
 }
 
-.newMessageBtn {
-    font-size: 0.8em;
-    color: #fff;
-    background: #2a2f4a;
-    border: 1px solid #3a4060;
-    border-radius: 3px;
-    padding: 4px 10px;
-    cursor: pointer;
+/* Pillola tipo conversazione (ON/OFF, Gruppo, Globale) nell'header del thread. */
+.pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+    background: var(--color-surface-raised);
+    color: var(--color-text-secondary);
+    letter-spacing: .03em;
     white-space: nowrap;
 }
 
-.newMessageBtn:hover {
-    background: #343a5c;
+.pillOn {
+    background: rgb(174 231 255 / 16%);
+    color: var(--color-action);
 }
 
-.selectModeBtn {
-    font-size: 0.8em;
-    color: #aaa;
-    background: none;
-    border: 1px solid #555;
-    border-radius: 3px;
-    padding: 2px 8px;
-    cursor: pointer;
+/* Pulsante "indietro": serve solo nella vista mobile a colonna singola —
+   su desktop lista e thread stanno gia' affiancate, non serve tornare indietro. */
+.backBtn {
+    flex-shrink: 0;
 }
 
-.selectModeBtn:hover {
-    border-color: #aaa;
-    color: #ccc;
-}
-
-.cancelSelectBtn {
-    font-size: 0.8em;
-    background: none;
-    border: 1px solid #555;
-    border-radius: 3px;
-    padding: 2px 8px;
-    cursor: pointer;
+@media screen and (min-width: 769px) {
+    .backBtn {
+        display: none;
+    }
 }
 
 .selectableMsgRow {
     cursor: pointer;
-    border-left: 3px solid transparent;
+    border-radius: 6px;
     transition: background 0.1s;
 }
 
@@ -129,8 +216,8 @@
 }
 
 .selectedMsgRow {
-    background: rgb(100 100 200 / 15%);
-    border-left: 3px solid #6060cc;
+    background: rgb(174 231 255 / 10%);
+    outline: 1px solid var(--color-action);
 }
 
 .msgCheckbox {
@@ -138,13 +225,14 @@
     align-self: center;
     margin-right: 4px;
     cursor: pointer;
+    accent-color: var(--color-action);
 }
 
 /* ── Selezione multipla nella lista conversazioni ────────────── */
 
 .convChecked {
-    background: rgb(100 100 200 / 15%);
-    border-left: 3px solid #6060cc;
+    background: var(--color-surface-raised) !important;
+    border-left-color: var(--color-action) !important;
 }
 
 .convCheckbox {
@@ -152,27 +240,44 @@
     align-self: center;
     margin-right: 6px;
     cursor: pointer;
-}
-
-.deleteConvBtn {
-    font-size: 0.8em;
-    color: #e74c3c;
-    background: none;
-    border: 1px solid #e74c3c;
-    border-radius: 3px;
-    padding: 2px 8px;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.deleteConvBtn:hover {
-    background: rgb(231 76 60 / 12%);
+    accent-color: var(--color-action);
 }
 
 /* ── ComposeView ───────────────────────────────────────────── */
-.composeWrap   { padding: 20px; }
-.formField     { margin-bottom: 10px; }
-.formLabel     { display: block; margin-bottom: 4px; }
+.composeWrap   { flex: 1; overflow-y: auto; padding: 22px; }
+
+.composeWrap h3 {
+    margin: 0 0 18px;
+    color: var(--color-text-title);
+    font-size: var(--text-xl);
+}
+.formField     { margin-bottom: 16px; }
+.formLabel     { display: block; margin-bottom: 6px; font-size: var(--text-sm); font-weight: 700; color: var(--color-text-secondary); }
 .fullWidth     { width: 100%; }
 .fullResize    { width: 100%; resize: vertical; }
-.formActions   { display: flex; gap: 8px; }
+.formActions   { display: flex; gap: 8px; margin-top: 4px; }
+
+.formField input,
+.formField select,
+.formField textarea {
+    width: 100%;
+    background: var(--color-surface-input);
+    border: 1px solid var(--color-surface-hover, var(--color-border));
+    border-radius: 6px;
+    color: var(--color-text);
+    font-family: var(--font-ui);
+    font-size: var(--text-md);
+    padding: 9px 11px;
+    box-sizing: border-box;
+}
+
+.formField input:focus,
+.formField select:focus,
+.formField textarea:focus {
+    outline: none;
+    border-color: var(--color-action);
+}
+
+.formField textarea {
+    font-family: var(--font-chat);
+}

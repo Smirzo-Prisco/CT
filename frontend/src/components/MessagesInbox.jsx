@@ -34,14 +34,6 @@ import styles from './MessagesInbox.module.css'
 // ---------------------------------------------------------------------------
 
 const IMG = {
-    /** Icona tab OFF con nuovi messaggi */
-    offAcceso:  '../themes/crystal/imgs/sms/MessaggioOff_Acceso.gif',
-    /** Icona tab OFF senza nuovi messaggi */
-    offSpento:  '../themes/crystal/imgs/sms/MessaggioOff_Spento.png',
-    /** Icona tab ON con nuovi messaggi */
-    onAcceso:   '../themes/crystal/imgs/sms/MessaggioOn_Acceso.gif',
-    /** Icona tab ON senza nuovi messaggi */
-    onSpento:   '../themes/crystal/imgs/sms/MessaggioOn_Spento.png',
     /** Avatar placeholder per messaggi di gruppo */
     gruppo:     '../themes/crystal/imgs/sms/img_gruppo.jpg',
     /** Avatar placeholder per messaggi globali */
@@ -167,7 +159,7 @@ function ConvItem({ conv, isSelected, onClick, selectMode = false, checked = fal
  * @param {Function} props.onDelete     - Callback per eliminare la conversazione
  * @param {Function} props.onDeleteMsgs - Callback ([{mittente,ora}]) per eliminare messaggi selezionati
  */
-function ThreadView({ messages, conv, loading, replyText, setReplyText, sending, onSend, onBack, onDelete, onDeleteMsgs }) {
+function ThreadView({ messages, conv, loading, replyText, setReplyText, sending, onSend, onBack, onDelete, onDeleteMsgs, myLogin }) {
     /** Ref per lo scroll automatico all'ultimo messaggio */
     const bottomRef = useRef(null)
     /** Ref alla textarea di risposta: usato per recuperare il focus dopo l'invio */
@@ -228,11 +220,12 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
     return (
         <div className={`thread-container ${styles.threadWrap}`}>
 
-            {/* Header: normale → [← nome badge] [Seleziona][Elimina conv]; selezione → [←] [Elimina N][Annulla] */}
+            {/* Header: normale → [← nome badge] [Seleziona][Elimina conv]; selezione → [←] [Elimina N][Annulla].
+                Il pulsante ← e' nascosto su desktop via CSS: la lista resta sempre visibile a fianco. */}
             <div className="thread-header">
                 <div className={styles.threadHeaderRow}>
                     <div className={styles.headerLeft}>
-                        <button onClick={onBack} className={styles.backBtn}>←</button>
+                        <button onClick={onBack} className={`btn btn--icon ${styles.backBtn}`}>←</button>
                         {!selectMode && (
                             <>
                                 {conv.tipo === 'individuale' ? (
@@ -258,8 +251,8 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                                         <strong>{conv.display_name}</strong>
                                     </span>
                                 )}
-                                <span className={styles.onlineBadge}>
-                                    {conv.ongame ? '[ON]' : '[OFF]'}
+                                <span className={`${styles.pill} ${conv.ongame ? styles.pillOn : ''}`}>
+                                    {conv.ongame ? 'ON' : 'OFF'}
                                     {conv.tipo === 'gruppo' ? ' · Gruppo' : ''}
                                     {conv.tipo === 'globale' ? ' · Globale' : ''}
                                 </span>
@@ -272,22 +265,22 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                                 <button
                                     onClick={handleDeleteSelected}
                                     disabled={selected.size === 0}
-                                    className={styles.deleteConvBtn}
+                                    className="btn btn--danger btn--sm"
                                 >
                                     {selected.size > 0 ? `Elimina (${selected.size})` : 'Elimina'}
                                 </button>
-                                <button onClick={exitSelectMode} className={styles.cancelSelectBtn}>
+                                <button onClick={exitSelectMode} className="btn btn--ghost btn--sm">
                                     Annulla
                                 </button>
                             </>
                         ) : conv.tipo !== 'globale' && (
                             <>
-                                <button onClick={() => setSelectMode(true)} className={styles.selectModeBtn}>
+                                <button onClick={() => setSelectMode(true)} className="btn btn--ghost btn--sm">
                                     Seleziona
                                 </button>
                                 <button
                                     onClick={() => { if (confirm('Eliminare questa conversazione?')) onDelete() }}
-                                    className={styles.deleteConvBtn}
+                                    className="btn btn--danger btn--sm"
                                     title="Elimina conversazione"
                                 >
                                     Elimina
@@ -310,12 +303,14 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                 {messages.map((msg, i) => {
                     const k = msgKey(msg)
                     const isSel = selected.has(k)
+                    const isOwn = msg.mittente === myLogin
                     return (
                         <div
                             key={i}
                             className={[
                                 'thread-message',
                                 styles.msgRow,
+                                isOwn      ? styles.msgOwn           : '',
                                 selectMode ? styles.selectableMsgRow : '',
                                 isSel      ? styles.selectedMsgRow   : '',
                             ].filter(Boolean).join(' ')}
@@ -375,7 +370,7 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                     <button
                         onClick={onSend}
                         disabled={sending || !replyText.trim()}
-                        className={styles.sendBtn}
+                        className={`btn btn--primary ${styles.sendBtn}`}
                     >
                         {sending ? '...' : 'Invia'}
                     </button>
@@ -490,10 +485,10 @@ function ComposeView({ onSend, onSendMass, onCancel, sending, defaultDest = '', 
             </div>
 
             <div className={styles.formActions}>
-                <button onClick={handleSend} disabled={sending || !canSend}>
+                <button onClick={handleSend} disabled={sending || !canSend} className="btn btn--primary">
                     {sending ? 'Invio...' : 'Invia'}
                 </button>
-                <button onClick={onCancel}>Annulla</button>
+                <button onClick={onCancel} className="btn btn--ghost">Annulla</button>
             </div>
         </div>
     )
@@ -910,138 +905,95 @@ export default function MessagesInbox({ toPg = null }) {
     // ---------------------------------------------------------------------------
 
     /**
-     * Layout a colonna singola con tre viste esclusive:
-     *   'list'    → lista conversazioni a piena larghezza
-     *   'thread'  → thread aperto a piena larghezza + pulsante back
-     *   'compose' → form nuovo messaggio + pulsante back
-     *
-     * Il .container di new_sms.css è display:flex, ma qui mostriamo una sola
-     * colonna alla volta, quindi usa width:100% su ciascuna vista.
+     * Layout a due colonne (lista + dettaglio) affiancate su desktop, come un
+     * client di messaggistica. Su mobile (@media max-width:768px in
+     * _messages_center.scss) resta una sola colonna visibile alla volta —
+     * la classe view-${view} sul contenitore e' quello che la CSS legge per
+     * decidere quale nascondere, la logica React non cambia tra i due casi.
      */
+    const myLogin = window.CT_USER?.login ?? ''
 
-    // --- VISTA LISTA ---
-    if (view === 'list') {
-        return (
-            <div id="messages-center-app" className="container">
-                <div className="sidebar" style={{ width: '100%' }}>
+    return (
+        <div id="messages-center-app" className={`container view-${view}`}>
 
-                    {/* Intestazione: azioni (Nuovo Messaggio/Seleziona, o Elimina/Annulla
-                        in modalità selezione) — spostate qui da in fondo alla pagina,
-                        cosi' restano sempre visibili e raggiungibili senza scroll. */}
-                    <div className="header">
-                        <div className={styles.headerActions}>
-                            {listSelectMode ? (
-                                <>
-                                    <button
-                                        onClick={handleDeleteSelectedConvs}
-                                        disabled={listSelected.size === 0}
-                                        className={styles.deleteConvBtn}
-                                    >
-                                        {listSelected.size > 0 ? `Elimina (${listSelected.size})` : 'Elimina'}
-                                    </button>
-                                    <button
-                                        onClick={() => { setListSelectMode(false); setListSelected(new Set()) }}
-                                        className={styles.cancelSelectBtn}
-                                    >
-                                        Annulla
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <button id="new-message-button" onClick={() => setView('compose')} className={styles.newMessageBtn}>
-                                        Nuovo Messaggio
-                                    </button>
-                                    <button onClick={() => setListSelectMode(true)} className={styles.selectModeBtn}>
-                                        Seleziona
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
+            {/* ── Colonna lista conversazioni ──────────────────────────── */}
+            <div className="col-list">
 
-                    {/* Toggle tab ON / OFF */}
-                    <div className="toggle-buttons">
-                        <div
-                            className={`toggle-button ${activeTab === 'off' ? 'active' : ''}`}
+                {/* Intestazione: tab ON/OFF a sinistra, azioni a destra
+                    (Nuovo/Seleziona, o Elimina/Annulla in modalità selezione) —
+                    sempre visibili senza scroll. */}
+                <div className="header">
+                    <div className={styles.tabsOnOff}>
+                        <button
+                            className={activeTab === 'off' ? styles.tabActive : ''}
                             onClick={() => setActiveTab('off')}
-                            title="Messaggi OFF"
                         >
-                            <img src={hasNewOff ? IMG.offAcceso : IMG.offSpento} alt="Messaggi Off" />
-                        </div>
-                        <div
-                            className={`toggle-button ${activeTab === 'on' ? 'active' : ''}`}
+                            {hasNewOff && <span className={styles.tabDot} />}
+                            OFF
+                        </button>
+                        <button
+                            className={activeTab === 'on' ? styles.tabActive : ''}
                             onClick={() => setActiveTab('on')}
-                            title="Messaggi ON"
                         >
-                            <img src={hasNewOn ? IMG.onAcceso : IMG.onSpento} alt="Messaggi On" />
-                        </div>
+                            {hasNewOn && <span className={styles.tabDot} />}
+                            ON
+                        </button>
                     </div>
-
-                    {/* Lista conversazioni — loading / vuota / popolata */}
-                    <div className="messages-list" id="messages-list">
-                        <div
-                            className="message-section"
-                            id="messages-off"
-                            style={{ display: activeTab === 'off' ? 'block' : 'none' }}
-                        >
-                            {loadingList ? (
-                                <p style={{ padding: '10px', color: 'var(--color-text-muted)' }}>Caricamento...</p>
-                            ) : convOff.length === 0 ? (
-                                <p style={{ padding: '10px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>Nessun messaggio OFF.</p>
-                            ) : (
-                                convOff.map(conv => (
-                                    <ConvItem
-                                        key={`${conv.tipo}-${conv.conversazione_id}`}
-                                        conv={conv}
-                                        isSelected={false}
-                                        onClick={openConversation}
-                                        selectMode={listSelectMode}
-                                        checked={listSelected.has(convKey(conv))}
-                                        onToggle={toggleListSelect}
-                                    />
-                                ))
-                            )}
-                        </div>
-                        <div
-                            className="message-section active"
-                            id="messages-on"
-                            style={{ display: activeTab === 'on' ? 'block' : 'none' }}
-                        >
-                            {loadingList ? (
-                                <p style={{ padding: '10px', color: 'var(--color-text-muted)' }}>Caricamento...</p>
-                            ) : convOn.length === 0 ? (
-                                <p style={{ padding: '10px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>Nessun messaggio ON.</p>
-                            ) : (
-                                convOn.map(conv => (
-                                    <ConvItem
-                                        key={`${conv.tipo}-${conv.conversazione_id}`}
-                                        conv={conv}
-                                        isSelected={false}
-                                        onClick={openConversation}
-                                        selectMode={listSelectMode}
-                                        checked={listSelected.has(convKey(conv))}
-                                        onToggle={toggleListSelect}
-                                    />
-                                ))
-                            )}
-                        </div>
+                    <div className={styles.headerActions}>
+                        {listSelectMode ? (
+                            <>
+                                <button
+                                    onClick={handleDeleteSelectedConvs}
+                                    disabled={listSelected.size === 0}
+                                    className="btn btn--danger btn--sm"
+                                >
+                                    {listSelected.size > 0 ? `Elimina (${listSelected.size})` : 'Elimina'}
+                                </button>
+                                <button
+                                    onClick={() => { setListSelectMode(false); setListSelected(new Set()) }}
+                                    className="btn btn--ghost btn--sm"
+                                >
+                                    Annulla
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button id="new-message-button" onClick={() => setView('compose')} className="btn btn--primary btn--sm">
+                                    + Nuovo
+                                </button>
+                                <button onClick={() => setListSelectMode(true)} className="btn btn--ghost btn--sm">
+                                    Seleziona
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
-            </div>
-        )
-    }
 
-    // --- VISTA THREAD ---
-    if (view === 'thread' && selectedConv) {
-        return (
-            <div id="messages-center-app" className="container">
-                {/* overflowY:visible qui (non nella classe .main-content, condivisa
-                    anche dalla vista lista/composizione): .main-content di default
-                    ha overflow-y:hidden, che spezza il contesto di .thread-header
-                    sticky (vedi _messages_center.scss) facendolo restare legato a
-                    questo contenitore invece che a #maincontent, l'unico vero
-                    scroll della pagina. */}
-                <div className="main-content" style={{ width: '100%', display: 'flex', flexDirection: 'column', overflowY: 'visible' }}>
+                {/* Lista conversazioni — loading / vuota / popolata */}
+                <div className="messages-list">
+                    {loadingList ? (
+                        <p className={styles.listHint}>Caricamento...</p>
+                    ) : displayed.length === 0 ? (
+                        <p className={styles.listHintMuted}>Nessun messaggio {activeTab.toUpperCase()}.</p>
+                    ) : (
+                        displayed.map(conv => (
+                            <ConvItem
+                                key={convKey(conv)}
+                                conv={conv}
+                                isSelected={!!selectedConv && convKey(conv) === convKey(selectedConv)}
+                                onClick={openConversation}
+                                selectMode={listSelectMode}
+                                checked={listSelected.has(convKey(conv))}
+                                onToggle={toggleListSelect}
+                            />
+                        ))
+                    )}
+                </div>
+            </div>
+
+            {/* ── Colonna dettaglio: thread aperto, composizione, o vuoto ── */}
+            <div className="col-detail">
+                {view === 'thread' && selectedConv ? (
                     <ThreadView
                         messages={messages}
                         conv={selectedConv}
@@ -1053,24 +1005,23 @@ export default function MessagesInbox({ toPg = null }) {
                         onBack={() => { setView('list'); setSelectedConv(null) }}
                         onDelete={handleDeleteConv}
                         onDeleteMsgs={handleDeleteMsgs}
+                        myLogin={myLogin}
                     />
-                </div>
-            </div>
-        )
-    }
-
-    // --- VISTA COMPOSIZIONE ---
-    return (
-        <div id="messages-center-app" className="container">
-            <div className="main-content" style={{ width: '100%' }}>
-                <ComposeView
-                    onSend={sendNew}
-                    onSendMass={sendMass}
-                    onCancel={() => setView('list')}
-                    sending={sending}
-                    defaultDest={composeDest}
-                    perms={perms}
-                />
+                ) : view === 'compose' ? (
+                    <ComposeView
+                        onSend={sendNew}
+                        onSendMass={sendMass}
+                        onCancel={() => setView('list')}
+                        sending={sending}
+                        defaultDest={composeDest}
+                        perms={perms}
+                    />
+                ) : (
+                    <div className={styles.emptyDetail}>
+                        <span>✉</span>
+                        <p>Seleziona una conversazione per iniziare</p>
+                    </div>
+                )}
             </div>
         </div>
     )
