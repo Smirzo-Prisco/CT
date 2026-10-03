@@ -1217,7 +1217,10 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                         <div key={`${sec.nome}-${sec.variants[0].id}`} className={styles.card}>
                             <div className={styles.cardIconWrap}>
                                 {sec.img ? (
-                                    <img src={`/themes/crystal/${sec.img}`} alt="" className={styles.cardImg} />
+                                    // sec.img e' "imgs/guilds/<file>" — cartella alla radice del
+                                    // webroot (non sotto themes/crystal/), stesso percorso usato
+                                    // da servizi_gilde_giusto.inc.php per le stesse immagini.
+                                    <img src={`/${sec.img}`} alt="" className={styles.cardImg} />
                                 ) : (
                                     <i className={`fa-solid ${categoryIcon(selectedCategory.tipo)} ${styles.cardIcon}`}></i>
                                 )}
