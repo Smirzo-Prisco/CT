@@ -1234,7 +1234,7 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                                         {sec.variants.map(v => (
                                             <button
                                                 key={v.id}
-                                                className={`btn btn--sm ${v.ongame ? 'btn--primary' : 'btn--ghost'}`}
+                                                className={`btn btn--sm ${styles.variantBtn} ${v.ongame ? styles.variantBtnOn : styles.variantBtnOff}`}
                                                 onClick={() => openCard(sec, v)}
                                             >
                                                 {v.ongame ? 'ON' : 'OFF'}{v.non_letti > 0 ? ` (${v.non_letti})` : ''}

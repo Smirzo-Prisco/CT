@@ -413,6 +413,34 @@
     margin-top: $space-1;
 }
 
+// Pulsanti ON/OFF della stessa card: nessuna gerarchia tra i due (non sono
+// un'azione primaria + una secondaria, ma due destinazioni alla pari) — stesso
+// trattamento (trasparente + bordo), solo il colore li distingue.
+.variantBtn {
+    background: transparent;
+}
+
+.variantBtnOn {
+    border-color: rgba($color-action, 0.5);
+    color: $color-action;
+
+    &:hover:not(:disabled) {
+        background: rgba($color-action, 0.12);
+        border-color: $color-action;
+    }
+}
+
+.variantBtnOff {
+    border-color: rgba($color-text-secondary, 0.5);
+    color: $color-text-secondary;
+
+    &:hover:not(:disabled) {
+        background: rgb(255 255 255 / 6%);
+        border-color: $color-text-secondary;
+        color: $color-text-light;
+    }
+}
+
 // ── Vista thread list ──────────────────────────────────────────
 
 .searchBar {
