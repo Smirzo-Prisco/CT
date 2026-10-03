@@ -28,6 +28,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import styles from './MessagesInbox.module.css'
+import SplitPane from './common/SplitPane'
 
 // ---------------------------------------------------------------------------
 // COSTANTI — path immagini (stesse del vecchio PHP)
@@ -296,7 +297,7 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
               * Senza max-height il div cresce con il contenuto e scrolla tutta la pagina.
               * calc(100vh - 180px) lascia spazio per header e form risposta.
               */}
-            <div className="thread-messages">
+            <SplitPane.ScrollArea className="thread-messages" padBottomMobile>
                 {messages.length === 0 && (
                     <p className={styles.emptyMsg}>Nessun messaggio.</p>
                 )}
@@ -352,7 +353,7 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                     )
                 })}
                 <div ref={bottomRef} />
-            </div>
+            </SplitPane.ScrollArea>
 
             {/* Form di risposta — nascosto per globali e durante la selezione */}
             {conv.tipo !== 'globale' && !selectMode && (
@@ -436,7 +437,7 @@ function ComposeView({ onSend, onSendMass, onCancel, sending, defaultDest = '', 
     }
 
     return (
-        <div className={styles.composeWrap}>
+        <SplitPane.ScrollArea className={styles.composeWrap}>
             <h3>Nuovo Messaggio</h3>
 
             {hasMassPerms && (
@@ -490,7 +491,7 @@ function ComposeView({ onSend, onSendMass, onCancel, sending, defaultDest = '', 
                 </button>
                 <button onClick={onCancel} className="btn btn--ghost">Annulla</button>
             </div>
-        </div>
+        </SplitPane.ScrollArea>
     )
 }
 
@@ -905,124 +906,126 @@ export default function MessagesInbox({ toPg = null }) {
     // ---------------------------------------------------------------------------
 
     /**
-     * Layout a due colonne (lista + dettaglio) affiancate su desktop, come un
-     * client di messaggistica. Su mobile (@media max-width:768px in
-     * _messages_center.scss) resta una sola colonna visibile alla volta —
-     * la classe view-${view} sul contenitore e' quello che la CSS legge per
-     * decidere quale nascondere, la logica React non cambia tra i due casi.
+     * Layout a due colonne (lista + dettaglio): la shell responsive (altezza,
+     * affiancamento su desktop, singola colonna su mobile) e' il componente
+     * condiviso SplitPane — qui restano solo i contenuti delle due colonne.
+     * L'id "messages-center-app" resta come wrapper per lo scoping di
+     * _messages_center.scss (stile di contenuto: header, tab, bolle...).
      */
     const myLogin = window.CT_USER?.login ?? ''
 
-    return (
-        <div id="messages-center-app" className={`container view-${view}`}>
-
-            {/* ── Colonna lista conversazioni ──────────────────────────── */}
-            <div className="col-list">
-
-                {/* Intestazione: tab ON/OFF a sinistra, azioni a destra
-                    (Nuovo/Seleziona, o Elimina/Annulla in modalità selezione) —
-                    sempre visibili senza scroll. */}
-                <div className="header">
-                    <div className={styles.tabsOnOff}>
-                        <button
-                            className={activeTab === 'off' ? styles.tabActive : ''}
-                            onClick={() => setActiveTab('off')}
-                        >
-                            {hasNewOff && <span className={styles.tabDot} />}
-                            OFF
-                        </button>
-                        <button
-                            className={activeTab === 'on' ? styles.tabActive : ''}
-                            onClick={() => setActiveTab('on')}
-                        >
-                            {hasNewOn && <span className={styles.tabDot} />}
-                            ON
-                        </button>
-                    </div>
-                    <div className={styles.headerActions}>
-                        {listSelectMode ? (
-                            <>
-                                <button
-                                    onClick={handleDeleteSelectedConvs}
-                                    disabled={listSelected.size === 0}
-                                    className="btn btn--danger btn--sm"
-                                >
-                                    {listSelected.size > 0 ? `Elimina (${listSelected.size})` : 'Elimina'}
-                                </button>
-                                <button
-                                    onClick={() => { setListSelectMode(false); setListSelected(new Set()) }}
-                                    className="btn btn--ghost btn--sm"
-                                >
-                                    Annulla
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <button id="new-message-button" onClick={() => setView('compose')} className="btn btn--primary btn--sm">
-                                    + Nuovo
-                                </button>
-                                <button onClick={() => setListSelectMode(true)} className="btn btn--ghost btn--sm">
-                                    Seleziona
-                                </button>
-                            </>
-                        )}
-                    </div>
+    const listContent = (
+        <>
+            {/* Intestazione: tab ON/OFF a sinistra, azioni a destra
+                (Nuovo/Seleziona, o Elimina/Annulla in modalità selezione) —
+                sempre visibili senza scroll. */}
+            <div className="header">
+                <div className={styles.tabsOnOff}>
+                    <button
+                        className={activeTab === 'off' ? styles.tabActive : ''}
+                        onClick={() => setActiveTab('off')}
+                    >
+                        {hasNewOff && <span className={styles.tabDot} />}
+                        OFF
+                    </button>
+                    <button
+                        className={activeTab === 'on' ? styles.tabActive : ''}
+                        onClick={() => setActiveTab('on')}
+                    >
+                        {hasNewOn && <span className={styles.tabDot} />}
+                        ON
+                    </button>
                 </div>
-
-                {/* Lista conversazioni — loading / vuota / popolata */}
-                <div className="messages-list">
-                    {loadingList ? (
-                        <p className={styles.listHint}>Caricamento...</p>
-                    ) : displayed.length === 0 ? (
-                        <p className={styles.listHintMuted}>Nessun messaggio {activeTab.toUpperCase()}.</p>
+                <div className={styles.headerActions}>
+                    {listSelectMode ? (
+                        <>
+                            <button
+                                onClick={handleDeleteSelectedConvs}
+                                disabled={listSelected.size === 0}
+                                className="btn btn--danger btn--sm"
+                            >
+                                {listSelected.size > 0 ? `Elimina (${listSelected.size})` : 'Elimina'}
+                            </button>
+                            <button
+                                onClick={() => { setListSelectMode(false); setListSelected(new Set()) }}
+                                className="btn btn--ghost btn--sm"
+                            >
+                                Annulla
+                            </button>
+                        </>
                     ) : (
-                        displayed.map(conv => (
-                            <ConvItem
-                                key={convKey(conv)}
-                                conv={conv}
-                                isSelected={!!selectedConv && convKey(conv) === convKey(selectedConv)}
-                                onClick={openConversation}
-                                selectMode={listSelectMode}
-                                checked={listSelected.has(convKey(conv))}
-                                onToggle={toggleListSelect}
-                            />
-                        ))
+                        <>
+                            <button id="new-message-button" onClick={() => setView('compose')} className="btn btn--primary btn--sm">
+                                + Nuovo
+                            </button>
+                            <button onClick={() => setListSelectMode(true)} className="btn btn--ghost btn--sm">
+                                Seleziona
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
 
-            {/* ── Colonna dettaglio: thread aperto, composizione, o vuoto ── */}
-            <div className="col-detail">
-                {view === 'thread' && selectedConv ? (
-                    <ThreadView
-                        messages={messages}
-                        conv={selectedConv}
-                        loading={loadingThread}
-                        replyText={replyText}
-                        setReplyText={setReplyText}
-                        sending={sending}
-                        onSend={sendReply}
-                        onBack={() => { setView('list'); setSelectedConv(null) }}
-                        onDelete={handleDeleteConv}
-                        onDeleteMsgs={handleDeleteMsgs}
-                        myLogin={myLogin}
-                    />
-                ) : view === 'compose' ? (
-                    <ComposeView
-                        onSend={sendNew}
-                        onSendMass={sendMass}
-                        onCancel={() => setView('list')}
-                        sending={sending}
-                        defaultDest={composeDest}
-                        perms={perms}
-                    />
+            {/* Lista conversazioni — loading / vuota / popolata */}
+            <SplitPane.ScrollArea className="messages-list" padBottomMobile>
+                {loadingList ? (
+                    <p className={styles.listHint}>Caricamento...</p>
+                ) : displayed.length === 0 ? (
+                    <p className={styles.listHintMuted}>Nessun messaggio {activeTab.toUpperCase()}.</p>
                 ) : (
-                    <div className={styles.emptyDetail}>
-                        <span>✉</span>
-                        <p>Seleziona una conversazione per iniziare</p>
-                    </div>
+                    displayed.map(conv => (
+                        <ConvItem
+                            key={convKey(conv)}
+                            conv={conv}
+                            isSelected={!!selectedConv && convKey(conv) === convKey(selectedConv)}
+                            onClick={openConversation}
+                            selectMode={listSelectMode}
+                            checked={listSelected.has(convKey(conv))}
+                            onToggle={toggleListSelect}
+                        />
+                    ))
                 )}
-            </div>
+            </SplitPane.ScrollArea>
+        </>
+    )
+
+    const detailContent = view === 'thread' && selectedConv ? (
+        <ThreadView
+            messages={messages}
+            conv={selectedConv}
+            loading={loadingThread}
+            replyText={replyText}
+            setReplyText={setReplyText}
+            sending={sending}
+            onSend={sendReply}
+            onBack={() => { setView('list'); setSelectedConv(null) }}
+            onDelete={handleDeleteConv}
+            onDeleteMsgs={handleDeleteMsgs}
+            myLogin={myLogin}
+        />
+    ) : view === 'compose' ? (
+        <ComposeView
+            onSend={sendNew}
+            onSendMass={sendMass}
+            onCancel={() => setView('list')}
+            sending={sending}
+            defaultDest={composeDest}
+            perms={perms}
+        />
+    ) : (
+        <div className={styles.emptyDetail}>
+            <span>✉</span>
+            <p>Seleziona una conversazione per iniziare</p>
+        </div>
+    )
+
+    return (
+        <div id="messages-center-app">
+            <SplitPane
+                view={view === 'list' ? 'list' : 'detail'}
+                list={listContent}
+                detail={detailContent}
+            />
         </div>
     )
 }

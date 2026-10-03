@@ -9,64 +9,12 @@
 
 #messages-center-app {
 
-    // Shell a due colonne: lista + dettaglio affiancate, altezza ancorata
-    // agli stessi riferimenti usati da #maincontent (vedi _layout.scss) cosi'
-    // il componente riempie esattamente lo spazio disponibile sotto l'HUD,
-    // senza dipendere dalla propagazione di height:100% lungo gli antenati.
-    // Ogni colonna gestisce il proprio scroll interno (niente position:sticky
-    // qui dentro: gli header sono semplici fratelli flex fuori dall'area che
-    // scrolla, non elementi sticky — e' quello il pattern che in passato ha
-    // creato i bug di doppio scroll, vedi commento su .thread-container).
-    //
-    // &.container (non ".container" discendente): nel JSX id="messages-center-app"
-    // e className="container ..." stanno sullo STESSO div, non in rapporto
-    // antenato-discendente — un selettore con lo spazio non avrebbe mai
-    // trovato corrispondenza nel DOM (bug preesistente, invisibile prima
-    // perche' il vecchio layout a vista singola non dipendeva da flex/height
-    // sul contenitore).
-    &.container {
-        display: flex;
-        width: 100%;
-        height: calc(100vh - #{$hud-content-top});
-        background-color: $palette-surface-deep;
-        border-radius: $radius-lg;
-        overflow: hidden;
-    }
-
-    .col-list {
-        width: 340px;
-        flex-shrink: 0;
-        background-color: $palette-surface-dark;
-        border-right: 1px solid $palette-surface-hover;
-        display: flex;
-        flex-direction: column;
-        min-height: 0; // permette a .messages-list di scrollare invece di espandere il flex item
-    }
-
-    .col-detail {
-        flex: 1;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-    }
-
-    // Mobile: una sola colonna alla volta, come nell'app originale — la
-    // classe view-${view} sul .container (impostata da MessagesInbox.jsx)
-    // dice quale nascondere. Su desktop entrambe restano sempre visibili.
-    @media screen and (max-width: 768px) {
-        &.container {
-            // 86px = top di #maincontent su mobile, vedi _layout.scss.
-            height: calc(100vh - 86px);
-            border-radius: 0;
-        }
-
-        .col-list { width: 100%; }
-
-        &.view-list .col-detail { display: none; }
-        &.view-thread .col-list,
-        &.view-compose .col-list { display: none; }
-    }
+    // La shell a due colonne (altezza ancorata a #maincontent, .col-list/
+    // .col-detail, switch mobile per vista) e' stata estratta nel componente
+    // condiviso SplitPane (frontend/src/components/common/SplitPane.jsx +
+    // SplitPane.module.scss) — MessagesInbox.jsx la consuma da li', non e'
+    // piu' definita qui. Quello che resta in questo file e' solo lo stile
+    // *di contenuto* specifico ai messaggi (header, bolle, tab ON/OFF...).
 
     // Header della lista conversazioni: tab ON/OFF a sinistra, azioni
     // (Nuovo/Seleziona o Elimina/Annulla) a destra, sempre visibili senza
@@ -101,22 +49,11 @@
         margin-top: 0;
     }
 
-    // Lista conversazioni: unico scroll interno della colonna (l'header sopra
-    // e' un fratello flex-shrink:0, non sticky — vedi commento su .container).
+    // Lista conversazioni: flex/overflow-y/overscroll-behavior/padding-bottom
+    // mobile ora li porta SplitPane.ScrollArea, qui resta solo il padding di
+    // contenuto attorno alle card.
     .messages-list {
-        flex: 1;
-        overflow-y: auto;
         padding: $space-2;
-        // Impedisce lo scroll chaining verso #maincontent quando si arriva in
-        // fondo/cima: su mobile, continuando a scorrere oltre il limite, il
-        // gesto altrimenti "passa" alla pagina sotto invece di fermarsi qui.
-        overscroll-behavior-y: contain;
-
-        @media screen and (max-width: 768px) {
-            // Lascia spazio ai pulsanti hamburger fissi (bottom:10px, ~44px alti)
-            // che altrimenti coprono l'ultima conversazione della lista.
-            padding-bottom: 60px;
-        }
     }
 
     .message-item {
@@ -638,8 +575,8 @@
 
     // ── Thread DM (ThreadView) ────────────────────────────────
     //
-    // Struttura voluta ORA (redesign a due colonne): .col-detail ha
-    // un'altezza vincolata (vedi .container), quindi .thread-container
+    // Struttura voluta ORA (redesign a due colonne): la colonna dettaglio di
+    // SplitPane (detailCol) ha un'altezza vincolata, quindi .thread-container
     // riempie quello spazio e scrolla al proprio interno — header e barra
     // di risposta sono semplici fratelli flex-shrink:0 FUORI dall'area che
     // scrolla, non elementi position:sticky dentro di essa. Questo evita per
@@ -666,24 +603,14 @@
         box-sizing: border-box;
     }
 
-    // Unico scroll interno della colonna dettaglio.
+    // flex/overflow-y/overscroll-behavior/padding-bottom mobile ora li porta
+    // SplitPane.ScrollArea, qui resta solo lo stile di contenuto (padding,
+    // disposizione dei messaggi in colonna).
     .thread-messages {
-        flex: 1;
-        overflow-y: auto;
         padding: $space-4;
         display: flex;
         flex-direction: column;
         gap: $space-3;
-        // Vedi .messages-list sopra: stesso motivo, qui e' ancora piu'
-        // rilevante perche' senza questo lo scroll chaining su mobile
-        // trascina via con se' anche l'header del thread (che non e' dentro
-        // l'area che scrolla, ma la pagina intera si sposta comunque).
-        overscroll-behavior-y: contain;
-
-        @media screen and (max-width: 768px) {
-            // Lascia spazio ai pulsanti hamburger fissi (bottom:10px, ~44px alti).
-            padding-bottom: 60px;
-        }
     }
 
     // Bolla del messaggio: il testo arriva via dangerouslySetInnerHTML, senza

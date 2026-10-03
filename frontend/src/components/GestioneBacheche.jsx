@@ -21,7 +21,7 @@ const API = '/pages/api_bacheche.php'
 const TIPI_CON_PROPRIETARIO = [4, 5, 6]
 
 function emptyBacheca() {
-    return { id_araldo: null, nome: '', descrizione: '', tipo: 0, proprietari: -1, invisibile: 0, punti: 0 }
+    return { id_araldo: null, nome: '', descrizione: '', tipo: 0, proprietari: -1, ongame: 1, invisibile: 0, punti: 0 }
 }
 
 // ── BachecaModal ─────────────────────────────────────────────────────────────
@@ -50,6 +50,7 @@ function BachecaModal({ bacheca, tipi, razze, gilde, mestieri, onClose, onSaved 
         fd.append('descrizione', form.descrizione)
         fd.append('tipo', form.tipo)
         fd.append('proprietari', showProprietario ? form.proprietari : -1)
+        if (form.ongame) fd.append('ongame', '1')
         if (form.invisibile) fd.append('invisibile', '1')
         if (form.punti) fd.append('punti', '1')
 
@@ -109,6 +110,14 @@ function BachecaModal({ bacheca, tipi, razze, gilde, mestieri, onClose, onSaved 
                                     <p className="gp-label-note">Chi avrà accesso esclusivo a questa bacheca.</p>
                                 </div>
                             )}
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group gp-checkbox-field">
+                                <input id="b-ongame" type="checkbox" checked={!!form.ongame}
+                                       onChange={e => setForm({ ...form, ongame: e.target.checked ? 1 : 0 })} />
+                                <label htmlFor="b-ongame">Dentro gioco (ON) <span className="gp-label-note">— se disattivato la bacheca è considerata fuori gioco (OFF). Per unire due bacheche come varianti ON/OFF della stessa sezione nell'elenco forum (es. "Ospedale"), usa lo stesso Nome e lo stesso Proprietario, cambiando solo questo campo</span></label>
+                            </div>
                         </div>
 
                         <div className="form-row">
@@ -227,19 +236,21 @@ export default function GestioneBacheche() {
                         <tr>
                             <th>Nome</th>
                             <th>Tipo</th>
+                            <th>ON/OFF</th>
                             <th>Visibile</th>
                             <th className="gp-th-actions">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20 }}>Caricamento…</td></tr>
+                            <tr><td colSpan={5} style={{ textAlign: 'center', padding: 20 }}>Caricamento…</td></tr>
                         ) : bacheche.length === 0 ? (
-                            <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Nessuna bacheca trovata.</td></tr>
+                            <tr><td colSpan={5} style={{ textAlign: 'center', padding: 20, fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Nessuna bacheca trovata.</td></tr>
                         ) : bacheche.map(b => (
                             <tr key={b.id_araldo}>
                                 <td className="gp-cell--name">{b.nome}</td>
                                 <td>{b.tipo_label}</td>
+                                <td>{b.ongame ? 'ON' : 'OFF'}</td>
                                 <td>{b.invisibile ? 'No' : 'Sì'}</td>
                                 <td className="gp-cell--actions">
                                     <div className="gp-actions">

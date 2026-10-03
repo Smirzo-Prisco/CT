@@ -119,10 +119,25 @@ switch ($op) {
     // SECTIONS — sezioni visibili all'utente (raggruppate per tipo)
     // -------------------------------------------------------------------------
     case 'sections':
-        $result = gdrcd_query("SELECT id_araldo, nome, descrizione, tipo, proprietari, punti
-            FROM araldo WHERE invisibile = 0 ORDER BY tipo, id_araldo", 'result');
+        // Alcune bacheche esistono in due righe gemelle che differiscono solo
+        // per araldo.ongame (es. "Ospedale" dentro/fuori gioco, le 7 bacheche
+        // di fazione) — stesso tipo/nome/proprietari, id_araldo diverso. Le
+        // raggruppiamo qui in un'unica sezione con piu' "varianti", cosi' il
+        // frontend le mostra come una sola card con due pulsanti ON/OFF
+        // invece di due righe separate che ripetono lo stesso nome.
+        //
+        // gilda.immagine (join solo per tipo = SOLOGILDA, dove proprietari
+        // punta a gilda.id_gilda) da' alla card il simbolo della fazione,
+        // stesso dato/percorso usato in servizi_gilde_giusto.inc.php
+        // ("imgs/guilds/" . gilda.immagine) — nessun asset nuovo.
+        $result = gdrcd_query("SELECT a.id_araldo, a.nome, a.descrizione, a.tipo, a.proprietari, a.ongame, a.punti,
+                g.immagine AS gilda_img
+            FROM araldo a
+            LEFT JOIN gilda g ON a.tipo = " . SOLOGILDA . " AND g.id_gilda = a.proprietari
+            WHERE a.invisibile = 0
+            ORDER BY a.tipo, a.nome, a.ongame DESC", 'result');
 
-        $sections = [];
+        $categories = []; // tipo => ['tipo','label','sections' => [groupKey => sezione]]
         while ($row = gdrcd_query($result, 'fetch')) {
             if (!can_access_section($row)) continue;
 
@@ -134,23 +149,43 @@ switch ($op) {
                 AND ma.id_messaggio NOT IN (
                     SELECT thread_id FROM araldo_letto WHERE nome = '" . gdrcd_filter('in', $login) . "'
                 )");
+            $non_letti = (int)$unread['n'];
 
-            $label = section_label((int)$row['tipo']);
-            if (!isset($sections[$label])) $sections[$label] = [];
+            $tipo = (int)$row['tipo'];
+            if (!isset($categories[$tipo])) {
+                $categories[$tipo] = ['tipo' => $tipo, 'label' => section_label($tipo), 'sections' => []];
+            }
 
-            $sections[$label][] = [
-                'id'          => (int)$row['id_araldo'],
-                'nome'        => $row['nome'],
-                'descrizione' => $row['descrizione'],
-                'tipo'        => (int)$row['tipo'],
-                'tipo_label'  => $label,
-                'non_letti'   => (int)$unread['n'],
-                'punti'       => (int)$row['punti'],
+            // Chiave di raggruppamento variante: stesso nome+proprietari =
+            // stessa sezione logica, solo ongame diverso.
+            $groupKey = $row['nome'] . '|' . $row['proprietari'];
+            if (!isset($categories[$tipo]['sections'][$groupKey])) {
+                $categories[$tipo]['sections'][$groupKey] = [
+                    'nome'        => $row['nome'],
+                    'descrizione' => $row['descrizione'],
+                    'non_letti'   => 0,
+                    'img'         => $row['gilda_img'] ? ('imgs/guilds/' . $row['gilda_img']) : null,
+                    'variants'    => [],
+                ];
+            }
+
+            $categories[$tipo]['sections'][$groupKey]['non_letti'] += $non_letti;
+            $categories[$tipo]['sections'][$groupKey]['variants'][] = [
+                'id'        => (int)$row['id_araldo'],
+                'ongame'    => (int)$row['ongame'],
+                'non_letti' => $non_letti,
+                'punti'     => (int)$row['punti'],
             ];
         }
         gdrcd_query($result, 'free');
 
-        echo json_encode(['success' => true, 'sections' => $sections]);
+        $categoriesOut = [];
+        foreach ($categories as $cat) {
+            $cat['sections'] = array_values($cat['sections']);
+            $categoriesOut[] = $cat;
+        }
+
+        echo json_encode(['success' => true, 'categories' => $categoriesOut]);
         break;
 
     // -------------------------------------------------------------------------

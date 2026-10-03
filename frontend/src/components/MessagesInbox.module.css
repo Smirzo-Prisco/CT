@@ -243,8 +243,8 @@
     accent-color: var(--color-action);
 }
 
-/* ── ComposeView ───────────────────────────────────────────── */
-.composeWrap   { flex: 1; overflow-y: auto; overscroll-behavior-y: contain; padding: 22px; }
+/* ── ComposeView — flex/overflow-y/overscroll-behavior ora li porta SplitPane.ScrollArea (common/SplitPane.jsx) ── */
+.composeWrap   { padding: 22px; }
 
 @media screen and (max-width: 768px) {
     /* Spazio per i pulsanti hamburger fissi, stesso margine usato altrove. */

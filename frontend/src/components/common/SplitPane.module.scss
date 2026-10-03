@@ -1,0 +1,70 @@
+// SplitPane.module.scss — shell responsiva a due colonne (lista + dettaglio)
+//
+// Estratta dal redesign di MessagesInbox (vedi git history _messages_center.scss)
+// per essere riusata da qualsiasi vista che abbia lo stesso bisogno (Messages,
+// Forum, ecc.) senza duplicare/divergere l'architettura di scroll corretta:
+// l'header di ciascuna colonna deve essere un fratello flex-shrink:0 FUORI
+// dall'area che scrolla, mai position:sticky al suo interno — altrimenti si
+// riproduce il bug storico di doppio scroll (un antenato con overflow diverso
+// da visible scavalca il contesto di scroll dell'elemento sticky). Il
+// consumer e' responsabile di struttura/contenuto interno delle colonne,
+// questo modulo gestisce solo: altezza ancorata a #maincontent, le due
+// colonne fianco a fianco, e quale mostrare su mobile in base a "view".
+@use '../../styles/tokens' as *;
+
+.shell {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - #{$hud-content-top});
+    background-color: $palette-surface-deep;
+    border-radius: $radius-lg;
+    overflow: hidden;
+}
+
+.listCol {
+    width: 340px;
+    flex-shrink: 0;
+    background-color: $palette-surface-dark;
+    border-right: 1px solid $palette-surface-hover;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // permette allo scroll interno del consumer di funzionare invece di espandere il flex item
+}
+
+.detailCol {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+@media screen and (max-width: 768px) {
+    .shell {
+        // 86px = top di #maincontent su mobile, vedi _layout.scss.
+        height: calc(100vh - 86px);
+        border-radius: 0;
+    }
+
+    .listCol { width: 100%; }
+
+    .viewList .detailCol { display: none; }
+    .viewDetail .listCol { display: none; }
+}
+
+// Area di scroll interna di una colonna — da usare al posto di un overflow-y
+// scritto a mano, incorpora overscroll-behavior-y:contain (impedisce lo
+// scroll-chaining che su mobile, superato il limite dell'area, "porta via"
+// anche l'header non scrollabile della colonna insieme al resto della pagina).
+.scrollArea {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+}
+
+.scrollAreaPadMobile {
+    @media screen and (max-width: 768px) {
+        // Spazio per i pulsanti hamburger fissi (bottom:10px, ~44px alti).
+        padding-bottom: 60px;
+    }
+}

@@ -204,63 +204,213 @@
     margin-right: 4px;
 }
 
-// ── Vista sezioni ──────────────────────────────────────────────
+// ── Vista sezioni — sidebar categorie + card bacheche ───────────
+//
+// Layout a due colonne via SplitPane (common/SplitPane.jsx): la colonna
+// lista mostra le categorie (ex righe "third_header" del vecchio forum),
+// la colonna dettaglio una griglia di card per la categoria selezionata
+// (ex righe piatte "mappa" per sezione). Sostituisce l'unica tabella
+// customTable usata prima — niente più CSS globale condiviso con le altre
+// ~40 pagine che si appoggiano a customTable/third_header/mappa.
 
 .loadingText {
     padding: 20px;
     color: $palette-text-secondary;
 }
 
-.sectionsTable {
-    width: 100%;
-    margin: 0 auto;
+// -- Colonna lista: header + elenco categorie --
 
-    // Griglia tra le righe, non ereditata da customTable (globale, per non
-    // spargere il bordo su tutte le altre ~40 pagine che la condividono).
-    td,
-    th {
-        border: 1px solid $color-bg;
+.catSidebarHeader {
+    flex-shrink: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 $space-3;
+    background-color: $palette-surface-dark;
+    border-bottom: 1px solid $palette-surface-hover;
+    box-sizing: border-box;
+}
+
+.catSidebarTitle {
+    font-family: $font-ui;
+    font-weight: $font-weight-bold;
+    color: $color-text-title;
+    font-size: $text-lg;
+}
+
+.catList {
+    padding: $space-2;
+}
+
+.catItem {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-3;
+    border-radius: $radius-lg;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    margin-bottom: $space-1;
+    transition: background-color $transition-fast, border-color $transition-fast;
+
+    &:hover {
+        background-color: $palette-surface;
     }
 }
 
-.groupHeaderCell {
+.catItemActive {
+    background-color: $palette-surface-raised;
+    border-left-color: $color-action;
+
+    .catIcon {
+        color: $color-action;
+    }
+}
+
+.catIcon {
+    width: 20px;
     text-align: center;
-    padding: 8px 20px;
-    text-transform: uppercase;
-    color: $color-text-title;
-    font-family: 'DejaVu Serif', serif;
-    filter: drop-shadow(-1.732px 1px 2px #000);
+    color: $color-text-secondary;
+    font-size: $text-lg;
+    flex-shrink: 0;
 }
 
-.sectionNameCell {
-    padding: 8px 20px;
-    text-transform: uppercase;
-    white-space: nowrap;
+.catLabel {
+    flex: 1;
+    color: $color-text;
+    font-size: $text-md;
 }
 
-.unreadMoon {
-    margin-right: 6px;
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-.unreadBadge {
-    margin-left: 6px;
+.catBadge {
     background: $palette-danger;
     color: $palette-text;
-    border-radius: 10px;
+    border-radius: $radius-full;
     padding: 1px 7px;
-    font-size: 10px;
-    font-weight: bold;
-    vertical-align: middle;
+    font-size: $text-xs;
+    font-weight: $font-weight-bold;
+    flex-shrink: 0;
 }
 
-.sectionDescCell {
-    padding: 8px 20px;
-    font-size: 11px;
-    color: $palette-text-secondary;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+// -- Colonna dettaglio: header categoria + griglia card --
+
+.catDetailHeader {
+    flex-shrink: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: 0 $space-4;
+    background-color: $palette-surface-dark;
+    border-bottom: 1px solid $palette-surface-hover;
+    box-sizing: border-box;
+    color: $color-text-title;
+    font-family: $font-ui;
+    font-weight: $font-weight-bold;
+}
+
+// Pulsante "indietro": solo mobile, su desktop le due colonne sono sempre affiancate.
+.catBackBtn {
+    flex-shrink: 0;
+}
+
+@media screen and (min-width: 769px) {
+    .catBackBtn {
+        display: none;
+    }
+}
+
+.emptyDetail {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+    color: $color-text-muted;
+    font-size: $text-md;
+
+    span {
+        font-size: 32px;
+        opacity: .5;
+    }
+}
+
+.cardsGrid {
+    padding: $space-4;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: $space-4;
+    align-content: start;
+}
+
+.card {
+    background-color: $palette-surface-dark;
+    border: 1px solid $palette-surface-hover;
+    border-radius: $radius-lg;
+    padding: $space-4;
+    display: flex;
+    gap: $space-3;
+}
+
+.cardIconWrap {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-full;
+    background-color: $palette-surface;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.cardImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cardIcon {
+    color: $color-action;
+    font-size: $text-xl;
+}
+
+.cardBody {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1 + 2;
+}
+
+.cardTitleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+}
+
+.cardTitle {
+    font-family: $font-ui;
+    font-weight: $font-weight-bold;
+    color: $color-text-title;
+    font-size: $text-md;
+}
+
+// Sentence case, non maiuscolo: il tutto-maiuscolo del vecchio forum rende
+// il testo descrittivo più lento da leggere a colpo d'occhio.
+.cardDesc {
+    margin: 0;
+    font-size: $text-sm;
+    color: $color-text-secondary;
+    line-height: 1.4;
+}
+
+.cardVariants {
+    display: flex;
+    gap: $space-2;
+    margin-top: $space-1;
 }
 
 // ── Vista thread list ──────────────────────────────────────────

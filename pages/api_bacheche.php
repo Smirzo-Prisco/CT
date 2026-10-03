@@ -35,7 +35,7 @@ switch ($op) {
 
     case 'list':
         $bacheche = [];
-        $result = gdrcd_query("SELECT id_araldo, nome, descrizione, tipo, proprietari, invisibile, punti FROM araldo ORDER BY tipo, nome", 'result');
+        $result = gdrcd_query("SELECT id_araldo, nome, descrizione, tipo, proprietari, ongame, invisibile, punti FROM araldo ORDER BY tipo, nome", 'result');
         while ($row = gdrcd_query($result, 'fetch')) {
             $bacheche[] = [
                 'id_araldo'   => (int)$row['id_araldo'],
@@ -44,6 +44,7 @@ switch ($op) {
                 'tipo'        => (int)$row['tipo'],
                 'tipo_label'  => $MESSAGE['interface']['forums']['type'][(int)$row['tipo']] ?? '—',
                 'proprietari' => (int)$row['proprietari'],
+                'ongame'      => (int)$row['ongame'],
                 'invisibile'  => (int)$row['invisibile'],
                 'punti'       => (int)$row['punti'],
             ];
@@ -80,7 +81,7 @@ switch ($op) {
 
     case 'get':
         $id  = (int)($_GET['id'] ?? 0);
-        $row = gdrcd_query("SELECT id_araldo, nome, descrizione, tipo, proprietari, invisibile, punti FROM araldo WHERE id_araldo = $id LIMIT 1");
+        $row = gdrcd_query("SELECT id_araldo, nome, descrizione, tipo, proprietari, ongame, invisibile, punti FROM araldo WHERE id_araldo = $id LIMIT 1");
         if ($row) {
             echo json_encode(['success' => true, 'bacheca' => [
                 'id_araldo'   => (int)$row['id_araldo'],
@@ -88,6 +89,7 @@ switch ($op) {
                 'descrizione' => $row['descrizione'],
                 'tipo'        => (int)$row['tipo'],
                 'proprietari' => (int)$row['proprietari'],
+                'ongame'      => (int)$row['ongame'],
                 'invisibile'  => (int)$row['invisibile'],
                 'punti'       => (int)$row['punti'],
             ]]);
@@ -102,6 +104,7 @@ switch ($op) {
         $descrizione = trim($_POST['descrizione'] ?? '');
         $tipo        = (int)($_POST['tipo'] ?? -1);
         $proprietari = (int)($_POST['proprietari'] ?? -1);
+        $ongame      = !empty($_POST['ongame']) ? 1 : 0;
         $invisibile  = !empty($_POST['invisibile']) ? 1 : 0;
         $punti       = !empty($_POST['punti']) ? 1 : 0;
 
@@ -124,9 +127,9 @@ switch ($op) {
         $descrizione_esc = gdrcd_filter('in', $descrizione);
 
         if ($id > 0) {
-            gdrcd_query("UPDATE araldo SET nome = '$nome_esc', descrizione = '$descrizione_esc', tipo = $tipo, proprietari = $proprietari, invisibile = $invisibile, punti = $punti WHERE id_araldo = $id LIMIT 1");
+            gdrcd_query("UPDATE araldo SET nome = '$nome_esc', descrizione = '$descrizione_esc', tipo = $tipo, proprietari = $proprietari, ongame = $ongame, invisibile = $invisibile, punti = $punti WHERE id_araldo = $id LIMIT 1");
         } else {
-            gdrcd_query("INSERT INTO araldo (nome, descrizione, tipo, proprietari, invisibile, punti) VALUES ('$nome_esc', '$descrizione_esc', $tipo, $proprietari, $invisibile, $punti)");
+            gdrcd_query("INSERT INTO araldo (nome, descrizione, tipo, proprietari, ongame, invisibile, punti) VALUES ('$nome_esc', '$descrizione_esc', $tipo, $proprietari, $ongame, $invisibile, $punti)");
         }
 
         echo json_encode(['success' => true, 'message' => $id > 0 ? 'Bacheca aggiornata.' : 'Bacheca creata.']);

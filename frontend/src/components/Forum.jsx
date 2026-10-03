@@ -23,8 +23,33 @@
  * @author Crystal Tokyo Dev
  */
 
-import { useState, useEffect, useCallback, useRef, Fragment } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import styles from './Forum.module.scss'
+import SplitPane from './common/SplitPane'
+
+// ---------------------------------------------------------------------------
+// Icona FontAwesome per categoria (tipo numerico di araldo, vedi
+// constant_values.inc.php) — fallback generico per eventuali tipi non
+// mappati (es. bacheche "coordinatori" storiche con tipo oltre SOLOADMIN).
+// ---------------------------------------------------------------------------
+const CATEGORY_ICON = {
+    0:  'fa-scroll',          // ONGAME
+    1:  'fa-book-open',       // INFO (role/quest)
+    2:  'fa-circle-info',     // COMUNICAZIONI
+    3:  'fa-comments',        // PERTUTTI (off-game)
+    4:  'fa-dna',             // SOLORAZZA
+    5:  'fa-shield-halved',   // SOLOGILDA (fazioni — le card hanno comunque il simbolo della fazione)
+    6:  'fa-briefcase',       // SOLOMESTIERE
+    7:  'fa-crown',           // SOLOMASTERS
+    8:  'fa-gavel',           // SOLOMODERATORS
+    9:  'fa-compass',         // SOLOGUIDES
+    10: 'fa-chess-king',      // SOLOCAPOGILDA
+    11: 'fa-user-tie',        // SOLOCAPOMESTIERI
+    12: 'fa-user-shield',     // SOLOADMIN
+}
+function categoryIcon(tipo) {
+    return CATEGORY_ICON[tipo] ?? 'fa-folder-open'
+}
 
 // ---------------------------------------------------------------------------
 // UTILITÀ
@@ -738,8 +763,10 @@ export default function Forum({ isStaff = false, initialThread = null }) {
     const [view, setView] = useState(initialThread ? 'read' : 'sections')
 
     // --- dati ---
-    /** Sezioni del forum raggruppate per tipo: { tipoLabel: [sezione, ...] } */
-    const [sections,        setSections]        = useState({})
+    /** Categorie del forum: [{ tipo, label, sections: [{ nome, descrizione, non_letti, img, variants }] }] */
+    const [categories,      setCategories]      = useState([])
+    /** Categoria selezionata nella vista 'sections' (tipo numerico, o null = nessuna) */
+    const [selectedCategoryTipo, setSelectedCategoryTipo] = useState(null)
     /** Threads della sezione corrente */
     const [threads,         setThreads]         = useState([])
     /** Totale thread per la paginazione */
@@ -772,13 +799,13 @@ export default function Forum({ isStaff = false, initialThread = null }) {
     // FETCH
     // ---------------------------------------------------------------------------
 
-    /** Carica la lista delle sezioni accessibili all'utente */
+    /** Carica la lista delle sezioni accessibili all'utente, raggruppate per categoria */
     const fetchSections = useCallback(() => {
         setLoadingSections(true)
         fetch('/pages/api_forum.php?op=sections')
             .then(r => r.json())
             .then(data => {
-                if (data.success) setSections(data.sections)
+                if (data.success) setCategories(data.categories)
                 setLoadingSections(false)
             })
             .catch(err => { console.error('[Forum] Errore sezioni:', err); setLoadingSections(false) })
@@ -1139,56 +1166,100 @@ export default function Forum({ isStaff = false, initialThread = null }) {
 
     // --- VISTA SEZIONI ---
     if (view === 'sections') {
-        return (
-            <div className="pagina_forum">
-                <div className={styles.buttonsBar}>
-                    <button onClick={markAllRead}>Leggi tutto</button>
-                </div>
-                {loadingSections ? (
-                    <p className={styles.loadingText}>Caricamento sezioni...</p>
-                ) : (
-                    /*
-                     * Struttura identica al vecchio forum PHP:
-                     * - Un'unica tabella per tutti i gruppi
-                     * - Riga header di gruppo a larghezza intera (third_header)
-                     * - Riga per ogni sezione: [icona letto] [nome] [descrizione]
-                     * - Nessuna ripetizione di "Sezione / Descrizione / Non letti"
-                     */
-                    <table className={`customTable ${styles.sectionsTable}`}>
-                        <tbody>
-                            {Object.entries(sections).map(([tipo, secs]) => (
-                                <Fragment key={tipo}>
-                                    {/*
-                                      * Header di gruppo: third_header dà lo sfondo corretto via CSS.
-                                      * Il colore arancione va aggiunto inline perché third_header colora
-                                      * solo i tag <a> per default, non il testo puro nei <td>.
-                                      */}
-                                    <tr key={`h-${tipo}`} className="third_header" style={{ backgroundImage: "url('/themes/crystal/imgs/presenti/barra_mappa_chat.png')" }}>
-                                        {/*
-                                          * backgroundImage inline forza il background-image anche quando
-                                          * la specificità CSS di customTable potrebbe sovrastare presenti.css.
-                                          * Il colore arancione va aggiunto inline perché third_header colora
-                                          * solo i tag <a> nel CSS, non il testo puro dei <td>.
-                                          */}
-                                        <td colSpan="3" className={styles.groupHeaderCell}>{tipo}</td>
-                                    </tr>
+        const selectedCategory = categories.find(c => c.tipo === selectedCategoryTipo) ?? null
 
-                                    {/* Righe delle sezioni: [🌙 nome] [descrizione] [badge] */}
-                                    {secs.map(sec => (
-                                        <tr key={sec.id} className={`mappa ${styles.clickable}`} onClick={() => openSection(sec)}>
-                                            <td className={styles.sectionNameCell}>
-                                                {sec.non_letti > 0 && <span className={styles.unreadMoon}>🌙</span>}
-                                                {sec.nome}
-                                                {sec.non_letti > 0 && <span className={styles.unreadBadge}>{sec.non_letti}</span>}
-                                            </td>
-                                            <td className={styles.sectionDescCell}>{sec.descrizione}</td>
-                                        </tr>
-                                    ))}
-                                </Fragment>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
+        /** Apre una sezione (o una sua variante ON/OFF) nella lista thread */
+        const openCard = (sec, variant) => openSection({ id: variant.id, nome: sec.nome })
+
+        const listContent = (
+            <>
+                <div className={styles.catSidebarHeader}>
+                    <span className={styles.catSidebarTitle}>Forum</span>
+                    <button className="btn btn--ghost btn--sm" onClick={markAllRead}>Leggi tutto</button>
+                </div>
+                <SplitPane.ScrollArea className={styles.catList} padBottomMobile>
+                    {loadingSections ? (
+                        <p className={styles.loadingText}>Caricamento...</p>
+                    ) : categories.map(cat => {
+                        const totNonLetti = cat.sections.reduce((a, s) => a + s.non_letti, 0)
+                        return (
+                            <div
+                                key={cat.tipo}
+                                className={`${styles.catItem} ${cat.tipo === selectedCategoryTipo ? styles.catItemActive : ''}`}
+                                onClick={() => setSelectedCategoryTipo(cat.tipo)}
+                            >
+                                <i className={`fa-solid ${categoryIcon(cat.tipo)} ${styles.catIcon}`}></i>
+                                <span className={styles.catLabel}>{cat.label}</span>
+                                {totNonLetti > 0 && <span className={styles.catBadge}>{totNonLetti}</span>}
+                            </div>
+                        )
+                    })}
+                </SplitPane.ScrollArea>
+            </>
+        )
+
+        const detailContent = !selectedCategory ? (
+            <div className={styles.emptyDetail}>
+                <span>🗂️</span>
+                <p>Seleziona una categoria per vedere le bacheche</p>
+            </div>
+        ) : (
+            <>
+                <div className={styles.catDetailHeader}>
+                    <button onClick={() => setSelectedCategoryTipo(null)} className={`btn btn--icon ${styles.catBackBtn}`}>←</button>
+                    <i className={`fa-solid ${categoryIcon(selectedCategory.tipo)}`}></i>
+                    <span>{selectedCategory.label}</span>
+                </div>
+                <SplitPane.ScrollArea className={styles.cardsGrid} padBottomMobile>
+                    {selectedCategory.sections.length === 0 ? (
+                        <p className={styles.loadingText}>Nessuna bacheca in questa categoria.</p>
+                    ) : selectedCategory.sections.map(sec => (
+                        <div key={`${sec.nome}-${sec.variants[0].id}`} className={styles.card}>
+                            <div className={styles.cardIconWrap}>
+                                {sec.img ? (
+                                    <img src={`/themes/crystal/${sec.img}`} alt="" className={styles.cardImg} />
+                                ) : (
+                                    <i className={`fa-solid ${categoryIcon(selectedCategory.tipo)} ${styles.cardIcon}`}></i>
+                                )}
+                            </div>
+                            <div className={styles.cardBody}>
+                                <div className={styles.cardTitleRow}>
+                                    <span className={styles.cardTitle}>{sec.nome}</span>
+                                    {sec.non_letti > 0 && <span className={styles.catBadge}>{sec.non_letti}</span>}
+                                </div>
+                                {sec.descrizione && <p className={styles.cardDesc}>{sec.descrizione}</p>}
+
+                                {sec.variants.length > 1 ? (
+                                    <div className={styles.cardVariants}>
+                                        {sec.variants.map(v => (
+                                            <button
+                                                key={v.id}
+                                                className={`btn btn--sm ${v.ongame ? 'btn--primary' : 'btn--ghost'}`}
+                                                onClick={() => openCard(sec, v)}
+                                            >
+                                                {v.ongame ? 'ON' : 'OFF'}{v.non_letti > 0 ? ` (${v.non_letti})` : ''}
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <button className="btn btn--ghost btn--sm" onClick={() => openCard(sec, sec.variants[0])}>
+                                        Apri
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </SplitPane.ScrollArea>
+            </>
+        )
+
+        return (
+            <div id="forum-sections-app">
+                <SplitPane
+                    view={selectedCategory ? 'detail' : 'list'}
+                    list={listContent}
+                    detail={detailContent}
+                />
             </div>
         )
     }
