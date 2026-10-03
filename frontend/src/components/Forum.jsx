@@ -442,7 +442,10 @@ function PostForm({ isNew, chiuso, sending, onSubmit, onCancel }) {
 
     return (
         <div className={styles.formContainer}>
-            <h4 className={styles.formTitle}>{isNew ? 'Nuova discussione' : 'Rispondi'}</h4>
+            {/* Per il nuovo thread il titolo c'e' gia' nell'header della colonna
+                dettaglio (vedi catDetailHeader in Forum.jsx) — qui ripeterlo sarebbe
+                ridondante. Per la risposta invece non c'e' nessun titolo sopra. */}
+            {!isNew && <h4 className={styles.formTitle}>Rispondi</h4>}
 
             {isNew && (
                 <div className={styles.titleField}>
