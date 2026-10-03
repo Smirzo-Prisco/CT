@@ -68,109 +68,78 @@ function formatDate(iso) {
 }
 
 // ---------------------------------------------------------------------------
-// SUB-COMPONENTE: singola riga thread nella lista
+// SUB-COMPONENTE: singola riga thread nella lista (dentro una sezione)
 // ---------------------------------------------------------------------------
 
 /**
- * Riga di un thread nell'elenco di una sezione.
- * Struttura identica al vecchio visit.inc.php:
- *   STATO | TOPIC (titolo+data) | AUTORE | RISPOSTE (n + ultima) | [AZIONI]
+ * Riga compatta di un thread nella lista a sinistra (stesso linguaggio
+ * visivo delle card sezioni: icona + titolo + meta + badge, non più una
+ * riga di tabella). L'icona di stato (aperto/chiuso) fa doppio uso: per
+ * tutti è il solo indicatore, per lo staff diventa anche il controllo per
+ * cambiare stato — prima erano due icone separate che mostravano la stessa
+ * informazione.
  *
  * @param {Object}   props.thread     - Dati del thread
+ * @param {boolean}  props.isSelected - true se è il thread aperto nel dettaglio
  * @param {Function} props.onClick    - Callback al click per aprire il thread
- * @param {boolean}  props.isStaff    - true = mostra pulsanti importante/chiudi
- * @param {boolean}  props.canDelete  - true = mostra pulsante elimina
+ * @param {boolean}  props.isStaff    - true = icona stato cliccabile + pin "importante"
+ * @param {boolean}  props.canDelete  - true = mostra icona elimina
  * @param {Function} props.onAction   - Callback ({ action, thread }) per azioni
  */
-function ThreadRow({ thread, onClick, isStaff, canDelete, onAction }) {
+function ThreadListItem({ thread, isSelected, onClick, isStaff, canDelete, onAction }) {
 
-    /** Blocca la propagazione per non aprire il thread al click sui pulsanti */
+    /** Blocca la propagazione per non aprire il thread al click sulle icone azione */
     const action = (e, type) => {
         e.stopPropagation()
         onAction && onAction({ action: type, thread })
     }
 
     return (
-        <tr className={styles.clickable} onClick={() => onClick(thread)}>
+        <div
+            className={`${styles.threadItem} ${isSelected ? styles.threadItemSelected : ''}`}
+            onClick={() => onClick(thread)}
+        >
+            <i
+                className={`fa-solid ${thread.chiuso ? 'fa-lock' : 'fa-lock-open'} ${styles.threadStatusIcon} ${thread.chiuso ? styles.threadStatusClosed : styles.threadStatusOpen}`}
+                title={isStaff ? (thread.chiuso ? 'Chiuso — clic per riaprire' : 'Aperto — clic per chiudere') : (thread.chiuso ? 'Thread chiuso' : 'Thread aperto')}
+                onClick={isStaff ? (e => action(e, 'toggle_close')) : undefined}
+                style={isStaff ? { cursor: 'pointer' } : undefined}
+            ></i>
 
-            {/* STATO: verde = aperto, rosso = chiuso */}
-            <td className={styles.statusCell}>
-                <img
-                    src={thread.chiuso
-                        ? '/themes/crystal/imgs/forum/topic_chiuso.png'
-                        : '/themes/crystal/imgs/forum/topic_aperto.png'}
-                    alt={thread.chiuso ? 'Chiuso' : 'Aperto'}
-                    className={styles.statusIcon}
-                    title={thread.chiuso ? 'Thread chiuso' : 'Thread aperto'}
-                />
-            </td>
-
-            {/* TOPIC: titolo + data creazione */}
-            <td className={styles.topicCell}>
-                <div className={`forum_post_title ${!thread.letto ? styles.unreadTitle : ''}`}>
+            <div className={styles.threadItemBody}>
+                <div className={styles.threadItemTitle}>
                     {!thread.letto && <span className={styles.unreadDot} title="Non letto" />}
                     {thread.titolo}
                 </div>
-                <div className="forum_date_small">{formatDate(thread.data)}</div>
-            </td>
+                <div className={styles.threadItemMeta}>
+                    {thread.autore} · {formatDate(thread.data)} · {thread.n_risposte} risposte
+                </div>
+            </div>
 
-            {/* AUTORE */}
-            <td className={styles.authorCell}>
-                <div className="forum_date_big_right">{thread.autore}</div>
-            </td>
-
-            {/* RISPOSTE: numero + data ultima risposta */}
-            <td className={styles.repliesCell}>
-                <div className="forum_date_big_right">{thread.n_risposte} Risposte</div>
-                {thread.n_risposte > 0 && (
-                    <div className={`forum_date_big ${styles.dateNoIndent}`}>
-                        Ultima: {formatDate(thread.data_ultimo_messaggio)}
-                    </div>
-                )}
-            </td>
-
-            {/* AZIONI: importante/chiudi per staff, elimina per chiunque abbia can_delete */}
             {(isStaff || canDelete) && (
-                <td className={styles.actionsCell}>
+                <div className={styles.threadItemActions}>
                     {isStaff && (
-                        <>
-                            <img
-                                src={thread.importante
-                                    ? '/themes/crystal/imgs/forum/freccia_giu.png'
-                                    : '/themes/crystal/imgs/forum/freccia_su.png'}
-                                alt="Importante"
-                                title={thread.importante ? 'Rimuovi da importanti' : 'Segna come importante'}
-                                className={styles.actionIcon}
-                                onClick={e => action(e, 'toggle_important')}
-                            />
-                            <img
-                                src={thread.chiuso
-                                    ? '/themes/crystal/imgs/forum/lucchetto_aperto.png'
-                                    : '/themes/crystal/imgs/forum/lucchetto_chiuso.png'}
-                                alt={thread.chiuso ? 'Apri' : 'Chiudi'}
-                                title={thread.chiuso ? 'Apri post' : 'Chiudi post'}
-                                className={styles.actionIcon}
-                                onClick={e => action(e, 'toggle_close')}
-                            />
-                        </>
+                        <i
+                            className={`fa-solid fa-thumbtack ${styles.threadActionIcon} ${thread.importante ? styles.threadActionIconActive : ''}`}
+                            title={thread.importante ? 'Rimuovi da importanti' : 'Segna come importante'}
+                            onClick={e => action(e, 'toggle_important')}
+                        ></i>
                     )}
                     {canDelete && (
-                        <img
-                            src="/themes/crystal/imgs/forum/cancella_topic.png"
-                            alt="Elimina"
+                        <i
+                            className={`fa-solid fa-trash-can ${styles.threadActionIcon}`}
                             title="Elimina thread"
-                            className={styles.actionIcon}
                             onClick={e => {
                                 e.stopPropagation()
                                 if (confirm('Eliminare questo thread e tutte le risposte?')) {
                                     onAction && onAction({ action: 'delete_thread', thread })
                                 }
                             }}
-                        />
+                        ></i>
                     )}
-                </td>
+                </div>
             )}
-        </tr>
+        </div>
     )
 }
 
@@ -872,7 +841,14 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                     setMessages(data.messages)
                     setPuntiList(data.punti_list ?? [])
                     setIsFollowing(!!data.is_following)
-                    if (data.sezione) setCurrentSection(data.sezione)
+                    if (data.sezione) {
+                        setCurrentSection(data.sezione)
+                        // La colonna lista (sempre visibile accanto al dettaglio su
+                        // desktop, vedi SplitPane) altrimenti resterebbe vuota: un
+                        // deep-link salta direttamente al thread senza passare dalla
+                        // vista 'threads' che la caricherebbe normalmente.
+                        fetchThreads(data.sezione.id, 1)
+                    }
                     setCurrentThread({
                         id:     initialThread,
                         titolo: data.messages[0]?.titolo ?? '',
@@ -1267,103 +1243,12 @@ export default function Forum({ isStaff = false, initialThread = null }) {
         )
     }
 
-    // --- VISTA THREAD LIST ---
-    if (view === 'threads') {
-        const totalPages = Math.ceil(totalThreads / 20)
-        /** Filtra i thread in base al testo di ricerca (locale, sui thread già caricati) */
-        const filteredThreads = searchQuery.trim()
-            ? threads.filter(t =>
-                t.titolo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                t.autore.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-            : threads
-        const showActionsCol = isStaff || filteredThreads.some(t => t.can_delete)
-
-        return (
-            <div className="pagina_forum">
-                <div className={styles.searchBar}>
-                    <input
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        placeholder="Cerca per termine, titolo o autore"
-                        className={styles.searchInput}
-                    />
-                    <button onClick={() => setSearchQuery(searchQuery)}>cerca</button>
-                </div>
-
-                <div className={styles.backBar}>
-                    <button onClick={backToSections}>← Torna indietro</button>
-                    <span className={styles.sectionHeading}>{currentSection?.nome}</span>
-                </div>
-                <div className={styles.buttonsBar}>
-                    <button onClick={() => setView('compose')}>Nuovo Messaggio</button>
-                </div>
-
-                {loadingThreads ? (
-                    <p className={styles.loadingSmall}>Caricamento thread...</p>
-                ) : (
-                    <>
-                        <table className="customTable" style={{ width: '100%' }}>
-                            <thead>
-                                {/*
-                                  * second_header ha color:#a7a7a8 nel CSS — aggiunto color inline
-                                  * per forzare il colore arancione come nel vecchio forum.
-                                  */}
-                                <tr className="second_header">
-                                    <td className={styles.theadCenter}>STATO</td>
-                                    <td className={styles.theadColor}>TOPIC</td>
-                                    <td className={styles.theadColor} style={{ textAlign: 'center' }}>AUTORE</td>
-                                    <td className={styles.theadColor} style={{ textAlign: 'center' }}>RISPOSTE</td>
-                                    {showActionsCol && <td className={styles.theadColor}></td>}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredThreads.length === 0 ? (
-                                    <tr><td colSpan={showActionsCol ? 5 : 4} className={styles.emptyState}>Nessuna discussione.</td></tr>
-                                ) : (
-                                    filteredThreads.map(t => (
-                                        <ThreadRow
-                                            key={t.id}
-                                            thread={t}
-                                            onClick={openThread}
-                                            isStaff={isStaff}
-                                            canDelete={t.can_delete}
-                                            onAction={handleThreadAction}
-                                        />
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-
-                        {/* Paginazione */}
-                        {totalPages > 1 && (
-                            <div className={`pagination ${styles.pagination}`}>
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                                    <a
-                                        key={p}
-                                        href="#"
-                                        className={p === page ? 'active' : ''}
-                                        onClick={e => { e.preventDefault(); fetchThreads(currentSection.id, p) }}
-                                    >
-                                        {p}
-                                    </a>
-                                ))}
-                            </div>
-                        )}
-
-                        <div className={styles.backBar} style={{ marginTop: '10px' }}>
-                            <button onClick={backToSections}>← Torna indietro</button>
-                        </div>
-                    </>
-                )}
-            </div>
-        )
-    }
-
     // --- VISTA MODIFICA QUEST (primo messaggio di un thread in id_araldo=10) ---
     // La creazione di nuove quest passa ora esclusivamente dalla modale "Assegna
     // punti quest" in role_recap (RoleRecap.jsx / QuestRecapModal.jsx), non più
-    // da qui — resta solo la modifica di una quest già pubblicata.
+    // da qui — resta solo la modifica di una quest già pubblicata. Resta a
+    // pagina intera (non nello SplitPane sotto): form lungo e specialistico,
+    // usato raramente e solo dallo staff — non vale il rischio di adattarlo.
     if (view === 'edit_quest') {
         return (
             <ComposeQuest
@@ -1376,42 +1261,110 @@ export default function Forum({ isStaff = false, initialThread = null }) {
         )
     }
 
-    // --- VISTA COMPOSIZIONE NUOVO THREAD ---
-    if (view === 'compose') {
-        return (
-            <div className="pagina_forum">
-                <div className={styles.backBar}>
-                    <button onClick={() => setView('threads')}>← {currentSection?.nome}</button>
-                </div>
-                <PostForm
-                    isNew={true}
-                    chiuso={false}
-                    sending={sending}
-                    onSubmit={sendNewThread}
-                    onCancel={() => setView('threads')}
-                />
-            </div>
-        )
-    }
-
-    // --- VISTA LETTURA THREAD ---
-    if (view === 'read') {
+    // --- VISTA THREAD LIST / LETTURA / COMPOSIZIONE — sezione aperta ---
+    //
+    // Stesso pattern della vista 'sections': SplitPane con la lista thread a
+    // sinistra (sempre quella, indipendentemente da cosa si vede a destra) e
+    // il thread aperto (o il form nuovo thread) a destra. Su mobile solo una
+    // colonna alla volta, con pulsante indietro che torna alla lista thread
+    // (non alle categorie — per quello c'è il pulsante dedicato nell'header
+    // della lista, sempre visibile).
+    if (view === 'threads' || view === 'read' || view === 'compose') {
+        const totalPages = Math.ceil(totalThreads / 20)
+        /** Filtra i thread in base al testo di ricerca (locale, sui thread già caricati) */
+        const filteredThreads = searchQuery.trim()
+            ? threads.filter(t =>
+                t.titolo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.autore.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+            : threads
         const threadClosed = messages[0]?.chiuso ?? false
-        return (
-            <div className="pagina_forum">
-                <div className={styles.backBar}>
-                    <button onClick={backToThreads}>← {currentSection?.nome}</button>
-                    {/* NON spingere questo bottone sul bordo destro (es. margin-left:
-                        auto): l'anello destro dell'HUD (avatar, 173px) e' un riquadro
-                        invisibile ancorato in alto a destra che sconfina leggermente
-                        sotto #maincontent (top:136px vs anello alto fino a 178px) —
-                        un bottone li' sotto viene "rubato" dall'anello (hover/click
-                        intercettati, la topbar HUD reagisce invece del bottone). */}
-                    <button
-                        type="button"
-                        className="btn--ghost"
-                        onClick={toggleFollow}
-                    >
+        const showingDetail = view === 'compose' || (view === 'read' && !!currentThread)
+
+        const listContent = (
+            <>
+                <div className={styles.catDetailHeader}>
+                    <div className={styles.catDetailHeaderLeft}>
+                        <button onClick={backToSections} className="btn btn--icon" title="Torna alle categorie">
+                            <i className="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <span className={styles.sectionHeadingCompact}>{currentSection?.nome}</span>
+                    </div>
+                    <button onClick={() => setView('compose')} className="btn btn--primary btn--sm">+ Nuovo</button>
+                </div>
+
+                <div className={styles.threadSearchBar}>
+                    <input
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        placeholder="Cerca per termine, titolo o autore"
+                        className={styles.threadSearchInput}
+                    />
+                </div>
+
+                <SplitPane.ScrollArea className={styles.threadList} padBottomMobile>
+                    {loadingThreads ? (
+                        <p className={styles.loadingSmall}>Caricamento thread...</p>
+                    ) : filteredThreads.length === 0 ? (
+                        <p className={styles.emptyState}>Nessuna discussione.</p>
+                    ) : (
+                        filteredThreads.map(t => (
+                            <ThreadListItem
+                                key={t.id}
+                                thread={t}
+                                isSelected={view === 'read' && currentThread?.id === t.id}
+                                onClick={openThread}
+                                isStaff={isStaff}
+                                canDelete={t.can_delete}
+                                onAction={handleThreadAction}
+                            />
+                        ))
+                    )}
+
+                    {totalPages > 1 && (
+                        <div className={`pagination ${styles.pagination}`}>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                                <a
+                                    key={p}
+                                    href="#"
+                                    className={p === page ? 'active' : ''}
+                                    onClick={e => { e.preventDefault(); fetchThreads(currentSection.id, p) }}
+                                >
+                                    {p}
+                                </a>
+                            ))}
+                        </div>
+                    )}
+                </SplitPane.ScrollArea>
+            </>
+        )
+
+        const detailContent = view === 'compose' ? (
+            <>
+                <div className={styles.catDetailHeader}>
+                    <div className={styles.catDetailHeaderLeft}>
+                        <button onClick={() => setView('threads')} className={`btn btn--icon ${styles.catBackBtn}`}>←</button>
+                        <span className={styles.sectionHeadingCompact}>Nuova discussione</span>
+                    </div>
+                </div>
+                <SplitPane.ScrollArea className={styles.threadDetailScroll} padBottomMobile>
+                    <PostForm
+                        isNew={true}
+                        chiuso={false}
+                        sending={sending}
+                        onSubmit={sendNewThread}
+                        onCancel={() => setView('threads')}
+                    />
+                </SplitPane.ScrollArea>
+            </>
+        ) : view === 'read' && currentThread ? (
+            <>
+                <div className={styles.catDetailHeader}>
+                    <div className={styles.catDetailHeaderLeft}>
+                        <button onClick={backToThreads} className={`btn btn--icon ${styles.catBackBtn}`}>←</button>
+                        <span className={styles.sectionHeadingCompact}>{currentThread?.titolo}</span>
+                    </div>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={toggleFollow}>
                         {isFollowing ? 'Non seguire' : 'Segui'}
                     </button>
                 </div>
@@ -1419,8 +1372,7 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                 {loadingRead ? (
                     <p className={styles.loadingSmall}>Caricamento messaggi...</p>
                 ) : (
-                    <>
-                        {/* Tutti i messaggi del thread */}
+                    <SplitPane.ScrollArea className={styles.threadDetailScroll} padBottomMobile>
                         {messages.map((msg, i) => (
                             <div key={msg.id}>
                                 <PostCard
@@ -1439,19 +1391,29 @@ export default function Forum({ isStaff = false, initialThread = null }) {
                             </div>
                         ))}
 
-                        {/* Form risposta */}
                         <PostForm
                             isNew={false}
                             chiuso={threadClosed}
                             sending={sending}
                             onSubmit={sendReply}
                         />
-
-                        <div className={styles.backBar}>
-                            <button onClick={backToThreads}>← {currentSection?.nome}</button>
-                        </div>
-                    </>
+                    </SplitPane.ScrollArea>
                 )}
+            </>
+        ) : (
+            <div className={styles.emptyDetail}>
+                <span>💬</span>
+                <p>Seleziona una discussione per leggerla</p>
+            </div>
+        )
+
+        return (
+            <div id="forum-sections-app">
+                <SplitPane
+                    view={showingDetail ? 'detail' : 'list'}
+                    list={listContent}
+                    detail={detailContent}
+                />
             </div>
         )
     }

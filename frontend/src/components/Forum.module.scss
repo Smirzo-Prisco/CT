@@ -1,56 +1,7 @@
 // Forum.module.scss — stili scoped per Forum.jsx
 @use '../styles/tokens' as *;
 
-// ── ThreadRow ─────────────────────────────────────────────────
-
-.clickable {
-    cursor: pointer;
-}
-
-.statusCell {
-    text-align: center;
-    width: 40px;
-    padding: 8px;
-}
-
-.statusIcon {
-    width: 18px;
-    height: 18px;
-}
-
-.topicCell {
-    padding: 8px 10px;
-}
-
-.authorCell {
-    padding: 8px 10px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.repliesCell {
-    padding: 8px 10px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.dateNoIndent {
-    padding-left: 0;
-}
-
-.actionsCell {
-    padding: 8px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.actionIcon {
-    cursor: pointer;
-    margin: 0 2px;
-    width: 20px;
-}
-
-// ── Thread non letti ──────────────────────────────────────────
+// ── Thread non letti (usato da ThreadListItem, vedi piu' sotto) ───
 
 .unreadDot {
     display: inline-block;
@@ -61,10 +12,6 @@
     margin-right: 8px;
     vertical-align: middle;
     flex-shrink: 0;
-}
-
-.unreadTitle {
-    font-weight: bold;
 }
 
 // ── PostCard ───────────────────────────────────────────────────
@@ -299,6 +246,7 @@
     height: 56px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: $space-3;
     padding: 0 $space-4;
     background-color: $palette-surface-dark;
@@ -307,6 +255,31 @@
     color: $color-text-title;
     font-family: $font-ui;
     font-weight: $font-weight-bold;
+}
+
+// Gruppo sinistro dell'header (back + icona/titolo) — necessario solo quando
+// l'header ha anche un gruppo a destra (es. "Segui"), altrimenti gap/flex sul
+// contenitore bastano da soli.
+.catDetailHeaderLeft {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    min-width: 0;
+    overflow: hidden;
+
+    span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+// Titolo nell'header, non in maiuscolo fisso (vedi .cardDesc) — usato sia per
+// il nome sezione sopra la lista thread sia per il titolo del thread aperto.
+.sectionHeadingCompact {
+    font-family: $font-ui;
+    font-weight: $font-weight-bold;
+    color: $color-text-title;
 }
 
 // Pulsante "indietro": solo mobile, su desktop le due colonne sono sempre affiancate.
@@ -342,6 +315,124 @@
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: $space-4;
     align-content: start;
+}
+
+// -- Colonna lista: barra ricerca + elenco thread di una sezione --
+
+.threadSearchBar {
+    flex-shrink: 0;
+    display: flex;
+    gap: $space-2;
+    padding: $space-3;
+    border-bottom: 1px solid $palette-surface-hover;
+}
+
+.threadSearchInput {
+    flex: 1;
+    min-width: 0;
+    background: $palette-surface-input;
+    border: 1px solid $palette-surface-hover;
+    border-radius: $radius-md;
+    color: $color-text;
+    font-family: $font-ui;
+    font-size: $text-sm;
+    padding: $space-1 + 2 $space-2 + 2;
+    box-sizing: border-box;
+
+    &:focus {
+        outline: none;
+        border-color: $color-action;
+    }
+}
+
+.threadList {
+    padding: $space-2;
+}
+
+.threadItem {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-2 + 2;
+    padding: $space-2 + 2 $space-3;
+    border-radius: $radius-lg;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    margin-bottom: $space-1;
+    transition: background-color $transition-fast, border-color $transition-fast;
+
+    &:hover {
+        background-color: $palette-surface;
+    }
+}
+
+.threadItemSelected {
+    background-color: $palette-surface-raised;
+    border-left-color: $color-action;
+}
+
+.threadStatusIcon {
+    flex-shrink: 0;
+    margin-top: 3px;
+    font-size: $text-md;
+}
+
+.threadStatusOpen {
+    color: $color-text-secondary;
+}
+
+.threadStatusClosed {
+    color: $palette-danger;
+}
+
+.threadItemBody {
+    flex: 1;
+    min-width: 0;
+}
+
+.threadItemTitle {
+    font-size: $text-md;
+    color: $color-text;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.threadItemMeta {
+    font-size: $text-xs;
+    color: $color-text-secondary;
+    margin-top: 2px;
+}
+
+.threadItemActions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding-top: 2px;
+}
+
+.threadActionIcon {
+    cursor: pointer;
+    color: $color-text-muted;
+    font-size: $text-sm;
+
+    &:hover {
+        color: $color-text-light;
+    }
+}
+
+.threadActionIconActive {
+    color: $color-action;
+
+    &:hover {
+        color: $color-action-hover;
+    }
+}
+
+// -- Colonna dettaglio: thread aperto / form nuovo thread --
+
+.threadDetailScroll {
+    padding: $space-4;
 }
 
 .card {
@@ -441,17 +532,9 @@
     }
 }
 
-// ── Vista thread list ──────────────────────────────────────────
-
-.searchBar {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.searchInput {
-    width: 200px;
-    margin-right: 6px;
-}
+// ── Vista thread list/lettura (ex tabella, ora dentro SplitPane — vedi
+//    .threadSearchBar/.threadList/.threadItem* e .threadDetailScroll piu'
+//    in basso) + ComposeQuest (pagina intera, non in SplitPane) ──────────
 
 .buttonsBar {
     text-align: center;
@@ -463,12 +546,6 @@
 }
 
 .theadColor {
-    color: $color-text-title;
-}
-
-.theadCenter {
-    text-align: center;
-    width: 40px;
     color: $color-text-title;
 }
 
@@ -491,14 +568,6 @@
     display: flex;
     align-items: center;
     gap: 14px;
-}
-
-.sectionHeading {
-    font-family: 'DejaVu Serif', serif;
-    font-size: 14px;
-    color: $color-text-title;
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
 .loadingSmall {
