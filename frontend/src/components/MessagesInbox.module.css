@@ -76,6 +76,21 @@
 .msgAvatar     { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; object-fit: cover; }
 .msgBody       { flex: 1; min-width: 0; }
 .msgMeta       { font-size: 10.5px; color: var(--color-text-muted); margin-bottom: 3px; }
+
+/* ── Spunta di lettura (stile WhatsApp) ───────────────────────── */
+.readTick {
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    letter-spacing: -1px;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.readTickSeen {
+    color: var(--color-action);
+    letter-spacing: 0;
+}
 .replyBar      { border-top: 1px solid var(--color-surface-raised); padding: 10px; display: flex; gap: 8px; }
 .sendBtn       { align-self: flex-end; }
 
