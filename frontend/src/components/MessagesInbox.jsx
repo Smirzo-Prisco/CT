@@ -348,6 +348,17 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                                     className="thread-message-text"
                                     dangerouslySetInnerHTML={{ __html: msg.testo }}
                                 />
+                                {/* Spunta di lettura stile WhatsApp: solo sui miei messaggi nelle
+                                    conversazioni individuali (il concetto di "letto dal destinatario"
+                                    non si applica a gruppo/globale, che hanno più destinatari). */}
+                                {isOwn && conv.tipo === 'individuale' && (
+                                    <span
+                                        className={`${styles.readTick} ${msg.letto ? styles.readTickSeen : ''}`}
+                                        title={msg.letto ? 'Letto' : 'Inviato'}
+                                    >
+                                        {msg.letto ? '✓✓' : '✓'}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     )

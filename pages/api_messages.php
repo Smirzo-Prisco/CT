@@ -53,8 +53,12 @@ switch ($op) {
             WHERE pg.utente_nome = '$login'
               AND s.is_globale = 0
               AND s.ora_spedizione = (
+                  -- Stesso filtro is_globale=0 della query esterna: senza, se un
+                  -- messaggio globale piu' recente esiste per questo gruppo, il MAX
+                  -- punta a una riga is_globale=1 che la WHERE esterna scarta sempre,
+                  -- e l'intera conversazione di gruppo scompare dalla lista.
                   SELECT MAX(s2.ora_spedizione) FROM sms s2
-                  WHERE s2.gruppo_id = s.gruppo_id
+                  WHERE s2.gruppo_id = s.gruppo_id AND s2.is_globale = 0
               ))
 
             UNION
@@ -169,6 +173,8 @@ switch ($op) {
             $ongame_filter = ' AND s.ongame = ' . (int)$_GET['ongame'];
         }
 
+        $letto_il_altro = null; // timestamp di lettura della controparte — solo individuali
+
         if ($conv_id > 0) {
             // Verifica accesso (l'utente deve partecipare alla conversazione)
             $access = gdrcd_query("SELECT COUNT(*) AS n FROM conversazioni_individuali
@@ -193,11 +199,19 @@ switch ($op) {
             // considerato letto anche se e' appena arrivato via socket. "silent"
             // continua a saltare solo il self-emit di dm:update, che altrimenti
             // farebbe un loop infinito (dm:update → re-read → dm:update → ...).
-            gdrcd_query("UPDATE conversazioni_individuali SET lettura = 1
+            // letto_il = timestamp di questa lettura, usato per la spunta stile
+            // WhatsApp sui messaggi che l'ALTRO partecipante ha inviato a me.
+            gdrcd_query("UPDATE conversazioni_individuali SET lettura = 1, letto_il = NOW()
                 WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
             if (empty($_GET['silent'])) {
                 notifySocketServer('dm:update', 'dm:' . $_SESSION['login']);
             }
+
+            // Lettura della controparte: un messaggio che HO inviato io e' "letto"
+            // se la sua ora_spedizione e' <= l'ultimo letto_il registrato dall'altro.
+            $altro = gdrcd_query("SELECT letto_il FROM conversazioni_individuali
+                WHERE id_conversazione = $conv_id AND utente_nome != '$login' LIMIT 1");
+            $letto_il_altro = $altro['letto_il'] ?? null;
 
         } elseif ($gruppo_id > 0) {
             // Verifica accesso al gruppo
@@ -232,6 +246,14 @@ switch ($op) {
 
         $messages = [];
         while ($row = gdrcd_query($result, 'fetch')) {
+            // 'letto': solo per i messaggi che ho inviato io (mittente = login), vero se
+            // la controparte li ha gia' letti (letto_il_altro valido e >= ora_spedizione
+            // di questo messaggio). Sempre false per i messaggi altrui/di gruppo: il
+            // confronto non ha senso per ciò che ho ricevuto io.
+            $letto = ($row['mittente_nome'] === $_SESSION['login'])
+                && $letto_il_altro !== null
+                && $row['ora_spedizione'] <= $letto_il_altro;
+
             $messages[] = [
                 'mittente'     => $row['mittente_nome'],
                 'destinatario' => $row['destinatario_nome'],
@@ -240,6 +262,7 @@ switch ($op) {
                 'ora'          => $row['ora_spedizione'],
                 'avatar'       => $row['url_img_chat'],
                 'tipo'         => $row['tipo_messaggio'],
+                'letto'        => $letto,
             ];
         }
         gdrcd_query($result, 'free');
