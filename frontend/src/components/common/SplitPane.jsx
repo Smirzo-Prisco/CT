@@ -13,6 +13,7 @@
  * @param {React.ReactNode} detail - Contenuto della colonna destra (dettaglio)
  * @param {string} [className]    - Classi extra sul contenitore radice
  */
+import { forwardRef } from 'react'
 import styles from './SplitPane.module.scss'
 
 export default function SplitPane({ view = 'list', list, detail, className = '' }) {
@@ -31,12 +32,13 @@ export default function SplitPane({ view = 'list', list, detail, className = '' 
  * all'header della colonna (mai annidarla dentro un header sticky).
  *
  * @param {boolean} [padBottomMobile] - true per lasciare spazio ai pulsanti hamburger fissi su mobile
+ * @param {Function} [onScroll]       - handler nativo onScroll, per chi deve sapere se e' vicino al fondo
  */
-SplitPane.ScrollArea = function ScrollArea({ children, className = '', padBottomMobile = false }) {
+SplitPane.ScrollArea = forwardRef(function ScrollArea({ children, className = '', padBottomMobile = false, onScroll }, ref) {
     const padClass = padBottomMobile ? styles.scrollAreaPadMobile : ''
     return (
-        <div className={`${styles.scrollArea} ${padClass} ${className}`}>
+        <div ref={ref} onScroll={onScroll} className={`${styles.scrollArea} ${padClass} ${className}`}>
             {children}
         </div>
     )
-}
+})

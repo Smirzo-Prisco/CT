@@ -163,6 +163,8 @@ function ConvItem({ conv, isSelected, onClick, selectMode = false, checked = fal
 function ThreadView({ messages, conv, loading, replyText, setReplyText, sending, onSend, onBack, onDelete, onDeleteMsgs, myLogin }) {
     /** Ref per lo scroll automatico all'ultimo messaggio */
     const bottomRef = useRef(null)
+    /** Ref al contenitore che scrolla, per leggerne scrollTop/scrollHeight */
+    const scrollAreaRef = useRef(null)
     /** Ref alla textarea di risposta: usato per recuperare il focus dopo l'invio */
     const textareaRef = useRef(null)
     /** Traccia il valore precedente di sending per intercettare la transizione true→false */
@@ -170,10 +172,45 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
     const [selectMode, setSelectMode] = useState(false)
     const [selected,   setSelected]   = useState(new Set())
 
-    // Scrolla in fondo ogni volta che arrivano nuovi messaggi
+    // true se l'utente era già vicino al fondo prima di questo aggiornamento di `messages`:
+    // un ref (non state) perché va letto nell'effetto di scroll sotto senza causare un
+    // render in più, e aggiornato ad ogni scroll manuale senza perdere il valore tra un
+    // render e l'altro. Parte da true: il primissimo caricamento del thread scrolla sempre
+    // in fondo. Senza questo, QUALSIASI refresh in background (es. fetchThreadSilent
+    // innescato da un dm:update di un'ALTRA conversazione) richiama scrollIntoView e
+    // riporta la vista in fondo anche mentre l'utente sta risalendo per leggere i
+    // messaggi precedenti — il motivo per cui la lista "non sale oltre un certo punto".
+    const eraVicinoAlFondoRef = useRef(true)
+
+    const handleScrollArea = useCallback(() => {
+        const el = scrollAreaRef.current
+        if (!el) return
+        const distanzaDalFondo = el.scrollHeight - el.scrollTop - el.clientHeight
+        eraVicinoAlFondoRef.current = distanzaDalFondo < 80
+    }, [])
+
+    // Scrolla in fondo quando arrivano nuovi messaggi, ma solo se l'utente non ha
+    // risalito manualmente il thread — altrimenti un aggiornamento in background lo
+    // riporterebbe giù mentre sta leggendo i messaggi precedenti.
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+        if (eraVicinoAlFondoRef.current) {
+            bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+        }
     }, [messages])
+
+    // Nuova conversazione aperta: riparte sempre dal fondo (il caricamento iniziale del
+    // thread deve sempre mostrare gli ultimi messaggi, indipendentemente da dove si era
+    // scrollato nella conversazione precedente).
+    useEffect(() => {
+        eraVicinoAlFondoRef.current = true
+    }, [conv])
+
+    // Mandare un messaggio proprio deve sempre scrollare in fondo per mostrarlo, anche se
+    // si era risaliti a leggere la storia.
+    const handleSend = useCallback(() => {
+        eraVicinoAlFondoRef.current = true
+        onSend()
+    }, [onSend])
 
     // Rimette il focus sulla textarea non appena l'invio si conclude
     useEffect(() => {
@@ -297,7 +334,7 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
               * Senza max-height il div cresce con il contenuto e scrolla tutta la pagina.
               * calc(100vh - 180px) lascia spazio per header e form risposta.
               */}
-            <SplitPane.ScrollArea className="thread-messages" padBottomMobile>
+            <SplitPane.ScrollArea className="thread-messages" padBottomMobile ref={scrollAreaRef} onScroll={handleScrollArea}>
                 {messages.length === 0 && (
                     <p className={styles.emptyMsg}>Nessun messaggio.</p>
                 )}
@@ -377,10 +414,10 @@ function ThreadView({ messages, conv, loading, replyText, setReplyText, sending,
                         rows="3"
                         className={styles.replyTextarea}
                         // Invio con Ctrl+Enter per comodità
-                        onKeyDown={e => { if (e.ctrlKey && e.key === 'Enter') onSend() }}
+                        onKeyDown={e => { if (e.ctrlKey && e.key === 'Enter') handleSend() }}
                     />
                     <button
-                        onClick={onSend}
+                        onClick={handleSend}
                         disabled={sending || !replyText.trim()}
                         className={`btn btn--primary ${styles.sendBtn}`}
                     >
