@@ -41,8 +41,16 @@
 
 @media screen and (max-width: 768px) {
     .shell {
-        // 86px = top di #maincontent su mobile, vedi _layout.scss.
-        height: calc(100vh - 86px);
+        // 86px = top di #maincontent su mobile, vedi _layout.scss. 100dvh invece di 100vh:
+        // #maincontent e' position:fixed con top/bottom (si adatta subito allo spazio
+        // visibile reale), ma 100vh usa il viewport "espanso" (barra indirizzi nascosta) —
+        // appena dopo il caricamento, prima che la barra si nasconda, 100vh puo' risultare
+        // piu' alto dello spazio reale di #maincontent, che diventa scrollabile per quella
+        // differenza e si porta via con se' .shell (header incluso): l'overscroll-behavior
+        // su .thread-messages non basta, perche' qui il problema e' un contenitore PIU' ALTO
+        // del previsto, non lo scroll-chaining al bordo. 100dvh segue sempre il viewport
+        // visibile reale, eliminando il disallineamento.
+        height: calc(100dvh - 86px);
         border-radius: 0;
     }
 
