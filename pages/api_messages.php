@@ -193,6 +193,15 @@ switch ($op) {
                 WHERE s.id_conversazione = $conv_id{$ongame_filter}
                 ORDER BY s.ora_spedizione DESC LIMIT 200", 'result');
 
+            // Stato PRIMA dell'update: serve a capire se questa lettura e' davvero nuova
+            // (vedi notifica alla controparte sotto) — senza, ogni fetchThreadSilent()
+            // ripetuto (anche quando non c'e' nulla di nuovo da segnare) notificherebbe di
+            // nuovo l'altro partecipante, che a sua volta notificherebbe indietro: un
+            // ping-pong continuo tra i due finche' entrambi hanno il thread aperto.
+            $primaRiga = gdrcd_query("SELECT lettura FROM conversazioni_individuali
+                WHERE id_conversazione = $conv_id AND utente_nome = '$login'");
+            $eraNonLetto = $primaRiga && (int)$primaRiga['lettura'] === 0;
+
             // Segna come letto SEMPRE, anche per una chiamata "silent" — chi la
             // chiama sta gia' guardando il thread in tempo reale (vedi
             // fetchThreadSilent in MessagesInbox.jsx), quindi il messaggio va
@@ -209,9 +218,27 @@ switch ($op) {
 
             // Lettura della controparte: un messaggio che HO inviato io e' "letto"
             // se la sua ora_spedizione e' <= l'ultimo letto_il registrato dall'altro.
-            $altro = gdrcd_query("SELECT letto_il FROM conversazioni_individuali
+            $altro = gdrcd_query("SELECT utente_nome, letto_il FROM conversazioni_individuali
                 WHERE id_conversazione = $conv_id AND utente_nome != '$login' LIMIT 1");
             $letto_il_altro = $altro['letto_il'] ?? null;
+
+            // Notifica l'altro partecipante SOLO se questa lettura era davvero nuova
+            // (vedi $eraNonLetto sopra): se ha questa conversazione aperta, il suo
+            // fetchThreadSilent() la ricarica e la spunta "letto" compare in tempo reale
+            // sui messaggi che ha inviato lui, senza bisogno di ricaricare — ma senza la
+            // guardia su $eraNonLetto, ogni suo giro di aggiornamento in risposta
+            // ripartirebbe il ciclo all'infinito tra i due.
+            if ($eraNonLetto && $altro) {
+                notifySocketServer('dm:update', 'dm:' . $altro['utente_nome']);
+            }
+
+            // Notifica SEMPRE l'altro partecipante (anche per una chiamata "silent": qui non
+            // rischia il loop di sopra, e' un utente diverso) — se ha questa conversazione
+            // aperta, il suo fetchThreadSilent() la ricarica e la spunta "letto" compare in
+            // tempo reale sui messaggi che ha inviato lui, senza bisogno di ricaricare.
+            if ($altro) {
+                notifySocketServer('dm:update', 'dm:' . $altro['utente_nome']);
+            }
 
         } elseif ($gruppo_id > 0) {
             // Verifica accesso al gruppo
