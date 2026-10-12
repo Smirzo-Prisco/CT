@@ -56,8 +56,17 @@
     // dice quale nascondere. Su desktop entrambe restano sempre visibili.
     @media screen and (max-width: 768px) {
         &.container {
-            // 86px = top di #maincontent su mobile, vedi _layout.scss.
-            height: calc(100vh - 86px);
+            // 86px = top di #maincontent su mobile, vedi _layout.scss. 100dvh invece di
+            // 100vh: #maincontent e' position:fixed con top/bottom (si adatta subito allo
+            // spazio visibile reale), ma 100vh usa il viewport "espanso" (barra indirizzi
+            // nascosta) — appena dopo il caricamento, prima che la barra si nasconda, 100vh
+            // puo' risultare piu' alto dello spazio reale di #maincontent, che diventa
+            // scrollabile per quella differenza e si porta via con se' l'intero container
+            // (header e pulsante "indietro" incluso) scorrendo — non prevenuto
+            // dall'overscroll-behavior su .thread-messages, che blocca solo lo
+            // scroll-chaining al bordo, non un contenitore semplicemente piu' alto del
+            // previsto. 100dvh segue sempre il viewport visibile reale.
+            height: calc(100dvh - 86px);
             border-radius: 0;
         }
 
