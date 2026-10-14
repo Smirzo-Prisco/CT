@@ -37,7 +37,7 @@ $personaggi = gdrcd_query(
      LEFT JOIN mestiere ON personaggio.id_mestiere      = mestiere.id_mestiere
      LEFT JOIN gilda    ON personaggio.id_gilda         = gilda.id_gilda
      WHERE 1=1 $where
-     ORDER BY nome ASC",
+     ORDER BY data_iscrizione DESC",
     'result'
 );
 
