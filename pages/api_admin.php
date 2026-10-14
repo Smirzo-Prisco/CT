@@ -45,7 +45,7 @@ switch ($op) {
                 $where .= " AND esperienza = '0.0000' AND DATE(ora_entrata) = DATE(data_iscrizione)";
                 break;
             case 'esiliati':
-                $where .= " AND esilio > NOW() AND esilio != '0000-00-00' AND esilio IS NOT NULL";
+                $where .= " AND esilio > NOW() AND esilio IS NOT NULL";
                 break;
         }
         if (!empty($cerca)) {

@@ -443,7 +443,7 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             break;
         
             case 'deleteEsiliati':  // Elimino tutti i pg esiliati
-            $queryDelete = gdrcd_query("DELETE FROM personaggio WHERE esilio != '0000-00-00' AND esilio IS NOT NULL");
+            $queryDelete = gdrcd_query("DELETE FROM personaggio WHERE esilio IS NOT NULL");
             
             if ($queryDelete) echo json_encode(['success' => true, 'message' => 'Personaggi esiliati eliminati con successo']);
             else echo json_encode(['success' => false, 'message' => 'Errore nella cancellazione']);
