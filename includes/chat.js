@@ -265,7 +265,20 @@ function editAction(content, id) {
 
 function saveEditAction() {
     const content = document.getElementById("edit_action_textarea").value;
-    const id = document.getElementById("edit_action_id").value;
+    let id = document.getElementById("edit_action_id").value;
+
+    // Il campo nascosto viene popolato una sola volta, al click su "Modifica" (editAction()),
+    // e da li' in poi non e' piu' toccato finche' non si salva: se nel frattempo si perde
+    // (causa non ancora individuata nonostante due indagini, vedi conversazione di progetto
+    // del 2026-09-29 e del 2026-10-19), recuperiamo l'id direttamente dal DOM invece di fallire
+    // a priori — e' comunque lo stesso elemento che editAction() aveva letto per popolare il campo.
+    if (!id) {
+        const active = document.querySelector('[data-editable].chat_editable--active');
+        if (active) {
+            console.warn('saveEditAction: id perso dal campo nascosto, recuperato dal DOM —', active.id);
+            id = active.id;
+        }
+    }
 
     // Log diagnostico: se in futuro ricompare "Dati mancanti" permette di vedere
     // subito in console quale dei due campi era vuoto/mancante lato client
