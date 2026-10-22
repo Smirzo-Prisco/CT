@@ -18,7 +18,9 @@ import SchedaMenu from './SchedaMenu'
 
 function formatDate(dateStr) {
     if (!dateStr) return ''
-    const d = new Date(dateStr)
+    // DATETIME MySQL "YYYY-MM-DD HH:mm:ss" (spazio, non 'T'): Safari/WebKit
+    // (iPad) lo rifiuta e restituisce Invalid Date, a differenza di Chrome/Firefox.
+    const d = new Date(dateStr.replace(' ', 'T'))
     return isNaN(d)
         ? dateStr
         : d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })

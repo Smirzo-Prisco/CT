@@ -58,7 +58,9 @@ function initials(nome, cognome) {
 
 function formatDate(dateStr) {
     if (!dateStr) return '—'
-    const d = new Date(dateStr)
+    // DATETIME MySQL "YYYY-MM-DD HH:mm:ss" (spazio, non 'T'): Safari/WebKit
+    // (iPad) lo rifiuta e restituisce Invalid Date, a differenza di Chrome/Firefox.
+    const d = new Date(dateStr.replace(' ', 'T'))
     if (isNaN(d)) return dateStr
     return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
