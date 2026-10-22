@@ -1,4 +1,4 @@
-
+#
 # Change Log
 Tutti i cambiamenti dalla versione 5.5 verranno inseriti qui.
 
