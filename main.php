@@ -41,7 +41,7 @@ const MIGRATED_PAGES = [
     'incremento_parametri', 'servizi_prenotazioni_prova',
     'servizi_gilde', 'statuto_main', 'documentazione_main',
     'chat_help', 'agenda_center', 'user_cancella_pg',
-    'gestione_esilio', 'gestione_personaggio',
+    'gestione_esilio', 'gestione_personaggio', 'gst_personaggio_skill',
 ];
 
 // ── DB update per cambio mappa (navigazione PHP diretta) ──────────────────────
