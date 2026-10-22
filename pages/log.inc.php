@@ -55,7 +55,29 @@ if ($currentTab === 'movimenti') {
         $condizioniMovimenti[] = "DATE(DataEvento) = '" . gdrcd_filter('in', $filtroDataMovimenti) . "'";
     }
     $whereMovimenti = $condizioniMovimenti ? 'WHERE ' . implode(' AND ', $condizioniMovimenti) : '';
-    $riepilogoMovimenti = gdrcd_query("SELECT COUNT(*) AS totali, COUNT(DISTINCT Nome) AS distinti FROM log_movimenti $whereMovimenti");
+
+    // Il login genera sempre, come prima azione dopo, un "Cambio mappa" automatico
+    // (il redirect verso l'ultima posizione) che non è un vero movimento del
+    // giocatore — va nascosto insieme al login stesso, altrimenti ogni accesso
+    // produce 2 righe di rumore identico. Si individua con LAG() guardando, per
+    // ogni riga, l'azione precedente DELLO STESSO personaggio: se è un login e
+    // questa riga è il changemap che lo segue immediatamente (nessun'altra azione
+    // in mezzo), è automatico. Il filtro WHERE data/pg va dentro la subquery
+    // (non dopo) così LAG lavora sullo stesso set di righe già limitato al giorno
+    // scelto, invece di scandire tutta la cronologia ogni volta.
+    $movimentiBase = "(
+        SELECT lm.*,
+               LAG(Endpoint)   OVER (PARTITION BY Nome ORDER BY id) AS prev_endpoint,
+               LAG(Operazione) OVER (PARTITION BY Nome ORDER BY id) AS prev_operazione
+        FROM log_movimenti lm
+        $whereMovimenti
+    ) t";
+    $escludiAutoMovimenti = "
+        NOT (Endpoint = 'api_auth.php' AND Operazione = 'login')
+        AND NOT (Endpoint = 'api_map.php' AND Operazione = 'changemap' AND prev_endpoint = 'api_auth.php' AND prev_operazione = 'login')
+    ";
+
+    $riepilogoMovimenti = gdrcd_query("SELECT COUNT(*) AS totali, COUNT(DISTINCT Nome) AS distinti FROM $movimentiBase WHERE $escludiAutoMovimenti");
 }
 
 // Stima quanto sia plausibile che un doppio segnalato sia davvero lo stesso giocatore:
@@ -545,7 +567,7 @@ function etichettaMovimento($endpoint, $operazione) {
                 // Luogo restano nel dettaglio espanso. Stesso pattern di
                 // Doppi/Accessi sopra.
                 $limiteMovimenti = $filtroDataMovimenti === 'tutti' ? ' LIMIT 500' : '';
-                $movimentiRes = gdrcd_query("SELECT * FROM log_movimenti $whereMovimenti ORDER BY DataEvento DESC$limiteMovimenti", 'result');
+                $movimentiRes = gdrcd_query("SELECT * FROM $movimentiBase WHERE $escludiAutoMovimenti ORDER BY DataEvento DESC$limiteMovimenti", 'result');
                 $movimenti = [];
                 while ($row = gdrcd_query($movimentiRes, 'fetch')) { $movimenti[] = $row; }
                 gdrcd_query($movimentiRes, 'free');
