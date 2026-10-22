@@ -257,7 +257,9 @@ function eliminaEsiliati() {
             .then(response => response.json())
             .then(data => {
                 showNotification(data.message, 'success');
-                window.location.reload();
+                // In SPA (GestionePersonaggio.jsx) window.refreshPgList ricarica solo la
+                // tabella; nel vecchio caricamento PHP (dove non e' definita) resta il reload.
+                if (window.refreshPgList) window.refreshPgList(); else window.location.reload();
             })
             .catch(error => {
                 console.error('Errore durante la cancellazione dei pg esiliati:', error);
@@ -279,7 +281,7 @@ function ripristinaPg(nome) {
         .then(response => response.json())
         .then(data => {
             showNotification(data.message, data.success ? 'success' : 'error');
-            if (data.success) window.location.reload();
+            if (data.success) { if (window.refreshPgList) window.refreshPgList(); else window.location.reload(); }
         })
         .catch(error => {
             console.error('Errore durante il ripristino:', error);
@@ -299,7 +301,7 @@ function disattivaPg(nome) {
         .then(response => response.json())
         .then(data => {
             showNotification(data.message, data.success ? 'success' : 'error');
-            if (data.success) window.location.reload();
+            if (data.success) { if (window.refreshPgList) window.refreshPgList(); else window.location.reload(); }
         })
         .catch(error => {
             console.error('Errore durante la disattivazione:', error);
@@ -318,7 +320,7 @@ function eliminaPg(nome) {
         .then(response => response.json())
         .then(data => {
             showNotification(data.message, data.success ? 'success' : 'error');
-            if (data.success) window.location.reload();
+            if (data.success) { if (window.refreshPgList) window.refreshPgList(); else window.location.reload(); }
         })
         .catch(error => {
             console.error('Errore durante la cancellazione:', error);
@@ -350,34 +352,46 @@ function resetPg(pgs) {
     }
 }
 
-/****************   Al completo caricamento del DOM della pagina... **********************************/
-document.addEventListener('DOMContentLoaded', function () {
-    // Sposta il modal fuori da #maincontent e sotto <body> — il modal ha position:fixed
-    // e z-index:1500, ma se rimane dentro #maincontent (z-index:auto) viene dipinto
-    // sotto le sidebar (z-index:1000). Il teleport risolve il conflitto di stacking context.
-    const pgEditContainer = document.getElementById('pg_edit_container');
-    if (pgEditContainer) document.body.appendChild(pgEditContainer);
-
+/**
+ * Attacca gli event listener della pagina gestione_personaggio.
+ * Esposta globalmente come window.initPersonaggioListeners() per essere
+ * richiamata da GestionePersonaggio.jsx in navigazione SPA, dove
+ * DOMContentLoaded e' gia' scattato quando questo script viene iniettato
+ * (stesso problema/soluzione di window.initChatListeners() in chat.js).
+ *
+ * Nota: qui non si teletrasporta piu' #pg_edit_container sotto <body> via
+ * appendChild — in SPA quel nodo e' gia' renderizzato li' direttamente da
+ * React tramite createPortal (stesso scopo: evitare che lo stacking context
+ * di #maincontent copra il modal), quindi il teleport manuale non serve piu'.
+ * Nel caricamento PHP tradizionale (gestione.php?page=gestione_personaggio,
+ * ancora servito dal vecchio .inc.php) il modal resta dentro #maincontent:
+ * non e' un problema li' perche' quella pagina non ha le sidebar con
+ * z-index:1000 di main.php.
+ */
+window.initPersonaggioListeners = function () {
     // Gestione modale di modifica personaggio
     const closePgModal = document.getElementById("closePgModal");
 
     if (closePgModal) {
-        const modalPG = closePgModal.closest('.pg-edit-container') || this.previousElementSibling?.closest('.pg-edit-container');
-        closePgModal.onclick = () => modalPG.style.display = "none";
-
-        window.onclick = e => { if (e.target === modalPG) modalPG.style.display = "none"; };
+        const modalPG = closePgModal.closest('.pg-edit-container');
+        if (modalPG) {
+            closePgModal.onclick = () => modalPG.style.display = "none";
+            window.onclick = e => { if (e.target === modalPG) modalPG.style.display = "none"; };
+        }
     }
 
-    // Salvataggio dei dati del personaggio nel database
+    // Salvataggio dei dati del personaggio nel database — .onsubmit invece di
+    // addEventListener: idempotente, puo' essere richiamato piu' volte senza
+    // accumulare listener (navigazione SPA avanti/indietro sulla pagina)
     const formPg = document.querySelector('#pg_edit_container form');
-    if (formPg) formPg.addEventListener('submit', savePgForm);
+    if (formPg) formPg.onsubmit = savePgForm;
 
-    // Motore di ricerca personaggio
+    // Motore di ricerca personaggio — stesso motivo, .onkeyup invece di addEventListener
     const inputSearchPg = document.getElementById("searchPg");
     const listaPg = document.getElementById("pgTable");
 
-    if (inputSearchPg) {
-        inputSearchPg.addEventListener("keyup", function () {
+    if (inputSearchPg && listaPg) {
+        inputSearchPg.onkeyup = function () {
             const allPg = listaPg.getElementsByTagName("a");
             const filtroPg = inputSearchPg.value.toLowerCase();
 
@@ -385,6 +399,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 let testoSearchPg = allPg[i].textContent.toLowerCase();
                 allPg[i].closest("tr").style.display = testoSearchPg.includes(filtroPg) ? "" : "none";
             }
-        });
+        };
     }
-});
+};
+
+// Al primo caricamento PHP la funzione viene chiamata automaticamente da DOMContentLoaded.
+// In navigazione SPA, GestionePersonaggio.jsx la chiama esplicitamente dopo aver montato il DOM.
+document.addEventListener('DOMContentLoaded', window.initPersonaggioListeners);

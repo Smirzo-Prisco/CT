@@ -69,7 +69,11 @@ switch ($op) {
 
         // 1. GESTIONE PERSONAGGI
         if ($perms['admin'] || $perms['master'] || $perms['moderatore'] || $perms['custode']) {
-            $voci = [['label' => 'Personaggi', 'url' => 'gestione.php?page=gestione_personaggio']];
+            // Migrata a React/SPA (vedi conversazione di progetto del 2026-10-22):
+            // main.php invece del vecchio gestione.php, cosi' CT.navigate() (gia'
+            // usato da Gestione.jsx per ogni voce di questo menu) la riconosce come
+            // pagina migrata e naviga senza reload.
+            $voci = [['label' => 'Personaggi', 'url' => 'main.php?page=gestione_personaggio']];
             if ($perms['admin'])
                 $voci[] = ['label' => 'Azzera punti', 'url' => 'gestione.php?page=gestione_azzeramento_skill'];
             if ($perms['admin'] || $perms['master'])

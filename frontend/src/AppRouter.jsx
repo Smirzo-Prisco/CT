@@ -46,6 +46,7 @@ import SchedaPunti    from './components/SchedaPunti'
 import SchedaOggetti  from './components/SchedaOggetti'
 import Gestione             from './components/Gestione'
 import GestioneEsilio       from './components/GestioneEsilio'
+import GestionePersonaggio  from './components/GestionePersonaggio'
 import Uffici               from './components/Uffici'
 import Preferenze            from './components/Preferenze'
 import MiaGilda              from './components/MiaGilda'
@@ -142,6 +143,10 @@ const ROUTES = {
     },
     gestione_esilio: {
         component: GestioneEsilio,
+        css: [],
+    },
+    gestione_personaggio: {
+        component: GestionePersonaggio,
         css: [],
     },
     uffici: {

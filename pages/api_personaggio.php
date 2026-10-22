@@ -496,6 +496,81 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             );
             echo json_encode(['success' => true, 'message' => "$pgEsilia esiliato"]);
             break;
+        // -------------------------------------------------------------------------
+        // LISTA PERSONAGGI — porta a JSON la query/i filtri di
+        // gestione_personaggio.inc.php:24-58, invariati, per la migrazione di
+        // quella pagina a React/SPA (vedi conversazione di progetto del
+        // 2026-10-22). Stesso permesso della pagina originale (riga 48):
+        // admin, master, moderatore, o personaggio con id_gilda == 4 (custode).
+        // -------------------------------------------------------------------------
+        case 'listPersonaggi':
+            $beastRow = gdrcd_query("SELECT id_gilda FROM personaggio WHERE nome = '" . gdrcd_filter('in', $_SESSION['login']) . "' LIMIT 1");
+            $isCustode = $beastRow && (int)$beastRow['id_gilda'] === 4;
+            $isAdmin = ($_SESSION['admin'] ?? 0) == 1;
+            $isMaster = ($_SESSION['master'] ?? 0) == 1;
+            $isModeratore = ($_SESSION['moderatore'] ?? 0) == 1;
+            if (!$isAdmin && !$isMaster && !$isModeratore && !$isCustode) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+
+            $filtroPg = $_GET['filtro'] ?? 'tutti';
+            switch ($filtroPg) {
+                case 'inattivi':    $whereFiltro = "AND DATE_ADD(ora_entrata, INTERVAL 150 DAY) <= NOW() AND (esilio < NOW() OR esilio IS NULL)"; break;
+                case 'mai_entrati': $whereFiltro = "AND esperienza = '0.0000' AND (DATE(ora_entrata) = DATE(data_iscrizione))"; break;
+                case 'esiliati':    $whereFiltro = "AND (esilio > NOW() AND esilio IS NOT NULL)"; break;
+                case 'eliminati':   $whereFiltro = "AND " . sqlPgCancellato(); break;
+                default:            $whereFiltro = '';
+            }
+
+            $risultatoPg = gdrcd_query(
+                "SELECT personaggio.nome, personaggio.cognome, personaggio.url_img_chat, personaggio.esilio, personaggio.permessi,
+                        razza.nome_razza, mestiere.nome AS nome_mestiere, gilda.nome AS nome_gilda
+                 FROM personaggio
+                 LEFT JOIN razza    ON personaggio.id_razza    = razza.id_razza
+                 LEFT JOIN mestiere ON personaggio.id_mestiere = mestiere.id_mestiere
+                 LEFT JOIN gilda    ON personaggio.id_gilda    = gilda.id_gilda
+                 WHERE 1=1 $whereFiltro
+                 ORDER BY data_iscrizione DESC",
+                'result'
+            );
+
+            $listaPg = [];
+            while ($pgRow = gdrcd_query($risultatoPg, 'fetch')) {
+                $isExiledPg = !empty($pgRow['esilio'])
+                    && $pgRow['esilio'] !== '0000-00-00 00:00:00'
+                    && $pgRow['esilio'] > date('Y-m-d H:i:s');
+                $listaPg[] = [
+                    'nome'            => $pgRow['nome'],
+                    'cognome'         => $pgRow['cognome'],
+                    'url_img_chat'    => $pgRow['url_img_chat'],
+                    'nome_razza'      => $pgRow['nome_razza'],
+                    'nome_mestiere'   => $pgRow['nome_mestiere'],
+                    'nome_gilda'      => $pgRow['nome_gilda'],
+                    'isExiled'        => $isExiledPg,
+                    'esilioFormattato' => $isExiledPg ? gdrcd_format_date($pgRow['esilio']) : null,
+                    'isDeleted'       => (int)$pgRow['permessi'] === -1,
+                ];
+            }
+            gdrcd_query($risultatoPg, 'free');
+
+            echo json_encode([
+                'success' => true,
+                'personaggi' => $listaPg,
+                'perms' => [
+                    'admin' => $isAdmin, 'master' => $isMaster,
+                    'moderatore' => $isModeratore, 'custode' => $isCustode,
+                ],
+            ]);
+            break;
+        case 'listRazze': // Elenco razze per la select del modale di modifica
+            $razzeRes = gdrcd_query("SELECT id_razza, nome_razza FROM razza ORDER BY nome_razza", 'result');
+            $razze = [];
+            while ($r = gdrcd_query($razzeRes, 'fetch')) $razze[] = $r;
+            gdrcd_query($razzeRes, 'free');
+            echo json_encode(['success' => true, 'razze' => $razze]);
+            break;
         case 'graziaPg': // Revoca l'esilio — stessa UPDATE di gestione_esilio.inc.php:22-24
             if (($_SESSION['admin'] ?? 0) != 1 && ($_SESSION['moderatore'] ?? 0) != 1) {
                 http_response_code(403);
