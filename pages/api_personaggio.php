@@ -431,6 +431,85 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             }
             
             exit;
+        // -------------------------------------------------------------------------
+        // ESILIO — porta a JSON la logica di gestione_esilio.inc.php, invariata,
+        // per permettere la migrazione di quella pagina a React/SPA (vedi
+        // conversazione di progetto del 2026-10-22). Stesso permesso di
+        // gestione_esilio.inc.php:3 — admin o moderatore, non solo admin.
+        // -------------------------------------------------------------------------
+        case 'getPgPerEsilio': // Elenco pg raggruppato per il dropdown (equivalente ai due optgroup della pagina originale)
+            if (($_SESSION['admin'] ?? 0) != 1 && ($_SESSION['moderatore'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+            $attiviRes = gdrcd_query("SELECT nome FROM personaggio WHERE (esilio < NOW() OR esilio IS NULL) ORDER BY nome", 'result');
+            $attivi = [];
+            while ($r = gdrcd_query($attiviRes, 'fetch')) $attivi[] = $r['nome'];
+            gdrcd_query($attiviRes, 'free');
+
+            $esiliatiRes = gdrcd_query("SELECT nome FROM personaggio WHERE esilio > NOW() ORDER BY nome", 'result');
+            $esiliati = [];
+            while ($r = gdrcd_query($esiliatiRes, 'fetch')) $esiliati[] = $r['nome'];
+            gdrcd_query($esiliatiRes, 'free');
+
+            echo json_encode(['success' => true, 'attivi' => $attivi, 'esiliati' => $esiliati]);
+            break;
+        case 'getEsilioStatus': // Stato esilio del pg selezionato (decide form esilia vs pulsante grazia)
+            if (($_SESSION['admin'] ?? 0) != 1 && ($_SESSION['moderatore'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+            if (!isset($_GET['name']) || trim($_GET['name']) === '') {
+                echo json_encode(['success' => false, 'message' => 'Parametro mancante']);
+                break;
+            }
+            $nomeEsilio = gdrcd_filter('in', trim($_GET['name']));
+            $rigaEsilio = gdrcd_query("SELECT nome, esilio FROM personaggio WHERE nome = '$nomeEsilio'");
+            if (!$rigaEsilio) {
+                echo json_encode(['success' => false, 'message' => 'Personaggio non trovato']);
+                break;
+            }
+            echo json_encode(['success' => true, 'nome' => $rigaEsilio['nome'], 'esilio' => $rigaEsilio['esilio']]);
+            break;
+        case 'exilePg': // Avvia l'esilio — stessa UPDATE di gestione_esilio.inc.php:12-18
+            if (($_SESSION['admin'] ?? 0) != 1 && ($_SESSION['moderatore'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+            $pgEsilia = isset($data['pg']) ? gdrcd_filter('in', trim($data['pg'])) : '';
+            if ($pgEsilia === '') {
+                echo json_encode(['success' => false, 'message' => 'Personaggio mancante']);
+                break;
+            }
+            $annoEsilio  = gdrcd_filter('num', $data['year'] ?? '');
+            $meseEsilio  = gdrcd_filter('num', $data['month'] ?? '');
+            $giornoEsilio = gdrcd_filter('num', $data['day'] ?? '');
+            $causaleEsilio = gdrcd_filter('in', $data['causale'] ?? '');
+
+            gdrcd_query(
+                "UPDATE personaggio SET esilio = '$annoEsilio-$meseEsilio-$giornoEsilio', data_esilio = NOW(), " .
+                "autore_esilio = '" . gdrcd_filter('in', $_SESSION['login']) . "', motivo_esilio = '$causaleEsilio' " .
+                "WHERE nome = '$pgEsilia'"
+            );
+            echo json_encode(['success' => true, 'message' => "$pgEsilia esiliato"]);
+            break;
+        case 'graziaPg': // Revoca l'esilio — stessa UPDATE di gestione_esilio.inc.php:22-24
+            if (($_SESSION['admin'] ?? 0) != 1 && ($_SESSION['moderatore'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+            $pgGrazia = isset($data['pg']) ? gdrcd_filter('in', trim($data['pg'])) : '';
+            if ($pgGrazia === '') {
+                echo json_encode(['success' => false, 'message' => 'Personaggio mancante']);
+                break;
+            }
+            gdrcd_query("UPDATE personaggio SET esilio = NULL, data_esilio = '2009-07-01', autore_esilio = NULL, motivo_esilio = NULL WHERE nome = '$pgGrazia'");
+            echo json_encode(['success' => true, 'message' => "$pgGrazia graziato"]);
+            break;
         default: echo json_encode(['error' => 'Operazione non valida']); break;
     }
     /*********************  FINE    Recupero i dati dell'utente che voglio modificare   */
