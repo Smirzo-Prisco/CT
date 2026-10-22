@@ -21,7 +21,9 @@ import QuestRecapModal from './QuestRecapModal'
 /** Formatta una stringa data in italiano (es. "venerdì 29 maggio 2026"). */
 function formatDate(dateString) {
     if (!dateString) return ''
-    const d = new Date(dateString)
+    // DATETIME MySQL "YYYY-MM-DD HH:mm:ss" (spazio, non 'T'): Safari/WebKit
+    // (iPad) lo rifiuta e restituisce Invalid Date, a differenza di Chrome/Firefox.
+    const d = new Date(dateString.replace(' ', 'T'))
     if (isNaN(d)) return dateString
     return d.toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 }
@@ -68,7 +70,7 @@ function StatCard({ icon, value, label, onClick, active }) {
 
 function GameCard({ game, canFlag, isStaff, onFlag, onAward, onReject, onOpenQuestRecap }) {
     const today = new Date().toISOString().split('T')[0]
-    const isToday = game.data === today || new Date(game.data).toISOString().split('T')[0] === today
+    const isToday = game.data === today || new Date(game.data.replace(' ', 'T')).toISOString().split('T')[0] === today
     const duration = calcDuration(game.oraInizio, game.oraFine)
 
     const flagIcon  = game.my_shin === 'awarded' ? 'fas fa-coins'
@@ -366,7 +368,7 @@ export default function RoleRecap() {
     const sorted = [...roles].sort((a, b) => {
         if (a.inCorso && !b.inCorso) return -1
         if (!a.inCorso && b.inCorso) return 1
-        return new Date(b.data) - new Date(a.data)
+        return new Date(b.data.replace(' ', 'T')) - new Date(a.data.replace(' ', 'T'))
     })
 
     // ── Filtri client-side ───────────────────────────────────────────────────
@@ -375,7 +377,7 @@ export default function RoleRecap() {
     const filtered = sorted.filter(r => {
         if (filterLuogo && r.luogo !== filterLuogo) return false
         if (filterData) {
-            const d = new Date(r.data)
+            const d = new Date(r.data.replace(' ', 'T'))
             const days = filterData === 'week' ? 7 : 30
             const cutoff = new Date(now)
             cutoff.setDate(cutoff.getDate() - days)

@@ -27,7 +27,9 @@ function navigate(url) {
 
 function formatDate(dateString) {
     if (!dateString) return ''
-    const d = new Date(dateString)
+    // DATETIME MySQL "YYYY-MM-DD HH:mm:ss" (spazio, non 'T'): Safari/WebKit
+    // (iPad) lo rifiuta e restituisce Invalid Date, a differenza di Chrome/Firefox.
+    const d = new Date(dateString.replace(' ', 'T'))
     if (isNaN(d)) return dateString
     return d.toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 }

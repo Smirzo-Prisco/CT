@@ -56,7 +56,11 @@ const IMG = {
  */
 function formatDate(isoDate, ongame) {
     if (!isoDate) return ''
-    const d = new Date(isoDate)
+    // Il DB restituisce un DATETIME MySQL "YYYY-MM-DD HH:mm:ss" (spazio, non 'T'):
+    // Chrome/Firefox lo accettano comunque, ma Safari/WebKit (unico motore su iPad,
+    // anche in "Chrome" iOS) lo rifiuta e restituisce Invalid Date → NaN ovunque.
+    // Lo spazio va sostituito con 'T' per renderlo un ISO 8601 valido ovunque.
+    const d = new Date(isoDate.replace(' ', 'T'))
     if (ongame) d.setFullYear(d.getFullYear() + 1053)
     const dd = String(d.getDate()).padStart(2, '0')
     const mm = String(d.getMonth() + 1).padStart(2, '0')
