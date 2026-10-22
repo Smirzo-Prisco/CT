@@ -25,9 +25,9 @@
  * personaggio.js ora chiamano window.refreshPgList() se definita (impostata
  * qui sotto) invece di window.location.reload() — nessun reload di pagina.
  *
- * Azione "Gestione skill": resta una vera <form method="POST"> verso
- * main.php?page=gst_personaggio_skill — quella pagina non e' ancora
- * migrata (fase 3), quindi il comportamento odierno va preservato 1:1.
+ * Azione "Gestione skill": naviga via SPA verso gst_personaggio_skill
+ * (migrata in fase 3) passando ?pg=Nome, letto da
+ * GestioneSkillPersonaggio.jsx per la preselezione.
  *
  * Azione "Esilia": naviga via SPA verso gestione_esilio (migrata in fase 1)
  * passando ?pg=Nome, letto da GestioneEsilio.jsx per la preselezione.
@@ -268,14 +268,13 @@ export default function GestionePersonaggio() {
                                         )}
 
                                         {hasPermesso(perms, PERMESSI_AZIONI.skill) && (
-                                            // gst_personaggio_skill non e' ancora migrata (fase 3): vera form POST,
-                                            // identica a quella odierna, per non regredire il comportamento.
-                                            <form action="main.php?page=gst_personaggio_skill" method="POST">
-                                                <input type="hidden" name="load_item" value={pg.nome} />
-                                                <button type="submit" className="btn-action btn-action--skill btn-action--icon" title="Gestione skill">
-                                                    <i className="fa-solid fa-wrench"></i>
-                                                </button>
-                                            </form>
+                                            <button
+                                                className="btn-action btn-action--skill btn-action--icon"
+                                                title="Gestione skill"
+                                                onClick={() => navigate(`main.php?page=gst_personaggio_skill&pg=${encodeURIComponent(pg.nome)}`)}
+                                            >
+                                                <i className="fa-solid fa-wrench"></i>
+                                            </button>
                                         )}
 
                                         {hasPermesso(perms, PERMESSI_AZIONI.esilia) && pg.nome !== login && (

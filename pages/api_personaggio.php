@@ -18,7 +18,37 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
 
     $json_data = file_get_contents('php://input');
     $data = json_decode($json_data, true);
-    
+
+    // Porta invariata da gst_personaggio_skill.inc.php:57-81 — usata da
+    // cancellaSkillAdmin per ricalcolare lato server il rimborso punti skill
+    // invece di fidarsi di un valore inviato dal client (vedi commento sopra
+    // il case 'cancellaSkillAdmin').
+    function calcolaSpesaAcquistoSkill($tipo, $grado) {
+        switch ($tipo) {
+            case 'Default':
+                return ($grado > 1) ? $grado - 1 : 0; // 0 Punti skill per il Lv0, poi 1 punti skill per livelli successivi
+            case 'Difensiva':
+                return 0; // 0 Punti skill
+            case 'Generica base':
+                return 1; // 1 Punto skill
+            case 'Generica avanzata':
+                return 3; // 3 Punti skill
+            case 'Attacco base':
+            case 'Mentale base':
+                return ($grado > 1) ? $grado : 1; // 1 Punto skill per il Lv0, poi 1 Punti skill per i livelli successivi
+            case 'Attacco medio':
+            case 'Mentale media':
+                return ($grado > 1) ? $grado + 2 : 3; // 3 Punti skill per il Lv0, poi 1 Punti skill per i livelli successivi
+            case 'Attacco avanzato':
+            case 'Mentale avanzata':
+                return ($grado > 1) ? $grado + 4 : 5; // 5 Punti skill per il Lv0, poi 1 Punti skill per i livelli successivi
+            case 'Potere speciale':
+                return 50; // 50 Punti skill
+            default:
+                return 0; // Per tipologie non definite, consideriamo 0
+        }
+    }
+
     /*********************  Recupero i dati dell'utente che voglio modificare   */
     switch ($_GET['op']) {
         case 'getUsr':  // Recupero i dati dell'utente
@@ -570,6 +600,105 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             while ($r = gdrcd_query($razzeRes, 'fetch')) $razze[] = $r;
             gdrcd_query($razzeRes, 'free');
             echo json_encode(['success' => true, 'razze' => $razze]);
+            break;
+        // -------------------------------------------------------------------------
+        // SKILL (admin) — porta a JSON la logica di gst_personaggio_skill.inc.php,
+        // per la migrazione di quella pagina a React/SPA (vedi conversazione di
+        // progetto del 2026-10-22). Solo admin (gst_personaggio_skill.inc.php:3).
+        //
+        // Fix di sicurezza rispetto all'originale: depotenziaSkillAdmin e
+        // cancellaSkillAdmin NON accettano piu' il "totale" (punti skill da
+        // restituire) dal client — nella pagina vecchia arrivava in SQL senza
+        // gdrcd_filter (vera iniezione SQL, mai sfruttata ma presente). Qui viene
+        // sempre ricalcolato lato server da tipo/grado correnti con la stessa
+        // calcolaSpesaAcquisto() della pagina originale (porta invariate le
+        // tabelle di costo).
+        // -------------------------------------------------------------------------
+        case 'getPgNomi': // Elenco pg per il dropdown (equivalente a $elenco_pg della pagina originale)
+            if (($_SESSION['admin'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+            $nomiRes = gdrcd_query("SELECT nome, cognome FROM personaggio ORDER BY nome", 'result');
+            $nomiPg = [];
+            while ($r = gdrcd_query($nomiRes, 'fetch')) $nomiPg[] = $r;
+            gdrcd_query($nomiRes, 'free');
+            echo json_encode(['success' => true, 'personaggi' => $nomiPg]);
+            break;
+        case 'getPgSkillsAdmin': // Skill possedute dal pg selezionato, raggruppate per tipo
+            if (($_SESSION['admin'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+            if (!isset($_GET['pg']) || trim($_GET['pg']) === '') {
+                echo json_encode(['success' => false, 'message' => 'Parametro mancante']);
+                break;
+            }
+            $pgSkill = gdrcd_filter('in', trim($_GET['pg']));
+            $abilitaRes = gdrcd_query(
+                "SELECT abilita.id_abilita, abilita.nome AS nome_abilita, abilita.tipo AS tipo_abilita, clgpersonaggioabilita.grado
+                 FROM abilita
+                 LEFT JOIN clgpersonaggioabilita ON abilita.id_abilita = clgpersonaggioabilita.id_abilita
+                 WHERE clgpersonaggioabilita.nome = '$pgSkill' AND abilita.tipo != 'Talento'
+                 ORDER BY abilita.tipo, abilita.nome",
+                'result'
+            );
+            $skillPerTipo = [];
+            while ($ab = gdrcd_query($abilitaRes, 'fetch')) {
+                $skillPerTipo[$ab['tipo_abilita']][] = [
+                    'id_abilita'   => (int)$ab['id_abilita'],
+                    'nome_abilita' => $ab['nome_abilita'],
+                    'grado'        => (int)$ab['grado'],
+                ];
+            }
+            gdrcd_query($abilitaRes, 'free');
+            echo json_encode(['success' => true, 'skillPerTipo' => $skillPerTipo]);
+            break;
+        case 'depotenziaSkillAdmin': // Grado -1, rimborso fisso di 1 punto skill — stessa logica di gst_personaggio_skill.inc.php:8-10
+            if (($_SESSION['admin'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+            $pgDepot = isset($data['pg']) ? gdrcd_filter('in', trim($data['pg'])) : '';
+            $idAbilitaDepot = isset($data['id_abilita']) ? (int)$data['id_abilita'] : 0;
+            if ($pgDepot === '' || $idAbilitaDepot <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Dati mancanti']);
+                break;
+            }
+            gdrcd_query("UPDATE clgpersonaggioabilita SET grado = grado - 1 WHERE id_abilita = $idAbilitaDepot AND nome = '$pgDepot'");
+            gdrcd_query("UPDATE personaggio SET punto_skill = punto_skill + 1, esperienza_s = esperienza_s + 1 WHERE nome = '$pgDepot'");
+            echo json_encode(['success' => true, 'message' => 'Skill depotenziata']);
+            break;
+        case 'cancellaSkillAdmin': // Rimozione completa, rimborso totale ricalcolato lato server
+            if (($_SESSION['admin'] ?? 0) != 1) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Permessi insufficienti']);
+                break;
+            }
+            $pgCancella = isset($data['pg']) ? gdrcd_filter('in', trim($data['pg'])) : '';
+            $idAbilitaCancella = isset($data['id_abilita']) ? (int)$data['id_abilita'] : 0;
+            if ($pgCancella === '' || $idAbilitaCancella <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Dati mancanti']);
+                break;
+            }
+            $skillCorrente = gdrcd_query(
+                "SELECT abilita.tipo, clgpersonaggioabilita.grado
+                 FROM clgpersonaggioabilita
+                 INNER JOIN abilita ON abilita.id_abilita = clgpersonaggioabilita.id_abilita
+                 WHERE clgpersonaggioabilita.id_abilita = $idAbilitaCancella AND clgpersonaggioabilita.nome = '$pgCancella'"
+            );
+            if (!$skillCorrente) {
+                echo json_encode(['success' => false, 'message' => 'Skill non trovata']);
+                break;
+            }
+            $totaleCancella = calcolaSpesaAcquistoSkill($skillCorrente['tipo'], (int)$skillCorrente['grado']);
+
+            gdrcd_query("DELETE FROM clgpersonaggioabilita WHERE id_abilita = $idAbilitaCancella AND nome = '$pgCancella'");
+            gdrcd_query("UPDATE personaggio SET punto_skill = punto_skill + $totaleCancella, esperienza_s = esperienza_s + $totaleCancella WHERE nome = '$pgCancella'");
+            echo json_encode(['success' => true, 'message' => 'Skill rimossa']);
             break;
         case 'graziaPg': // Revoca l'esilio — stessa UPDATE di gestione_esilio.inc.php:22-24
             if (($_SESSION['admin'] ?? 0) != 1 && ($_SESSION['moderatore'] ?? 0) != 1) {
