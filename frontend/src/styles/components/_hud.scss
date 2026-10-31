@@ -651,7 +651,7 @@ body[data-palette="public"] {
 // qui invariato — vedi bug gia' capitato: alzare quello scale slegava
 // le icone dal bordo della miniatura, che ha il proprio scale(.7) fisso).
 .ct-hud__ring:not(.is-open) .ct-hud__icon { font-size: 23px; }
-.ct-hud__ring:not(.is-open) .ct-hud__pip { font-size: 11px; }
+.ct-hud__ring:not(.is-open) .ct-hud__pip { font-size: 12px; }
 
 // Pannello info: tra la miniatura e il centro, mai sopra l'arco.
 // Nessun z-index esplicito: resta dietro sia a .ct-hud__thumb (1) sia a
