@@ -632,7 +632,7 @@ body[data-palette="public"] {
     // visivo dei badge in tutto il sito invece del rosso di allarme.
     background: var(--gold);
     color: var(--ink-deep);
-    font-size: 8px;
+    font-size: 10px;
     font-weight: 800;
     padding: 0 4px;
     border-radius: 999px;
@@ -642,14 +642,16 @@ body[data-palette="public"] {
 }
 .ct-hud__pip--dot { width: 8px; height: 8px; min-width: 0; padding: 0; border-radius: 50%; }
 
-// Anello "compresso" (a riposo, senza .is-open): .ct-hud__arc ha
-// transform:scale(.7) (vedi sopra) che rimpicciolisce anche il badge insieme
-// all'icona. Qui lo scale extra riporta il badge a circa meta' strada tra
-// quello scale(.7) ereditato e la dimensione piena (scale(1) annullerebbe
-// l'effetto, tornando esattamente al badge rimpicciolito di base).
-.ct-hud__ring:not(.is-open) .ct-hud__pip {
-    transform: translate(calc(var(--px, 14px) - 50%), calc(var(--py, -14px) - 50%)) scale(1)
-}
+// Icona+badge piu' leggibili da compresso (anello senza .is-open), senza
+// toccare transform/scale: .ct-hud__icon e .ct-hud__pip sono gia' dentro
+// .ct-hud__arc (scale(.7) sopra), quindi un font-size piu' grande qui viene
+// comunque rimpicciolito in proporzione da quello scale — resta pero'
+// visibilmente piu' leggibile di prima, SENZA spostare la posizione
+// radiale delle icone (che dipende solo dallo scale di .ct-hud__arc,
+// qui invariato — vedi bug gia' capitato: alzare quello scale slegava
+// le icone dal bordo della miniatura, che ha il proprio scale(.7) fisso).
+.ct-hud__ring:not(.is-open) .ct-hud__icon { font-size: 23px; }
+.ct-hud__ring:not(.is-open) .ct-hud__pip { font-size: 12px; }
 
 // Pannello info: tra la miniatura e il centro, mai sopra l'arco.
 // Nessun z-index esplicito: resta dietro sia a .ct-hud__thumb (1) sia a
