@@ -1568,8 +1568,10 @@ button.chat_button {
     // icone vicine piu' lontane, e' esattamente lo spazio visivo in piu'
     // richiesto (un margine negativo pari al padding avrebbe "mangiato"
     // il gap qui sopra, vanificando l'aumento — bug gia' capitato).
+    // Solo orizzontale: verticale avrebbe allargato anche l'altezza
+    // della pillola gdrSessionStatus, non richiesto.
     .gdr-session-status > i {
-        padding: 10px;
+        padding: 0 10px;
     }
 
     // Dentro chat-action-controls il session-status NON va a capo su riga propria
