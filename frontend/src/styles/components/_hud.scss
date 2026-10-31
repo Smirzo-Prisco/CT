@@ -1288,7 +1288,9 @@ a.ct-hud__char-badge {
         // Badge piu' leggibile qui che su desktop: l'arco e' gia' compresso
         // in griglia (icone piu' grandi, vedi .ct-hud__icon sopra), e testi
         // come "3/8" all'8px della base risultavano troppo piccoli da leggere.
-        font-size: 11px;
-        padding: 1px 5px;
+        font-size: 22px;
+        padding: 2px 10px;
+        min-width: 24px;
+        line-height: 1.3;
     }
 }
