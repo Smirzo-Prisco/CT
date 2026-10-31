@@ -554,10 +554,7 @@ body[data-palette="public"] {
     width: 173px; height: 173px;
     transform-origin: top left;
     z-index: 2;
-    // .85 invece di .7 (valore di .ct-hud__thumb/.ct-hud__ring-badge, non
-    // toccato): qui serve solo rendere piu' leggibili icona+badge da
-    // compresso, senza legarsi alla dimensione della miniatura centrale.
-    transform: scale(.85);
+    transform: scale(.7);
     transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
     // Prima (punto a top/left:50%, nessuna larghezza/altezza) quest'area
     // era 0x0, non poteva intercettare nulla. Da quando ha una dimensione
@@ -644,6 +641,17 @@ body[data-palette="public"] {
     text-align: center;
 }
 .ct-hud__pip--dot { width: 8px; height: 8px; min-width: 0; padding: 0; border-radius: 50%; }
+
+// Icona+badge piu' leggibili da compresso (anello senza .is-open), senza
+// toccare transform/scale: .ct-hud__icon e .ct-hud__pip sono gia' dentro
+// .ct-hud__arc (scale(.7) sopra), quindi un font-size piu' grande qui viene
+// comunque rimpicciolito in proporzione da quello scale — resta pero'
+// visibilmente piu' leggibile di prima, SENZA spostare la posizione
+// radiale delle icone (che dipende solo dallo scale di .ct-hud__arc,
+// qui invariato — vedi bug gia' capitato: alzare quello scale slegava
+// le icone dal bordo della miniatura, che ha il proprio scale(.7) fisso).
+.ct-hud__ring:not(.is-open) .ct-hud__icon { font-size: 23px; }
+.ct-hud__ring:not(.is-open) .ct-hud__pip { font-size: 11px; }
 
 // Pannello info: tra la miniatura e il centro, mai sopra l'arco.
 // Nessun z-index esplicito: resta dietro sia a .ct-hud__thumb (1) sia a
