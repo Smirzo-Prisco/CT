@@ -1599,8 +1599,8 @@ export default function ChatShell() {
                                     <div className="gdr-card">
                                         <div className="gdr-card-title">Imposta caratteri</div>
                                         <div className="gdr-form-group">
-                                            <label className="gdr-label" htmlFor="caratteri">Limite Caratteri Azione</label>
-                                            <input className="gdr-input" name="caratteri" id="caratteri" placeholder="Limite caratteri" />
+                                            <label className="gdr-label" htmlFor="caratteri">Limite Caratteri Azione (attuale: {maxlength})</label>
+                                            <input className="gdr-input" name="caratteri" id="caratteri" placeholder={`Limite caratteri (attuale: ${maxlength})`} />
                                         </div>
                                         <button className="gdr-button" onClick={() => window.setCharLimit?.()}>Imposta Limite</button>
                                     </div>
