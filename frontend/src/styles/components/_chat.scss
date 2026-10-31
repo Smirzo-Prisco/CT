@@ -1559,15 +1559,17 @@ button.chat_button {
         // Piu' spazio tra le icone (esci/partecipanti/avvia) che tra
         // gdrSessionStatus: a dito sono vicine, facile toccarne una per
         // un'altra sul touch.
-        gap: $space-3 + 6;
+        gap: $space-2 + 2;
     }
 
     // Icone cliccabili dentro gdrSessionStatus: da sole sono solo il
-    // glifo (~16px), un'area di tocco troppo piccola — il padding allarga
-    // il bersaglio reale senza cambiare l'aspetto visivo dell'icona.
+    // glifo (~16px), un'area di tocco troppo piccola. NIENTE margine
+    // negativo a compensare: qui va bene che il padding spinga anche le
+    // icone vicine piu' lontane, e' esattamente lo spazio visivo in piu'
+    // richiesto (un margine negativo pari al padding avrebbe "mangiato"
+    // il gap qui sopra, vanificando l'aumento — bug gia' capitato).
     .gdr-session-status > i {
-        padding: 6px;
-        margin: -6px;
+        padding: 10px;
     }
 
     // Dentro chat-action-controls il session-status NON va a capo su riga propria
