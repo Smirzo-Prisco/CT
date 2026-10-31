@@ -644,10 +644,11 @@ body[data-palette="public"] {
 
 // Anello "compresso" (a riposo, senza .is-open): .ct-hud__arc ha
 // transform:scale(.7) (vedi sopra) che rimpicciolisce anche il badge insieme
-// all'icona. Qui lo scale extra raddoppia la dimensione del badge rispetto
-// a com'era prima di questa regola (compresso: era 8px*.7; ora 8px*.7*2).
+// all'icona. Qui lo scale extra riporta il badge a circa meta' strada tra
+// quello scale(.7) ereditato e la dimensione piena (scale(1) annullerebbe
+// l'effetto, tornando esattamente al badge rimpicciolito di base).
 .ct-hud__ring:not(.is-open) .ct-hud__pip {
-    transform: translate(calc(var(--px, 14px) - 50%), calc(var(--py, -14px) - 50%)) scale(2);
+    transform: translate(calc(var(--px, 14px) - 50%), calc(var(--py, -14px) - 50%)) scale(1)
 }
 
 // Pannello info: tra la miniatura e il centro, mai sopra l'arco.
