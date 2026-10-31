@@ -960,6 +960,13 @@ function endRoleSession($location) {
 
     if ($role_row) deleteRolePngs($rid);
 
+    // Riporta il limite caratteri della stanza al default (2000, vedi api_chat.php
+    // "charLimit" ?: 2000): senza questo reset un limite alzato con setCharLimit
+    // (es. a 10000 per un combattimento) restava attivo per tutte le role future
+    // nella stessa stanza finché non veniva cambiato o revocato manualmente.
+    gdrcd_query("UPDATE mappa SET limite_lunghezza_massima = NULL, timestamp_modifica_limite = NULL WHERE id = $location");
+    gdrcd_query("DELETE FROM scelte_utenti WHERE id_luogo = $location");
+
     chatInsertMessage($location, 'System', null, 'Role conclusa!', 'N');
 }
 
