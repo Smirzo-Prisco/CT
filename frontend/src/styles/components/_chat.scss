@@ -449,6 +449,13 @@ $chat-popup-accent: #6366f1; // accent popup ricerca utenti
     }
 }
 
+// Icone cliccabili (esci ruolo/partecipanti/avvia): solo il glifo (~16px)
+// senza padding sarebbe un bersaglio facile da sbagliare anche col mouse,
+// non solo a dito — stesso spazio ovunque, non solo sotto i 1024px.
+.gdr-session-status > i {
+    padding: 0 16px;
+}
+
 .gdr-pulse-dot {
     width: 12px;
     height: 12px;
@@ -1556,22 +1563,6 @@ button.chat_button {
         order: 3;
         width: 100%;
         justify-content: center;
-        // Piu' spazio tra le icone (esci/partecipanti/avvia) che tra
-        // gdrSessionStatus: a dito sono vicine, facile toccarne una per
-        // un'altra sul touch.
-        gap: $space-2 + 2;
-    }
-
-    // Icone cliccabili dentro gdrSessionStatus: da sole sono solo il
-    // glifo (~16px), un'area di tocco troppo piccola. NIENTE margine
-    // negativo a compensare: qui va bene che il padding spinga anche le
-    // icone vicine piu' lontane, e' esattamente lo spazio visivo in piu'
-    // richiesto (un margine negativo pari al padding avrebbe "mangiato"
-    // il gap qui sopra, vanificando l'aumento — bug gia' capitato).
-    // Solo orizzontale: verticale avrebbe allargato anche l'altezza
-    // della pillola gdrSessionStatus, non richiesto.
-    .gdr-session-status > i {
-        padding: 0 16px;
     }
 
     // Dentro chat-action-controls il session-status NON va a capo su riga propria
