@@ -642,6 +642,14 @@ body[data-palette="public"] {
 }
 .ct-hud__pip--dot { width: 8px; height: 8px; min-width: 0; padding: 0; border-radius: 50%; }
 
+// Anello "compresso" (a riposo, senza .is-open): .ct-hud__arc ha
+// transform:scale(.7) (vedi sopra) che rimpicciolisce anche il badge insieme
+// all'icona. Qui lo scale extra raddoppia la dimensione del badge rispetto
+// a com'era prima di questa regola (compresso: era 8px*.7; ora 8px*.7*2).
+.ct-hud__ring:not(.is-open) .ct-hud__pip {
+    transform: translate(calc(var(--px, 14px) - 50%), calc(var(--py, -14px) - 50%)) scale(2);
+}
+
 // Pannello info: tra la miniatura e il centro, mai sopra l'arco.
 // Nessun z-index esplicito: resta dietro sia a .ct-hud__thumb (1) sia a
 // .ct-hud__arc (2), che quindi restano sempre visibili/cliccabili anche
