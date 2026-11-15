@@ -1064,9 +1064,16 @@ function closePgTurn($id_role, $pgName, $location) {
 
 // Chiudo il turno
 function closeTurn($id_role, $location) {
-    // Rispettare l'ordine dell'esecuzione dei metodi
-    setCanSend($id_role); // Impedisco o consento al pg di lanciare nel prossimo turno
+    // ORDINE CRITICO: elaborateTurn() deve girare PRIMA di setCanSend(). Entrambe
+    // leggono/scrivono sullo stesso numero di turno (l'incremento avviene piu'
+    // sotto) — invertito, un pg che nello STESSO turno attacca E si scuda con
+    // successo si vedeva setCanSend() azzerare il proprio can_send PRIMA che
+    // elaborateTurn() calcolasse i danni di quel turno, facendo ignorare il
+    // proprio scudo appena riuscito (applicava l'80% del danno come se non si
+    // fosse difeso, pur mostrando "Scudato" in chat — bug reale verificato in
+    // produzione sulla role 508, turni 4 e 6, 2026-11-13).
     $msgElaboration = elaborateTurn($id_role); // Elaboro il turno per calcolare eventuali danni
+    setCanSend($id_role); // Impedisco o consento al pg di lanciare nel prossimo turno
     gdrcd_query("UPDATE role_sessions SET turn = (turn + 1), timer_end = NULL, turn_order_idx = 0 WHERE id_role = $id_role"); // Passo al turno successivo e resetto lo stato quest
     gdrcd_query("UPDATE role_session_players SET `sent` = 0, close_turn = 0 WHERE id_role = $id_role"); // Riporto tutti i pg a sent = 0 e riapro il turno per tutti
     if ($msgElaboration !== '') chatInsertMessage($location, 'System', NULL, $msgElaboration, 'N');
