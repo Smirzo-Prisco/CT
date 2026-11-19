@@ -87,7 +87,9 @@ if (isset($_REQUEST['page'])) {
         notifySocketServer('users:update', 'loc:' . $old_luogo);
         notifySocketServer('users:update', 'loc:' . (int)$_REQUEST['dir']);
         notifySocketServer('presenti:update', 'global');
-        notifyRoomEntry($_SESSION['login'], (int)$_REQUEST['dir'], (int)$_SESSION['mappa']);
+        if ($old_luogo !== (int)$_REQUEST['dir']) {
+            notifyRoomEntry($_SESSION['login'], (int)$_REQUEST['dir'], (int)$_SESSION['mappa']);
+        }
     }
 
 } else {
