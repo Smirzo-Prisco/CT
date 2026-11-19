@@ -56,13 +56,14 @@ function notifyThreadFollowers(int $thread_id, string $autore_commento, string $
 
         $nome_f = gdrcd_filter('in', $f['nome']);
 
-        // Riga assente in preferenze_notifiche = default (via_dm=1, via_email=0)
-        $pref      = gdrcd_query("SELECT via_dm, via_email FROM preferenze_notifiche
+        // Riga assente in preferenze_notifiche = default (via_dm=1, via_email=0, via_popup=1)
+        $pref      = gdrcd_query("SELECT via_dm, via_email, via_popup FROM preferenze_notifiche
             WHERE nome = '$nome_f' AND evento = '$evento'");
         $via_dm    = $pref ? (int)$pref['via_dm']    : 1;
         $via_email = $pref ? (int)$pref['via_email'] : 0;
+        $via_popup = $pref ? (int)$pref['via_popup'] : 1;
 
-        if (!$via_dm && !$via_email) continue;
+        if (!$via_dm && !$via_email && !$via_popup) continue;
 
         // Il testo è salvato come HTML e renderizzato con dangerouslySetInnerHTML in
         // MessagesInbox.jsx (stesso pattern della segnalazione staff piu' sotto):
@@ -81,6 +82,12 @@ function notifyThreadFollowers(int $thread_id, string $autore_commento, string $
         if ($via_email) {
             gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato)
                 VALUES ('$nome_f', '$evento', $thread_id, 'email', 'pending')");
+        }
+
+        // Testo semplice (niente HTML) per il popup, a differenza di $testo sopra
+        // che e' pensato per dangerouslySetInnerHTML nell'inbox DM.
+        if ($via_popup) {
+            notifyPopup($f['nome'], $evento, "Nuovo commento di $autore_commento su \"$titolo_thread\"");
         }
     }
     gdrcd_query($follower_res, 'free');

@@ -331,6 +331,7 @@ switch ($op) {
         notifySocketServer('users:update', 'loc:' . $old_luogo);
         notifySocketServer('users:update', 'loc:' . $dir);
         notifySocketServer('presenti:update', 'global');
+        notifyRoomEntry($_SESSION['login'], $dir, (int)$_SESSION['mappa']);
 
         echo json_encode([
             'success'      => true,

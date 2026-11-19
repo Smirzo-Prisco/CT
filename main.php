@@ -23,6 +23,9 @@ if (empty($_SESSION['login'])) {
 }
 
 require('header.inc.php');
+// header.inc.php non carica custom_functions.inc.php (lo fanno i singoli
+// pages/api_*.php): serve qui esplicitamente per notifyRoomEntry() sotto.
+require_once(__DIR__ . '/includes/custom_functions.inc.php');
 gdrcd_controllo_sessione();
 
 $scripts = [];
@@ -84,6 +87,7 @@ if (isset($_REQUEST['page'])) {
         notifySocketServer('users:update', 'loc:' . $old_luogo);
         notifySocketServer('users:update', 'loc:' . (int)$_REQUEST['dir']);
         notifySocketServer('presenti:update', 'global');
+        notifyRoomEntry($_SESSION['login'], (int)$_REQUEST['dir'], (int)$_SESSION['mappa']);
     }
 
 } else {

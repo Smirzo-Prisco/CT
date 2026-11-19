@@ -101,12 +101,12 @@ $pref-muted:   #7a8499;
     }
 
     // ── Notifiche ──────────────────────────────────────────────
-    // display:contents sulle righe: i loro figli (label + 2 checkbox) entrano
-    // direttamente nella grid del genitore (3 colonne), niente grid annidate.
+    // display:contents sulle righe: i loro figli (label + 3 checkbox) entrano
+    // direttamente nella grid del genitore (4 colonne), niente grid annidate.
     &__notif-grid {
         display: grid;
-        grid-template-columns: 1fr 64px 64px;
-        gap: 4px 8px;
+        grid-template-columns: 1fr 56px 56px 56px;
+        gap: 4px 6px;
     }
 
     &__notif-head {
@@ -214,5 +214,9 @@ $pref-muted:   #7a8499;
 
         &__title { font-size: 14px; }
         &__palettes { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        // 4 colonne (label + 3 canali) sono strette su un telefono: riduco
+        // i canali per lasciare piu' spazio alla label, che va a capo.
+        &__notif-grid { grid-template-columns: 1fr 44px 44px 44px; gap: 4px; }
+        &__notif-label { padding: 8px 4px; }
     }
 }

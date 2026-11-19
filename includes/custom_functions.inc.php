@@ -175,7 +175,21 @@ function send_sms($from, $to, $title, $text, $ongame = 0, $notifyNewDm = false) 
 
     notifySocketServer('dm:update', 'dm:' . $to);
 
-    if ($notifyNewDm) queueNewDmEmailNotification($to_safe, $sms_id);
+    if ($notifyNewDm) {
+        queueNewDmEmailNotification($to_safe, $sms_id);
+        queueNewDmPopupNotification($to_safe, $from_safe);
+    }
+}
+
+// Notifiche "Popup": avviso live via socket sulla room personale dm:<nome>
+// (stessa room gia' usata per DM/combattimento in tempo reale, vedi
+// nodeserver/server.js) — fire-and-forget, nessuna coda ne' persistenza: se il
+// pg non e' online in quel momento il popup semplicemente non arriva,
+// esattamente come un avviso dal vivo (a differenza di dm/email, che restano
+// in coda finche' non vengono consegnati). Helper condiviso da tutte le
+// funzioni queue*Notification() sotto.
+function notifyPopup(string $nome, string $evento, string $testo): void {
+    notifySocketServer('notification:popup', 'dm:' . $nome, ['evento' => $evento, 'testo' => $testo]);
 }
 
 // Notifiche Fase E: accoda un'email "hai un nuovo messaggio privato" per il
@@ -197,6 +211,20 @@ function queueNewDmEmailNotification(string $to_safe, int $sms_id): void {
         VALUES ('$to_safe', 'nuovo_dm', $sms_id, 'email', 'pending')");
 }
 
+// Notifiche "Popup" per nuovo_dm: a differenza di via_dm (sempre 0, vedi sopra:
+// un DM non puo' notificare un altro DM), qui ha senso — e' un avviso live
+// mentre si e' altrove nella SPA, non un secondo messaggio nella stessa inbox.
+// Default ON (vedi api_global.php::getNotificationPrefs), a differenza
+// dell'email che e' un opt-in esplicito.
+function queueNewDmPopupNotification(string $to_safe, string $from_safe): void {
+    $pref = gdrcd_query("SELECT via_popup FROM preferenze_notifiche
+        WHERE nome = '$to_safe' AND evento = 'nuovo_dm'");
+    $via_popup = $pref ? (int)$pref['via_popup'] : 1;
+    if (!$via_popup) return;
+
+    notifyPopup($to_safe, 'nuovo_dm', "Nuovo messaggio privato da $from_safe");
+}
+
 // Notifiche: "hai messaggi non letti nella chattina off" (vedi api_chatoff.php,
 // che chiama questa funzione solo alla transizione letto->non letto, non ad
 // ogni riga scritta da altri). A differenza degli altri eventi, qui il
@@ -204,10 +232,11 @@ function queueNewDmEmailNotification(string $to_safe, int $sms_id): void {
 // getNotificationPrefs) — la chattina off e' molto attiva, un default ON
 // sarebbe troppo invasivo.
 function queueChatOffUnreadNotification(string $nome_f): void {
-    $pref = gdrcd_query("SELECT via_dm, via_email FROM preferenze_notifiche
+    $pref = gdrcd_query("SELECT via_dm, via_email, via_popup FROM preferenze_notifiche
         WHERE nome = '$nome_f' AND evento = 'chat_off_non_letta'");
     $via_dm    = $pref ? (int)$pref['via_dm']    : 0;
     $via_email = $pref ? (int)$pref['via_email'] : 0;
+    $via_popup = $pref ? (int)$pref['via_popup'] : 0;
 
     if ($via_dm) {
         gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato, data_invio)
@@ -219,6 +248,8 @@ function queueChatOffUnreadNotification(string $nome_f): void {
         gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato)
             VALUES ('$nome_f', 'chat_off_non_letta', 0, 'email', 'pending')");
     }
+
+    if ($via_popup) notifyPopup($nome_f, 'chat_off_non_letta', 'Hai messaggi non letti nella chattina off.');
 }
 
 // Notifiche: "sei stato aggiunto a un impegno nel calendario" — accodata da
@@ -227,25 +258,62 @@ function queueChatOffUnreadNotification(string $nome_f): void {
 // OFF su entrambi i canali (come chat_off_non_letta): l'impegno e' gia'
 // visibile nel proprio calendario, questa e' un extra opt-in.
 function queueCalendarioEventoNotification(string $nome_f, int $evento_id, string $autore, string $data_evento): void {
-    $pref = gdrcd_query("SELECT via_dm, via_email FROM preferenze_notifiche
+    $pref = gdrcd_query("SELECT via_dm, via_email, via_popup FROM preferenze_notifiche
         WHERE nome = '$nome_f' AND evento = 'calendario_nuovo_impegno'");
     $via_dm    = $pref ? (int)$pref['via_dm']    : 0;
     $via_email = $pref ? (int)$pref['via_email'] : 0;
-    if (!$via_dm && !$via_email) return;
+    $via_popup = $pref ? (int)$pref['via_popup'] : 0;
+    if (!$via_dm && !$via_email && !$via_popup) return;
 
     $data_fmt = date('d/m/Y', strtotime($data_evento));
     $autore_html = htmlspecialchars($autore, ENT_QUOTES, 'UTF-8');
+    $testo = "$autore_html ti ha aggiunto a un impegno nel calendario per il $data_fmt.";
 
     if ($via_dm) {
         gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato, data_invio)
             VALUES ('$nome_f', 'calendario_nuovo_impegno', $evento_id, 'dm', 'sent', NOW())");
-        send_sms('Notifiche', $nome_f, '', "$autore_html ti ha aggiunto a un impegno nel calendario per il $data_fmt.", 0);
+        send_sms('Notifiche', $nome_f, '', $testo, 0);
     }
 
     if ($via_email) {
         gdrcd_query("INSERT INTO notifiche (nome, evento, riferimento_id, canale, stato)
             VALUES ('$nome_f', 'calendario_nuovo_impegno', $evento_id, 'email', 'pending')");
     }
+
+    // Testo semplice (niente entita' HTML: $testo sopra e' per send_sms(), che va
+    // in dangerouslySetInnerHTML nell'inbox DM) — il popup renderizza come testo
+    // puro, "&amp;" ci finirebbe scritto cosi' com'e' invece che come "&".
+    if ($via_popup) notifyPopup($nome_f, 'calendario_nuovo_impegno', "$autore ti ha aggiunto a un impegno nel calendario per il $data_fmt.");
+}
+
+// Notifiche: avvisa chi e' gia' presente in una stanza quando qualcuno vi entra
+// (mai per chi esce). Chiamata da pages/api_map.php (op=move) e main.php
+// (navigazione diretta ?dir=X) — gli unici due punti che aggiornano
+// personaggio.ultimo_luogo verso una stanza reale. Solo canale popup (vedi
+// migrations/2026_11_19_notifica_popup.sql): via_dm/via_email non esistono per
+// questo evento, un DM o un'email per ogni ingresso sarebbe troppo invasivo in
+// una stanza affollata. $new_luogo < 0 (mappa/home) non e' una stanza: il
+// chiamante lo esclude gia' passando solo luoghi validi, ma il controllo resta
+// qui per sicurezza se la funzione viene richiamata da altri punti in futuro.
+function notifyRoomEntry(string $login, int $new_luogo, int $mappa): void {
+    if ($new_luogo < 0) return;
+
+    $login_f = gdrcd_filter('in', $login);
+    $condizione_online = gdrcd_condizione_online();
+
+    $result = gdrcd_query("SELECT p.nome FROM personaggio p
+        WHERE $condizione_online AND p.ultimo_luogo = $new_luogo AND p.ultima_mappa = $mappa
+          AND p.nome != '$login_f'", 'result');
+
+    while ($r = gdrcd_query($result, 'fetch')) {
+        $nome_f = gdrcd_filter('in', $r['nome']);
+        $pref = gdrcd_query("SELECT via_popup FROM preferenze_notifiche
+            WHERE nome = '$nome_f' AND evento = 'ingresso_stanza'");
+        $via_popup = $pref ? (int)$pref['via_popup'] : 0; // default OFF: puo' essere frequente in stanze affollate
+
+        if ($via_popup) notifyPopup($r['nome'], 'ingresso_stanza', "$login ha raggiunto la stanza.");
+    }
+    gdrcd_query($result, 'free');
 }
 
 function isAdminMasterMod($session) {

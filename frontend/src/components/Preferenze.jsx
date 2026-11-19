@@ -30,23 +30,29 @@ function navigate(url) {
 
 const PALETTE_STORAGE_KEY = 'ct_hud_palette'
 
-// I 3 eventi commento_* (fan-out Fase C) + nuovo_dm (Fase E, solo email: un
-// DM non puo' notificare un altro DM, non applicabile via_dm — dmOnly:false
-// nasconde la checkbox del messaggio per quella riga) + chat_off_non_letta
-// (fan-out in api_chatoff.php, notifica solo alla transizione letto->non
-// letto) + calendario_nuovo_impegno (fan-out in api_calendario.php?op=create,
-// vedi queueCalendarioEventoNotification) — questi ultimi due default OFF su
-// entrambi i canali, a differenza degli altri eventi, perche' gia' visibili
-// nell'app (chat/calendario) senza bisogno di una notifica push. nuovo_post_sezione
-// resta fuori: arrivera' con la Fase F, quando esistera' davvero un trigger
-// che lo produce — mostrare il toggle ora sarebbe un interruttore senza alcun effetto.
+// I 3 eventi commento_* (fan-out Fase C) + nuovo_dm (Fase E: niente Messaggio,
+// un DM non puo' notificare un altro DM, ma Email e Popup si applicano) +
+// chat_off_non_letta (fan-out in api_chatoff.php, notifica solo alla
+// transizione letto->non letto) + calendario_nuovo_impegno (fan-out in
+// api_calendario.php?op=create, vedi queueCalendarioEventoNotification) —
+// questi ultimi due default OFF su tutti i canali, a differenza degli altri
+// eventi, perche' gia' visibili nell'app (chat/calendario) senza bisogno di
+// una notifica push. ingresso_stanza (fan-out in notifyRoomEntry(), chiamata
+// da api_map.php/main.php): solo Popup ha senso, un DM/email per ogni
+// ingresso sarebbe troppo invasivo in una stanza affollata — default OFF.
+// nuovo_post_sezione resta fuori: arrivera' con la Fase F, quando esistera'
+// davvero un trigger che lo produce — mostrare il toggle ora sarebbe un
+// interruttore senza alcun effetto.
+// `channels` limita quali colonne sono applicabili per quella riga (default:
+// tutte e tre). Le colonne non applicabili mostrano "—" invece della checkbox.
 const NOTIFICATION_EVENTS = [
     { key: 'commento_post_seguito',    label: 'Nuovo commento sui post che seguo' },
     { key: 'commento_post_commentato', label: 'Nuovo commento sui post che ho commentato' },
     { key: 'commento_post_proprio',    label: 'Nuovo commento sui post che ho creato' },
-    { key: 'nuovo_dm',                 label: 'Nuovo messaggio privato ricevuto', emailOnly: true },
+    { key: 'nuovo_dm',                 label: 'Nuovo messaggio privato ricevuto', channels: ['email', 'popup'] },
     { key: 'chat_off_non_letta',       label: 'Messaggi non letti nella chattina off' },
     { key: 'calendario_nuovo_impegno', label: 'Aggiunto a un impegno nel calendario' },
+    { key: 'ingresso_stanza',          label: 'Un altro utente entra nella mia stanza', channels: ['popup'] },
 ]
 
 // swatch = [ink, gold] — stessi valori esatti delle varianti body[data-palette] in _hud.scss
@@ -186,24 +192,23 @@ export default function Preferenze() {
                             <span />
                             <span>Messaggio</span>
                             <span>Email</span>
+                            <span>Popup</span>
                         </div>
-                        {NOTIFICATION_EVENTS.map(({ key, label, emailOnly }) => (
+                        {NOTIFICATION_EVENTS.map(({ key, label, channels }) => (
                             <div key={key} className="preferenze-page__notif-row">
                                 <span className="preferenze-page__notif-label">{label}</span>
-                                {emailOnly
-                                    ? <span className="preferenze-page__notif-na" title="Non applicabile">—</span>
-                                    : (
-                                        <input
-                                            type="checkbox"
-                                            checked={!!notifPrefs[key]?.dm}
-                                            onChange={() => handleNotifToggle(key, 'dm')}
-                                        />
-                                    )}
-                                <input
-                                    type="checkbox"
-                                    checked={!!notifPrefs[key]?.email}
-                                    onChange={() => handleNotifToggle(key, 'email')}
-                                />
+                                {['dm', 'email', 'popup'].map(canale => (
+                                    !channels || channels.includes(canale)
+                                        ? (
+                                            <input
+                                                key={canale}
+                                                type="checkbox"
+                                                checked={!!notifPrefs[key]?.[canale]}
+                                                onChange={() => handleNotifToggle(key, canale)}
+                                            />
+                                        )
+                                        : <span key={canale} className="preferenze-page__notif-na" title="Non applicabile">—</span>
+                                ))}
                             </div>
                         ))}
                     </div>

@@ -66,6 +66,7 @@ import GestioneMestieri from './components/GestioneMestieri'
 import GestioneLuoghiMestiere from './components/GestioneLuoghiMestiere'
 import ContattaModerazione from './components/ContattaModerazione'
 import SkillDescModal  from './components/SkillDescModal'
+import NotificationPopup from './components/NotificationPopup'
 import GestioneBacheche from './components/GestioneBacheche'
 import GestioneMappe   from './components/GestioneMappe'
 import GestioneLuoghi  from './components/GestioneLuoghi'
@@ -172,6 +173,9 @@ window.CT.register('ContattaModerazione', ContattaModerazione)
 
 /** Modale globale descrizione abilità — pilotato via window.CT.openSkillDesc() */
 window.CT.register('SkillDescModal', SkillDescModal)
+
+/** Toast globale canale notifiche "Popup" — ascolta l'evento socket notification:popup */
+window.CT.register('NotificationPopup', NotificationPopup)
 
 /** Pannello admin gestione bacheche (sezioni forum/araldo): lista, form CRUD */
 window.CT.register('GestioneBacheche', GestioneBacheche)
