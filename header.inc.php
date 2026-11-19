@@ -240,6 +240,9 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
 
             if (document.getElementById('skill-desc-modal-container'))
                 CT.mount('SkillDescModal', 'skill-desc-modal-container', {});
+
+            if (document.getElementById('notification-popup-container'))
+                CT.mount('NotificationPopup', 'notification-popup-container', {});
         });
         </script>
         <?php endif; ?>
@@ -248,6 +251,7 @@ if(($PARAMETERS['mode']['user_bbcode'] == 'ON' && $PARAMETERS['settings']['user_
 <?php if (!empty($_SESSION['login'])): ?>
 <div id="chatbot-widget-container"></div>
 <div id="skill-desc-modal-container"></div>
+<div id="notification-popup-container"></div>
 <?php endif; ?>
 <?php endif; // ct_is_guest_home ?>
 <?php

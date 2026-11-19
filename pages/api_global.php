@@ -1191,21 +1191,25 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // Solo lettura, $_SESSION resta disponibile dopo il write_close iniziale.
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
-            $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta', 'calendario_nuovo_impegno'];
+            $eventi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta', 'calendario_nuovo_impegno', 'ingresso_stanza'];
             $prefs  = [];
-            foreach ($eventi as $ev) $prefs[$ev] = ['dm' => 1, 'email' => 0]; // default
-            $prefs['chat_off_non_letta']       = ['dm' => 0, 'email' => 0]; // default OFF: chat molto attiva, ON di default sarebbe invasivo
-            $prefs['calendario_nuovo_impegno'] = ['dm' => 0, 'email' => 0]; // default OFF: gia' visibile nel proprio calendario
+            foreach ($eventi as $ev) $prefs[$ev] = ['dm' => 1, 'email' => 0, 'popup' => 1]; // default
+            $prefs['chat_off_non_letta']       = ['dm' => 0, 'email' => 0, 'popup' => 0]; // default OFF: chat molto attiva, ON di default sarebbe invasivo
+            $prefs['calendario_nuovo_impegno'] = ['dm' => 0, 'email' => 0, 'popup' => 0]; // default OFF: gia' visibile nel proprio calendario
+            $prefs['ingresso_stanza']          = ['dm' => 0, 'email' => 0, 'popup' => 0]; // solo popup applicabile, default OFF: puo' essere frequente
 
-            $res = gdrcd_query("SELECT evento, via_dm, via_email FROM preferenze_notifiche
+            $res = gdrcd_query("SELECT evento, via_dm, via_email, via_popup FROM preferenze_notifiche
                 WHERE nome = '$login_f'", 'result');
             while ($row = gdrcd_query($res, 'fetch')) {
                 if (isset($prefs[$row['evento']])) {
-                    $prefs[$row['evento']] = ['dm' => (int)$row['via_dm'], 'email' => (int)$row['via_email']];
+                    $prefs[$row['evento']] = ['dm' => (int)$row['via_dm'], 'email' => (int)$row['via_email'], 'popup' => (int)$row['via_popup']];
                 }
             }
             gdrcd_query($res, 'free');
             $prefs['nuovo_dm']['dm'] = 0; // non applicabile (vedi commento sopra), forzato dopo il merge
+            // ingresso_stanza: solo popup e' applicabile, forzati dopo il merge indipendentemente da cosa c'e' a DB.
+            $prefs['ingresso_stanza']['dm'] = 0;
+            $prefs['ingresso_stanza']['email'] = 0;
 
             echo json_encode(['success' => true, 'prefs' => $prefs]);
             break;
@@ -1215,18 +1219,20 @@ if(isset($_GET['op']) && $_GET['op'] != '') {
             // dopo il write_close iniziale, non serve riaprire la sessione.
             $login_f = gdrcd_filter('in', $_SESSION['login']);
 
-            $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta', 'calendario_nuovo_impegno'];
+            $eventi_validi = ['commento_post_seguito', 'commento_post_commentato', 'commento_post_proprio', 'nuovo_dm', 'chat_off_non_letta', 'calendario_nuovo_impegno', 'ingresso_stanza'];
             foreach (($data['prefs'] ?? []) as $evento => $canali) {
                 if (!in_array($evento, $eventi_validi, true)) continue; // ignora chiavi non valide/impreviste
 
-                // nuovo_dm: via_dm non applicabile (vedi getNotificationPrefs), sempre 0
-                // indipendentemente da cosa arriva dal client.
-                $via_dm    = ($evento !== 'nuovo_dm' && !empty($canali['dm'])) ? 1 : 0;
-                $via_email = !empty($canali['email']) ? 1 : 0;
+                // nuovo_dm: via_dm non applicabile (vedi getNotificationPrefs), sempre 0.
+                // ingresso_stanza: via_dm/via_email non applicabili, solo popup.
+                // Indipendentemente da cosa arriva dal client.
+                $via_dm    = (!in_array($evento, ['nuovo_dm', 'ingresso_stanza'], true) && !empty($canali['dm'])) ? 1 : 0;
+                $via_email = ($evento !== 'ingresso_stanza' && !empty($canali['email'])) ? 1 : 0;
+                $via_popup = !empty($canali['popup']) ? 1 : 0;
 
-                gdrcd_query("INSERT INTO preferenze_notifiche (nome, evento, via_dm, via_email)
-                    VALUES ('$login_f', '$evento', $via_dm, $via_email)
-                    ON DUPLICATE KEY UPDATE via_dm = VALUES(via_dm), via_email = VALUES(via_email)");
+                gdrcd_query("INSERT INTO preferenze_notifiche (nome, evento, via_dm, via_email, via_popup)
+                    VALUES ('$login_f', '$evento', $via_dm, $via_email, $via_popup)
+                    ON DUPLICATE KEY UPDATE via_dm = VALUES(via_dm), via_email = VALUES(via_email), via_popup = VALUES(via_popup)");
             }
 
             echo json_encode(['success' => true]);

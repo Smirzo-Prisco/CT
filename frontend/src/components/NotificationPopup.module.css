@@ -1,0 +1,86 @@
+/* NotificationPopup.module.css — stili scoped per NotificationPopup.jsx */
+
+.stack {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 9500;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    max-width: calc(100vw - 32px);
+    pointer-events: none;
+}
+
+.popup {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 320px;
+    max-width: 100%;
+    padding: 12px 14px;
+    background: linear-gradient(160deg, #161b35, #0b0d1e);
+    border: 1px solid rgba(218, 168, 50, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgb(0 0 0 / 50%);
+    pointer-events: auto;
+    animation: popupIn 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #daa832;
+    font-size: 15px;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #daa832;
+}
+
+.text {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #e8e6e3;
+    word-break: break-word;
+}
+
+.close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: #8a93a8;
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 1;
+    padding: 4px;
+    margin: -4px -4px -4px 0;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.close:hover {
+    background: rgba(218, 168, 50, 0.12);
+    color: #daa832;
+}
+
+@keyframes popupIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+    .stack { right: 8px; left: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+    .popup { width: 100%; }
+}
